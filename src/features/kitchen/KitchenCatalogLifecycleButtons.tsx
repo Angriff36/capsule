@@ -1,8 +1,13 @@
+import type { ReactNode } from "react";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { ActionMenuRule } from "../../ui/primitives";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import type { KitchenSection } from "./kitchenRoutes";
 
 const policy = new CulinaryLifecyclePolicy();
+
+/** Actions that remove or hide the record — always last, always red. */
+const DESTRUCTIVE = new Set(["purge", "archive"]);
 
 type Commands = {
   purgeIngredient: (args: Record<string, unknown>) => Promise<unknown>;
@@ -28,6 +33,11 @@ type Props = {
   showHidden?: boolean;
   run: (key: string, work: () => Promise<void>) => Promise<void>;
   commands: Commands;
+  /**
+   * Wraps the rendered action buttons (e.g. in an overflow menu). Receives
+   * null when the record has no actions. Defaults to an inline button row.
+   */
+  render?: (buttons: ReactNode | null) => ReactNode;
 };
 
 export function KitchenCatalogLifecycleButtons({
@@ -37,6 +47,7 @@ export function KitchenCatalogLifecycleButtons({
   showHidden = false,
   run,
   commands,
+  render,
 }: Props) {
   const { prompt, host } = useActionPrompt();
   const deletedAt = item.deletedAt ?? null;
@@ -54,7 +65,6 @@ export function KitchenCatalogLifecycleButtons({
             ? [{ key: "purge", label: "Delete" }]
             : []
           : policy.menuActions(String(item.status));
-  if (!actions.length) return null;
 
   const invoke = (key: string) => {
     void (async () => {
@@ -100,20 +110,45 @@ export function KitchenCatalogLifecycleButtons({
     })();
   };
 
+  const safe = actions.filter((action) => !DESTRUCTIVE.has(action.key));
+  const destructive = actions.filter((action) => DESTRUCTIVE.has(action.key));
+  const button = (action: { key: string; label: string }, danger: boolean) => (
+    <button
+      key={action.key}
+      type="button"
+      className={
+        render ? (danger ? "action-menu-danger" : "") : "btn btn-ghost btn-sm"
+      }
+      disabled={busy != null}
+      onClick={() => invoke(action.key)}
+    >
+      {busy === `${item._id}:${action.key}` ? "Working…" : action.label}
+    </button>
+  );
+  const buttons =
+    actions.length === 0 ? null : (
+      <>
+        {safe.map((action) => button(action, false))}
+        {render && safe.length > 0 && destructive.length > 0 ? (
+          <ActionMenuRule />
+        ) : null}
+        {destructive.map((action) => button(action, true))}
+      </>
+    );
+
+  if (render) {
+    return (
+      <>
+        {host}
+        {render(buttons)}
+      </>
+    );
+  }
+  if (!buttons) return null;
   return (
     <div className="culinary-row-actions">
       {host}
-      {actions.map((action) => (
-        <button
-          key={action.key}
-          type="button"
-          className="btn btn-ghost btn-sm"
-          disabled={busy != null}
-          onClick={() => invoke(action.key)}
-        >
-          {busy === `${item._id}:${action.key}` ? "Working…" : action.label}
-        </button>
-      ))}
+      {buttons}
     </div>
   );
 }

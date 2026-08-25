@@ -1,0 +1,190 @@
+// AUTHOR SEAM — the notification tray as ONE server query.
+//
+// Before this seam, NotificationTray held twelve whole-table subscriptions
+// (listEvent, listPerson, listShift, …) on every page of the app. Each of
+// those generated list queries also projects relations per row (N+1
+// db.get). Every auth-token refresh or socket reconnect re-ran all twelve,
+// which is how a single open production tab burned ~1.5M query calls on
+// 2026-08-19/20 (see Convex usage: 12 queries × ~121K, 421 mutations).
+//
+// This query reads the same tables once, with no relation projection and no
+// decryption (deriveNotifications touches no encrypted field), and returns
+// only the derived notification list. Additive READ only — no manifest
+// change, no regen, no schema change (docs/architecture/domain-gating-restraint.md).
+//
+// Access mirrors each entity's generated read policy in convex/queries.ts so
+// the seam widens nothing: a source is included only when the caller's role
+// passes that entity's read capability. checkRole / ROLE_PERMISSIONS are
+// generated as non-exported locals, so the role → capability map is mirrored
+// here (same pattern as sourceProvenance.ts / hiringPipeline.ts). Keep in
+// sync with src/foundation/base.manifest if a role grant moves.
+import { query } from "./_generated/server";
+import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
+import { getAuthContext, type AppAuthContext } from "./lib/authContext";
+import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
+
+const ALL_ACCESS = [
+  "eventAccess",
+  "financeAccess",
+  "inventoryAccess",
+  "kitchenAccess",
+  "manageAccess",
+  "procurementAccess",
+  "salesAccess",
+  "staffAccess",
+  "workforceAccess",
+  "workforceManageAccess",
+];
+
+// Only the capabilities the twelve read guards below consult.
+const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
+  admin: ALL_ACCESS,
+  owner: ALL_ACCESS,
+  system: ALL_ACCESS,
+  manager: ["manageAccess", "staffAccess"],
+  staff: ["staffAccess"],
+  driver: ["staffAccess"],
+  event_manager: ["eventAccess", "manageAccess", "staffAccess"],
+  event_staff: ["eventAccess", "staffAccess"],
+  finance_manager: ["financeAccess", "manageAccess", "staffAccess"],
+  finance_staff: ["financeAccess", "staffAccess"],
+  inventory_manager: [
+    "inventoryAccess",
+    "manageAccess",
+    "procurementAccess",
+    "staffAccess",
+  ],
+  inventory_staff: ["inventoryAccess", "staffAccess"],
+  kitchen_lead: ["kitchenAccess", "staffAccess"],
+  kitchen_manager: ["kitchenAccess", "manageAccess", "staffAccess"],
+  kitchen_staff: ["kitchenAccess", "staffAccess"],
+  logistics_manager: ["manageAccess", "staffAccess"],
+  logistics_staff: ["staffAccess"],
+  procurement_staff: ["inventoryAccess", "procurementAccess", "staffAccess"],
+  sales_manager: ["manageAccess", "salesAccess", "staffAccess"],
+  sales_staff: ["salesAccess", "staffAccess"],
+  workforce_manager: [
+    "manageAccess",
+    "staffAccess",
+    "workforceAccess",
+    "workforceManageAccess",
+  ],
+  workforce_staff: ["staffAccess", "workforceAccess"],
+};
+
+function can(auth: AppAuthContext, ...capabilities: string[]): boolean {
+  const granted = ROLE_CAPABILITIES[auth.role] ?? [];
+  return capabilities.some(
+    (capability) =>
+      granted.includes(capability) &&
+      !orgCapabilityDeniesAction(capability, auth.disabledCapabilities),
+  );
+}
+
+export const listNotifications = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = auth.tenantId;
+    if (!tenantId) return [];
+
+    const byTenant = <T>(q: { eq: (field: "tenantId", value: string) => T }) =>
+      q.eq("tenantId", tenantId);
+    const when = <T>(allowed: boolean, read: () => Promise<T>) =>
+      allowed ? read() : Promise.resolve(undefined);
+
+    // One guard per source, each the same capability test as the generated
+    // list<Entity> query in convex/queries.ts.
+    const [
+      events,
+      incidents,
+      invoices,
+      inventoryItems,
+      ingredients,
+      shifts,
+      people,
+      qualifications,
+      timeOffRequests,
+      vendorOrders,
+      staffMessages,
+      prepTaskComments,
+    ] = await Promise.all([
+      when(can(auth, "eventAccess", "salesAccess"), () =>
+        ctx.db.query("events").withIndex("by_tenantId", byTenant).collect(),
+      ),
+      when(can(auth, "eventAccess", "kitchenAccess"), () =>
+        ctx.db.query("incidents").withIndex("by_tenantId", byTenant).collect(),
+      ),
+      when(can(auth, "financeAccess", "manageAccess"), () =>
+        ctx.db.query("invoices").withIndex("by_tenantId", byTenant).collect(),
+      ),
+      when(can(auth, "inventoryAccess"), () =>
+        ctx.db
+          .query("inventoryItems")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
+      when(can(auth, "kitchenAccess"), () =>
+        ctx.db
+          .query("ingredients")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
+      when(can(auth, "workforceAccess"), () =>
+        ctx.db.query("shifts").withIndex("by_tenantId", byTenant).collect(),
+      ),
+      when(can(auth, "staffAccess"), () =>
+        ctx.db.query("people").withIndex("by_tenantId", byTenant).collect(),
+      ),
+      when(can(auth, "workforceAccess"), () =>
+        ctx.db
+          .query("qualifications")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
+      // Row policy: workforceManageAccess, or the requester's own row. Own
+      // rows never notify, so only the manage capability matters here.
+      when(can(auth, "workforceManageAccess"), () =>
+        ctx.db
+          .query("timeOffRequests")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
+      when(can(auth, "procurementAccess", "manageAccess"), () =>
+        ctx.db
+          .query("vendorOrders")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
+      when(can(auth, "staffAccess"), () =>
+        ctx.db
+          .query("staffMessages")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
+      when(can(auth, "kitchenAccess", "manageAccess"), () =>
+        ctx.db
+          .query("prepTaskComments")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ),
+    ]);
+
+    return deriveNotifications({
+      now: Date.now(),
+      currentAuthSubjectId: auth.id || undefined,
+      events,
+      incidents,
+      invoices,
+      inventoryItems,
+      ingredients,
+      shifts,
+      people,
+      qualifications,
+      timeOffRequests,
+      vendorOrders,
+      staffMessages,
+      prepTaskComments,
+    });
+  },
+});

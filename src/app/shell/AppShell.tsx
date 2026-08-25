@@ -68,7 +68,7 @@ export function AppShell() {
         )}
         <AnnouncementBanner />
         <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
-          <div className="workspace-sheet mx-auto max-w-[1440px] px-12 py-11 max-xl:px-8 max-md:px-5 max-md:py-7">
+          <div className="workspace-sheet px-6 py-4 max-md:px-4 max-md:py-3">
             <PageGuide />
             <RouteErrorBoundary>
               <Outlet />

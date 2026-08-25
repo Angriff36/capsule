@@ -240,11 +240,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
     <div className="component-book-stage culinary-studio">
       <header className="component-book-masthead">
         <div>
-          <p className="eyebrow">Culinary book · {title}</p>
-          <h1 className="display-title mt-2">The house book</h1>
-          <p className="mt-3 max-w-150 text-ink-2">
-            Browse and open {section} as cards — then drill into the record that
-            needs work.
+          <h1 className="text-xl font-semibold tracking-tight text-ink">
+            {title}
+          </h1>
+          <p className="mt-0.5 text-sm text-ink-2">
+            Browse and open {section} — then drill into the record that needs
+            work.
           </p>
         </div>
         <div className="component-book-masthead-actions">
@@ -282,13 +283,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
 
       <section className="component-catalog">
         <div className="component-index-heading">
-          <div>
-            <p className="eyebrow">Live index</p>
-            <h2 className="font-display mt-1 text-2xl">{title}</h2>
-          </div>
-          <span className="font-mono text-xs text-ink-3">
-            {formatCountNoun(rows.length, "record")}
-          </span>
+          <h2 className="text-lg font-semibold text-ink">
+            All {section}
+            <span className="ml-2 text-sm font-medium text-ink-2">
+              {formatCountNoun(rows.length, "record")}
+            </span>
+          </h2>
         </div>
         <div className="component-toolbar">
           <label className="component-search">
@@ -296,13 +296,14 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder={`Search ${section}…`}
+              placeholder={`Search ${section} by name or category…`}
+              aria-label={`Search ${section}`}
             />
           </label>
           {section === "dishes" ||
           section === "ingredients" ||
           section === "components" ? (
-            <label className="flex items-center gap-2 text-xs text-ink-2">
+            <label className="flex items-center gap-2 text-sm font-medium text-ink-2">
               <input
                 type="checkbox"
                 checked={showHidden}
@@ -328,13 +329,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                 <span />
               </div>
               <div>
-                <p className="eyebrow">Blank first edition</p>
-                <h3 className="font-display mt-2 text-3xl">
-                  Every kitchen needs a house book.
+                <h3 className="text-xl font-semibold text-ink">
+                  No {section} yet
                 </h3>
-                <p className="mt-3 max-w-110 text-ink-2">
-                  Create the first {KITCHEN_SECTION_SINGULAR[section]} through
-                  the generated Manifest command.
+                <p className="mt-2 max-w-110 text-ink-2">
+                  Add the first {KITCHEN_SECTION_SINGULAR[section]} with the
+                  button above.
                 </p>
               </div>
             </div>

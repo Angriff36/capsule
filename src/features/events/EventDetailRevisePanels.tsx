@@ -123,7 +123,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
       description="Update schedule, headcount, venue, pricing, contact, and planning notes for this event."
       testId="event-setup-basics-panel"
     >
-      <div className="grid gap-3 lg:grid-cols-3">
+      <div className="grid gap-4 lg:grid-cols-3">
         <EventFormCluster
           title="Schedule"
           hint="When the event starts and ends"

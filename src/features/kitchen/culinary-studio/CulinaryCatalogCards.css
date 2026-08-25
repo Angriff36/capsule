@@ -1,196 +1,26 @@
-/* Per-entry distinctness: kind tint, status chips, layered type. */
-
-.culinary-card--components {
-  --card-kind: var(--color-brand);
-  --card-kind-soft: color-mix(
-    in srgb,
-    var(--color-brand) 12%,
-    var(--color-panel)
-  );
-  --card-kind-ink: var(--color-brand);
-}
-
-.culinary-card--ingredients {
-  --card-kind: var(--color-info);
-  --card-kind-soft: var(--color-info-soft);
-  --card-kind-ink: var(--color-info);
-}
-
-.culinary-card--dishes {
-  --card-kind: var(--color-accent);
-  --card-kind-soft: var(--color-accent-soft);
-  --card-kind-ink: var(--color-accent-deep);
-}
-
-.culinary-card--menus {
-  --card-kind: #6b5b8c;
-  --card-kind-soft: color-mix(in srgb, #6b5b8c 14%, var(--color-panel));
-  --card-kind-ink: #5a4a78;
-}
-
-.dark .culinary-card--menus {
-  --card-kind: #b7a6d9;
-  --card-kind-soft: color-mix(in srgb, #b7a6d9 16%, var(--color-panel));
-  --card-kind-ink: #cbbce8;
-}
-
-.culinary-card[class*="culinary-card--"] {
-  background: linear-gradient(
-    165deg,
-    var(--card-kind-soft) 0%,
-    var(--color-panel) 42%
-  );
-}
-
-.culinary-card[class*="culinary-card--"]::before {
-  background: var(--card-kind);
-  top: 0.55rem;
-  bottom: 0.55rem;
-}
-
-.culinary-card[class*="culinary-card--"]:hover {
-  border-color: color-mix(in srgb, var(--card-kind) 45%, var(--color-line));
-  box-shadow: 0 12px 28px color-mix(in srgb, var(--card-kind) 16%, transparent);
-}
-
-.culinary-card[class*="culinary-card--"]:hover::before {
-  background: var(--card-kind);
-}
-
-.culinary-card-kicker {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.15rem;
-}
-
-.culinary-card-kind {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--card-kind-ink);
-}
-
-.culinary-card-status {
-  display: inline-flex;
-  align-items: center;
-  border-radius: 999px;
-  padding: 0.18rem 0.55rem;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: 1px solid transparent;
-}
+/* Catalog cards: status chip colors only. Kind tints, spines, gradients and
+   tracked micro text are gone — the card is a plain white surface. */
 
 .culinary-card-status.is-live {
   color: var(--color-ok);
   background: var(--color-ok-soft);
-  border-color: color-mix(in srgb, var(--color-ok) 28%, transparent);
+  border-color: color-mix(in srgb, var(--color-ok) 30%, transparent);
 }
 
 .culinary-card-status.is-draft {
   color: var(--color-info);
   background: var(--color-info-soft);
-  border-color: color-mix(in srgb, var(--color-info) 28%, transparent);
+  border-color: color-mix(in srgb, var(--color-info) 30%, transparent);
 }
 
 .culinary-card-status.is-quiet {
-  color: var(--color-ink-3);
-  background: var(--color-mute-soft);
-  border-color: var(--color-line);
+  color: var(--color-ink-2);
+  background: var(--color-inset);
+  border-color: var(--color-line-2);
 }
 
 .culinary-card-status.is-warn {
   color: var(--color-warn);
   background: var(--color-warn-soft);
   border-color: color-mix(in srgb, var(--color-warn) 30%, transparent);
-}
-
-.culinary-card-glyph {
-  display: grid;
-  place-items: center;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 11px;
-  background: color-mix(in srgb, var(--card-kind) 16%, var(--color-panel));
-  border: 1px solid color-mix(in srgb, var(--card-kind) 28%, transparent);
-  color: var(--card-kind-ink);
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 500;
-  line-height: 1;
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 35%, transparent);
-}
-
-.culinary-card-title {
-  font-size: clamp(1.25rem, 2vw, 1.55rem);
-  font-weight: 500;
-  color: var(--color-ink);
-}
-
-.culinary-card-desc {
-  margin-top: 0.45rem;
-  font-size: 0.8rem;
-  font-weight: 400;
-  font-style: italic;
-  color: var(--color-ink-2);
-  border-left: 2px solid color-mix(in srgb, var(--card-kind) 35%, transparent);
-  padding-left: 0.55rem;
-}
-
-.culinary-card-desc.is-empty {
-  font-style: normal;
-  color: var(--color-ink-3);
-  opacity: 0.85;
-}
-
-.culinary-card-meta > span {
-  border-color: color-mix(in srgb, var(--card-kind) 22%, transparent);
-  background: color-mix(in srgb, var(--card-kind) 9%, var(--color-panel));
-  color: var(--card-kind-ink);
-}
-
-.culinary-card-meta > span.is-unit {
-  border-color: color-mix(in srgb, var(--color-ink) 14%, transparent);
-  background: var(--color-inset);
-  color: var(--color-ink-2);
-  font-family: var(--font-mono);
-  letter-spacing: 0.02em;
-  text-transform: none;
-  font-weight: 600;
-}
-
-.culinary-card-meta > span.is-flag {
-  border-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
-  background: var(--color-accent-soft);
-  color: var(--color-accent-deep);
-}
-
-.culinary-card-foot {
-  margin-top: 0.55rem;
-  padding-top: 0.45rem;
-  border-top: 1px solid color-mix(in srgb, var(--color-line) 85%, transparent);
-}
-
-.culinary-card-foot .culinary-card-version {
-  color: var(--color-ink-3);
-  font-weight: 500;
-}
-
-.culinary-card-foot .culinary-card-open {
-  color: var(--card-kind-ink);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  font-size: 0.62rem;
-}
-
-.culinary-card-link:hover .culinary-card-open {
-  text-decoration: underline;
-  text-underline-offset: 2px;
 }

@@ -1,24 +1,27 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useMobileViewport } from "../shell/useMobileViewport";
+import { XIcon } from "../../ui/icons";
 import { guideForPath } from "./pageGuides";
 
 const seenKey = (prefix: string) => `capsule-guide-seen:${prefix}`;
 
 /**
- * "What's this page?" — a plain-language purpose card for every screen.
- * Opens automatically the first time someone lands on a section, then stays
- * available as a small pill. Presentation only; remembers dismissal per
- * section in localStorage.
+ * Compact onboarding: one line of purpose plus the tips, shown once per
+ * section on desktop until dismissed. On phones nothing opens by itself —
+ * a small "?" button reveals the same line on demand. The same button stays
+ * on desktop after dismissal so help is never lost.
  */
 export function PageGuide() {
   const { pathname } = useLocation();
   const guide = guideForPath(pathname);
+  const mobile = useMobileViewport();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (!guide) return;
-    setOpen(localStorage.getItem(seenKey(guide.prefix)) == null);
-  }, [guide?.prefix]);
+    setOpen(!mobile && localStorage.getItem(seenKey(guide.prefix)) == null);
+  }, [guide?.prefix, mobile]);
 
   if (!guide) return null;
 
@@ -29,56 +32,37 @@ export function PageGuide() {
 
   if (!open) {
     return (
-      <div className="mb-3 flex justify-end">
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm text-ink-3"
-          onClick={() => setOpen(true)}
-        >
-          <span
-            aria-hidden="true"
-            className="grid h-3.5 w-3.5 place-items-center rounded-full border border-current text-2xs font-semibold"
-          >
-            ?
-          </span>
-          What's this page?
-        </button>
-      </div>
+      <button
+        type="button"
+        className="fixed top-[72px] right-3 z-20 grid h-8 w-8 place-items-center rounded-full border border-line bg-panel text-sm font-bold text-ink-2 shadow-[0_2px_8px_-2px_rgb(30_40_36/0.2)]"
+        aria-label={`About ${guide.title}`}
+        title={`About ${guide.title}`}
+        onClick={() => setOpen(true)}
+      >
+        ?
+      </button>
     );
   }
 
   return (
     <aside
-      className="mb-4 rounded-sm border border-brand/25 bg-brand-soft/50 px-4 py-3"
+      className="mb-3 flex items-start gap-3 rounded-sm border border-info/30 bg-info-soft px-3 py-2 text-sm text-ink"
       aria-label={`About ${guide.title}`}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="eyebrow text-brand">
-            {guide.title} — what this page is for
-          </p>
-          <p className="mt-1 max-w-3xl text-base leading-relaxed text-ink">
-            {guide.purpose}
-          </p>
-          <ol className="mt-2 max-w-3xl space-y-1 text-sm leading-relaxed text-ink-2">
-            {guide.steps.map((step, index) => (
-              <li key={step} className="flex gap-2">
-                <span className="font-mono text-xs text-brand">
-                  {index + 1}.
-                </span>
-                {step}
-              </li>
-            ))}
-          </ol>
-        </div>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={dismiss}
-        >
-          Got it
-        </button>
-      </div>
+      <p className="min-w-0 flex-1 leading-snug">
+        <strong className="font-semibold">{guide.title}.</strong>{" "}
+        {guide.purpose}{" "}
+        <span className="text-ink-2">{guide.steps.join(" · ")}</span>
+      </p>
+      <button
+        type="button"
+        className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-xs text-ink-2 hover:bg-panel hover:text-ink"
+        aria-label="Dismiss"
+        title="Dismiss"
+        onClick={mobile ? () => setOpen(false) : dismiss}
+      >
+        <XIcon width={13} height={13} />
+      </button>
     </aside>
   );
 }

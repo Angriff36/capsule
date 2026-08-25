@@ -7,14 +7,8 @@ import {
   useListVendorOrderLine,
 } from "../../lib/manifest-convex-react";
 import { formatCount, formatDate, formatMoneyExact } from "../../lib/format";
-import {
-  EmptyState,
-  PageHeader,
-  Section,
-  Skeleton,
-  StatusChip,
-  TableSkeleton,
-} from "../../ui/primitives";
+import { ChevronRightIcon } from "../../ui/icons";
+import { PageHeader, Skeleton, StatusChip } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import {
   catalogUnitForStockLine,
@@ -35,19 +29,17 @@ const QUICK_LINKS = [
   {
     label: "Demand ledger",
     path: "/inventory/demand",
-    description:
-      "Event-scoped ingredient requirements flowing into purchasing.",
+    description: "Ingredient needs by event, flowing into purchasing.",
   },
   {
     label: "Stock book",
     path: "/inventory/stock",
-    description:
-      "Stock by ingredient and location, reorder alerts, reservations.",
+    description: "On-hand by ingredient and location, with reorder points.",
   },
   {
     label: "Counts",
     path: "/inventory/counts",
-    description: "Physical count sessions reconciled against the book.",
+    description: "Physical counts reconciled against the book.",
   },
   {
     label: "Audit log",
@@ -57,31 +49,42 @@ const QUICK_LINKS = [
   {
     label: "Waste",
     path: "/inventory/waste",
-    description: "Spoilage and loss records with reasons and cost impact.",
+    description: "Spoilage and loss with reasons and cost.",
   },
   {
     label: "Lot trace",
     path: "/inventory/traceability",
-    description: "Supplier lots traced from receipt through consumption.",
+    description: "Supplier lots from receipt through use.",
   },
   {
     label: "Purchasing",
     path: "/inventory/purchasing",
-    description: "Weekly drafts, purchase needs, and vendor order folios.",
+    description: "Weekly drafts, purchase needs, vendor orders.",
   },
   {
     label: "Contracts",
     path: "/inventory/contracts",
-    description: "Vendor agreements and negotiated pricing terms.",
+    description: "Vendor agreements and negotiated pricing.",
   },
 ] as const;
+
+type Urgency = "now" | "soon" | "watch";
 
 type AttentionRow = {
   key: string;
   to: string;
+  urgency: Urgency;
+  urgencyLabel: string;
   title: string;
-  detail: string;
+  reason: string;
   status: string;
+  actionLabel: string;
+};
+
+const URGENCY_CHIP: Record<Urgency, string> = {
+  now: "border-danger/30 bg-danger-soft text-danger",
+  soon: "border-warn/30 bg-warn-soft text-warn",
+  watch: "border-info/30 bg-info-soft text-info",
 };
 
 export function InventoryOverviewPage() {
@@ -136,114 +139,233 @@ export function InventoryOverviewPage() {
   );
 
   const attention: AttentionRow[] = [
-    ...lowStockItems.map((item) => ({
-      key: item._id,
-      to: stockLineLink(item._id),
-      title: ingredientName(item.ingredientId),
-      detail: `${Number(item.quantityOnHand)} of reorder ${Number(item.reorderThreshold)} ${catalogUnitForStockLine(item, ingredients ?? [])} on hand`,
-      status: "reorder now",
-    })),
+    ...lowStockItems.map((item) => {
+      const onHand = Number(item.quantityOnHand);
+      const out = onHand <= 0;
+      return {
+        key: item._id,
+        to: stockLineLink(item._id),
+        urgency: (out ? "now" : "soon") as Urgency,
+        urgencyLabel: out ? "Out of stock" : "Low stock",
+        title: ingredientName(item.ingredientId),
+        reason: `${onHand} on hand · reorder at ${Number(item.reorderThreshold)} ${catalogUnitForStockLine(item, ingredients ?? [])}`,
+        status: "reorder now",
+        actionLabel: "Open stock line",
+      };
+    }),
     ...awaitingReceipt.map((order) => ({
       key: order._id,
       to: `/inventory/orders/${order._id}`,
+      urgency: (String(order.status) === "partially_received"
+        ? "soon"
+        : "watch") as Urgency,
+      urgencyLabel:
+        String(order.status) === "partially_received"
+          ? "Partly received"
+          : "Awaiting receipt",
       title: `${vendorName(order.vendorId)} order`,
-      detail: `${formatMoneyExact(vendorOrderHeaderTotal(order, lines))}${
+      reason: `${formatMoneyExact(vendorOrderHeaderTotal(order, lines))}${
         order.sourceRangeStart != null
           ? ` · week of ${formatDate(order.sourceRangeStart)}`
           : ""
       }`,
       status: String(order.status),
+      actionLabel: "Receive order",
     })),
   ].slice(0, 8);
 
-  const kpis = [
-    { label: "Below reorder", value: formatCount(lowStockItems.length) },
-    { label: "Open vendor orders", value: formatCount(openOrders.length) },
-    { label: "Awaiting receipt", value: formatCount(awaitingReceipt.length) },
-    { label: "Weekly draft total", value: formatMoneyExact(weeklyDraftTotal) },
+  const metrics: {
+    label: string;
+    value: string;
+    hint: string;
+    tone: "neutral" | "warn" | "info" | "ok";
+    to: string;
+  }[] = [
+    {
+      label: "Below reorder",
+      value: formatCount(lowStockItems.length),
+      hint:
+        lowStockItems.length > 0
+          ? "Stock lines under their reorder point"
+          : "All tracked stock is at or above reorder",
+      tone: lowStockItems.length > 0 ? "warn" : "ok",
+      to: "/inventory/stock",
+    },
+    {
+      label: "Open vendor orders",
+      value: formatCount(openOrders.length),
+      hint: "Drafts plus orders sent to vendors",
+      tone: "neutral",
+      to: "/inventory/purchasing",
+    },
+    {
+      label: "Awaiting receipt",
+      value: formatCount(awaitingReceipt.length),
+      hint: "Sent orders not fully received",
+      tone: awaitingReceipt.length > 0 ? "info" : "neutral",
+      to: "/inventory/purchasing",
+    },
+    {
+      label: "Weekly draft total",
+      value: formatMoneyExact(weeklyDraftTotal),
+      hint: `${formatCount(weeklyDrafts.length)} weekly draft${weeklyDrafts.length === 1 ? "" : "s"} waiting to send`,
+      tone: "neutral",
+      to: "/inventory/purchasing",
+    },
   ];
 
+  const toneClass = {
+    neutral: "border-line",
+    warn: "border-warn/50",
+    info: "border-info/50",
+    ok: "border-ok/50",
+  } as const;
+
   return (
-    <div className="operations-stage supply-stage">
+    <div className="space-y-5">
       <PageHeader
         title="Inventory"
-        lead="What's low, what's on order, and what needs receiving — before it becomes a service problem."
+        lead="What is low, on order, or waiting to be received."
+        actions={
+          <Link to="/inventory/purchasing" className="btn btn-primary">
+            Review purchasing
+          </Link>
+        }
       />
       <InventoryWorkspaceNav />
 
-      <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
-        {kpis.map((kpi) => (
-          <div key={kpi.label} className="bg-panel px-4 py-3">
-            <dt className="eyebrow">{kpi.label}</dt>
-            <dd className="mt-1 text-xl font-semibold text-ink">
-              {loading ? <Skeleton className="h-7 w-16" /> : kpi.value}
+      <dl className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+        {metrics.map((metric) => (
+          <Link
+            key={metric.label}
+            to={metric.to}
+            className={`card block border-t-4 px-5 py-4 transition-shadow hover:shadow-[0_4px_16px_-4px_rgb(30_40_36/0.18)] ${toneClass[metric.tone]}`}
+          >
+            <dt className="text-sm font-semibold text-ink-2">{metric.label}</dt>
+            <dd className="mt-1 text-3xl font-bold tracking-tight text-ink">
+              {loading ? <Skeleton className="h-9 w-20" /> : metric.value}
             </dd>
-          </div>
+            <dd className="mt-1 text-sm text-ink-2">{metric.hint}</dd>
+          </Link>
         ))}
       </dl>
 
-      <Section
-        title="Needs attention"
-        count={loading ? undefined : attention.length}
-      >
+      <section className="card" aria-labelledby="attention-title">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
+          <div>
+            <h2 id="attention-title" className="text-lg font-semibold text-ink">
+              Needs attention
+              {!loading ? (
+                <span className="ml-2 text-base font-medium text-ink-2">
+                  {attention.length}
+                </span>
+              ) : null}
+            </h2>
+            <p className="mt-0.5 text-sm text-ink-2">
+              Stock under its reorder point and vendor orders waiting to be
+              received, most urgent first.
+            </p>
+          </div>
+        </div>
         {loading ? (
-          <TableSkeleton rows={4} />
+          <div className="space-y-2 p-5">
+            <Skeleton className="h-12" />
+            <Skeleton className="h-12" />
+            <Skeleton className="h-12" />
+          </div>
         ) : attention.length === 0 ? (
-          <EmptyState
-            title="Nothing needs attention"
-            hint="Tracked stock is at or above its reorder point and no vendor orders are waiting on receipt."
-            action={
-              <>
-                <Link to="/inventory/stock" className="btn btn-ghost btn-sm">
+          <div className="grid gap-4 px-5 py-8 sm:grid-cols-[auto_1fr] sm:items-center">
+            <div className="grid h-12 w-12 place-items-center rounded-full bg-ok-soft text-xl font-bold text-ok">
+              ✓
+            </div>
+            <div>
+              <p className="text-base font-semibold text-ink">
+                Nothing needs attention right now
+              </p>
+              <p className="mt-0.5 text-sm text-ink-2">
+                Every tracked stock line is at or above its reorder point and no
+                vendor order is waiting on receipt. Good time to run a count or
+                review next week's draft.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link to="/inventory/counts" className="btn btn-secondary">
+                  Start a count
+                </Link>
+                <Link to="/inventory/stock" className="btn btn-ghost">
                   Open stock book
                 </Link>
-                <Link
-                  to="/inventory/purchasing"
-                  className="btn btn-primary btn-sm"
-                >
-                  Review purchasing
-                </Link>
-              </>
-            }
-          />
+              </div>
+            </div>
+          </div>
         ) : (
           <ul className="divide-y divide-line">
             {attention.map((row) => (
-              <li key={row.key}>
+              <li
+                key={row.key}
+                className="grid items-center gap-x-4 gap-y-2 px-5 py-3 md:grid-cols-[130px_minmax(0,1fr)_auto_auto]"
+              >
+                <span
+                  className={`chip justify-self-start ${URGENCY_CHIP[row.urgency]}`}
+                >
+                  {row.urgencyLabel}
+                </span>
+                <span className="min-w-0">
+                  <Link
+                    to={row.to}
+                    className="block truncate text-base font-semibold text-ink hover:underline"
+                  >
+                    {row.title}
+                  </Link>
+                  <span className="block text-sm text-ink-2">{row.reason}</span>
+                </span>
+                <StatusChip status={row.status} />
                 <Link
                   to={row.to}
-                  className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-inset"
+                  className="btn btn-secondary btn-sm justify-self-start md:justify-self-end"
                 >
-                  <span className="min-w-0">
-                    <span className="block truncate font-medium text-ink">
-                      {row.title}
-                    </span>
-                    <span className="block text-sm text-ink-3">
-                      {row.detail}
-                    </span>
-                  </span>
-                  <StatusChip status={row.status} />
+                  {row.actionLabel}
                 </Link>
               </li>
             ))}
           </ul>
         )}
-      </Section>
+      </section>
 
-      <Section title="Workspace">
-        <ul className="grid grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-y-0">
+      <section aria-labelledby="workspace-title">
+        <h2
+          id="workspace-title"
+          className="mb-3 text-lg font-semibold text-ink"
+        >
+          Workspace
+        </h2>
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {QUICK_LINKS.map((link) => (
             <li key={link.path}>
-              <Link to={link.path} className="block px-3 py-2.5 hover:bg-inset">
-                <span className="block font-medium text-ink">{link.label}</span>
-                <span className="block text-sm text-ink-3">
-                  {link.description}
+              <Link
+                to={link.path}
+                className="card group flex h-full items-start gap-3 px-4 py-4 transition-shadow hover:shadow-[0_4px_16px_-4px_rgb(30_40_36/0.18)]"
+              >
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-brand-soft text-base font-bold text-brand">
+                  {link.label.slice(0, 1)}
                 </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-base font-semibold text-ink">
+                    {link.label}
+                  </span>
+                  <span className="block text-sm text-ink-2">
+                    {link.description}
+                  </span>
+                </span>
+                <ChevronRightIcon
+                  className="mt-1 shrink-0 text-ink-3 group-hover:text-ink"
+                  width={14}
+                  height={14}
+                />
               </Link>
             </li>
           ))}
         </ul>
-      </Section>
+      </section>
     </div>
   );
 }

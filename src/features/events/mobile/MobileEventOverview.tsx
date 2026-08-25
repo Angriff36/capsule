@@ -7,16 +7,24 @@ import {
   MobileNotesCard,
 } from "./MobileEventInfoCards";
 import {
-  MobileFactsCard,
   MobileMenuCard,
   MobileStaffCard,
   MobileTimelineCard,
 } from "./MobileEventReadCards";
+import { EventSetupProgress } from "../EventSetupProgress";
 import { MobilePackListCard } from "./MobilePackListCard";
 import { MobilePrepCard } from "./MobilePrepCard";
 
+type SetupFlags = {
+  hasAssignedClient?: boolean;
+  hasExpectedHeadcount?: boolean;
+  hasMenuDishes?: boolean;
+  hasStaffAssigned?: boolean;
+};
+
 type Props = {
-  readonly event: Doc<"events">;
+  /** Event row plus the isSetupReady computeds the getEvent query returns. */
+  readonly event: Doc<"events"> & SetupFlags;
   readonly venue: { name: string } | null | undefined;
   readonly clients: readonly ({ _id: string } | null | undefined)[] | undefined;
   readonly dishes: readonly Doc<"dishes">[] | undefined;
@@ -48,12 +56,7 @@ export function MobileEventOverview({
   );
   return (
     <div className="space-y-3" data-testid="mobile-event-overview">
-      <MobileFactsCard
-        event={event}
-        venue={venue}
-        clients={clients}
-        currencyCode={currencyCode}
-      />
+      <EventSetupProgress eventId={event._id} event={event} />
       <MobileMenuCard
         eventId={event._id}
         eventDishes={eventDishes}

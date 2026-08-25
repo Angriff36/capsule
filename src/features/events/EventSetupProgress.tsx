@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { CheckIcon, ChevronRightIcon } from "../../ui/icons";
-import { EventTabPanel } from "./EventTabPanel";
 
 type SetupItem = {
   key: string;
@@ -69,37 +68,59 @@ export function EventSetupProgress({
       ? `${gaps} ${gapWord} block prep, demand, and staffing automation. Resolve each to let the event derive downstream work.`
       : "Client, headcount, menu, and staff are set. Downstream work can derive from this event.";
 
+  const percent = Math.round((done / items.length) * 100);
   return (
-    <EventTabPanel
-      eyebrow="Setup readiness"
-      title={`${done} of ${items.length} ready`}
-      description={description}
-      testId="event-setup-progress"
-    >
-      <ul className="divide-y divide-line-2 rounded-sm border border-line-2 bg-panel">
+    <section className="card p-5" data-testid="event-setup-progress">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-semibold text-ink">Setup readiness</h2>
+          <p className="mt-0.5 text-sm text-ink-2">{description}</p>
+        </div>
+        <p className="text-2xl font-bold text-ink">
+          {done}
+          <span className="text-base font-medium text-ink-2">
+            {" "}
+            of {items.length} ready
+          </span>
+        </p>
+      </div>
+      <div
+        className="mt-3 h-2 overflow-hidden rounded-full bg-inset"
+        role="progressbar"
+        aria-valuenow={done}
+        aria-valuemin={0}
+        aria-valuemax={items.length}
+        aria-label="Setup readiness"
+      >
+        <div
+          className={`h-full rounded-full ${gaps === 0 ? "bg-ok" : "bg-warn"}`}
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
         {items.map((item) => (
           <SetupProgressRow key={item.key} item={item} />
         ))}
       </ul>
-    </EventTabPanel>
+    </section>
   );
 }
 
 function SetupReadyIcon({ ready }: { readonly ready: boolean | undefined }) {
   if (ready === true) {
-    return <CheckIcon className="text-ok" width={14} height={14} />;
+    return <CheckIcon className="text-ok" width={16} height={16} />;
   }
   if (ready === false) {
     return (
       <span
-        className="inline-block h-2 w-2 rounded-full bg-warn"
+        className="inline-block h-2.5 w-2.5 rounded-full bg-warn"
         aria-hidden="true"
       />
     );
   }
   return (
     <span
-      className="inline-block h-2 w-2 rounded-full bg-line-2"
+      className="inline-block h-2.5 w-2.5 rounded-full bg-line-2"
       aria-hidden="true"
     />
   );
@@ -130,12 +151,16 @@ function SetupProgressRow({ item }: { readonly item: SetupItem }) {
   }
 
   return (
-    <li className="flex items-center justify-between gap-3 px-3 py-2.5 text-base">
+    <li
+      className={`flex items-center justify-between gap-3 rounded-sm border px-3 py-2.5 text-base ${
+        item.ready === false
+          ? "border-warn/40 bg-warn-soft"
+          : "border-line bg-inset"
+      }`}
+    >
       <span className="flex items-center gap-2">
         <SetupReadyIcon ready={item.ready} />
-        <span className={item.ready === false ? "text-ink" : "text-ink-2"}>
-          {item.label}
-        </span>
+        <span className="font-medium text-ink">{item.label}</span>
       </span>
       {action}
     </li>

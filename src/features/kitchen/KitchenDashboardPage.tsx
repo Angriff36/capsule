@@ -170,15 +170,17 @@ export function KitchenDashboardPage() {
     <div className="culinary-document culinary-document-compact culinary-studio kitchen-command-deck space-y-4">
       <KitchenBookNav />
       <header className="kcd-masthead">
-        <p className="eyebrow">Kitchen</p>
-        <h1>Command deck</h1>
-        <p className="kcd-lede">
-          Next 7 days from {formatDate(horizon.start().getTime())} — put cooks
-          on dishes and steps, and keep an eye on who is buried.
-        </p>
+        <div>
+          <h1>Kitchen command board</h1>
+          <p className="kcd-lede">
+            7 days from {formatDate(horizon.start().getTime())} ·{" "}
+            {formatCountNoun(horizonEvents.length, "event")} ·{" "}
+            {formatCountNoun(crewRows.length, "cook")} with prep
+          </p>
+        </div>
       </header>
 
-      <div className="kcd-toolbar">
+      <div className="kcd-toolbar card">
         <fieldset className="kcd-horizon-nav">
           <legend>Horizon</legend>
           <button type="button" onClick={() => setHorizonOffset((v) => v - 7)}>
@@ -230,8 +232,10 @@ export function KitchenDashboardPage() {
 
       {loading ? null : (
         <div className="kcd-board">
-          <aside className="kcd-rail" aria-label="Events in horizon">
-            <h2 className="kcd-rail-title">This horizon</h2>
+          <aside className="kcd-rail card" aria-label="Events in horizon">
+            <h2 className="kcd-rail-title">
+              Upcoming events <span>{horizonEvents.length}</span>
+            </h2>
             <KitchenCommandDeckEventRail
               model={model}
               events={horizonEvents}
@@ -311,6 +315,21 @@ export function KitchenDashboardPage() {
                   "Completed",
                 )
               }
+              nextEvent={
+                horizonEvents.length === 0
+                  ? model.nextEventAfterHorizon()
+                  : null
+              }
+              onJumpToEvent={(event) => {
+                setHorizonOffset(
+                  KitchenCommandDeckHorizon.offsetForTimestamp(
+                    Number(event.startsAt),
+                  ),
+                );
+                setSelectedEventId(event._id);
+              }}
+              horizonLabel={`No events between ${formatDate(horizon.start().getTime())} and ${formatDate(horizon.start().getTime() + 6 * 86_400_000)}.`}
+              crewWithLoad={crewRows.length}
               onSyncPrep={() => {
                 if (!selectedEvent) return;
                 void run(
@@ -344,7 +363,7 @@ export function KitchenDashboardPage() {
             />
           </main>
 
-          <aside className="kcd-rail" aria-label="Crew load">
+          <aside className="kcd-rail card" aria-label="Crew load">
             <KitchenCommandDeckCrewRail
               model={model}
               rows={crewRows}

@@ -1,7 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
-import { relativeDays } from "../../lib/format";
+import {
+  formatCount,
+  formatDate,
+  formatMoney,
+  formatTime,
+  normalizeCurrencyCode,
+  relativeDays,
+} from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
@@ -23,6 +30,7 @@ import {
   useEventSubmitForApproval,
   useGetEvent,
   useListClient,
+  useListOrganization,
   useListDish,
   useListEventAssignment,
   useListEventDish,
@@ -34,7 +42,13 @@ import { useTrackRecent } from "../../lib/recents";
 import { ArrowLeftIcon } from "../../ui/icons";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
-import { ErrorState, PageHeader, StatusChip } from "../../ui/primitives";
+import {
+  ActionMenu,
+  ActionMenuRule,
+  ErrorState,
+  StatusChip,
+} from "../../ui/primitives";
+import { useSuccessToast } from "../../ui/useSuccessToast";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
@@ -65,7 +79,6 @@ import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
 import { FailureBanner } from "./FailureBanner";
-import { MobileEventHeader } from "./mobile/MobileEventHeader";
 import { MobileEventOverview } from "./mobile/MobileEventOverview";
 import { RecurringEventPanel } from "./RecurringEventPanel";
 import {
@@ -74,6 +87,19 @@ import {
   parseEventDetailTab,
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
+
+function HeroFact({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs font-semibold tracking-[0.04em] text-ink-2 uppercase">
+        {label}
+      </dt>
+      <dd className="mt-0.5 text-base font-semibold break-words text-ink">
+        {children}
+      </dd>
+    </div>
+  );
+}
 
 export function EventDetailPage() {
   const { id } = useParams();
@@ -86,6 +112,12 @@ export function EventDetailPage() {
   const mobileOverview =
     mobile && activeTab === "overview" && searchParams.get("full") !== "1";
   const clients = useListClient();
+  const organizations = useListOrganization();
+  // Same functional-currency rule as the phone Money card and Finance.
+  const currencyCode = normalizeCurrencyCode(
+    organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
+    "USD",
+  );
   useTrackRecent("Event", event?.title);
   useEffect(() => {
     if (!id || event == null || event.deletedAt != null) return;
@@ -121,6 +153,7 @@ export function EventDetailPage() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
+  const { notifySuccess, host: savedToast } = useSuccessToast();
   const { loadingTooLong } = useSlowQuery(event);
 
   if (event === undefined) {
@@ -168,13 +201,14 @@ export function EventDetailPage() {
     setSearchParams(next, { replace: true });
   };
 
-  const run = async (work: () => Promise<unknown>) => {
+  const run = async (work: () => Promise<unknown>, okMessage = "Saved") => {
     setFailure(null);
     setBusy(true);
     try {
       await work();
       setReasonFor(null);
       setReason("");
+      notifySuccess(okMessage);
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     } finally {
@@ -189,180 +223,285 @@ export function EventDetailPage() {
       return;
     }
     const args = { docId: event._id, version };
-    if (key === "submitForApproval") void run(() => submitForApproval(args));
-    if (key === "approve") void run(() => approve(args));
-    if (key === "lockForSales") void run(() => lockForSales(args));
-    if (key === "confirmSalesLock") void run(() => confirmSalesLock(args));
-    if (key === "finalizeEvent") void run(() => finalizeEvent(args));
-    if (key === "beginExecution") void run(() => beginExecution(args));
-    if (key === "complete") void run(() => complete(args));
-    if (key === "closeOut") void run(() => closeOut(args));
+    const done = "Stage updated";
+    if (key === "submitForApproval")
+      void run(() => submitForApproval(args), done);
+    if (key === "approve") void run(() => approve(args), done);
+    if (key === "lockForSales") void run(() => lockForSales(args), done);
+    if (key === "confirmSalesLock")
+      void run(() => confirmSalesLock(args), done);
+    if (key === "finalizeEvent") void run(() => finalizeEvent(args), done);
+    if (key === "beginExecution") void run(() => beginExecution(args), done);
+    if (key === "complete") void run(() => complete(args), done);
+    if (key === "closeOut") void run(() => closeOut(args), done);
   };
 
+  // One obvious next step: the first primary lifecycle action. Other stage
+  // moves and every utility live under "More"; destructive moves sit last.
+  const lifecycle = eventLifecyclePolicy.availableActions(String(event.stage));
+  const primaryAction = lifecycle.find((action) => action.kind === "primary");
+  const secondaryActions = lifecycle.filter(
+    (action) => action !== primaryAction && action.kind !== "danger",
+  );
+  const dangerActions = lifecycle.filter((action) => action.kind === "danger");
+  const beoReady =
+    !busy &&
+    clients !== undefined &&
+    dishes !== undefined &&
+    eventAssignments !== undefined &&
+    eventDishes !== undefined &&
+    people !== undefined &&
+    timelineActivities !== undefined;
+
   const headerActions = [
-    <EventClientPortalShare key="client-portal-share" eventId={event._id} />,
-    <button
-      key="download-beo"
-      type="button"
-      className="btn btn-ghost"
-      disabled={
-        busy ||
-        clients === undefined ||
-        dishes === undefined ||
-        eventAssignments === undefined ||
-        eventDishes === undefined ||
-        people === undefined ||
-        timelineActivities === undefined
-      }
-      onClick={() => {
-        setPdfNotice(null);
-        void downloadBeoPdf({
-          event,
-          clientName: clientDisplayName(event.clientId, clients),
-          dishes: (eventDishes ?? [])
-            .filter(
-              (selection) =>
-                selection.deletedAt == null &&
-                selection.removedAt == null &&
-                selection.eventId === event._id,
-            )
-            .map((selection) => ({
-              selection,
-              dish: dishes?.find((dish) => dish._id === selection.dishId),
-            })),
-          timeline: (timelineActivities ?? []).filter(
-            (activity) =>
-              activity.eventId === event._id &&
-              activity.scheduledAt != null &&
-              activity.deletedAt == null,
-          ),
-          staff: (eventAssignments ?? [])
-            .filter(
-              (assignment) =>
-                assignment.deletedAt == null &&
-                assignment.eventId === event._id &&
-                assignment.status !== "unassigned",
-            )
-            .map((assignment) => ({
-              assignment,
-              person: people?.find(
-                (person) => person._id === assignment.personId,
-              ),
-            })),
-          branding,
-        })
-          .then(() => setPdfNotice("BEO PDF downloaded."))
-          .catch((error) => setFailure(classifyCommandFailure(error)));
-      }}
-    >
-      Download BEO
-    </button>,
-    <Link
-      key="create-proposal"
-      className="btn btn-ghost"
-      to={`/clients/proposals?event=${event._id}`}
-    >
-      Create proposal
-    </Link>,
-    <Link
-      key="save-as-template"
-      className="btn btn-ghost"
-      to={`/events/templates?fromEvent=${event._id}`}
-    >
-      Save as template
-    </Link>,
-    <Link
-      key="allergen-briefing"
-      className="btn btn-ghost"
-      to={`/events/${event._id}/allergen-briefing`}
-    >
-      Allergen briefing
-    </Link>,
-    ...eventLifecyclePolicy
-      .availableActions(String(event.stage))
-      .map((action) => (
+    ...(primaryAction
+      ? [
+          <button
+            key={primaryAction.key}
+            type="button"
+            disabled={busy}
+            onClick={() => runAction(primaryAction.key)}
+            className="btn btn-primary"
+          >
+            {primaryAction.label}
+          </button>,
+        ]
+      : []),
+    ...secondaryActions.map((action) => (
+      <button
+        key={action.key}
+        type="button"
+        disabled={busy}
+        onClick={() => runAction(action.key)}
+        className={`btn ${action.kind === "primary" ? "btn-secondary" : "btn-ghost"}`}
+      >
+        {action.label}
+      </button>
+    )),
+    <ActionMenu key="more">
+      {mobile ? (
+        <Link
+          key="edit-details"
+          to={`${eventDetailPath(event._id, "overview")}&full=1`}
+        >
+          Edit event details
+        </Link>
+      ) : null}
+      <EventClientPortalShare key="client-portal-share" eventId={event._id} />
+      <button
+        key="download-beo"
+        type="button"
+        className="btn btn-ghost"
+        disabled={!beoReady}
+        onClick={() => {
+          setPdfNotice(null);
+          void downloadBeoPdf({
+            event,
+            clientName: clientDisplayName(event.clientId, clients),
+            dishes: (eventDishes ?? [])
+              .filter(
+                (selection) =>
+                  selection.deletedAt == null &&
+                  selection.removedAt == null &&
+                  selection.eventId === event._id,
+              )
+              .map((selection) => ({
+                selection,
+                dish: dishes?.find((dish) => dish._id === selection.dishId),
+              })),
+            timeline: (timelineActivities ?? []).filter(
+              (activity) =>
+                activity.eventId === event._id &&
+                activity.scheduledAt != null &&
+                activity.deletedAt == null,
+            ),
+            staff: (eventAssignments ?? [])
+              .filter(
+                (assignment) =>
+                  assignment.deletedAt == null &&
+                  assignment.eventId === event._id &&
+                  assignment.status !== "unassigned",
+              )
+              .map((assignment) => ({
+                assignment,
+                person: people?.find(
+                  (person) => person._id === assignment.personId,
+                ),
+              })),
+            branding,
+          })
+            .then(() => setPdfNotice("BEO PDF downloaded."))
+            .catch((error) => setFailure(classifyCommandFailure(error)));
+        }}
+      >
+        Download BEO
+      </button>
+      <Link
+        key="create-proposal"
+        className="btn btn-ghost"
+        to={`/clients/proposals?event=${event._id}`}
+      >
+        Create proposal
+      </Link>
+      <Link
+        key="save-as-template"
+        className="btn btn-ghost"
+        to={`/events/templates?fromEvent=${event._id}`}
+      >
+        Save as template
+      </Link>
+      <Link
+        key="allergen-briefing"
+        className="btn btn-ghost"
+        to={`/events/${event._id}/allergen-briefing`}
+      >
+        Allergen briefing
+      </Link>
+      {dangerActions.length > 0 ? <ActionMenuRule /> : null}
+      {dangerActions.map((action) => (
         <button
           key={action.key}
           type="button"
           disabled={busy}
           onClick={() => runAction(action.key)}
-          className={`btn ${action.kind === "primary" ? "btn-primary" : action.kind === "danger" ? "btn-danger" : "btn-ghost"}`}
+          className="action-menu-danger"
         >
           {action.label}
         </button>
-      )),
+      ))}
+    </ActionMenu>,
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {mobile ? (
-        <>
-          <MobileEventHeader title={event.title} stage={String(event.stage)} />
-          <details className="card">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center px-3 text-base font-semibold text-ink [&::-webkit-details-marker]:hidden">
-              Actions
-            </summary>
-            <div className="mobile-actions flex flex-wrap gap-2 px-3 pb-3">
-              {headerActions}
-            </div>
-          </details>
-        </>
-      ) : (
-        <>
-          <Link
-            to="/events"
-            className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
-          >
-            <ArrowLeftIcon width={12} height={12} /> All events
-          </Link>
-          <PageHeader
-            title={
-              <span className="flex flex-wrap items-center gap-2.5">
+        <section
+          className="card px-4 py-4"
+          data-testid="event-context-header-mobile"
+        >
+          <div className="flex items-start gap-2">
+            <Link
+              to="/events"
+              aria-label="All events"
+              className="-ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-inset"
+            >
+              <ArrowLeftIcon width={18} height={18} />
+            </Link>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl leading-tight font-bold text-ink">
                 {event.title}
+              </h1>
+              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
                 <StatusChip status={String(event.stage)} />
-              </span>
-            }
-            lead={
-              <span className="text-sm">
-                {formatStatusLabel(event.eventType)} ·{" "}
-                {(() => {
-                  const client = clients?.find((c) => c._id === event.clientId);
-                  const name = clientDisplayName(event.clientId, clients);
-                  if (!client) return name;
-                  return (
-                    <HoverPreview card={<ClientPreviewCard client={client} />}>
-                      <Link
-                        to={`/clients/${client._id}`}
-                        className="underline decoration-dotted underline-offset-2 hover:text-ink"
-                      >
-                        {name}
-                      </Link>
-                    </HoverPreview>
-                  );
-                })()}
-                {venue ? (
-                  <>
-                    {" · "}
-                    <Link
-                      to="/facilities"
-                      className="underline decoration-dotted underline-offset-2 hover:text-ink"
-                    >
-                      {venue.name}
-                    </Link>
-                  </>
+                <span>{formatStatusLabel(event.eventType)}</span>
+                {event.startsAt != null ? (
+                  <span>· {relativeDays(event.startsAt)}</span>
                 ) : null}
+              </div>
+            </div>
+          </div>
+          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
+            <HeroFact label="Date">
+              {formatDate(event.startsAt)}
+              <span className="block text-sm font-medium text-ink-2">
+                {event.startsAt != null
+                  ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
+                  : "—"}
+              </span>
+            </HeroFact>
+            <HeroFact label="Headcount">
+              {formatCount(event.expectedHeadcount)} guests
+            </HeroFact>
+            <HeroFact label="Venue">
+              {venue ? venue.name : "No venue yet"}
+            </HeroFact>
+            <HeroFact label="Client">
+              {clientDisplayName(event.clientId, clients)}
+            </HeroFact>
+          </dl>
+          <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
+            <span className="font-semibold text-ink">Budget / quoted</span>{" "}
+            {formatMoney(event.budgetAmount, currencyCode)} /{" "}
+            {formatMoney(event.quotedPrice, currencyCode)}
+          </p>
+          <div className="mobile-actions mt-4 flex items-center gap-2">
+            {headerActions}
+          </div>
+        </section>
+      ) : (
+        <section className="card px-6 py-5" data-testid="event-context-header">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <Link
+                to="/events"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-ink"
+              >
+                <ArrowLeftIcon width={13} height={13} /> All events
+              </Link>
+              <div className="mt-1.5 flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight text-ink">
+                  {event.title}
+                </h1>
+                <StatusChip status={String(event.stage)} />
+              </div>
+              <p className="mt-1 text-base text-ink-2">
+                {formatStatusLabel(event.eventType)}
                 {event.startsAt != null
                   ? ` · ${relativeDays(event.startsAt)}`
                   : ""}
-              </span>
-            }
-            actions={headerActions}
-          />
-        </>
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {headerActions}
+            </div>
+          </div>
+          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-4 md:grid-cols-3 xl:grid-cols-6">
+            <HeroFact label="Date">{formatDate(event.startsAt)}</HeroFact>
+            <HeroFact label="Time">
+              {event.startsAt != null
+                ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
+                : "—"}
+            </HeroFact>
+            <HeroFact label="Headcount">
+              {formatCount(event.expectedHeadcount)} guests
+            </HeroFact>
+            <HeroFact label="Venue">
+              {venue ? (
+                <Link to="/facilities" className="hover:underline">
+                  {venue.name}
+                </Link>
+              ) : (
+                "No venue yet"
+              )}
+            </HeroFact>
+            <HeroFact label="Client">
+              {(() => {
+                const client = clients?.find((c) => c._id === event.clientId);
+                const name = clientDisplayName(event.clientId, clients);
+                if (!client) return name;
+                return (
+                  <HoverPreview card={<ClientPreviewCard client={client} />}>
+                    <Link
+                      to={`/clients/${client._id}`}
+                      className="hover:underline"
+                    >
+                      {name}
+                    </Link>
+                  </HoverPreview>
+                );
+              })()}
+            </HeroFact>
+            <HeroFact label="Budget / quoted">
+              {formatMoney(event.budgetAmount, currencyCode)} /{" "}
+              {formatMoney(event.quotedPrice, currencyCode)}
+            </HeroFact>
+          </dl>
+        </section>
       )}
 
+      {savedToast}
       {pdfNotice ? (
-        <p className="text-base text-ink-2" role="status">
+        <p className="banner banner-ok" role="status">
           {pdfNotice}
         </p>
       ) : null}
@@ -419,7 +558,7 @@ export function EventDetailPage() {
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
 
-      <EventDetailTabs active={activeTab} onChange={setTab} />
+      <EventDetailTabs active={activeTab} onChange={setTab} compact={mobile} />
 
       {mobileOverview ? (
         <EventTabErrorBoundary tabLabel="Overview" key="mobile-overview">

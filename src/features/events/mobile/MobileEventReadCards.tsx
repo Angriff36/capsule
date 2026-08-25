@@ -22,77 +22,7 @@ const ROW_LIMIT = 8;
 
 type ClientRow = { _id: string } | null | undefined;
 
-export type MobileFactsProps = {
-  readonly event: Doc<"events">;
-  readonly venue: { name: string } | null | undefined;
-  readonly clients: readonly ClientRow[] | undefined;
-  readonly currencyCode: string;
-};
-
-/** Facts: when, how many, where, who, what kind, and the commercial snapshot. */
-export function MobileFactsCard({
-  event,
-  venue,
-  clients,
-  currencyCode,
-}: MobileFactsProps) {
-  const facts: Array<[string, ReactNode]> = [
-    ["Start", `${formatDate(event.startsAt)} ${formatTime(event.startsAt)}`],
-    ["End", `${formatDate(event.endsAt)} ${formatTime(event.endsAt)}`],
-    ["Headcount", formatCount(event.expectedHeadcount)],
-    ["Type", formatStatusLabel(event.eventType)],
-    [
-      "Venue",
-      venue ? (
-        <Link
-          to="/facilities"
-          className="inline-flex min-h-11 items-center underline"
-        >
-          {venue.name}
-        </Link>
-      ) : (
-        "—"
-      ),
-    ],
-    [
-      "Client",
-      <Link
-        key="client"
-        to={`/clients/${event.clientId}`}
-        className="inline-flex min-h-11 items-center underline"
-      >
-        {clientDisplayName(event.clientId, clients as never)}
-      </Link>,
-    ],
-    [
-      "Budget / quoted",
-      `${formatMoney(event.budgetAmount, currencyCode)} / ${formatMoney(event.quotedPrice, currencyCode)}`,
-    ],
-  ];
-  return (
-    <MobileSectionCard
-      id="facts"
-      title="Facts"
-      seeAllTo={`${eventDetailPath(event._id, "overview")}&full=1`}
-      seeAllLabel="Edit"
-    >
-      <dl className="grid grid-cols-2 gap-x-3 gap-y-2">
-        {facts.map(([label, value]) => (
-          <div key={label} className="min-w-0">
-            <dt className="text-xs font-semibold tracking-[0.06em] text-ink-3 uppercase">
-              {label}
-            </dt>
-            <dd className="font-mono text-base break-words text-ink">
-              {value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </MobileSectionCard>
-  );
-}
-
-type EventDish = Doc<"eventDishes">;
+export type EventDish = Doc<"eventDishes">;
 type Dish = Doc<"dishes">;
 
 export function MobileMenuCard({

@@ -25,6 +25,7 @@ import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import { ActionMenu, ActionMenuRule } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
@@ -194,14 +195,17 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     }
   };
 
+  const unpricedCount = costRollup.dishes.filter(
+    (line) => eventMenuDishEstimateKind(line) !== "priced",
+  ).length;
+
   return (
-    <section className="space-y-4" data-testid="event-menu-tab">
-      <div className="flex flex-wrap items-center justify-between gap-2">
+    <section className="space-y-5" data-testid="event-menu-tab">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="font-display text-lg">Event menu</h2>
-          <p className="text-base text-ink-2">
-            Customer-facing dishes for this event — images, allergens, cost, and
-            pans.
+          <h2 className="text-lg font-semibold text-ink">Event menu</h2>
+          <p className="text-sm text-ink-2">
+            Dishes guests will see — course, servings, price, and pans per line.
           </p>
         </div>
         <button
@@ -213,25 +217,42 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           {showPicker ? "Hide picker" : "Add dish"}
         </button>
       </div>
+
       {selections.length > 0 ? (
-        <p
-          className="font-mono text-sm text-ink-2"
+        <div
+          className="card grid grid-cols-1 divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0"
           data-testid="event-menu-food-cost"
         >
-          Food cost {formatMoneyExact(costRollup.foodCost)}
-          {" · "}
-          {formatMoneyExact(costRollup.costPerServing)} / serving
-          {" · "}
-          {costRollup.servings} servings
-          {headerUnpricedNote ? ` · ${headerUnpricedNote}` : ""}
-          {sellRollup.foodSellTotal > 0
-            ? ` · food sell ${formatMoneyExact(sellRollup.foodSellTotal)}`
-            : ""}
-        </p>
+          <CostFigure
+            label="Food cost"
+            value={formatMoneyExact(costRollup.foodCost)}
+            note={
+              sellRollup.foodSellTotal > 0
+                ? `food sell ${formatMoneyExact(sellRollup.foodSellTotal)}`
+                : undefined
+            }
+          />
+          <CostFigure
+            label="Cost per serving"
+            value={formatMoneyExact(costRollup.costPerServing)}
+            note={headerUnpricedNote ?? undefined}
+            warn={headerUnpricedNote != null}
+          />
+          <CostFigure
+            label="Servings"
+            value={String(costRollup.servings)}
+            note={
+              unpricedCount > 0
+                ? `${unpricedCount} ${unpricedCount === 1 ? "dish" : "dishes"} without a priced recipe`
+                : `${selections.length} ${selections.length === 1 ? "dish" : "dishes"} on the menu`
+            }
+            warn={unpricedCount > 0}
+          />
+        </div>
       ) : null}
       {costRollup.mismatches.length > 0 ? (
         <div
-          className="border border-danger/40 bg-danger/5 p-3 text-sm text-danger"
+          className="banner banner-danger"
           data-testid="event-menu-unit-mismatch"
           role="status"
         >
@@ -242,11 +263,6 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
       {host}
-      <ComponentStockSuggestions />
-      <EventDraftPoButton
-        eventId={eventId}
-        eventStage={String(event?.stage ?? "planning")}
-      />
       {showPicker ? (
         <CulinaryRecordPicker
           kind="dish"
@@ -291,14 +307,24 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       ) : null}
 
       {selections.length === 0 ? (
-        <div className="document-empty">
-          <p>
-            No dishes on this event yet. Add a dish to build the menu guests
-            will see.
+        <div className="card px-5 py-10 text-center">
+          <p className="text-base font-semibold text-ink">
+            No dishes on this event yet
           </p>
+          <p className="mt-1 text-sm text-ink-2">
+            Add a dish to build the menu guests will see.
+          </p>
+          <button
+            type="button"
+            className="btn btn-primary mt-4"
+            disabled={busy != null}
+            onClick={() => setShowPicker(true)}
+          >
+            Add dish
+          </button>
         </div>
       ) : (
-        <ul className="space-y-4">
+        <ul className="space-y-3">
           {selections.map((selection) => {
             const dish = dishes?.find((row) => row._id === selection.dishId);
             const dishCost = eventMenuCostForDish(costRollup, selection._id);
@@ -350,86 +376,12 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                 })),
               servings,
             );
+            const recipeOpen = openRecipeId === selection._id;
             return (
-              <li
-                key={selection._id}
-                className="flex flex-wrap gap-4 border border-line bg-panel p-3"
-              >
-                <DishPrimaryImage
-                  storageId={dish?.primaryImageStorageId}
-                  alt={dish?.name ?? "Dish"}
-                  size="thumb"
-                />
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Link
-                      to={dish ? dishPath(dish._id) : "#"}
-                      className="text-lg font-semibold hover:underline"
-                    >
-                      {dish?.name ?? "Unknown dish"}
-                    </Link>
-                    <AllergenIconRow codes={dish?.allergenSummary} />
-                  </div>
-                  <p className="text-base text-ink-2">
-                    {dish?.description || "No description yet."}
-                  </p>
-                  <p className="font-mono text-xs text-ink-3">
-                    {selection.course || "Uncategorized"}
-                    {" · "}
-                    {selection.quantityServings} servings
-                    {" · est. "}
-                    {estimateKind === "priced"
-                      ? formatMoneyExact(estimated)
-                      : eventMenuUnpricedEstimateLabel(estimateKind)}
-                    {(() => {
-                      const sell = sellRollup.lines.find(
-                        (line) => line.eventDishId === selection._id,
-                      );
-                      return sell?.unitSellPrice != null
-                        ? ` · sell ${formatMoneyExact(sell.sellTotal)}`
-                        : "";
-                    })()}
-                    {panLabel ? ` · ${panLabel}` : ""}
-                  </p>
-                  {dishCost && dishCost.mismatches.length > 0 ? (
-                    <p className="text-sm text-danger">
-                      {dishCost.mismatches[0]?.message}
-                    </p>
-                  ) : null}
-                  {recipeFlags.map((row) => (
-                    <p
-                      key={`${row.name}:${row.quantity}:${row.unit}`}
-                      className="text-sm text-danger"
-                      data-testid="suspect-prep-quantity"
-                    >
-                      {row.flag}
-                    </p>
-                  ))}
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() =>
-                      setOpenRecipeId((current) =>
-                        current === selection._id ? null : selection._id,
-                      )
-                    }
-                  >
-                    {openRecipeId === selection._id
-                      ? "Hide recipe"
-                      : "Edit recipe on this menu"}
-                  </button>
-                  {openRecipeId === selection._id ? (
-                    <EventMenuRecipeEditor
-                      dishId={selection.dishId}
-                      servings={
-                        dishCost?.servings ?? Number(selection.quantityServings)
-                      }
-                    />
-                  ) : null}
-                </div>
+              <li key={selection._id} className="card">
                 <form
                   key={`${selection._id}:${selection.version}`}
-                  className="flex flex-wrap items-end gap-2"
+                  className="grid gap-4 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start"
                   onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
                     formEvent.preventDefault();
                     const data = new FormData(formEvent.currentTarget);
@@ -491,96 +443,221 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     });
                   }}
                 >
-                  <label className="field-label">
-                    Course
-                    <input
-                      className="field-input w-36"
-                      name="course"
-                      defaultValue={selection.course ?? ""}
-                      placeholder="Uncategorized"
+                  <div className="flex min-w-0 gap-4">
+                    <DishPrimaryImage
+                      storageId={dish?.primaryImageStorageId}
+                      alt={dish?.name ?? "Dish"}
+                      size="thumb"
+                      className="h-16 w-16 shrink-0 rounded-sm"
                     />
-                  </label>
-                  <label className="field-label">
-                    Sell / serving
-                    <input
-                      className="field-input w-24"
-                      name="unitSellPrice"
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      data-testid="event-menu-unit-sell-price"
-                      defaultValue={formatEventMenuSellInput(
-                        lineFields.unitSellPrice,
-                      )}
-                    />
-                  </label>
-                  <label className="field-label">
-                    Servings
-                    <input
-                      className="field-input w-24"
-                      name="quantityServings"
-                      type="number"
-                      min={0}
-                      step={1}
-                      data-testid="event-menu-servings"
-                      defaultValue={selection.quantityServings}
-                    />
-                  </label>
-                  <label className="field-label">
-                    Pans
-                    <input
-                      className="field-input w-20"
-                      name="containerCount"
-                      type="number"
-                      min={0}
-                      step={1}
-                      data-testid="event-menu-line-pans"
-                      defaultValue={eventMenuPansInputValue(
-                        lineFields.containerCount,
-                        linePanCount,
-                      )}
-                    />
-                  </label>
-                  <button
-                    type="submit"
-                    className="btn btn-ghost"
-                    disabled={busy != null}
-                  >
-                    Save
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    disabled={busy != null}
-                    onClick={() => {
-                      void (async () => {
-                        const reason = await prompt.askReason({
-                          ...ReasonCopy.removeLine,
-                          title: "Remove event dish",
-                          description:
-                            "Record why this dish is leaving the event menu.",
-                          confirmLabel: "Remove dish",
-                          tone: "danger",
-                        });
-                        if (!reason) return;
-                        void run(`remove:${selection._id}`, () =>
-                          removeDish({
-                            docId: selection._id,
-                            version: selection.version,
-                            reason,
-                          }),
-                        );
-                      })();
-                    }}
-                  >
-                    Remove
-                  </button>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <Link
+                          to={dish ? dishPath(dish._id) : "#"}
+                          className="text-lg font-semibold text-ink hover:underline"
+                        >
+                          {dish?.name ?? "Unknown dish"}
+                        </Link>
+                        <span className="chip border-line-2 bg-inset text-ink-2">
+                          {selection.course || "Uncategorized"}
+                        </span>
+                        <AllergenIconRow codes={dish?.allergenSummary} />
+                      </div>
+                      <p className="mt-0.5 truncate text-sm text-ink-2">
+                        {dish?.description || "No description yet."}
+                      </p>
+                      <p className="mt-1 text-sm font-medium text-ink-2">
+                        {selection.quantityServings} servings
+                        {" · est. "}
+                        <span className="text-ink">
+                          {estimateKind === "priced"
+                            ? formatMoneyExact(estimated)
+                            : eventMenuUnpricedEstimateLabel(estimateKind)}
+                        </span>
+                        {(() => {
+                          const sell = sellRollup.lines.find(
+                            (line) => line.eventDishId === selection._id,
+                          );
+                          return sell?.unitSellPrice != null
+                            ? ` · sell ${formatMoneyExact(sell.sellTotal)}`
+                            : "";
+                        })()}
+                        {panLabel ? ` · ${panLabel}` : ""}
+                      </p>
+                      {dishCost && dishCost.mismatches.length > 0 ? (
+                        <p className="mt-1 text-sm font-medium text-danger">
+                          {dishCost.mismatches[0]?.message}
+                        </p>
+                      ) : null}
+                      {recipeFlags.map((row) => (
+                        <p
+                          key={`${row.name}:${row.quantity}:${row.unit}`}
+                          className="mt-1 text-sm font-medium text-danger"
+                          data-testid="suspect-prep-quantity"
+                        >
+                          {row.flag}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_auto_auto_auto_auto_auto] sm:items-end">
+                    <label className="field-label col-span-2 sm:col-span-1">
+                      Course
+                      <input
+                        className="field-input sm:w-36"
+                        name="course"
+                        defaultValue={selection.course ?? ""}
+                        placeholder="Uncategorized"
+                      />
+                    </label>
+                    <label className="field-label">
+                      Sell / serving
+                      <input
+                        className="field-input sm:w-24"
+                        name="unitSellPrice"
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        data-testid="event-menu-unit-sell-price"
+                        defaultValue={formatEventMenuSellInput(
+                          lineFields.unitSellPrice,
+                        )}
+                      />
+                    </label>
+                    <label className="field-label">
+                      Servings
+                      <input
+                        className="field-input sm:w-24"
+                        name="quantityServings"
+                        type="number"
+                        min={0}
+                        step={1}
+                        data-testid="event-menu-servings"
+                        defaultValue={selection.quantityServings}
+                      />
+                    </label>
+                    <label className="field-label">
+                      Pans
+                      <input
+                        className="field-input sm:w-20"
+                        name="containerCount"
+                        type="number"
+                        min={0}
+                        step={1}
+                        data-testid="event-menu-line-pans"
+                        defaultValue={eventMenuPansInputValue(
+                          lineFields.containerCount,
+                          linePanCount,
+                        )}
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      className="btn btn-secondary"
+                      disabled={busy != null}
+                    >
+                      Save
+                    </button>
+                    <ActionMenu>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenRecipeId((current) =>
+                            current === selection._id ? null : selection._id,
+                          )
+                        }
+                      >
+                        {recipeOpen
+                          ? "Hide recipe"
+                          : "Edit recipe on this menu"}
+                      </button>
+                      <ActionMenuRule />
+                      <button
+                        type="button"
+                        className="action-menu-danger"
+                        disabled={busy != null}
+                        onClick={() => {
+                          void (async () => {
+                            const reason = await prompt.askReason({
+                              ...ReasonCopy.removeLine,
+                              title: "Remove event dish",
+                              description:
+                                "Record why this dish is leaving the event menu.",
+                              confirmLabel: "Remove dish",
+                              tone: "danger",
+                            });
+                            if (!reason) return;
+                            void run(`remove:${selection._id}`, () =>
+                              removeDish({
+                                docId: selection._id,
+                                version: selection.version,
+                                reason,
+                              }),
+                            );
+                          })();
+                        }}
+                      >
+                        Remove from menu
+                      </button>
+                    </ActionMenu>
+                  </div>
                 </form>
+                {recipeOpen ? (
+                  <div className="border-t border-line p-4">
+                    <EventMenuRecipeEditor
+                      dishId={selection.dishId}
+                      servings={
+                        dishCost?.servings ?? Number(selection.quantityServings)
+                      }
+                    />
+                  </div>
+                ) : null}
               </li>
             );
           })}
         </ul>
       )}
+
+      <div className="grid gap-3 lg:grid-cols-2">
+        <ComponentStockSuggestions />
+        <div className="card p-4">
+          <p className="text-base font-semibold text-ink">Purchasing</p>
+          <p className="mb-3 text-sm text-ink-2">
+            Turn this menu's ingredient needs into a vendor order.
+          </p>
+          <EventDraftPoButton
+            eventId={eventId}
+            eventStage={String(event?.stage ?? "planning")}
+          />
+        </div>
+      </div>
     </section>
+  );
+}
+
+function CostFigure({
+  label,
+  value,
+  note,
+  warn = false,
+}: {
+  label: string;
+  value: string;
+  note?: string;
+  warn?: boolean;
+}) {
+  return (
+    <div className="px-5 py-4">
+      <p className="text-xs font-semibold tracking-[0.04em] text-ink-2 uppercase">
+        {label}
+      </p>
+      <p className="mt-1 text-2xl font-bold text-ink">{value}</p>
+      {note ? (
+        <p className={`mt-0.5 text-sm ${warn ? "text-warn" : "text-ink-2"}`}>
+          {note}
+        </p>
+      ) : null}
+    </div>
   );
 }

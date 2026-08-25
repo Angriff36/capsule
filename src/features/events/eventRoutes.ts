@@ -40,6 +40,38 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "margin", label: "Margin" },
 ] as const;
 
+/**
+ * Workflow grouping for the event detail navigation. Tab keys (and the
+ * `?tab=` URL contract) are unchanged; groups only decide which sections sit
+ * together on screen.
+ */
+export const EVENT_TAB_GROUPS: readonly {
+  key: "plan" | "food" | "dayof" | "records" | "money";
+  label: string;
+  tabs: readonly EventDetailTab[];
+}[] = [
+  {
+    key: "plan",
+    label: "Plan",
+    tabs: ["overview", "client", "guests", "recurring"],
+  },
+  { key: "food", label: "Food", tabs: ["menu", "prep", "inventory"] },
+  {
+    key: "dayof",
+    label: "Day-of",
+    tabs: ["timeline", "staffing", "equipment", "layouts"],
+  },
+  { key: "records", label: "Records", tabs: ["photos", "incidents"] },
+  { key: "money", label: "Money", tabs: ["margin"] },
+] as const;
+
+export function eventTabGroupFor(tab: EventDetailTab) {
+  return (
+    EVENT_TAB_GROUPS.find((group) => group.tabs.includes(tab)) ??
+    EVENT_TAB_GROUPS[0]
+  );
+}
+
 const EVENTS_INDEX_PATH = "/events";
 const EVENTS_NEW_PATH = "/events/new";
 
