@@ -9,7 +9,8 @@ const seenKey = (prefix: string) => `capsule-guide-seen:${prefix}`;
 /**
  * Compact onboarding: one line of purpose plus the tips, shown once per
  * section on desktop until dismissed. On phones nothing opens by itself —
- * a small "?" button reveals the same line on demand.
+ * a small "?" button reveals the same line on demand. The same button stays
+ * on desktop after dismissal so help is never lost.
  */
 export function PageGuide() {
   const { pathname } = useLocation();
@@ -30,7 +31,6 @@ export function PageGuide() {
   };
 
   if (!open) {
-    if (!mobile) return null;
     return (
       <button
         type="button"

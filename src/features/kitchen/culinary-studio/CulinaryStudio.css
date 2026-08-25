@@ -134,7 +134,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  overflow: hidden;
+  /* No overflow clipping: the More menu drops below the card footer. The
+     media block clips its own image corners. */
   transition:
     transform 0.15s ease,
     box-shadow 0.15s ease;
@@ -149,6 +150,8 @@
 
 /* Media: full-width image area on top of the card. */
 .culinary-card-media {
+  overflow: hidden;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
   height: 160px;
   background: var(--color-inset);
   border-bottom: 1px solid var(--color-line);
@@ -272,4 +275,10 @@
   .culinary-card {
     animation: none;
   }
+}
+
+/* A card with its More menu open sits above the neighbouring cards so the
+   dropdown is never painted over by the next row. */
+.culinary-card:has(details.action-menu[open]) {
+  z-index: 40;
 }

@@ -6,6 +6,7 @@ import {
   formatDate,
   formatMoney,
   formatTime,
+  normalizeCurrencyCode,
   relativeDays,
 } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -29,6 +30,7 @@ import {
   useEventSubmitForApproval,
   useGetEvent,
   useListClient,
+  useListOrganization,
   useListDish,
   useListEventAssignment,
   useListEventDish,
@@ -110,6 +112,12 @@ export function EventDetailPage() {
   const mobileOverview =
     mobile && activeTab === "overview" && searchParams.get("full") !== "1";
   const clients = useListClient();
+  const organizations = useListOrganization();
+  // Same functional-currency rule as the phone Money card and Finance.
+  const currencyCode = normalizeCurrencyCode(
+    organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
+    "USD",
+  );
   useTrackRecent("Event", event?.title);
   useEffect(() => {
     if (!id || event == null || event.deletedAt != null) return;
@@ -413,7 +421,8 @@ export function EventDetailPage() {
           </dl>
           <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
             <span className="font-semibold text-ink">Budget / quoted</span>{" "}
-            {formatMoney(event.budgetAmount)} / {formatMoney(event.quotedPrice)}
+            {formatMoney(event.budgetAmount, currencyCode)} /{" "}
+            {formatMoney(event.quotedPrice, currencyCode)}
           </p>
           <div className="mobile-actions mt-4 flex items-center gap-2">
             {headerActions}
@@ -483,8 +492,8 @@ export function EventDetailPage() {
               })()}
             </HeroFact>
             <HeroFact label="Budget / quoted">
-              {formatMoney(event.budgetAmount)} /{" "}
-              {formatMoney(event.quotedPrice)}
+              {formatMoney(event.budgetAmount, currencyCode)} /{" "}
+              {formatMoney(event.quotedPrice, currencyCode)}
             </HeroFact>
           </dl>
         </section>
