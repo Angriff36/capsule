@@ -132,7 +132,11 @@ export function buildEventBundlePlan(
   }
   const startsAt = toEpochMillis(eventDate, startMinutes);
   const endMinutes = bundle.header.endMinutes;
-  // An end before the start (10:00 PM - 2:00 AM) is the next morning.
+  // An end before the start (10:00 PM - 2:00 AM) is the next morning, and so
+  // is any timeline row (a 1:00 AM strike) that falls before the start.
+  const crossesMidnight = endMinutes !== undefined && endMinutes < startMinutes;
+  const eventRelativeMinutes = (minutes: number): number =>
+    crossesMidnight && minutes < startMinutes ? minutes + 24 * 60 : minutes;
   const endsAt =
     endMinutes !== undefined && endMinutes !== startMinutes
       ? toEpochMillis(
@@ -221,7 +225,10 @@ export function buildEventBundlePlan(
   }
 
   const knownTimeline = existing?.timelineNames ?? [];
-  bundle.timeline.forEach((entry, index) => {
+  const timeline = [...bundle.timeline].sort(
+    (a, b) => eventRelativeMinutes(a.minutes) - eventRelativeMinutes(b.minutes),
+  );
+  timeline.forEach((entry, index) => {
     if (timelineEntryExists(entry.name, knownTimeline)) return;
     summary.timelineActivities += 1;
     steps.push({
@@ -233,7 +240,7 @@ export function buildEventBundlePlan(
       args: {
         eventId: "event",
         name: entry.name,
-        startsAt: toEpochMillis(eventDate, entry.minutes),
+        startsAt: toEpochMillis(eventDate, eventRelativeMinutes(entry.minutes)),
         notes: entry.notes,
         category: entry.category,
         responsibleParty: entry.staff,
