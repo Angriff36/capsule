@@ -41,18 +41,57 @@ if [ "$(git rev-parse main)" != "$(git rev-parse origin/main)" ]; then
   echo "  git branch -f main origin/main"
   exit 1
 fi
-if git show-ref --verify --quiet "refs/heads/archive/$branch" || git show-ref --verify --quiet "refs/remotes/origin/archive/$branch"; then
-  echo "release: archive/$branch already exists. Delete or rename it first."
-  exit 1
-fi
 base="$(git rev-parse origin/main)"
 branch_sha="$(git rev-parse "$branch")"
 proof=.artifacts/release-check-passed
+remote_archive="$(git ls-remote origin "refs/heads/archive/$branch" | cut -f1 || true)"
+remote_branch="$(git ls-remote origin "refs/heads/$branch" | cut -f1 || true)"
+
+archive_branch() {
+  # Remote first (one atomic push), then local. --force-with-lease pins the
+  # delete to the released sha: work pushed during the gate is never deleted.
+  if [ "$remote_archive" = "$branch_sha" ] && [ -z "$remote_branch" ]; then
+    echo "release: origin already has archive/$branch; renaming locally."
+  elif ! git push --atomic --force-with-lease="refs/heads/$branch:$branch_sha" origin "$branch_sha:refs/heads/archive/$branch" ":refs/heads/$branch"; then
+    git checkout -q "$branch"
+    echo "release: main is released, but archiving $branch on origin failed (new commits on it, or a network error). You are back on $branch."
+    echo "  Run this again: bash scripts/release.sh --reviewer $reviewer"
+    echo "  It resumes the archive without a second release. If $branch gained commits during the gate, it"
+    echo "  keeps them: archive only the released sha and keep working on the branch:"
+    echo "    git push origin $branch_sha:refs/heads/archive/$branch && git pull --ff-only origin $branch"
+    exit 1
+  fi
+  git checkout -q main
+  git branch -m "$branch" "archive/$branch"
+  echo "release: done. $branch is now archive/$branch. Start the next branch from main."
+}
+
+# Already released once (main push landed, archive did not finish)? Resume
+# the archive; never create a second [release] commit for the same branch.
+if [ -n "$remote_archive" ] && [ "$remote_archive" != "$branch_sha" ]; then
+  echo "release: archive/$branch already exists on origin at a different sha. Delete or rename it first."
+  exit 1
+fi
+if git merge-base --is-ancestor "$branch" origin/main && [ -n "$(git log origin/main -1 --format=%H --grep="^\[release\] $branch ")" ]; then
+  echo "release: $branch was already released (a [release] commit for it is on main). Resuming the archive only."
+  archive_branch
+  exit 0
+fi
 
 back_to_branch() {
   git checkout -q "$branch"
   rm -f "$proof"
 }
+
+abort_release() {
+  echo ""
+  echo "release: interrupted. Restoring main and returning to $branch."
+  git merge --abort 2>/dev/null || true
+  git reset -q --hard "$base"
+  back_to_branch
+  exit 130
+}
+trap abort_release INT TERM
 
 git checkout -q main
 subject="[release] $branch (reviewed by $reviewer)"
@@ -93,6 +132,7 @@ fi
 mkdir -p .artifacts
 git rev-parse HEAD > "$proof"
 
+trap - INT TERM
 echo "release: pushing main — this is the ONE production build for $branch."
 if ! CAPSULE_RELEASE=1 git push origin main; then
   rm -f "$proof"
@@ -104,10 +144,8 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
     echo "release: push failed and origin cannot be reached. State is UNKNOWN."
     echo "  Local main holds the unpushed release commit $(git rev-parse main). When origin is back:"
     echo "  git ls-remote origin refs/heads/main"
-    echo "  If it prints that sha, the release LANDED. Finish the archive:"
-    echo "    git checkout $branch"
-    echo "    git push --atomic --force-with-lease=refs/heads/$branch:$branch_sha origin $branch_sha:refs/heads/archive/$branch :refs/heads/$branch"
-    echo "    git branch -m $branch archive/$branch"
+    echo "  If it prints that sha, the release LANDED. Finish the archive (no second release):"
+    echo "    git checkout $branch && bash scripts/release.sh --reviewer $reviewer"
     echo "  If it prints a different sha, the release did NOT land. Reset and release again:"
     echo "    git checkout $branch && git branch -f main origin/main"
     exit 1
@@ -120,21 +158,4 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
 fi
 rm -f "$proof"
 
-# Remote first (one atomic push), then local. If this push fails the release
-# is already live; finish by hand with the two commands printed.
-# --force-with-lease pins the delete to the sha that was released: if
-# someone pushed to the branch during the gate, that work is not deleted.
-if ! git push --atomic --force-with-lease="refs/heads/$branch:$branch_sha" origin "$branch_sha:refs/heads/archive/$branch" ":refs/heads/$branch"; then
-  git checkout -q "$branch"
-  echo "release: main is released, but archiving $branch on origin failed (new commits on it, or a network error). You are back on $branch. Finish by hand:"
-  echo "  git fetch origin && git log --oneline $branch_sha..origin/$branch"
-  echo "  Nothing listed (network error): retry the leased push, then rename:"
-  echo "    git push --atomic --force-with-lease=refs/heads/$branch:$branch_sha origin $branch_sha:refs/heads/archive/$branch :refs/heads/$branch"
-  echo "    git branch -m $branch archive/$branch"
-  echo "  Commits listed (pushed during the gate): they are NOT released. Keep $branch; archive only the released sha:"
-  echo "    git push origin $branch_sha:refs/heads/archive/$branch"
-  echo "    git pull --ff-only origin $branch   # continue on $branch; release again later"
-  exit 1
-fi
-git branch -m "$branch" "archive/$branch"
-echo "release: done. $branch is now archive/$branch. Start the next branch from main."
+archive_branch
