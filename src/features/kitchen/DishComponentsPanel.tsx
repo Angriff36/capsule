@@ -8,6 +8,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 
 // DishComponent attach/detach — the first hop of the purchasing chain.
 //
@@ -32,6 +33,7 @@ export function DishComponentsPanel({ dishId }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const { prompt, host: promptHost } = useActionPrompt();
 
   const rows = (dishComponents ?? [])
     .filter((row) => row.deletedAt == null && row.dishId === dishId)
@@ -85,7 +87,20 @@ export function DishComponentsPanel({ dishId }: Props) {
     }
   }
 
-  async function onDetach(id: string, version: number | undefined) {
+  async function onDetach(
+    id: string,
+    version: number | undefined,
+    componentName: string,
+  ) {
+    // Detaching drops the component's ingredients out of demand, purchasing
+    // and food cost for every event using this dish — confirm before firing.
+    const ok = await prompt.askConfirm({
+      title: "Detach component",
+      description: `Remove "${componentName}" from this dish? Its ingredients stop driving demand, purchasing, and food cost for events using this dish.`,
+      confirmLabel: "Detach",
+      tone: "danger",
+    });
+    if (!ok) return;
     setBusy(id);
     setError(null);
     setNotice(null);
@@ -114,6 +129,7 @@ export function DishComponentsPanel({ dishId }: Props) {
         <span>{rows.length} attached</span>
       </div>
 
+      {promptHost}
       {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
         <p className="text-base text-ok" role="status">
@@ -168,7 +184,13 @@ export function DishComponentsPanel({ dishId }: Props) {
                   type="button"
                   className="btn btn-ghost btn-sm"
                   disabled={busy != null}
-                  onClick={() => void onDetach(row._id, row.version)}
+                  onClick={() =>
+                    void onDetach(
+                      row._id,
+                      row.version,
+                      component?.name ?? "this component",
+                    )
+                  }
                 >
                   {busy === row._id ? "Working…" : "Detach"}
                 </button>

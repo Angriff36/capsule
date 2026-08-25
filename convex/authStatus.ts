@@ -16,6 +16,8 @@ export const getAuthStatus = query({
       role: auth.role,
       roleSource: auth.roleSource,
       personId: auth.personId ?? null,
+      /** Resolved tenant id (organization/workspace id; not a secret). */
+      tenantId: auth.tenantId || null,
       disabledCapabilities: auth.disabledCapabilities,
     };
   },

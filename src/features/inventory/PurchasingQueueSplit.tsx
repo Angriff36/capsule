@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import type { ReorderSuggestion } from "./reorderSuggestion";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
@@ -95,7 +96,7 @@ export function PurchasingQueueSplit({
             <p className="eyebrow">Open demand</p>
             <h2>Purchase needs</h2>
           </div>
-          <span>{activeNeeds.length} needs</span>
+          <span>{formatCountNoun(activeNeeds.length, "need")}</span>
         </div>
         {needsLoading ? (
           <TableSkeleton rows={6} />

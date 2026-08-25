@@ -8,9 +8,10 @@ import {
 import { PersonRoleDirectory } from "../admin/PersonRoleDirectory";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // A measurable expectation row — serialized to a JSON string on the
 // `expectations` property (additive shape; no schema migration to extend).
@@ -244,10 +245,9 @@ export function RoleScorecardsPage() {
             </label>
             <label className="field-label">
               Effective from (optional)
-              <input
+              <BoundedDateInput
                 name="effectiveFrom"
                 className="input"
-                type="date"
                 defaultValue={
                   editing?.effectiveFrom
                     ? new Date(editing.effectiveFrom).toISOString().slice(0, 10)
@@ -324,7 +324,7 @@ export function RoleScorecardsPage() {
               <p className="eyebrow">Scorecard ledger</p>
               <h2>Defined scorecards</h2>
             </div>
-            <span>{rows.length} records</span>
+            <span>{formatCountNoun(rows.length, "record")}</span>
           </div>
           {rows.length === 0 ? (
             <div className="document-empty">

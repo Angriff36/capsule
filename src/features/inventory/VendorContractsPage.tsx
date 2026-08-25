@@ -12,9 +12,14 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate, formatMoneyExact } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatMoneyExact,
+} from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const EXPIRY_ALERT_DAYS = 30;
@@ -216,11 +221,11 @@ export function VendorContractsPage() {
             </label>
             <label className="field-label">
               Starts
-              <input name="startsAt" className="input" type="date" required />
+              <BoundedDateInput name="startsAt" className="input" required />
             </label>
             <label className="field-label">
               Ends
-              <input name="endsAt" className="input" type="date" required />
+              <BoundedDateInput name="endsAt" className="input" required />
             </label>
             <label className="field-label">
               Payment terms (days)
@@ -260,7 +265,7 @@ export function VendorContractsPage() {
             <p className="eyebrow">Agreements</p>
             <h2>Contracts</h2>
           </div>
-          <span>{liveContracts.length} contracts</span>
+          <span>{formatCountNoun(liveContracts.length, "contract")}</span>
         </div>
         {contracts === undefined ||
         vendors === undefined ||

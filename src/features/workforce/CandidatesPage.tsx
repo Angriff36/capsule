@@ -12,9 +12,10 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useIngestKmCandidates } from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // ponytail: a focused set of hireable operational roles for the create-form
 // picker. roleAppliedFor is a free CapsuleRole, so a KM-sourced value outside
@@ -335,7 +336,7 @@ export function CandidatesPage() {
               <p className="eyebrow">Candidate pipeline</p>
               <h2>All candidates</h2>
             </div>
-            <span>{liveCandidates.length} records</span>
+            <span>{formatCountNoun(liveCandidates.length, "record")}</span>
           </div>
           {liveCandidates.map((candidate) => {
             const candidateInterviews = liveInterviews.filter(
@@ -536,7 +537,7 @@ export function CandidatesPage() {
                   </label>
                   <label className="field-label">
                     Scheduled for (optional)
-                    <input name="scheduledFor" className="input" type="date" />
+                    <BoundedDateInput name="scheduledFor" className="input" />
                   </label>
                   <div className="field-label">
                     <span>&nbsp;</span>

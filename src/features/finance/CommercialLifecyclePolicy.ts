@@ -15,6 +15,18 @@ export interface CommercialAction<Key extends string = string> {
   label: string;
 }
 
+/** Money context the send action needs beyond the lifecycle status. */
+export interface InvoiceBalanceContext {
+  amountDue?: unknown;
+}
+
+// Mirrors the Invoice.send manifest constraint `sendBalance`
+// ("Cannot send an invoice with zero balance"): a $0-due invoice is never
+// sendable, so the UI must not offer send on it even when the lifecycle
+// (draft → sent) would otherwise allow the transition.
+const hasBalanceDue = (invoice: InvoiceBalanceContext): boolean =>
+  Number(invoice.amountDue ?? 0) > 0;
+
 type Lifecycle = readonly {
   property: string;
   from: string;
@@ -63,8 +75,10 @@ const PAYMENT_ACTIONS = [
 ] as const;
 
 export class CommercialLifecyclePolicy {
-  invoiceActions(status: string) {
-    return available(status, INVOICE_ACTIONS);
+  invoiceActions(status: string, invoice: InvoiceBalanceContext) {
+    const actions = available(status, INVOICE_ACTIONS);
+    if (hasBalanceDue(invoice)) return actions;
+    return actions.filter((action) => action.key !== "send");
   }
 
   paymentActions(status: string) {

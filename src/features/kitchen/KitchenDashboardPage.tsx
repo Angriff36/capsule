@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListDish,
   useListEvent,
@@ -16,6 +16,7 @@ import {
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -102,6 +103,11 @@ export function KitchenDashboardPage() {
 
   const selectedEvent = horizonEvents.find((e) => e._id === selectedEventId);
   const crewRows = model.crewLoad(horizonEvents.map((e) => e._id));
+  const assignableInView = selectedEvent
+    ? model.assignableTasks(
+        model.filterTasks(selectedEvent._id, filter, assigneeFilter),
+      ).length
+    : 0;
 
   const loading =
     events === undefined ||
@@ -157,7 +163,7 @@ export function KitchenDashboardPage() {
     const label = model.personLabel(model.findPerson(personId));
     void run(`assign-dish:${dishTasks[0]?._id ?? "x"}`, async () => {
       const count = await actions.assignMany(dishTasks, personId);
-      showToast(`${count} tasks → ${label}`);
+      showToast(`${formatCountNoun(count, "task")} → ${label}`);
     });
   };
 
@@ -165,15 +171,17 @@ export function KitchenDashboardPage() {
     <div className="culinary-document culinary-document-compact culinary-studio kitchen-command-deck space-y-4">
       <KitchenBookNav />
       <header className="kcd-masthead">
-        <p className="eyebrow">Kitchen</p>
-        <h1>Command deck</h1>
-        <p className="kcd-lede">
-          Next 7 days from {formatDate(horizon.start().getTime())} — put cooks
-          on dishes and steps, and keep an eye on who is buried.
-        </p>
+        <div>
+          <h1>Kitchen command board</h1>
+          <p className="kcd-lede">
+            7 days from {formatDate(horizon.start().getTime())} ·{" "}
+            {formatCountNoun(horizonEvents.length, "event")} ·{" "}
+            {formatCountNoun(crewRows.length, "cook")} with prep
+          </p>
+        </div>
       </header>
 
-      <div className="kcd-toolbar">
+      <div className="kcd-toolbar card">
         <fieldset className="kcd-horizon-nav">
           <legend>Horizon</legend>
           <button type="button" onClick={() => setHorizonOffset((v) => v - 7)}>
@@ -189,6 +197,17 @@ export function KitchenDashboardPage() {
           <button type="button" onClick={() => setHorizonOffset((v) => v + 7)}>
             Later
           </button>
+          <BoundedDateInput
+            aria-label="Jump to date"
+            title="Jump to date"
+            value={horizon.startDateValue()}
+            onChange={(e) => {
+              const offset = KitchenCommandDeckHorizon.offsetForDateValue(
+                e.target.value,
+              );
+              if (offset != null) setHorizonOffset(offset);
+            }}
+          />
         </fieldset>
         <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
         <label className="kcd-field">
@@ -217,8 +236,10 @@ export function KitchenDashboardPage() {
 
       {loading ? null : (
         <div className="kcd-board">
-          <aside className="kcd-rail" aria-label="Events in horizon">
-            <h2 className="kcd-rail-title">This horizon</h2>
+          <aside className="kcd-rail card" aria-label="Events in horizon">
+            <h2 className="kcd-rail-title">
+              Upcoming events <span>{horizonEvents.length}</span>
+            </h2>
             <KitchenCommandDeckEventRail
               model={model}
               events={horizonEvents}
@@ -227,6 +248,19 @@ export function KitchenDashboardPage() {
               venueName={(id) =>
                 venues?.find((v) => v._id === id)?.name ?? "No venue"
               }
+              nextEvent={
+                horizonEvents.length === 0
+                  ? model.nextEventAfterHorizon()
+                  : null
+              }
+              onJumpToEvent={(event) => {
+                setHorizonOffset(
+                  KitchenCommandDeckHorizon.offsetForTimestamp(
+                    Number(event.startsAt),
+                  ),
+                );
+                setSelectedEventId(event._id);
+              }}
             />
           </aside>
 
@@ -285,33 +319,61 @@ export function KitchenDashboardPage() {
                   "Completed",
                 )
               }
+              nextEvent={
+                horizonEvents.length === 0
+                  ? model.nextEventAfterHorizon()
+                  : null
+              }
+              onJumpToEvent={(event) => {
+                setHorizonOffset(
+                  KitchenCommandDeckHorizon.offsetForTimestamp(
+                    Number(event.startsAt),
+                  ),
+                );
+                setSelectedEventId(event._id);
+              }}
+              horizonLabel={`No events between ${formatDate(horizon.start().getTime())} and ${formatDate(horizon.start().getTime() + 6 * 86_400_000)}.`}
+              crewWithLoad={crewRows.length}
               onSyncPrep={() => {
                 if (!selectedEvent) return;
                 void run(
                   `sync:${selectedEvent._id}`,
                   async () => {
                     const rows = model.selections(selectedEvent._id);
+                    if (rows.length === 0) {
+                      throw new Error(
+                        "No dishes on this event, so Sync prep has nothing to create.",
+                      );
+                    }
+                    const reasons: string[] = [];
+                    let created = 0;
                     for (const row of rows) {
-                      await syncPrepForDish({
+                      const result = await syncPrepForDish({
                         id: row._id,
                         eventId: selectedEvent._id,
                         dishId: row.dishId,
                         quantityServings: Number(row.quantityServings) || 1,
                       });
+                      created += result.taskCount;
+                      if (result.noOpReason) reasons.push(result.noOpReason);
+                    }
+                    if (created === 0 && reasons.length > 0) {
+                      throw new Error(reasons[0] ?? "Sync prep did nothing.");
                     }
                   },
-                  "Prep synced from dish templates",
+                  "Prep synced from the event menu",
                 );
               }}
             />
           </main>
 
-          <aside className="kcd-rail" aria-label="Crew load">
+          <aside className="kcd-rail card" aria-label="Crew load">
             <KitchenCommandDeckCrewRail
               model={model}
               rows={crewRows}
               people={people ?? []}
               armedPersonId={armedPersonId}
+              assignableInView={assignableInView}
               onArm={setArmedPersonId}
             />
           </aside>

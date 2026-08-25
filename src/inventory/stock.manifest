@@ -67,6 +67,11 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint openStockIngredientMatch: ingredientId == self.ingredientId "Open ingredientId must match the seeded ingredient reference"
     constraint openStockLocationMatch: locationId == self.locationId "Open locationId must match the seeded location reference"
+    // Stock is counted in the ingredient's catalog unit. Nothing converts
+    // between units (they are opaque labels — see UnitOfMeasure), so a line
+    // opened in a different unit silently breaks on-hand vs demand math,
+    // low-stock alerts, and suggested purchase quantities (issue #150).
+    constraint openStockUnitMatchesCatalog: self.ingredient != null and unit == self.ingredient.unit "Stock line unit must match the ingredient's catalog unit — units do not convert"
     constraint openStockQuantityNonnegative: quantityOnHand == null or quantityOnHand >= 0 "Quantity on hand cannot be negative"
     constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "Par level cannot be negative"
     constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "Reorder threshold cannot be negative"

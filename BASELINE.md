@@ -16,6 +16,7 @@ and the last green `bun run check` / CI run.
 - [x] Vitest + coverage ratchet (`test:coverage` thresholds in `vite.config.ts`)
 - [x] Smoke path test (`tests/smoke-app-path.test.ts`)
 - [x] One local truth: `bun run check` == CI job `check`
+- [x] Branch/release rule: `.githooks/pre-push` blocks `main`; only `main` builds on Vercel (`ignoreCommand`); one `bash scripts/release.sh` per branch
 - [x] Dependabot (bun weekly, actions monthly)
 - [x] Docs split: `AGENTS.md` / `CLAUDE.md` / `docs/**` / `PRESET.md`
 - [x] `.artifacts/` for scratch; monthly `baseline:decay`

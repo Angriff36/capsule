@@ -13,6 +13,7 @@ import {
   suggestVisitOrder,
   type GeoPoint,
 } from "./routePlanner";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -179,9 +180,8 @@ export function RoutePlannerPage() {
           </p>
         </div>
         <div className="supply-row-actions">
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             aria-label="Route day"
             value={day}
             onChange={(event) => {
@@ -233,7 +233,15 @@ export function RoutePlannerPage() {
           <div className="document-empty">
             <p>No delivery stops for this vehicle on this day.</p>
             <span>
-              Assign vehicles to runs from the{" "}
+              Runs start in{" "}
+              <Link className="text-link" to="/logistics/packs">
+                Pack lists
+              </Link>
+              : pack the event's list, schedule the run in{" "}
+              <Link className="text-link" to="/logistics/deliveries">
+                Deliveries
+              </Link>
+              , then assign this vehicle from the{" "}
               <Link className="text-link" to="/logistics/schedule">
                 vehicle schedule
               </Link>

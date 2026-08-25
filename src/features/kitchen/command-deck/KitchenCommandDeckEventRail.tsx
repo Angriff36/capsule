@@ -8,6 +8,8 @@ type Props = Readonly<{
   selectedEventId: string;
   onSelect: (eventId: string) => void;
   venueName: (venueId: string | null | undefined) => string;
+  nextEvent?: EventLike | null;
+  onJumpToEvent?: (event: EventLike) => void;
 }>;
 
 export function KitchenCommandDeckEventRail({
@@ -16,18 +18,32 @@ export function KitchenCommandDeckEventRail({
   selectedEventId,
   onSelect,
   venueName,
+  nextEvent,
+  onJumpToEvent,
 }: Props) {
   if (events.length === 0) {
     return (
-      <p className="kcd-empty">
-        No events in the next 7 days. Shift the horizon or add events.
-      </p>
+      <div className="kcd-empty">
+        <p>No events in this window.</p>
+        {nextEvent && onJumpToEvent ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm mt-2"
+            onClick={() => onJumpToEvent(nextEvent)}
+            data-testid="command-deck-jump-next-event-rail"
+          >
+            Next: {nextEvent.title} · {formatDate(nextEvent.startsAt)}
+          </button>
+        ) : (
+          <p className="mt-1">Pick a date above or add events.</p>
+        )}
+      </div>
     );
   }
 
   return (
     <div className="kcd-event-list" data-testid="command-deck-event-rail">
-      {events.map((event, index) => {
+      {events.map((event) => {
         const progress = model.progress(event._id);
         const selected = event._id === selectedEventId;
         return (
@@ -36,7 +52,6 @@ export function KitchenCommandDeckEventRail({
             type="button"
             onClick={() => onSelect(event._id)}
             className={`kcd-event-ticket${selected ? " is-selected" : ""}`}
-            style={{ ["--delay" as string]: `${index * 45}ms` }}
             data-testid="command-deck-event-card"
             aria-pressed={selected}
           >

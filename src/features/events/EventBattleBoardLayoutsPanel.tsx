@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import type { Id } from "../../lib/api";
-import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useCreateEventLayoutSection,
   useEventLayoutSectionRemove,
@@ -144,7 +143,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
     <EventTabPanel
       eyebrow="Layout & setup"
       title={`${eventSections.length} ${eventSections.length === 1 ? "section" : "sections"}`}
-      description="Pick a section type (Buffet, Bar, Kitchen…), then write setup notes for this event."
+      description="Name each area — pick a preset (Buffet, Bar, Kitchen…) or type your own, like “Main Bar” and “Patio Bar” — then write setup notes for this event."
       actions={
         <button
           type="button"
@@ -167,6 +166,14 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       testId="event-battle-board-layouts"
     >
       {failure ? <FailureBanner failure={failure} /> : null}
+
+      {/* Preset suggestions for every area-name input below. The stored value
+          is a free string, so “Main Bar” and “Patio Bar” are both valid. */}
+      <datalist id="battle-board-layout-type-presets">
+        {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
+          <option key={type} value={type} />
+        ))}
+      </datalist>
 
       {copyable.length > 0 ? (
         <div className="mb-3 flex flex-wrap items-end gap-2">
@@ -213,34 +220,31 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
             >
               <div className="flex items-center justify-between gap-2">
                 <label className="field-label min-w-0 flex-1">
-                  <span>Type</span>
-                  <select
+                  <span>Area name</span>
+                  <input
                     className="input"
-                    value={section.type}
+                    defaultValue={section.type}
+                    key={`${section._id}:${section.version}:${section.type}`}
+                    list="battle-board-layout-type-presets"
                     disabled={busy != null}
-                    onChange={(changeEvent) =>
+                    placeholder="Buffet, Main Bar, Patio Bar…"
+                    onBlur={(blurEvent) => {
+                      const next = blurEvent.target.value.trim();
+                      if (!next) {
+                        // Blank names are rejected by the domain; restore.
+                        blurEvent.target.value = section.type;
+                        return;
+                      }
+                      if (next === section.type) return;
                       void run(`type:${section._id}`, () =>
                         updateSection({
                           docId: section._id,
                           version: section.version,
-                          type: changeEvent.target.value,
+                          type: next,
                         }),
-                      )
-                    }
-                  >
-                    {BATTLE_BOARD_LAYOUT_TYPES.includes(
-                      section.type as (typeof BATTLE_BOARD_LAYOUT_TYPES)[number],
-                    ) ? null : (
-                      <option value={section.type}>
-                        {formatStatusLabel(section.type)}
-                      </option>
-                    )}
-                    {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {formatStatusLabel(type)}
-                      </option>
-                    ))}
-                  </select>
+                      );
+                    }}
+                  />
                 </label>
                 <button
                   type="button"

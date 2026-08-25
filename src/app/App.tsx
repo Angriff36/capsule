@@ -1,5 +1,5 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
-import { Navigate, Route, Routes, useMatch } from "react-router-dom";
+import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
@@ -10,6 +10,7 @@ import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
+import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
@@ -78,6 +79,17 @@ const StaffOverviewPage = lazy(() =>
     default: module.StaffOverviewPage,
   })),
 );
+function RedirectEventMenuAlias() {
+  const { id } = useParams();
+  return <Navigate to={id ? eventMenuRedirectPath(id) : "/events"} replace />;
+}
+function RedirectPackListAlias() {
+  const { id } = useParams();
+  return (
+    <Navigate to={id ? `/logistics/packs/${id}` : "/logistics/packs"} replace />
+  );
+}
+
 const LogisticsOverviewPage = lazy(() =>
   import("../features/logistics/LogisticsOverviewPage").then((module) => ({
     default: module.LogisticsOverviewPage,
@@ -483,8 +495,11 @@ class AppErrorBoundary extends Component<
           <ErrorState
             title="This screen failed to render"
             detail={
-              this.state.error.message ||
-              "Reload the page. If it keeps failing, check the browser console for the component stack."
+              // Raw messages leak internal query names / request ids in prod.
+              import.meta.env.DEV
+                ? this.state.error.message ||
+                  "Reload the page. If it keeps failing, check the browser console for the component stack."
+                : "Something went wrong loading this screen. Reload the page, and if it keeps failing let an admin know."
             }
             onRetry={() => window.location.reload()}
           />
@@ -570,6 +585,10 @@ export function App() {
             <Route
               path="/events/:id/allergen-briefing"
               element={<EventAllergenBriefingPage />}
+            />
+            <Route
+              path="/events/:id/menu"
+              element={<RedirectEventMenuAlias />}
             />
             <Route path="/kitchen" element={<KitchenDashboardPage />} />
             <Route
@@ -831,6 +850,22 @@ export function App() {
                   <LogisticsOverviewPage />
                 </SupplyRoute>
               }
+            />
+            <Route
+              path="/logistics/pack-lists"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/pack-lists/:id"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/packlists"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/packlists/:id"
+              element={<RedirectPackListAlias />}
             />
             <Route
               path="/logistics/packs"

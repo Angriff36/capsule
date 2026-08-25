@@ -11,8 +11,9 @@ import {
   useListComponentIngredient,
   useListVendor,
 } from "../../lib/manifest-convex-react";
-import { formatMoneyExact } from "../../lib/format";
+import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -258,7 +259,7 @@ function PreferredVendorEditor({
 
 export function IngredientDetailPage() {
   const { id } = useParams();
-  const ingredient = useGetIngredient(id ?? "skip");
+  const ingredient = useRouteRecord(useGetIngredient, id);
   useTrackRecent("Ingredient", ingredient?.name);
   const components = useListComponent();
   const lines = useListComponentIngredient();
@@ -461,7 +462,7 @@ export function IngredientDetailPage() {
       <section className="culinary-section">
         <div className="culinary-section-heading">
           <h2>Component uses</h2>
-          <span>{componentUses.length} components</span>
+          <span>{formatCountNoun(componentUses.length, "component")}</span>
         </div>
         {componentUses.length ? (
           <ul className="ingredient-list">

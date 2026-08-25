@@ -1,4 +1,4 @@
-import { OrganizationSwitcher, UserButton, useUser } from "@clerk/react";
+import { UserButton, useUser } from "@clerk/react";
 import { useQuery } from "convex/react";
 import { Link, useLocation } from "react-router-dom";
 import { NotificationTray } from "../../features/notifications/NotificationTray";
@@ -6,29 +6,12 @@ import { api } from "../../lib/api";
 import { WORKSPACE_NAME } from "../../lib/workspace";
 import { ChevronRightIcon, GearIcon, SearchIcon } from "../../ui/icons";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
+import { breadcrumbsForPath, type Breadcrumb } from "./breadcrumbs";
 import { RecentsMenu } from "./RecentsMenu";
 
-function useBreadcrumbs(): Array<{ label: string; to?: string }> {
+function useBreadcrumbs(): Breadcrumb[] {
   const { pathname } = useLocation();
-  if (pathname === "/") return [{ label: "Home" }];
-  if (pathname === "/settings/email") return [{ label: "Email settings" }];
-  if (pathname.startsWith("/kitchen")) {
-    const crumbs: Array<{ label: string; to?: string }> = [
-      { label: "Kitchen", to: "/kitchen" },
-    ];
-    if (pathname === "/kitchen") {
-      crumbs.push({ label: "Kitchen" });
-    }
-    return crumbs;
-  }
-  const area = navigationCatalog.areaForPath(pathname);
-  if (!area) return [{ label: "Capsule" }];
-  const crumbs: Array<{ label: string; to?: string }> = [
-    { label: area.label, to: area.path },
-  ];
-  if (pathname === `${area.path}/new`) crumbs.push({ label: "New" });
-  else if (pathname !== area.path) crumbs.push({ label: "Detail" });
-  return crumbs;
+  return breadcrumbsForPath(pathname);
 }
 
 export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
@@ -124,23 +107,11 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
   );
 }
 
-/** Clerk user + org switcher. Authorization remains server-side claims only. */
+/** Clerk user menu. Authorization stays server-side (linked Person). */
 function AccountMenu() {
   const { user } = useUser();
   return (
     <div className="flex items-center gap-2 pl-1.5">
-      <OrganizationSwitcher
-        hidePersonal
-        afterCreateOrganizationUrl="/"
-        afterSelectOrganizationUrl="/"
-        appearance={{
-          elements: {
-            rootBox: "flex items-center",
-            organizationSwitcherTrigger:
-              "h-8 rounded-xs border border-transparent px-2 text-sm text-ink-2 hover:border-line-2 hover:bg-inset",
-          },
-        }}
-      />
       <div className="text-right max-sm:hidden">
         <p className="max-w-40 truncate text-sm leading-tight font-medium">
           {user?.fullName ??

@@ -9,9 +9,10 @@ import {
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { CHIP_TONE_CLASS } from "../../lib/statusLabels";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // goals/decisions are JSON string arrays on the entity (additive shape, like
 // RoleScorecard.expectations) so the captured lists can grow without a schema
@@ -226,12 +227,7 @@ export function OneOnOnesPage() {
             </label>
             <label className="field-label">
               Meeting date
-              <input
-                name="meetingDate"
-                className="input"
-                type="date"
-                required
-              />
+              <BoundedDateInput name="meetingDate" className="input" required />
             </label>
             <label className="field-label col-span-2">
               Agenda
@@ -405,7 +401,7 @@ export function OneOnOnesPage() {
               <p className="eyebrow">One-on-one ledger</p>
               <h2>Held meetings</h2>
             </div>
-            <span>{heldMeetings.length} records</span>
+            <span>{formatCountNoun(heldMeetings.length, "record")}</span>
           </div>
           {heldMeetings.map((meeting) => {
             const meetingActions = liveActions.filter(
@@ -539,7 +535,7 @@ export function OneOnOnesPage() {
                   </label>
                   <label className="field-label">
                     Due (optional)
-                    <input name="dueDate" className="input" type="date" />
+                    <BoundedDateInput name="dueDate" className="input" />
                   </label>
                   <div className="field-label">
                     <span>&nbsp;</span>

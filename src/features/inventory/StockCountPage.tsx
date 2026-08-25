@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateStockCountLine,
   useCreateStockCountSession,
@@ -458,7 +459,11 @@ export function StockCountPage() {
           </fieldset>
           <div className="stock-count-setup-footer">
             <span>
-              {stockLinesForLocations(selectedLocationIds).length} quantities
+              {formatCountNoun(
+                stockLinesForLocations(selectedLocationIds).length,
+                "quantity",
+                "quantities",
+              )}{" "}
               will be frozen when the session starts.
             </span>
             <button
@@ -762,7 +767,7 @@ export function StockCountPage() {
                     <p className="eyebrow">Frozen count sheet</p>
                     <h2>Line queue</h2>
                   </div>
-                  <span>{sessionLines.length} lines</span>
+                  <span>{formatCountNoun(sessionLines.length, "line")}</span>
                 </div>
                 <div className="stock-count-line-list">
                   {sessionLines.map((line, index) => {

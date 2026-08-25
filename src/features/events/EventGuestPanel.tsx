@@ -14,6 +14,11 @@ import { EmptyState, Section, Skeleton, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { eventGuestPolicy } from "./EventGuestPolicy";
 import { FailureBanner } from "./FailureBanner";
+import {
+  assessGuestListCoverage,
+  GuestListCoverageNotice,
+} from "./GuestListCoverageNotice";
+import { guestTableLabel } from "./guestTableLabel";
 
 type GuestAction = {
   kind: "decline" | "table" | "withdraw";
@@ -29,7 +34,13 @@ function list(value: string): string[] | undefined {
   return values.length ? values : undefined;
 }
 
-export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
+export function EventGuestPanel({
+  eventId,
+  expectedHeadcount,
+}: {
+  eventId: Id<"events">;
+  expectedHeadcount?: number | null;
+}) {
   const eventGuests = useQuery(api.queries.listEventGuestByEventId, {
     eventId,
   });
@@ -105,6 +116,11 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
     >
       <div className="space-y-3 p-3">
         {failure ? <FailureBanner failure={failure} /> : null}
+        {eventGuests !== undefined ? (
+          <GuestListCoverageNotice
+            coverage={assessGuestListCoverage(guests.length, expectedHeadcount)}
+          />
+        ) : null}
         {showInvite ? (
           <form
             onSubmit={submitInvite}
@@ -127,7 +143,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
               <input
                 name="dietaryRestrictions"
                 className="input"
-                placeholder="Comma-separated"
+                placeholder="One per comma — e.g. vegan, gluten-free"
               />
             </label>
             <label className="field-label">
@@ -135,7 +151,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
               <input
                 name="allergenRestrictions"
                 className="input"
-                placeholder="Comma-separated"
+                placeholder="One per comma — e.g. peanuts, shellfish"
               />
             </label>
             <label className="field-label">
@@ -143,7 +159,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
               <input
                 name="accessibilityNeeds"
                 className="input"
-                placeholder="Comma-separated"
+                placeholder="One per comma — e.g. wheelchair access"
               />
             </label>
             <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-2">
@@ -192,7 +208,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
                       <p className="mt-1 text-xs text-ink-3">
                         {guest.email ?? guest.phone ?? "No contact recorded"}
                         {guest.tableAssignment
-                          ? ` · Table ${guest.tableAssignment}`
+                          ? ` · ${guestTableLabel(guest.tableAssignment)}`
                           : ""}
                       </p>
                       {guest.dietaryRestrictions?.length ||

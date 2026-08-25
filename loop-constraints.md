@@ -49,7 +49,11 @@
 
 ## Push & Merge
 
-- Push ONLY `loop/*` branches (`git push origin loop/<run-id>`).
+- Push ONLY `loop/*` branches (`git push origin loop/<run-id>`). Branch
+  pushes are chores (Vercel ignores non-`main` refs). `main` is only ever
+  deployed by `bash scripts/release.sh` — the pre-push hook blocks hand
+  pushes, and Vercel builds only `[release]` commits, so an auto-merged PR
+  lands on `main` without deploying.
 - PRs must be created with `gh pr create --draft`, verification evidence in
   the body. NEVER push main, merge, mark PRs ready, or close PRs.
 - **AUTO-MERGE IS ON (human enabled 2026-07-21): once a PR is marked ready, a

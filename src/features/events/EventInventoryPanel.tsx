@@ -12,6 +12,7 @@ import {
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { StatusChip } from "../../ui/primitives";
+import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventStockIssueCoordinator } from "./EventStockIssueCoordinator";
 import {
   EventStockReservationCoordinator,
@@ -236,7 +237,9 @@ export function EventInventoryPanel({
         <p className="text-base text-ink-2">
           Nothing to reserve yet. Add dishes on the Menu tab to create
           ingredient demand, then approve the event to reserve stock against it.
+          Planning events can still draft a PO from needs once demand exists.
         </p>
+        <EventDraftPoButton eventId={eventId} eventStage={eventStage} />
       </section>
     );
   }
@@ -274,6 +277,8 @@ export function EventInventoryPanel({
           </p>
         )}
       </div>
+
+      <EventDraftPoButton eventId={eventId} eventStage={eventStage} />
 
       {eventDemands.length === 0 ? (
         <p className="text-base text-ink-3">

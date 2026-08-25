@@ -9,6 +9,7 @@ import {
 } from "./CulinaryAllergenVocabulary";
 import {
   UNIT_OF_MEASURE,
+  unitOptionsFor,
   type UnitOfMeasure,
 } from "./import/UnitOfMeasureMapper";
 
@@ -143,7 +144,7 @@ export function IngredientDetailsEditor({
             disabled={!canEdit || saving != null}
             onChange={(event) => setUnit(event.target.value)}
           >
-            {UNIT_OF_MEASURE.map((option) => (
+            {unitOptionsFor(ingredient.unit).map((option) => (
               <option key={option} value={option}>
                 {option}
               </option>

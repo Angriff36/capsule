@@ -10,6 +10,7 @@ import {
   useListOccasion,
   useListVenue,
 } from "../../../lib/manifest-convex-react";
+import { formatCountNoun } from "../../../lib/format";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { Link } from "react-router-dom";
@@ -480,7 +481,7 @@ export function ParallelRunDashboardPage() {
               <div>
                 <h2>Record Counts Comparison</h2>
               </div>
-              <span>{comparisonMetrics.length} metrics</span>
+              <span>{formatCountNoun(comparisonMetrics.length, "metric")}</span>
             </div>
 
             <div className="supply-table-wrap">
@@ -598,7 +599,7 @@ export function ParallelRunDashboardPage() {
                 <div>
                   <h2>By Occasion</h2>
                 </div>
-                <span>{occasionBreakdown.length} types</span>
+                <span>{formatCountNoun(occasionBreakdown.length, "type")}</span>
               </div>
               <div className="supply-table-wrap">
                 <table className="supply-table">
@@ -635,7 +636,9 @@ export function ParallelRunDashboardPage() {
                 <div>
                   <h2>By Service Style</h2>
                 </div>
-                <span>{serviceStyleBreakdown.length} styles</span>
+                <span>
+                  {formatCountNoun(serviceStyleBreakdown.length, "style")}
+                </span>
               </div>
               <div className="supply-table-wrap">
                 <table className="supply-table">
@@ -672,7 +675,7 @@ export function ParallelRunDashboardPage() {
                 <div>
                   <h2>By Venue</h2>
                 </div>
-                <span>{venueBreakdown.length} venues</span>
+                <span>{formatCountNoun(venueBreakdown.length, "venue")}</span>
               </div>
               <div className="supply-table-wrap">
                 <table className="supply-table">
@@ -720,7 +723,7 @@ export function ParallelRunDashboardPage() {
               <div>
                 <h2>Recently Changed Events (Last 24 Hours)</h2>
               </div>
-              <span>{recentChanges.length} events</span>
+              <span>{formatCountNoun(recentChanges.length, "event")}</span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">
@@ -784,7 +787,9 @@ export function ParallelRunDashboardPage() {
                   Imported records that still need to be checked or matched up.
                 </p>
               </div>
-              <span>{unresolvedMappings.length} records</span>
+              <span>
+                {formatCountNoun(unresolvedMappings.length, "record")}
+              </span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">
@@ -864,7 +869,7 @@ export function ParallelRunDashboardPage() {
                   The imports these comparisons are based on.
                 </p>
               </div>
-              <span>{completedImportRuns.length} runs</span>
+              <span>{formatCountNoun(completedImportRuns.length, "run")}</span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">

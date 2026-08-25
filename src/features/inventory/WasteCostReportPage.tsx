@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { formatMoney } from "../../lib/format";
+import { formatCountNoun, formatMoney } from "../../lib/format";
 import {
   useListEvent,
   useListIngredient,
@@ -174,7 +174,7 @@ export function WasteCostReportPage() {
             <p className="eyebrow">{period.label}</p>
             <h2>Waste by reason</h2>
           </div>
-          <span>{report.reasonRanking.length} reasons</span>
+          <span>{formatCountNoun(report.reasonRanking.length, "reason")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={4} />
@@ -231,7 +231,9 @@ export function WasteCostReportPage() {
             <p className="eyebrow">{period.label}</p>
             <h2>Top wasted ingredients by cost</h2>
           </div>
-          <span>{report.ingredientRanking.length} ingredients</span>
+          <span>
+            {formatCountNoun(report.ingredientRanking.length, "ingredient")}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={6} />
@@ -277,7 +279,7 @@ export function WasteCostReportPage() {
             <p className="eyebrow">{period.label}</p>
             <h2>Waste by event</h2>
           </div>
-          <span>{report.eventRanking.length} sources</span>
+          <span>{formatCountNoun(report.eventRanking.length, "source")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={4} />

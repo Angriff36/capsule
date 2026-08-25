@@ -1,5 +1,13 @@
-import { useMemo, useState, type FormEvent } from "react";
-import { useOrganization, useUser } from "@clerk/react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
+import { useUser } from "@clerk/react";
+import { useAction } from "convex/react";
+import { api } from "../../lib/api";
 import { usePayRates } from "../facilities/useLaborSummary";
 import {
   useCreatePerson,
@@ -52,9 +60,6 @@ export function TeamRolesPanel({
     [payRates],
   );
   const { user } = useUser();
-  const { memberships } = useOrganization({
-    memberships: { infinite: true, pageSize: 50 },
-  });
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -67,21 +72,54 @@ export function TeamRolesPanel({
     [people],
   );
 
-  const clerkMembers = useMemo(() => {
-    const data = memberships?.data ?? [];
-    return data
-      .map((membership) => {
-        const profile = membership.publicUserData;
-        const userId = profile?.userId;
-        if (!profile || !userId) return null;
-        const name =
-          [profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
-          profile.identifier ||
-          userId;
-        return { userId, name, identifier: profile.identifier };
+  // Sign-ins known to the identity provider (admin-only, tenant-scoped action)
+  // — covers admin-capable staff that self-link refuses.
+  const listSignIns = useAction(api.authLink.listSignIns);
+  const [signIns, setSignIns] = useState<
+    Array<{ userId: string; name: string; email: string | null }>
+  >([]);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const loadSignIns = useCallback(() => {
+    listSignIns({})
+      .then((catalog) => {
+        setSignIns(catalog.signIns);
+        setCatalogError(
+          catalog.error === "not_configured"
+            ? "Sign-in list unavailable: CLERK_SECRET_KEY is not set on this deployment."
+            : catalog.error === "provider_error"
+              ? "Sign-in list unavailable: the sign-in service did not answer."
+              : null,
+        );
       })
-      .filter((row): row is NonNullable<typeof row> => row != null);
-  }, [memberships?.data]);
+      .catch(() =>
+        setCatalogError("Sign-in list unavailable: the request failed."),
+      );
+  }, [listSignIns]);
+  // Reload when the roster changes (a hire or unlink makes new emails wanted).
+  const unlinkedKey = (people ?? [])
+    .filter(
+      (row) =>
+        row.deletedAt == null &&
+        String(row.status) === "active" &&
+        !row.authSubjectId,
+    )
+    .map((row) => row._id)
+    .join(",");
+  useEffect(() => {
+    loadSignIns();
+  }, [loadSignIns, unlinkedKey]);
+
+  // Tenant-scoped catalog from the server (convex/authLink.ts): only
+  // sign-ins whose email matches one of this tenant's unlinked staff rows.
+  const clerkMembers = useMemo(
+    () =>
+      signIns.map((row) => ({
+        userId: row.userId,
+        name: row.name,
+        identifier: row.email ?? undefined,
+      })),
+    [signIns],
+  );
 
   // Two staff rows sharing one sign-in would make getAuthContext's lookup
   // ambiguous (it takes .first()), so an account already spoken for is not
@@ -132,8 +170,8 @@ export function TeamRolesPanel({
       form.reset();
       setNotice(
         authSubjectId
-          ? "Team member hired and linked. Their Capsule role now comes from this record, not Clerk."
-          : "Team member hired. Link their Clerk user id so sign-in uses this Capsule role.",
+          ? "Team member hired and linked. Their Capsule role now comes from this record."
+          : "Team member hired. When they sign in with this email their account links on its own; admin-role staff get linked here in their row.",
       );
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "Could not hire.");
@@ -229,6 +267,23 @@ export function TeamRolesPanel({
 
   return (
     <Section title="Team roles" count={activePeople.length}>
+      <p className="flex flex-wrap items-center gap-2 text-sm text-ink-3">
+        {catalogError ? (
+          <span className="text-warn">{catalogError}</span>
+        ) : (
+          <span>
+            Sign-ins that match an unlinked staff email appear in each row's
+            account picker.
+          </span>
+        )}
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={loadSignIns}
+        >
+          Refresh sign-ins
+        </button>
+      </p>
       <div className="space-y-4 border-b border-line p-4">
         <p className="max-w-3xl text-sm leading-relaxed text-ink-3">
           Capsule permissions come from the role on each hired team member once
@@ -277,18 +332,6 @@ export function TeamRolesPanel({
               {PersonRoleDirectory.ASSIGNABLE_ROLES.map((role) => (
                 <option key={role} value={role}>
                   {PersonRoleDirectory.label(role)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm sm:col-span-2">
-            <span className="meta-term">Link Clerk member</span>
-            <select name="authSubjectId" className="input mt-1" defaultValue="">
-              <option value="">Link later</option>
-              {clerkMembers.map((member) => (
-                <option key={member.userId} value={member.userId}>
-                  {member.name}
-                  {member.identifier ? ` · ${member.identifier}` : ""}
                 </option>
               ))}
             </select>
@@ -568,8 +611,13 @@ function PersonLinkCell({
   }
 
   // Only accounts not already claimed by another staff row.
+  // Only the provider account whose verified primary email is THIS row's
+  // email — never another staff member's account.
+  const personEmail = person.email.trim().toLowerCase();
   const available = clerkMembers.filter(
-    (row) => !linkedSubjectIds.has(row.userId),
+    (row) =>
+      !linkedSubjectIds.has(row.userId) &&
+      (row.identifier ?? "").trim().toLowerCase() === personEmail,
   );
 
   return (
@@ -577,7 +625,8 @@ function PersonLinkCell({
       <span className="text-warn">Not linked — still using Clerk role</span>
       {available.length === 0 ? (
         <span className="text-ink-3">
-          No unlinked workspace accounts available.
+          No sign-in matches an unlinked staff email yet. Ask them to sign in
+          once, then retry.
         </span>
       ) : (
         <select

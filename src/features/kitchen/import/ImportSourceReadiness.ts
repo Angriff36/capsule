@@ -1,3 +1,5 @@
+import { formatCountNoun } from "../../../lib/format";
+
 export type ImportSourceMode = "paste" | "files";
 
 export interface ImportSourceSnapshot {
@@ -76,13 +78,13 @@ export class ImportSourceReadinessChecker {
       return `${snapshot.textFilename} loaded`;
     }
     if (hasSheet && hasLines) {
-      return `CSV bundle ready · sheet ${this.countRows(snapshot.sheetCsv)} rows · lines ${this.countRows(snapshot.linesCsv)} rows`;
+      return `CSV bundle ready · sheet ${formatCountNoun(this.countRows(snapshot.sheetCsv), "row")} · lines ${formatCountNoun(this.countRows(snapshot.linesCsv), "row")}`;
     }
     if (hasSheet) {
-      return `Component sheet loaded · ${this.countRows(snapshot.sheetCsv)} rows · add component_lines.csv to continue`;
+      return `Component sheet loaded · ${formatCountNoun(this.countRows(snapshot.sheetCsv), "row")} · add component_lines.csv to continue`;
     }
     if (hasLines) {
-      return `Component lines loaded · ${this.countRows(snapshot.linesCsv)} rows · add component_sheet.csv to continue`;
+      return `Component lines loaded · ${formatCountNoun(this.countRows(snapshot.linesCsv), "row")} · add component_sheet.csv to continue`;
     }
     return null;
   }

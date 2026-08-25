@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
+import { formatCountNoun } from "../../lib/format";
 import {
   useListDelivery,
   useListEvent,
@@ -10,6 +11,7 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { useAssignVehicle } from "../facilities/vehicleAssignment";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MARKS = [0, 6, 12, 18, 24];
@@ -122,9 +124,8 @@ export function VehicleSchedulePage() {
           >
             ← Previous
           </button>
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             aria-label="Schedule day"
             value={day}
             onChange={(event) => setDay(event.currentTarget.value)}
@@ -153,7 +154,8 @@ export function VehicleSchedulePage() {
             <h2>{new Date(dayStart).toLocaleDateString()}</h2>
           </div>
           <span>
-            {fleet.length} vehicles · {dayRuns.length} delivery runs
+            {formatCountNoun(fleet.length, "vehicle")} ·{" "}
+            {formatCountNoun(dayRuns.length, "delivery run")}
           </span>
         </div>
         {loading ? (
@@ -259,16 +261,33 @@ export function VehicleSchedulePage() {
         {loading ? (
           <TableSkeleton rows={2} />
         ) : unassignedRuns.length === 0 ? (
-          <div className="document-empty">
-            <p>Every delivery this day has a vehicle.</p>
-            <span>
-              Schedule more runs from{" "}
-              <Link className="text-link" to="/logistics/deliveries">
-                Deliveries
-              </Link>
-              .
-            </span>
-          </div>
+          dayRuns.length === 0 ? (
+            <div className="document-empty">
+              <p>No delivery runs scheduled this day.</p>
+              <span>
+                Runs start in{" "}
+                <Link className="text-link" to="/logistics/packs">
+                  Pack lists
+                </Link>
+                : pack the event's list, then schedule the run in{" "}
+                <Link className="text-link" to="/logistics/deliveries">
+                  Deliveries
+                </Link>{" "}
+                and it will show up here for a vehicle.
+              </span>
+            </div>
+          ) : (
+            <div className="document-empty">
+              <p>Every delivery this day has a vehicle.</p>
+              <span>
+                Schedule more runs from{" "}
+                <Link className="text-link" to="/logistics/deliveries">
+                  Deliveries
+                </Link>
+                .
+              </span>
+            </div>
+          )
         ) : (
           <div className="supply-table-wrap">
             <table className="supply-table">

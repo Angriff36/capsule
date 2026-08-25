@@ -1,4 +1,5 @@
 import type { Doc } from "../../lib/api";
+import { formatCountNoun } from "../../lib/format";
 import { clientDisplayName } from "../events/clientName";
 import type { ClientDuplicateCandidate } from "./contactDedup";
 
@@ -52,8 +53,9 @@ function AccountChoice({
             {client.email || "No email"}
           </span>
           <span className="mt-3 block text-sm text-ink-2">
-            {counts.events} events · {counts.contacts} contacts ·{" "}
-            {counts.communications} communications
+            {formatCountNoun(counts.events, "event")} ·{" "}
+            {formatCountNoun(counts.contacts, "contact")} ·{" "}
+            {formatCountNoun(counts.communications, "communication")}
           </span>
         </span>
       </span>

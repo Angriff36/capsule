@@ -1,3 +1,4 @@
+import { isBilledInvoice } from "./invoiceBilling";
 import { readInvoiceLineItems } from "./invoiceTax";
 
 export type RevenueGranularity = "week" | "month" | "quarter";
@@ -306,12 +307,10 @@ export function buildRevenueTrend({
 
   let currentInvoiceCount = 0;
   for (const invoice of annotatedInvoices) {
-    if (
-      invoice.deletedAt != null ||
-      ["voided", "written_off"].includes(String(invoice.status))
-    ) {
-      continue;
-    }
+    // Only invoices actually billed to a client (sent through paid) are
+    // revenue. Drafts are intent — counting them invents billed money the
+    // hub and invoice ledger rightly report as $0.
+    if (!isBilledInvoice(invoice)) continue;
     const issuedAt = validDate(invoice.issuedAt ?? invoice.createdAt);
     const total = invoice.functionalTotal;
     if (!issuedAt || !Number.isFinite(total)) continue;

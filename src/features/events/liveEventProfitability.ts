@@ -1,3 +1,5 @@
+import { isBilledInvoice } from "../finance/invoiceBilling";
+
 type MaybeNumber = number | string | null | undefined;
 
 type SoftDelete = {
@@ -82,6 +84,8 @@ export type LiveEventProfitability = {
   rentalReservationCount: number;
   unpricedRentalReservationCount: number;
   hasIncompletePricing: boolean;
+  /** purchase = submitted PO; recipe = menu × catalog even when $0; none = no source. */
+  ingredientCostSource: "purchase" | "recipe" | "none";
 };
 
 const COMMITTED_ORDER_STATUSES = new Set([
@@ -98,7 +102,6 @@ const ACTIVE_RESERVATION_STATUSES = new Set([
   "checked_out",
   "returned",
 ]);
-const EXCLUDED_INVOICE_STATUSES = new Set(["voided", "written_off"]);
 
 const key = (value: unknown) => String(value ?? "");
 
@@ -303,6 +306,7 @@ export function buildLiveEventProfitability({
   equipment,
   equipmentReservations,
   clockedLabor,
+  recipeEstimatedFoodCost,
 }: {
   eventId: string;
   invoices: readonly ProfitabilityInvoice[];
@@ -320,14 +324,19 @@ export function buildLiveEventProfitability({
    * payroll-input pricing is blind to rates on the client — issue #76.)
    */
   clockedLabor?: ClockedLaborSummary | null;
+  /**
+   * Recipe × catalog (or receipt) food cost. Used when no submitted PO
+   * contribution exists so a costed menu is not $0 / Margin % —.
+   */
+  recipeEstimatedFoodCost?: number | null;
 }): LiveEventProfitability {
   const eventKey = key(eventId);
+  // Confirmed revenue = invoices actually billed to the client (sent through
+  // paid), per invoiceBilling.ts. issuedAt alone is not enough — issue()
+  // stamps it while the invoice is still an unsent draft, and drafts are
+  // intent, not revenue.
   const includedInvoices = invoices.filter(
-    (invoice) =>
-      isActive(invoice) &&
-      key(invoice.eventId) === eventKey &&
-      invoice.issuedAt != null &&
-      !EXCLUDED_INVOICE_STATUSES.has(key(invoice.status)),
+    (invoice) => key(invoice.eventId) === eventKey && isBilledInvoice(invoice),
   );
   const confirmedRevenue = includedInvoices.reduce(
     (sum, invoice) => sum + amount(invoice.total),
@@ -368,7 +377,22 @@ export function buildLiveEventProfitability({
     equipment,
     equipmentReservations,
   );
-  const totalCommittedCost = ingredient.cost + labor.cost + equipmentTotal.cost;
+  const recipeProvided =
+    recipeEstimatedFoodCost != null &&
+    Number.isFinite(Number(recipeEstimatedFoodCost));
+  const recipeFood = Number(recipeEstimatedFoodCost);
+  const ingredientCostSource = (
+    ingredient.cost > 0 ? "purchase" : recipeProvided ? "recipe" : "none"
+  ) as "purchase" | "recipe" | "none";
+  const ingredientCost =
+    ingredient.cost > 0
+      ? ingredient.cost
+      : ingredientCostSource === "recipe"
+        ? Number.isFinite(recipeFood) && recipeFood > 0
+          ? recipeFood
+          : 0
+        : 0;
+  const totalCommittedCost = ingredientCost + labor.cost + equipmentTotal.cost;
   const margin = confirmedRevenue - totalCommittedCost;
   const hasIncompletePricing =
     labor.unpricedMinutes > 0 ||
@@ -376,7 +400,7 @@ export function buildLiveEventProfitability({
 
   return {
     confirmedRevenue,
-    ingredientCost: ingredient.cost,
+    ingredientCost,
     laborCost: labor.cost,
     equipmentCost: equipmentTotal.cost,
     totalCommittedCost,
@@ -394,5 +418,6 @@ export function buildLiveEventProfitability({
     unpricedRentalReservationCount:
       equipmentTotal.unpricedRentalReservationCount,
     hasIncompletePricing,
+    ingredientCostSource,
   };
 }

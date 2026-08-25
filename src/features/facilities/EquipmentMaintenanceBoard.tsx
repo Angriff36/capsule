@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import {
   useCreateEquipmentMaintenanceTask,
   useCreateEquipmentServiceEntry,
@@ -9,6 +9,7 @@ import {
 import { TableSkeleton } from "../../ui/primitives";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import "./EquipmentMaintenanceBoard.css";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SOON_MS = 7 * DAY_MS;
@@ -262,10 +263,9 @@ export function EquipmentMaintenanceBoard({
           </label>
           <label className="field-label">
             First due
-            <input
+            <BoundedDateTimeLocalInput
               name="nextDueAt"
               className="input"
-              type="datetime-local"
               defaultValue={localDateTime(now + 30 * DAY_MS)}
               required
             />
@@ -369,7 +369,10 @@ export function EquipmentMaintenanceBoard({
                     {isServiceOpen ? "Close log" : "Log service"}
                   </button>
                   {taskEntries.length > 1 ? (
-                    <small>{taskEntries.length} entries on file</small>
+                    <small>
+                      {formatCountNoun(taskEntries.length, "entry", "entries")}{" "}
+                      on file
+                    </small>
                   ) : null}
                 </div>
 
@@ -394,10 +397,9 @@ export function EquipmentMaintenanceBoard({
                     </label>
                     <label className="field-label">
                       Completed
-                      <input
+                      <BoundedDateTimeLocalInput
                         name="completedAt"
                         className="input"
-                        type="datetime-local"
                         max={localDateTime(now)}
                         defaultValue={localDateTime(now)}
                         required

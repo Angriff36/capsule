@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -42,7 +43,7 @@ export class ActionPromptSession {
     request: Omit<ConfirmPromptRequest, "kind">,
   ): Promise<boolean> {
     const result = await this.ask({ ...request, kind: "confirm" });
-    if (result.status === "dismissed") {
+    if (result.status !== "confirmed") {
       this.announceDismissed();
       return false;
     }
@@ -69,6 +70,7 @@ export function useActionPrompt(busy = false): {
   const controller = useMemo(() => new ActionPromptController(), []);
   const [pending, setPending] = useState(controller.getPending());
   const [notice, setNotice] = useState<string | null>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
 
   const announceDismissed = useCallback(() => {
     setNotice(DISMISSED_NOTICE);
@@ -87,8 +89,18 @@ export function useActionPrompt(busy = false): {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  // Scroll the prompt into view when it appears
+  useEffect(() => {
+    if (pending && hostRef.current) {
+      hostRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [pending]);
+
   const host = (
-    <div aria-live="polite" aria-atomic="true">
+    <div ref={hostRef} aria-live="polite" aria-atomic="true">
       {notice ? (
         <p
           className="mt-3 rounded-sm border border-line bg-inset px-3 py-2 text-sm text-ink-2"

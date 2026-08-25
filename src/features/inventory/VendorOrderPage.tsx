@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { formatMoneyExact } from "../../lib/format";
+import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateVendorOrderLine,
   useGetVendorOrder,
@@ -31,13 +32,15 @@ import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
+import { vendorOrderTitle } from "./vendorOrderNumber";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
 
 const policy = new SupplyLifecyclePolicy();
 
 export function VendorOrderPage() {
   const { id } = useParams();
-  const order = useGetVendorOrder(id || "skip");
+  const order = useRouteRecord(useGetVendorOrder, id);
   const vendors = useListVendor();
   const vendorContacts = useListVendorContact();
   const lines = useListVendorOrderLine();
@@ -289,9 +292,7 @@ export function VendorOrderPage() {
       <header className="order-folio-masthead">
         <div>
           <p className="eyebrow">Vendor order · {order._id.slice(-8)}</p>
-          <h1 className="display-title mt-2">
-            {order.orderNumber || "Unnumbered order"}
-          </h1>
+          <h1 className="display-title mt-2">{vendorOrderTitle(order)}</h1>
           <p className="mt-3 text-ink-2">
             {vendor?.name ?? "Unknown vendor"} ·{" "}
             {order.eventId ? "Event order" : "General stock"}
@@ -299,7 +300,9 @@ export function VendorOrderPage() {
         </div>
         <div className="order-state">
           <StatusChip status={String(order.status)} />
-          <strong>{formatMoneyExact(Number(order.totalAmount))}</strong>
+          <strong>
+            {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
+          </strong>
           <span>Order total</span>
         </div>
       </header>

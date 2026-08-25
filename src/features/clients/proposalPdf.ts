@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import {
+  formatCountNoun,
   formatMoneyExact,
   formatTime as formatTimeShared,
 } from "../../lib/format";
@@ -473,7 +474,7 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
       doc.setTextColor(...MUTED);
       let detail = `${basisLabel}`;
       if (line.pricingBasis === "per_person") {
-        detail = `Per person · ${usd(unit)} × ${guestCount} guests`;
+        detail = `Per person · ${usd(unit)} × ${formatCountNoun(guestCount, "guest")}`;
       } else if (line.pricingBasis === "per_unit") {
         const unitLabel = line.unit?.trim();
         detail = `Per unit · ${usd(unit)} × ${Number(line.quantity ?? 0)}${

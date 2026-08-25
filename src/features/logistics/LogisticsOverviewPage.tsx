@@ -10,6 +10,7 @@ import {
   EmptyState,
   PageHeader,
   Section,
+  Skeleton,
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
@@ -140,25 +141,29 @@ export function LogisticsOverviewPage() {
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Deliveries today</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : todayCount}
+            {loading ? <Skeleton className="h-7 w-12" /> : todayCount}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">In transit</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : inTransitCount}
+            {loading ? <Skeleton className="h-7 w-12" /> : inTransitCount}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Open pack lists</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : openPackCount}
+            {loading ? <Skeleton className="h-7 w-12" /> : openPackCount}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Vehicles available</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : availableVehicleCount}
+            {loading ? (
+              <Skeleton className="h-7 w-12" />
+            ) : (
+              availableVehicleCount
+            )}
           </dd>
         </div>
       </dl>

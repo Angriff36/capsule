@@ -10,6 +10,23 @@ import type {
   PrepTaskLike,
 } from "./KitchenCommandDeckTypes";
 
+export function commandDeckFilterNoun(filter: CommandDeckFilter): string {
+  switch (filter) {
+    case "unassigned":
+      return "Unassigned";
+    case "blocked":
+      return "Blocked";
+    case "kitchen":
+      return "Kitchen";
+    case "event":
+      return "Event";
+    case "mine":
+      return "Mine";
+    default:
+      return "All";
+  }
+}
+
 export class KitchenCommandDeckModel {
   constructor(
     private readonly events: EventLike[],
@@ -39,6 +56,20 @@ export class KitchenCommandDeckModel {
       .sort((a, b) => Number(a.startsAt) - Number(b.startsAt));
   }
 
+  /** First event at/after the window start — the empty rail offers to jump to it. */
+  nextEventAfterHorizon(): EventLike | undefined {
+    const windowStart = this.horizon.start().getTime();
+    return this.events
+      .filter(
+        (e) =>
+          e.deletedAt == null &&
+          e.startsAt != null &&
+          Number.isFinite(Number(e.startsAt)) &&
+          Number(e.startsAt) >= windowStart,
+      )
+      .sort((a, b) => Number(a.startsAt) - Number(b.startsAt))[0];
+  }
+
   tasksForEvent(eventId: string): PrepTaskLike[] {
     // Pulling a dish mid-service stands its prep down, but work already
     // completed keeps its record rather than being cancelled. Those tasks are
@@ -65,6 +96,45 @@ export class KitchenCommandDeckModel {
       completed,
       pct: total ? Math.round((completed / total) * 100) : 0,
     };
+  }
+
+  filterIsActive(filter: CommandDeckFilter, assigneeFilter: string): boolean {
+    return filter !== "all" || Boolean(assigneeFilter);
+  }
+
+  /**
+   * Headline for the selected event. Unassigned/Blocked (and assignee)
+   * must not keep painting overall 15/15 · 100% while the dishes under it
+   * are empty — QA: 0-of-15, not "No matching tasks" with a finished header.
+   */
+  filteredHeadline(
+    eventId: string,
+    filter: CommandDeckFilter,
+    assigneeFilter: string,
+  ): string {
+    const overall = this.progress(eventId);
+    if (overall.total === 0) {
+      return "No prep tasks yet — add dishes on the event menu, or load prep from dish templates.";
+    }
+    if (!this.filterIsActive(filter, assigneeFilter)) {
+      return `${overall.completed}/${overall.total} steps · ${overall.pct}% complete`;
+    }
+    const matching = this.filterTasks(eventId, filter, assigneeFilter);
+    const noun = assigneeFilter
+      ? "this assignee"
+      : commandDeckFilterNoun(filter);
+    return `${matching.length} matching ${noun} of ${overall.total} steps`;
+  }
+
+  dishMatchingLine(
+    matchingCount: number,
+    allCount: number,
+    filterActive: boolean,
+  ): string {
+    if (!filterActive) {
+      return matchingCount ? `${matchingCount} tasks` : "No matching tasks";
+    }
+    return `${matchingCount} of ${allCount} matching`;
   }
 
   selections(eventId: string): EventDishLike[] {

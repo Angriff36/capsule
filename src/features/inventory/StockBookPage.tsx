@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   useCreateInventoryItem,
   useCreateInventoryReservation,
@@ -19,34 +19,45 @@ import {
   useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { StockReceiptScanner } from "./StockReceiptScanner";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
-
-const UNITS = [
-  "each",
-  "gram",
-  "kilogram",
-  "ounce",
-  "pound",
-  "milliliter",
-  "liter",
-  "teaspoon",
-  "tablespoon",
-  "cup",
-  "pint",
-  "quart",
-  "gallon",
-  "portion",
-] as const;
+import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
+import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 
 const policy = new SupplyLifecyclePolicy();
 
 const DAY_MS = 86_400_000;
+
+export const SUPPLY_EDITOR_DOM_ID = "supply-stock-editor";
+
+/** Transfer Apply stays off until destination and qty are both set. */
+export function supplyEditorCanApply(opts: {
+  busy: boolean;
+  kind: string;
+  destinationId?: string;
+  quantity?: string;
+  destinationCount?: number;
+}): boolean {
+  if (opts.busy) return false;
+  if (opts.kind === "transfer") {
+    if (!opts.destinationCount) return false;
+    if (!String(opts.destinationId ?? "").trim()) return false;
+    const q = Number(opts.quantity);
+    return Number.isFinite(q) && q > 0;
+  }
+  return true;
+}
+
+/** Esc dismisses the inline editor the same way Cancel does. */
+export function supplyEditorClosesOnKey(key: string): boolean {
+  return key === "Escape";
+}
+
 const HORIZON_DAYS = [3, 7, 14, 30] as const;
 
 const isExpired = (item: any) =>
@@ -97,6 +108,14 @@ export function StockBookPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const [horizonDays, setHorizonDays] = useState(7);
   const { prompt, host } = useActionPrompt(busy != null);
+  // Notification deep links land on ?item=<id> — scroll to and highlight it.
+  // rowsReady must match the table's own render gate (items AND ingredients
+  // AND locations). Pass `items` as rowEpoch so a first land that paints
+  // with an empty list still retries once the focused row mounts.
+  const focusedItemId = useFocusedStockRow(
+    items !== undefined && ingredients !== undefined && locations !== undefined,
+    items,
+  );
 
   const activeItems = (items ?? []).filter((item) => item.deletedAt == null);
   const expiringItems = activeItems
@@ -111,6 +130,10 @@ export function StockBookPage() {
   );
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
+  const unitFor = (item: {
+    ingredientId?: string | null;
+    unit?: string | null;
+  }) => catalogUnitForStockLine(item, ingredients ?? []);
   const locationName = (id: string) =>
     locations?.find((item) => item._id === id)?.name ?? "Unknown location";
   const eventName = (id: string) =>
@@ -130,14 +153,16 @@ export function StockBookPage() {
     qty4(item.quantityOnHand - reservedFor(item._id));
   const belowPar = (item: any) =>
     item.parLevel > 0 && availableFor(item) < item.parLevel;
-  const belowReorder = (item: any) =>
-    item.reorderThreshold > 0 && availableFor(item) < item.reorderThreshold;
   const suggestedPurchase = (item: any) =>
     qty4(Math.max(0, item.parLevel - availableFor(item)));
+  // Same predicate as the bell and home widget — quantityOnHand vs
+  // reorderThreshold, not available-vs-PAR (unconfigured 0/0 stays quiet).
   const lowStockItems = activeItems
-    .filter(belowPar)
+    .filter(isBelowReorder)
     .sort(
-      (a, b) => availableFor(a) / a.parLevel - availableFor(b) / b.parLevel,
+      (a, b) =>
+        a.quantityOnHand / Math.max(1, a.reorderThreshold) -
+        b.quantityOnHand / Math.max(1, b.reorderThreshold),
     );
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -169,10 +194,17 @@ export function StockBookPage() {
         });
       }
       if (current === "stock") {
+        const ingredient = (ingredients ?? []).find(
+          (candidate) => candidate._id === String(data.get("ingredientId")),
+        );
+        if (!ingredient) throw new Error("Select an ingredient.");
         await createItem({
-          ingredientId: String(data.get("ingredientId")),
+          ingredientId: ingredient._id,
           locationId: String(data.get("locationId")),
-          unit: String(data.get("unit")) as (typeof UNITS)[number],
+          // Locked to the ingredient's catalog unit: nothing converts between
+          // units, so a diverging stock unit silently breaks on-hand vs demand
+          // math and low-stock alerts (issue #150).
+          unit: ingredient.unit,
           quantityOnHand: Number(data.get("quantityOnHand")),
           parLevel: Number(data.get("parLevel")),
           reorderThreshold: Number(data.get("reorderThreshold")),
@@ -260,7 +292,7 @@ export function StockBookPage() {
         title: action === "receive" ? "Receive stock" : "Recount stock",
         description: `${ingredientName(item.ingredientId)} at ${locationName(
           item.locationId,
-        )} (${item.unit}).`,
+        )} (${unitFor(item)}).`,
         fields: [
           {
             name: "quantity",
@@ -333,18 +365,18 @@ export function StockBookPage() {
       const values = await prompt.askFields({
         title: "Set PAR & reorder levels",
         description:
-          "A low-stock alert appears when available stock (on hand minus active reservations) drops below PAR.",
+          "A low-stock alert appears when on-hand quantity is below a tracked reorder point (reorder threshold greater than zero).",
         fields: [
           {
             name: "parLevel",
-            label: `PAR level (${item.unit})`,
+            label: `PAR level (${unitFor(item)})`,
             defaultValue: String(item.parLevel),
             inputType: "number",
             required: true,
           },
           {
             name: "reorderThreshold",
-            label: `Reorder threshold (${item.unit})`,
+            label: `Reorder threshold (${unitFor(item)})`,
             defaultValue: String(item.reorderThreshold),
             inputType: "number",
             required: true,
@@ -427,9 +459,10 @@ export function StockBookPage() {
       <aside className="supply-degraded" role="note">
         <strong>Live stock facts</strong>
         <span>
-          Available stock is what's on hand minus what's reserved for events —
-          low-stock alerts and suggested purchase quantities come from those
-          live totals. Search and exact decimals can be slightly imprecise.
+          Available stock is what's on hand minus what's reserved for events.
+          Low-stock alerts follow on-hand vs a tracked reorder point (same
+          predicate as home and the bell). Suggested purchase still uses PAR
+          minus available. Search and exact decimals can be slightly imprecise.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -455,9 +488,9 @@ export function StockBookPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Low-stock alerts</p>
-            <h2>Below PAR</h2>
+            <h2>Below reorder</h2>
           </div>
-          <span>{lowStockItems.length} alerts</span>
+          <span>{formatCountNoun(lowStockItems.length, "alert")}</span>
         </div>
         {items === undefined ||
         ingredients === undefined ||
@@ -465,10 +498,10 @@ export function StockBookPage() {
           <TableSkeleton rows={3} />
         ) : lowStockItems.length === 0 ? (
           <div className="document-empty">
-            <p>Every stock line with a PAR level is at or above it.</p>
+            <p>Every tracked stock line is at or above its reorder point.</p>
             <span>
-              Set a PAR level on a stock line (Levels action) to get alerted
-              when available stock drops below it.
+              Set a reorder threshold on a stock line (Levels action) to get
+              alerted when on-hand quantity drops below it.
             </span>
           </div>
         ) : (
@@ -478,8 +511,8 @@ export function StockBookPage() {
                 <tr>
                   <th>Ingredient</th>
                   <th>Location</th>
-                  <th>Available</th>
-                  <th>PAR</th>
+                  <th>On hand</th>
+                  <th>Reorder</th>
                   <th>Suggested purchase</th>
                   <th>State</th>
                 </tr>
@@ -489,27 +522,23 @@ export function StockBookPage() {
                   <tr key={item._id}>
                     <td>
                       <strong>{ingredientName(item.ingredientId)}</strong>
-                      <small>{item.unit}</small>
+                      <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
                     <td className="supply-number">
-                      {availableFor(item)}
+                      {item.quantityOnHand}
                       {reservedFor(item._id) > 0
-                        ? ` (${item.quantityOnHand} − ${qty4(reservedFor(item._id))} reserved)`
+                        ? ` (${availableFor(item)} available)`
                         : ""}
                     </td>
-                    <td className="supply-number">{item.parLevel}</td>
+                    <td className="supply-number">{item.reorderThreshold}</td>
                     <td className="supply-number">
                       <strong>
-                        {suggestedPurchase(item)} {item.unit}
+                        {suggestedPurchase(item)} {unitFor(item)}
                       </strong>
                     </td>
                     <td>
-                      <StatusChip
-                        status={
-                          belowReorder(item) ? "reorder now" : "below par"
-                        }
-                      />
+                      <StatusChip status="reorder now" />
                     </td>
                   </tr>
                 ))}
@@ -585,7 +614,7 @@ export function StockBookPage() {
                   <tr key={item._id}>
                     <td>
                       <strong>{ingredientName(item.ingredientId)}</strong>
-                      <small>{item.unit}</small>
+                      <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
                     <td className="supply-number">{item.quantityOnHand}</td>
@@ -610,7 +639,7 @@ export function StockBookPage() {
             <p className="eyebrow">Stock position</p>
             <h2>Ingredient by location</h2>
           </div>
-          <span>{activeItems.length} lines</span>
+          <span>{formatCountNoun(activeItems.length, "line")}</span>
         </div>
         {items === undefined ||
         ingredients === undefined ||
@@ -639,22 +668,28 @@ export function StockBookPage() {
               </thead>
               <tbody>
                 {activeItems.map((item) => (
-                  <tr key={item._id}>
+                  <tr
+                    key={item._id}
+                    id={stockRowDomId(item._id)}
+                    className={
+                      item._id === focusedItemId
+                        ? "supply-row-focus"
+                        : undefined
+                    }
+                  >
                     <td>
                       <strong>{ingredientName(item.ingredientId)}</strong>
-                      <small>{item.unit}</small>
+                      <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
                     <td className="supply-number">{item.quantityOnHand}</td>
                     <td className="supply-number">{reservedFor(item._id)}</td>
                     <td className="supply-number">
                       {item.parLevel} / {item.reorderThreshold}
-                      {belowPar(item) ? (
-                        <StatusChip
-                          status={
-                            belowReorder(item) ? "reorder now" : "below par"
-                          }
-                        />
+                      {isBelowReorder(item) ? (
+                        <StatusChip status="reorder now" />
+                      ) : belowPar(item) ? (
+                        <StatusChip status="below par" />
                       ) : null}
                     </td>
                     <td>
@@ -717,7 +752,7 @@ export function StockBookPage() {
             <p className="eyebrow">Event claims</p>
             <h2>Reservations</h2>
           </div>
-          <span>{activeReservations.length} records</span>
+          <span>{formatCountNoun(activeReservations.length, "record")}</span>
         </div>
         {reservations === undefined || events === undefined ? (
           <TableSkeleton rows={5} />
@@ -804,7 +839,7 @@ export function StockBookPage() {
             <p className="eyebrow">Movement audit</p>
             <h2>Transfer history</h2>
           </div>
-          <span>{(transfers ?? []).length} transfers</span>
+          <span>{formatCountNoun((transfers ?? []).length, "transfer")}</span>
         </div>
         {transfers === undefined ? (
           <TableSkeleton rows={3} />
@@ -868,6 +903,13 @@ function SupplyStockForm({
   onSubmit,
   onClose,
 }: any) {
+  const [stockIngredientId, setStockIngredientId] = useState("");
+  const stockIngredient =
+    kind === "stock" && stockIngredientId
+      ? ingredients.find(
+          (candidate: any) => candidate._id === stockIngredientId,
+        )
+      : undefined;
   const transferDestinations =
     kind === "transfer" && transferSource
       ? items.filter(
@@ -877,8 +919,42 @@ function SupplyStockForm({
             item.unit === transferSource.unit,
         )
       : [];
+  const [destinationId, setDestinationId] = useState("");
+  const [transferQty, setTransferQty] = useState("");
+  const editorRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    const node = editorRef.current;
+    if (!node) return;
+    node.scrollIntoView({ block: "start", behavior: "smooth" });
+    const focusable = node.querySelector<HTMLElement>(
+      "select:not([disabled]), input:not([readonly]):not([disabled])",
+    );
+    focusable?.focus();
+  }, [kind, transferSource?._id]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!supplyEditorClosesOnKey(event.key)) return;
+      event.preventDefault();
+      onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+  const canApply = supplyEditorCanApply({
+    busy,
+    kind,
+    destinationId,
+    quantity: transferQty,
+    destinationCount: transferDestinations.length,
+  });
   return (
-    <form className="supply-form" onSubmit={onSubmit}>
+    <form
+      id={SUPPLY_EDITOR_DOM_ID}
+      ref={editorRef}
+      className="supply-form"
+      onSubmit={onSubmit}
+    >
       <div className="supply-form-heading">
         <div>
           <p className="eyebrow">Inventory</p>
@@ -896,7 +972,7 @@ function SupplyStockForm({
           <button type="button" className="btn btn-ghost" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn btn-primary" disabled={busy}>
+          <button className="btn btn-primary" disabled={!canApply}>
             {busy ? "Working…" : "Apply"}
           </button>
         </div>
@@ -922,7 +998,13 @@ function SupplyStockForm({
           <>
             <label className="field-label">
               Ingredient
-              <select name="ingredientId" className="input" required>
+              <select
+                name="ingredientId"
+                className="input"
+                required
+                value={stockIngredientId}
+                onChange={(event) => setStockIngredientId(event.target.value)}
+              >
                 <option value="">Select ingredient</option>
                 {ingredients
                   .filter(
@@ -954,11 +1036,19 @@ function SupplyStockForm({
             </label>
             <label className="field-label">
               Unit
-              <select name="unit" className="input">
-                {UNITS.map((unit) => (
-                  <option key={unit}>{unit}</option>
-                ))}
-              </select>
+              <input
+                className="input"
+                value={
+                  stockIngredient
+                    ? String(stockIngredient.unit)
+                    : "Select an ingredient"
+                }
+                readOnly
+              />
+              <span className="field-hint">
+                Locked to the ingredient's catalog unit so on-hand stock counts
+                in the same unit as event demand.
+              </span>
             </label>
             {["quantityOnHand", "parLevel", "reorderThreshold", "unitCost"].map(
               (name) => (
@@ -1003,7 +1093,7 @@ function SupplyStockForm({
                     (location: any) =>
                       location._id === transferSource.locationId,
                   )?.name ?? "Location"
-                } (${transferSource.quantityOnHand} ${transferSource.unit} on hand)`}
+                } (${transferSource.quantityOnHand} ${catalogUnitForStockLine(transferSource, ingredients)} on hand)`}
                 readOnly
               />
             </label>
@@ -1013,6 +1103,9 @@ function SupplyStockForm({
                 name="destinationInventoryItemId"
                 className="input"
                 required
+                autoFocus
+                value={destinationId}
+                onChange={(event) => setDestinationId(event.target.value)}
               >
                 <option value="">Select destination</option>
                 {transferDestinations.map((item: any) => (
@@ -1020,7 +1113,8 @@ function SupplyStockForm({
                     {locations.find(
                       (location: any) => location._id === item.locationId,
                     )?.name ?? "Location"}{" "}
-                    ({item.quantityOnHand} {item.unit} on hand)
+                    ({item.quantityOnHand}{" "}
+                    {catalogUnitForStockLine(item, ingredients)} on hand)
                   </option>
                 ))}
               </select>
@@ -1041,6 +1135,8 @@ function SupplyStockForm({
                 max={transferSource.quantityOnHand}
                 step="any"
                 required
+                value={transferQty}
+                onChange={(event) => setTransferQty(event.target.value)}
               />
             </label>
             <label className="field-label">

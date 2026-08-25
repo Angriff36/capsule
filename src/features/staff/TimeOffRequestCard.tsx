@@ -4,6 +4,7 @@ import {
   useListTimeOffRequest,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const dateOnly = new Intl.DateTimeFormat(undefined, {
   month: "short",
@@ -91,11 +92,11 @@ export function TimeOffRequestCard({
           <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
             <label className="field-label">
               First day
-              <input name="startsOn" className="input" type="date" required />
+              <BoundedDateInput name="startsOn" className="input" required />
             </label>
             <label className="field-label">
               Last day
-              <input name="endsOn" className="input" type="date" required />
+              <BoundedDateInput name="endsOn" className="input" required />
             </label>
           </div>
           <label className="field-label">

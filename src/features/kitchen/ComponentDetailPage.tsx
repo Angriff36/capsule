@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateComponentIngredient,
   useGetComponent,
@@ -19,6 +20,7 @@ import {
   useCreateComponentSnapshot,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   buildComponentSnapshotData,
@@ -45,7 +47,11 @@ import {
   toNutritionIngredient,
 } from "./ComponentNutrition";
 import { ComponentNutritionPanel } from "./ComponentNutritionPanel";
-import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
+import {
+  SELECTABLE_UNITS,
+  UNIT_OF_MEASURE,
+  unitOptionsFor,
+} from "./import/UnitOfMeasureMapper";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -57,7 +63,7 @@ function optional(value: FormDataEntryValue | null) {
 
 export function ComponentDetailPage() {
   const { id } = useParams();
-  const component = useGetComponent(id ?? "skip");
+  const component = useRouteRecord(useGetComponent, id);
   useTrackRecent("Component", component?.name);
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
@@ -441,7 +447,7 @@ export function ComponentDetailPage() {
         <section className="culinary-section">
           <div className="culinary-section-heading">
             <h2>Composition</h2>
-            <span>{componentLines.length} lines</span>
+            <span>{formatCountNoun(componentLines.length, "line")}</span>
           </div>
           <div className="flex flex-wrap items-end gap-3">
             <label className="field-label">
@@ -621,7 +627,7 @@ export function ComponentDetailPage() {
               <label className="field-label">
                 Unit
                 <select name="unit" className="input">
-                  {UNITS.map((unit) => (
+                  {SELECTABLE_UNITS.map((unit) => (
                     <option key={unit}>{unit}</option>
                   ))}
                 </select>
@@ -685,7 +691,9 @@ export function ComponentDetailPage() {
       <section className="culinary-section">
         <div className="culinary-section-heading">
           <h2>Dish uses</h2>
-          <span>{componentDishes.length} dishes</span>
+          <span>
+            {formatCountNoun(componentDishes.length, "dish", "dishes")}
+          </span>
         </div>
         {componentDishes.length ? (
           <ul className="dish-uses">
@@ -769,7 +777,7 @@ function ComponentEditForm({
             className="input"
             defaultValue={component.yieldUnit}
           >
-            {UNITS.map((unit) => (
+            {unitOptionsFor(component.yieldUnit).map((unit) => (
               <option key={unit}>{unit}</option>
             ))}
           </select>

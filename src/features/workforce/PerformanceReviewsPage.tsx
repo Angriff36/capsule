@@ -7,9 +7,10 @@ import {
   useListEvent,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DIMENSIONS = [
   { key: "reliabilityRating", label: "Reliability" },
@@ -150,7 +151,7 @@ export function PerformanceReviewsPage() {
             </label>
             <label className="field-label">
               Review date
-              <input name="reviewDate" className="input" type="date" required />
+              <BoundedDateInput name="reviewDate" className="input" required />
             </label>
             {DIMENSIONS.map((dimension) => (
               <label key={dimension.key} className="field-label">
@@ -184,7 +185,7 @@ export function PerformanceReviewsPage() {
             <p className="eyebrow">Review ledger</p>
             <h2>Recorded reviews</h2>
           </div>
-          <span>{recordedReviews.length} records</span>
+          <span>{formatCountNoun(recordedReviews.length, "record")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={4} />

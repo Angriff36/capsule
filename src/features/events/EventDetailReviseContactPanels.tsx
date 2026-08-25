@@ -54,7 +54,7 @@ export function EventDetailReviseContactPanels({
   onChangeRequirements,
 }: Props) {
   return (
-    <div className="mt-3 grid gap-3 lg:grid-cols-2">
+    <div className="mt-4 grid gap-4 lg:grid-cols-2">
       <EventFormCluster title="Primary contact" hint="Who we call on the day">
         <form
           key={`contact-${version}`}

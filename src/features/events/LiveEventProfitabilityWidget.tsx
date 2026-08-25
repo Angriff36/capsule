@@ -23,7 +23,16 @@ const hours = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 1,
 });
 
-export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
+export function LiveEventProfitabilityWidget({
+  eventId,
+  recipeEstimatedFoodCost,
+  recipeUnpricedReason,
+}: {
+  eventId: string;
+  recipeEstimatedFoodCost?: number | null;
+  /** Why the recipe estimate is $0 (unit mismatch, no priced lines). */
+  recipeUnpricedReason?: string | null;
+}) {
   const invoices = useListInvoice();
   const demands = useListIngredientDemand();
   const orders = useListVendorOrder();
@@ -58,6 +67,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
         equipment: equipment ?? [],
         equipmentReservations: equipmentReservations ?? [],
         clockedLabor,
+        recipeEstimatedFoodCost,
       }),
     [
       clockedLabor,
@@ -70,6 +80,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
       lines,
       orders,
       payrollInputs,
+      recipeEstimatedFoodCost,
     ],
   );
 
@@ -163,11 +174,15 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
                 <strong data-testid="live-profit-ingredients">
                   {formatMoney(result.ingredientCost)}
                 </strong>
-                <small>
-                  {result.ingredientLineCount} committed line
-                  {result.ingredientLineCount === 1 ? "" : "s"} across{" "}
-                  {result.ingredientOrderCount} order
-                  {result.ingredientOrderCount === 1 ? "" : "s"}
+                <small data-testid="live-profit-ingredient-source">
+                  {result.ingredientCostSource === "recipe"
+                    ? recipeEstimatedFoodCost != null &&
+                      Number(recipeEstimatedFoodCost) === 0
+                      ? "recipe × catalog estimate · $0 (no same-unit priced lines)"
+                      : "recipe × catalog estimate (no submitted PO)"
+                    : result.ingredientCostSource === "purchase"
+                      ? `${result.ingredientLineCount} committed line${result.ingredientLineCount === 1 ? "" : "s"} across ${result.ingredientOrderCount} order${result.ingredientOrderCount === 1 ? "" : "s"}`
+                      : "no recipe estimate and no submitted purchase contribution"}
                 </small>
               </div>
             </article>
@@ -222,11 +237,19 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
             </div>
           ) : null}
 
-          <footer className="live-profitability__footer">
+          <footer
+            className="live-profitability__footer"
+            data-testid="live-profit-footer"
+          >
             Revenue uses issued, non-void event invoices. Ingredient value uses
-            submitted purchase contributions; labor uses clocked time × pay
-            rates (falling back to reviewed payroll amounts); equipment uses
-            active rented catalog value. Final closeout may differ.
+            the recipe × catalog estimate when no submitted purchase
+            contribution exists; submitted purchase contributions replace that
+            estimate once a PO is committed. A $0 recipe estimate means no
+            same-unit priced lines (unit mismatches are not converted). Labor
+            uses clocked time × pay rates (falling back to reviewed payroll
+            amounts); equipment uses active rented catalog value. Final closeout
+            may differ.
+            {recipeUnpricedReason ? ` ${recipeUnpricedReason}` : ""}
           </footer>
         </>
       )}

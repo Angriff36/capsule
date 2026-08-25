@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDish,
   useDishLinkAsEdition,
@@ -14,6 +15,7 @@ import {
   useListComponent,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useUndoToast } from "../../ui/useUndoToast";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -34,7 +36,7 @@ const policy = new CulinaryLifecyclePolicy();
 
 export function DishDetailPage() {
   const { id } = useParams();
-  const dish = useGetDish(id ?? "skip");
+  const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
   const allDishes = useListDish();
   const components = useListComponent();
@@ -293,7 +295,7 @@ export function DishDetailPage() {
       <section className="culinary-section">
         <div className="culinary-section-heading">
           <h2>Event uses</h2>
-          <span>{eventUses.length} events</span>
+          <span>{formatCountNoun(eventUses.length, "event")}</span>
         </div>
         {eventUses.length ? (
           <ul className="dish-uses">

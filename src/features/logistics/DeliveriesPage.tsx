@@ -1,6 +1,7 @@
 import { Fragment, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDelivery,
   useDeliveryCancel,
@@ -29,6 +30,7 @@ import { RecordPhotoCapture } from "../attachments/RecordPhotoCapture";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -308,19 +310,17 @@ export function DeliveriesPage() {
             </label>
             <label className="field-label">
               Window starts
-              <input
+              <BoundedDateTimeLocalInput
                 name="windowStartsAt"
                 className="input"
-                type="datetime-local"
                 required
               />
             </label>
             <label className="field-label">
               Window ends
-              <input
+              <BoundedDateTimeLocalInput
                 name="windowEndsAt"
                 className="input"
-                type="datetime-local"
                 required
               />
             </label>
@@ -358,7 +358,9 @@ export function DeliveriesPage() {
             <p className="eyebrow">Transit</p>
             <h2>Deliveries</h2>
           </div>
-          <span>{visibleRows.length} deliveries</span>
+          <span>
+            {formatCountNoun(visibleRows.length, "delivery", "deliveries")}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
@@ -366,8 +368,11 @@ export function DeliveriesPage() {
           <div className="document-empty">
             <p>No active deliveries.</p>
             <span>
-              Schedule a delivery once a pack list is packed, loaded, or
-              dispatched.
+              Deliveries start from packed lists — open{" "}
+              <Link className="text-link" to="/logistics/packs">
+                Pack lists
+              </Link>{" "}
+              to pack an event first, then schedule the run here.
             </span>
             <div className="mt-3 flex justify-center">
               <button

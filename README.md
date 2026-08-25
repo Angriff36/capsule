@@ -37,7 +37,7 @@ bun run dev          # terminal 2 → http://localhost:7811
 bun run check
 ```
 
-Runs toolchain pin check, typecheck, Prettier (`format:check`), secret scan, tests with coverage ratchet, production build, and baseline decay checks. CI runs the same script (`.github/workflows/ci.yml`). See [`BASELINE.md`](BASELINE.md).
+Runs toolchain pin check, typecheck, Prettier (`format:check`), secret scan, tests with coverage ratchet, production build, and baseline decay checks. CI (`.github/workflows/ci.yml`) runs it on pull requests only; the release script runs it locally before the one `main` push. See [`BASELINE.md`](BASELINE.md).
 
 ## Deploying to Vercel (production)
 
@@ -49,19 +49,24 @@ https://dashboard.convex.dev/d/impartial-mule-193). Auth: Clerk dev instance
 `golden-koi-11` (test keys — swap for a Clerk production instance before real
 customers).
 
-The app is TWO deployables. Ship the backend first, then the frontend:
+**Branch and release rule (owner, 2026-08-25):** never push `main` by hand (`.githooks/pre-push` blocks it). Work on a branch; commit and push to that branch at once and often — those pushes are chores: Vercel ignores non-`main` refs (`vercel.json` `ignoreCommand`), so no build and no Convex prod deploy. Dev uses the LOCAL Convex backend. ONE merge to `main` at the end of the branch — `bash scripts/release.sh --reviewer <model>` — is the only production build and prod deploy; it then renames the branch to `archive/<branch>`.
 
-1. **Land the change on `main`** through a green-CI PR as usual.
-2. **Backend (only if `convex/` output or `src/**/*.manifest` changed):**
-   run `bun run manifest:regen` first when manifests changed, then
-   `npx convex deploy -y` — pushes functions/schema/indexes to
-   impartial-mule-193. Backend env vars live on the deployment:
-   `npx convex env set KEY value --prod` (CLERK_JWT_ISSUER_DOMAIN is already
-   set to the golden-koi-11 issuer).
-3. **Frontend:** pushing/merging to `main` auto-deploys via the GitHub
-   integration. Manual alternative from a checkout:
-   `vercel deploy --prod --yes --archive=tgz` (`--archive` is REQUIRED — the
-   repo exceeds Vercel's 15k-file upload limit without it).
+How a change reaches production:
+
+1. **Work on a branch.** Commit and push to the branch as you go. Nothing
+   builds; nothing deploys.
+2. **Release once.** After the cross-model review APPROVES, run
+   `bash scripts/release.sh --reviewer <model>` from the branch. It merges into
+   `main`, pushes `main` one time, and archives the branch.
+3. **That one `main` push builds on Vercel** and its build
+   (`scripts/vercel-build.sh`) runs `convex deploy --cmd 'vite build'`, so the
+   Convex backend (impartial-mule-193) and the UI ship together. Backend env
+   vars live on the deployment: `npx convex env set KEY value --prod`
+   (CLERK_JWT_ISSUER_DOMAIN is already set to the golden-koi-11 issuer).
+
+Manual deploys are human-only (`npx convex deploy -y`;
+`vercel deploy --prod --yes --archive=tgz` — `--archive` is REQUIRED, the
+repo exceeds Vercel's 15k-file upload limit without it).
 
 Frontend env vars (`VITE_CONVEX_URL`, `VITE_CLERK_PUBLISHABLE_KEY`) are baked
 in at **build time** from the Vercel project's Production env — changing one
@@ -70,7 +75,11 @@ requires a redeploy, and `vercel env add NAME production` to update.
 Config files that make deploys work (do not delete):
 
 - `vercel.json` — SPA rewrite of every route to `index.html`; without it any
-  client-side route 404s on refresh.
+  client-side route 404s on refresh. Its `ignoreCommand` skips every build
+  that is not a `[release]` commit on `main`: branch pushes and GitHub-side
+  merges run no build and no Convex deploy (Vercel still counts the skipped
+  deployment, but at zero build time).
+- `.githooks/pre-push` + `scripts/release.sh` — the branch/release rule above.
 - `.vercelignore` — keeps worktrees/transcripts/generated docs out of the
   upload. Patterns are root-anchored (`/generated`) on purpose: a bare
   `generated` also matches `src/generated` and breaks the build.

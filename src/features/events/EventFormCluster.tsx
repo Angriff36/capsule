@@ -6,15 +6,15 @@ type Props = {
   readonly children: ReactNode;
 };
 
-/** Form group tile matching Photo Gallery category cards (panel + border). */
+/** Editable section: white card, titled header, form body with its own Save. */
 export function EventFormCluster({ title, hint, children }: Props) {
   return (
-    <div className="rounded-sm border border-line-2 bg-panel p-3">
-      <p className="text-base font-semibold text-ink">{title}</p>
-      {hint ? (
-        <p className="mt-0.5 text-xs leading-snug text-ink-3">{hint}</p>
-      ) : null}
-      <div className="mt-3 space-y-3">{children}</div>
+    <div className="card flex flex-col">
+      <div className="border-b border-line px-4 py-3">
+        <p className="text-base font-semibold text-ink">{title}</p>
+        {hint ? <p className="mt-0.5 text-sm text-ink-2">{hint}</p> : null}
+      </div>
+      <div className="space-y-3 p-4">{children}</div>
     </div>
   );
 }

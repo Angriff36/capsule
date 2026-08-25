@@ -37,6 +37,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
+    prefix: "/events/",
+    title: "Event",
+    purpose: "This booking — menu, staff, timeline, and money in one place.",
+    steps: [
+      "Review the menu, staff, and timeline.",
+      "Update details as the booking firms up.",
+      "Use the stage actions to move it forward.",
+    ],
+  },
+  {
     prefix: "/events/new",
     title: "New event",
     purpose: "Book a new event — only the Basics section is needed to start.",
@@ -175,7 +185,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose:
       "What's on the shelf, what's running low, and what's on order from vendors.",
     steps: [
-      "Watch the Below PAR list — that's what to reorder.",
+      "Watch the Below reorder alerts — that's what to reorder.",
       "Use Purchasing to turn needs into vendor orders.",
     ],
   },
@@ -242,6 +252,17 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Review this week's draft order.",
       "Adjust quantities, pick vendors, and send.",
       "Mark orders received when deliveries arrive.",
+    ],
+  },
+  {
+    prefix: "/inventory/orders",
+    title: "Purchasing",
+    purpose:
+      "A vendor order — review lines, send it, and mark it received when the delivery arrives.",
+    steps: [
+      "Check quantities and prices.",
+      "Send the order to the vendor.",
+      "Mark it received when the delivery arrives.",
     ],
   },
   {
@@ -611,13 +632,22 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
 ];
 
+/** True when pathname is this guide's page or a nested path under it. */
+function matchesGuidePrefix(pathname: string, prefix: string): boolean {
+  if (prefix === "/") return pathname === "/";
+  if (pathname === prefix) return true;
+  if (pathname.startsWith(`${prefix}/`)) return true;
+  // Trailing-slash prefixes (e.g. "/events/") cover record paths only.
+  return prefix.endsWith("/") && pathname.startsWith(prefix);
+}
+
 /** Longest-prefix match; "/" only matches home exactly. */
 export function guideForPath(pathname: string): PageGuide | undefined {
   if (pathname === "/") return PAGE_GUIDES.find((g) => g.prefix === "/");
   let best: PageGuide | undefined;
   for (const guide of PAGE_GUIDES) {
     if (guide.prefix === "/") continue;
-    if (pathname === guide.prefix || pathname.startsWith(`${guide.prefix}/`)) {
+    if (matchesGuidePrefix(pathname, guide.prefix)) {
       if (!best || guide.prefix.length > best.prefix.length) best = guide;
     }
   }

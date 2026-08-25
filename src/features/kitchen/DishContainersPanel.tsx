@@ -1,5 +1,7 @@
 import { useState, type FormEvent } from "react";
+import { formatCountNoun } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import {
   useCreateDishContainer,
   useDishContainerRetire,
@@ -35,6 +37,7 @@ export function DishContainersPanel({ dishId }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const { prompt, host: promptHost } = useActionPrompt();
 
   const rows = (containers ?? [])
     .filter(
@@ -83,7 +86,18 @@ export function DishContainersPanel({ dishId }: Props) {
     }
   }
 
-  async function onRetire(id: string, version: number | undefined) {
+  async function onRetire(
+    id: string,
+    version: number | undefined,
+    name: string,
+  ) {
+    const ok = await prompt.askConfirm({
+      title: "Retire container",
+      description: `Retire "${name}"? It stops appearing on the pack list of events using this dish.`,
+      confirmLabel: "Retire",
+      tone: "danger",
+    });
+    if (!ok) return;
     setBusy(id);
     setError(null);
     setNotice(null);
@@ -105,9 +119,10 @@ export function DishContainersPanel({ dishId }: Props) {
     <section className="culinary-section">
       <div className="culinary-section-heading">
         <h2>Containers &amp; service method</h2>
-        <span>{rows.length} containers</span>
+        <span>{formatCountNoun(rows.length, "container")}</span>
       </div>
 
+      {promptHost}
       {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
         <p className="text-base text-ok" role="status">
@@ -148,7 +163,7 @@ export function DishContainersPanel({ dishId }: Props) {
                 type="button"
                 className="btn btn-ghost btn-sm"
                 disabled={busy != null}
-                onClick={() => void onRetire(row._id, row.version)}
+                onClick={() => void onRetire(row._id, row.version, row.name)}
               >
                 {busy === row._id ? "Working…" : "Retire"}
               </button>

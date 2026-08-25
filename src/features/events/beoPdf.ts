@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { formatTime } from "../../lib/format";
+import { formatCountNoun, formatTime } from "../../lib/format";
 import { addPdfLogo, documentAddressLines } from "../admin/pdfBranding";
 import {
   brandColorRgb,
@@ -247,7 +247,7 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
     },
     {
       label: "Guest count",
-      primary: `${event.expectedHeadcount ?? 0} guests`,
+      primary: formatCountNoun(event.expectedHeadcount ?? 0, "guest"),
       secondary: plain(event.eventType, "Event type not recorded"),
     },
     {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatCountNoun } from "../../lib/format";
 import {
   useListPerson,
   useListQualification,
@@ -96,7 +97,7 @@ export function ShiftSwapRequestsPage() {
             <p className="eyebrow">Both staff confirmed</p>
             <h2>Manager queue</h2>
           </div>
-          <span>{pending.length} requests</span>
+          <span>{formatCountNoun(pending.length, "request")}</span>
         </div>
 
         {loading ? (
@@ -222,7 +223,7 @@ export function ShiftSwapRequestsPage() {
               <p className="eyebrow">Recent decisions</p>
               <h2>Swap history</h2>
             </div>
-            <span>{history.length} requests</span>
+            <span>{formatCountNoun(history.length, "request")}</span>
           </div>
           <div className="supply-table-wrap">
             <table className="supply-table">

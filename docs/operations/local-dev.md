@@ -69,6 +69,8 @@ bun run check
 
 toolchain → typecheck → format:check (Prettier) → secrets → test:coverage → build → baseline:decay. CI runs the same script.
 
+**Branch and release rule (owner, 2026-08-25):** never push `main` by hand (`.githooks/pre-push` blocks it). Work on a branch; commit and push to that branch at once and often — those pushes are chores: Vercel ignores non-`main` refs (`vercel.json` `ignoreCommand`), so no build and no Convex prod deploy. Dev uses the LOCAL Convex backend. ONE merge to `main` at the end of the branch — `bash scripts/release.sh --reviewer <model>` — is the only production build and prod deploy; it then renames the branch to `archive/<branch>`.
+
 Full command reference (build from scratch, regen, maintenance, features): [commands.md](./commands.md) (essentials) · [operations/commands.md](./operations/commands.md) (full).
 
 ## Reset local state

@@ -1,10 +1,13 @@
 export type EventCreatePrefill = {
   clientId?: string;
+  /** Accepted proposal to book: pre-fills the form and links + copies its menu on create. */
+  proposalId?: string;
 };
 
 export type EventDetailTab =
   | "overview"
   | "menu"
+  | "prep"
   | "equipment"
   | "client"
   | "guests"
@@ -23,6 +26,7 @@ export const EVENT_DETAIL_TABS: readonly {
 }[] = [
   { key: "overview", label: "Overview" },
   { key: "menu", label: "Menu" },
+  { key: "prep", label: "Prep" },
   { key: "equipment", label: "Equipment" },
   { key: "client", label: "Client Information" },
   { key: "guests", label: "Guests" },
@@ -36,16 +40,56 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "margin", label: "Margin" },
 ] as const;
 
+/**
+ * Workflow grouping for the event detail navigation. Tab keys (and the
+ * `?tab=` URL contract) are unchanged; groups only decide which sections sit
+ * together on screen.
+ */
+export const EVENT_TAB_GROUPS: readonly {
+  key: "plan" | "food" | "dayof" | "records" | "money";
+  label: string;
+  tabs: readonly EventDetailTab[];
+}[] = [
+  {
+    key: "plan",
+    label: "Plan",
+    tabs: ["overview", "client", "guests", "recurring"],
+  },
+  { key: "food", label: "Food", tabs: ["menu", "prep", "inventory"] },
+  {
+    key: "dayof",
+    label: "Day-of",
+    tabs: ["timeline", "staffing", "equipment", "layouts"],
+  },
+  { key: "records", label: "Records", tabs: ["photos", "incidents"] },
+  { key: "money", label: "Money", tabs: ["margin"] },
+] as const;
+
+export function eventTabGroupFor(tab: EventDetailTab) {
+  return (
+    EVENT_TAB_GROUPS.find((group) => group.tabs.includes(tab)) ??
+    EVENT_TAB_GROUPS[0]
+  );
+}
+
+const EVENTS_INDEX_PATH = "/events";
 const EVENTS_NEW_PATH = "/events/new";
+
+/** Exact events list path — never a record id. */
+export function eventsIndexPath(): string {
+  return EVENTS_INDEX_PATH;
+}
+
 const TAB_KEYS = new Set<string>(EVENT_DETAIL_TABS.map((tab) => tab.key));
 
-/** Builds /events/new?clientId= deep links from CRM (e.g. accepted Proposal). */
+/** Builds /events/new?clientId=&proposalId= deep links from CRM (e.g. accepted Proposal). */
 export class EventCreateLinkBuilder {
   build(prefill: EventCreatePrefill = {}): string {
-    if (!prefill.clientId) return EVENTS_NEW_PATH;
     const params = new URLSearchParams();
-    params.set("clientId", prefill.clientId);
-    return `${EVENTS_NEW_PATH}?${params.toString()}`;
+    if (prefill.clientId) params.set("clientId", prefill.clientId);
+    if (prefill.proposalId) params.set("proposalId", prefill.proposalId);
+    const query = params.toString();
+    return query ? `${EVENTS_NEW_PATH}?${query}` : EVENTS_NEW_PATH;
   }
 }
 

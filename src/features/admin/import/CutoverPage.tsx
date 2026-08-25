@@ -18,7 +18,7 @@ import { classifyCommandFailure } from "../../events/CommandFailure";
 import { FailureBanner } from "../../events/FailureBanner";
 import { PageHeader, TableSkeleton } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
-import { formatDate } from "@/lib/format";
+import { formatCountNoun, formatDate } from "@/lib/format";
 import { useAuthStatus } from "@/lib/useAuthStatus";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 
@@ -180,7 +180,8 @@ export function CutoverPage() {
       {details && <p className="text-2xs text-ink-3">{details}</p>}
       {check.count !== undefined && check.count > 0 && (
         <p className="text-xs text-danger font-medium">
-          {check.count} items require attention
+          {formatCountNoun(check.count, "item")}{" "}
+          {check.count === 1 ? "requires" : "require"} attention
         </p>
       )}
     </div>

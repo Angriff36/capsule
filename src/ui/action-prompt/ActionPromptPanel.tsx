@@ -1,5 +1,10 @@
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import type { ActionPromptRequest } from "./ActionPromptTypes";
+import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
+import {
+  ACTION_PROMPT_CONFIRM_ARM_MS,
+  shouldAcceptConfirmClick,
+} from "./confirmClickArm";
 
 interface ActionPromptPanelProps {
   request: ActionPromptRequest;
@@ -27,10 +32,47 @@ export function ActionPromptPanel({
   const tone = request.tone ?? "default";
   const cancelLabel = request.cancelLabel ?? "Keep as-is";
 
+  const [confirmArmed, setConfirmArmed] = useState(request.kind !== "confirm");
+
+  useEffect(() => {
+    if (request.kind !== "confirm") return;
+    setConfirmArmed(false);
+    const id = window.setTimeout(() => {
+      setConfirmArmed(true);
+    }, ACTION_PROMPT_CONFIRM_ARM_MS);
+    return () => window.clearTimeout(id);
+    // Keyed to the request object itself: replacing an open confirm with
+    // another (same title or not) re-arms the delay, so a click aimed at the
+    // first prompt can never land on the second one's destructive button.
+  }, [request]);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onDismiss();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onDismiss]);
+
+  const rejectUnarmedConfirm = (event: {
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  }) => {
+    if (shouldAcceptConfirmClick({ kind: request.kind, armed: confirmArmed })) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // Confirm-kind is click-only. Form submit / Enter / a Keep as-is button
+    // that lost type="button" must not confirm a destructive remove.
     if (request.kind === "confirm") {
-      onConfirm({});
       return;
     }
     if (request.kind === "reason") {
@@ -46,6 +88,15 @@ export function ActionPromptPanel({
       next[field.name] = value;
     }
     onConfirm({ values: next });
+  };
+
+  const cancel = (event: {
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  }) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onDismiss();
   };
 
   return (
@@ -74,7 +125,8 @@ export function ActionPromptPanel({
           type="button"
           className="btn btn-ghost btn-sm"
           disabled={busy}
-          onClick={onDismiss}
+          data-testid="action-prompt-cancel"
+          onClick={cancel}
         >
           {cancelLabel}
         </button>
@@ -139,6 +191,14 @@ export function ActionPromptPanel({
                     id={fieldId}
                     name={field.name}
                     type={field.inputType ?? "text"}
+                    // Unbounded datetime-local years grow to six digits while
+                    // typing (issue #148); cap at 9999 so the year commits
+                    // after four digits.
+                    max={
+                      field.inputType === "datetime-local"
+                        ? MAX_DATETIME_LOCAL_INPUT_VALUE
+                        : undefined
+                    }
                     className="input mt-1"
                     value={values[field.name] ?? ""}
                     required={field.required ?? true}
@@ -162,26 +222,53 @@ export function ActionPromptPanel({
           type="button"
           className="btn btn-ghost"
           disabled={busy}
-          onClick={onDismiss}
+          data-testid="action-prompt-cancel"
+          onClick={cancel}
         >
           {cancelLabel}
         </button>
-        <button
-          type="submit"
-          className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
-          disabled={
-            busy ||
-            (request.kind === "reason" && !reason.trim()) ||
-            (request.kind === "fields" &&
-              request.fields.some(
-                (field) =>
-                  (field.required ?? true) &&
-                  !(values[field.name] ?? "").trim(),
-              ))
-          }
-        >
-          {busy ? "Working…" : request.confirmLabel}
-        </button>
+        {request.kind === "confirm" ? (
+          <button
+            type="button"
+            className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
+            disabled={busy || !confirmArmed}
+            data-testid="action-prompt-confirm"
+            data-confirm-armed={confirmArmed ? "true" : "false"}
+            style={{ pointerEvents: confirmArmed ? "auto" : "none" }}
+            onMouseDown={rejectUnarmedConfirm}
+            onClick={() => {
+              if (
+                !shouldAcceptConfirmClick({
+                  kind: request.kind,
+                  armed: confirmArmed,
+                })
+              ) {
+                return;
+              }
+              onConfirm({});
+            }}
+          >
+            {busy ? "Working…" : request.confirmLabel}
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
+            disabled={
+              busy ||
+              (request.kind === "reason" && !reason.trim()) ||
+              (request.kind === "fields" &&
+                request.fields.some(
+                  (field) =>
+                    (field.required ?? true) &&
+                    !(values[field.name] ?? "").trim(),
+                ))
+            }
+            data-testid="action-prompt-confirm"
+          >
+            {busy ? "Working…" : request.confirmLabel}
+          </button>
+        )}
       </div>
     </form>
   );

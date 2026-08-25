@@ -68,6 +68,13 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   computed needsSpendApproval: boolean = self.purchasingConfig != null and self.purchasingConfig.orderApprovalThresholdAmount != null and self.totalAmount > self.purchasingConfig.orderApprovalThresholdAmount
   // Raw child status fields via count_of — not child computeds (parent rollup limitation).
   computed hasIncompleteLines: boolean = count_of(self.lines, (line) => line.deletedAt == null and line.status != "cancelled" and line.status != "complete") > 0
+  // Live header money, derived from the lines at READ time (issue #140 review
+  // round 2): no command writes it, so no client can forge it in any status.
+  // Receipts and line cancels show immediately. Stored subtotal/totalAmount
+  // remain the as-submitted facts behind the spend-approval gate. Lambda reads
+  // raw stored line fields only (parent rollup limitation); pre-#140 lines
+  // with null lineTotalAmount contribute 0 until next touched.
+  computed liveTotalAmount: money(12, 2) = sum(self.lines, (line) => (line.deletedAt == null and line.lineTotalAmount != null) ? line.lineTotalAmount : 0) + self.taxAmount + self.shippingAmount
 
   constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
   constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Order source range requires both a start and end"
@@ -123,6 +130,9 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   }
 
   // Manifest weekly draft ensure (match else create from PurchaseNeedReadyForWeeklyDraft).
+  // orderSequence is a reaction-param count of the tenant's vendor orders — it
+  // assigns "PO-<n>" once (never reassigns) so drafts stop showing "Unnumbered
+  // order" (issue #140).
   command ensureWeeklyDraft(
     vendorId: uuid,
     sourceRangeStart: datetime,
@@ -131,7 +141,8 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     ingredientDemandId: uuid,
     ingredientId: uuid,
     requiredQuantity: decimal(12, 4),
-    unit: UnitOfMeasure
+    unit: UnitOfMeasure,
+    orderSequence: int
   ) {
     guard self.deletedAt == null
     guard self.status == "draft"
@@ -139,6 +150,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     mutate vendorId = vendorId
     mutate sourceRangeStart = sourceRangeStart
     mutate sourceRangeEnd = sourceRangeEnd
+    mutate orderNumber = self.orderNumber != null ? self.orderNumber : "PO-" + (orderSequence + 1)
     mutate openedAt = self.openedAt == null ? now() : self.openedAt
     emit VendorOrderWeeklyDraftEnsured {
       vendorOrderId: self.id
@@ -177,6 +189,38 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
       subtotal: subtotal
       taxAmount: taxAmount
       shippingAmount: shippingAmount
+      totalAmount: nextTotal
+    }
+  }
+
+  // Stored-money rollup for DRAFT/SUBMITTED only (issue #140, review round 2).
+  // Draft-state line reactions feed the DB-derived line sum here so the stored
+  // subtotal/totalAmount stay accurate through the spend-approval gate — the
+  // same trust envelope as updateTotals. From confirmed onward NOTHING may
+  // write header money through this command (a forged lineSubtotal could zero
+  // committed spend); the user-facing header is the read-time liveTotalAmount
+  // computed instead, which tracks receipts and cancels with no writable path.
+  // (Re-deriving the sum from self.lines inside this command — no param at
+  // all — is blocked at Manifest 3.6.45: the Convex projection only preloads
+  // hasMany for count_of, and sum(self.lines, …) in a command body
+  // fail-closes with a denying throw.)
+  command syncLineTotals(lineSubtotal: money(12, 2)) {
+    guard self.deletedAt == null
+    guard self.status == "draft" or self.status == "submitted"
+    constraint syncLineSubtotalNonnegative: lineSubtotal >= 0 "Order money amounts cannot be negative"
+    compute previousTotal = self.totalAmount
+    compute nextTotal = lineSubtotal + self.taxAmount + self.shippingAmount
+    mutate subtotal = lineSubtotal
+    mutate totalAmount = nextTotal
+    emit VendorOrderTotalsUpdated {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousTotalAmount: previousTotal
+      subtotal: lineSubtotal
+      taxAmount: self.taxAmount
+      shippingAmount: self.shippingAmount
       totalAmount: nextTotal
     }
   }
@@ -359,6 +403,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   property required receivedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
   property required unitCost: money(12, 2) = 0
+  // Stored orderedQuantity * unitCost fact so header rollups can sum it
+  // (reaction sum() only reads stored properties). Optional so pre-#140 rows
+  // still validate; null sums as 0 until the line is next touched.
+  property lineTotalAmount: money(12, 2)?
   property discrepancyQuantity: decimal(12, 4)?
   property discrepancyNotes: string?
   property required status: VendorOrderLineStatus = "pending"
@@ -420,6 +468,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     mutate orderedQuantity = orderedQuantity
     mutate unit = unit
     mutate unitCost = unitCost
+    mutate lineTotalAmount = orderedQuantity * unitCost
     mutate status = "added"
     mutate addedAt = now()
     emit VendorOrderLineAdded {
@@ -437,6 +486,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
 
   // Weekly draft line ensure: create or revise consolidated shortage quantity.
   // weekNeed / onHand are reaction-param sums (command-body sum() is not projected).
+  // Pricing (issue #140): the draft line pre-prices from the ingredient's
+  // catalog costPerUnit instead of $0. A price the buyer already set on the
+  // line (or a prior receipt recorded) is kept — re-ensures never clobber a
+  // nonzero unitCost.
   command ensureWeeklyLine(
     vendorOrderId: uuid,
     ingredientId: uuid,
@@ -444,7 +497,6 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     onHand: decimal(12, 4),
     contributionQuantity: decimal(12, 4),
     unit: UnitOfMeasure,
-    unitCost: money(12, 2),
     purchaseNeedId: uuid,
     ingredientDemandId: uuid
   ) {
@@ -453,12 +505,14 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.ingredient != null and self.ingredient.status == "active"
     constraint ensureContributionPositive: contributionQuantity > 0 "Contribution quantity must be positive"
     compute orderQty = max(0.0001, weekNeed - onHand)
+    compute effectiveUnitCost = self.unitCost > 0 ? self.unitCost : self.ingredient.costPerUnit
     mutate vendorOrderId = vendorOrderId
     mutate ingredientId = ingredientId
     mutate ingredientDemandId = ingredientDemandId
     mutate orderedQuantity = orderQty
     mutate unit = unit
-    mutate unitCost = unitCost
+    mutate unitCost = effectiveUnitCost
+    mutate lineTotalAmount = orderQty * effectiveUnitCost
     mutate status = self.addedAt == null ? "added" : self.status
     mutate addedAt = self.addedAt == null ? now() : self.addedAt
     emit VendorOrderLineWeeklyEnsured {
@@ -483,8 +537,10 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     constraint reviseLineQuantityPositive: orderedQuantity > 0 "Ordered quantity must be positive"
     constraint reviseLineCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    compute nextUnitCost = unitCost != null ? unitCost : self.unitCost
     mutate orderedQuantity = orderedQuantity
-    mutate unitCost = unitCost != null ? unitCost : self.unitCost
+    mutate unitCost = nextUnitCost
+    mutate lineTotalAmount = orderedQuantity * nextUnitCost
     emit VendorOrderLineQuantityRevised {
       vendorOrderLineId: self.id
       tenantId: self.tenantId
@@ -492,7 +548,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       orderedQuantity: orderedQuantity
       unit: self.unit
-      unitCost: unitCost != null ? unitCost : self.unitCost
+      unitCost: nextUnitCost
     }
   }
 
@@ -520,6 +576,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     mutate locationId = locationId
     mutate receivedQuantity = nextReceived
     mutate unitCost = unitPrice
+    mutate lineTotalAmount = self.orderedQuantity * unitPrice
     mutate discrepancyQuantity = discrepancyQuantity != null ? discrepancyQuantity : self.discrepancyQuantity
     mutate discrepancyNotes = discrepancyNotes != null ? discrepancyNotes : self.discrepancyNotes
     mutate status = nextStatus
@@ -1009,6 +1066,33 @@ event VendorOrderLineDemandRetired: "vendor_order_line_demand.retired" {
   ingredientDemandId: string
   reason: string
 }
+
+// Stored header rollup (issue #140): draft-state line changes recompute the
+// order's summed line totals so stored totalAmount is accurate at the
+// spend-approval gate. The sum() reads stored VendorOrderLine rows in the
+// reaction dispatch (tenant + soft-delete filtered). Only draft-only line
+// events react — syncLineTotals guards draft/submitted, and a reaction guard
+// failure would abort the triggering line command, so events that can fire on
+// confirmed orders (VendorOrderLineReceived, VendorOrderLineCancelled) must
+// NOT target it; from confirmed onward the header is the read-time
+// liveTotalAmount computed (review round 2 on #159).
+on VendorOrderLineWeeklyEnsured run VendorOrder.syncLineTotals
+  resolve payload.vendorOrderId
+  params {
+    lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)
+  }
+
+on VendorOrderLineAdded run VendorOrder.syncLineTotals
+  resolve payload.vendorOrderId
+  params {
+    lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)
+  }
+
+on VendorOrderLineQuantityRevised run VendorOrder.syncLineTotals
+  resolve payload.vendorOrderId
+  params {
+    lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)
+  }
 
 on VendorOrderLineReceived run IngredientPriceObservation.record
   match vendorOrderLineId = payload.vendorOrderLineId, cumulativeReceivedQuantity = payload.receivedQuantity

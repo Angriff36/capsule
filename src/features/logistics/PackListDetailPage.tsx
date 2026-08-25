@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackListItem,
   useGetPackList,
@@ -22,6 +23,7 @@ import {
   useBulkRun,
   useBulkSelection,
 } from "../../ui/bulk-select";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
@@ -50,7 +52,7 @@ type TemplateSummary = {
 
 export function PackListDetailPage() {
   const { id } = useParams();
-  const packList = useGetPackList(id || "skip");
+  const packList = useRouteRecord(useGetPackList, id);
   const items = useListPackListItem();
   const events = useListEvent();
   const dishes = useListDish();
@@ -537,7 +539,7 @@ export function PackListDetailPage() {
             <p className="eyebrow">Ruled load sheet</p>
             <h2>Pack items</h2>
           </div>
-          <span>{listItems.length} items</span>
+          <span>{formatCountNoun(listItems.length, "item")}</span>
         </div>
         <PackListItemTable
           loading={items === undefined || events === undefined}

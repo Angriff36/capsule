@@ -27,7 +27,7 @@ import type { Id } from "../../lib/api";
 import { findApprovedTimeOffConflict } from "../../lib/timeOff";
 import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
@@ -44,6 +44,7 @@ import { SmsAlertOptInSection } from "./SmsAlertOptInSection";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const policy = new WorkforceLifecyclePolicy();
 const OVERTIME_THRESHOLD_STORAGE_KEY =
@@ -438,7 +439,7 @@ export function RosterPage() {
           </div>
           <div className="supply-row-actions">
             <span className="font-mono text-2xs text-ink-3 uppercase">
-              {activeAssignments.length} assignments
+              {formatCountNoun(activeAssignments.length, "assignment")}
             </span>
             <button
               type="button"
@@ -507,15 +508,11 @@ export function RosterPage() {
               </label>
               <label className="field-label">
                 Starts
-                <input
-                  name="startsAt"
-                  className="input"
-                  type="datetime-local"
-                />
+                <BoundedDateTimeLocalInput name="startsAt" className="input" />
               </label>
               <label className="field-label">
                 Ends
-                <input name="endsAt" className="input" type="datetime-local" />
+                <BoundedDateTimeLocalInput name="endsAt" className="input" />
               </label>
               <label className="field-label">
                 Notes
@@ -597,7 +594,7 @@ export function RosterPage() {
           </div>
           <div className="supply-row-actions">
             <span className="font-mono text-2xs text-ink-3 uppercase">
-              {selectedWeekShifts.length} shifts
+              {formatCountNoun(selectedWeekShifts.length, "shift")}
             </span>
             <button
               type="button"
@@ -661,19 +658,17 @@ export function RosterPage() {
               </label>
               <label className="field-label">
                 Starts
-                <input
+                <BoundedDateTimeLocalInput
                   name="startsAt"
                   className="input"
-                  type="datetime-local"
                   required
                 />
               </label>
               <label className="field-label">
                 Ends
-                <input
+                <BoundedDateTimeLocalInput
                   name="endsAt"
                   className="input"
-                  type="datetime-local"
                   required
                 />
               </label>

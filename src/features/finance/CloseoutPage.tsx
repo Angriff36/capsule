@@ -10,7 +10,7 @@ import {
   useListInvoice,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatMoneyExact } from "../../lib/format";
+import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
@@ -20,11 +20,20 @@ import {
   CloseoutCapturePayloadBuilder,
   type CloseoutDraft,
 } from "./CloseoutCaptureForm";
+import {
+  CloseoutRevenueNote,
+  isUnreconciledCloseout,
+} from "./CloseoutBillingTruth";
 import { CloseoutLifecyclePolicy } from "./CloseoutLifecyclePolicy";
+import { rollupEventBilling } from "./invoiceBilling";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
+import {
+  closeoutListedCost,
+  isCloseoutListProfitPending,
+} from "./eventCostSummary";
 
 const policy = new CloseoutLifecyclePolicy();
 const payloadBuilder = new CloseoutCapturePayloadBuilder();
@@ -85,6 +94,14 @@ export function CloseoutPage() {
   const formEvents = draft
     ? (events ?? []).filter((event) => event._id === String(draft.eventId))
     : capturableEvents;
+  const billingFor = (eventId: string) =>
+    rollupEventBilling(invoices ?? [], eventId);
+  const formBilling =
+    showCapture && formEventId
+      ? invoices === undefined
+        ? undefined
+        : billingFor(formEventId)
+      : null;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -215,6 +232,7 @@ export function CloseoutPage() {
           selectedEventId={formEventId}
           onSelectEvent={setSelectedEventId}
           labor={labor}
+          billing={formBilling}
           draft={draft}
           busy={busy === "capture-closeout"}
           onSubmit={submitCapture}
@@ -227,7 +245,7 @@ export function CloseoutPage() {
             <p className="eyebrow">Reconciliation</p>
             <h2>Closeout folios</h2>
           </div>
-          <span>{visibleRows.length} closeouts</span>
+          <span>{formatCountNoun(visibleRows.length, "closeout")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
@@ -256,6 +274,8 @@ export function CloseoutPage() {
               <thead>
                 <tr>
                   <th>Event</th>
+                  <th>Billed</th>
+                  <th>Cost</th>
                   <th>Gross profit</th>
                   <th>Headcount</th>
                   <th>State</th>
@@ -265,6 +285,16 @@ export function CloseoutPage() {
               <tbody>
                 {visibleRows.map((row) => {
                   const event = eventFor(String(row.eventId));
+                  const unreconciled = isUnreconciledCloseout(row);
+                  // Seeded drafts carry zero headcount — the event's planned
+                  // headcount is the honest expected figure until reconciled.
+                  const expectedHeadcount =
+                    Number(row.expectedHeadcount ?? 0) > 0
+                      ? Number(row.expectedHeadcount)
+                      : Number(event?.expectedHeadcount ?? 0);
+                  const actualHeadcount = Number(row.actualHeadcount ?? 0);
+                  const billing = billingFor(String(row.eventId));
+                  const listedCost = closeoutListedCost(row);
                   return (
                     <Fragment key={row._id}>
                       <tr>
@@ -275,16 +305,24 @@ export function CloseoutPage() {
                           >
                             <strong>{eventTitle(String(row.eventId))}</strong>
                           </Link>
-                          <small>
-                            Revenue{" "}
-                            {formatMoneyExact(Number(row.actualRevenue ?? 0))}
-                          </small>
+                          <CloseoutRevenueNote row={row} billing={billing} />
+                        </td>
+                        <td>{formatMoneyExact(billing.billedTotal)}</td>
+                        <td>
+                          {listedCost == null
+                            ? "—"
+                            : formatMoneyExact(listedCost)}
                         </td>
                         <td>
-                          {formatMoneyExact(Number(row.grossProfit ?? 0))}
+                          {isCloseoutListProfitPending(row)
+                            ? "—"
+                            : formatMoneyExact(Number(row.grossProfit ?? 0))}
                         </td>
                         <td>
-                          {row.actualHeadcount}/{row.expectedHeadcount}
+                          {unreconciled && actualHeadcount === 0
+                            ? "—"
+                            : actualHeadcount}
+                          /{expectedHeadcount}
                         </td>
                         <td>
                           <StatusChip status={String(row.status)} />
@@ -360,7 +398,7 @@ export function CloseoutPage() {
                       </tr>
                       {photoCloseoutId === row._id ? (
                         <tr>
-                          <td colSpan={5} className="!p-3">
+                          <td colSpan={7} className="!p-3">
                             <RecordPhotoCapture
                               parentType="closeout"
                               parentId={row._id}

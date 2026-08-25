@@ -1,24 +1,11 @@
-import { useUser } from "@clerk/react";
-import { useCallback, useMemo, useState, type MouseEvent } from "react";
+import { useQuery } from "convex/react";
+import { useCallback, useState, type MouseEvent } from "react";
 import { Link } from "react-router-dom";
-import {
-  useListEvent,
-  useListIncident,
-  useListIngredient,
-  useListInventoryItem,
-  useListInvoice,
-  useListPerson,
-  useListPrepTaskComment,
-  useListQualification,
-  useListShift,
-  useListStaffMessage,
-  useListTimeOffRequest,
-  useListVendorOrder,
-} from "../../lib/manifest-convex-react";
+import { api } from "../../lib/api";
 import { relativeDays } from "../../lib/format";
 import { BellIcon } from "../../ui/icons";
 import {
-  deriveNotifications,
+  type AppNotification,
   NOTIFICATION_KIND_LABELS,
 } from "./deriveNotifications";
 
@@ -26,6 +13,7 @@ import {
 // across devices). Move to a Notification entity + manifest commands if
 // cross-device read sync ever matters.
 const READ_STORAGE_KEY = "capsule.notifications.read";
+const NO_NOTIFICATIONS: AppNotification[] = [];
 
 function loadReadIds(): ReadonlySet<string> {
   try {
@@ -52,54 +40,10 @@ function saveReadIds(read: ReadonlySet<string>, visibleIds: string[]) {
 }
 
 export function NotificationTray() {
-  const { user } = useUser();
-  const events = useListEvent();
-  const incidents = useListIncident();
-  const invoices = useListInvoice();
-  const inventoryItems = useListInventoryItem();
-  const ingredients = useListIngredient();
-  const shifts = useListShift();
-  const people = useListPerson();
-  const qualifications = useListQualification();
-  const timeOffRequests = useListTimeOffRequest();
-  const vendorOrders = useListVendorOrder();
-  const staffMessages = useListStaffMessage();
-  const prepTaskComments = useListPrepTaskComment();
-
-  const notifications = useMemo(
-    () =>
-      deriveNotifications({
-        now: Date.now(),
-        currentAuthSubjectId: user?.id,
-        events,
-        incidents,
-        invoices,
-        inventoryItems,
-        ingredients,
-        shifts,
-        people,
-        qualifications,
-        timeOffRequests,
-        vendorOrders,
-        staffMessages,
-        prepTaskComments,
-      }),
-    [
-      events,
-      incidents,
-      invoices,
-      inventoryItems,
-      ingredients,
-      shifts,
-      people,
-      qualifications,
-      timeOffRequests,
-      vendorOrders,
-      staffMessages,
-      prepTaskComments,
-      user?.id,
-    ],
-  );
+  // One server query (convex/notifications.ts) instead of twelve whole-table
+  // subscriptions: a re-auth or reconnect now costs one call, not twelve.
+  const notifications =
+    useQuery(api.notifications.listNotifications) ?? NO_NOTIFICATIONS;
 
   const [readIds, setReadIds] = useState<ReadonlySet<string>>(loadReadIds);
   const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;

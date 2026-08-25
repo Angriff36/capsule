@@ -11,6 +11,7 @@ import {
 } from "../../../lib/manifest-convex-react";
 import { api } from "../../../lib/api";
 import { formatDate, formatTime } from "../../../lib/format";
+import { useRouteRecord } from "../../../lib/routeRecord";
 import { importRunsListPath } from "./importRoutes";
 import { StatusChip } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
@@ -72,7 +73,7 @@ const STAGE_TRANSITIONS: Record<string, { next: string; label: string }[]> = {
 
 export function ImportRunDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const importRun = useGetImportRun(id ?? "skip");
+  const importRun = useRouteRecord(useGetImportRun, id);
 
   // Commands
   const recordParse = useImportRunRecordParse();

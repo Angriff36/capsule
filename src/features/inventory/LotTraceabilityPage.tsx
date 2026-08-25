@@ -19,6 +19,7 @@ import {
   countUnattributedConsumptions,
 } from "./lotTraceability";
 import "./LotTraceabilityPage.css";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const quantity = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 4,
@@ -160,20 +161,18 @@ export function LotTraceabilityPage() {
         </label>
         <label className="field-label" htmlFor="trace-from-date">
           Lots received from
-          <input
+          <BoundedDateInput
             id="trace-from-date"
             className="input"
-            type="date"
             value={fromDate}
             onChange={(event) => setFromDate(event.currentTarget.value)}
           />
         </label>
         <label className="field-label" htmlFor="trace-to-date">
           Lots received through
-          <input
+          <BoundedDateInput
             id="trace-to-date"
             className="input"
-            type="date"
             value={toDate}
             onChange={(event) => setToDate(event.currentTarget.value)}
           />

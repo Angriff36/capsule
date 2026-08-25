@@ -74,4 +74,5 @@ MCP not required for this pattern — triage uses `gh` CLI (read-only) and git.
 - Deploys: `convex deploy` / `bun run deploy` are forbidden to the loop
   (Builder never deploys Convex either — `bun run codegen` / `bun run dev:convex`
   are human steps after apply)
-- Pushes, merges, PR closes
+- Pushes, merges, PR closes (production ships only via the one
+  `bash scripts/release.sh` per branch — owner rule 2026-08-25)
