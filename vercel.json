@@ -1,5 +1,5 @@
 {
   "buildCommand": "bash scripts/vercel-build.sh",
-  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ] || [ \"${VERCEL_GIT_COMMIT_MESSAGE#\[release\]}\" = \"$VERCEL_GIT_COMMIT_MESSAGE\" ]",
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ] || [ \"${VERCEL_GIT_COMMIT_MESSAGE#\"[release]\"}\" = \"$VERCEL_GIT_COMMIT_MESSAGE\" ]",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

@@ -40,6 +40,10 @@ if [ "$(git rev-parse main)" != "$(git rev-parse origin/main)" ]; then
   echo "  git branch -f main origin/main"
   exit 1
 fi
+if git show-ref --verify --quiet "refs/heads/archive/$branch" || git show-ref --verify --quiet "refs/remotes/origin/archive/$branch"; then
+  echo "release: archive/$branch already exists. Delete or rename it first."
+  exit 1
+fi
 base="$(git rev-parse origin/main)"
 proof=.artifacts/release-check-passed
 
@@ -49,7 +53,12 @@ back_to_branch() {
 }
 
 git checkout -q main
-if ! git merge --no-ff "$branch" -m "[release] $branch (reviewed by $reviewer)"; then
+subject="[release] $branch (reviewed by $reviewer)"
+if git merge-base --is-ancestor "$branch" main; then
+  # Already on main (e.g. a GitHub-side merge that never deployed). A real
+  # [release] commit is still required: Vercel builds main only for one.
+  git commit -q --allow-empty -m "$subject"
+elif ! git merge --no-ff "$branch" -m "$subject"; then
   git merge --abort || true
   back_to_branch
   echo "release: merge conflict with main. Merge main into $branch, resolve, push, and release again."
@@ -65,13 +74,22 @@ if ! bun run check; then
   echo "release: check failed. main is unchanged. Fix on $branch and release again."
   exit 1
 fi
+# The gate must not have changed the tree (e.g. proof:emit rewriting
+# generated/proof): the commit pushed must be the exact tree that passed.
+if [ -n "$(git status --porcelain)" ]; then
+  git status --short | head -20
+  git reset -q --hard "$base"
+  back_to_branch
+  echo "release: bun run check changed tracked files (above). Run it on $branch, commit the result, push, and release again."
+  exit 1
+fi
 mkdir -p .artifacts
 git rev-parse HEAD > "$proof"
 
 echo "release: pushing main — this is the ONE production build for $branch."
 if ! CAPSULE_RELEASE=1 git push origin main; then
   rm -f "$proof"
-  git fetch origin --quiet
+  git fetch origin --quiet || true
   if [ "$(git rev-parse origin/main)" = "$(git rev-parse main)" ]; then
     echo "release: push reported an error but origin/main has the release. Continuing."
   else
@@ -83,6 +101,13 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
 fi
 rm -f "$proof"
 
+# Remote first (one atomic push), then local. If this push fails the release
+# is already live; finish by hand with the two commands printed.
+if ! git push --atomic origin "$branch:archive/$branch" ":$branch"; then
+  echo "release: main is released, but archiving $branch on origin failed. Finish by hand:"
+  echo "  git push --atomic origin $branch:archive/$branch :$branch"
+  echo "  git branch -m $branch archive/$branch"
+  exit 1
+fi
 git branch -m "$branch" "archive/$branch"
-git push origin "archive/$branch" ":$branch"
 echo "release: done. $branch is now archive/$branch. Start the next branch from main."
