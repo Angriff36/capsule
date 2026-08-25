@@ -271,6 +271,14 @@ export function EventDetailPage() {
       </button>
     )),
     <ActionMenu key="more">
+      {mobile ? (
+        <Link
+          key="edit-details"
+          to={`${eventDetailPath(event._id, "overview")}&full=1`}
+        >
+          Edit event details
+        </Link>
+      ) : null}
       <EventClientPortalShare key="client-portal-share" eventId={event._id} />
       <button
         key="download-beo"
@@ -403,6 +411,10 @@ export function EventDetailPage() {
               {clientDisplayName(event.clientId, clients)}
             </HeroFact>
           </dl>
+          <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
+            <span className="font-semibold text-ink">Budget / quoted</span>{" "}
+            {formatMoney(event.budgetAmount)} / {formatMoney(event.quotedPrice)}
+          </p>
           <div className="mobile-actions mt-4 flex items-center gap-2">
             {headerActions}
           </div>

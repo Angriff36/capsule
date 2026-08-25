@@ -22,68 +22,7 @@ const ROW_LIMIT = 8;
 
 type ClientRow = { _id: string } | null | undefined;
 
-export type MobileFactsProps = {
-  readonly event: Doc<"events">;
-  readonly venue: { name: string } | null | undefined;
-  readonly clients: readonly ClientRow[] | undefined;
-  readonly currencyCode: string;
-};
-
-/** Facts: when, how many, where, who, what kind, and the commercial snapshot. */
-export function MobileFactsCard({
-  event,
-  venue,
-  clients,
-  currencyCode,
-}: MobileFactsProps) {
-  const when = (value: number | null | undefined) => (
-    <>
-      {formatDate(value)}
-      <span className="block text-sm font-medium text-ink-2">
-        {formatTime(value)}
-      </span>
-    </>
-  );
-  const facts: Array<[string, ReactNode]> = [
-    ["Starts", when(event.startsAt)],
-    ["Ends", when(event.endsAt)],
-    // Date, headcount, and venue already sit in the page header.
-    ["Type", formatStatusLabel(event.eventType)],
-    [
-      "Client",
-      <Link
-        key="client"
-        to={`/clients/${event.clientId}`}
-        className="underline"
-      >
-        {clientDisplayName(event.clientId, clients as never)}
-      </Link>,
-    ],
-    ["Budget", formatMoney(event.budgetAmount, currencyCode)],
-    ["Quoted", formatMoney(event.quotedPrice, currencyCode)],
-  ];
-  return (
-    <MobileSectionCard
-      id="facts"
-      title="Facts"
-      seeAllTo={`${eventDetailPath(event._id, "overview")}&full=1`}
-      seeAllLabel="Edit"
-    >
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-3 pt-1">
-        {facts.map(([label, value]) => (
-          <div key={label} className="min-w-0">
-            <dt className="text-xs font-semibold text-ink-2">{label}</dt>
-            <dd className="mt-0.5 text-base font-semibold break-words text-ink">
-              {value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-    </MobileSectionCard>
-  );
-}
-
-type EventDish = Doc<"eventDishes">;
+export type EventDish = Doc<"eventDishes">;
 type Dish = Doc<"dishes">;
 
 export function MobileMenuCard({

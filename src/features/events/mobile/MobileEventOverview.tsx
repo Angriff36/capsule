@@ -7,7 +7,6 @@ import {
   MobileNotesCard,
 } from "./MobileEventInfoCards";
 import {
-  MobileFactsCard,
   MobileMenuCard,
   MobileStaffCard,
   MobileTimelineCard,
@@ -57,12 +56,6 @@ export function MobileEventOverview({
   );
   return (
     <div className="space-y-3" data-testid="mobile-event-overview">
-      <MobileFactsCard
-        event={event}
-        venue={venue}
-        clients={clients}
-        currencyCode={currencyCode}
-      />
       <EventSetupProgress eventId={event._id} event={event} />
       <MobileMenuCard
         eventId={event._id}
