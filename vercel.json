@@ -1,4 +1,17 @@
 {
   "buildCommand": "bash scripts/vercel-build.sh",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "feat/*": false,
+      "fix/*": false,
+      "deps/*": false,
+      "chore/*": false,
+      "dependabot/*": false,
+      "prod-*": false,
+      "dep-*": false,
+      "loop/*": false
+    }
+  }
 }
