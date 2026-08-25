@@ -39,6 +39,8 @@ git merge --no-ff "$branch" -m "[release] $branch (reviewed by $reviewer)"
 
 # The gate must be green BEFORE main is pushed: the push is the production
 # build and the Convex prod deploy, and CI on main only starts after it.
+# There is no flag to skip this. The pre-push hook needs the proof file
+# below, stamped with the exact commit that passed, or it refuses main.
 echo "release: running bun run check on the merge result before anything is pushed."
 if ! bun run check; then
   git reset --hard "$base"
@@ -46,9 +48,12 @@ if ! bun run check; then
   echo "release: check failed. main is unchanged. Fix on $branch and release again."
   exit 1
 fi
+mkdir -p .artifacts
+git rev-parse HEAD > .artifacts/release-check-passed
 
 echo "release: pushing main — this is the ONE production build for $branch."
 CAPSULE_RELEASE=1 git push origin main
+rm -f .artifacts/release-check-passed
 
 git branch -m "$branch" "archive/$branch"
 git push origin "archive/$branch" ":$branch"

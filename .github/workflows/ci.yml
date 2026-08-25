@@ -1,11 +1,11 @@
-# CI only. Nothing here deploys. Production ships from the ONE release push
-# to main per branch (`bash scripts/release.sh`, AGENTS.md § Deploying); branch pushes
-# are chores and Vercel ignores them (vercel.json ignoreCommand).
+# CI runs on pull requests only (owner, 2026-08-25). It does NOT run on main:
+# the same `bun run check` already ran locally inside scripts/release.sh
+# BEFORE the release push, and .githooks/pre-push refuses a main push without
+# proof of that run. A main-push CI run would only repeat it, after the deploy.
+# Do not add `push: branches: [main]` back.
 name: ci
 
 on:
-  push:
-    branches: [main]
   pull_request:
 
 concurrency:

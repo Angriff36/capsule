@@ -211,7 +211,9 @@ bash scripts/release.sh --reviewer <model>
 ```
 
 It requires a clean tree, the branch pushed, and the reviewer that APPROVED
-the diff (merge gate above). It merges `--no-ff` into `main`, pushes `main`
+the diff (merge gate above). It merges `--no-ff` into `main`, runs
+`bun run check` on the merge (CI does not run on `main`; the pre-push hook
+refuses `main` without proof of that run), pushes `main`
 once with `CAPSULE_RELEASE=1` (the only Vercel production build and the only
 Convex prod deploy for that branch), then renames the branch to
 `archive/<branch>` locally and on origin. Start the next task from `main`.

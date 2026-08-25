@@ -37,7 +37,7 @@ bun run dev          # terminal 2 → http://localhost:7811
 bun run check
 ```
 
-Runs toolchain pin check, typecheck, Prettier (`format:check`), secret scan, tests with coverage ratchet, production build, and baseline decay checks. CI runs the same script (`.github/workflows/ci.yml`). See [`BASELINE.md`](BASELINE.md).
+Runs toolchain pin check, typecheck, Prettier (`format:check`), secret scan, tests with coverage ratchet, production build, and baseline decay checks. CI (`.github/workflows/ci.yml`) runs it on pull requests only; the release script runs it locally before the one `main` push. See [`BASELINE.md`](BASELINE.md).
 
 ## Deploying to Vercel (production)
 
