@@ -8,6 +8,7 @@ import {
 } from "../../lib/format";
 import { useListClient, useListEvent } from "../../lib/manifest-convex-react";
 import { PlusIcon } from "../../ui/icons";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   ActionMenu,
   EmptyState,
@@ -110,8 +111,21 @@ export function EventsListPage() {
     });
   }, [live, clients, tab, search, dir, now]);
 
+  const questionTabs: Tab[] = ["upcoming", "attention", "all"];
+  const stageFilter: EventStage | "" = questionTabs.includes(tab)
+    ? ""
+    : (tab as EventStage);
+  const listTitle =
+    tab === "upcoming"
+      ? "Upcoming events"
+      : tab === "attention"
+        ? "Events that need action"
+        : tab === "all"
+          ? "All events"
+          : `${STAGE_LABEL[tab as EventStage]} events`;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <PageHeader
         title="Events"
         lead={`${counts.upcoming ?? 0} upcoming · ${counts.attention ?? 0} need action`}
@@ -126,52 +140,68 @@ export function EventsListPage() {
         ]}
       />
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="card flex flex-wrap items-center gap-3 px-4 py-3">
         <div
           role="tablist"
-          aria-label="Filter by stage"
-          className="flex max-w-full overflow-x-auto rounded-xs border border-line-2 bg-panel"
+          aria-label="Show"
+          className="flex rounded-full bg-inset p-1"
         >
-          {(["upcoming", "attention", "all", ...EVENT_STAGES] as Tab[]).map(
-            (t) => (
-              <button
-                key={t}
-                type="button"
-                role="tab"
-                aria-selected={tab === t}
-                onClick={() => setTab(t)}
-                className={`h-8 shrink-0 cursor-pointer border-r border-line px-3 text-sm font-medium last:border-r-0 ${
-                  tab === t
-                    ? "bg-brand-soft text-brand"
-                    : "text-ink-2 hover:bg-inset hover:text-ink"
-                } ${t === "all" ? "border-l-2 border-l-line-2" : ""}`}
+          {questionTabs.map((t) => (
+            <button
+              key={t}
+              type="button"
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => setTab(t)}
+              className={`h-8 cursor-pointer rounded-full px-3.5 text-sm font-semibold whitespace-nowrap transition-colors ${
+                tab === t
+                  ? "bg-panel text-ink shadow-[0_1px_2px_rgb(30_40_36/0.15)]"
+                  : "text-ink-2 hover:text-ink"
+              }`}
+            >
+              {TAB_LABEL[t as keyof typeof TAB_LABEL]}
+              <span
+                className={`ml-1.5 text-xs ${t === "attention" && (counts[t] ?? 0) > 0 ? "font-bold text-warn" : "text-ink-2"}`}
               >
-                {t in TAB_LABEL
-                  ? TAB_LABEL[t as keyof typeof TAB_LABEL]
-                  : STAGE_LABEL[t as EventStage]}
-                <span className="ml-1.5 font-mono text-xs text-ink-2">
-                  {counts[t] ?? 0}
-                </span>
-              </button>
-            ),
-          )}
+                {counts[t] ?? 0}
+              </span>
+            </button>
+          ))}
         </div>
+        <label className="flex items-center gap-2 text-sm font-medium text-ink-2">
+          Stage
+          <select
+            className="input w-44"
+            aria-label="Filter by stage"
+            value={stageFilter}
+            onChange={(e) =>
+              setTab(e.target.value ? (e.target.value as EventStage) : "all")
+            }
+          >
+            <option value="">Any stage</option>
+            {EVENT_STAGES.map((s) => (
+              <option key={s} value={s}>
+                {STAGE_LABEL[s]} ({counts[s] ?? 0})
+              </option>
+            ))}
+          </select>
+        </label>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Filter by title, client, venue…"
-          className="input max-w-72"
+          placeholder="Search title, client, venue…"
+          className="input min-w-0 flex-1 basis-56"
           aria-label="Filter events"
         />
         <button
           type="button"
-          className="btn btn-ghost btn-sm font-mono"
+          className="btn btn-ghost"
           onClick={() => setDir((d) => (d === "asc" ? "desc" : "asc"))}
           aria-label={`Sort by date, currently ${dir === "asc" ? "soonest first" : "latest first"}`}
         >
-          Date {dir === "asc" ? "↑" : "↓"}
+          {dir === "asc" ? "Soonest first" : "Latest first"}
         </button>
-        <div className="ml-auto">
+        <div className="max-md:w-full">
           <SavedViewsBar<EventsView>
             pageKey="events"
             subjectArea="events"
@@ -185,83 +215,135 @@ export function EventsListPage() {
         </div>
       </div>
 
-      <div className="card overflow-x-auto">
+      <section className="card" aria-labelledby="events-list-title">
+        <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
+          <h2 id="events-list-title" className="text-lg font-semibold text-ink">
+            {listTitle}
+            <span className="ml-2 text-base font-medium text-ink-2">
+              {rows.length}
+            </span>
+          </h2>
+        </div>
         {events === undefined ? (
           <TableSkeleton rows={8} />
         ) : rows.length === 0 ? (
           <EmptyState
             title={
               search || tab !== "all"
-                ? "No events match this filter"
+                ? "No events match this view"
                 : "No events yet"
             }
             hint={
               search || tab !== "all"
-                ? "Try another tab or clear the search."
-                : "Create the first engagement to begin planning."
+                ? "Try another view, clear the search, or book a new event."
+                : "Book the first event to start planning."
+            }
+            action={
+              <Link to="/events/new" className="btn btn-primary">
+                <PlusIcon /> New event
+              </Link>
             }
           />
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr>
-                <th className="th">Starts</th>
-                <th className="th w-full">Event</th>
-                <th className="th">Stage</th>
-                <th className="th">Client</th>
-                <th className="th text-right">Guests</th>
-                <th className="th text-right">Budget</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((e) => (
-                <tr
-                  key={e._id}
-                  onClick={() => navigate(`/events/${e._id}`)}
-                  className="cursor-pointer transition-colors hover:bg-inset"
-                >
-                  <td className="td font-mono text-sm">
-                    {formatDate(e.startsAt)}
-                    {e.startsAt != null ? (
-                      <span
-                        className={`ml-2 ${needsAction(e, now) ? "font-semibold text-warn" : "text-ink-2"}`}
-                      >
-                        {relativeDays(e.startsAt, now)}
-                      </span>
-                    ) : null}
-                  </td>
-                  <td className="td w-full max-w-0 truncate">
-                    <Link
-                      to={`/events/${e._id}`}
-                      className="font-semibold text-ink hover:underline"
-                      onClick={(click) => click.stopPropagation()}
-                    >
-                      {e.title}
-                    </Link>
-                    {e.venueName ? (
-                      <span className="ml-2 text-sm text-ink-2">
-                        {e.venueName}
-                      </span>
-                    ) : null}
-                  </td>
-                  <td className="td">
-                    <StatusChip status={String(e.stage)} />
-                  </td>
-                  <td className="td text-ink-2">
-                    {clientDisplayName(e.clientId, clients)}
-                  </td>
-                  <td className="td text-right font-mono">
-                    {formatCount(e.expectedHeadcount)}
-                  </td>
-                  <td className="td text-right font-mono">
-                    {formatMoney(e.budgetAmount)}
-                  </td>
+          <>
+            <table className="w-full max-md:hidden">
+              <thead>
+                <tr>
+                  <th className="th">Date</th>
+                  <th className="th w-full">Event</th>
+                  <th className="th">Stage</th>
+                  <th className="th">Client</th>
+                  <th className="th text-right">Guests</th>
+                  <th className="th text-right">Budget</th>
                 </tr>
+              </thead>
+              <tbody>
+                {rows.map((e) => (
+                  <tr
+                    key={e._id}
+                    onClick={() => navigate(`/events/${e._id}`)}
+                    className="cursor-pointer transition-colors hover:bg-inset"
+                  >
+                    <td className="td h-12">
+                      <span className="block font-semibold text-ink">
+                        {formatDate(e.startsAt)}
+                      </span>
+                      {e.startsAt != null ? (
+                        <span
+                          className={`block text-xs ${needsAction(e, now) ? "font-semibold text-warn" : "text-ink-2"}`}
+                        >
+                          {relativeDays(e.startsAt, now)}
+                        </span>
+                      ) : null}
+                    </td>
+                    <td className="td h-12 w-full max-w-0">
+                      <Link
+                        to={`/events/${e._id}`}
+                        className="block truncate text-base font-semibold text-ink hover:underline"
+                        onClick={(click) => click.stopPropagation()}
+                      >
+                        {e.title}
+                      </Link>
+                      <span className="block truncate text-xs text-ink-2">
+                        {formatStatusLabel(e.eventType)}
+                        {e.venueName ? ` · ${e.venueName}` : ""}
+                      </span>
+                    </td>
+                    <td className="td h-12">
+                      <StatusChip status={String(e.stage)} />
+                    </td>
+                    <td className="td h-12 text-ink-2">
+                      {clientDisplayName(e.clientId, clients)}
+                    </td>
+                    <td className="td h-12 text-right">
+                      {formatCount(e.expectedHeadcount)}
+                    </td>
+                    <td className="td h-12 text-right">
+                      {formatMoney(e.budgetAmount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <ul className="divide-y divide-line md:hidden">
+              {rows.map((e) => (
+                <li key={e._id}>
+                  <Link
+                    to={`/events/${e._id}`}
+                    className="block px-4 py-3 hover:bg-inset"
+                  >
+                    <span className="flex items-start justify-between gap-3">
+                      <span className="min-w-0 text-base font-semibold text-ink">
+                        {e.title}
+                      </span>
+                      <StatusChip status={String(e.stage)} />
+                    </span>
+                    <span className="mt-1 block text-sm text-ink-2">
+                      {formatDate(e.startsAt)}
+                      {e.startsAt != null ? (
+                        <span
+                          className={
+                            needsAction(e, now) ? "font-semibold text-warn" : ""
+                          }
+                        >
+                          {" "}
+                          · {relativeDays(e.startsAt, now)}
+                        </span>
+                      ) : null}
+                      {" · "}
+                      {formatCount(e.expectedHeadcount)} guests
+                    </span>
+                    <span className="block truncate text-sm text-ink-2">
+                      {clientDisplayName(e.clientId, clients)}
+                      {e.venueName ? ` · ${e.venueName}` : ""}
+                    </span>
+                  </Link>
+                </li>
               ))}
-            </tbody>
-          </table>
+            </ul>
+          </>
         )}
-      </div>
+      </section>
     </div>
   );
 }

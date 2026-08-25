@@ -1,7 +1,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
 
-type Size = "thumb" | "hero";
+type Size = "thumb" | "hero" | "card";
 
 type Props = {
   storageId?: string | null;
@@ -12,6 +12,7 @@ type Props = {
 
 const SIZE_CLASS: Record<Size, string> = {
   thumb: "h-14 w-14 rounded-xs object-cover",
+  card: "h-40 w-full border-0 object-cover",
   hero: "h-48 w-full max-w-xl rounded-xs object-cover",
 };
 

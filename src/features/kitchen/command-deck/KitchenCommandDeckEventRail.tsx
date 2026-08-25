@@ -30,10 +30,9 @@ export function KitchenCommandDeckEventRail({
             type="button"
             className="btn btn-ghost btn-sm mt-2"
             onClick={() => onJumpToEvent(nextEvent)}
-            data-testid="command-deck-jump-next-event"
+            data-testid="command-deck-jump-next-event-rail"
           >
-            Next: {nextEvent.title} · {formatDate(nextEvent.startsAt)} — jump
-            there
+            Next: {nextEvent.title} · {formatDate(nextEvent.startsAt)}
           </button>
         ) : (
           <p className="mt-1">Pick a date above or add events.</p>
@@ -44,7 +43,7 @@ export function KitchenCommandDeckEventRail({
 
   return (
     <div className="kcd-event-list" data-testid="command-deck-event-rail">
-      {events.map((event, index) => {
+      {events.map((event) => {
         const progress = model.progress(event._id);
         const selected = event._id === selectedEventId;
         return (
@@ -53,7 +52,6 @@ export function KitchenCommandDeckEventRail({
             type="button"
             onClick={() => onSelect(event._id)}
             className={`kcd-event-ticket${selected ? " is-selected" : ""}`}
-            style={{ ["--delay" as string]: `${index * 45}ms` }}
             data-testid="command-deck-event-card"
             aria-pressed={selected}
           >

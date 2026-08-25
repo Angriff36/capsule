@@ -32,11 +32,7 @@ export function KitchenCommandDeckCrewRail({
       ) : (
         <ul className="m-0 list-none p-0">
           {rows.map((row, index) => (
-            <li
-              key={row.person._id}
-              className="kcd-crew-card"
-              style={{ ["--delay" as string]: `${index * 40}ms` }}
-            >
+            <li key={row.person._id} className="kcd-crew-card">
               <div className="kcd-crew-top">
                 <span className="kcd-avatar" aria-hidden="true">
                   {KitchenCommandDeckPersonLabel.initials(row.person)}
