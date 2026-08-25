@@ -23,7 +23,8 @@ while [ $# -gt 0 ]; do
 done
 [ -n "$reviewer" ] || { echo "release: --reviewer <model> is required (independent review approval)."; exit 1; }
 
-branch="$(git rev-parse --abbrev-ref HEAD)"
+branch="$(git symbolic-ref --short -q HEAD || true)"
+[ -n "$branch" ] || { echo "release: detached HEAD. Check out the branch to release."; exit 1; }
 [ "$branch" != "main" ] || { echo "release: you are on main. Check out the branch to release."; exit 1; }
 case "$branch" in archive/*) echo "release: $branch is already archived."; exit 1 ;; esac
 [ -z "$(git status --porcelain)" ] || { echo "release: working tree is not clean. Commit or stash first."; exit 1; }
@@ -45,6 +46,7 @@ if git show-ref --verify --quiet "refs/heads/archive/$branch" || git show-ref --
   exit 1
 fi
 base="$(git rev-parse origin/main)"
+branch_sha="$(git rev-parse "$branch")"
 proof=.artifacts/release-check-passed
 
 back_to_branch() {
@@ -57,7 +59,12 @@ subject="[release] $branch (reviewed by $reviewer)"
 if git merge-base --is-ancestor "$branch" main; then
   # Already on main (e.g. a GitHub-side merge that never deployed). A real
   # [release] commit is still required: Vercel builds main only for one.
-  git commit -q --allow-empty -m "$subject"
+  if ! git commit -q --allow-empty -m "$subject"; then
+    git reset -q --hard "$base"
+    back_to_branch
+    echo "release: could not create the release commit (see above). main is unchanged."
+    exit 1
+  fi
 elif ! git merge --no-ff "$branch" -m "$subject"; then
   git merge --abort || true
   back_to_branch
@@ -89,9 +96,16 @@ git rev-parse HEAD > "$proof"
 echo "release: pushing main — this is the ONE production build for $branch."
 if ! CAPSULE_RELEASE=1 git push origin main; then
   rm -f "$proof"
-  git fetch origin --quiet || true
-  if [ "$(git rev-parse origin/main)" = "$(git rev-parse main)" ]; then
-    echo "release: push reported an error but origin/main has the release. Continuing."
+  # Ask the server directly; a cached origin/main could be stale.
+  remote_main="$(git ls-remote origin refs/heads/main 2>/dev/null | cut -f1 || true)"
+  if [ "$remote_main" = "$(git rev-parse main)" ]; then
+    echo "release: push reported an error but origin has the release. Continuing."
+  elif [ -z "$remote_main" ]; then
+    echo "release: push failed and origin cannot be reached. State is UNKNOWN."
+    echo "  Local main holds the unpushed release commit. When origin is back:"
+    echo "  git ls-remote origin refs/heads/main   # if it equals 'git rev-parse main', the release landed"
+    echo "  otherwise: git branch -f main origin/main && git checkout $branch, then release again."
+    exit 1
   else
     git reset -q --hard "$base"
     back_to_branch
@@ -103,9 +117,12 @@ rm -f "$proof"
 
 # Remote first (one atomic push), then local. If this push fails the release
 # is already live; finish by hand with the two commands printed.
-if ! git push --atomic origin "$branch:archive/$branch" ":$branch"; then
-  echo "release: main is released, but archiving $branch on origin failed. Finish by hand:"
-  echo "  git push --atomic origin $branch:archive/$branch :$branch"
+# --force-with-lease pins the delete to the sha that was released: if
+# someone pushed to the branch during the gate, that work is not deleted.
+if ! git push --atomic --force-with-lease="refs/heads/$branch:$branch_sha" origin "$branch_sha:refs/heads/archive/$branch" ":refs/heads/$branch"; then
+  echo "release: main is released, but archiving $branch on origin failed (new commits on it, or a network error). Finish by hand:"
+  echo "  git fetch origin && git log $branch_sha..origin/$branch   # anything listed was pushed after the release"
+  echo "  git push --atomic origin $branch_sha:refs/heads/archive/$branch :refs/heads/$branch"
   echo "  git branch -m $branch archive/$branch"
   exit 1
 fi

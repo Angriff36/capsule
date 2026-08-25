@@ -1,7 +1,8 @@
 # Branch protection (intended)
 
-CI job name that must stay required on `main`: **`check`**  
-(workflow: `.github/workflows/ci.yml` → job `name: check`)
+CI job name for pull requests: **`check`** (workflow: `.github/workflows/ci.yml`
+→ job `name: check`). It is NOT required on `main`: releases are local merge
+commits gated by `scripts/release.sh` (see Local enforcement below).
 
 ## Desired rules
 
@@ -37,4 +38,6 @@ Evidence: `gh api repos/Angriff36/capsule/branches/main/protection` and
 
 Owner enables GitHub Pro (or temporarily public) and applies the rules above,
 or imports a ruleset JSON once the API accepts it. Re-verify the required check
-name is still exactly `check` after any CI rename.
+name is still exactly `check` after any CI rename. Also set the repo to
+merge-commit only (no squash, no rebase merges) so a PR title cannot produce a
+`[release]` commit on `main` — owner setting, see AGENTS.md § Deploying.

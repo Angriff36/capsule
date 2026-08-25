@@ -76,8 +76,9 @@ Config files that make deploys work (do not delete):
 
 - `vercel.json` — SPA rewrite of every route to `index.html`; without it any
   client-side route 404s on refresh. Its `ignoreCommand` skips every build
-  that is not a `[release]` commit on `main` (branch pushes and GitHub-side
-  merges cost nothing).
+  that is not a `[release]` commit on `main`: branch pushes and GitHub-side
+  merges run no build and no Convex deploy (Vercel still counts the skipped
+  deployment, but at zero build time).
 - `.githooks/pre-push` + `scripts/release.sh` — the branch/release rule above.
 - `.vercelignore` — keeps worktrees/transcripts/generated docs out of the
   upload. Patterns are root-anchored (`/generated`) on purpose: a bare
