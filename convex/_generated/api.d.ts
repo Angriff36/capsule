@@ -46,6 +46,7 @@ import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as mutations from "../mutations.js";
+import type * as notifications from "../notifications.js";
 import type * as personalDataExport from "../personalDataExport.js";
 import type * as qboSync from "../qboSync.js";
 import type * as queries from "../queries.js";
@@ -109,6 +110,7 @@ declare const fullApi: ApiFromModules<{
   "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
   messageInbox: typeof messageInbox;
   mutations: typeof mutations;
+  notifications: typeof notifications;
   personalDataExport: typeof personalDataExport;
   qboSync: typeof qboSync;
   queries: typeof queries;
