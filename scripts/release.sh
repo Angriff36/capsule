@@ -30,7 +30,13 @@ case "$branch" in archive/*) echo "release: $branch is already archived."; exit 
 [ -z "$(git status --porcelain)" ] || { echo "release: working tree is not clean. Commit or stash first."; exit 1; }
 
 git fetch origin --quiet
-if [ "$(git rev-parse "$branch")" != "$(git rev-parse "origin/$branch" 2>/dev/null || true)" ]; then
+branch_sha="$(git rev-parse "$branch")"
+remote_archive="$(git ls-remote origin "refs/heads/archive/$branch" | cut -f1 || true)"
+remote_branch="$(git ls-remote origin "refs/heads/$branch" | cut -f1 || true)"
+# The branch must be on origin at this exact sha — unless origin already
+# holds it as archive/<branch> at this sha (a release whose local rename
+# did not finish); that case resumes below.
+if [ "$remote_branch" != "$branch_sha" ] && ! { [ -z "$remote_branch" ] && [ "$remote_archive" = "$branch_sha" ]; }; then
   echo "release: $branch is not pushed to origin, or differs from origin/$branch. Push it first."
   exit 1
 fi
@@ -42,10 +48,7 @@ if [ "$(git rev-parse main)" != "$(git rev-parse origin/main)" ]; then
   exit 1
 fi
 base="$(git rev-parse origin/main)"
-branch_sha="$(git rev-parse "$branch")"
 proof=.artifacts/release-check-passed
-remote_archive="$(git ls-remote origin "refs/heads/archive/$branch" | cut -f1 || true)"
-remote_branch="$(git ls-remote origin "refs/heads/$branch" | cut -f1 || true)"
 
 archive_branch() {
   # Remote first (one atomic push), then local. --force-with-lease pins the
