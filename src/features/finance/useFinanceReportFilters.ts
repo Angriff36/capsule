@@ -2,6 +2,7 @@
 // Uses URLSearchParams for shareable, bookmarkable filter state
 
 import { useSearchParams } from "react-router-dom";
+import { isoDate } from "../inventory/PurchasingFormHelpers";
 
 const DEFAULT_GRANULARITY = "month";
 const DEFAULT_PERIOD_COUNT = 12;
@@ -10,11 +11,11 @@ const DEFAULT_PERIOD_COUNT = 12;
 const defaultStartDate = (): string => {
   const date = new Date();
   date.setMonth(date.getMonth() - DEFAULT_PERIOD_COUNT);
-  return date.toISOString().split("T")[0];
+  return isoDate(date);
 };
 
 const defaultEndDate = (): string => {
-  return new Date().toISOString().split("T")[0];
+  return isoDate(new Date());
 };
 
 export interface FinanceReportFilters {

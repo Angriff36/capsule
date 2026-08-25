@@ -1,0 +1,30 @@
+Sample Catering
+"1 Example WaySuite 2Sampleton, WA 99000"
+Phone: 509-555-0000
+Sample Garden Reception
+Prepared For:,Sample Client,Event Date:,9/12/2026 - Saturday
+Address:,"12 Example RoadB3Sampleton, WA 99000",Phone:,Home: 5095550100
+Email:,sample.client@example.com
+Invoice #:,7001,Guest Count:,40 Final Count
+Service Style:,Buffet - Bring Hot,Occasion:,Reception
+Event Type:,Reception
+Salesperson: ,Sample Rep
+Venue:,"Sample Hall44 Demo AvenueSampleton, WA 99000",Last Change:,9/1/2026
+Other Contacts:,Planner - Sample Planner - sample.planner@example.comCell: (509) 555-0122
+
+Food
+Qty,Description,Unit Price,Total
+40,Sample Salsa Bar,"T,S",$5.00,$200.00
+40,Sample Grilled Chicken,"T,S",$12.00,$480.00
+Food,Subtotal,$680.00
+Charges:,$680.00
+Subtotal:,$680.00
+6% Sales Tax (WA State):,$40.80
+Post-Tax Subtotal:,$720.80
+Balance Due:,$720.80
+Deposit Due:,3/1/2026,Deposit Amount:,$200.00
+Event Total:,$720.80,Per Person:,$18.02
+Payments
+Date,Method,Number,Note,Event,Platform,Gratuity,Amount
+3/1/2026,Visa,****4242,Online Payment,$200.00,$0.00,$0.00,$200.00
+Payment Total:,$200.00

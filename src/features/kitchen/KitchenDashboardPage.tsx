@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListDish,
@@ -225,6 +226,9 @@ export function KitchenDashboardPage() {
               ))}
           </select>
         </label>
+        <Link to="/kitchen/yield" className="btn btn-ghost ml-auto">
+          Yield variance
+        </Link>
       </div>
 
       {failure ? <CulinaryFailureBanner error={failure} /> : null}

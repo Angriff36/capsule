@@ -17,16 +17,21 @@ import {
   useListEventDish,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListInventoryItem,
+  useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
+import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
+import { EventMenuStockShortageBanner } from "../kitchen/EventMenuStockShortageBanner";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { ActionMenu, ActionMenuRule } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
+import type { EventStockShortage } from "./EventStockReservationCoordinator";
 import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 import { EventDraftPoButton } from "./EventDraftPoButton";
@@ -52,6 +57,7 @@ import {
   planEventMenuLineSave,
 } from "./eventMenuLineFields";
 import { suspectRowsFromRecipeLines } from "./eventMenuSuspectQuantity";
+import { useEventMenuNutrition } from "./useEventMenuNutrition";
 
 type Props = {
   eventId: string;
@@ -69,6 +75,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
   const containers = useListDishContainer();
+  const inventoryItems = useListInventoryItem();
+  const inventoryReservations = useListInventoryReservation();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
   const changeCourse = useEventDishChangeCourse();
@@ -77,6 +85,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const updateInstructions = useEventDishUpdateInstructions();
   const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
+  const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
+    [],
+  );
   const [openRecipeId, setOpenRecipeId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
@@ -92,6 +103,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     [eventDishes, eventId],
   );
   const existingDishIds = selections.map((row) => row.dishId);
+
+  const nutrition = useEventMenuNutrition(existingDishIds);
+
+  const refreshStock = async () => {
+    if (!prepSyncReady) return;
+    setStockShortages(await syncStockForEvent(eventId));
+  };
 
   const costRollup = useMemo(
     () =>
@@ -263,6 +281,34 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
       {host}
+      <EventMenuStockShortageBanner
+        shortages={stockShortages}
+        ingredients={(ingredients ?? []).map((ingredient) => ({
+          id: ingredient._id,
+          name: ingredient.name,
+          unit: String(ingredient.unit),
+          costPerUnit: Number(ingredient.costPerUnit),
+          allergens: ingredient.allergens ?? [],
+          status: String(ingredient.status),
+          substituteIngredientIds: ingredient.substituteIngredientIds,
+          deletedAt: ingredient.deletedAt,
+        }))}
+        inventoryItems={(inventoryItems ?? []).map((item) => ({
+          id: item._id,
+          ingredientId: item.ingredientId,
+          quantityOnHand: Number(item.quantityOnHand),
+          unit: String(item.unit),
+          stockedAt: item.stockedAt,
+          deletedAt: item.deletedAt,
+        }))}
+        reservations={(inventoryReservations ?? []).map((reservation) => ({
+          inventoryItemId: reservation.inventoryItemId,
+          quantity: Number(reservation.quantity),
+          status: String(reservation.status),
+          deletedAt: reservation.deletedAt,
+        }))}
+        onDismiss={() => setStockShortages([])}
+      />
       {showPicker ? (
         <CulinaryRecordPicker
           kind="dish"
@@ -288,9 +334,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                 quantityServings: servings,
                 headcountOverride: 0,
               });
-              if (prepSyncReady) {
-                await syncStockForEvent(eventId);
-              }
+              await refreshStock();
               setShowPicker(false);
             })
           }
@@ -572,6 +616,47 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           ? "Hide recipe"
                           : "Edit recipe on this menu"}
                       </button>
+                      <button
+                        type="button"
+                        disabled={busy != null}
+                        onClick={() => {
+                          void (async () => {
+                            const current =
+                              Number(
+                                (selection as { headcountOverride?: number })
+                                  .headcountOverride,
+                              ) || 0;
+                            const values = await prompt.askFields({
+                              title: "Food-cost headcount",
+                              description:
+                                "Guests this dish is costed for. 0 uses the event guest count.",
+                              fields: [
+                                {
+                                  name: "headcountOverride",
+                                  label: "Headcount override",
+                                  defaultValue: String(current),
+                                  inputType: "number",
+                                  required: true,
+                                },
+                              ],
+                              confirmLabel: "Save headcount",
+                            });
+                            if (!values) return;
+                            const override = Number(values.headcountOverride);
+                            if (!Number.isFinite(override) || override < 0)
+                              return;
+                            void run(`override:${selection._id}`, () =>
+                              setHeadcountOverride({
+                                docId: selection._id,
+                                version: selection.version,
+                                headcountOverride: override,
+                              }),
+                            );
+                          })();
+                        }}
+                      >
+                        Set food-cost headcount
+                      </button>
                       <ActionMenuRule />
                       <button
                         type="button"
@@ -618,6 +703,16 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           })}
         </ul>
       )}
+
+      <ComponentNutritionPanel
+        heading="Per-guest nutrition"
+        portionLabel="per guest"
+        totals={
+          nutrition.totals.componentCount > 0 ? nutrition.totals.perGuest : null
+        }
+        coverageNote={nutrition.coverageNote}
+        loading={nutrition.loading}
+      />
 
       <div className="grid gap-3 lg:grid-cols-2">
         <ComponentStockSuggestions />

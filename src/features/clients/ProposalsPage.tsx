@@ -39,6 +39,7 @@ import {
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
+import { generateAcceptanceUrl } from "./proposalSignatureRequest";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
@@ -396,7 +397,7 @@ export function ProposalsPage() {
 
           // Generate acceptance URL
           const callbackToken = result.docId; // The entity ID is the callback token
-          const acceptanceUrl = `${window.location.origin}/accept/${callbackToken}`;
+          const acceptanceUrl = generateAcceptanceUrl(callbackToken);
 
           // Copy to clipboard and show success
           await navigator.clipboard.writeText(acceptanceUrl);

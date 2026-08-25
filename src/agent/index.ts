@@ -20,6 +20,16 @@ export type {
   CapsuleDocumentEnterResult,
   CapsuleDocumentPreviewResult,
 } from "./CapsuleDocumentEnterCoordinator";
+export { CapsuleEventBundleCoordinator } from "./CapsuleEventBundleCoordinator";
+export type {
+  CapsuleEventBundleEnterOptions,
+  CapsuleEventBundleEnterResult,
+  CapsuleEventBundlePreview,
+} from "./CapsuleEventBundleCoordinator";
+export { buildEventBundlePlan } from "./CapsuleEventBundlePlan";
+export type { EventBundlePlan, PlannedStep } from "./CapsuleEventBundlePlan";
+export { toCapsuleUnit, CAPSULE_UNITS } from "./CapsuleMeasureUnit";
+export type { CapsuleUnit } from "./CapsuleMeasureUnit";
 export { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 export { CapsuleComponentStatusLoader } from "./CapsuleComponentStatusLoader";
 export type {
@@ -35,6 +45,7 @@ export { listWiringCapabilityIds } from "./CapsuleWiringCapabilityIds";
 export { ConvexCommandClient } from "./ConvexCommandClient";
 export { CapsuleIngredientCatalogLoader } from "./CapsuleIngredientCatalogLoader";
 export { CapsuleMcpServerFactory } from "./mcp/CapsuleMcpServerFactory";
+export { CapsuleMcpEventBundleRegistrar } from "./mcp/CapsuleMcpEventBundleRegistrar";
 export { CapsuleAgentToolBridge } from "./llm/CapsuleAgentToolBridge";
 export { CapsuleLlmToolDriver } from "./llm/CapsuleLlmToolDriver";
 export { CapsuleAgentBuiltinToolNames } from "./llm/CapsuleAgentBuiltinToolNames";

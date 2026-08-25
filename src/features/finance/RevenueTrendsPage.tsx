@@ -9,6 +9,7 @@ import {
 import { normalizeCurrencyCode } from "../../lib/format";
 import { formatCurrencyLabel } from "../../lib/currency";
 import { TableSkeleton } from "../../ui/primitives";
+import { PieChart } from "../../ui/charts/PieChart";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import {
   buildRevenueTrend,
@@ -254,6 +255,41 @@ function RevenueLegend({
         <span>Prior year total</span>
       </div>
     </div>
+  );
+}
+
+function RevenueShare({
+  categories,
+  currencyCode,
+}: {
+  categories: RevenueCategory[];
+  currencyCode: string;
+}) {
+  const visible = chartCategories(categories).filter(
+    (category) => category.currentTotal > 0,
+  );
+  if (visible.length < 2) return null;
+  const money = moneyFmt(currencyCode);
+  const total = visible.reduce((sum, item) => sum + item.currentTotal, 0);
+  return (
+    <section className="revenue-panel" aria-label="Revenue share by category">
+      <div className="revenue-panel-heading">
+        <div>
+          <p className="eyebrow">Current window</p>
+          <h2>Share by category</h2>
+        </div>
+      </div>
+      <PieChart
+        data={visible.map((category) => ({
+          name: `${category.label} · ${money.format(category.currentTotal)} (${((category.currentTotal / total) * 100).toFixed(0)}%)`,
+          value: category.currentTotal,
+        }))}
+        colors={[...CATEGORY_COLORS]}
+        innerRadius={58}
+        outerRadius={96}
+        height={280}
+      />
+    </section>
   );
 }
 
@@ -504,6 +540,10 @@ export function RevenueTrendsDashboard({
               </>
             )}
           </section>
+          <RevenueShare
+            categories={trend.categories}
+            currencyCode={functionalCurrencyCode}
+          />
         </>
       )}
 
