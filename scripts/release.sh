@@ -125,14 +125,15 @@ rm -f "$proof"
 # --force-with-lease pins the delete to the sha that was released: if
 # someone pushed to the branch during the gate, that work is not deleted.
 if ! git push --atomic --force-with-lease="refs/heads/$branch:$branch_sha" origin "$branch_sha:refs/heads/archive/$branch" ":refs/heads/$branch"; then
-  echo "release: main is released, but archiving $branch on origin failed (new commits on it, or a network error). Finish by hand:"
+  git checkout -q "$branch"
+  echo "release: main is released, but archiving $branch on origin failed (new commits on it, or a network error). You are back on $branch. Finish by hand:"
   echo "  git fetch origin && git log --oneline $branch_sha..origin/$branch"
-  echo "  Nothing listed (network error): retry the same leased push:"
+  echo "  Nothing listed (network error): retry the leased push, then rename:"
   echo "    git push --atomic --force-with-lease=refs/heads/$branch:$branch_sha origin $branch_sha:refs/heads/archive/$branch :refs/heads/$branch"
-  echo "  Commits listed (pushed during the gate): they are NOT released. Keep the branch, archive only the released sha:"
+  echo "    git branch -m $branch archive/$branch"
+  echo "  Commits listed (pushed during the gate): they are NOT released. Keep $branch; archive only the released sha:"
   echo "    git push origin $branch_sha:refs/heads/archive/$branch"
-  echo "    git pull --ff-only origin $branch   # then continue on $branch and release again later"
-  echo "  git branch -m $branch archive/$branch"
+  echo "    git pull --ff-only origin $branch   # continue on $branch; release again later"
   exit 1
 fi
 git branch -m "$branch" "archive/$branch"
