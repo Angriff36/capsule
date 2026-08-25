@@ -47,6 +47,10 @@ if [ "$(git rev-parse main)" != "$(git rev-parse origin/main)" ]; then
   echo "  git branch -f main origin/main"
   exit 1
 fi
+if git show-ref --verify --quiet "refs/heads/archive/$branch"; then
+  echo "release: a local branch archive/$branch already exists. Delete or rename it first."
+  exit 1
+fi
 base="$(git rev-parse origin/main)"
 proof=.artifacts/release-check-passed
 
