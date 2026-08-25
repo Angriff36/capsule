@@ -205,3 +205,15 @@
   font-weight: 600;
   color: var(--color-ink-2);
 }
+
+/* Phones: the horizon row (Earlier / From today / Later / date) is wider than
+   the toolbar, so it wraps instead of pushing the board sideways. */
+@media (max-width: 767px) {
+  .kcd-toolbar > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .kcd-horizon-nav {
+    flex-wrap: wrap;
+  }
+}
