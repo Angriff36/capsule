@@ -132,9 +132,13 @@ export function buildEventBundlePlan(
   }
   const startsAt = toEpochMillis(eventDate, startMinutes);
   const endMinutes = bundle.header.endMinutes;
+  // An end before the start (10:00 PM - 2:00 AM) is the next morning.
   const endsAt =
-    endMinutes !== undefined && endMinutes > startMinutes
-      ? toEpochMillis(eventDate, endMinutes)
+    endMinutes !== undefined && endMinutes !== startMinutes
+      ? toEpochMillis(
+          eventDate,
+          endMinutes > startMinutes ? endMinutes : endMinutes + 24 * 60,
+        )
       : startsAt + HOUR_MS;
 
   if (existing) {

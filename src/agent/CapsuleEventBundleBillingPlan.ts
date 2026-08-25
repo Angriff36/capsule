@@ -101,7 +101,7 @@ export function planBillingSteps(input: {
   }
   const matchedPayments = new Set<string>();
   bundle.payments.forEach((payment, index) => {
-    if (payment.amountCents === undefined || payment.amountCents < 100) {
+    if (payment.amountCents === undefined || payment.amountCents <= 0) {
       return;
     }
     const already = existingPayments.find(

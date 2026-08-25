@@ -75,7 +75,7 @@ function dropEmptyArgs(args: Record<string, unknown>): Record<string, unknown> {
  * guessed for it (an assumed start time); everything else is a note.
  */
 const NEEDS_DECISION =
-  /was skipped|were skipped|not entered|match no person|is assumed/;
+  /was skipped|were skipped|not entered|match no person|is assumed|different invoice numbers/;
 
 /** The warnings a human must accept before entering; the rest are notes. */
 export function warningsNeedingDecision(plan: {
