@@ -199,10 +199,22 @@ Convex agent skills for common tasks can be installed by running
 
 ## Deploying (agents: read before touching anything deploy-shaped)
 
-**Normal Git pushes are allowed.** Feature/PR branch pushes may run CI. A push
-or merge to `main` is allowed once the required CI is green and the independent
-cross-model review gate has APPROVED; that normal deployment path does not need
-separate human deploy authorization.
+**Branch and release rule (owner, 2026-08-25).** Direct pushes to `main`
+are blocked by `.githooks/pre-push`. Every task works on a branch and pushes
+to that branch immediately and often; those pushes are chores — `vercel.json`
+`ignoreCommand` skips every non-`main` ref, so nothing builds and nothing
+deploys. Dev work uses the LOCAL Convex backend (`bun run dev:convex`,
+127.0.0.1:3210). ONE merge to `main` happens at the end of the branch:
+
+```text
+bash scripts/release.sh --reviewer <model>
+```
+
+It requires a clean tree, the branch pushed, and the reviewer that APPROVED
+the diff (merge gate above). It merges `--no-ff` into `main`, pushes `main`
+once with `CAPSULE_RELEASE=1` (the only Vercel production build and the only
+Convex prod deploy for that branch), then renames the branch to
+`archive/<branch>` locally and on origin. Start the next task from `main`.
 
 **Manual deploy commands and settings changes are HUMAN-AUTHORIZED only.** No
 loop or agent runs `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk

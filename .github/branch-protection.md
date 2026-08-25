@@ -11,6 +11,13 @@ CI job name that must stay required on `main`: **`check`**
 - Do not allow force pushes to `main`
 - Do not allow deletions of `main`
 
+## Local enforcement (2026-08-25)
+
+Until GitHub can protect `main`, the repo enforces it locally:
+`.githooks/pre-push` rejects any push to `refs/heads/main` unless
+`CAPSULE_RELEASE=1`, which only `scripts/release.sh` (`bash scripts/release.sh`) sets.
+Vercel builds `main` only (`vercel.json` `ignoreCommand`).
+
 ## Current blocker (2026-07-16)
 
 Private repo on GitHub Free cannot enable classic branch protection or repository rulesets via API:

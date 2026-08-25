@@ -16,7 +16,8 @@ cp .env.example .env.local
 bun run convex:env-set -- CLERK_JWT_ISSUER_DOMAIN https://YOUR.clerk.accounts.dev
 bun run convex:env-set -- CONVEX_FIELD_ENCRYPTION_KEY <32-byte-secret>
 # Production (Vercel app → cloud Convex): set the same vars with --prod, then
-# bunx convex deploy. Local env set does not affect tangible-skunk / prod.
+# the release push to main deploys (see AGENTS.md § Deploying). Local env set
+# does not affect prod (impartial-mule-193).
 # Windows: if env list warns about trailing \r on this key, do not "clean" it
 # without migrating ciphertext — decrypt/create will fail as Server Error.
 
@@ -92,4 +93,5 @@ bun run check
 | Convex codegen | `bun run codegen`                    |
 | All tests      | `bun run test`                       |
 | Full CI gate   | `bun run check`                      |
-| Deploy         | `bun run deploy`                     |
+| Release        | `bash scripts/release.sh --reviewer <model>` |
+| Deploy (human) | `bun run deploy`                     |

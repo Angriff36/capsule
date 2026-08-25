@@ -52,7 +52,8 @@ Declared as `allowed-tools` frontmatter in each `.claude/skills/*/SKILL.md`.
 - Anything on the denylist
 - Convex schema or deploy (`convex deploy` / `bun run deploy` forbidden to the loop)
 - Manifest pipeline changes
-- Pushes, merges, PR closes
+- Pushes, merges, PR closes (production ships only via the one
+  `bash scripts/release.sh` per branch — owner rule 2026-08-25)
 - Third failed attempt on the same item (loop-guard escalates)
 
 ## Kill switch

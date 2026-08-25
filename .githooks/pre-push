@@ -1,4 +1,21 @@
 #!/bin/sh
+# Branch rule (owner, 2026-08-25): nothing pushes to main by hand. Work lives
+# on a branch; every branch push is a chore (Vercel ignores non-main refs via
+# vercel.json ignoreCommand). ONE merge to main happens at the end of the
+# branch, through `bash scripts/release.sh`, which sets CAPSULE_RELEASE=1.
+if [ "${CAPSULE_RELEASE:-0}" != "1" ]; then
+  while read -r _local_ref _local_sha remote_ref _remote_sha; do
+    case "$remote_ref" in
+      refs/heads/main)
+        echo ""
+        echo "pre-push blocked: direct push to main."
+        echo "Push your branch instead. Release with: bash scripts/release.sh --reviewer <model>"
+        exit 1
+        ;;
+    esac
+  done
+fi
+
 # Regeneration is a local gate (owner policy 2026-07-19): Builder-owned output
 # must be regenerated and current BEFORE anything reaches GitHub — CI has no
 # Builder checkout and cannot regenerate. Blocks the push when the Builder

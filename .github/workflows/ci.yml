@@ -1,3 +1,6 @@
+# CI only. Nothing here deploys. Production ships from the ONE release push
+# to main per branch (`bash scripts/release.sh`, AGENTS.md § Deploying); branch pushes
+# are chores and Vercel ignores them (vercel.json ignoreCommand).
 name: ci
 
 on:
