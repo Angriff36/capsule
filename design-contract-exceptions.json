@@ -1,0 +1,156 @@
+{
+  "_note": [
+    "Recorded divergences between DESIGN.md (presentation authority) and the",
+    "@theme tokens in src/styles/app.css. scripts/check-design-vocab.ts reads",
+    "this file: a listed token is reported, not fatal; anything else fails the",
+    "build. An entry that no longer matches reality also fails, so the list",
+    "cannot rot.",
+    "",
+    "This file records reality. It does not approve it. Every entry tagged",
+    "'owner decision pending' below is an implementation-only override of",
+    "DESIGN.md that shipped without amending DESIGN.md. Resolve each one by",
+    "either amending DESIGN.md (owner approves the new design) or moving the",
+    "token back. Do not add an entry to silence a new change: per AGENTS.md,",
+    "changing the design contract needs explicit owner approval first."
+  ],
+  "tokens": [
+    {
+      "token": "--color-canvas",
+      "design": "#dfe8da",
+      "app": "#f3f2ee",
+      "reason": "owner decision pending — f8649bb (2026-08-24) replaced the pale botanical canvas with a warm gray one. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-panel",
+      "design": "#fffefa",
+      "app": "#ffffff",
+      "reason": "owner decision pending — f8649bb (2026-08-24) moved the working-paper panel to pure white for elevated cards. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-inset",
+      "design": "#f1f3ed",
+      "app": "#f5f4f0",
+      "reason": "owner decision pending — f8649bb (2026-08-24) warmed the inset surface to match the gray canvas. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-ink-2",
+      "design": "#53615b",
+      "app": "#3f4b46",
+      "reason": "owner decision pending — 909bc59 (2026-08-24) darkened secondary ink for contrast. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-ink-3",
+      "design": "#7b867f",
+      "app": "#5f6b65",
+      "reason": "owner decision pending — 909bc59 (2026-08-24) darkened tertiary ink for contrast. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-line",
+      "design": "#dde1d9",
+      "app": "#e2e1dc",
+      "reason": "owner decision pending — 909bc59 (2026-08-24) shifted rules off the sage hue. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-line-2",
+      "design": "#c8cec5",
+      "app": "#b9bcb4",
+      "reason": "owner decision pending — 909bc59 (2026-08-24) strengthened the heavy rule. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-rail",
+      "design": "#f7f8f4",
+      "app": "#1e3a31",
+      "reason": "owner decision pending — f8649bb (2026-08-24) made the navigation rail dark forest green. DESIGN.md specifies a light rail and its Don't list forbids a dark admin-template sidebar. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-rail-2",
+      "design": "#edf1ea",
+      "app": "#2a4d42",
+      "reason": "owner decision pending — f8649bb (2026-08-24) darkened the rail hover surface to suit the dark rail. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-rail-ink",
+      "design": "#46534e",
+      "app": "#ffffff",
+      "reason": "owner decision pending — f8649bb (2026-08-24) inverted rail text to white for the dark rail. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-rail-dim",
+      "design": "#87918b",
+      "app": "#a9c0b6",
+      "reason": "owner decision pending — f8649bb (2026-08-24) lifted dim rail text for the dark rail. DESIGN.md was not amended."
+    },
+    {
+      "token": "--radius-xs",
+      "design": "3px",
+      "app": "4px",
+      "reason": "owner decision pending — f8649bb (2026-08-24) softened the control radius. DESIGN.md was not amended."
+    },
+    {
+      "token": "--radius-sm",
+      "design": "5px",
+      "app": "6px",
+      "reason": "owner decision pending — f8649bb (2026-08-24) softened the card radius. DESIGN.md was not amended."
+    },
+    {
+      "token": "--font-display",
+      "design": "Iowan Old Style",
+      "app": "Archivo Variable",
+      "reason": "owner decision pending — f8649bb (2026-08-24) collapsed the app to one sans face, dropping the editorial serif. DESIGN.md requires serif for page and object identity. DESIGN.md was not amended."
+    },
+    {
+      "token": "--font-mono",
+      "design": "IBM Plex Mono",
+      "app": "Archivo Variable",
+      "reason": "owner decision pending — f8649bb (2026-08-24) collapsed the app to one sans face, dropping the mono figure face. DESIGN.md was not amended."
+    },
+    {
+      "token": "--color-success",
+      "design": "#3d7253",
+      "app": "(absent)",
+      "reason": "naming only — app.css declares this value as --color-ok (renamed in 956f3bd, 2026-07-28). The value matches DESIGN.md exactly. Predates the 2026-08-24 override."
+    },
+    {
+      "token": "--color-success-soft",
+      "design": "#e4efe2",
+      "app": "(absent)",
+      "reason": "naming only — app.css declares this value as --color-ok-soft (renamed in 956f3bd, 2026-07-28). The value matches DESIGN.md exactly."
+    },
+    {
+      "token": "--color-warning",
+      "design": "#8a641c",
+      "app": "(absent)",
+      "reason": "naming only — app.css has always declared this value as --color-warn. The value matches DESIGN.md exactly."
+    },
+    {
+      "token": "--color-warning-soft",
+      "design": "#f5ecd4",
+      "app": "(absent)",
+      "reason": "naming only — app.css has always declared this value as --color-warn-soft. The value matches DESIGN.md exactly."
+    },
+    {
+      "token": "--color-on-brand",
+      "design": "#ffffff",
+      "app": "(absent)",
+      "reason": "never implemented — no --color-on-brand token has ever existed in app.css; brand-filled controls use a literal white. Predates the 2026-08-24 override."
+    },
+    {
+      "token": "--radius-pill",
+      "design": "9999px",
+      "app": "(absent)",
+      "reason": "never implemented — no --radius-pill token has ever existed in app.css; the pill shape comes from Tailwind's rounded-full, which the vocabulary gate already allows."
+    },
+    {
+      "token": "--radius-ledger",
+      "design": "14px",
+      "app": "(absent)",
+      "reason": "never implemented — no --radius-ledger token has ever existed in app.css. The attention-ledger surface DESIGN.md describes was never built with its own radius token."
+    },
+    {
+      "token": "--radius-sheet",
+      "design": "22px",
+      "app": "(absent)",
+      "reason": "never implemented — no --radius-sheet token has ever existed in app.css. The .workspace-sheet class that carried a 22px radius was removed by 909bc59 (2026-08-24)."
+    }
+  ]
+}

@@ -68,6 +68,38 @@ Do **not** create, add, or expand tests unless the owner asks. Run existing
 `bun run test` / `bun run test:proofs` / `bun run check` gates when verifying.
 Never disable or delete failing tests to go green.
 
+## Design authority (agents)
+
+Applies to all authored UI work: screens, shell, theme, tokens, shared
+components, and any styling under `src/app/**`, `src/features/**`, `src/ui/**`,
+and `src/styles/**`.
+
+- **Read [DESIGN.md](DESIGN.md) first**, plus the applicable references it
+  names (`docs/design-references/`, the owning page under `docs/systems/`),
+  **before** proposing or implementing a UI change. Not after.
+- `DESIGN.md` is the presentation authority
+  ([docs/product/authority.md](docs/product/authority.md)). Its front matter is
+  the authoritative source for colors, type faces, and radii;
+  `bun run check:design-vocab` compares `src/styles/app.css` against it.
+- **A complaint is not authorization.** “Bland,” “unintuitive,” “too pale,”
+  “needs better contrast,” “make it pop” — these authorize work _inside_ the
+  established visual language. They do not authorize replacing it. Fix the
+  specific defect: raise a contrast ratio, tighten a hierarchy, correct a
+  spacing error, add the missing focal point.
+- **Conflict → stop and ask.** If the requested outcome cannot be reached
+  without breaking a `DESIGN.md` rule, say which rule, quote it, describe the
+  conflict, and get explicit owner approval to amend the design contract. Then
+  amend `DESIGN.md` in the same change.
+- **Never override `DESIGN.md` through implementation alone.** Moving a token,
+  swapping a type face, or deleting a described component without amending
+  `DESIGN.md` is silent drift, not a design decision. That is exactly how the
+  2026-08-24 divergence happened (909bc59, f8649bb).
+- Recorded, not-yet-resolved divergences live in
+  [design-contract-exceptions.json](design-contract-exceptions.json), one entry
+  per token with a reason. Do **not** add an entry to make a new change pass —
+  an entry records an owner decision that is still open, and adding one for
+  fresh work is the silent override this rule forbids.
+
 ## Domain gating (agents)
 
 Before adding or tightening policies/guards/constraints in `src/**/*.manifest`,
@@ -170,6 +202,32 @@ user tedium and let users actually use the app instead of being policy-denied
 every time they try to do anything. Flag any new guard, policy, approval, or
 validation that blocks a reasonable user action without a proportionate
 real-world reason."
+
+**If the diff touches authored UI** — screens, shell, theme, tokens, shared
+components, or styling under `src/app/**`, `src/features/**`, `src/ui/**`,
+`src/styles/**` — the prompt MUST ALSO include the following, and the reviewer
+must be given `DESIGN.md` itself, not just the diff:
+
+> "DESIGN.md is the presentation authority for this repo. Read it, then
+> compare these changes against it directly. (1) List every DESIGN.md rule the
+> diff violates — quote the rule and point at the line that breaks it; check
+> the front-matter colors, type faces, and radii against src/styles/app.css,
+> and the Components, Do's and Don'ts, Responsive, and Accessibility sections
+> against the markup. (2) Distinguish a usability improvement made WITHIN the
+> established visual language (better contrast inside the palette, clearer
+> hierarchy, fixed spacing, a real focal point) from a REPLACEMENT of the
+> visual language (new palette, new type system, a described component deleted
+> or re-shaped, a forbidden pattern introduced). (3) REJECT any replacement of
+> the visual language that changes implementation only. A visual-language
+> change is acceptable ONLY if this same diff also amends DESIGN.md to match
+> and cites the owner's explicit approval for that amendment. An unamended
+> DESIGN.md plus a changed look is a REJECT, no matter how good the new look
+> is. (4) Adding a token to design-contract-exceptions.json to make new work
+> pass is a REJECT — that file records open owner decisions, it does not grant
+> them."
+
+A reviewer that was not given `DESIGN.md` has not reviewed the presentation.
+Treat that verdict as incomplete and re-run the review with the file attached.
 
 Reviewer APPROVE = authorization to merge. Reviewer REJECT = fix or escalate
 to the human; never merge over a rejection. The PR body must name the
