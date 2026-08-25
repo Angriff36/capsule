@@ -85,17 +85,22 @@ if git merge-base --is-ancestor "$branch" origin/main && [ -n "$(git log origin/
   exit 0
 fi
 
-back_to_branch() {
-  git checkout -q "$branch"
+# Leave main first, then move it: `git branch -f` on a branch that is not
+# checked out always works, and a failed move is loud.
+restore_main_and_branch() {
+  git checkout -q -f "$branch"
+  git branch -f main "$base"
   rm -f "$proof"
+  if [ "$(git rev-parse main)" != "$base" ]; then
+    echo "release: WARNING — could not move local main back to $base. Run: git branch -f main origin/main"
+  fi
 }
 
 abort_release() {
   echo ""
   echo "release: interrupted. Restoring main and returning to $branch."
   git merge --abort 2>/dev/null || true
-  git reset -q --hard "$base"
-  back_to_branch
+  restore_main_and_branch
   exit 130
 }
 trap abort_release INT TERM
@@ -106,14 +111,13 @@ if git merge-base --is-ancestor "$branch" main; then
   # Already on main (e.g. a GitHub-side merge that never deployed). A real
   # [release] commit is still required: Vercel builds main only for one.
   if ! git commit -q --allow-empty -m "$subject"; then
-    git reset -q --hard "$base"
-    back_to_branch
+    restore_main_and_branch
     echo "release: could not create the release commit (see above). main is unchanged."
     exit 1
   fi
 elif ! git merge --no-ff "$branch" -m "$subject"; then
   git merge --abort || true
-  back_to_branch
+  restore_main_and_branch
   echo "release: merge conflict with main. Merge main into $branch, resolve, push, and release again."
   exit 1
 fi
@@ -122,8 +126,8 @@ fi
 # below, stamped with the exact commit that passed, or it refuses main.
 echo "release: running bun run check on the merge result before anything is pushed."
 if ! bun run check; then
-  git reset -q --hard "$base"
-  back_to_branch
+  git checkout -q -- .
+  restore_main_and_branch
   echo "release: check failed. main is unchanged. Fix on $branch and release again."
   exit 1
 fi
@@ -131,8 +135,8 @@ fi
 # generated/proof): the commit pushed must be the exact tree that passed.
 if [ -n "$(git status --porcelain)" ]; then
   git status --short | head -20
-  git reset -q --hard "$base"
-  back_to_branch
+  git checkout -q -- .
+  restore_main_and_branch
   echo "release: bun run check changed tracked files (above). Run it on $branch, commit the result, push, and release again."
   exit 1
 fi
@@ -157,8 +161,7 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
     echo "    git checkout $branch && git branch -f main origin/main"
     exit 1
   else
-    git reset -q --hard "$base"
-    back_to_branch
+    restore_main_and_branch
     echo "release: push to main failed (see above). main is unchanged. Fix and release again."
     exit 1
   fi
