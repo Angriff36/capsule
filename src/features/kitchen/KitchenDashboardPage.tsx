@@ -6,13 +6,16 @@ import {
   useListEvent,
   useListEventDish,
   useListPerson,
+  useListInvoice,
   useListPrepTask,
   useListComponent,
   useListVenue,
   usePrepTaskAssign,
+  usePrepTaskCancel,
   usePrepTaskClaim,
   usePrepTaskComplete,
   usePrepTaskRelease,
+  usePrepTaskRevise,
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -33,6 +36,28 @@ import type {
 
 /** One prep task with the service it belongs to. */
 type LedgerRow = { task: PrepTaskLike; event: EventLike };
+
+/** prepTasks.unit is a closed enum in convex/schema.ts; offer exactly it. */
+const PREP_UNITS = [
+  "each",
+  "portion",
+  "serving",
+  "batch",
+  "gram",
+  "kilogram",
+  "ounce",
+  "pound",
+  "milliliter",
+  "liter",
+  "teaspoon",
+  "tablespoon",
+  "cup",
+  "pint",
+  "quart",
+  "gallon",
+  "melon",
+  "bottle",
+] as const;
 import { KitchenPrepAssignManager } from "./command-deck/KitchenPrepAssignManager";
 import "./command-deck/KitchenCommandDeck.css";
 import "./command-deck/KitchenCommandDeckSurfaces.css";
@@ -45,6 +70,7 @@ export function KitchenDashboardPage() {
   const dishes = useListDish();
   const components = useListComponent();
   const tasks = useListPrepTask();
+  const invoices = useListInvoice();
   const people = useListPerson();
   const venues = useListVenue();
   const authStatus = useAuthStatus();
@@ -53,6 +79,8 @@ export function KitchenDashboardPage() {
   const claim = usePrepTaskClaim();
   const release = usePrepTaskRelease();
   const start = usePrepTaskStart();
+  const revise = usePrepTaskRevise();
+  const cancel = usePrepTaskCancel();
   const complete = usePrepTaskComplete();
   const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
 
@@ -65,6 +93,9 @@ export function KitchenDashboardPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [attentionAll, setAttentionAll] = useState(false);
+  const [editing, setEditing] = useState<string | null>(null);
+  /** Ticked rows. The board works in batches — one cook, many steps. */
+  const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
   const [failure, setFailure] = useState<unknown>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -94,16 +125,16 @@ export function KitchenDashboardPage() {
   const horizonEvents = model.horizonEvents();
 
   useEffect(() => {
-    if (!selectedEventId && horizonEvents[0]) {
-      setSelectedEventId(horizonEvents[0]._id);
-      return;
-    }
+    // The board opens on every service in the window. It used to open on the
+    // first event, which read as a filter nobody set — and re-picking that
+    // event whenever the id went empty made "Every service" unselectable.
+    // Only drop a selection that has left the window; never invent one.
     if (
       selectedEventId &&
       horizonEvents.length > 0 &&
       !horizonEvents.some((e) => e._id === selectedEventId)
     ) {
-      setSelectedEventId(horizonEvents[0]?._id ?? "");
+      setSelectedEventId("");
     }
   }, [horizonEvents, selectedEventId]);
 
@@ -299,6 +330,35 @@ export function KitchenDashboardPage() {
     })}`;
   };
 
+  /** The kitchen identifies a job by its invoice number, as the printed
+   *  sheets do ("Invoice #: 5792"). Shown only where one exists — Events
+   *  themselves carry no number, and inventing one would be a lie. */
+  const invoiceNumberFor = (eventId: unknown) =>
+    (invoices ?? []).find(
+      (i) => i.deletedAt == null && String(i.eventId) === String(eventId),
+    )?.invoiceNumber ?? null;
+
+  /** Change a step's quantity or unit in place, through PrepTask.revise. */
+  const onRevise = (task: PrepTaskLike, quantity: number, unit: string) =>
+    void run(
+      `revise:${task._id}`,
+      async () => {
+        await revise({ docId: task._id, quantity, unit });
+        setEditing(null);
+      },
+      "Quantity updated",
+    );
+
+  /** Clock only. The day is stated once, by the service, not on every step. */
+  const serviceTime = (startsAt: unknown) => {
+    const ms = Number(startsAt);
+    if (!Number.isFinite(ms) || ms === 0) return "time to confirm";
+    return new Date(ms).toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
+
   /** One next action per row, using the handlers already wired above. */
   const nextAction = (row: LedgerRow) => {
     const status = String(row.task.status);
@@ -332,6 +392,106 @@ export function KitchenDashboardPage() {
           ? "chip-state chip-state-warn"
           : "chip-meta";
 
+  /** Prep names arrive shouting from the recipe import; calm them down. */
+  const sentenceCase = (raw: unknown) => {
+    const name = String(raw ?? "").trim();
+    if (!name) return "Untitled task";
+    const letters = name.replace(/[^A-Za-z]/g, "");
+    if (letters && letters === letters.toUpperCase()) {
+      return name.charAt(0) + name.slice(1).toLowerCase();
+    }
+    return name;
+  };
+
+  const togglePicked = (id: string) =>
+    setPicked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const pickedRows = horizonTasks.filter((r) => picked.has(String(r.task._id)));
+
+  /** Everything ticked, in board order, whatever section it sits in. */
+  const onPickedBulk = (
+    label: string,
+    verb: (task: PrepTaskLike) => Promise<void>,
+    done: string,
+  ) =>
+    void run(`bulk:${label}`, async () => {
+      let count = 0;
+      for (const row of pickedRows) {
+        await verb(row.task);
+        count += 1;
+      }
+      setPicked(new Set());
+      showToast(`${formatCountNoun(count, "task")} ${done}`);
+    });
+
+  const onBulkAssign = () => {
+    const personId = requireArmed();
+    if (!personId) return;
+    const label = model.personLabel(model.findPerson(personId));
+    void run("bulk:assign", async () => {
+      const count = await actions.assignMany(
+        pickedRows.map((r) => r.task),
+        personId,
+      );
+      setPicked(new Set());
+      showToast(`${formatCountNoun(count, "task")} → ${label}`);
+    });
+  };
+
+  /** Why combine can or cannot run on what is ticked. The kitchen combines
+   *  like with like: the same unit, and nothing already cooked. */
+  const combineBlocker = (): string | null => {
+    if (pickedRows.length < 2) return "Tick two or more steps to combine them.";
+    const units = new Set(pickedRows.map((r) => String(r.task.unit ?? "each")));
+    if (units.size > 1) {
+      return `These steps are measured in ${[...units].join(" and ")}. Combine steps that share a unit.`;
+    }
+    const stuck = pickedRows.find((r) =>
+      ["completed", "cancelled"].includes(String(r.task.status)),
+    );
+    if (stuck) return "A finished or cancelled step cannot be combined.";
+    return null;
+  };
+
+  /** Combine = one step carries the whole quantity, the rest stand down.
+   *  Built from PrepTask.revise + PrepTask.cancel — no new backend command,
+   *  and the cancelled rows keep their history with the reason written on. */
+  const onCombine = () => {
+    const blocker = combineBlocker();
+    if (blocker) {
+      setFailure(new Error(blocker));
+      return;
+    }
+    const [keep, ...fold] = pickedRows;
+    if (!keep) return;
+    const total = pickedRows.reduce(
+      (sum, r) => sum + (Number(r.task.quantity) || 0),
+      0,
+    );
+    void run("bulk:combine", async () => {
+      await revise({
+        docId: keep.task._id,
+        quantity: total,
+        unit: keep.task.unit ?? "each",
+      });
+      for (const row of fold) {
+        await cancel({
+          docId: row.task._id,
+          reason: `Combined into "${String(keep.task.name)}" (${total} ${String(keep.task.unit ?? "each")}).`,
+        });
+      }
+      setPicked(new Set());
+      showToast(
+        `Combined ${formatCountNoun(pickedRows.length, "step")} into ${total} ${String(keep.task.unit ?? "each")}`,
+      );
+    });
+  };
+
   const ledgerRow = (row: LedgerRow) => {
     const action = nextAction(row);
     const owner = row.task.assignedToId
@@ -344,13 +504,20 @@ export function KitchenDashboardPage() {
     return (
       <div
         key={String(row.task._id)}
-        className="grid grid-cols-[minmax(0,1fr)_96px_136px_128px_112px] items-center gap-x-5 border-b border-line py-3.5 max-md:grid-cols-1 max-md:gap-y-1.5 max-md:py-4"
+        className="grid grid-cols-[24px_minmax(0,1fr)_124px_136px_128px_112px] items-center gap-x-5 border-b border-line py-3.5 max-md:grid-cols-1 max-md:gap-y-1.5 max-md:py-4"
       >
+        <input
+          type="checkbox"
+          className="h-5 w-5 accent-[var(--color-brand)] max-md:hidden"
+          checked={picked.has(String(row.task._id))}
+          onChange={() => togglePicked(String(row.task._id))}
+          aria-label={`Select ${String(row.task.name)}`}
+        />
         <div className="min-w-0">
-          {/* Truncates in the desktop column; wraps on a phone, where the
-              task name is the whole identity of the row. */}
-          <div className="font-display text-xl text-ink md:truncate">
-            {row.task.name}
+          {/* Never truncated. A half-printed instruction is not an
+              instruction — the cook has to read the whole line. */}
+          <div className="font-display text-xl leading-snug text-ink">
+            {sentenceCase(row.task.name)}
           </div>
           {/* Event and due time sit under the name. As their own columns they
               starved the task identity down to a few characters. */}
@@ -362,22 +529,79 @@ export function KitchenDashboardPage() {
               className="cursor-pointer hover:text-ink hover:underline"
             >
               {String(row.event.title)}
-            </button>{" "}
-            · due {dueLabel(row.event.startsAt)}
+            </button>
+            {invoiceNumberFor(row.event._id)
+              ? ` #${invoiceNumberFor(row.event._id)}`
+              : ""}{" "}
+            · {serviceTime(row.event.startsAt)}
           </div>
         </div>
-        <div className="font-mono text-base text-ink max-md:hidden">
-          {row.task.quantity != null
-            ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
-            : "—"}
+        {/* While editing, the fields need more room than the column has, so
+            the cell lifts above its neighbours instead of being clipped. */}
+        <div
+          className={`max-md:hidden ${editing === String(row.task._id) ? "relative z-10" : ""}`}
+        >
+          {editing === String(row.task._id) ? (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const data = new FormData(e.currentTarget);
+                const q = Number(data.get("q"));
+                if (Number.isFinite(q) && q > 0) {
+                  onRevise(row.task, q, String(data.get("u") ?? ""));
+                }
+              }}
+              className="bg-panel flex w-max items-center gap-1"
+            >
+              <input
+                name="q"
+                type="number"
+                step="any"
+                defaultValue={String(row.task.quantity ?? "")}
+                aria-label="Quantity"
+                className="input h-8 w-16 px-1.5"
+              />
+              <select
+                name="u"
+                defaultValue={String(row.task.unit ?? "each")}
+                aria-label="Unit"
+                className="input h-8 w-20 px-1"
+              >
+                {PREP_UNITS.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </select>
+              <button type="submit" className="btn btn-ghost btn-sm">
+                Save
+              </button>
+            </form>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setEditing(String(row.task._id))}
+              title="Change the quantity"
+              className="font-mono cursor-pointer text-base whitespace-nowrap text-ink underline decoration-line-2 underline-offset-4"
+            >
+              {row.task.quantity != null
+                ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
+                : "—"}
+            </button>
+          )}
         </div>
+        {/* The editor borrows this column's width while it is open. */}
         <div className="truncate text-base text-ink-2 max-md:hidden">
-          {owner}
+          {editing === String(row.task._id) ? "" : owner}
         </div>
         {/* Phone: event, due, quantity and owner ride together on one honest
             line rather than being squeezed into columns that clip. */}
         <div className="text-sm text-ink-2 md:hidden">
-          {String(row.event.title)} · due {dueLabel(row.event.startsAt)} ·{" "}
+          {String(row.event.title)}
+          {invoiceNumberFor(row.event._id)
+            ? ` #${invoiceNumberFor(row.event._id)}`
+            : ""}{" "}
+          · due {dueLabel(row.event.startsAt)} ·{" "}
           {row.task.quantity != null
             ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
             : "—"}{" "}
@@ -526,21 +750,10 @@ export function KitchenDashboardPage() {
     if (cut.length > 1) {
       const tail = cut[cut.length - 1]!.trim().toUpperCase();
       if (tail && itemName.includes(tail)) {
-        return cut.slice(0, -1).join(" — ").trim();
+        return sentenceCase(cut.slice(0, -1).join(" — ").trim());
       }
     }
-    return text;
-  };
-
-  /** Prep names arrive shouting from the recipe import; calm them down. */
-  const sentenceCase = (raw: unknown) => {
-    const name = String(raw ?? "").trim();
-    if (!name) return "Untitled task";
-    const letters = name.replace(/[^A-Za-z]/g, "");
-    if (letters && letters === letters.toUpperCase()) {
-      return name.charAt(0) + name.slice(1).toLowerCase();
-    }
-    return name;
+    return sentenceCase(text);
   };
 
   const mobileCollapsed = (row: LedgerRow) => {
@@ -880,6 +1093,17 @@ export function KitchenDashboardPage() {
                           </span>
                         ) : null}
                       </div>
+                      {/* Which job this item belongs to, stated once per item
+                          — the same "Invoice #" the printed sheet carries. */}
+                      {item.steps[0] ? (
+                        <div className="mt-1 text-sm text-ink-2">
+                          {String(item.steps[0].event.title)}
+                          {invoiceNumberFor(item.steps[0].event._id)
+                            ? ` #${invoiceNumberFor(item.steps[0].event._id)}`
+                            : ""}{" "}
+                          · {serviceTime(item.steps[0].event.startsAt)}
+                        </div>
+                      ) : null}
 
                       {item.steps.map((row) => {
                         const status = String(row.task.status);
@@ -1082,6 +1306,46 @@ export function KitchenDashboardPage() {
               </select>
             </label>
             <label className="kcd-field">
+              <span>Arm cook</span>
+              <select
+                value={armedPersonId ?? ""}
+                onChange={(e) => setArmedPersonId(e.target.value || null)}
+                aria-label="Arm a cook for assignment"
+              >
+                <option value="">Nobody armed</option>
+                {crewRows.map((crew) => (
+                  <option
+                    key={String(crew.person._id)}
+                    value={String(crew.person._id)}
+                  >
+                    {model.personLabel(crew.person)} ({crew.load} open)
+                  </option>
+                ))}
+              </select>
+            </label>
+            {selectedEvent ? (
+              <span className="flex items-center gap-3">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={
+                    !prepSyncReady || busy === `sync:${selectedEvent._id}`
+                  }
+                  onClick={onSyncPrep}
+                >
+                  {busy === `sync:${selectedEvent._id}`
+                    ? "Syncing…"
+                    : "Sync prep"}
+                </button>
+                <Link
+                  to={eventMenuRedirectPath(selectedEvent._id)}
+                  className="btn btn-ghost btn-sm"
+                >
+                  Event menu
+                </Link>
+              </span>
+            ) : null}
+            <label className="kcd-field">
               <span>Assignee</span>
               <select
                 value={assigneeFilter}
@@ -1099,6 +1363,75 @@ export function KitchenDashboardPage() {
             </label>
           </div>
         </div>
+
+        {/* What is ticked, and what can be done to all of it at once. */}
+        {pickedRows.length > 0 ? (
+          <div className="attention-band mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 max-md:hidden">
+            <span className="text-base font-medium text-ink">
+              {formatCountNoun(pickedRows.length, "step")} selected
+            </span>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={busy === "bulk:assign"}
+              onClick={onBulkAssign}
+            >
+              {armedPersonId
+                ? `Assign to ${model.personLabel(model.findPerson(armedPersonId))}`
+                : "Assign"}
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={busy === "bulk:claim"}
+              onClick={() =>
+                onPickedBulk("claim", (t) => actions.claimOne(t), "claimed")
+              }
+            >
+              Claim
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={busy === "bulk:start"}
+              onClick={() =>
+                onPickedBulk("start", (t) => actions.startOne(t), "started")
+              }
+            >
+              Start
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={busy === "bulk:complete"}
+              onClick={() =>
+                onPickedBulk(
+                  "complete",
+                  (t) => actions.completeOne(t),
+                  "completed",
+                )
+              }
+            >
+              Complete
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={busy === "bulk:combine" || combineBlocker() !== null}
+              title={combineBlocker() ?? "Cook these as one step"}
+              onClick={onCombine}
+            >
+              Combine
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm ml-auto"
+              onClick={() => setPicked(new Set())}
+            >
+              Clear
+            </button>
+          </div>
+        ) : null}
 
         {failure ? (
           <div className="mt-4">
@@ -1134,15 +1467,38 @@ export function KitchenDashboardPage() {
             </div>
           </div>
         ) : (
-          // Split workbench: the ledger reads left, the selected service works
-          // right — Galley's two-pane treatment, the active pane marked.
-          <div className="mt-2 grid grid-cols-[minmax(0,1fr)_368px] gap-x-9 max-lg:grid-cols-1">
+          // One ledger, full width. The old right-hand pane repeated what the
+          // rows already said; its controls moved into the toolbar.
+          <div className="mt-2">
             <div>
               {sections.map((section) =>
                 section.rows.length === 0 ? null : (
                   <section key={section.id} className="mt-7">
                     <div className="section-rule">
-                      <span>{section.label}</span>
+                      <label className="flex cursor-pointer items-center gap-2 max-md:hidden">
+                        <input
+                          type="checkbox"
+                          className="h-5 w-5 accent-[var(--color-brand)]"
+                          checked={section.rows.every((r) =>
+                            picked.has(String(r.task._id)),
+                          )}
+                          onChange={(e) => {
+                            const ids = section.rows.map((r) =>
+                              String(r.task._id),
+                            );
+                            setPicked((prev) => {
+                              const next = new Set(prev);
+                              for (const id of ids) {
+                                if (e.target.checked) next.add(id);
+                                else next.delete(id);
+                              }
+                              return next;
+                            });
+                          }}
+                          aria-label={`Select every step under ${section.label}`}
+                        />
+                        <span>{section.label}</span>
+                      </label>
                       <i />
                       {armedPersonId &&
                       model.assignableTasks(section.rows.map((r) => r.task))
@@ -1182,124 +1538,11 @@ export function KitchenDashboardPage() {
                   <p className="mt-2 text-base text-ink-2">
                     {model.filterIsActive(filter, assigneeFilter)
                       ? "Clear the status or assignee filter to see the rest of the board."
-                      : "These services have menus but no prep yet. Sync prep on the right to build the steps from the event menu."}
+                      : "These services have menus but no prep yet. Pick a service, then use Sync prep to build the steps from its menu."}
                   </p>
                 </div>
               ) : null}
             </div>
-
-            <aside className="max-lg:mt-8">
-              <div className="sticky top-2 rounded-md border-2 border-accent bg-panel p-5">
-                {selectedEvent ? (
-                  <>
-                    <div className="font-display text-2xl leading-tight text-ink">
-                      {String(selectedEvent.title)}
-                    </div>
-                    <div className="fact-row mt-3 gap-x-5">
-                      <span className="fact">
-                        <b>Service:</b>
-                        {formatDate(Number(selectedEvent.startsAt))}
-                      </span>
-                      <span className="fact">
-                        <b>Covers:</b>
-                        {String(selectedEvent.expectedHeadcount ?? "—")}
-                      </span>
-                    </div>
-                    <div className="fact-row mt-2 gap-x-5">
-                      <span className="fact">
-                        <b>Prep:</b>
-                        {model.progress(selectedEvent._id).completed}/
-                        {model.progress(selectedEvent._id).total} done
-                      </span>
-                      <span className="fact">
-                        <b>Venue:</b>
-                        {venues?.find((v) => v._id === selectedEvent.venueId)
-                          ?.name ?? "No venue"}
-                      </span>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-3">
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                        disabled={
-                          !prepSyncReady || busy === `sync:${selectedEvent._id}`
-                        }
-                        onClick={onSyncPrep}
-                      >
-                        {busy === `sync:${selectedEvent._id}`
-                          ? "Syncing…"
-                          : "Sync prep"}
-                      </button>
-                      <Link
-                        to={eventMenuRedirectPath(selectedEvent._id)}
-                        className="btn btn-ghost btn-sm"
-                      >
-                        Event menu
-                      </Link>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => setSelectedEventId("")}
-                      >
-                        Every service
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="font-display text-2xl leading-tight text-ink">
-                      Every service in the window
-                    </div>
-                    <p className="mt-2 text-base text-ink-2">
-                      Pick a service from the toolbar or a row to work it on its
-                      own.
-                    </p>
-                  </>
-                )}
-
-                <div className="section-rule mt-6">
-                  <span>Crew</span>
-                  <i />
-                  <em>{assignableInView} assignable</em>
-                </div>
-                {crewRows.length === 0 ? (
-                  <p className="mt-3 text-base text-ink-2">
-                    Nobody holds prep in this window. Arm a cook, then assign.
-                  </p>
-                ) : (
-                  <div className="mt-1">
-                    {crewRows.map((crew) => {
-                      const id = String(crew.person._id);
-                      const armed = armedPersonId === id;
-                      return (
-                        <button
-                          key={id}
-                          type="button"
-                          aria-pressed={armed}
-                          onClick={() => setArmedPersonId(armed ? null : id)}
-                          className={`flex w-full cursor-pointer items-baseline justify-between gap-3 border-t border-line py-3 text-left ${
-                            armed ? "text-brand" : "hover:bg-inset"
-                          }`}
-                        >
-                          <span className="min-w-0">
-                            <span className="block truncate text-base text-ink">
-                              {model.personLabel(crew.person)}
-                            </span>
-                            <span className="block text-sm text-ink-2">
-                              {crew.inProgress} doing · {crew.claimed} claimed ·{" "}
-                              {crew.completed} done
-                            </span>
-                          </span>
-                          <span className="shrink-0 text-sm font-semibold text-ink-2">
-                            {armed ? "Armed" : `${crew.load} open`}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </aside>
           </div>
         )}
       </div>

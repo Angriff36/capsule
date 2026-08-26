@@ -230,7 +230,9 @@
   .section-rule {
     @apply flex items-center gap-3.5;
   }
-  .section-rule > span:first-child {
+  /* A section label may carry a tick-all box; style the label the same. */
+  .section-rule > span:first-child,
+  .section-rule > label:first-child > span {
     @apply text-sm font-bold tracking-[0.09em] whitespace-nowrap uppercase text-ink;
   }
   .section-rule > i {
