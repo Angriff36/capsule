@@ -43,13 +43,16 @@ export function ThemeToggle() {
 }
 
 /**
- * Labeled workspace sidebar. Every area shows its icon AND name under a group
- * heading; "Collapse" folds it to an icon rail (titles still name each area).
+ * Slim light icon rail inside the workspace sheet (DESIGN.md navigation-rail).
+ * It reserves a 94px gutter and floats its own surface, so pointing at it
+ * reveals every area's name over the page instead of shoving the page sideways.
+ * "Pin" locks the labels open for anyone who wants them permanently, and the
+ * choice persists per browser.
  */
 export function Sidebar() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const [collapsed, setCollapsed] = useState(
-    () => localStorage.getItem(COLLAPSED_KEY) === "1",
+    () => localStorage.getItem(COLLAPSED_KEY) !== "0",
   );
   const available = navigationCatalog.availableAreas(
     authStatus?.disabledCapabilities,
@@ -70,48 +73,52 @@ export function Sidebar() {
       className="app-shell-sidebar max-md:hidden"
       data-collapsed={collapsed ? "true" : "false"}
     >
-      <NavLink to="/" className="sidebar-brand" aria-label="Capsule home">
-        <span className="capsule-mark" aria-hidden="true">
-          C
-        </span>
-        <strong>Capsule</strong>
-      </NavLink>
-      <nav className="sidebar-nav" aria-label="Primary">
-        {groups.map(({ group, areas }) => (
-          <Fragment key={group}>
-            <p className="sidebar-group">{group}</p>
-            {areas.map((area) => (
-              <NavLink
-                key={area.path}
-                to={area.path === "/events" ? eventsIndexPath() : area.path}
-                end={area.path === "/"}
-                aria-label={area.label}
-                title={area.label}
-                className={({ isActive }) => (isActive ? "active" : undefined)}
-              >
-                <area.icon width={17} height={17} />
-                <span>{area.label}</span>
-              </NavLink>
-            ))}
-          </Fragment>
-        ))}
-      </nav>
-      <div className="sidebar-foot">
-        <ThemeToggle />
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          aria-expanded={!collapsed}
-        >
-          {collapsed ? (
-            <ChevronRightIcon width={14} height={14} />
-          ) : (
-            <ChevronLeftIcon width={14} height={14} />
-          )}
-          <span>Collapse</span>
-        </button>
+      <div className="rail-inner">
+        <NavLink to="/" className="sidebar-brand" aria-label="Capsule home">
+          <span className="capsule-mark" aria-hidden="true">
+            C
+          </span>
+          <strong>Capsule</strong>
+        </NavLink>
+        <nav className="sidebar-nav" aria-label="Primary">
+          {groups.map(({ group, areas }) => (
+            <Fragment key={group}>
+              <p className="sidebar-group">{group}</p>
+              {areas.map((area) => (
+                <NavLink
+                  key={area.path}
+                  to={area.path === "/events" ? eventsIndexPath() : area.path}
+                  end={area.path === "/"}
+                  aria-label={area.label}
+                  title={area.label}
+                  className={({ isActive }) =>
+                    isActive ? "active" : undefined
+                  }
+                >
+                  <area.icon width={17} height={17} />
+                  <span>{area.label}</span>
+                </NavLink>
+              ))}
+            </Fragment>
+          ))}
+        </nav>
+        <div className="sidebar-foot">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={collapsed ? "Pin the labels open" : "Unpin the labels"}
+            title={collapsed ? "Pin the labels open" : "Unpin the labels"}
+            aria-pressed={!collapsed}
+          >
+            {collapsed ? (
+              <ChevronRightIcon width={14} height={14} />
+            ) : (
+              <ChevronLeftIcon width={14} height={14} />
+            )}
+            <span>{collapsed ? "Pin labels" : "Unpin"}</span>
+          </button>
+        </div>
       </div>
     </aside>
   );
