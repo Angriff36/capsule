@@ -469,17 +469,17 @@ export function KitchenDashboardPage() {
             {sentenceCase(row.task.name)}
           </span>
           <span className="mt-1 block text-sm text-ink-2">
-            {String(row.event.title)} · due {dueLabel(row.event.startsAt)}
-          </span>
-          <span className="mt-0.5 block text-sm text-ink-2">{owner}</span>
-          <span className="mt-2 block">
-            <span className={statusTone(String(row.task.status))}>
-              {formatStatusLabel(String(row.task.status))}
-            </span>
+            {String(row.event.title)} · {dueLabel(row.event.startsAt)} ·{" "}
+            {row.task.quantity != null
+              ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
+              : "—"}{" "}
+            · {owner}
           </span>
         </span>
-        <span className="mt-1 shrink-0 self-center text-base text-brand underline underline-offset-4">
-          Open
+        <span className="shrink-0 self-center">
+          <span className={statusTone(String(row.task.status))}>
+            {formatStatusLabel(String(row.task.status))}
+          </span>
         </span>
       </button>
     );
@@ -504,28 +504,16 @@ export function KitchenDashboardPage() {
         <div className="font-display text-2xl leading-tight text-ink">
           {sentenceCase(row.task.name)}
         </div>
+        {/* The service time IS the deadline: prepTasks.dueAt is null on every
+            row, so a "Due" field here would be invented. State it once. */}
         <div className="mt-1 text-base text-ink-2">
-          {String(row.event.title)} · {dueLabel(row.event.startsAt)}
+          {String(row.event.title)} · service {dueLabel(row.event.startsAt)}
         </div>
-        <div className="fact-row mt-3 gap-x-6 gap-y-1.5">
-          <span className="fact">
-            <b>Due:</b>
-            {dueLabel(row.event.startsAt)}
-          </span>
-          <span className="fact">
-            <b>Quantity:</b>
-            {row.task.quantity != null
-              ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
-              : "—"}
-          </span>
-          <span className="fact">
-            <b>Assignee:</b>
-            {owner}
-          </span>
-          <span className="fact">
-            <b>Status:</b>
-            {formatStatusLabel(status)}
-          </span>
+        <div className="mt-2 text-base text-ink-2">
+          {row.task.quantity != null
+            ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
+            : "Quantity not set"}{" "}
+          · {owner} · {formatStatusLabel(status)}
         </div>
         {status === "blocked" ? (
           <p className="mt-3 text-base text-danger">
@@ -695,6 +683,55 @@ export function KitchenDashboardPage() {
           </div>
         ) : null}
 
+        {loading ? null : (
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {[
+              {
+                // Mirrors the sections below. A strip counting something
+                // other than the lists under it is just noise.
+                id: "m-band",
+                label: "Attention",
+                n: mobileAttention.length,
+                tone: mobileBlocked > 0 ? "text-danger" : "text-ink",
+              },
+              {
+                id: "m-active",
+                label: "Doing",
+                n: mobileSections[0].rows.length,
+                tone: "text-warn",
+              },
+              {
+                id: "m-next",
+                label: "To do",
+                n: mobileSections[1].rows.length,
+                tone: "text-ink",
+              },
+              {
+                id: "m-done",
+                label: "Done",
+                n: mobileSections[2].rows.length,
+                tone: "text-ok",
+              },
+            ].map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                onClick={() =>
+                  document
+                    .getElementById(c.id)
+                    ?.scrollIntoView({ block: "start" })
+                }
+                className="flex h-16 cursor-pointer flex-col items-start justify-center rounded-sm bg-inset px-3"
+              >
+                <span className={`font-mono text-xl leading-none ${c.tone}`}>
+                  {c.n}
+                </span>
+                <span className="mt-1 text-sm text-ink-2">{c.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+
         {loading ? (
           <div className="mt-6">
             <TableSkeleton rows={6} />
@@ -725,7 +762,7 @@ export function KitchenDashboardPage() {
         ) : (
           <>
             {/* The attention band, same pale sage as Today's service. */}
-            <div className="attention-band mt-6 -mx-4 px-4 py-5">
+            <div id="m-band" className="attention-band mt-5 -mx-4 px-4 py-5">
               <div className="section-rule">
                 <span>Needs attention</span>
                 <i />
@@ -737,31 +774,18 @@ export function KitchenDashboardPage() {
                 </p>
               ) : (
                 <>
-                  {mobileUrgent ? mobileExpanded(mobileUrgent) : null}
-                  {mobileAttention
-                    .filter((r) => r.task._id !== mobileUrgent?.task._id)
-                    .slice(0, attentionAll ? undefined : 0)
-                    .map((row) =>
-                      expandedTaskId === String(row.task._id)
-                        ? mobileExpanded(row)
-                        : mobileCollapsed(row),
-                    )}
-                  {!attentionAll && mobileAttention.length > 1 ? (
-                    <button
-                      type="button"
-                      onClick={() => setAttentionAll(true)}
-                      className="mt-1 flex h-11 w-full cursor-pointer items-center border-t border-sage-2 text-base text-brand underline underline-offset-4"
-                    >
-                      {mobileAttention.length - 1} more need attention
-                    </button>
-                  ) : null}
+                  {mobileAttention.map((row) =>
+                    expandedTaskId === String(row.task._id)
+                      ? mobileExpanded(row)
+                      : mobileCollapsed(row),
+                  )}
                 </>
               )}
             </div>
 
             {mobileSections.map((section) =>
               section.rows.length === 0 ? null : (
-                <section key={section.id} className="mt-7">
+                <section key={section.id} id={section.id} className="mt-7">
                   <div className="section-rule">
                     <span>{section.label}</span>
                     <i />
