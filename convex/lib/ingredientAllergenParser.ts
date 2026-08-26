@@ -79,9 +79,11 @@ export function parseAllergensFromIngredientsText(
 
 export function parseAllergensFromOffTags(
   tags?: readonly string[] | null,
+  labelTags?: readonly string[] | null,
 ): ParsedAllergens {
   const tagList = tags ?? [];
-  if (tagList.length === 0) {
+  const labelList = labelTags ?? [];
+  if (tagList.length === 0 && labelList.length === 0) {
     return {
       allergens: [],
       isGlutenFree: false,
@@ -94,7 +96,7 @@ export function parseAllergensFromOffTags(
       .map((tag) => OFF_TAG_TO_CODE[tag.toLowerCase()] ?? OFF_TAG_TO_CODE[tag])
       .filter(Boolean) as string[],
   );
-  const declaresGlutenFree = tagList.some((tag) =>
+  const declaresGlutenFree = [...tagList, ...labelList].some((tag) =>
     /gluten-free|no-gluten/i.test(tag),
   );
   const isGlutenFree = declaresGlutenFree && !allergens.includes("wheat");

@@ -394,8 +394,8 @@ export function IngredientDetailPage() {
           <IngredientDatabaseLookup
             disabled={busy != null}
             label="Update from food database"
-            onApply={(profile: IngredientAutofillProfile) => {
-              void run("lookup", async () => {
+            onApply={async (profile: IngredientAutofillProfile) => {
+              await run("lookup", async () => {
                 await applyLookup({
                   docId: ingredient._id,
                   profile: {
@@ -482,18 +482,20 @@ export function IngredientDetailPage() {
         </dl>
       </header>
 
-      <section className="culinary-section">
-        <div className="culinary-section-heading">
-          <h2>Primary image</h2>
-        </div>
-        <IngredientPrimaryImageUploader
-          ingredientId={ingredient._id}
-          ingredientVersion={ingredient.version}
-          ingredientName={ingredient.name}
-          storageId={ingredient.primaryImageStorageId}
-          onError={setFailure}
-        />
-      </section>
+      {ingredient.status === "active" ? (
+        <section className="culinary-section">
+          <div className="culinary-section-heading">
+            <h2>Primary image</h2>
+          </div>
+          <IngredientPrimaryImageUploader
+            ingredientId={ingredient._id}
+            ingredientVersion={ingredient.version}
+            ingredientName={ingredient.name}
+            storageId={ingredient.primaryImageStorageId}
+            onError={setFailure}
+          />
+        </section>
+      ) : null}
 
       <IngredientDetailsEditor
         key={`details:${ingredient._id}:${ingredient.version}`}

@@ -9,7 +9,7 @@ import type {
 } from "./ExternalIngredientProfile";
 
 type Props = Readonly<{
-  onApply: (profile: IngredientAutofillProfile) => void;
+  onApply: (profile: IngredientAutofillProfile) => void | Promise<void>;
   disabled?: boolean;
   label?: string;
 }>;
@@ -34,6 +34,7 @@ export function IngredientDatabaseLookup({
   );
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipSearchRef = useRef(false);
+  const searchGenerationRef = useRef(0);
 
   useEffect(() => {
     if (skipSearchRef.current) {
@@ -48,16 +49,19 @@ export function IngredientDatabaseLookup({
       return;
     }
     setSearching(true);
+    const generation = ++searchGenerationRef.current;
     debounceRef.current = setTimeout(() => {
       void (async () => {
         try {
           setError(null);
           const results = await searchFoods({ query: trimmed, limit: 10 });
+          if (generation !== searchGenerationRef.current) return;
           setHits(results as IngredientLookupHit[]);
           if (document.activeElement?.id === `${listId}-query`) {
             setOpen(true);
           }
         } catch (cause) {
+          if (generation !== searchGenerationRef.current) return;
           setError(
             cause instanceof Error
               ? cause.message
@@ -65,7 +69,9 @@ export function IngredientDatabaseLookup({
           );
           setHits([]);
         } finally {
-          setSearching(false);
+          if (generation === searchGenerationRef.current) {
+            setSearching(false);
+          }
         }
       })();
     }, 320);
@@ -82,11 +88,11 @@ export function IngredientDatabaseLookup({
         externalId: hit.externalId,
         source: hit.source,
       })) as IngredientAutofillProfile;
-      setApplied(profile);
       skipSearchRef.current = true;
       setQuery(profile.name);
       setOpen(false);
-      onApply(profile);
+      await onApply(profile);
+      setApplied(profile);
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Could not load food details",

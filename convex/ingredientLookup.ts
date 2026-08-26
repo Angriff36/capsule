@@ -17,6 +17,7 @@ import {
   mapOffNutrimentsPerGram,
   offCategory,
 } from "./lib/openFoodFactsMapper";
+import { scaleNutritionFromGramsToUnit } from "./lib/nutritionUnitScaler";
 
 const FDC_BASE = "https://api.nal.usda.gov/fdc/v1";
 const OFF_BASE = "https://world.openfoodfacts.org/api/v2";
@@ -162,12 +163,27 @@ export const searchFoods = action({
     const pageSize = Math.min(Math.max(args.limit ?? 10, 1), 25);
     const perSource = Math.ceil(pageSize / 2);
 
+    let usdaError: unknown;
+    let offError: unknown;
     const [usda, off] = await Promise.all([
-      searchUsdaFoods(query, perSource).catch(() => [] as SearchHit[]),
-      searchOpenFoodFacts(query, perSource).catch(() => [] as SearchHit[]),
+      searchUsdaFoods(query, perSource).catch((error) => {
+        usdaError = error;
+        return [] as SearchHit[];
+      }),
+      searchOpenFoodFacts(query, perSource).catch((error) => {
+        offError = error;
+        return [] as SearchHit[];
+      }),
     ]);
 
-    return [...usda, ...off].slice(0, pageSize);
+    const hits = [...usda, ...off].slice(0, pageSize);
+    if (hits.length === 0 && (usdaError || offError)) {
+      throw new Error(
+        "Food database search is unavailable right now — try again in a moment.",
+      );
+    }
+
+    return hits;
   },
 });
 
@@ -219,11 +235,12 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
       brands?: string;
       categories_tags?: string[];
       allergens_tags?: string[];
+      labels_tags?: string[];
       ingredients_text?: string;
       nutriments?: Record<string, number | undefined>;
     };
   }>(
-    `/product/${encodeURIComponent(barcode)}?fields=product_name,brands,categories_tags,allergens_tags,ingredients_text,nutriments`,
+    `/product/${encodeURIComponent(barcode)}?fields=product_name,brands,categories_tags,allergens_tags,labels_tags,ingredients_text,nutriments`,
   );
 
   const product = payload.product;
@@ -233,8 +250,9 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
   if (!name) throw new Error("Product has no name in Open Food Facts");
 
   const allergenParse =
-    (product.allergens_tags?.length ?? 0) > 0
-      ? parseAllergensFromOffTags(product.allergens_tags)
+    (product.allergens_tags?.length ?? 0) > 0 ||
+    (product.labels_tags?.length ?? 0) > 0
+      ? parseAllergensFromOffTags(product.allergens_tags, product.labels_tags)
       : parseAllergensFromIngredientsText(product.ingredients_text);
 
   const nutrition = mapOffNutrimentsPerGram(product.nutriments);
@@ -335,11 +353,17 @@ export const applyToIngredient = action({
     if (nutritionEntries.length > 0) {
       doc = await ctx.runQuery(api.queries.getIngredient, { id: args.docId });
       if (!doc) throw new Error("Ingredient not found");
-      await ctx.runMutation(api.mutations.Ingredient_setNutrition, {
-        docId: args.docId,
-        version: doc.version,
-        ...args.profile.nutrition,
-      });
+      const scaled = scaleNutritionFromGramsToUnit(
+        args.profile.nutrition,
+        doc.unit,
+      );
+      if (scaled) {
+        await ctx.runMutation(api.mutations.Ingredient_setNutrition, {
+          docId: args.docId,
+          version: doc.version,
+          ...scaled,
+        });
+      }
     }
   },
 });

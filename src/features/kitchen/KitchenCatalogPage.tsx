@@ -153,28 +153,32 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           isGlutenFree,
         })) as { docId: string };
         let ingredientVersion = 1;
-        const pendingNutrition = parseIngredientNutritionFromForm(data);
-        if (Object.keys(pendingNutrition).length > 0) {
-          await setIngredientNutrition({
-            docId: created.docId,
-            version: ingredientVersion,
-            ...pendingNutrition,
-          });
-          ingredientVersion += 1;
-        }
-        const photo = data.get("photo");
-        if (photo instanceof File && photo.size > 0) {
-          await uploadCatalogPrimaryImage(
-            photo,
-            "ingredient",
-            created.docId,
-            ingredientVersion,
-            {
-              generateUploadUrl,
-              createAttachment,
-              setPrimaryImage: setIngredientPrimaryImage,
-            },
-          );
+        try {
+          const pendingNutrition = parseIngredientNutritionFromForm(data);
+          if (Object.keys(pendingNutrition).length > 0) {
+            await setIngredientNutrition({
+              docId: created.docId,
+              version: ingredientVersion,
+              ...pendingNutrition,
+            });
+            ingredientVersion += 1;
+          }
+          const photo = data.get("photo");
+          if (photo instanceof File && photo.size > 0) {
+            await uploadCatalogPrimaryImage(
+              photo,
+              "ingredient",
+              created.docId,
+              ingredientVersion,
+              {
+                generateUploadUrl,
+                createAttachment,
+                setPrimaryImage: setIngredientPrimaryImage,
+              },
+            );
+          }
+        } catch (enrichmentError) {
+          setFailure(enrichmentError);
         }
         navigate(ingredientPath(created.docId));
         return;
