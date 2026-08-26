@@ -225,6 +225,14 @@ export function KitchenDashboardPage() {
   };
   const onStartTask = (task: PrepTaskLike) =>
     void run(`start:${task._id}`, () => actions.startOne(task), "Started");
+  /** Hand a claim back to the shared pool. An accidental or abandoned claim
+   *  used to be unreachable from the board. */
+  const onReleaseTask = (task: PrepTaskLike) =>
+    void run(
+      `release:${task._id}`,
+      () => actions.releaseOne(task),
+      "Returned to the pool",
+    );
   const onCompleteTask = (task: PrepTaskLike) =>
     void run(
       `complete:${task._id}`,
@@ -339,7 +347,12 @@ export function KitchenDashboardPage() {
       `revise:${task._id}`,
       async () => {
         if (!canRevise(task)) throw new Error(reviseBlocked(task));
-        await revise({ docId: task._id, quantity, unit });
+        await revise({
+          docId: task._id,
+          version: task.version,
+          quantity,
+          unit,
+        });
         setEditing(null);
       },
       "Quantity updated",
@@ -356,6 +369,13 @@ export function KitchenDashboardPage() {
   };
 
   /** One next action per row, using the handlers already wired above. */
+  /** The quiet action that sits beside the primary one, where there is a
+   *  sensible second move. Today that is only Release on a claimed step. */
+  const secondAction = (row: LedgerRow) =>
+    String(row.task.status) === "claimed"
+      ? { label: "Release", run: () => onReleaseTask(row.task) }
+      : null;
+
   const nextAction = (row: LedgerRow) => {
     const status = String(row.task.status);
     if (status === "completed") return null;
@@ -410,20 +430,43 @@ export function KitchenDashboardPage() {
   const pickedRows = horizonTasks.filter((r) => picked.has(String(r.task._id)));
 
   /** Everything ticked, in board order, whatever section it sits in. */
+  /** Which of the ticked steps a bulk verb can actually act on. Checked
+   *  BEFORE anything is written: running the verb row by row and letting the
+   *  backend reject a later one left the earlier ones committed, so a failed
+   *  bulk action was half applied. */
+  const bulkTargets = (label: string) =>
+    pickedRows.filter((r) => {
+      const status = String(r.task.status);
+      if (label === "claim") return status === "pending";
+      if (label === "start") return status === "claimed";
+      if (label === "complete") return status === "in_progress";
+      return false;
+    });
+
   const onPickedBulk = (
     label: string,
     verb: (task: PrepTaskLike) => Promise<void>,
     done: string,
-  ) =>
+  ) => {
+    const targets = bulkTargets(label);
+    const skipped = pickedRows.length - targets.length;
+    if (targets.length === 0) {
+      setFailure(
+        new Error(
+          `None of the ${formatCountNoun(pickedRows.length, "step")} selected can be ${done} from where they are.`,
+        ),
+      );
+      return;
+    }
     void run(`bulk:${label}`, async () => {
-      let count = 0;
-      for (const row of pickedRows) {
-        await verb(row.task);
-        count += 1;
-      }
+      for (const row of targets) await verb(row.task);
       setPicked(new Set());
-      showToast(`${formatCountNoun(count, "task")} ${done}`);
+      showToast(
+        `${formatCountNoun(targets.length, "step")} ${done}` +
+          (skipped > 0 ? ` · ${skipped} skipped` : ""),
+      );
     });
+  };
 
   const onBulkAssign = () => {
     const personId = requireArmed();
@@ -787,6 +830,7 @@ export function KitchenDashboardPage() {
     const done = status === "completed";
     const blocked = status === "blocked";
     const action = nextAction(row);
+    const second = secondAction(row);
     const busyHere =
       busy === `claim:${id}` ||
       busy === `start:${id}` ||
@@ -904,6 +948,16 @@ export function KitchenDashboardPage() {
                 className="cursor-pointer text-sm font-semibold text-brand"
               >
                 {busyHere ? "Working…" : action.label}
+              </button>
+            ) : null}
+            {second ? (
+              <button
+                type="button"
+                disabled={busy === `release:${id}`}
+                onClick={second.run}
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                {busy === `release:${id}` ? "Working…" : second.label}
               </button>
             ) : null}
           </div>
@@ -1223,9 +1277,39 @@ export function KitchenDashboardPage() {
                 its portion basis, then the steps — quantity on the left,
                 instruction reading across. Same shape as work/list3.jpg. */}
             {prepSheet.length === 0 ? (
-              <p className="mt-7 text-base text-ink-2">
-                No prep matches this view.
-              </p>
+              <div className="mt-7">
+                <p className="text-base text-ink-2">
+                  No prep matches this view.
+                </p>
+                {/* Building prep used to be desktop-only, so a phone facing an
+                    event with a menu and no steps had no way forward. */}
+                {selectedEvent ? (
+                  <div className="mt-4 flex flex-col gap-3">
+                    <button
+                      type="button"
+                      className="btn btn-primary h-12 w-full justify-center"
+                      disabled={
+                        !prepSyncReady || busy === `sync:${selectedEvent._id}`
+                      }
+                      onClick={onSyncPrep}
+                    >
+                      {busy === `sync:${selectedEvent._id}`
+                        ? "Syncing…"
+                        : "Sync prep from the menu"}
+                    </button>
+                    <Link
+                      to={eventMenuRedirectPath(selectedEvent._id)}
+                      className="btn btn-ghost h-12 w-full justify-center"
+                    >
+                      Event menu
+                    </Link>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-base text-ink-2">
+                    Pick one service above to build its prep from the menu.
+                  </p>
+                )}
+              </div>
             ) : (
               prepSheet.map((group) => (
                 <section key={group.category} className="mt-7">
@@ -1532,6 +1616,26 @@ export function KitchenDashboardPage() {
                       {model.personLabel(person)}
                     </option>
                   ))}
+              </select>
+            </label>
+            {/* Arming a cook was desktop-only, so a phone could never hand
+                work out. Same control, same state. */}
+            <label className="kcd-field">
+              <span>Arm cook</span>
+              <select
+                value={armedPersonId ?? ""}
+                onChange={(e) => setArmedPersonId(e.target.value || null)}
+                aria-label="Arm a cook for assignment"
+              >
+                <option value="">Nobody armed</option>
+                {crewRows.map((crew) => (
+                  <option
+                    key={String(crew.person._id)}
+                    value={String(crew.person._id)}
+                  >
+                    {model.personLabel(crew.person)} ({crew.load} open)
+                  </option>
+                ))}
               </select>
             </label>
           </div>

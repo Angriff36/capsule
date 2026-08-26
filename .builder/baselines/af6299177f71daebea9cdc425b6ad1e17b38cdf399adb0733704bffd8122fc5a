@@ -27272,7 +27272,7 @@ async function __runPrepTaskAssign(ctx: MutationCtx, { docId, personId, version 
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = String(nextStatus);
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -27334,7 +27334,7 @@ async function __runPrepTaskCancel(ctx: MutationCtx, { docId, reason, version }:
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "cancelled";
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -27396,7 +27396,7 @@ async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __c
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "claimed";
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -27458,7 +27458,7 @@ async function __runPrepTaskComplete(ctx: MutationCtx, { docId, completedQuantit
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "completed";
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -27526,7 +27526,7 @@ async function __runPrepTaskMarkBlocked(ctx: MutationCtx, { docId, reason, versi
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "blocked";
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -27826,7 +27826,7 @@ async function __runPrepTaskRelease(ctx: MutationCtx, { docId, version }: any, _
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "pending";
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -27949,7 +27949,7 @@ async function __runPrepTaskStandDown(ctx: MutationCtx, { docId, reason, version
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = String((alreadySettled ? doc.status : "cancelled"));
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -28013,7 +28013,7 @@ async function __runPrepTaskStart(ctx: MutationCtx, { docId, version }: any, __c
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "in_progress";
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -28068,12 +28068,13 @@ async function __runPrepTaskUnblock(ctx: MutationCtx, { docId, version }: any, _
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "kitchenLeadAccess"))) throw new Error("Guard 3 failed");
     const previousStatus = doc.status;
+    const keptAssignee = doc.assignedToId;
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
         const __from = String(__cur);
-        const __to = "pending";
-        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
+        const __to = String(((keptAssignee != null) ? "claimed" : "pending"));
+        const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "claimed", "cancelled"], "completed": [], "cancelled": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -28084,10 +28085,10 @@ async function __runPrepTaskUnblock(ctx: MutationCtx, { docId, version }: any, _
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      status: "pending",
+      status: ((keptAssignee != null) ? "claimed" : "pending"),
       blockedAt: null,
       blockReason: null,
-      claimedAt: null,
+      claimedAt: ((keptAssignee != null) ? ((doc.claimedAt != null) ? doc.claimedAt : Date.now()) : null),
       startedAt: null,
       version: ((doc as any).version ?? 0) + 1
     };

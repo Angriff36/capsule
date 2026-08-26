@@ -187,9 +187,13 @@ export function HomePage() {
   });
 
   const now = Date.now();
-  const endOfToday = startOfDay(now) + DAY_MS;
+  const startOfToday = startOfDay(now);
+  const endOfToday = startOfToday + DAY_MS;
   const today = snapshot.upcoming.filter(
-    (s) => s.startsAt != null && s.startsAt < endOfToday,
+    (s) =>
+      s.startsAt != null &&
+      s.startsAt >= startOfToday &&
+      s.startsAt < endOfToday,
   );
   const later = snapshot.upcoming.filter(
     (s) => s.startsAt == null || s.startsAt >= endOfToday,

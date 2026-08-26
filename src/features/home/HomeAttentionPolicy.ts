@@ -203,8 +203,15 @@ export class HomeAttentionPolicy {
       openPackByEvent.set(eventId, (openPackByEvent.get(eventId) ?? 0) + 1);
     }
 
+    // A service that started an hour ago is still today's work, and the
+    // service desk needs it most while it is running. Keeping the whole of
+    // the current local day means a lunch does not disappear off Home at
+    // noon. Terminal stages are already excluded from liveEvents.
+    const startOfToday = new Date(now).setHours(0, 0, 0, 0);
     const upcoming = [...liveEvents]
-      .filter((event) => event.startsAt == null || event.startsAt >= now)
+      .filter(
+        (event) => event.startsAt == null || event.startsAt >= startOfToday,
+      )
       .sort(
         (a, b) =>
           (a.startsAt ?? Number.MAX_SAFE_INTEGER) -
