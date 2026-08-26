@@ -16,20 +16,23 @@ import {
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { formatStatusLabel } from "../../lib/statusLabels";
+import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
-import { KitchenCommandDeckCrewRail } from "./command-deck/KitchenCommandDeckCrewRail";
-import { KitchenCommandDeckEventRail } from "./command-deck/KitchenCommandDeckEventRail";
 import { KitchenCommandDeckFilters } from "./command-deck/KitchenCommandDeckFilters";
 import { KitchenCommandDeckHorizon } from "./command-deck/KitchenCommandDeckHorizon";
 import { KitchenCommandDeckModel } from "./command-deck/KitchenCommandDeckModel";
-import { KitchenCommandDeckTaskPanel } from "./command-deck/KitchenCommandDeckTaskPanel";
 import type {
   CommandDeckFilter,
+  EventLike,
   PrepTaskLike,
 } from "./command-deck/KitchenCommandDeckTypes";
+
+/** One prep task with the service it belongs to. */
+type LedgerRow = { task: PrepTaskLike; event: EventLike };
 import { KitchenPrepAssignManager } from "./command-deck/KitchenPrepAssignManager";
 import "./command-deck/KitchenCommandDeck.css";
 import "./command-deck/KitchenCommandDeckSurfaces.css";
@@ -59,6 +62,7 @@ export function KitchenDashboardPage() {
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [armedPersonId, setArmedPersonId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -140,7 +144,7 @@ export function KitchenDashboardPage() {
 
   const requireArmed = (): string | null => {
     if (!armedPersonId) {
-      showToast("Arm a cook on the right first");
+      showToast("Arm a cook in the workbench first");
       return null;
     }
     return armedPersonId;
@@ -167,215 +171,558 @@ export function KitchenDashboardPage() {
     });
   };
 
-  return (
-    <div className="culinary-document culinary-document-compact culinary-studio kitchen-command-deck space-y-4">
-      <KitchenBookNav />
-      <header className="kcd-masthead">
-        <div>
-          <h1>Kitchen command board</h1>
-          <p className="kcd-lede">
-            7 days from {formatDate(horizon.start().getTime())} ·{" "}
-            {formatCountNoun(horizonEvents.length, "event")} ·{" "}
-            {formatCountNoun(crewRows.length, "cook")} with prep
-          </p>
-        </div>
-      </header>
+  // Same guarded calls the board has always made, named once so the ledger
+  // and the workbench can both reach them.
+  const onClaimTask = (task: PrepTaskLike) => {
+    // PrepTask.claim writes user.personId into a Person FK, so it fails
+    // outright for a sign-in with no staff profile. Say that instead of
+    // surfacing a bare "Action failed unexpectedly".
+    if (!authStatus?.personId) {
+      setFailure(
+        new Error(
+          "Your sign-in isn't linked to a staff profile yet, so it can't hold prep work. Ask an admin to link it under Administration → Team roles — or arm a cook and use Assign.",
+        ),
+      );
+      return;
+    }
+    void run(`claim:${task._id}`, () => actions.claimOne(task), "Claimed");
+  };
+  const onStartTask = (task: PrepTaskLike) =>
+    void run(`start:${task._id}`, () => actions.startOne(task), "Started");
+  const onCompleteTask = (task: PrepTaskLike) =>
+    void run(
+      `complete:${task._id}`,
+      () => actions.completeOne(task),
+      "Completed",
+    );
 
-      <div className="kcd-toolbar card">
-        <fieldset className="kcd-horizon-nav">
-          <legend>Horizon</legend>
-          <button type="button" onClick={() => setHorizonOffset((v) => v - 7)}>
-            Earlier
-          </button>
-          <button
-            type="button"
-            data-active={horizonOffset === 0 ? "true" : "false"}
-            onClick={() => setHorizonOffset(0)}
-          >
-            From today
-          </button>
-          <button type="button" onClick={() => setHorizonOffset((v) => v + 7)}>
-            Later
-          </button>
-          <BoundedDateInput
-            aria-label="Jump to date"
-            title="Jump to date"
-            value={horizon.startDateValue()}
-            onChange={(e) => {
-              const offset = KitchenCommandDeckHorizon.offsetForDateValue(
-                e.target.value,
-              );
-              if (offset != null) setHorizonOffset(offset);
-            }}
-          />
-        </fieldset>
-        <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
-        <label className="kcd-field">
-          <span>Assignee</span>
-          <select
-            value={assigneeFilter}
-            onChange={(e) => setAssigneeFilter(e.target.value)}
-          >
-            <option value="">Anyone</option>
-            {(people ?? [])
-              .filter((person) => person.deletedAt == null)
-              .map((person) => (
-                <option key={person._id} value={person._id}>
-                  {model.personLabel(person)}
-                </option>
-              ))}
-          </select>
-        </label>
-        <Link to="/kitchen/yield" className="btn btn-ghost ml-auto">
+  const onSyncPrep = () => {
+    if (!selectedEvent) return;
+    void run(
+      `sync:${selectedEvent._id}`,
+      async () => {
+        const rows = model.selections(selectedEvent._id);
+        if (rows.length === 0) {
+          throw new Error(
+            "No dishes on this event, so Sync prep has nothing to create.",
+          );
+        }
+        const reasons: string[] = [];
+        let created = 0;
+        for (const row of rows) {
+          const result = await syncPrepForDish({
+            id: row._id,
+            eventId: selectedEvent._id,
+            dishId: row.dishId,
+            quantityServings: Number(row.quantityServings) || 1,
+          });
+          created += result.taskCount;
+          if (result.noOpReason) reasons.push(result.noOpReason);
+        }
+        if (created === 0 && reasons.length > 0) {
+          throw new Error(reasons[0] ?? "Sync prep did nothing.");
+        }
+      },
+      "Prep synced from the event menu",
+    );
+  };
+  // ── Ledger ────────────────────────────────────────────────────────────
+  // Prep across the whole horizon, not one event at a time. Every existing
+  // filter still decides membership — filterTasks is called per event and
+  // concatenated, so status/assignee/date-window semantics are untouched.
+  const horizonTasks = useMemo(() => {
+    const scope = selectedEventId
+      ? horizonEvents.filter((e) => e._id === selectedEventId)
+      : horizonEvents;
+    return scope.flatMap((e) =>
+      model.filterTasks(e._id, filter, assigneeFilter).map((task) => ({
+        task,
+        event: e,
+      })),
+    );
+  }, [horizonEvents, model, filter, assigneeFilter, selectedEventId]);
+
+  const sections = useMemo(() => {
+    const attention: LedgerRow[] = [];
+    const active: LedgerRow[] = [];
+    const upcoming: LedgerRow[] = [];
+    const completed: LedgerRow[] = [];
+    for (const row of horizonTasks) {
+      const status = String(row.task.status);
+      if (status === "completed") completed.push(row);
+      else if (status === "blocked" || !row.task.assignedToId)
+        attention.push(row);
+      else if (status === "in_progress" || status === "claimed")
+        active.push(row);
+      else upcoming.push(row);
+    }
+    const byTime = (a: LedgerRow, b: LedgerRow) =>
+      Number(a.event.startsAt ?? 0) - Number(b.event.startsAt ?? 0);
+    return [
+      {
+        id: "attention",
+        label: "Needs attention",
+        rows: attention.sort(byTime),
+      },
+      { id: "active", label: "Active preparation", rows: active.sort(byTime) },
+      {
+        id: "upcoming",
+        label: "Upcoming preparation",
+        rows: upcoming.sort(byTime),
+      },
+      { id: "completed", label: "Completed", rows: completed.sort(byTime) },
+    ];
+  }, [horizonTasks]);
+
+  // The masthead states the window, so it counts every service in it — not
+  // whatever the status/event/assignee filters happen to be showing below.
+  const windowTasks = useMemo(
+    () => horizonEvents.flatMap((e) => model.tasksForEvent(e._id)),
+    [horizonEvents, model],
+  );
+  const openTotal = windowTasks.filter(
+    (t) => String(t.status) !== "completed",
+  ).length;
+  const blockedTotal = windowTasks.filter(
+    (t) => String(t.status) === "blocked",
+  ).length;
+
+  /** Prep is due at its service; show that clock, not a raw date. */
+  const dueLabel = (startsAt: unknown) => {
+    const ms = Number(startsAt);
+    if (!Number.isFinite(ms) || ms === 0) return "—";
+    return `${formatDate(ms)} ${new Date(ms).toLocaleTimeString(undefined, {
+      hour: "numeric",
+      minute: "2-digit",
+    })}`;
+  };
+
+  /** One next action per row, using the handlers already wired above. */
+  const nextAction = (row: LedgerRow) => {
+    const status = String(row.task.status);
+    if (status === "completed") return null;
+    // A cook armed in the crew rail is an instruction: the next action on any
+    // assignable row becomes Assign, exactly as the old board behaved.
+    if (armedPersonId && (status === "pending" || status === "claimed")) {
+      return { label: "Assign", run: () => onAssignTask(row.task) };
+    }
+    if (status === "blocked") {
+      return {
+        label: "Open event",
+        run: () => setSelectedEventId(row.event._id),
+      };
+    }
+    if (status === "in_progress")
+      return { label: "Complete", run: () => onCompleteTask(row.task) };
+    if (status === "claimed")
+      return { label: "Start", run: () => onStartTask(row.task) };
+    if (!row.task.assignedToId)
+      return { label: "Claim", run: () => onClaimTask(row.task) };
+    return { label: "Start", run: () => onStartTask(row.task) };
+  };
+
+  const statusTone = (status: string) =>
+    status === "blocked"
+      ? "chip-state chip-state-danger"
+      : status === "completed"
+        ? "chip-state chip-state-ok"
+        : status === "in_progress" || status === "claimed"
+          ? "chip-state chip-state-warn"
+          : "chip-meta";
+
+  const ledgerRow = (row: LedgerRow) => {
+    const action = nextAction(row);
+    const owner = row.task.assignedToId
+      ? model.personLabel(model.findPerson(String(row.task.assignedToId)))
+      : "Unassigned";
+    const busyHere =
+      busy === `claim:${row.task._id}` ||
+      busy === `start:${row.task._id}` ||
+      busy === `complete:${row.task._id}`;
+    return (
+      <div
+        key={String(row.task._id)}
+        className="grid grid-cols-[minmax(0,1fr)_96px_136px_128px_112px] items-center gap-x-5 border-b border-line py-3.5 max-md:grid-cols-1 max-md:gap-y-1.5 max-md:py-4"
+      >
+        <div className="min-w-0">
+          {/* Truncates in the desktop column; wraps on a phone, where the
+              task name is the whole identity of the row. */}
+          <div className="font-display text-xl text-ink md:truncate">
+            {row.task.name}
+          </div>
+          {/* Event and due time sit under the name. As their own columns they
+              starved the task identity down to a few characters. */}
+          <div className="text-sm text-ink-2 max-md:hidden">
+            {row.task.category ?? "Prep"} ·{" "}
+            <button
+              type="button"
+              onClick={() => setSelectedEventId(row.event._id)}
+              className="cursor-pointer hover:text-ink hover:underline"
+            >
+              {String(row.event.title)}
+            </button>{" "}
+            · due {dueLabel(row.event.startsAt)}
+          </div>
+        </div>
+        <div className="font-mono text-base text-ink max-md:hidden">
+          {row.task.quantity != null
+            ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
+            : "—"}
+        </div>
+        <div className="truncate text-base text-ink-2 max-md:hidden">
+          {owner}
+        </div>
+        {/* Phone: event, due, quantity and owner ride together on one honest
+            line rather than being squeezed into columns that clip. */}
+        <div className="text-sm text-ink-2 md:hidden">
+          {String(row.event.title)} · due {dueLabel(row.event.startsAt)} ·{" "}
+          {row.task.quantity != null
+            ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
+            : "—"}{" "}
+          · {owner}
+        </div>
+        <div className="max-md:mt-1">
+          <span className={statusTone(String(row.task.status))}>
+            {formatStatusLabel(String(row.task.status))}
+          </span>
+        </div>
+        <div className="text-right max-md:mt-2 max-md:text-left">
+          {action ? (
+            <button
+              type="button"
+              disabled={busyHere}
+              onClick={action.run}
+              className="btn btn-ghost btn-sm h-11 md:h-8"
+            >
+              {busyHere ? "Working…" : action.label}
+            </button>
+          ) : null}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="kitchen-command-deck pb-10">
+      <KitchenBookNav />
+
+      <div className="mt-5 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+        <div>
+          <h1 className="display-title text-ink">Kitchen</h1>
+          <div className="fact-row mt-3">
+            <span className="fact">
+              <b>Window:</b>
+              {formatDate(horizon.start().getTime())} + 7 days
+            </span>
+            <span className="fact">
+              <b>Services:</b>
+              {horizonEvents.length}
+            </span>
+            <span className="fact">
+              <b>Prep open:</b>
+              {openTotal}
+            </span>
+            <span className="fact">
+              <b>Blocked:</b>
+              <span
+                className={blockedTotal > 0 ? "font-medium text-danger" : ""}
+              >
+                {blockedTotal}
+              </span>
+            </span>
+          </div>
+        </div>
+        <Link to="/kitchen/yield" className="btn btn-ghost">
           Yield variance
         </Link>
       </div>
 
-      {failure ? <CulinaryFailureBanner error={failure} /> : null}
-      {loading ? <TableSkeleton rows={8} /> : null}
-
-      {loading ? null : (
-        <div className="kcd-board">
-          <aside className="kcd-rail card" aria-label="Events in horizon">
-            <h2 className="kcd-rail-title">
-              Upcoming events <span>{horizonEvents.length}</span>
-            </h2>
-            <KitchenCommandDeckEventRail
-              model={model}
-              events={horizonEvents}
-              selectedEventId={selectedEventId}
-              onSelect={setSelectedEventId}
-              venueName={(id) =>
-                venues?.find((v) => v._id === id)?.name ?? "No venue"
-              }
-              nextEvent={
-                horizonEvents.length === 0
-                  ? model.nextEventAfterHorizon()
-                  : null
-              }
-              onJumpToEvent={(event) => {
-                setHorizonOffset(
-                  KitchenCommandDeckHorizon.offsetForTimestamp(
-                    Number(event.startsAt),
-                  ),
+      {/* One ruled toolbar: window, status, event, assignee. */}
+      <div className="mt-6 border-y border-line">
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((v) => !v)}
+          aria-expanded={filtersOpen}
+          className="flex h-11 w-full cursor-pointer items-center justify-between text-sm font-semibold tracking-[0.09em] text-ink uppercase md:hidden"
+        >
+          Filters
+          <span className="text-ink-2 font-normal tracking-normal normal-case">
+            {horizonOffset === 0
+              ? "From today"
+              : formatDate(horizon.start().getTime())}
+            {filter !== "all" ? ` · ${filter}` : ""}
+          </span>
+        </button>
+        <div
+          className={`flex-wrap items-center gap-x-5 gap-y-3 py-3 max-md:pb-4 md:flex ${
+            filtersOpen ? "flex" : "hidden"
+          }`}
+        >
+          <fieldset className="kcd-horizon-nav">
+            <legend>Window</legend>
+            <button
+              type="button"
+              onClick={() => setHorizonOffset((v) => v - 7)}
+            >
+              Earlier
+            </button>
+            <button
+              type="button"
+              data-active={horizonOffset === 0 ? "true" : "false"}
+              onClick={() => setHorizonOffset(0)}
+            >
+              From today
+            </button>
+            <button
+              type="button"
+              onClick={() => setHorizonOffset((v) => v + 7)}
+            >
+              Later
+            </button>
+            <BoundedDateInput
+              aria-label="Jump to date"
+              title="Jump to date"
+              value={horizon.startDateValue()}
+              onChange={(e) => {
+                const offset = KitchenCommandDeckHorizon.offsetForDateValue(
+                  e.target.value,
                 );
-                setSelectedEventId(event._id);
+                if (offset != null) setHorizonOffset(offset);
               }}
             />
-          </aside>
+          </fieldset>
+          <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
+          <label className="kcd-field">
+            <span>Event</span>
+            <select
+              value={selectedEventId}
+              onChange={(e) => setSelectedEventId(e.target.value)}
+              aria-label="Filter by event"
+            >
+              <option value="">Every service</option>
+              {horizonEvents.map((e) => (
+                <option key={e._id} value={e._id}>
+                  {String(e.title)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="kcd-field">
+            <span>Assignee</span>
+            <select
+              value={assigneeFilter}
+              onChange={(e) => setAssigneeFilter(e.target.value)}
+            >
+              <option value="">Anyone</option>
+              {(people ?? [])
+                .filter((person) => person.deletedAt == null)
+                .map((person) => (
+                  <option key={person._id} value={person._id}>
+                    {model.personLabel(person)}
+                  </option>
+                ))}
+            </select>
+          </label>
+        </div>
+      </div>
 
-          <main className="kcd-stage">
-            <KitchenCommandDeckTaskPanel
-              model={model}
-              event={selectedEvent}
-              filter={filter}
-              assigneeFilter={assigneeFilter}
-              armedPersonId={armedPersonId}
-              busy={busy}
-              prepSyncReady={prepSyncReady}
-              componentName={(id) =>
-                id
-                  ? (components?.find((r) => r._id === id)?.name ?? null)
-                  : null
-              }
-              onAssignTask={onAssignTask}
-              onAssignDish={onAssignDish}
-              onRelease={(task) =>
-                void run(
-                  `release:${task._id}`,
-                  () => actions.releaseOne(task),
-                  "Released",
-                )
-              }
-              onClaim={(task) => {
-                // PrepTask.claim writes user.personId into a Person FK, so it
-                // fails outright for a sign-in with no staff profile. Say that
-                // instead of surfacing a bare "Action failed unexpectedly".
-                if (!authStatus?.personId) {
-                  setFailure(
-                    new Error(
-                      "Your sign-in isn't linked to a staff profile yet, so it can't hold prep work. Ask an admin to link it under Administration → Team roles — or use Assign to put a cook on this step.",
-                    ),
-                  );
-                  return;
-                }
-                void run(
-                  `claim:${task._id}`,
-                  () => actions.claimOne(task),
-                  "Claimed",
-                );
-              }}
-              onStart={(task) =>
-                void run(
-                  `start:${task._id}`,
-                  () => actions.startOne(task),
-                  "Started",
-                )
-              }
-              onComplete={(task) =>
-                void run(
-                  `complete:${task._id}`,
-                  () => actions.completeOne(task),
-                  "Completed",
-                )
-              }
-              nextEvent={
-                horizonEvents.length === 0
-                  ? model.nextEventAfterHorizon()
-                  : null
-              }
-              onJumpToEvent={(event) => {
-                setHorizonOffset(
-                  KitchenCommandDeckHorizon.offsetForTimestamp(
-                    Number(event.startsAt),
-                  ),
-                );
-                setSelectedEventId(event._id);
-              }}
-              horizonLabel={`No events between ${formatDate(horizon.start().getTime())} and ${formatDate(horizon.start().getTime() + 6 * 86_400_000)}.`}
-              crewWithLoad={crewRows.length}
-              onSyncPrep={() => {
-                if (!selectedEvent) return;
-                void run(
-                  `sync:${selectedEvent._id}`,
-                  async () => {
-                    const rows = model.selections(selectedEvent._id);
-                    if (rows.length === 0) {
-                      throw new Error(
-                        "No dishes on this event, so Sync prep has nothing to create.",
-                      );
-                    }
-                    const reasons: string[] = [];
-                    let created = 0;
-                    for (const row of rows) {
-                      const result = await syncPrepForDish({
-                        id: row._id,
-                        eventId: selectedEvent._id,
-                        dishId: row.dishId,
-                        quantityServings: Number(row.quantityServings) || 1,
-                      });
-                      created += result.taskCount;
-                      if (result.noOpReason) reasons.push(result.noOpReason);
-                    }
-                    if (created === 0 && reasons.length > 0) {
-                      throw new Error(reasons[0] ?? "Sync prep did nothing.");
-                    }
-                  },
-                  "Prep synced from the event menu",
-                );
-              }}
-            />
-          </main>
+      {failure ? (
+        <div className="mt-4">
+          <CulinaryFailureBanner error={failure} />
+        </div>
+      ) : null}
 
-          <aside className="kcd-rail card" aria-label="Crew load">
-            <KitchenCommandDeckCrewRail
-              model={model}
-              rows={crewRows}
-              people={people ?? []}
-              armedPersonId={armedPersonId}
-              assignableInView={assignableInView}
-              onArm={setArmedPersonId}
-            />
+      {loading ? (
+        <div className="mt-6">
+          <TableSkeleton rows={8} />
+        </div>
+      ) : horizonEvents.length === 0 ? (
+        <div className="mt-10 max-w-prose">
+          <h2 className="font-display text-3xl text-ink">
+            No service in this window.
+          </h2>
+          <p className="mt-2 text-base text-ink-2">
+            Nothing is booked between {formatDate(horizon.start().getTime())}{" "}
+            and {formatDate(horizon.start().getTime() + 6 * 86_400_000)}. Move
+            the window, or open the events book to see what is coming.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setHorizonOffset((v) => v + 7)}
+            >
+              Next 7 days
+            </button>
+            <Link to={eventsIndexPath()} className="btn btn-ghost">
+              Open the events book
+            </Link>
+          </div>
+        </div>
+      ) : (
+        // Split workbench: the ledger reads left, the selected service works
+        // right — Galley's two-pane treatment, the active pane marked.
+        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_368px] gap-x-9 max-lg:grid-cols-1">
+          <div>
+            {sections.map((section) =>
+              section.rows.length === 0 ? null : (
+                <section key={section.id} className="mt-7">
+                  <div className="section-rule">
+                    <span>{section.label}</span>
+                    <i />
+                    {armedPersonId &&
+                    model.assignableTasks(section.rows.map((r) => r.task))
+                      .length > 0 ? (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() =>
+                          onAssignDish(
+                            model.assignableTasks(
+                              section.rows.map((r) => r.task),
+                            ),
+                          )
+                        }
+                      >
+                        Assign{" "}
+                        {
+                          model.assignableTasks(section.rows.map((r) => r.task))
+                            .length
+                        }{" "}
+                        to {model.personLabel(model.findPerson(armedPersonId))}
+                      </button>
+                    ) : null}
+                    <em>{section.rows.length}</em>
+                  </div>
+                  {section.rows.map(ledgerRow)}
+                </section>
+              ),
+            )}
+            {horizonTasks.length === 0 ? (
+              <div className="mt-8 max-w-prose">
+                <h2 className="font-display text-2xl text-ink">
+                  No prep matches this view.
+                </h2>
+                <p className="mt-2 text-base text-ink-2">
+                  {model.filterIsActive(filter, assigneeFilter)
+                    ? "Clear the status or assignee filter to see the rest of the board."
+                    : "These services have menus but no prep yet. Sync prep on the right to build the steps from the event menu."}
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          <aside className="max-lg:mt-8">
+            <div className="sticky top-2 rounded-md border-2 border-accent bg-panel p-5">
+              {selectedEvent ? (
+                <>
+                  <div className="font-display text-2xl leading-tight text-ink">
+                    {String(selectedEvent.title)}
+                  </div>
+                  <div className="fact-row mt-3 gap-x-5">
+                    <span className="fact">
+                      <b>Service:</b>
+                      {formatDate(Number(selectedEvent.startsAt))}
+                    </span>
+                    <span className="fact">
+                      <b>Covers:</b>
+                      {String(selectedEvent.expectedHeadcount ?? "—")}
+                    </span>
+                  </div>
+                  <div className="fact-row mt-2 gap-x-5">
+                    <span className="fact">
+                      <b>Prep:</b>
+                      {model.progress(selectedEvent._id).completed}/
+                      {model.progress(selectedEvent._id).total} done
+                    </span>
+                    <span className="fact">
+                      <b>Venue:</b>
+                      {venues?.find((v) => v._id === selectedEvent.venueId)
+                        ?.name ?? "No venue"}
+                    </span>
+                  </div>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      disabled={
+                        !prepSyncReady || busy === `sync:${selectedEvent._id}`
+                      }
+                      onClick={onSyncPrep}
+                    >
+                      {busy === `sync:${selectedEvent._id}`
+                        ? "Syncing…"
+                        : "Sync prep"}
+                    </button>
+                    <Link
+                      to={eventMenuRedirectPath(selectedEvent._id)}
+                      className="btn btn-ghost btn-sm"
+                    >
+                      Event menu
+                    </Link>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setSelectedEventId("")}
+                    >
+                      Every service
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="font-display text-2xl leading-tight text-ink">
+                    Every service in the window
+                  </div>
+                  <p className="mt-2 text-base text-ink-2">
+                    Pick a service from the toolbar or a row to work it on its
+                    own.
+                  </p>
+                </>
+              )}
+
+              <div className="section-rule mt-6">
+                <span>Crew</span>
+                <i />
+                <em>{assignableInView} assignable</em>
+              </div>
+              {crewRows.length === 0 ? (
+                <p className="mt-3 text-base text-ink-2">
+                  Nobody holds prep in this window. Arm a cook, then assign.
+                </p>
+              ) : (
+                <div className="mt-1">
+                  {crewRows.map((crew) => {
+                    const id = String(crew.person._id);
+                    const armed = armedPersonId === id;
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        aria-pressed={armed}
+                        onClick={() => setArmedPersonId(armed ? null : id)}
+                        className={`flex w-full cursor-pointer items-baseline justify-between gap-3 border-t border-line py-3 text-left ${
+                          armed ? "text-brand" : "hover:bg-inset"
+                        }`}
+                      >
+                        <span className="min-w-0">
+                          <span className="block truncate text-base text-ink">
+                            {model.personLabel(crew.person)}
+                          </span>
+                          <span className="block text-sm text-ink-2">
+                            {crew.inProgress} doing · {crew.claimed} claimed ·{" "}
+                            {crew.completed} done
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-sm font-semibold text-ink-2">
+                          {armed ? "Armed" : `${crew.load} open`}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </aside>
         </div>
       )}
