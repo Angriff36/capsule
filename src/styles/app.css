@@ -2170,7 +2170,20 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
+}
+
+/* A table wider than the phone must scroll INSIDE itself. Clipping at the
+   sheet edge hides the columns that carry state, and letting the page scroll
+   sideways drags the whole app with it. One rule covers all 69 tables without
+   a wrapper element in every file. */
+@media (max-width: 767px) {
+  .workspace-sheet table {
+    display: block;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    white-space: nowrap;
+  }
 }
 
 .supply-table {
