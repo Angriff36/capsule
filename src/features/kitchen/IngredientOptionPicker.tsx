@@ -32,7 +32,16 @@ export function IngredientOptionPicker({
 
   return (
     <div className="space-y-2">
-      <input type="hidden" name={name} value={selectedId} required={required} />
+      <input
+        className="sr-only"
+        name={name}
+        value={selectedId}
+        readOnly
+        required={required}
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={() => undefined}
+      />
       <ul
         className="max-h-48 space-y-1 overflow-y-auto rounded-xs border border-line bg-panel p-1"
         role="listbox"

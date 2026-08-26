@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useAction } from "convex/react";
-import { api } from "../../lib/api";
+import { useIngredientLookupApplyToIngredient } from "../../lib/ingredientLookupClient";
 import {
   useGetIngredient,
   useIngredientPurge,
@@ -307,7 +306,7 @@ export function IngredientDetailPage() {
   const priceObservations = useListIngredientPriceObservation();
   const purge = useIngredientPurge();
   const reinstate = useIngredientReinstate();
-  const applyLookup = useAction(api.ingredientLookup.applyToIngredient);
+  const applyLookup = useIngredientLookupApplyToIngredient();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 

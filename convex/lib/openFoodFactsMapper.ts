@@ -12,9 +12,9 @@ export function mapOffNutrimentsPerGram(nutriments?: Record<string, number | und
     { nutrient: { id: 1005 }, amount: nutriments.carbohydrates_100g },
     { nutrient: { id: 1079 }, amount: nutriments.fiber_100g },
     { nutrient: { id: 2000 }, amount: nutriments.sugars_100g },
-    { nutrient: { id: 1093 }, amount: nutriments.sodium_100g },
-    { nutrient: { id: 1087 }, amount: nutriments.calcium_100g },
-    { nutrient: { id: 1089 }, amount: nutriments.iron_100g },
+    { nutrient: { id: 1093 }, amount: (nutriments.sodium_100g ?? 0) * 1000 },
+    { nutrient: { id: 1087 }, amount: (nutriments.calcium_100g ?? 0) * 1000 },
+    { nutrient: { id: 1089 }, amount: (nutriments.iron_100g ?? 0) * 1000 },
   ];
   return mapFdcNutrientsPerGram(rows);
 }

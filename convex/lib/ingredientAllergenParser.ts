@@ -65,11 +65,10 @@ export function parseAllergensFromIngredientsText(
   if (declaresGlutenFree) {
     allergens = allergens.filter((code) => code !== "wheat");
   }
-  const hasGlutenSignal = allergens.includes("wheat");
 
   return {
     allergens,
-    isGlutenFree: declaresGlutenFree || !hasGlutenSignal,
+    isGlutenFree: declaresGlutenFree,
     allergenNote: allergens.length
       ? "Allergens inferred from the product ingredient list — verify before service."
       : declaresGlutenFree
@@ -95,7 +94,10 @@ export function parseAllergensFromOffTags(
       .map((tag) => OFF_TAG_TO_CODE[tag.toLowerCase()] ?? OFF_TAG_TO_CODE[tag])
       .filter(Boolean) as string[],
   );
-  const isGlutenFree = !allergens.includes("wheat");
+  const declaresGlutenFree = tagList.some((tag) =>
+    /gluten-free|no-gluten/i.test(tag),
+  );
+  const isGlutenFree = declaresGlutenFree && !allergens.includes("wheat");
   return {
     allergens,
     isGlutenFree,

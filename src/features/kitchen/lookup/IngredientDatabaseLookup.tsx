@@ -1,6 +1,8 @@
-import { useAction } from "convex/react";
 import { useEffect, useId, useRef, useState } from "react";
-import { api } from "../../../lib/api";
+import {
+  useIngredientLookupGetFoodAutofill,
+  useIngredientLookupSearchFoods,
+} from "../../../lib/ingredientLookupClient";
 import type {
   IngredientAutofillProfile,
   IngredientLookupHit,
@@ -19,8 +21,8 @@ export function IngredientDatabaseLookup({
   label = "Search food database",
 }: Props) {
   const listId = useId();
-  const searchFoods = useAction(api.ingredientLookup.searchFoods);
-  const getFoodAutofill = useAction(api.ingredientLookup.getFoodAutofill);
+  const searchFoods = useIngredientLookupSearchFoods();
+  const getFoodAutofill = useIngredientLookupGetFoodAutofill();
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<IngredientLookupHit[]>([]);
   const [open, setOpen] = useState(false);
@@ -31,8 +33,13 @@ export function IngredientDatabaseLookup({
     null,
   );
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipSearchRef = useRef(false);
 
   useEffect(() => {
+    if (skipSearchRef.current) {
+      skipSearchRef.current = false;
+      return;
+    }
     if (debounceRef.current) clearTimeout(debounceRef.current);
     const trimmed = query.trim();
     if (trimmed.length < 2) {
@@ -47,7 +54,9 @@ export function IngredientDatabaseLookup({
           setError(null);
           const results = await searchFoods({ query: trimmed, limit: 10 });
           setHits(results as IngredientLookupHit[]);
-          setOpen(true);
+          if (document.activeElement?.id === `${listId}-query`) {
+            setOpen(true);
+          }
         } catch (cause) {
           setError(
             cause instanceof Error
@@ -63,7 +72,7 @@ export function IngredientDatabaseLookup({
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [query, searchFoods]);
+  }, [query, searchFoods, listId]);
 
   const selectHit = async (hit: IngredientLookupHit) => {
     setLoadingId(hit.externalId);
@@ -74,6 +83,7 @@ export function IngredientDatabaseLookup({
         source: hit.source,
       })) as IngredientAutofillProfile;
       setApplied(profile);
+      skipSearchRef.current = true;
       setQuery(profile.name);
       setOpen(false);
       onApply(profile);

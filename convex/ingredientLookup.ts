@@ -20,6 +20,7 @@ import {
 
 const FDC_BASE = "https://api.nal.usda.gov/fdc/v1";
 const OFF_BASE = "https://world.openfoodfacts.org/api/v2";
+const OFF_SEARCH_BASE = "https://world.openfoodfacts.org/cgi/search.pl";
 
 const lookupSource = v.union(
   v.literal("usda_fdc"),
@@ -112,19 +113,27 @@ async function searchOpenFoodFacts(
   pageSize: number,
 ): Promise<SearchHit[]> {
   const params = new URLSearchParams({
+    action: "process",
     search_terms: query,
+    json: "true",
     page_size: String(pageSize),
     fields: "code,product_name,brands,categories_tags",
   });
 
-  const payload = await offFetch<{
+  const response = await fetch(`${OFF_SEARCH_BASE}?${params.toString()}`, {
+    headers: { Accept: "application/json", "User-Agent": "Capsule/1.0" },
+  });
+  if (!response.ok) {
+    throw new Error(`Open Food Facts request failed (${response.status})`);
+  }
+  const payload = (await response.json()) as {
     products?: Array<{
       code?: string;
       product_name?: string;
       brands?: string;
       categories_tags?: string[];
     }>;
-  }>(`/search?${params.toString()}`);
+  };
 
   return (payload.products ?? [])
     .filter((row) => row.code?.trim() && row.product_name?.trim())
@@ -306,7 +315,7 @@ export const applyToIngredient = action({
       docId: args.docId,
       version: doc.version,
       name: args.profile.name,
-      unit: args.profile.unit,
+      unit: doc.unit,
       category: args.profile.category,
     });
 

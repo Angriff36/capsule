@@ -1,8 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useMutation } from "convex/react";
 import { formatCountNoun } from "../../lib/format";
-import { api } from "../../lib/api";
+import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
 import {
   useCreateDish,
   useCreateIngredient,
@@ -72,7 +71,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const createComponent = useCreateComponent();
   const createDish = useCreateDish();
   const createMenu = useCreateMenu();
-  const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
+  const generateUploadUrl = useGenerateUploadUrl();
   const createAttachment = useCreateAttachment();
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
@@ -153,13 +152,15 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           allergens: allergens.length ? allergens : undefined,
           isGlutenFree,
         })) as { docId: string };
+        let ingredientVersion = 1;
         const pendingNutrition = parseIngredientNutritionFromForm(data);
         if (Object.keys(pendingNutrition).length > 0) {
           await setIngredientNutrition({
             docId: created.docId,
-            version: 1,
+            version: ingredientVersion,
             ...pendingNutrition,
           });
+          ingredientVersion += 1;
         }
         const photo = data.get("photo");
         if (photo instanceof File && photo.size > 0) {
@@ -167,7 +168,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             photo,
             "ingredient",
             created.docId,
-            1,
+            ingredientVersion,
             {
               generateUploadUrl,
               createAttachment,
