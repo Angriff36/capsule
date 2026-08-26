@@ -24,8 +24,8 @@ export class KitchenPrepAssignManager {
   ) {}
 
   async assignOne(task: PrepTaskLike, personId: string): Promise<void> {
-    if (task.status !== "pending" && task.status !== "claimed") {
-      throw new Error("Only pending or claimed tasks can be assigned");
+    if (!KitchenPrepAssignManager.canAssign(task)) {
+      throw new Error("A finished or cancelled task cannot change hands");
     }
     await this.assignFn({
       docId: task._id,
@@ -34,10 +34,17 @@ export class KitchenPrepAssignManager {
     });
   }
 
-  async assignMany(tasks: PrepTaskLike[], personId: string): Promise<number> {
-    const targets = tasks.filter(
-      (t) => t.status === "pending" || t.status === "claimed",
+  /** Live work changes hands; closed work does not. PrepTask.assign accepts
+   *  pending, claimed, in-progress and blocked, and leaves a started or
+   *  blocked step in that state rather than rewinding it. */
+  static canAssign(task: PrepTaskLike): boolean {
+    return ["pending", "claimed", "in_progress", "blocked"].includes(
+      String(task.status),
     );
+  }
+
+  async assignMany(tasks: PrepTaskLike[], personId: string): Promise<number> {
+    const targets = tasks.filter((t) => KitchenPrepAssignManager.canAssign(t));
     for (const task of targets) {
       await this.assignOne(task, personId);
     }

@@ -314,22 +314,21 @@ export function KitchenDashboardPage() {
       (i) => i.deletedAt == null && String(i.eventId) === String(eventId),
     )?.invoiceNumber ?? null;
 
-  /** PrepTask.revise only accepts a step that is still pending. Once a cook
-   *  has claimed or started it the quantity is fixed, and the generated guard
-   *  throws a bare "Guard 0 failed" that reads as "one of this action's
-   *  requirements was not met". Say the real rule here instead, and do not
-   *  offer an editor that cannot save. */
-  const canRevise = (task: PrepTaskLike) => String(task.status) === "pending";
+  /** A live step can be re-measured: the head count changes, the delivery is
+   *  short, the cook is already on it. PrepTask.revise accepts pending,
+   *  claimed, in-progress and blocked (task.manifest). A finished or
+   *  cancelled step is closed — yield variance reads completedQuantity
+   *  against quantity, so rewriting the amount after the fact would falsify
+   *  the record, not correct it. */
+  const canRevise = (task: PrepTaskLike) =>
+    ["pending", "claimed", "in_progress", "blocked"].includes(
+      String(task.status),
+    );
 
   const reviseBlocked = (task: PrepTaskLike) => {
     const status = String(task.status);
-    if (status === "claimed")
-      return "A cook has claimed this step. Release it to change the amount.";
-    if (status === "in_progress")
-      return "This step is under way, so the amount is fixed.";
-    if (status === "blocked")
-      return "This step is blocked. Clear the block to change the amount.";
-    if (status === "completed") return "This step is done.";
+    if (status === "completed")
+      return "This step is done. Its amount is what the yield was measured against.";
     if (status === "cancelled") return "This step was cancelled.";
     return "This step cannot be re-measured.";
   };
@@ -463,26 +462,17 @@ export function KitchenDashboardPage() {
       .map(([unit, total]) => `${qty(total)} ${unit}`)
       .join(" · ");
   };
-
-  /** A step can only change hands while it is pending or claimed —
-   *  PrepTask.assign refuses anything already started, blocked or finished.
-   *  Combine says so out loud rather than dropping those steps in silence. */
+  /** Live work changes hands; closed work does not. Combine says which steps
+   *  stayed behind rather than dropping them in silence. */
   const movable = (rows: LedgerRow[]) =>
-    rows.filter((r) => ["pending", "claimed"].includes(String(r.task.status)));
+    rows.filter((r) => KitchenPrepAssignManager.canAssign(r.task));
 
   const stuckReason = (rows: LedgerRow[]) => {
     const counts = new Map<string, number>();
     for (const row of rows) {
+      if (KitchenPrepAssignManager.canAssign(row.task)) continue;
       const status = String(row.task.status);
-      if (["pending", "claimed"].includes(status)) continue;
-      const label =
-        status === "blocked"
-          ? "blocked"
-          : status === "in_progress"
-            ? "already started"
-            : status === "completed"
-              ? "already done"
-              : status;
+      const label = status === "completed" ? "already done" : status;
       counts.set(label, (counts.get(label) ?? 0) + 1);
     }
     return [...counts.entries()]
@@ -511,7 +501,7 @@ export function KitchenDashboardPage() {
     if (targets.length === 0) {
       setFailure(
         new Error(
-          `None of these steps can change hands (${stuck}). A step only moves while it is pending or claimed.`,
+          `None of these steps can change hands (${stuck}). Finished and cancelled work stays where it is.`,
         ),
       );
       return;

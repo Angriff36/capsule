@@ -159,7 +159,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     optional ingredientId: uuid,
     optional componentId: uuid
   ) {
-    guard self.status == "pending"
+    guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     constraint reviseNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
     constraint reviseQuantityPositive: quantity == null or quantity > 0 "Prep quantity must be positive"
@@ -237,14 +237,18 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   // Lead/manager puts a cook on a prep line (or moves it) before work starts.
   // Pending → claimed with assignee; claimed → reassign without restarting the clock.
   command assign(personId: uuid) {
-    guard self.status == "pending" or self.status == "claimed"
+    // Work changes hands while it is live, not only before it starts: a cook
+    // goes home, a station is behind, a lead pulls several steps together as
+    // one job. Handing over never rewinds the step - a started step stays
+    // started and a blocked step stays blocked, so nothing hides a stall.
+    guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard personId != null
     constraint assignQuantityReady: self.quantity > 0 "Prep quantity must be positive before assign"
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
     mutate assignedToId = personId
-    mutate status = "claimed"
+    mutate status = self.status == "in_progress" ? "in_progress" : (self.status == "blocked" ? "blocked" : "claimed")
     mutate claimedAt = self.claimedAt != null ? self.claimedAt : now()
     emit PrepTaskAssigned {
       prepTaskId: self.id
