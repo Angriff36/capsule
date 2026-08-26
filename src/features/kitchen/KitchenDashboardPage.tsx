@@ -314,11 +314,32 @@ export function KitchenDashboardPage() {
       (i) => i.deletedAt == null && String(i.eventId) === String(eventId),
     )?.invoiceNumber ?? null;
 
+  /** PrepTask.revise only accepts a step that is still pending. Once a cook
+   *  has claimed or started it the quantity is fixed, and the generated guard
+   *  throws a bare "Guard 0 failed" that reads as "one of this action's
+   *  requirements was not met". Say the real rule here instead, and do not
+   *  offer an editor that cannot save. */
+  const canRevise = (task: PrepTaskLike) => String(task.status) === "pending";
+
+  const reviseBlocked = (task: PrepTaskLike) => {
+    const status = String(task.status);
+    if (status === "claimed")
+      return "A cook has claimed this step. Release it to change the amount.";
+    if (status === "in_progress")
+      return "This step is under way, so the amount is fixed.";
+    if (status === "blocked")
+      return "This step is blocked. Clear the block to change the amount.";
+    if (status === "completed") return "This step is done.";
+    if (status === "cancelled") return "This step was cancelled.";
+    return "This step cannot be re-measured.";
+  };
+
   /** Change a step's quantity or unit in place, through PrepTask.revise. */
   const onRevise = (task: PrepTaskLike, quantity: number, unit: string) =>
     void run(
       `revise:${task._id}`,
       async () => {
+        if (!canRevise(task)) throw new Error(reviseBlocked(task));
         await revise({ docId: task._id, quantity, unit });
         setEditing(null);
       },
@@ -834,17 +855,28 @@ export function KitchenDashboardPage() {
                   Save
                 </button>
               </form>
-            ) : (
+            ) : canRevise(row.task) ? (
               <button
                 type="button"
                 onClick={() => setEditing(id)}
-                title="Change the quantity"
+                title="Change the amount"
                 className="font-mono shrink-0 cursor-pointer text-base whitespace-nowrap text-ink underline decoration-line-2 underline-offset-4"
               >
                 {row.task.quantity != null
                   ? `${qty(Number(row.task.quantity))} ${row.task.unit ?? ""}`.trim()
                   : "—"}
               </button>
+            ) : (
+              <span
+                title={reviseBlocked(row.task)}
+                className={`font-mono shrink-0 text-base whitespace-nowrap ${
+                  done ? "text-ink-3" : "text-ink"
+                }`}
+              >
+                {row.task.quantity != null
+                  ? `${qty(Number(row.task.quantity))} ${row.task.unit ?? ""}`.trim()
+                  : "—"}
+              </span>
             )}
             <span
               className={`text-base ${done ? "text-ink-3 line-through" : "text-ink"}`}
