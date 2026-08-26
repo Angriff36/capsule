@@ -29,6 +29,7 @@ import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
 import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
+import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -434,483 +435,500 @@ export function StockBookPage() {
   };
 
   return (
-    <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Inventory · Stock book</p>
-          <h1 className="display-title mt-2">What the house holds</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Stock by ingredient and storage location, with event reservations
-            kept beside the quantity they claim.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
-          <button className="btn btn-ghost" onClick={() => setForm("location")}>
-            New location
-          </button>
-          <button className="btn btn-ghost" onClick={() => setForm("reserve")}>
-            Reserve
-          </button>
-          <button className="btn btn-primary" onClick={() => setForm("stock")}>
-            Open stock line
-          </button>
-        </div>
-      </header>
-      <InventoryWorkspaceNav />
-      <aside className="supply-degraded" role="note">
-        <strong>Live stock facts</strong>
-        <span>
-          Available stock is what's on hand minus what's reserved for events.
-          Low-stock alerts follow on-hand vs a tracked reorder point (same
-          predicate as home and the bell). Suggested purchase still uses PAR
-          minus available. Search and exact decimals can be slightly imprecise.
-        </span>
-      </aside>
-      {failure ? <SupplyFailureBanner error={failure} /> : null}
-      {host}
-
-      <StockReceiptScanner
-        items={activeItems}
-        demands={demands ?? []}
-        ingredients={ingredients ?? []}
-        locations={locations ?? []}
-        events={events ?? []}
-        onReceive={async ({ item, quantity, unitCost }) => {
-          await receiveStock({
-            docId: item._id,
-            version: item.version,
-            quantity,
-            unitCost,
-          });
-        }}
-      />
-
-      <section className="working-ledger">
-        <div className="ledger-heading">
+    <IngredientCatalogImageProvider ingredients={ingredients}>
+      <div className="operations-stage supply-stage">
+        <header className="supply-masthead">
           <div>
-            <p className="eyebrow">Low-stock alerts</p>
-            <h2>Below reorder</h2>
+            <p className="eyebrow">Inventory · Stock book</p>
+            <h1 className="display-title mt-2">What the house holds</h1>
+            <p className="mt-3 max-w-160 text-ink-2">
+              Stock by ingredient and storage location, with event reservations
+              kept beside the quantity they claim.
+            </p>
           </div>
-          <span>{formatCountNoun(lowStockItems.length, "alert")}</span>
-        </div>
-        {items === undefined ||
-        ingredients === undefined ||
-        locations === undefined ? (
-          <TableSkeleton rows={3} />
-        ) : lowStockItems.length === 0 ? (
-          <div className="document-empty">
-            <p>Every tracked stock line is at or above its reorder point.</p>
-            <span>
-              Set a reorder threshold on a stock line (Levels action) to get
-              alerted when on-hand quantity drops below it.
-            </span>
+          <div className="supply-masthead-actions">
+            <button
+              className="btn btn-ghost"
+              onClick={() => setForm("location")}
+            >
+              New location
+            </button>
+            <button
+              className="btn btn-ghost"
+              onClick={() => setForm("reserve")}
+            >
+              Reserve
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => setForm("stock")}
+            >
+              Open stock line
+            </button>
           </div>
-        ) : (
-          <div className="supply-table-wrap">
-            <table className="supply-table">
-              <thead>
-                <tr>
-                  <th>Ingredient</th>
-                  <th>Location</th>
-                  <th>On hand</th>
-                  <th>Reorder</th>
-                  <th>Suggested purchase</th>
-                  <th>State</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lowStockItems.map((item) => (
-                  <tr key={item._id}>
-                    <td>
-                      <IngredientCatalogLabel
-                        ingredientId={item.ingredientId}
-                        ingredients={ingredients}
-                        link
-                      />
-                      <small>{unitFor(item)}</small>
-                    </td>
-                    <td>{locationName(item.locationId)}</td>
-                    <td className="supply-number">
-                      {item.quantityOnHand}
-                      {reservedFor(item._id) > 0
-                        ? ` (${availableFor(item)} available)`
-                        : ""}
-                    </td>
-                    <td className="supply-number">{item.reorderThreshold}</td>
-                    <td className="supply-number">
-                      <strong>
-                        {suggestedPurchase(item)} {unitFor(item)}
-                      </strong>
-                    </td>
-                    <td>
-                      <StatusChip status="reorder now" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-      {form ? (
-        <SupplyStockForm
-          kind={form}
+        </header>
+        <InventoryWorkspaceNav />
+        <aside className="supply-degraded" role="note">
+          <strong>Live stock facts</strong>
+          <span>
+            Available stock is what's on hand minus what's reserved for events.
+            Low-stock alerts follow on-hand vs a tracked reorder point (same
+            predicate as home and the bell). Suggested purchase still uses PAR
+            minus available. Search and exact decimals can be slightly
+            imprecise.
+          </span>
+        </aside>
+        {failure ? <SupplyFailureBanner error={failure} /> : null}
+        {host}
+
+        <StockReceiptScanner
           items={activeItems}
+          demands={demands ?? []}
           ingredients={ingredients ?? []}
           locations={locations ?? []}
           events={events ?? []}
-          inventoryLots={(inventoryLots ?? []).filter(
-            (lot) => lot.deletedAt == null,
-          )}
-          transferSource={transferSource}
-          busy={busy != null}
-          onSubmit={submit}
-          onClose={() => {
-            setForm(null);
-            setTransferSource(null);
+          onReceive={async ({ item, quantity, unitCost }) => {
+            await receiveStock({
+              docId: item._id,
+              version: item.version,
+              quantity,
+              unitCost,
+            });
           }}
         />
-      ) : null}
 
-      <section className="working-ledger">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">Freshness digest</p>
-            <h2>Expiring soon</h2>
+        <section className="working-ledger">
+          <div className="ledger-heading">
+            <div>
+              <p className="eyebrow">Low-stock alerts</p>
+              <h2>Below reorder</h2>
+            </div>
+            <span>{formatCountNoun(lowStockItems.length, "alert")}</span>
           </div>
-          <label className="field-label">
-            Horizon
-            <select
-              className="input"
-              value={horizonDays}
-              onChange={(event) => setHorizonDays(Number(event.target.value))}
-            >
-              {HORIZON_DAYS.map((days) => (
-                <option key={days} value={days}>
-                  {days} days
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-        {expiringItems.length === 0 ? (
-          <div className="document-empty">
-            <p>Nothing expires within {horizonDays} days.</p>
-            <span>
-              Lots with a best-before or use-by date inside the horizon surface
-              here daily.
-            </span>
-          </div>
-        ) : (
-          <div className="supply-table-wrap">
-            <table className="supply-table">
-              <thead>
-                <tr>
-                  <th>Ingredient</th>
-                  <th>Location</th>
-                  <th>On hand</th>
-                  <th>Best before</th>
-                  <th>Use by</th>
-                  <th>State</th>
-                </tr>
-              </thead>
-              <tbody>
-                {expiringItems.map((item) => (
-                  <tr key={item._id}>
-                    <td>
-                      <IngredientCatalogLabel
-                        ingredientId={item.ingredientId}
-                        ingredients={ingredients}
-                        link
-                      />
-                      <small>{unitFor(item)}</small>
-                    </td>
-                    <td>{locationName(item.locationId)}</td>
-                    <td className="supply-number">{item.quantityOnHand}</td>
-                    <td>{dateLabel(item.bestBeforeAt)}</td>
-                    <td>{dateLabel(item.useByAt)}</td>
-                    <td>
-                      <StatusChip
-                        status={isExpired(item) ? "expired" : "use soon"}
-                      />
-                    </td>
+          {items === undefined ||
+          ingredients === undefined ||
+          locations === undefined ? (
+            <TableSkeleton rows={3} />
+          ) : lowStockItems.length === 0 ? (
+            <div className="document-empty">
+              <p>Every tracked stock line is at or above its reorder point.</p>
+              <span>
+                Set a reorder threshold on a stock line (Levels action) to get
+                alerted when on-hand quantity drops below it.
+              </span>
+            </div>
+          ) : (
+            <div className="supply-table-wrap">
+              <table className="supply-table">
+                <thead>
+                  <tr>
+                    <th>Ingredient</th>
+                    <th>Location</th>
+                    <th>On hand</th>
+                    <th>Reorder</th>
+                    <th>Suggested purchase</th>
+                    <th>State</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="working-ledger">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">Stock position</p>
-            <h2>Ingredient by location</h2>
-          </div>
-          <span>{formatCountNoun(activeItems.length, "line")}</span>
-        </div>
-        {items === undefined ||
-        ingredients === undefined ||
-        locations === undefined ? (
-          <TableSkeleton rows={7} />
-        ) : activeItems.length === 0 ? (
-          <div className="document-empty">
-            <p>No stock lines are open.</p>
-            <span>
-              Register a location, then open the first ingredient line.
-            </span>
-          </div>
-        ) : (
-          <div className="supply-table-wrap">
-            <table className="supply-table">
-              <thead>
-                <tr>
-                  <th>Ingredient</th>
-                  <th>Location</th>
-                  <th>On hand</th>
-                  <th>Active reserved</th>
-                  <th>PAR / reorder</th>
-                  <th>Best before / Use by</th>
-                  <th aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody>
-                {activeItems.map((item) => (
-                  <tr
-                    key={item._id}
-                    id={stockRowDomId(item._id)}
-                    className={
-                      item._id === focusedItemId
-                        ? "supply-row-focus"
-                        : undefined
-                    }
-                  >
-                    <td>
-                      <IngredientCatalogLabel
-                        ingredientId={item.ingredientId}
-                        ingredients={ingredients}
-                        link
-                      />
-                      <small>{unitFor(item)}</small>
-                    </td>
-                    <td>{locationName(item.locationId)}</td>
-                    <td className="supply-number">{item.quantityOnHand}</td>
-                    <td className="supply-number">{reservedFor(item._id)}</td>
-                    <td className="supply-number">
-                      {item.parLevel} / {item.reorderThreshold}
-                      {isBelowReorder(item) ? (
-                        <StatusChip status="reorder now" />
-                      ) : belowPar(item) ? (
-                        <StatusChip status="below par" />
-                      ) : null}
-                    </td>
-                    <td>
-                      {dateLabel(item.bestBeforeAt)} / {dateLabel(item.useByAt)}
-                      {isExpired(item) ? <StatusChip status="expired" /> : null}
-                    </td>
-                    <td>
-                      <div className="supply-row-actions">
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          onClick={() => stockAction(item, "receive")}
-                        >
-                          Receive
-                        </button>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          onClick={() => stockAction(item, "recount")}
-                        >
-                          Recount
-                        </button>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          onClick={() => expiryAction(item)}
-                        >
-                          Dates
-                        </button>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          onClick={() => levelsAction(item)}
-                        >
-                          Levels
-                        </button>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          onClick={() => {
-                            setTransferSource(item);
-                            setForm("transfer");
-                          }}
-                        >
-                          Transfer
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="working-ledger mt-10">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">Event claims</p>
-            <h2>Reservations</h2>
-          </div>
-          <span>{formatCountNoun(activeReservations.length, "record")}</span>
-        </div>
-        {reservations === undefined || events === undefined ? (
-          <TableSkeleton rows={5} />
-        ) : activeReservations.length === 0 ? (
-          <div className="document-empty">
-            <p>No stock is reserved.</p>
-            <span>
-              Reserve stock for an event and it will show here, linked to that
-              event.
-            </span>
-          </div>
-        ) : (
-          <div className="supply-table-wrap">
-            <table className="supply-table">
-              <thead>
-                <tr>
-                  <th>Event</th>
-                  <th>Ingredient</th>
-                  <th>Location</th>
-                  <th>Quantity</th>
-                  <th>State</th>
-                  <th aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody>
-                {activeReservations.map((reservation) => {
-                  const item = activeItems.find(
-                    (candidate) =>
-                      candidate._id === reservation.inventoryItemId,
-                  );
-                  return (
-                    <tr key={reservation._id}>
-                      <td>{eventName(reservation.eventId)}</td>
+                </thead>
+                <tbody>
+                  {lowStockItems.map((item) => (
+                    <tr key={item._id}>
                       <td>
                         <IngredientCatalogLabel
-                          ingredientId={reservation.ingredientId}
+                          ingredientId={item.ingredientId}
                           ingredients={ingredients}
                           link
                         />
+                        <small>{unitFor(item)}</small>
+                      </td>
+                      <td>{locationName(item.locationId)}</td>
+                      <td className="supply-number">
+                        {item.quantityOnHand}
+                        {reservedFor(item._id) > 0
+                          ? ` (${availableFor(item)} available)`
+                          : ""}
+                      </td>
+                      <td className="supply-number">{item.reorderThreshold}</td>
+                      <td className="supply-number">
+                        <strong>
+                          {suggestedPurchase(item)} {unitFor(item)}
+                        </strong>
                       </td>
                       <td>
-                        {item
-                          ? locationName(item.locationId)
-                          : "Unknown location"}
+                        <StatusChip status="reorder now" />
                       </td>
-                      <td className="supply-number">{reservation.quantity}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+        {form ? (
+          <SupplyStockForm
+            kind={form}
+            items={activeItems}
+            ingredients={ingredients ?? []}
+            locations={locations ?? []}
+            events={events ?? []}
+            inventoryLots={(inventoryLots ?? []).filter(
+              (lot) => lot.deletedAt == null,
+            )}
+            transferSource={transferSource}
+            busy={busy != null}
+            onSubmit={submit}
+            onClose={() => {
+              setForm(null);
+              setTransferSource(null);
+            }}
+          />
+        ) : null}
+
+        <section className="working-ledger">
+          <div className="ledger-heading">
+            <div>
+              <p className="eyebrow">Freshness digest</p>
+              <h2>Expiring soon</h2>
+            </div>
+            <label className="field-label">
+              Horizon
+              <select
+                className="input"
+                value={horizonDays}
+                onChange={(event) => setHorizonDays(Number(event.target.value))}
+              >
+                {HORIZON_DAYS.map((days) => (
+                  <option key={days} value={days}>
+                    {days} days
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          {expiringItems.length === 0 ? (
+            <div className="document-empty">
+              <p>Nothing expires within {horizonDays} days.</p>
+              <span>
+                Lots with a best-before or use-by date inside the horizon
+                surface here daily.
+              </span>
+            </div>
+          ) : (
+            <div className="supply-table-wrap">
+              <table className="supply-table">
+                <thead>
+                  <tr>
+                    <th>Ingredient</th>
+                    <th>Location</th>
+                    <th>On hand</th>
+                    <th>Best before</th>
+                    <th>Use by</th>
+                    <th>State</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {expiringItems.map((item) => (
+                    <tr key={item._id}>
                       <td>
-                        <StatusChip status={String(reservation.status)} />
+                        <IngredientCatalogLabel
+                          ingredientId={item.ingredientId}
+                          ingredients={ingredients}
+                          link
+                        />
+                        <small>{unitFor(item)}</small>
+                      </td>
+                      <td>{locationName(item.locationId)}</td>
+                      <td className="supply-number">{item.quantityOnHand}</td>
+                      <td>{dateLabel(item.bestBeforeAt)}</td>
+                      <td>{dateLabel(item.useByAt)}</td>
+                      <td>
+                        <StatusChip
+                          status={isExpired(item) ? "expired" : "use soon"}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="working-ledger">
+          <div className="ledger-heading">
+            <div>
+              <p className="eyebrow">Stock position</p>
+              <h2>Ingredient by location</h2>
+            </div>
+            <span>{formatCountNoun(activeItems.length, "line")}</span>
+          </div>
+          {items === undefined ||
+          ingredients === undefined ||
+          locations === undefined ? (
+            <TableSkeleton rows={7} />
+          ) : activeItems.length === 0 ? (
+            <div className="document-empty">
+              <p>No stock lines are open.</p>
+              <span>
+                Register a location, then open the first ingredient line.
+              </span>
+            </div>
+          ) : (
+            <div className="supply-table-wrap">
+              <table className="supply-table">
+                <thead>
+                  <tr>
+                    <th>Ingredient</th>
+                    <th>Location</th>
+                    <th>On hand</th>
+                    <th>Active reserved</th>
+                    <th>PAR / reorder</th>
+                    <th>Best before / Use by</th>
+                    <th aria-label="Actions" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeItems.map((item) => (
+                    <tr
+                      key={item._id}
+                      id={stockRowDomId(item._id)}
+                      className={
+                        item._id === focusedItemId
+                          ? "supply-row-focus"
+                          : undefined
+                      }
+                    >
+                      <td>
+                        <IngredientCatalogLabel
+                          ingredientId={item.ingredientId}
+                          ingredients={ingredients}
+                          link
+                        />
+                        <small>{unitFor(item)}</small>
+                      </td>
+                      <td>{locationName(item.locationId)}</td>
+                      <td className="supply-number">{item.quantityOnHand}</td>
+                      <td className="supply-number">{reservedFor(item._id)}</td>
+                      <td className="supply-number">
+                        {item.parLevel} / {item.reorderThreshold}
+                        {isBelowReorder(item) ? (
+                          <StatusChip status="reorder now" />
+                        ) : belowPar(item) ? (
+                          <StatusChip status="below par" />
+                        ) : null}
+                      </td>
+                      <td>
+                        {dateLabel(item.bestBeforeAt)} /{" "}
+                        {dateLabel(item.useByAt)}
+                        {isExpired(item) ? (
+                          <StatusChip status="expired" />
+                        ) : null}
                       </td>
                       <td>
                         <div className="supply-row-actions">
-                          {policy
-                            .reservationActions(String(reservation.status))
-                            // Generated consume guards use-by expiry; do not
-                            // offer an action that can never succeed.
-                            .filter(
-                              (action) =>
-                                action.key !== "consume" ||
-                                item == null ||
-                                !isExpired(item),
-                            )
-                            .map((action) => (
-                              <button
-                                key={action.key}
-                                className="btn btn-ghost btn-sm"
-                                disabled={busy != null}
-                                onClick={() =>
-                                  reservationAction(reservation, action.key)
-                                }
-                              >
-                                {busy === `${reservation._id}:${action.key}`
-                                  ? "Working…"
-                                  : action.label}
-                              </button>
-                            ))}
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => stockAction(item, "receive")}
+                          >
+                            Receive
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => stockAction(item, "recount")}
+                          >
+                            Recount
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => expiryAction(item)}
+                          >
+                            Dates
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => levelsAction(item)}
+                          >
+                            Levels
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => {
+                              setTransferSource(item);
+                              setForm("transfer");
+                            }}
+                          >
+                            Transfer
+                          </button>
                         </div>
                       </td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </section>
-
-      <section className="working-ledger mt-10">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">Movement audit</p>
-            <h2>Transfer history</h2>
-          </div>
-          <span>{formatCountNoun((transfers ?? []).length, "transfer")}</span>
-        </div>
-        {transfers === undefined ? (
-          <TableSkeleton rows={3} />
-        ) : transfers.length === 0 ? (
-          <div className="document-empty">
-            <p>No stock has moved between locations.</p>
-            <span>
-              Each transfer keeps its debit and credit ledger entries beside the
-              durable record shown here.
-            </span>
-          </div>
-        ) : (
-          <div className="supply-table-wrap">
-            <table className="supply-table">
-              <thead>
-                <tr>
-                  <th>When</th>
-                  <th>Ingredient</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>Quantity</th>
-                  <th>Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...transfers]
-                  .sort(
-                    (a, b) => (b.transferredAt ?? 0) - (a.transferredAt ?? 0),
-                  )
-                  .map((transfer) => (
-                    <tr key={transfer._id}>
-                      <td>{dateLabel(transfer.transferredAt)}</td>
-                      <td>
-                        <IngredientCatalogLabel
-                          ingredientId={transfer.ingredientId}
-                          ingredients={ingredients}
-                          link
-                        />
-                        <small>{transfer.unit}</small>
-                      </td>
-                      <td>{locationName(transfer.sourceLocationId)}</td>
-                      <td>{locationName(transfer.destinationLocationId)}</td>
-                      <td className="supply-number">{transfer.quantity}</td>
-                      <td>{transfer.notes ?? "—"}</td>
-                    </tr>
                   ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="working-ledger mt-10">
+          <div className="ledger-heading">
+            <div>
+              <p className="eyebrow">Event claims</p>
+              <h2>Reservations</h2>
+            </div>
+            <span>{formatCountNoun(activeReservations.length, "record")}</span>
           </div>
-        )}
-      </section>
-    </div>
+          {reservations === undefined || events === undefined ? (
+            <TableSkeleton rows={5} />
+          ) : activeReservations.length === 0 ? (
+            <div className="document-empty">
+              <p>No stock is reserved.</p>
+              <span>
+                Reserve stock for an event and it will show here, linked to that
+                event.
+              </span>
+            </div>
+          ) : (
+            <div className="supply-table-wrap">
+              <table className="supply-table">
+                <thead>
+                  <tr>
+                    <th>Event</th>
+                    <th>Ingredient</th>
+                    <th>Location</th>
+                    <th>Quantity</th>
+                    <th>State</th>
+                    <th aria-label="Actions" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeReservations.map((reservation) => {
+                    const item = activeItems.find(
+                      (candidate) =>
+                        candidate._id === reservation.inventoryItemId,
+                    );
+                    return (
+                      <tr key={reservation._id}>
+                        <td>{eventName(reservation.eventId)}</td>
+                        <td>
+                          <IngredientCatalogLabel
+                            ingredientId={reservation.ingredientId}
+                            ingredients={ingredients}
+                            link
+                          />
+                        </td>
+                        <td>
+                          {item
+                            ? locationName(item.locationId)
+                            : "Unknown location"}
+                        </td>
+                        <td className="supply-number">
+                          {reservation.quantity}
+                        </td>
+                        <td>
+                          <StatusChip status={String(reservation.status)} />
+                        </td>
+                        <td>
+                          <div className="supply-row-actions">
+                            {policy
+                              .reservationActions(String(reservation.status))
+                              // Generated consume guards use-by expiry; do not
+                              // offer an action that can never succeed.
+                              .filter(
+                                (action) =>
+                                  action.key !== "consume" ||
+                                  item == null ||
+                                  !isExpired(item),
+                              )
+                              .map((action) => (
+                                <button
+                                  key={action.key}
+                                  className="btn btn-ghost btn-sm"
+                                  disabled={busy != null}
+                                  onClick={() =>
+                                    reservationAction(reservation, action.key)
+                                  }
+                                >
+                                  {busy === `${reservation._id}:${action.key}`
+                                    ? "Working…"
+                                    : action.label}
+                                </button>
+                              ))}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="working-ledger mt-10">
+          <div className="ledger-heading">
+            <div>
+              <p className="eyebrow">Movement audit</p>
+              <h2>Transfer history</h2>
+            </div>
+            <span>{formatCountNoun((transfers ?? []).length, "transfer")}</span>
+          </div>
+          {transfers === undefined ? (
+            <TableSkeleton rows={3} />
+          ) : transfers.length === 0 ? (
+            <div className="document-empty">
+              <p>No stock has moved between locations.</p>
+              <span>
+                Each transfer keeps its debit and credit ledger entries beside
+                the durable record shown here.
+              </span>
+            </div>
+          ) : (
+            <div className="supply-table-wrap">
+              <table className="supply-table">
+                <thead>
+                  <tr>
+                    <th>When</th>
+                    <th>Ingredient</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Quantity</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[...transfers]
+                    .sort(
+                      (a, b) => (b.transferredAt ?? 0) - (a.transferredAt ?? 0),
+                    )
+                    .map((transfer) => (
+                      <tr key={transfer._id}>
+                        <td>{dateLabel(transfer.transferredAt)}</td>
+                        <td>
+                          <IngredientCatalogLabel
+                            ingredientId={transfer.ingredientId}
+                            ingredients={ingredients}
+                            link
+                          />
+                          <small>{transfer.unit}</small>
+                        </td>
+                        <td>{locationName(transfer.sourceLocationId)}</td>
+                        <td>{locationName(transfer.destinationLocationId)}</td>
+                        <td className="supply-number">{transfer.quantity}</td>
+                        <td>{transfer.notes ?? "—"}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      </div>
+    </IngredientCatalogImageProvider>
   );
 }
 

@@ -44,6 +44,7 @@ export function IngredientDatabaseLookup({
     if (debounceRef.current) clearTimeout(debounceRef.current);
     const trimmed = query.trim();
     if (trimmed.length < 2) {
+      searchGenerationRef.current += 1;
       setHits([]);
       setSearching(false);
       return;

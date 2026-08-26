@@ -395,7 +395,9 @@ export function IngredientDetailPage() {
             disabled={busy != null}
             label="Update from food database"
             onApply={async (profile: IngredientAutofillProfile) => {
-              await run("lookup", async () => {
+              setFailure(null);
+              setBusy("lookup");
+              try {
                 await applyLookup({
                   docId: ingredient._id,
                   profile: {
@@ -407,7 +409,12 @@ export function IngredientDetailPage() {
                     nutrition: nutritionPayload(profile.nutrition),
                   },
                 });
-              });
+              } catch (error) {
+                setFailure(error);
+                throw error;
+              } finally {
+                setBusy(null);
+              }
             }}
           />
         </div>

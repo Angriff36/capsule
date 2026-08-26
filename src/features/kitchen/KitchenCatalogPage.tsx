@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
+import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import {
   useCreateDish,
   useCreateIngredient,
@@ -154,7 +155,15 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         })) as { docId: string };
         let ingredientVersion = 1;
         try {
-          const pendingNutrition = parseIngredientNutritionFromForm(data);
+          const unit = String(data.get("unit"));
+          const rawNutrition = parseIngredientNutritionFromForm(data);
+          const gramNutrition = Object.fromEntries(
+            Object.entries(rawNutrition).filter(
+              ([, value]) => value != null && Number(value) > 0,
+            ),
+          );
+          const pendingNutrition =
+            scaleNutritionFromGramsToUnit(gramNutrition, unit) ?? gramNutrition;
           if (Object.keys(pendingNutrition).length > 0) {
             await setIngredientNutrition({
               docId: created.docId,
@@ -179,6 +188,11 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           }
         } catch (enrichmentError) {
           setFailure(enrichmentError);
+          notifySuccess(
+            `Created ${name}. Photo or nutrition failed — open the ingredient to finish.`,
+          );
+          navigate(ingredientPath(created.docId));
+          return;
         }
         navigate(ingredientPath(created.docId));
         return;

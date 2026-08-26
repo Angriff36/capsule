@@ -4,6 +4,7 @@ import { v } from "convex/values";
 import { action } from "./_generated/server";
 import { api } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
+import { requireKitchenAccess } from "./lib/kitchenAccessGate";
 import {
   mapFdcNutrientsPerGram,
   normalizeFdcCategory,
@@ -33,9 +34,7 @@ function fdcApiKey(): string {
 }
 
 function requireKitchenStaff(auth: Awaited<ReturnType<typeof getAuthContext>>) {
-  if (!auth.tenantId || auth.role === "anonymous") {
-    throw new Error("Sign in to search the food database");
-  }
+  requireKitchenAccess(auth);
 }
 
 type LookupSource = "usda_fdc" | "open_food_facts";
@@ -250,10 +249,18 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
   if (!name) throw new Error("Product has no name in Open Food Facts");
 
   const allergenParse =
-    (product.allergens_tags?.length ?? 0) > 0 ||
-    (product.labels_tags?.length ?? 0) > 0
+    (product.allergens_tags?.length ?? 0) > 0
       ? parseAllergensFromOffTags(product.allergens_tags, product.labels_tags)
-      : parseAllergensFromIngredientsText(product.ingredients_text);
+      : (() => {
+          const fromText = parseAllergensFromIngredientsText(
+            product.ingredients_text,
+          );
+          const fromLabels = parseAllergensFromOffTags([], product.labels_tags);
+          return {
+            ...fromText,
+            isGlutenFree: fromText.isGlutenFree || fromLabels.isGlutenFree,
+          };
+        })();
 
   const nutrition = mapOffNutrimentsPerGram(product.nutriments);
   const hasNutrition = Object.values(nutrition).some((value) => value > 0);
