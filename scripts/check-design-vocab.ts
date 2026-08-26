@@ -191,6 +191,20 @@ export class DesignContractGate {
         stack === undefined ? undefined : firstFamily(stack),
       );
     }
+    // The type floor. DESIGN.md states the smallest role it will admit; every
+    // --text-* step must clear it. Without this the floor is a sentence in a
+    // document that nothing can check, and 11px creeps back one call at a time.
+    const floor = design.typeFloorPx;
+    for (const [name, value] of theme) {
+      if (!name.startsWith("text-")) continue;
+      const px = Number.parseFloat(value);
+      if (Number.isNaN(px) || px >= floor) continue;
+      out.push({
+        token: `--${name}`,
+        design: `>= ${floor}px (DESIGN.md type floor)`,
+        app: value,
+      });
+    }
     return out;
   }
 
@@ -199,6 +213,7 @@ export class DesignContractGate {
     colors: Map<string, string>;
     radii: Map<string, string>;
     fonts: Map<string, string>;
+    typeFloorPx: number;
   } {
     const text = readFileSync(resolve(this.root, DESIGN_MD), "utf8");
     const matter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(text)?.[1];
@@ -208,7 +223,7 @@ export class DesignContractGate {
     const doc = parseYaml(matter) as {
       colors?: Record<string, string>;
       rounded?: Record<string, string>;
-      typography?: Record<string, { fontFamily?: string }>;
+      typography?: Record<string, { fontFamily?: string; fontSize?: string }>;
     };
     const scalars = (
       block: Record<string, unknown> | undefined,
@@ -225,10 +240,19 @@ export class DesignContractGate {
     if (fonts.size === 0) {
       throw new Error(`${DESIGN_MD} declares no typography fontFamily.`);
     }
+    // The floor is the smallest fontSize any typography role declares, so the
+    // contract and the check can never disagree about what it is.
+    const sizes = Object.values(doc.typography ?? {})
+      .map((spec) => Number.parseFloat(String(spec?.fontSize ?? "")))
+      .filter((n) => !Number.isNaN(n));
+    if (sizes.length === 0) {
+      throw new Error(`${DESIGN_MD} typography declares no fontSize.`);
+    }
     return {
       colors: scalars(doc.colors, "colors"),
       radii: scalars(doc.rounded, "rounded radii"),
       fonts,
+      typeFloorPx: Math.min(...sizes),
     };
   }
 

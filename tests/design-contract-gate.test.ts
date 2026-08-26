@@ -22,10 +22,13 @@ function designMd(
     "typography:",
     "  section-display:",
     `    fontFamily: ${display}`,
+    "    fontSize: 30px",
     "  body:",
     "    fontFamily: Archivo Variable",
+    "    fontSize: 15px",
     "  mono-data:",
     "    fontFamily: IBM Plex Mono",
+    "    fontSize: 13px",
     "rounded:",
     `  xs: ${xs}`,
     "---",
@@ -256,5 +259,38 @@ describe("DesignContractGate against the real repository", () => {
     // Not "no mismatches" — the app currently diverges. The contract is that
     // every divergence is written down, so none of it is silent.
     expect(() => gate.enforce()).not.toThrow();
+  });
+});
+
+describe("DesignContractGate type floor", () => {
+  it("fails a --text-* step below the smallest DESIGN.md role", () => {
+    // The floor was prose in DESIGN.md that nothing checked, so 11px survived
+    // in 44 files while the gate stayed green.
+    const root = mkdtempSync(path.join(tmpdir(), "capsule-type-floor-"));
+    mkdirSync(path.join(root, "src/styles"), { recursive: true });
+    writeFileSync(path.join(root, "DESIGN.md"), designMd(), "utf8");
+    writeFileSync(
+      path.join(root, "src/styles/app.css"),
+      appCss().replace("@theme {", "@theme {\n  --text-2xs: 11px;"),
+      "utf8",
+    );
+    const gate = new DesignContractGate(root);
+    expect(gate.mismatches()).toContainEqual({
+      token: "--text-2xs",
+      design: expect.stringContaining("type floor") as unknown as string,
+      app: "11px",
+    });
+  });
+
+  it("passes a --text-* step at the floor", () => {
+    const root = mkdtempSync(path.join(tmpdir(), "capsule-type-floor-ok-"));
+    mkdirSync(path.join(root, "src/styles"), { recursive: true });
+    writeFileSync(path.join(root, "DESIGN.md"), designMd(), "utf8");
+    writeFileSync(
+      path.join(root, "src/styles/app.css"),
+      appCss().replace("@theme {", "@theme {\n  --text-2xs: 13px;"),
+      "utf8",
+    );
+    expect(new DesignContractGate(root).mismatches()).toEqual([]);
   });
 });

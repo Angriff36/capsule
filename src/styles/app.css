@@ -69,8 +69,12 @@
      scripts/check-type-scale.ts; add a step here instead of a one-off size.
      Font-size only, no paired line-height: every call site inherits normal
      leading, so a size change never also shifts vertical rhythm. */
-  --text-2xs: 11px;
-  --text-xs: 12px;
+  /* DESIGN.md sets a 13px floor for supporting metadata, and
+     scripts/check-design-vocab.ts now enforces it. 2xs and xs are kept as
+     aliases of the floor so ~550 existing call sites keep resolving; they
+     collapse into --text-sm when someone sweeps the call sites. */
+  --text-2xs: 13px;
+  --text-xs: 13px;
   --text-sm: 13px;
   --text-base: 15px;
   --text-lg: 18px;

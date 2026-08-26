@@ -487,7 +487,11 @@ export function VenueVendorRelationshipsPage() {
             </thead>
             <tbody className="divide-y divide-line">
               {relationships === undefined || vendors === undefined ? (
-                <TableSkeleton columns={7} rows={5} />
+                <tr>
+                  <td colSpan={7} className="py-4">
+                    <TableSkeleton columns={7} rows={5} />
+                  </td>
+                </tr>
               ) : rows.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-4 text-center text-ink-3">
