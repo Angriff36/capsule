@@ -1,292 +1,303 @@
-import { useUser } from "@clerk/react";
-import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
 import {
   useListEvent,
-  useListEventAssignment,
-  useListIngredient,
-  useListInventoryItem,
+  useListEventCloseout,
   useListInvoice,
-  useListPayment,
-  useListVendorOrder,
+  useListPackList,
+  useListPrepTask,
 } from "../../lib/manifest-convex-react";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
-import { DashboardWidgetCard } from "./DashboardWidgetCard";
+import { eventsIndexPath } from "../events/eventRoutes";
 import {
-  DASHBOARD_WIDGET_CATALOG,
-  DEFAULT_DASHBOARD_WIDGETS,
-  DashboardWidgetPolicy,
-  type DashboardWidgetId,
-  normalizeDashboardPins,
-} from "./DashboardWidgetPolicy";
-import "./HomeDashboard.css";
+  HomeAttentionPolicy,
+  type HomeAttentionItem,
+  type HomeUpcomingService,
+} from "./HomeAttentionPolicy";
 
-const policy = new DashboardWidgetPolicy();
+const policy = new HomeAttentionPolicy();
+const DAY_MS = 86_400_000;
 
-const DASHBOARD_METADATA_KEY = "capsuleDashboardWidgets";
+/** The lanes that mean somebody has to decide something today. */
+const DECISION_LANES = new Set(["open_prep", "open_packs", "open_invoices"]);
 
-/** User-owned home dashboard over live Convex domain subscriptions. */
+function severityOf(item: HomeAttentionItem): "danger" | "warn" {
+  return item.id === "open_prep" || item.id === "open_packs"
+    ? "danger"
+    : "warn";
+}
+
+function startOfDay(ms: number): number {
+  const d = new Date(ms);
+  d.setHours(0, 0, 0, 0);
+  return d.getTime();
+}
+
+function timeOf(startsAt: number | null): string {
+  if (startsAt == null) return "Unscheduled";
+  return new Date(startsAt).toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+function dayOf(startsAt: number | null): string {
+  if (startsAt == null) return "TBC";
+  return new Date(startsAt).toLocaleDateString(undefined, {
+    weekday: "short",
+    day: "numeric",
+  });
+}
+
+/** `SECTION ————————— trailing context` — DESIGN.md section-rule. */
+function SectionRule({
+  label,
+  trailing,
+}: {
+  label: string;
+  trailing?: string;
+}) {
+  return (
+    <div className="section-rule">
+      <span>{label}</span>
+      <i />
+      {trailing ? <em>{trailing}</em> : null}
+    </div>
+  );
+}
+
+/** `LABEL: value` — DESIGN.md fact-pair. */
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <span className="fact">
+      <b>{label}:</b>
+      {value}
+    </span>
+  );
+}
+
+function ServiceRow({
+  service,
+  next,
+}: {
+  service: HomeUpcomingService;
+  next: boolean;
+}) {
+  return (
+    <div className="grid grid-cols-[120px_minmax(0,1fr)_auto] items-center gap-x-6 border-t border-line py-4 max-md:grid-cols-1 max-md:gap-y-2">
+      <div>
+        <div className="font-mono text-base font-semibold text-ink">
+          {timeOf(service.startsAt)}
+        </div>
+        {next ? (
+          <div className="text-accent-deep text-sm font-semibold tracking-[0.06em] uppercase">
+            Next
+          </div>
+        ) : null}
+      </div>
+      <div>
+        <Link
+          to={service.href}
+          className="font-display text-xl text-ink hover:underline"
+        >
+          {service.title}
+        </Link>
+        {service.readiness.length > 0 ? (
+          <div className="fact-row mt-1">
+            <Fact label="Readiness" value={service.readiness.join(" · ")} />
+          </div>
+        ) : null}
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="chip-meta capitalize">
+          {service.stage.replace(/_/g, " ")}
+        </span>
+        <Link to={service.href} className="btn btn-ghost btn-sm">
+          Open brief
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function Decision({ item }: { item: HomeAttentionItem }) {
+  const severity = severityOf(item);
+  return (
+    <div>
+      <span
+        className={`chip-state ${
+          severity === "danger" ? "chip-state-danger" : "chip-state-warn"
+        }`}
+      >
+        {severity === "danger" ? "Blocking" : "Open"}
+      </span>
+      <div className="font-display mt-3 text-2xl leading-tight text-ink">
+        {item.count} {item.label.toLowerCase()}
+      </div>
+      <p className="mt-1 text-base text-ink-2">{item.detail}</p>
+      <Link to={item.href} className="btn btn-primary mt-4">
+        Open
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * Today's service — the operator's home. It answers, in order: what needs a
+ * decision now, what is running today, and what is coming next. Every number
+ * comes from HomeAttentionPolicy, so it is a queryable fact rather than a
+ * dashboard estimate.
+ */
 export function HomePage() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
-  const { isLoaded: userLoaded, user } = useUser();
   const events = useListEvent();
   const invoices = useListInvoice();
-  const inventoryItems = useListInventoryItem();
-  const ingredients = useListIngredient();
-  const assignments = useListEventAssignment();
-  const payments = useListPayment();
-  const vendorOrders = useListVendorOrder();
-  const [customizing, setCustomizing] = useState(false);
-  const [draftPins, setDraftPins] = useState<DashboardWidgetId[]>([]);
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const prepTasks = useListPrepTask();
+  const packLists = useListPackList();
+  const closeouts = useListEventCloseout();
 
-  const loading =
-    [
-      authStatus,
-      events,
-      invoices,
-      inventoryItems,
-      ingredients,
-      assignments,
-      payments,
-      vendorOrders,
-    ].some((value) => value === undefined) || !userLoaded;
-  const { loadingTooLong } = useSlowQuery(loading ? undefined : true);
-
-  const pinnedWidgets = useMemo(() => {
-    const stored = user?.unsafeMetadata?.[DASHBOARD_METADATA_KEY];
-    if (!Array.isArray(stored)) return DEFAULT_DASHBOARD_WIDGETS;
-    return normalizeDashboardPins(stored);
-  }, [user]);
-
-  const views = useMemo(() => {
-    if (loading) return null;
-    return policy.build({
-      events: events ?? [],
-      invoices: invoices ?? [],
-      inventoryItems: inventoryItems ?? [],
-      ingredients: ingredients ?? [],
-      assignments: assignments ?? [],
-      payments: payments ?? [],
-      vendorOrders: vendorOrders ?? [],
-    });
-  }, [
-    loading,
+  const loading = [
+    authStatus,
     events,
     invoices,
-    inventoryItems,
-    ingredients,
-    assignments,
-    payments,
-    vendorOrders,
-  ]);
+    prepTasks,
+    packLists,
+    closeouts,
+  ].some((value) => value === undefined);
+  const { loadingTooLong } = useSlowQuery(loading ? undefined : true);
 
-  useEffect(() => {
-    if (!customizing) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !saving) setCustomizing(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [customizing, saving]);
-
-  const openCustomizer = () => {
-    setDraftPins([...pinnedWidgets]);
-    setSaveError(null);
-    setCustomizing(true);
-  };
-
-  const togglePin = (id: DashboardWidgetId) => {
-    setDraftPins((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id].slice(0, 6),
-    );
-  };
-
-  const savePins = async () => {
-    setSaving(true);
-    setSaveError(null);
-    try {
-      if (!user) throw new Error("Your user profile is still loading.");
-      await user.update({
-        unsafeMetadata: {
-          ...user.unsafeMetadata,
-          [DASHBOARD_METADATA_KEY]: draftPins,
-        },
-      });
-      setCustomizing(false);
-    } catch (error) {
-      setSaveError(
-        error instanceof Error
-          ? error.message
-          : "Dashboard changes could not be saved.",
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading || views == null || authStatus == null) {
+  if (loading) {
     return (
       <QueryLoadState
         loadingTooLong={loadingTooLong}
-        title="Assembling your dashboard"
-        detail="Loading your events, invoices, stock, and staffing."
+        title="Still loading today’s service"
       />
     );
   }
 
-  const roleLabel = String(authStatus.role || "staff").replaceAll("_", " ");
+  const snapshot = policy.build({
+    role: authStatus?.role ?? "staff",
+    events,
+    invoices,
+    prepTasks,
+    packLists,
+    closeouts,
+  });
+
+  const now = Date.now();
+  const endOfToday = startOfDay(now) + DAY_MS;
+  const today = snapshot.upcoming.filter(
+    (s) => s.startsAt != null && s.startsAt < endOfToday,
+  );
+  const later = snapshot.upcoming.filter(
+    (s) => s.startsAt == null || s.startsAt >= endOfToday,
+  );
+  const decisions = snapshot.attention.filter(
+    (item) => DECISION_LANES.has(item.id) && item.count > 0,
+  );
+  const thisWeek = snapshot.attention.find(
+    (item) => item.id === "services_this_week",
+  );
 
   return (
-    <div className="dashboard-stage">
-      <header className="dashboard-masthead">
-        <div className="dashboard-masthead__copy">
-          <p className="eyebrow">Home / {roleLabel}</p>
-          <h1 className="display-title">Today, at a glance.</h1>
-          <p>
-            Your pinned view of the business — it updates itself as work
-            happens. Keep the board spare or pin the full six—this view belongs
-            to you.
-          </p>
-        </div>
-        <div className="dashboard-masthead__actions">
-          <span className="dashboard-live-stamp">
-            <i /> Live
-          </span>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={openCustomizer}
-          >
-            Customize widgets
-          </button>
-          <Link to="/events/new" className="btn btn-primary">
-            New event
-          </Link>
-        </div>
-      </header>
-
-      <div className="dashboard-board-head">
+    <div className="pb-10">
+      <div className="flex flex-wrap items-start justify-between gap-6">
         <div>
-          <p className="eyebrow">Pinned workspace</p>
-          <h2>Your operating board</h2>
+          <p className="font-display text-accent-deep text-lg italic underline underline-offset-4">
+            {new Date(now).toLocaleDateString(undefined, {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+          <h1 className="font-display mt-1 text-4xl leading-none tracking-tight text-ink">
+            Today’s service
+          </h1>
+          <div className="fact-row mt-3">
+            <Fact label="Today" value={`${today.length} services`} />
+            <Fact label="This week" value={String(thisWeek?.count ?? 0)} />
+            {today[0] ? (
+              <Fact
+                label="Next"
+                value={`${timeOf(today[0].startsAt)} · ${today[0].title}`}
+              />
+            ) : null}
+          </div>
         </div>
-        <span>{pinnedWidgets.length} / 6 widgets pinned</span>
+        <Link to={eventsIndexPath()} className="btn btn-primary">
+          All events
+        </Link>
       </div>
 
-      {pinnedWidgets.length === 0 ? (
-        <section className="dashboard-empty-board">
-          <div>
-            <p className="eyebrow">A clear desk</p>
-            <h2>No widgets pinned</h2>
-            <p>Choose what you want waiting here when you open Capsule.</p>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={openCustomizer}
-            >
-              Pin widgets
-            </button>
+      <div className="attention-band mt-7 -mx-8 px-8 py-5 max-md:-mx-4 max-md:px-4">
+        <SectionRule
+          label="Needs a decision"
+          trailing={
+            decisions.length > 0 ? `${decisions.length} open` : undefined
+          }
+        />
+        {decisions.length === 0 ? (
+          <p className="mt-3 text-base text-ink-2">
+            Nothing is asking for you.
+          </p>
+        ) : (
+          <div className="mt-4 grid gap-x-11 gap-y-8 md:grid-cols-2 xl:grid-cols-3">
+            {decisions.map((item) => (
+              <Decision key={item.id} item={item} />
+            ))}
           </div>
-        </section>
-      ) : (
-        <section
-          className="dashboard-grid"
-          aria-label="Pinned dashboard widgets"
-        >
-          {pinnedWidgets.map((id) => (
-            <DashboardWidgetCard key={id} view={views[id]} />
-          ))}
-        </section>
-      )}
+        )}
+      </div>
 
-      {customizing ? (
-        <div
-          className="dashboard-customizer"
-          role="presentation"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget && !saving) {
-              setCustomizing(false);
-            }
-          }}
-        >
-          <section
-            className="dashboard-customizer__panel"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="dashboard-customizer-title"
-          >
-            <div className="dashboard-customizer__head">
-              <div>
-                <p className="eyebrow">Personal workspace</p>
-                <h2 id="dashboard-customizer-title">Choose your dashboard</h2>
-                <p>Pin any combination of these six live operating views.</p>
-              </div>
-              <button
-                type="button"
-                className="dashboard-customizer__close"
-                aria-label="Close widget customizer"
-                onClick={() => setCustomizing(false)}
-                disabled={saving}
+      <div className="mt-7">
+        <SectionRule
+          label="Today’s services"
+          trailing={today.length === 0 ? "none scheduled" : undefined}
+        />
+        {today.length === 0 ? (
+          <p className="mt-3 text-base text-ink-2">
+            No service is scheduled for today.{" "}
+            <Link to={eventsIndexPath()} className="text-brand underline">
+              Open the events book
+            </Link>
+            .
+          </p>
+        ) : (
+          <div className="mt-1">
+            {today.map((service, i) => (
+              <ServiceRow key={service.id} service={service} next={i === 0} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {later.length > 0 ? (
+        <div className="mt-7">
+          <SectionRule
+            label="Week ahead"
+            trailing={`${later.length} services`}
+          />
+          <div className="fact-row mt-3 gap-x-8">
+            {later.slice(0, 5).map((service) => (
+              <Link
+                key={service.id}
+                to={service.href}
+                className="fact hover:underline"
               >
-                ×
-              </button>
-            </div>
-
-            <div className="dashboard-customizer__grid">
-              {DASHBOARD_WIDGET_CATALOG.map((item) => (
-                <label key={item.id} className="dashboard-pin-option">
-                  <input
-                    type="checkbox"
-                    checked={draftPins.includes(item.id)}
-                    onChange={() => togglePin(item.id)}
-                    disabled={saving}
-                  />
-                  <span>
-                    <strong>{item.title}</strong>
-                    <small>{item.description}</small>
-                  </span>
-                </label>
-              ))}
-            </div>
-
-            <div className="dashboard-customizer__foot">
-              <div>
-                <p className="dashboard-customizer__count">
-                  {draftPins.length} of 6 selected
-                </p>
-                {saveError ? (
-                  <p className="dashboard-customizer__error" role="alert">
-                    {saveError}
-                  </p>
-                ) : null}
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => setCustomizing(false)}
-                  disabled={saving}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => void savePins()}
-                  disabled={saving}
-                >
-                  {saving ? "Saving…" : "Save dashboard"}
-                </button>
-              </div>
-            </div>
-          </section>
+                <b>{dayOf(service.startsAt)}</b>
+                {service.title}
+              </Link>
+            ))}
+            <Link
+              to={eventsIndexPath()}
+              className="text-brand ml-auto text-base underline underline-offset-4"
+            >
+              Open the week
+            </Link>
+          </div>
         </div>
       ) : null}
     </div>

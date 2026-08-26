@@ -72,11 +72,13 @@
   --text-2xs: 11px;
   --text-xs: 12px;
   --text-sm: 13px;
-  --text-base: 14px;
+  --text-base: 15px;
   --text-lg: 18px;
-  --text-xl: 20px;
+  --text-xl: 21px;
   --text-2xl: 24px;
   --text-3xl: 30px;
+  --text-4xl: 36px;
+  --text-5xl: 45px;
 }
 
 /* Dark scheme — same editorial palette shifted to lamplight: deep green-black
@@ -282,7 +284,7 @@
   }
   .display-title {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 5vw, 5.25rem);
+    font-size: clamp(2.1rem, 3.2vw, 2.9rem);
     font-weight: 400;
     letter-spacing: -0.045em;
     line-height: 0.92;
@@ -291,7 +293,7 @@
     font-family: var(--font-display);
     margin-top: 0.65rem;
     max-width: 42rem;
-    font-size: clamp(2rem, 3.25vw, 3.6rem);
+    font-size: clamp(1.4rem, 2.1vw, 1.85rem);
     font-weight: 400;
     letter-spacing: -0.035em;
     line-height: 0.98;
@@ -2431,7 +2433,7 @@
     padding-bottom: 2.3rem;
   }
   .display-title {
-    font-size: clamp(2.8rem, 13vw, 4rem);
+    font-size: clamp(1.9rem, 8.5vw, 2.5rem);
   }
   .service-brief {
     padding-top: 1.8rem;
