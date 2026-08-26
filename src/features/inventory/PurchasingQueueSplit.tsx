@@ -5,6 +5,8 @@ import type { ReorderSuggestion } from "./reorderSuggestion";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
 import type { VendorPerformance } from "./vendorPerformance";
+import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
+import type { IngredientCatalogRow } from "../kitchen/IngredientCatalogLabel";
 
 const formatQty = (value: number): string =>
   Number.isInteger(value) ? String(value) : value.toFixed(2);
@@ -62,6 +64,7 @@ export type PurchasingQueueSplitProps = {
   linkedLine: (need: PurchaseNeed) => VendorOrderLine | undefined;
   reorderSuggestion: (need: PurchaseNeed) => ReorderSuggestion | undefined;
   ingredientName: (id: string) => string;
+  ingredients?: readonly IngredientCatalogRow[];
   eventName: (id: string) => string;
   onNeedAction: (need: PurchaseNeed, key: string) => void;
   onOnboardVendor: () => void;
@@ -82,6 +85,7 @@ export function PurchasingQueueSplit({
   linkedLine,
   reorderSuggestion,
   ingredientName,
+  ingredients,
   eventName,
   onNeedAction,
   onOnboardVendor,
@@ -137,7 +141,15 @@ export function PurchasingQueueSplit({
                     </label>
                   ) : null}
                   <div>
-                    <strong>{ingredientName(need.ingredientId)}</strong>
+                    {ingredients ? (
+                      <IngredientCatalogLabel
+                        ingredientId={need.ingredientId}
+                        ingredients={ingredients}
+                        link
+                      />
+                    ) : (
+                      <strong>{ingredientName(need.ingredientId)}</strong>
+                    )}
                     <span>
                       {eventName(need.eventId)} · {need.requiredQuantity}{" "}
                       {need.unit}

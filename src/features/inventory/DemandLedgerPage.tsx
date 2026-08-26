@@ -14,6 +14,8 @@ import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { HoverPreview } from "../../ui/HoverPreview";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { IngredientPreviewCard } from "../kitchen/IngredientPreviewCard";
+import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
+import { IngredientOptionPicker } from "../kitchen/IngredientOptionPicker";
 import {
   DEFAULT_ANOMALY_THRESHOLD,
   computeDemandAnomalies,
@@ -215,21 +217,11 @@ export function DemandLedgerPage() {
                   ))}
               </select>
             </label>
-            <label className="field-label">
+            <label className="field-label sm:col-span-2">
               Ingredient
-              <select name="ingredientId" className="input" required>
-                <option value="">Select ingredient</option>
-                {(ingredients ?? [])
-                  .filter(
-                    (item) =>
-                      item.deletedAt == null && item.status === "active",
-                  )
-                  .map((item) => (
-                    <option key={item._id} value={item._id}>
-                      {item.name}
-                    </option>
-                  ))}
-              </select>
+              <div className="mt-1">
+                <IngredientOptionPicker ingredients={ingredients} required />
+              </div>
             </label>
             <label className="field-label">
               Required quantity
@@ -325,12 +317,11 @@ export function DemandLedgerPage() {
                                 />
                               }
                             >
-                              <Link
-                                to={`/kitchen/ingredients/${ingredient._id}`}
-                                className="underline decoration-dotted underline-offset-2 hover:text-ink"
-                              >
-                                {ingredient.name}
-                              </Link>
+                              <IngredientCatalogLabel
+                                ingredientId={ingredient._id}
+                                ingredients={ingredients}
+                                link
+                              />
                             </HoverPreview>
                           );
                         })()}

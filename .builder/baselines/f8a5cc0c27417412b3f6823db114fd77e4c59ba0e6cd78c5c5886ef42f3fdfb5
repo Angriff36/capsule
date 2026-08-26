@@ -1084,7 +1084,6 @@ export default defineSchema({
     name: v.string(),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle")),
     allergens: v.optional(v.array(v.union(v.literal("milk"), v.literal("eggs"), v.literal("fish"), v.literal("crustacean_shellfish"), v.literal("tree_nuts"), v.literal("peanuts"), v.literal("wheat"), v.literal("soybeans"), v.literal("sesame")))),
-    isGlutenFree: v.optional(v.boolean()),
     costPerUnit: v.number(),
     category: v.optional(v.union(v.string(), v.null())),
     substituteIngredientIds: v.optional(v.array(v.string())),

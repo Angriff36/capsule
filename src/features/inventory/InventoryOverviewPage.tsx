@@ -16,6 +16,7 @@ import {
   stockLineLink,
 } from "./stockLevels";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
+import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 
 // Vendor orders that left draft but have not fully arrived yet.
 const AWAITING_RECEIPT = new Set([
@@ -76,6 +77,7 @@ type AttentionRow = {
   urgency: Urgency;
   urgencyLabel: string;
   title: string;
+  ingredientId?: string;
   reason: string;
   status: string;
   actionLabel: string;
@@ -148,6 +150,7 @@ export function InventoryOverviewPage() {
         urgency: (out ? "now" : "soon") as Urgency,
         urgencyLabel: out ? "Out of stock" : "Low stock",
         title: ingredientName(item.ingredientId),
+        ingredientId: item.ingredientId,
         reason: `${onHand} on hand · reorder at ${Number(item.reorderThreshold)} ${catalogUnitForStockLine(item, ingredients ?? [])}`,
         status: "reorder now",
         actionLabel: "Open stock line",
@@ -314,7 +317,14 @@ export function InventoryOverviewPage() {
                     to={row.to}
                     className="block truncate text-base font-semibold text-ink hover:underline"
                   >
-                    {row.title}
+                    {row.ingredientId ? (
+                      <IngredientCatalogLabel
+                        ingredientId={row.ingredientId}
+                        ingredients={ingredients}
+                      />
+                    ) : (
+                      row.title
+                    )}
                   </Link>
                   <span className="block text-sm text-ink-2">{row.reason}</span>
                 </span>

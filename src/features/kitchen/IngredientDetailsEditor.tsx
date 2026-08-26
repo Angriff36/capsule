@@ -3,10 +3,8 @@ import {
   useIngredientClassifyAllergens,
   useIngredientUpdateDetails,
 } from "../../lib/manifest-convex-react";
-import {
-  CULINARY_ALLERGENS,
-  type CulinaryAllergenCode,
-} from "./CulinaryAllergenVocabulary";
+import { type CulinaryAllergenCode } from "./CulinaryAllergenVocabulary";
+import { IngredientAllergenFieldset } from "./IngredientAllergenFieldset";
 import {
   UNIT_OF_MEASURE,
   unitOptionsFor,
@@ -20,6 +18,7 @@ export type IngredientDetailsTarget = {
   unit: string;
   category?: string | null;
   allergens?: readonly string[] | null;
+  isGlutenFree?: boolean | null;
   status: string;
 };
 
@@ -28,7 +27,17 @@ function isUnitOfMeasure(value: string): value is UnitOfMeasure {
 }
 
 function isAllergenCode(value: string): value is CulinaryAllergenCode {
-  return CULINARY_ALLERGENS.some((allergen) => allergen.code === value);
+  return (
+    value === "milk" ||
+    value === "eggs" ||
+    value === "fish" ||
+    value === "crustacean_shellfish" ||
+    value === "tree_nuts" ||
+    value === "peanuts" ||
+    value === "wheat" ||
+    value === "soybeans" ||
+    value === "sesame"
+  );
 }
 
 function sortedAllergenKey(codes: readonly CulinaryAllergenCode[]) {
@@ -52,6 +61,9 @@ export function IngredientDetailsEditor({
   const [allergens, setAllergens] = useState<CulinaryAllergenCode[]>(
     (ingredient.allergens ?? []).filter(isAllergenCode),
   );
+  const [isGlutenFree, setIsGlutenFree] = useState(
+    Boolean(ingredient.isGlutenFree),
+  );
   const [saving, setSaving] = useState<"details" | "allergens" | null>(null);
 
   const detailsDirty =
@@ -61,7 +73,9 @@ export function IngredientDetailsEditor({
   const initialAllergens = sortedAllergenKey(
     (ingredient.allergens ?? []).filter(isAllergenCode),
   );
-  const allergensDirty = sortedAllergenKey(allergens) !== initialAllergens;
+  const allergensDirty =
+    sortedAllergenKey(allergens) !== initialAllergens ||
+    isGlutenFree !== Boolean(ingredient.isGlutenFree);
   const canEdit = ingredient.status === "active";
 
   const saveDetails = async (event: FormEvent) => {
@@ -93,20 +107,13 @@ export function IngredientDetailsEditor({
         docId: ingredient._id,
         version: ingredient.version,
         allergens,
+        isGlutenFree,
       });
     } catch (error) {
       onFailure(error);
     } finally {
       setSaving(null);
     }
-  };
-
-  const toggleAllergen = (code: CulinaryAllergenCode) => {
-    setAllergens((current) =>
-      current.includes(code)
-        ? current.filter((item) => item !== code)
-        : [...current, code],
-    );
   };
 
   return (
@@ -175,30 +182,19 @@ export function IngredientDetailsEditor({
       <div className="mt-6">
         <div className="culinary-section-heading">
           <h3 className="text-lg font-semibold text-ink">Allergens</h3>
-          <span>{allergens.length} flagged</span>
+          <span>
+            {allergens.length} flagged
+            {isGlutenFree ? " · gluten free" : ""}
+          </span>
         </div>
-        <fieldset
-          className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3"
+        <IngredientAllergenFieldset
+          allergens={allergens}
+          isGlutenFree={isGlutenFree}
+          onAllergensChange={setAllergens}
+          onGlutenFreeChange={setIsGlutenFree}
           disabled={!canEdit || saving != null}
-        >
-          <legend className="sr-only">Ingredient allergens</legend>
-          {CULINARY_ALLERGENS.map((allergen) => {
-            const checked = allergens.includes(allergen.code);
-            return (
-              <label
-                key={allergen.code}
-                className="flex items-center gap-2 rounded-sm border border-line bg-panel px-3 py-2 text-base"
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={() => toggleAllergen(allergen.code)}
-                />
-                {allergen.label}
-              </label>
-            );
-          })}
-        </fieldset>
+          idPrefix={`ingredient-${ingredient._id}`}
+        />
         <div className="mt-3">
           <button
             type="button"

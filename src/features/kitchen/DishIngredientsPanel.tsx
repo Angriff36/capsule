@@ -20,6 +20,8 @@ import {
   formatRecipeQuantity,
 } from "../events/eventMenuRecipeQuantity";
 import { applyDishIngredientRemoval } from "./dishIngredientRemoval";
+import { IngredientCatalogLabel } from "./IngredientCatalogLabel";
+import { IngredientOptionPicker } from "./IngredientOptionPicker";
 
 type Props = {
   dishId: string;
@@ -52,6 +54,9 @@ export function DishIngredientsPanel({ dishId }: Props) {
 
   const ingredientName = (id: string) =>
     ingredients?.find((row) => row._id === id)?.name ?? "Unknown ingredient";
+
+  const ingredientRow = (id: string) =>
+    ingredients?.find((row) => row._id === id);
 
   async function onAdd(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -204,9 +209,16 @@ export function DishIngredientsPanel({ dishId }: Props) {
                 onSubmit={(event) => void onSaveQty(event, line)}
               >
                 <div>
-                  <p className="text-lg font-medium text-ink">
-                    {ingredientName(String(line.ingredientId))}
-                  </p>
+                  {ingredientRow(String(line.ingredientId)) ? (
+                    <IngredientCatalogLabel
+                      ingredientId={String(line.ingredientId)}
+                      ingredients={ingredients}
+                    />
+                  ) : (
+                    <p className="text-lg font-medium text-ink">
+                      {ingredientName(String(line.ingredientId))}
+                    </p>
+                  )}
                   {line.prepNotes ? (
                     <p className="font-mono text-xs text-ink-3">
                       {line.prepNotes}
@@ -272,16 +284,9 @@ export function DishIngredientsPanel({ dishId }: Props) {
       <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
         <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Ingredient</span>
-          <select name="ingredientId" className="input mt-1" required>
-            <option value="">Select an ingredient…</option>
-            {(ingredients ?? [])
-              .filter((row) => row.deletedAt == null)
-              .map((row) => (
-                <option key={row._id} value={row._id}>
-                  {row.name}
-                </option>
-              ))}
-          </select>
+          <div className="mt-1">
+            <IngredientOptionPicker ingredients={ingredients} required />
+          </div>
         </label>
         <label className="block text-sm">
           <span className="meta-term">Per serving</span>

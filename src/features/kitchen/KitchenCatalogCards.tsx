@@ -124,7 +124,7 @@ function CardMedia({
   item: CatalogItem;
   index: number;
 }>) {
-  if (section === "dishes") {
+  if (section === "dishes" || section === "ingredients") {
     return (
       <div className="culinary-card-media">
         <DishPrimaryImage

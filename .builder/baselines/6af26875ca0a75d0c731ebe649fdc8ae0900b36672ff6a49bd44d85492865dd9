@@ -883,7 +883,7 @@ const COMMAND_DISPATCH = {
   },
   "Ingredient.classifyAllergens": {
     ref: api.mutations.Ingredient_classifyAllergens,
-    params: ["docId","allergens","isGlutenFree","version","idempotencyKey"] as const,
+    params: ["docId","allergens","version","idempotencyKey"] as const,
   },
   "Ingredient.clearPrimaryImage": {
     ref: api.mutations.Ingredient_clearPrimaryImage,
@@ -899,7 +899,7 @@ const COMMAND_DISPATCH = {
   },
   "Ingredient.introduce": {
     ref: api.mutations.Ingredient_createViaIntroduce,
-    params: ["name","unit","costPerUnit","allergens","category","preferredVendorId","isGlutenFree","idempotencyKey"] as const,
+    params: ["name","unit","costPerUnit","allergens","category","preferredVendorId","idempotencyKey"] as const,
   },
   "Ingredient.linkAsEdition": {
     ref: api.mutations.Ingredient_linkAsEdition,

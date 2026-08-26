@@ -1200,7 +1200,6 @@ export const IngredientSchema = z.object({
   name: z.string().default(""),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
-  isGlutenFree: z.boolean().optional().default(false),
   costPerUnit: z.number().min(0).default(0),
   category: z.string().nullable().optional(),
   substituteIngredientIds: z.array(z.string().uuid()).optional().default([]),
@@ -5126,7 +5125,6 @@ export type IncidentReportParams = z.infer<typeof IncidentReportParamsSchema>;
 // Command: classifyAllergens on Ingredient
 export const IngredientClassifyAllergensParamsSchema = z.object({
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])),
-  isGlutenFree: z.boolean().optional(),
 });
 
 export type IngredientClassifyAllergensParams = z.infer<typeof IngredientClassifyAllergensParamsSchema>;
@@ -5158,7 +5156,6 @@ export const IngredientIntroduceParamsSchema = z.object({
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
   category: z.string().optional(),
   preferredVendorId: z.string().min(1).optional(),
-  isGlutenFree: z.boolean().optional(),
 });
 
 export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParamsSchema>;

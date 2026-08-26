@@ -1,11 +1,16 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useMutation } from "convex/react";
 import { formatCountNoun } from "../../lib/format";
+import { api } from "../../lib/api";
 import {
   useCreateDish,
   useCreateIngredient,
   useCreateMenu,
   useCreateComponent,
+  useCreateAttachment,
+  useIngredientSetPrimaryImage,
+  useIngredientSetNutrition,
   useDishPurge,
   useDishReinstate,
   useIngredientPurge,
@@ -34,8 +39,12 @@ import {
   COMPONENT_IMPORT_PATH,
   dishPath,
   componentPath,
+  ingredientPath,
   type KitchenSection,
 } from "./kitchenRoutes";
+import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
+import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
+import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -63,6 +72,10 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const createComponent = useCreateComponent();
   const createDish = useCreateDish();
   const createMenu = useCreateMenu();
+  const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
+  const createAttachment = useCreateAttachment();
+  const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
+  const setIngredientNutrition = useIngredientSetNutrition();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -130,26 +143,40 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         ) {
           return;
         }
-        await createIngredient({
+        const { allergens, isGlutenFree } =
+          parseIngredientAllergensFromForm(data);
+        const created = (await createIngredient({
           name,
           unit: String(data.get("unit")) as (typeof UNITS)[number],
           costPerUnit: Number(data.get("costPerUnit")),
           category: optional(data.get("category")),
-          allergens: csv(data.get("allergens")) as
-            | (
-                | "milk"
-                | "eggs"
-                | "fish"
-                | "crustacean_shellfish"
-                | "tree_nuts"
-                | "peanuts"
-                | "wheat"
-                | "soybeans"
-                | "sesame"
-              )[]
-            | undefined,
-        });
-        notifySuccess(`Ingredient "${name}" created.`);
+          allergens: allergens.length ? allergens : undefined,
+          isGlutenFree,
+        })) as { docId: string };
+        const pendingNutrition = parseIngredientNutritionFromForm(data);
+        if (Object.keys(pendingNutrition).length > 0) {
+          await setIngredientNutrition({
+            docId: created.docId,
+            version: 1,
+            ...pendingNutrition,
+          });
+        }
+        const photo = data.get("photo");
+        if (photo instanceof File && photo.size > 0) {
+          await uploadCatalogPrimaryImage(
+            photo,
+            "ingredient",
+            created.docId,
+            1,
+            {
+              generateUploadUrl,
+              createAttachment,
+              setPrimaryImage: setIngredientPrimaryImage,
+            },
+          );
+        }
+        navigate(ingredientPath(created.docId));
+        return;
       } else if (section === "components") {
         const created = await createComponent({
           name: String(data.get("name") ?? "").trim(),

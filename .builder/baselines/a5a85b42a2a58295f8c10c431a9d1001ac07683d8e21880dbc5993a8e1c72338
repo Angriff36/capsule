@@ -16989,7 +16989,7 @@ export const Incident_createViaReport = mutation({
   },
 });
 
-async function __runIngredientClassifyAllergens(ctx: MutationCtx, { docId, allergens, isGlutenFree, version }: any, __creation = false) {
+async function __runIngredientClassifyAllergens(ctx: MutationCtx, { docId, allergens, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -17005,13 +17005,12 @@ async function __runIngredientClassifyAllergens(ctx: MutationCtx, { docId, aller
     }
     const updates = {
       allergens: allergens,
-      isGlutenFree: ((isGlutenFree != null) ? isGlutenFree : doc.isGlutenFree),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, ingredientId: docId, tenantId: __after.tenantId, allergens: allergens, isGlutenFree: ((isGlutenFree != null) ? isGlutenFree : __after.isGlutenFree), _subject: { entity: "Ingredient", command: "classifyAllergens", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "IngredientAllergensClassified", entity: "Ingredient", entityId: docId, payload: { ingredientId: docId, tenantId: __after.tenantId, allergens: allergens, isGlutenFree: ((isGlutenFree != null) ? isGlutenFree : __after.isGlutenFree) }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, ingredientId: docId, tenantId: __after.tenantId, allergens: allergens, _subject: { entity: "Ingredient", command: "classifyAllergens", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "IngredientAllergensClassified", entity: "Ingredient", entityId: docId, payload: { ingredientId: docId, tenantId: __after.tenantId, allergens: allergens }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -17019,7 +17018,6 @@ export const Ingredient_classifyAllergens = mutation({
   args: {
     docId: v.id("ingredients"),
     allergens: v.array(v.any()),
-    isGlutenFree: v.optional(v.boolean()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -17184,7 +17182,7 @@ export const Ingredient_discontinue = mutation({
   },
 });
 
-async function __runIngredientIntroduce(ctx: MutationCtx, { docId, name, unit, costPerUnit, allergens, category, preferredVendorId, isGlutenFree, version }: any, __creation = false) {
+async function __runIngredientIntroduce(ctx: MutationCtx, { docId, name, unit, costPerUnit, allergens, category, preferredVendorId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -17207,7 +17205,6 @@ async function __runIngredientIntroduce(ctx: MutationCtx, { docId, name, unit, c
       allergens: ((allergens != null) ? allergens : []),
       category: category,
       preferredVendorId: preferredVendorId,
-      isGlutenFree: ((isGlutenFree != null) ? isGlutenFree : false),
       introducedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -17227,7 +17224,6 @@ export const Ingredient_introduce = mutation({
     allergens: v.optional(v.array(v.any())),
     category: v.optional(v.string()),
     preferredVendorId: v.optional(v.string()),
-    isGlutenFree: v.optional(v.boolean()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -17252,7 +17248,6 @@ export const Ingredient_createViaIntroduce = mutation({
     allergens: v.optional(v.array(v.any())),
     category: v.optional(v.string()),
     preferredVendorId: v.optional(v.string()),
-    isGlutenFree: v.optional(v.boolean()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -17262,11 +17257,10 @@ export const Ingredient_createViaIntroduce = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { name, unit, costPerUnit, allergens, category, preferredVendorId, isGlutenFree } = args;
+    const { name, unit, costPerUnit, allergens, category, preferredVendorId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       allergens: args.allergens !== undefined ? args.allergens : [],
-      isGlutenFree: args.isGlutenFree !== undefined ? args.isGlutenFree : false,
       substituteIngredientIds: [],
       preferredVendorIds: [],
       status: "active",
@@ -17294,7 +17288,6 @@ export const Ingredient_createViaIntroduce = mutation({
       allergens: ((allergens != null) ? allergens : []),
       category: category,
       preferredVendorId: preferredVendorId,
-      isGlutenFree: ((isGlutenFree != null) ? isGlutenFree : false),
       introducedAt: Date.now(),
       version: 1,
     };

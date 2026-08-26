@@ -56,6 +56,8 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   property required searchable name: string = ""
   property required unit: UnitOfMeasure = "each"
   property allergens: list<AllergenCode> = []
+  // Operator-confirmed gluten-free claim (separate from the wheat allergen flag).
+  property isGlutenFree: boolean = false
   property required costPerUnit: money(12, 2) = 0
   property category: string?
   // Kitchen-configured alternatives evaluated against live stock when demand
@@ -73,6 +75,9 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   // Optional so existing ingredient rows validate before backfill; UI treats null as 1.
   property editionNumber: int? = 1
   property mergedIntoIngredientId: uuid?
+  // Convex storage id for the catalog hero image (upload via Attachment).
+  property primaryImageStorageId: string?
+  property primaryImageFileName: string?
 
   // Nutrition per one `unit` of this ingredient. All optional so pre-field rows
   // validate under Convex schema push; component/menu panels aggregate the values
@@ -113,7 +118,8 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     costPerUnit: money(12, 2),
     optional allergens: list<AllergenCode>,
     optional category: string,
-    optional preferredVendorId: uuid
+    optional preferredVendorId: uuid,
+    optional isGlutenFree: boolean
   ) {
     guard self.introducedAt == null
     guard self.deletedAt == null
@@ -125,6 +131,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     mutate allergens = allergens != null ? allergens : []
     mutate category = category
     mutate preferredVendorId = preferredVendorId
+    mutate isGlutenFree = isGlutenFree != null ? isGlutenFree : false
     mutate introducedAt = now()
     emit IngredientIntroduced {
       ingredientId: self.id
@@ -177,14 +184,16 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command classifyAllergens(allergens: list<AllergenCode>) {
+  command classifyAllergens(allergens: list<AllergenCode>, optional isGlutenFree: boolean) {
     guard self.status == "active"
     guard self.deletedAt == null
     mutate allergens = allergens
+    mutate isGlutenFree = isGlutenFree != null ? isGlutenFree : self.isGlutenFree
     emit IngredientAllergensClassified {
       ingredientId: self.id
       tenantId: self.tenantId
       allergens: allergens
+      isGlutenFree: isGlutenFree != null ? isGlutenFree : self.isGlutenFree
     }
   }
 
@@ -289,6 +298,30 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command setPrimaryImage(storageId: string, optional fileName: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint primaryImageStorage: length(trim(storageId)) > 0 "Primary image storage id is required"
+    mutate primaryImageStorageId = storageId
+    mutate primaryImageFileName = fileName
+    emit IngredientPrimaryImageSet {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      storageId: storageId
+    }
+  }
+
+  command clearPrimaryImage() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate primaryImageStorageId = null
+    mutate primaryImageFileName = null
+    emit IngredientPrimaryImageCleared {
+      ingredientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Attach an already-introduced ingredient as an edition of a canonical root.
   command linkAsEdition(sourceIngredientId: uuid, optional editionNumber: int) {
     guard self.introducedAt != null
@@ -349,6 +382,7 @@ event IngredientAllergensClassified: "ingredient.allergens_classified" {
   ingredientId: string
   tenantId: string
   allergens: list<AllergenCode>
+  isGlutenFree: boolean
 }
 
 event IngredientNutritionSet: "ingredient.nutrition_set" {
@@ -394,4 +428,15 @@ event IngredientMerged: "ingredient.merged" {
   tenantId: string
   targetIngredientId: string
   reason: string
+}
+
+event IngredientPrimaryImageSet: "ingredient.primary_image_set" {
+  ingredientId: string
+  tenantId: string
+  storageId: string
+}
+
+event IngredientPrimaryImageCleared: "ingredient.primary_image_cleared" {
+  ingredientId: string
+  tenantId: string
 }

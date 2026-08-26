@@ -28,6 +28,7 @@ import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
 import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
+import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -521,7 +522,11 @@ export function StockBookPage() {
                 {lowStockItems.map((item) => (
                   <tr key={item._id}>
                     <td>
-                      <strong>{ingredientName(item.ingredientId)}</strong>
+                      <IngredientCatalogLabel
+                        ingredientId={item.ingredientId}
+                        ingredients={ingredients}
+                        link
+                      />
                       <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
@@ -613,7 +618,11 @@ export function StockBookPage() {
                 {expiringItems.map((item) => (
                   <tr key={item._id}>
                     <td>
-                      <strong>{ingredientName(item.ingredientId)}</strong>
+                      <IngredientCatalogLabel
+                        ingredientId={item.ingredientId}
+                        ingredients={ingredients}
+                        link
+                      />
                       <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
@@ -678,7 +687,11 @@ export function StockBookPage() {
                     }
                   >
                     <td>
-                      <strong>{ingredientName(item.ingredientId)}</strong>
+                      <IngredientCatalogLabel
+                        ingredientId={item.ingredientId}
+                        ingredients={ingredients}
+                        link
+                      />
                       <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
@@ -786,7 +799,13 @@ export function StockBookPage() {
                   return (
                     <tr key={reservation._id}>
                       <td>{eventName(reservation.eventId)}</td>
-                      <td>{ingredientName(reservation.ingredientId)}</td>
+                      <td>
+                        <IngredientCatalogLabel
+                          ingredientId={reservation.ingredientId}
+                          ingredients={ingredients}
+                          link
+                        />
+                      </td>
                       <td>
                         {item
                           ? locationName(item.locationId)
@@ -873,7 +892,11 @@ export function StockBookPage() {
                     <tr key={transfer._id}>
                       <td>{dateLabel(transfer.transferredAt)}</td>
                       <td>
-                        <strong>{ingredientName(transfer.ingredientId)}</strong>
+                        <IngredientCatalogLabel
+                          ingredientId={transfer.ingredientId}
+                          ingredients={ingredients}
+                          link
+                        />
                         <small>{transfer.unit}</small>
                       </td>
                       <td>{locationName(transfer.sourceLocationId)}</td>

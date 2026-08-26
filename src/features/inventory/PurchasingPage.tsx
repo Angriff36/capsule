@@ -500,6 +500,7 @@ export function PurchasingPage() {
         linkedLine={linkedLine}
         reorderSuggestion={reorderSuggestion}
         ingredientName={ingredientName}
+        ingredients={ingredients}
         eventName={eventName}
         onNeedAction={needAction}
         onOnboardVendor={() => setForm("vendor")}
