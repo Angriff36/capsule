@@ -37,8 +37,12 @@ function nutritionStatusMessage(
   if (applyResult?.nutritionApplied) {
     return profile.nutritionNote;
   }
-  if (catalogUnit && !canScaleNutritionToUnit(catalogUnit)) {
-    return `Nutrition from the lookup was not applied — unit "${catalogUnit}" cannot be scaled from per-gram values. Switch to gram, kilogram, ounce, or pound to store nutrition automatically.`;
+  const scaleUnit =
+    catalogUnit && canScaleNutritionToUnit(catalogUnit)
+      ? catalogUnit
+      : profile.unit;
+  if (!canScaleNutritionToUnit(scaleUnit)) {
+    return `Nutrition from the lookup was not applied — unit "${scaleUnit}" cannot be scaled from per-gram values. Switch to gram, kilogram, ounce, or pound to store nutrition automatically.`;
   }
   return profile.nutritionNote;
 }
@@ -61,7 +65,7 @@ export function IngredientDatabaseLookup({
   const [error, setError] = useState<string | null>(null);
   const [applied, setApplied] = useState<{
     profile: IngredientAutofillProfile;
-    nutritionMessage: string;
+    applyResult?: IngredientLookupApplyResult | void;
   } | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipSearchRef = useRef(false);
@@ -124,14 +128,7 @@ export function IngredientDatabaseLookup({
       setQuery(profile.name);
       setOpen(false);
       const applyResult = await onApply(profile);
-      setApplied({
-        profile,
-        nutritionMessage: nutritionStatusMessage(
-          profile,
-          applyResult,
-          catalogUnit,
-        ),
-      });
+      setApplied({ profile, applyResult });
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Could not load food details",
@@ -141,9 +138,13 @@ export function IngredientDatabaseLookup({
     }
   };
 
+  const nutritionMessage = applied
+    ? nutritionStatusMessage(applied.profile, applied.applyResult, catalogUnit)
+    : null;
+
   const nutritionWarning =
-    applied?.nutritionMessage.startsWith("Nutrition") &&
-    applied.nutritionMessage.includes("not");
+    nutritionMessage?.startsWith("Nutrition") &&
+    nutritionMessage.includes("not");
 
   return (
     <div className="space-y-2 rounded-sm border border-line bg-inset/40 p-3">
@@ -210,7 +211,7 @@ export function IngredientDatabaseLookup({
           ))}
         </ul>
       ) : null}
-      {applied ? (
+      {applied && nutritionMessage ? (
         <p
           className={`rounded-xs border px-2 py-1.5 text-sm text-ink ${
             nutritionWarning
@@ -219,7 +220,7 @@ export function IngredientDatabaseLookup({
           }`}
         >
           Applied <strong>{applied.profile.name}</strong> from{" "}
-          {applied.profile.sourceLabel}. {applied.nutritionMessage}{" "}
+          {applied.profile.sourceLabel}. {nutritionMessage}{" "}
           {applied.profile.allergenNote}
         </p>
       ) : null}

@@ -72,10 +72,24 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   const applyAutofill = (profile: IngredientAutofillProfile) => {
     setName(profile.name);
     setUnit(profile.unit);
-    setCategory(profile.category ?? "");
-    setCreateAllergens(profile.allergens);
-    setCreateGlutenFree(profile.isGlutenFree);
-    setNutrition(profile.nutrition);
+    setCategory((existing) => profile.category ?? existing);
+    setCreateAllergens((existing) =>
+      profile.allergens.length > 0
+        ? [...new Set([...existing, ...profile.allergens])]
+        : existing,
+    );
+    setCreateGlutenFree((existing) => {
+      if (profile.isGlutenFree) return true;
+      if (profile.allergens.includes("wheat")) return false;
+      return existing;
+    });
+    if (
+      Object.values(profile.nutrition).some(
+        (value) => value != null && Number(value) > 0,
+      )
+    ) {
+      setNutrition(profile.nutrition);
+    }
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {

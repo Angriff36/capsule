@@ -16,7 +16,8 @@ const ALLERGEN_PATTERNS: ReadonlyArray<{ code: string; pattern: RegExp }> = [
   },
   {
     code: "tree_nuts",
-    pattern: /\b(almond|walnut|pecan|cashew|pistachio|hazelnut|macadamia|tree\s*nuts?)\b/i,
+    pattern:
+      /\b(almonds?|walnuts?|pecans?|cashews?|pistachios?|hazelnuts?|macadamias?|tree\s*nuts?)\b/i,
   },
   { code: "peanuts", pattern: /\b(peanuts?|groundnut)\b/i },
   {
@@ -45,6 +46,10 @@ function unique(codes: string[]) {
   return [...new Set(codes)];
 }
 
+function stripGlutenFreeClaims(text: string) {
+  return text.replace(/\bgluten[\s-]*free\b/gi, " ");
+}
+
 export function parseAllergensFromIngredientsText(
   ingredientsText?: string | null,
 ): ParsedAllergens {
@@ -58,9 +63,10 @@ export function parseAllergensFromIngredientsText(
   }
 
   const declaresGlutenFree = /\bgluten[\s-]*free\b/i.test(text);
-  const found = ALLERGEN_PATTERNS.filter(({ pattern }) => pattern.test(text)).map(
-    ({ code }) => code,
-  );
+  const scanText = stripGlutenFreeClaims(text);
+  const found = ALLERGEN_PATTERNS.filter(({ pattern }) =>
+    pattern.test(scanText),
+  ).map(({ code }) => code);
   const allergens = unique(found);
 
   return {

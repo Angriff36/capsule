@@ -38,6 +38,8 @@ import type * as lib_fdcNutrientMapper from "../lib/fdcNutrientMapper.js";
 import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_ingredientAllergenParser from "../lib/ingredientAllergenParser.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
+import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
+import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
 import type * as lib_parseSearchQuery from "../lib/parseSearchQuery.js";
@@ -106,6 +108,8 @@ declare const fullApi: ApiFromModules<{
   "lib/googleCalendar": typeof lib_googleCalendar;
   "lib/ingredientAllergenParser": typeof lib_ingredientAllergenParser;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
+  "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
+  "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
   "lib/parseSearchQuery": typeof lib_parseSearchQuery;

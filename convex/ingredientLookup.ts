@@ -33,6 +33,16 @@ function mergeAllergenCodes(
   return [...new Set([...(existing ?? []), ...incoming])];
 }
 
+function resolveGlutenFree(
+  existing: boolean | null | undefined,
+  profileGlutenFree: boolean,
+  mergedAllergens: readonly string[],
+): boolean {
+  if (profileGlutenFree) return true;
+  if (mergedAllergens.includes("wheat")) return false;
+  return Boolean(existing);
+}
+
 const FDC_BASE = "https://api.nal.usda.gov/fdc/v1";
 const OFF_BASE = "https://world.openfoodfacts.org/api/v2";
 const OFF_SEARCH_BASE = "https://world.openfoodfacts.org/cgi/search.pl";
@@ -374,7 +384,11 @@ export const applyToIngredient = action({
         docId: args.docId,
         version: doc.version,
         allergens: mergedAllergens,
-        isGlutenFree: args.profile.isGlutenFree,
+        isGlutenFree: resolveGlutenFree(
+          doc.isGlutenFree,
+          args.profile.isGlutenFree,
+          mergedAllergens,
+        ),
       });
     }
 
