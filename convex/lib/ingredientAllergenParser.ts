@@ -61,10 +61,7 @@ export function parseAllergensFromIngredientsText(
   const found = ALLERGEN_PATTERNS.filter(({ pattern }) => pattern.test(text)).map(
     ({ code }) => code,
   );
-  let allergens = unique(found);
-  if (declaresGlutenFree) {
-    allergens = allergens.filter((code) => code !== "wheat");
-  }
+  const allergens = unique(found);
 
   return {
     allergens,
@@ -99,7 +96,7 @@ export function parseAllergensFromOffTags(
   const declaresGlutenFree = [...tagList, ...labelList].some((tag) =>
     /gluten-free|no-gluten/i.test(tag),
   );
-  const isGlutenFree = declaresGlutenFree && !allergens.includes("wheat");
+  const isGlutenFree = declaresGlutenFree;
   return {
     allergens,
     isGlutenFree,

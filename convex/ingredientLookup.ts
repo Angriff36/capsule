@@ -20,6 +20,16 @@ import {
 } from "./lib/openFoodFactsMapper";
 import { scaleNutritionFromGramsToUnit } from "./lib/nutritionUnitScaler";
 
+function mergeAllergenCodes(
+  existing: readonly string[] | null | undefined,
+  incoming: readonly string[],
+): string[] {
+  if (incoming.length === 0) {
+    return [...(existing ?? [])];
+  }
+  return [...new Set([...(existing ?? []), ...incoming])];
+}
+
 const FDC_BASE = "https://api.nal.usda.gov/fdc/v1";
 const OFF_BASE = "https://world.openfoodfacts.org/api/v2";
 const OFF_SEARCH_BASE = "https://world.openfoodfacts.org/cgi/search.pl";
@@ -341,7 +351,9 @@ export const applyToIngredient = action({
       version: doc.version,
       name: args.profile.name,
       unit: doc.unit,
-      category: args.profile.category,
+      ...(args.profile.category !== undefined
+        ? { category: args.profile.category }
+        : {}),
     });
 
     doc = await ctx.runQuery(api.queries.getIngredient, { id: args.docId });
@@ -351,13 +363,14 @@ export const applyToIngredient = action({
     const shouldUpdateAllergens =
       incomingAllergens.length > 0 || args.profile.isGlutenFree;
     if (shouldUpdateAllergens) {
+      const mergedAllergens = mergeAllergenCodes(
+        doc.allergens,
+        incomingAllergens,
+      );
       await ctx.runMutation(api.mutations.Ingredient_classifyAllergens, {
         docId: args.docId,
         version: doc.version,
-        allergens:
-          incomingAllergens.length > 0
-            ? incomingAllergens
-            : (doc.allergens ?? []),
+        allergens: mergedAllergens,
         isGlutenFree: args.profile.isGlutenFree,
       });
     }

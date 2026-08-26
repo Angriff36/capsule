@@ -14,10 +14,6 @@ type Props = Readonly<{
   idPrefix?: string;
 }>;
 
-function withoutWheat(codes: readonly CulinaryAllergenCode[]) {
-  return codes.filter((code) => code !== "wheat");
-}
-
 /** Clickable allergen flags plus gluten-free checkbox for ingredient forms. */
 export function IngredientAllergenFieldset({
   allergens,
@@ -41,9 +37,6 @@ export function IngredientAllergenFieldset({
 
   const toggleGlutenFree = (checked: boolean) => {
     onGlutenFreeChange(checked);
-    if (checked) {
-      onAllergensChange(withoutWheat(allergens));
-    }
   };
 
   return (
