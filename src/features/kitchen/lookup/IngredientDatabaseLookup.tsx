@@ -3,22 +3,52 @@ import {
   useIngredientLookupGetFoodAutofill,
   useIngredientLookupSearchFoods,
 } from "../../../lib/ingredientLookupClient";
+import { canScaleNutritionToUnit } from "../../../lib/nutritionUnitScale";
 import type {
   IngredientAutofillProfile,
+  IngredientLookupApplyResult,
   IngredientLookupHit,
 } from "./ExternalIngredientProfile";
 
 type Props = Readonly<{
-  onApply: (profile: IngredientAutofillProfile) => void | Promise<void>;
+  onApply: (
+    profile: IngredientAutofillProfile,
+  ) => void | Promise<IngredientLookupApplyResult | void>;
   disabled?: boolean;
   label?: string;
+  /** Catalog unit used to decide whether lookup nutrition can be stored. */
+  catalogUnit?: string;
 }>;
+
+function nutritionStatusMessage(
+  profile: IngredientAutofillProfile,
+  applyResult: IngredientLookupApplyResult | void,
+  catalogUnit?: string,
+): string {
+  if (applyResult?.nutritionSkippedReason) {
+    return applyResult.nutritionSkippedReason;
+  }
+  const hasNutrition = Object.values(profile.nutrition).some(
+    (value) => value != null && Number(value) > 0,
+  );
+  if (!hasNutrition) {
+    return profile.nutritionNote;
+  }
+  if (applyResult?.nutritionApplied) {
+    return profile.nutritionNote;
+  }
+  if (catalogUnit && !canScaleNutritionToUnit(catalogUnit)) {
+    return `Nutrition from the lookup was not applied — unit "${catalogUnit}" cannot be scaled from per-gram values. Switch to gram, kilogram, ounce, or pound to store nutrition automatically.`;
+  }
+  return profile.nutritionNote;
+}
 
 /** Search USDA FoodData Central and apply autofill to a parent ingredient form. */
 export function IngredientDatabaseLookup({
   onApply,
   disabled = false,
   label = "Search food database",
+  catalogUnit,
 }: Props) {
   const listId = useId();
   const searchFoods = useIngredientLookupSearchFoods();
@@ -29,9 +59,10 @@ export function IngredientDatabaseLookup({
   const [searching, setSearching] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [applied, setApplied] = useState<IngredientAutofillProfile | null>(
-    null,
-  );
+  const [applied, setApplied] = useState<{
+    profile: IngredientAutofillProfile;
+    nutritionMessage: string;
+  } | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipSearchRef = useRef(false);
   const searchGenerationRef = useRef(0);
@@ -92,8 +123,15 @@ export function IngredientDatabaseLookup({
       skipSearchRef.current = true;
       setQuery(profile.name);
       setOpen(false);
-      await onApply(profile);
-      setApplied(profile);
+      const applyResult = await onApply(profile);
+      setApplied({
+        profile,
+        nutritionMessage: nutritionStatusMessage(
+          profile,
+          applyResult,
+          catalogUnit,
+        ),
+      });
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Could not load food details",
@@ -102,6 +140,10 @@ export function IngredientDatabaseLookup({
       setLoadingId(null);
     }
   };
+
+  const nutritionWarning =
+    applied?.nutritionMessage.startsWith("Nutrition") &&
+    applied.nutritionMessage.includes("not");
 
   return (
     <div className="space-y-2 rounded-sm border border-line bg-inset/40 p-3">
@@ -169,9 +211,16 @@ export function IngredientDatabaseLookup({
         </ul>
       ) : null}
       {applied ? (
-        <p className="rounded-xs border border-ok/30 bg-ok-soft px-2 py-1.5 text-sm text-ink">
-          Applied <strong>{applied.name}</strong> from {applied.sourceLabel}.{" "}
-          {applied.nutritionNote} {applied.allergenNote}
+        <p
+          className={`rounded-xs border px-2 py-1.5 text-sm text-ink ${
+            nutritionWarning
+              ? "border-warn/40 bg-warn-soft"
+              : "border-ok/30 bg-ok-soft"
+          }`}
+        >
+          Applied <strong>{applied.profile.name}</strong> from{" "}
+          {applied.profile.sourceLabel}. {applied.nutritionMessage}{" "}
+          {applied.profile.allergenNote}
         </p>
       ) : null}
     </div>

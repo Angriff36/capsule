@@ -1,5 +1,9 @@
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
-import { useIngredientCatalogImageUrl } from "../../lib/IngredientCatalogImageContext";
+import {
+  useIngredientCatalogImageBatchActive,
+  useIngredientCatalogImageBatchLoading,
+  useIngredientCatalogImageUrl,
+} from "../../lib/IngredientCatalogImageContext";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 
 export type IngredientCatalogRow = {
@@ -67,17 +71,19 @@ export function IngredientCatalogLabel({
   link = false,
 }: Props) {
   const row = ingredients?.find((item) => item._id === ingredientId);
+  const batchActive = useIngredientCatalogImageBatchActive();
+  const batchLoading = useIngredientCatalogImageBatchLoading();
   const batchedUrl = useIngredientCatalogImageUrl(row?.primaryImageStorageId);
   if (!row) {
     return <span>Unknown ingredient</span>;
   }
   const body = (
     <span className="inline-flex min-w-0 items-center gap-2">
-      {batchedUrl !== undefined ? (
+      {batchActive ? (
         <CatalogThumb
           name={row.name}
           storageId={row.primaryImageStorageId}
-          imageUrl={batchedUrl}
+          imageUrl={batchLoading ? undefined : batchedUrl}
         />
       ) : (
         <DishPrimaryImage

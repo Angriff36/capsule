@@ -102,6 +102,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
             <div className="sm:col-span-2">
               <IngredientDatabaseLookup
                 disabled={busy}
+                catalogUnit={unit}
                 onApply={applyAutofill}
               />
             </div>

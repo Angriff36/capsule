@@ -19,6 +19,23 @@ export type ScaledNutrition = {
   ironMgPerUnit?: number;
 };
 
+export const NUTRITION_FIELD_KEYS = [
+  "caloriesPerUnit",
+  "proteinGramsPerUnit",
+  "carbsGramsPerUnit",
+  "fatGramsPerUnit",
+  "fiberGramsPerUnit",
+  "sugarGramsPerUnit",
+  "sodiumMgPerUnit",
+  "calciumMgPerUnit",
+  "ironMgPerUnit",
+] as const satisfies readonly (keyof ScaledNutrition)[];
+
+function round(value: number, digits: number) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
 export function scaleNutritionFromGramsToUnit(
   nutrition: ScaledNutrition,
   unit: string,
@@ -31,8 +48,27 @@ export function scaleNutritionFromGramsToUnit(
     [keyof ScaledNutrition, number | undefined]
   >) {
     if (value != null && value > 0) {
-      scaled[key] = value * factor;
+      scaled[key] = round(value * factor, 2);
     }
   }
   return Object.keys(scaled).length > 0 ? scaled : null;
+}
+
+export function mergeScaledNutritionWithExisting(
+  existing: Record<string, unknown>,
+  scaled: ScaledNutrition,
+): ScaledNutrition {
+  const merged: ScaledNutrition = {};
+  for (const key of NUTRITION_FIELD_KEYS) {
+    const incoming = scaled[key];
+    if (incoming != null && incoming > 0) {
+      merged[key] = incoming;
+      continue;
+    }
+    const current = existing[key];
+    if (typeof current === "number" && current >= 0) {
+      merged[key] = current;
+    }
+  }
+  return merged;
 }

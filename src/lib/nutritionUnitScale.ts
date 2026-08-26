@@ -19,6 +19,11 @@ export type NutritionFields = {
   ironMgPerUnit?: number;
 };
 
+function round(value: number, digits: number) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
 export function scaleNutritionFromGramsToUnit(
   nutrition: NutritionFields,
   unit: string,
@@ -31,8 +36,12 @@ export function scaleNutritionFromGramsToUnit(
     [keyof NutritionFields, number | undefined]
   >) {
     if (value != null && value > 0) {
-      scaled[key] = value * factor;
+      scaled[key] = round(value * factor, 2);
     }
   }
   return Object.keys(scaled).length > 0 ? scaled : null;
+}
+
+export function canScaleNutritionToUnit(unit: string): boolean {
+  return GRAMS_PER_UNIT[unit] != null;
 }

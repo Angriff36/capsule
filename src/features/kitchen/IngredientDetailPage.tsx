@@ -398,7 +398,7 @@ export function IngredientDetailPage() {
               setFailure(null);
               setBusy("lookup");
               try {
-                await applyLookup({
+                return await applyLookup({
                   docId: ingredient._id,
                   profile: {
                     name: profile.name,

@@ -5,6 +5,11 @@ import type { UnitOfMeasure } from "../import/UnitOfMeasureMapper";
 export type IngredientLookupSource = "usda_fdc" | "open_food_facts";
 
 /** Normalized autofill payload from `ingredientLookup.getFoodAutofill`. */
+export type IngredientLookupApplyResult = {
+  nutritionApplied: boolean;
+  nutritionSkippedReason?: string;
+};
+
 export type IngredientAutofillProfile = {
   source: IngredientLookupSource;
   externalId: string;

@@ -18,7 +18,10 @@ import {
   mapOffNutrimentsPerGram,
   offCategory,
 } from "./lib/openFoodFactsMapper";
-import { scaleNutritionFromGramsToUnit } from "./lib/nutritionUnitScaler";
+import {
+  scaleNutritionFromGramsToUnit,
+  mergeScaledNutritionWithExisting,
+} from "./lib/nutritionUnitScaler";
 
 function mergeAllergenCodes(
   existing: readonly string[] | null | undefined,
@@ -381,6 +384,8 @@ export const applyToIngredient = action({
     const nutritionEntries = Object.entries(args.profile.nutrition).filter(
       ([, value]) => value != null && Number(value) > 0,
     );
+    let nutritionApplied = false;
+    let nutritionSkippedReason: string | undefined;
     if (nutritionEntries.length > 0) {
       doc = await ctx.runQuery(api.queries.getIngredient, { id: args.docId });
       if (!doc) throw new Error("Ingredient not found");
@@ -389,12 +394,18 @@ export const applyToIngredient = action({
         doc.unit,
       );
       if (scaled) {
+        const merged = mergeScaledNutritionWithExisting(doc, scaled);
         await ctx.runMutation(api.mutations.Ingredient_setNutrition, {
           docId: args.docId,
           version: doc.version,
-          ...scaled,
+          ...merged,
         });
+        nutritionApplied = true;
+      } else {
+        nutritionSkippedReason = `Nutrition was not saved — unit "${String(doc.unit)}" cannot be scaled from per-gram lookup values. Switch to gram, kilogram, ounce, or pound, or enter nutrition manually.`;
       }
     }
+
+    return { nutritionApplied, nutritionSkippedReason };
   },
 });
