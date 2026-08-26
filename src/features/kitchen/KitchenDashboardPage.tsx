@@ -94,6 +94,9 @@ export function KitchenDashboardPage() {
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [attentionAll, setAttentionAll] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
+  /** Columns are services by default; combining switches to cooks so the
+   *  handed-out job reads back as one column. */
+  const [boardBy, setBoardBy] = useState<"service" | "cook">("service");
   /** Ticked rows. The board works in batches — one cook, many steps. */
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
   const [failure, setFailure] = useState<unknown>(null);
@@ -231,10 +234,15 @@ export function KitchenDashboardPage() {
 
   const onSyncPrep = () => {
     if (!selectedEvent) return;
+    onSyncPrepFor(String(selectedEvent._id));
+  };
+
+  /** Build prep for one service from its event menu. */
+  const onSyncPrepFor = (eventId: string) => {
     void run(
-      `sync:${selectedEvent._id}`,
+      `sync:${eventId}`,
       async () => {
-        const rows = model.selections(selectedEvent._id);
+        const rows = model.selections(eventId);
         if (rows.length === 0) {
           throw new Error(
             "No dishes on this event, so Sync prep has nothing to create.",
@@ -245,7 +253,7 @@ export function KitchenDashboardPage() {
         for (const row of rows) {
           const result = await syncPrepForDish({
             id: row._id,
-            eventId: selectedEvent._id,
+            eventId,
             dishId: row.dishId,
             quantityServings: Number(row.quantityServings) || 1,
           });
@@ -274,38 +282,6 @@ export function KitchenDashboardPage() {
       })),
     );
   }, [horizonEvents, model, filter, assigneeFilter, selectedEventId]);
-
-  const sections = useMemo(() => {
-    const attention: LedgerRow[] = [];
-    const active: LedgerRow[] = [];
-    const upcoming: LedgerRow[] = [];
-    const completed: LedgerRow[] = [];
-    for (const row of horizonTasks) {
-      const status = String(row.task.status);
-      if (status === "completed") completed.push(row);
-      else if (status === "blocked" || !row.task.assignedToId)
-        attention.push(row);
-      else if (status === "in_progress" || status === "claimed")
-        active.push(row);
-      else upcoming.push(row);
-    }
-    const byTime = (a: LedgerRow, b: LedgerRow) =>
-      Number(a.event.startsAt ?? 0) - Number(b.event.startsAt ?? 0);
-    return [
-      {
-        id: "attention",
-        label: "Needs attention",
-        rows: attention.sort(byTime),
-      },
-      { id: "active", label: "Active preparation", rows: active.sort(byTime) },
-      {
-        id: "upcoming",
-        label: "Upcoming preparation",
-        rows: upcoming.sort(byTime),
-      },
-      { id: "completed", label: "Completed", rows: completed.sort(byTime) },
-    ];
-  }, [horizonTasks]);
 
   // The masthead states the window, so it counts every service in it — not
   // whatever the status/event/assignee filters happen to be showing below.
@@ -443,189 +419,98 @@ export function KitchenDashboardPage() {
     });
   };
 
-  /** Why combine can or cannot run on what is ticked. The kitchen combines
-   *  like with like: the same unit, and nothing already cooked. */
-  const combineBlocker = (): string | null => {
-    if (pickedRows.length < 2) return "Tick two or more steps to combine them.";
-    const units = new Set(pickedRows.map((r) => String(r.task.unit ?? "each")));
-    if (units.size > 1) {
-      return `These steps are measured in ${[...units].join(" and ")}. Combine steps that share a unit.`;
+  /** Round the way a kitchen writes a quantity: 7.81, not 7.8100000001. */
+  const qty = (n: number) =>
+    Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)));
+
+  /** Totals per unit. Steps from different events, dishes and measurements
+   *  combine fine — you just cannot add pounds to each, so each unit gets
+   *  its own subtotal. Finished work is not counted as work left. */
+  const unitTotals = (rows: LedgerRow[]) => {
+    const totals = new Map<string, number>();
+    for (const row of rows) {
+      const status = String(row.task.status);
+      if (status === "completed" || status === "cancelled") continue;
+      const unit = String(row.task.unit ?? "each");
+      totals.set(
+        unit,
+        (totals.get(unit) ?? 0) + (Number(row.task.quantity) || 0),
+      );
     }
-    const stuck = pickedRows.find((r) =>
-      ["completed", "cancelled"].includes(String(r.task.status)),
-    );
-    if (stuck) return "A finished or cancelled step cannot be combined.";
-    return null;
+    return [...totals.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([unit, total]) => `${qty(total)} ${unit}`)
+      .join(" · ");
   };
 
-  /** Combine = one step carries the whole quantity, the rest stand down.
-   *  Built from PrepTask.revise + PrepTask.cancel — no new backend command,
-   *  and the cancelled rows keep their history with the reason written on. */
+  /** A step can only change hands while it is pending or claimed —
+   *  PrepTask.assign refuses anything already started, blocked or finished.
+   *  Combine says so out loud rather than dropping those steps in silence. */
+  const movable = (rows: LedgerRow[]) =>
+    rows.filter((r) => ["pending", "claimed"].includes(String(r.task.status)));
+
+  const stuckReason = (rows: LedgerRow[]) => {
+    const counts = new Map<string, number>();
+    for (const row of rows) {
+      const status = String(row.task.status);
+      if (["pending", "claimed"].includes(status)) continue;
+      const label =
+        status === "blocked"
+          ? "blocked"
+          : status === "in_progress"
+            ? "already started"
+            : status === "completed"
+              ? "already done"
+              : status;
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .map(([label, n]) => `${n} ${label}`)
+      .join(", ");
+  };
+
+  /** Combine = one cook takes all of it as one job. Nothing is cancelled and
+   *  nothing is rewritten: every step still gets done, and every step keeps
+   *  its own event, dish, quantity and unit. Combining is how work is handed
+   *  out, so it spans services, dishes and measurements on purpose — each
+   *  unit simply keeps its own subtotal. Assignment is the grouping: the
+   *  Cooks view then reads the combined job back as one column. */
   const onCombine = () => {
-    const blocker = combineBlocker();
-    if (blocker) {
-      setFailure(new Error(blocker));
+    const personId = requireArmed();
+    if (!personId) return;
+    if (pickedRows.length < 2) {
+      setFailure(
+        new Error("Tick two or more steps to combine them into one job."),
+      );
       return;
     }
-    const [keep, ...fold] = pickedRows;
-    if (!keep) return;
-    const total = pickedRows.reduce(
-      (sum, r) => sum + (Number(r.task.quantity) || 0),
-      0,
-    );
+    const targets = movable(pickedRows);
+    const stuck = stuckReason(pickedRows);
+    const label = model.personLabel(model.findPerson(personId));
+    if (targets.length === 0) {
+      setFailure(
+        new Error(
+          `None of these steps can change hands (${stuck}). A step only moves while it is pending or claimed.`,
+        ),
+      );
+      return;
+    }
+    const totals = unitTotals(targets);
     void run("bulk:combine", async () => {
-      await revise({
-        docId: keep.task._id,
-        quantity: total,
-        unit: keep.task.unit ?? "each",
-      });
-      for (const row of fold) {
-        await cancel({
-          docId: row.task._id,
-          reason: `Combined into "${String(keep.task.name)}" (${total} ${String(keep.task.unit ?? "each")}).`,
-        });
-      }
+      const count = await actions.assignMany(
+        targets.map((r) => r.task),
+        personId,
+      );
       setPicked(new Set());
+      // Show it back as one job: the cook's column now holds all of it. Do
+      // not narrow the board to that cook — the rest of the week still has
+      // to be visible while work is handed out.
+      setBoardBy("cook");
       showToast(
-        `Combined ${formatCountNoun(pickedRows.length, "step")} into ${total} ${String(keep.task.unit ?? "each")}`,
+        `${formatCountNoun(count, "step")} combined for ${label} — ${totals}` +
+          (stuck ? ` · ${stuck} stayed put` : ""),
       );
     });
-  };
-
-  const ledgerRow = (row: LedgerRow) => {
-    const action = nextAction(row);
-    const owner = row.task.assignedToId
-      ? model.personLabel(model.findPerson(String(row.task.assignedToId)))
-      : "Unassigned";
-    const busyHere =
-      busy === `claim:${row.task._id}` ||
-      busy === `start:${row.task._id}` ||
-      busy === `complete:${row.task._id}`;
-    return (
-      <div
-        key={String(row.task._id)}
-        className="grid grid-cols-[24px_minmax(0,1fr)_124px_136px_128px_112px] items-center gap-x-5 border-b border-line py-3.5 max-md:grid-cols-1 max-md:gap-y-1.5 max-md:py-4"
-      >
-        <input
-          type="checkbox"
-          className="h-5 w-5 accent-[var(--color-brand)] max-md:hidden"
-          checked={picked.has(String(row.task._id))}
-          onChange={() => togglePicked(String(row.task._id))}
-          aria-label={`Select ${String(row.task.name)}`}
-        />
-        <div className="min-w-0">
-          {/* Never truncated. A half-printed instruction is not an
-              instruction — the cook has to read the whole line. */}
-          <div className="font-display text-xl leading-snug text-ink">
-            {sentenceCase(row.task.name)}
-          </div>
-          {/* Event and due time sit under the name. As their own columns they
-              starved the task identity down to a few characters. */}
-          <div className="text-sm text-ink-2 max-md:hidden">
-            {row.task.category ?? "Prep"} ·{" "}
-            <button
-              type="button"
-              onClick={() => setSelectedEventId(row.event._id)}
-              className="cursor-pointer hover:text-ink hover:underline"
-            >
-              {String(row.event.title)}
-            </button>
-            {invoiceNumberFor(row.event._id)
-              ? ` #${invoiceNumberFor(row.event._id)}`
-              : ""}{" "}
-            · {serviceTime(row.event.startsAt)}
-          </div>
-        </div>
-        {/* While editing, the fields need more room than the column has, so
-            the cell lifts above its neighbours instead of being clipped. */}
-        <div
-          className={`max-md:hidden ${editing === String(row.task._id) ? "relative z-10" : ""}`}
-        >
-          {editing === String(row.task._id) ? (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const data = new FormData(e.currentTarget);
-                const q = Number(data.get("q"));
-                if (Number.isFinite(q) && q > 0) {
-                  onRevise(row.task, q, String(data.get("u") ?? ""));
-                }
-              }}
-              className="bg-panel flex w-max items-center gap-1"
-            >
-              <input
-                name="q"
-                type="number"
-                step="any"
-                defaultValue={String(row.task.quantity ?? "")}
-                aria-label="Quantity"
-                className="input h-8 w-16 px-1.5"
-              />
-              <select
-                name="u"
-                defaultValue={String(row.task.unit ?? "each")}
-                aria-label="Unit"
-                className="input h-8 w-20 px-1"
-              >
-                {PREP_UNITS.map((u) => (
-                  <option key={u} value={u}>
-                    {u}
-                  </option>
-                ))}
-              </select>
-              <button type="submit" className="btn btn-ghost btn-sm">
-                Save
-              </button>
-            </form>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setEditing(String(row.task._id))}
-              title="Change the quantity"
-              className="font-mono cursor-pointer text-base whitespace-nowrap text-ink underline decoration-line-2 underline-offset-4"
-            >
-              {row.task.quantity != null
-                ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
-                : "—"}
-            </button>
-          )}
-        </div>
-        {/* The editor borrows this column's width while it is open. */}
-        <div className="truncate text-base text-ink-2 max-md:hidden">
-          {editing === String(row.task._id) ? "" : owner}
-        </div>
-        {/* Phone: event, due, quantity and owner ride together on one honest
-            line rather than being squeezed into columns that clip. */}
-        <div className="text-sm text-ink-2 md:hidden">
-          {String(row.event.title)}
-          {invoiceNumberFor(row.event._id)
-            ? ` #${invoiceNumberFor(row.event._id)}`
-            : ""}{" "}
-          · due {dueLabel(row.event.startsAt)} ·{" "}
-          {row.task.quantity != null
-            ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
-            : "—"}{" "}
-          · {owner}
-        </div>
-        <div className="max-md:mt-1">
-          <span className={statusTone(String(row.task.status))}>
-            {formatStatusLabel(String(row.task.status))}
-          </span>
-        </div>
-        <div className="text-right max-md:mt-2 max-md:text-left">
-          {action ? (
-            <button
-              type="button"
-              disabled={busyHere}
-              onClick={action.run}
-              className="btn btn-ghost btn-sm h-11 md:h-8"
-            >
-              {busyHere ? "Working…" : action.label}
-            </button>
-          ) : null}
-        </div>
-      </div>
-    );
   };
 
   // ── Phone composition ────────────────────────────────────────────────
@@ -754,6 +639,255 @@ export function KitchenDashboardPage() {
       }
     }
     return sentenceCase(text);
+  };
+
+  // -- The week board ---------------------------------------------------
+  // One column per service (or per cook), each column a prep sheet: category,
+  // then the dish with its portion basis, then that dish's own steps. A whole
+  // week stands side by side, so nothing needs switching and nothing needs a
+  // mile of scrolling - each column scrolls on its own.
+  const boardColumns = useMemo(() => {
+    const dishName = (id: unknown) =>
+      dishes?.find((d) => d._id === String(id))?.name ?? null;
+    const servingsFor = (row: LedgerRow) =>
+      eventDishes?.find((ed) => ed._id === String(row.task.eventDishId))
+        ?.quantityServings;
+
+    /** Category then dish then steps, in printed-sheet order. */
+    const sheet = (rows: LedgerRow[]) => {
+      const byCategory = new Map<string, Map<string, LedgerRow[]>>();
+      for (const row of rows) {
+        const category = String(row.task.category ?? "Other");
+        const key = String(
+          row.task.eventDishId ?? row.task.dishId ?? row.task._id,
+        );
+        let dishesIn = byCategory.get(category);
+        if (!dishesIn) byCategory.set(category, (dishesIn = new Map()));
+        const steps = dishesIn.get(key);
+        if (steps) steps.push(row);
+        else dishesIn.set(key, [row]);
+      }
+      const rank = (c: string) => {
+        const i = SHEET_ORDER.indexOf(c);
+        return i < 0 ? SHEET_ORDER.length : i;
+      };
+      return [...byCategory.entries()]
+        .sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]))
+        .map(([category, dishesIn]) => ({
+          category,
+          dishes: [...dishesIn.entries()].map(([key, steps]) => {
+            const first = steps[0]!;
+            const servings = servingsFor(first);
+            return {
+              key,
+              name: (
+                dishName(first.task.dishId) ??
+                String(first.task.name).split("—")[0] ??
+                "Item"
+              )
+                .trim()
+                .toUpperCase(),
+              portionBasis:
+                servings != null ? `P: ${Number(servings)} Serving` : null,
+              event: first.event,
+              steps,
+            };
+          }),
+        }));
+    };
+
+    const columns: {
+      id: string;
+      title: string;
+      meta: string;
+      rows: LedgerRow[];
+      groups: ReturnType<typeof sheet>;
+    }[] = [];
+
+    if (boardBy === "cook") {
+      const byPerson = new Map<string, LedgerRow[]>();
+      for (const row of horizonTasks) {
+        const key = String(row.task.assignedToId ?? "");
+        const held = byPerson.get(key);
+        if (held) held.push(row);
+        else byPerson.set(key, [row]);
+      }
+      const entries = [...byPerson.entries()].sort((a, b) => {
+        if (a[0] === "") return -1;
+        if (b[0] === "") return 1;
+        return b[1].length - a[1].length;
+      });
+      for (const [personId, rows] of entries) {
+        columns.push({
+          id: personId || "unassigned",
+          title: personId
+            ? model.personLabel(model.findPerson(personId))
+            : "Nobody yet",
+          meta: personId
+            ? `${formatCountNoun(rows.length, "step")} in hand`
+            : `${formatCountNoun(rows.length, "step")} to hand out`,
+          rows,
+          groups: sheet(rows),
+        });
+      }
+      return columns;
+    }
+
+    for (const event of horizonEvents) {
+      const rows = horizonTasks.filter((r) => r.event._id === event._id);
+      const number = invoiceNumberFor(event._id);
+      columns.push({
+        id: String(event._id),
+        title: String(event.title),
+        meta: `${formatDate(Number(event.startsAt))} · ${serviceTime(
+          event.startsAt,
+        )}${number ? ` · Invoice #${number}` : ""}`,
+        rows,
+        groups: sheet(rows),
+      });
+    }
+    return columns;
+  }, [
+    boardBy,
+    horizonTasks,
+    horizonEvents,
+    dishes,
+    eventDishes,
+    model,
+    invoices,
+  ]);
+
+  const tickAll = (rows: LedgerRow[], on: boolean) =>
+    setPicked((prev) => {
+      const next = new Set(prev);
+      for (const row of rows) {
+        const id = String(row.task._id);
+        if (on) next.add(id);
+        else next.delete(id);
+      }
+      return next;
+    });
+
+  /** One step inside a dish block. Narrow enough for a column, and still
+   *  showing the whole instruction - a half-printed step is not a step. */
+  const boardStep = (row: LedgerRow, itemName: string) => {
+    const id = String(row.task._id);
+    const status = String(row.task.status);
+    const done = status === "completed";
+    const blocked = status === "blocked";
+    const action = nextAction(row);
+    const busyHere =
+      busy === `claim:${id}` ||
+      busy === `start:${id}` ||
+      busy === `complete:${id}` ||
+      busy === `assign:${id}`;
+    const owner = row.task.assignedToId
+      ? model.personLabel(model.findPerson(String(row.task.assignedToId)))
+      : null;
+    return (
+      <div
+        key={id}
+        className="flex items-start gap-2.5 border-b border-line py-2.5"
+      >
+        <input
+          type="checkbox"
+          className="mt-1 h-5 w-5 shrink-0 accent-[var(--color-brand)]"
+          checked={picked.has(id)}
+          onChange={() => togglePicked(id)}
+          aria-label={`Select ${String(row.task.name)}`}
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-2">
+            {editing === id ? (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const data = new FormData(e.currentTarget);
+                  const next = Number(data.get("q"));
+                  if (Number.isFinite(next) && next > 0) {
+                    onRevise(row.task, next, String(data.get("u") ?? ""));
+                  }
+                }}
+                className="flex items-center gap-1"
+              >
+                <input
+                  name="q"
+                  type="number"
+                  step="any"
+                  defaultValue={String(row.task.quantity ?? "")}
+                  aria-label="Quantity"
+                  className="input h-8 w-16 px-1.5"
+                />
+                <select
+                  name="u"
+                  defaultValue={String(row.task.unit ?? "each")}
+                  aria-label="Unit"
+                  className="input h-8 w-24 px-1"
+                >
+                  {PREP_UNITS.map((unit) => (
+                    <option key={unit} value={unit}>
+                      {unit}
+                    </option>
+                  ))}
+                </select>
+                <button type="submit" className="btn btn-ghost btn-sm">
+                  Save
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setEditing(id)}
+                title="Change the quantity"
+                className="font-mono shrink-0 cursor-pointer text-base whitespace-nowrap text-ink underline decoration-line-2 underline-offset-4"
+              >
+                {row.task.quantity != null
+                  ? `${qty(Number(row.task.quantity))} ${row.task.unit ?? ""}`.trim()
+                  : "—"}
+              </button>
+            )}
+            <span
+              className={`text-base ${done ? "text-ink-3 line-through" : "text-ink"}`}
+            >
+              {stepText(row.task.name, itemName)}
+            </span>
+          </div>
+          {row.task.specialInstructions ? (
+            <p className="mt-0.5 text-sm text-ink-2">
+              {String(row.task.specialInstructions)}
+            </p>
+          ) : null}
+          {blocked ? (
+            <p className="mt-0.5 text-sm text-danger">
+              {String(
+                (row.task as { blockReason?: string | null }).blockReason ??
+                  "Blocked",
+              )}
+            </p>
+          ) : null}
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
+            {boardBy === "service" && owner ? (
+              <span className="text-sm text-ink-2">{owner}</span>
+            ) : null}
+            {boardBy === "cook" ? (
+              <span className="text-sm text-ink-2">
+                {String(row.event.title)}
+              </span>
+            ) : null}
+            {action ? (
+              <button
+                type="button"
+                disabled={busyHere}
+                onClick={action.run}
+                className="cursor-pointer text-sm font-semibold text-brand"
+              >
+                {busyHere ? "Working…" : action.label}
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const mobileCollapsed = (row: LedgerRow) => {
@@ -1289,6 +1423,23 @@ export function KitchenDashboardPage() {
                 }}
               />
             </fieldset>
+            <fieldset className="kcd-horizon-nav">
+              <legend>Board by</legend>
+              <button
+                type="button"
+                data-active={boardBy === "service" ? "true" : "false"}
+                onClick={() => setBoardBy("service")}
+              >
+                Services
+              </button>
+              <button
+                type="button"
+                data-active={boardBy === "cook" ? "true" : "false"}
+                onClick={() => setBoardBy("cook")}
+              >
+                Cooks
+              </button>
+            </fieldset>
             <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
             <label className="kcd-field">
               <span>Event</span>
@@ -1366,19 +1517,40 @@ export function KitchenDashboardPage() {
 
         {/* What is ticked, and what can be done to all of it at once. */}
         {pickedRows.length > 0 ? (
-          <div className="attention-band mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 max-md:hidden">
+          <div className="attention-band mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
             <span className="text-base font-medium text-ink">
               {formatCountNoun(pickedRows.length, "step")} selected
             </span>
+            <span className="font-mono text-base text-ink-2">
+              {unitTotals(pickedRows) || "nothing left to do"}
+            </span>
+            {stuckReason(pickedRows) ? (
+              <span className="text-sm text-ink-2">
+                {stuckReason(pickedRows)} cannot change hands
+              </span>
+            ) : null}
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={busy === "bulk:combine"}
+              title={
+                armedPersonId
+                  ? "Hand all of this to the armed cook as one job. Nothing is cancelled and nothing is rewritten."
+                  : "Arm a cook in the toolbar first"
+              }
+              onClick={onCombine}
+            >
+              {armedPersonId
+                ? `Combine for ${model.personLabel(model.findPerson(armedPersonId))}`
+                : "Combine"}
+            </button>
             <button
               type="button"
               className="btn btn-ghost btn-sm"
               disabled={busy === "bulk:assign"}
               onClick={onBulkAssign}
             >
-              {armedPersonId
-                ? `Assign to ${model.personLabel(model.findPerson(armedPersonId))}`
-                : "Assign"}
+              Assign
             </button>
             <button
               type="button"
@@ -1413,15 +1585,6 @@ export function KitchenDashboardPage() {
               }
             >
               Complete
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
-              disabled={busy === "bulk:combine" || combineBlocker() !== null}
-              title={combineBlocker() ?? "Cook these as one step"}
-              onClick={onCombine}
-            >
-              Combine
             </button>
             <button
               type="button"
@@ -1466,83 +1629,143 @@ export function KitchenDashboardPage() {
               </Link>
             </div>
           </div>
+        ) : boardColumns.length === 0 ? (
+          <div className="mt-8 max-w-prose">
+            <h2 className="font-display text-2xl text-ink">
+              No prep matches this view.
+            </h2>
+            <p className="mt-2 text-base text-ink-2">
+              {model.filterIsActive(filter, assigneeFilter)
+                ? "Clear the status or assignee filter to see the rest of the board."
+                : "These services have menus but no prep yet. Pick a service, then use Sync prep to build the steps from its menu."}
+            </p>
+          </div>
         ) : (
-          // One ledger, full width. The old right-hand pane repeated what the
-          // rows already said; its controls moved into the toolbar.
-          <div className="mt-2">
-            <div>
-              {sections.map((section) =>
-                section.rows.length === 0 ? null : (
-                  <section key={section.id} className="mt-7">
-                    <div className="section-rule">
-                      <label className="flex cursor-pointer items-center gap-2 max-md:hidden">
-                        <input
-                          type="checkbox"
-                          className="h-5 w-5 accent-[var(--color-brand)]"
-                          checked={section.rows.every((r) =>
-                            picked.has(String(r.task._id)),
-                          )}
-                          onChange={(e) => {
-                            const ids = section.rows.map((r) =>
-                              String(r.task._id),
-                            );
-                            setPicked((prev) => {
-                              const next = new Set(prev);
-                              for (const id of ids) {
-                                if (e.target.checked) next.add(id);
-                                else next.delete(id);
-                              }
-                              return next;
-                            });
-                          }}
-                          aria-label={`Select every step under ${section.label}`}
-                        />
-                        <span>{section.label}</span>
-                      </label>
-                      <i />
-                      {armedPersonId &&
-                      model.assignableTasks(section.rows.map((r) => r.task))
-                        .length > 0 ? (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          onClick={() =>
-                            onAssignDish(
-                              model.assignableTasks(
-                                section.rows.map((r) => r.task),
-                              ),
-                            )
-                          }
-                        >
-                          Assign{" "}
-                          {
-                            model.assignableTasks(
-                              section.rows.map((r) => r.task),
-                            ).length
-                          }{" "}
-                          to{" "}
-                          {model.personLabel(model.findPerson(armedPersonId))}
-                        </button>
-                      ) : null}
-                      <em>{section.rows.length}</em>
+          // The board proper. It scrolls sideways through the week; each
+          // column scrolls on its own, so no column can push the page down.
+          <div className="kcd-week mt-5 flex gap-7 overflow-x-auto pb-4">
+            {boardColumns.map((column) => {
+              const allTicked =
+                column.rows.length > 0 &&
+                column.rows.every((r) => picked.has(String(r.task._id)));
+              const blocked = column.rows.filter(
+                (r) => String(r.task.status) === "blocked",
+              ).length;
+              const doneHere = column.rows.filter(
+                (r) => String(r.task.status) === "completed",
+              ).length;
+              return (
+                <section
+                  key={column.id}
+                  className="flex h-[calc(100vh-19rem)] max-h-[900px] min-h-[520px] w-[382px] shrink-0 flex-col"
+                >
+                  {/* Column head: whose sheet this is, and what is left on it. */}
+                  <header className="border-t-2 border-ink pt-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <h2 className="font-display text-2xl leading-tight text-ink">
+                        {column.title}
+                      </h2>
+                      <input
+                        type="checkbox"
+                        className="mt-1.5 h-5 w-5 shrink-0 accent-[var(--color-brand)]"
+                        checked={allTicked}
+                        onChange={(e) => tickAll(column.rows, e.target.checked)}
+                        aria-label={`Select every step on ${column.title}`}
+                      />
                     </div>
-                    {section.rows.map(ledgerRow)}
-                  </section>
-                ),
-              )}
-              {horizonTasks.length === 0 ? (
-                <div className="mt-8 max-w-prose">
-                  <h2 className="font-display text-2xl text-ink">
-                    No prep matches this view.
-                  </h2>
-                  <p className="mt-2 text-base text-ink-2">
-                    {model.filterIsActive(filter, assigneeFilter)
-                      ? "Clear the status or assignee filter to see the rest of the board."
-                      : "These services have menus but no prep yet. Pick a service, then use Sync prep to build the steps from its menu."}
-                  </p>
-                </div>
-              ) : null}
-            </div>
+                    <p className="mt-1 text-sm text-ink-2">{column.meta}</p>
+                    <p className="font-mono mt-1.5 text-base text-ink">
+                      {unitTotals(column.rows) || "nothing left"}
+                    </p>
+                    <p className="mt-1 text-sm text-ink-2">
+                      {doneHere}/{column.rows.length} done
+                      {blocked > 0 ? (
+                        <span className="font-medium text-danger">
+                          {" "}
+                          · {blocked} blocked
+                        </span>
+                      ) : null}
+                    </p>
+                  </header>
+
+                  {/* The sheet: category, dish, then that dish's own steps. */}
+                  <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+                    {column.rows.length === 0 ? (
+                      <div className="border-t border-line pt-3">
+                        <p className="text-base text-ink-2">
+                          No prep built for this service yet.
+                        </p>
+                        {boardBy === "service" ? (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              disabled={
+                                !prepSyncReady || busy === `sync:${column.id}`
+                              }
+                              onClick={() => onSyncPrepFor(column.id)}
+                            >
+                              {busy === `sync:${column.id}`
+                                ? "Syncing…"
+                                : "Sync prep from the menu"}
+                            </button>
+                            <Link
+                              to={eventMenuRedirectPath(column.id)}
+                              className="btn btn-ghost btn-sm"
+                            >
+                              Event menu
+                            </Link>
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {column.groups.map((group) => (
+                      <div key={group.category} className="mt-4 first:mt-0">
+                        <div className="section-rule">
+                          <span>{group.category}</span>
+                          <i />
+                        </div>
+                        {group.dishes.map((dish) => (
+                          <article key={dish.key} className="mt-3">
+                            <div className="flex items-baseline justify-between gap-2 border-b border-line-2 pb-1">
+                              <h3 className="font-display text-lg leading-snug text-ink">
+                                {sentenceCase(dish.name)}
+                              </h3>
+                              {dish.portionBasis ? (
+                                <span className="font-mono shrink-0 text-sm text-ink-2">
+                                  {dish.portionBasis}
+                                </span>
+                              ) : null}
+                            </div>
+                            {dish.steps.map((row) => boardStep(row, dish.name))}
+                            {armedPersonId &&
+                            model.assignableTasks(dish.steps.map((r) => r.task))
+                              .length > 0 ? (
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-sm mt-1.5"
+                                onClick={() =>
+                                  onAssignDish(
+                                    model.assignableTasks(
+                                      dish.steps.map((r) => r.task),
+                                    ),
+                                  )
+                                }
+                              >
+                                Whole dish to{" "}
+                                {model.personLabel(
+                                  model.findPerson(armedPersonId),
+                                )}
+                              </button>
+                            ) : null}
+                          </article>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
           </div>
         )}
       </div>
