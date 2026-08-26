@@ -7,9 +7,7 @@
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(45, 105, 85, 0.28);
-  background:
-    linear-gradient(90deg, rgba(45, 105, 85, 0.035) 1px, transparent 1px),
-    var(--profit-paper);
+  background: var(--profit-paper);
   background-size: 36px 100%;
   box-shadow: 0 16px 44px rgba(22, 38, 31, 0.09);
   color: var(--profit-ink);
@@ -252,12 +250,7 @@
 
 .live-profitability__loading span {
   height: 70px;
-  background: linear-gradient(
-    100deg,
-    rgba(23, 37, 31, 0.06) 30%,
-    rgba(255, 255, 255, 0.42) 50%,
-    rgba(23, 37, 31, 0.06) 70%
-  );
+  background: var(--color-inset);
   background-size: 240% 100%;
   animation: live-profit-shimmer 1.4s linear infinite;
 }

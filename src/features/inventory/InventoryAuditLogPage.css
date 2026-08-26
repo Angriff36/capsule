@@ -14,7 +14,7 @@
   bottom: -1px;
   width: min(34vw, 320px);
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--audit-copper));
+  background: var(--color-inset);
   content: "";
 }
 
@@ -73,18 +73,7 @@
   padding: 1rem 1.1rem;
   border: 1px solid color-mix(in srgb, var(--color-ok) 30%, var(--color-line));
   border-radius: 5px;
-  background:
-    linear-gradient(
-      105deg,
-      color-mix(in srgb, var(--color-ok) 9%, var(--color-panel)),
-      var(--color-panel) 55%
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0,
-      transparent 23px,
-      var(--audit-grid) 24px
-    );
+  background: var(--color-inset);
 }
 
 .inventory-integrity-mark {

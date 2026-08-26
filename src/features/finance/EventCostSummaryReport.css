@@ -37,10 +37,7 @@
   max-width: 980px;
   margin: 0 auto;
   border: 1px solid rgba(49, 87, 79, 0.26);
-  background:
-    linear-gradient(90deg, rgba(200, 120, 63, 0.08) 1px, transparent 1px),
-    linear-gradient(rgba(49, 87, 79, 0.045) 1px, transparent 1px),
-    var(--folio-paper);
+  background: var(--folio-paper);
   background-size:
     80px 80px,
     80px 80px,

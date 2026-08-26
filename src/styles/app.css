@@ -139,7 +139,7 @@
   background: #232b26;
 }
 .dark .component-empty-state {
-  background: linear-gradient(105deg, #262e29 0%, #212824 74%);
+  background: var(--color-inset);
 }
 .dark .schedule-publish-status span,
 .dark .schedule-notice-item {
@@ -910,7 +910,7 @@
     white-space: nowrap;
   }
   .kitchen-book-nav a:hover {
-    background: var(--color-inset);
+    background: var(--color-panel);
     color: var(--color-ink);
   }
   .kitchen-book-nav a.active {
@@ -979,7 +979,7 @@
   }
   .component-status-tabs button:hover,
   .component-status-tabs button[aria-selected="true"] {
-    background: var(--color-inset);
+    background: var(--color-panel);
     color: var(--color-brand);
   }
   .component-status-tabs button span {
@@ -1005,7 +1005,7 @@
   .component-index > li > a:hover {
     padding-right: 0.7rem;
     padding-left: 0.7rem;
-    background: var(--color-inset);
+    background: var(--color-panel);
   }
   .culinary-index-row {
     display: grid;
@@ -1021,7 +1021,7 @@
     display: contents;
   }
   .culinary-index-row:hover {
-    background: var(--color-inset);
+    background: var(--color-panel);
   }
   .culinary-row-actions {
     display: flex;
@@ -1135,7 +1135,7 @@
     gap: 4rem;
     overflow: hidden;
     border-top: 1px solid var(--color-ink);
-    background: linear-gradient(105deg, #f2f5ef 0%, #fffefa 74%);
+    background: var(--color-inset);
     padding: 3rem 5rem;
   }
   .component-book-mark {
@@ -1460,7 +1460,7 @@
     margin-top: 1.5rem;
     border-left: 2px solid var(--color-sage-2);
     padding: 1rem 1.3rem;
-    background: var(--color-inset);
+    background: var(--color-panel);
   }
   .document-empty p {
     font-family: var(--font-display);
@@ -1945,9 +1945,7 @@
   gap: 1rem 1.5rem;
   padding: 1rem;
   border-bottom: 1px solid var(--color-line-2);
-  background:
-    linear-gradient(105deg, rgb(49 87 79 / 0.08), transparent 48%),
-    var(--color-panel);
+  background: var(--color-inset);
 }
 
 .schedule-publish-heading {
@@ -2045,9 +2043,7 @@
 .schedule-notice-card {
   overflow: hidden;
   border-color: var(--color-sage-2);
-  background:
-    linear-gradient(145deg, rgb(203 217 198 / 0.45), transparent 55%),
-    var(--color-panel);
+  background: var(--color-inset);
 }
 
 .schedule-notice-count {
@@ -2954,9 +2950,7 @@
   border: 1px solid var(--color-line-2);
   border-left: 4px solid var(--color-accent-deep);
   padding: 1.35rem 1.5rem;
-  background:
-    linear-gradient(120deg, var(--color-inset), transparent 62%),
-    var(--color-panel);
+  background: var(--color-inset);
   box-shadow: 0 14px 34px color-mix(in srgb, var(--color-ink) 7%, transparent);
 }
 
@@ -3082,9 +3076,7 @@
   overflow: hidden;
   border: 1px solid var(--color-line-2);
   border-top: 4px solid var(--color-brand);
-  background:
-    linear-gradient(115deg, var(--color-inset), transparent 48%),
-    var(--color-panel);
+  background: var(--color-inset);
   box-shadow: 0 16px 38px -32px
     color-mix(in srgb, var(--color-ink) 60%, transparent);
 }
@@ -3624,7 +3616,7 @@
   display: grid;
   grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
   border-block: 1px solid var(--color-line-2);
-  background: linear-gradient(90deg, var(--color-inset), transparent 42%);
+  background: var(--color-inset);
 }
 
 .revenue-scorecard > div {
@@ -3674,9 +3666,7 @@
   border: 1px solid var(--color-line);
   border-top: 3px solid var(--color-brand);
   padding: 1.4rem 1.5rem 1rem;
-  background:
-    linear-gradient(135deg, rgb(223 232 218 / 0.28), transparent 34%),
-    var(--color-panel);
+  background: var(--color-inset);
   box-shadow: 0 18px 45px -38px rgb(36 50 45 / 0.65);
 }
 

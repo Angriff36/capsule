@@ -164,14 +164,7 @@
   min-height: 360px;
   margin-top: 1.2rem;
   border: 1px dashed var(--color-line-2);
-  background:
-    linear-gradient(
-      135deg,
-      transparent 49.7%,
-      rgb(49 87 79 / 0.055) 50%,
-      transparent 50.3%
-    ),
-    var(--color-panel);
+  background: var(--color-panel);
   text-align: center;
 }
 
@@ -225,13 +218,7 @@
   border: 1px solid var(--color-line-2);
   /* Theme tokens: the old hardcoded paper-white sheet made dark-theme (light)
      text unreadable on screen. Print keeps paper colors below. */
-  background:
-    linear-gradient(
-        color-mix(in srgb, var(--color-ink) 4%, transparent) 1px,
-        transparent 1px
-      )
-      0 74px / 100% 38px,
-    var(--color-panel);
+  background: var(--color-panel);
   box-shadow: 0 24px 55px -46px rgb(36 50 45 / 0.8);
 }
 

@@ -7,15 +7,7 @@
   margin-bottom: 22px;
   border: 1px solid color-mix(in srgb, var(--line) 65%, var(--maintenance-ink));
   border-radius: 12px;
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(27, 36, 32, 0.025) 0,
-      rgba(27, 36, 32, 0.025) 1px,
-      transparent 1px,
-      transparent 24px
-    ),
-    var(--maintenance-paper);
+  background: var(--maintenance-paper);
   color: var(--maintenance-ink);
   box-shadow: 0 18px 42px rgba(27, 36, 32, 0.1);
 }
@@ -27,8 +19,7 @@
   gap: 28px;
   padding: 22px 24px;
   border-bottom: 1px solid rgba(27, 36, 32, 0.22);
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.7), transparent 58%), #e2dccb;
+  background: #e2dccb;
 }
 
 .maintenance-board__kicker,
@@ -237,19 +228,11 @@
 }
 
 .maintenance-ticket[data-due="overdue"] {
-  background: linear-gradient(
-    90deg,
-    rgba(185, 54, 36, 0.11),
-    rgba(255, 255, 255, 0.58) 36%
-  );
+  background: var(--color-inset);
 }
 
 .maintenance-ticket[data-due="soon"] {
-  background: linear-gradient(
-    90deg,
-    rgba(237, 106, 50, 0.1),
-    rgba(255, 255, 255, 0.58) 36%
-  );
+  background: var(--color-inset);
 }
 
 .maintenance-ticket__rail,

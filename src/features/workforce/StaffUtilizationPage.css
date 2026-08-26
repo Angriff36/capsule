@@ -11,14 +11,7 @@
   align-items: flex-end;
   overflow: hidden;
   border-color: rgb(49 87 79 / 0.2);
-  background:
-    linear-gradient(120deg, rgb(49 87 79 / 0.13), transparent 43%),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 47px,
-      rgb(49 87 79 / 0.035) 48px
-    ),
-    var(--utilization-paper);
+  background: var(--utilization-paper);
 }
 
 .staff-utilization-masthead::after {
@@ -312,9 +305,7 @@
 }
 
 .staff-demand-panel {
-  background:
-    linear-gradient(90deg, rgb(49 87 79 / 0.025), transparent 28%),
-    var(--color-panel);
+  background: var(--color-panel);
 }
 
 .staff-demand-layout {
@@ -400,11 +391,7 @@
   display: block;
   min-width: 2px;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    var(--utilization-sage),
-    var(--utilization-green)
-  );
+  background: var(--color-inset);
 }
 
 .utilization-demand-value {

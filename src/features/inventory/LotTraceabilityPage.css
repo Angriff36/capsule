@@ -14,7 +14,7 @@
   bottom: -1px;
   width: min(38vw, 360px);
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--trace-red));
+  background: var(--color-inset);
   content: "";
 }
 
@@ -47,14 +47,7 @@
   display: grid;
   align-content: center;
   justify-items: center;
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      transparent 0,
-      transparent 7px,
-      var(--trace-red-soft) 8px
-    ),
-    var(--color-panel);
+  background: var(--color-panel);
   color: var(--trace-red);
 }
 
