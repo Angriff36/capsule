@@ -19,7 +19,7 @@ import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
-import { TableSkeleton } from "../../ui/primitives";
+import { ActionMenu, TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCommandDeckFilters } from "./command-deck/KitchenCommandDeckFilters";
@@ -63,6 +63,8 @@ export function KitchenDashboardPage() {
   const [armedPersonId, setArmedPersonId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [attentionAll, setAttentionAll] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -402,330 +404,714 @@ export function KitchenDashboardPage() {
     );
   };
 
+  // ── Phone composition ────────────────────────────────────────────────
+  // Its own sections and rows. The desktop ledger above is untouched.
+  const mobileAttention = useMemo(
+    () =>
+      horizonTasks.filter((r) => {
+        const s = String(r.task.status);
+        return s !== "completed" && (s === "blocked" || !r.task.assignedToId);
+      }),
+    [horizonTasks],
+  );
+  const mobileUrgent = mobileAttention[0] ?? null;
+  const mobileOpen = horizonTasks.filter(
+    (r) => String(r.task.status) !== "completed",
+  ).length;
+  const mobileBlocked = horizonTasks.filter(
+    (r) => String(r.task.status) === "blocked",
+  ).length;
+  const mobileServices = selectedEventId ? 1 : horizonEvents.length;
+
+  const mobileSections = useMemo(() => {
+    const inProgress: LedgerRow[] = [];
+    const upNext: LedgerRow[] = [];
+    const done: LedgerRow[] = [];
+    const urgentIds = new Set(mobileAttention.map((r) => String(r.task._id)));
+    for (const row of horizonTasks) {
+      if (urgentIds.has(String(row.task._id))) continue;
+      const s = String(row.task.status);
+      if (s === "completed") done.push(row);
+      else if (s === "in_progress" || s === "claimed") inProgress.push(row);
+      else upNext.push(row);
+    }
+    return [
+      { id: "m-active", label: "In progress", rows: inProgress },
+      { id: "m-next", label: "Up next", rows: upNext },
+      { id: "m-done", label: "Completed", rows: done },
+    ];
+  }, [horizonTasks, mobileAttention]);
+
+  /** Prep names arrive shouting from the recipe import; calm them down. */
+  const sentenceCase = (raw: unknown) => {
+    const name = String(raw ?? "").trim();
+    if (!name) return "Untitled task";
+    const letters = name.replace(/[^A-Za-z]/g, "");
+    if (letters && letters === letters.toUpperCase()) {
+      return name.charAt(0) + name.slice(1).toLowerCase();
+    }
+    return name;
+  };
+
+  const mobileCollapsed = (row: LedgerRow) => {
+    const owner = row.task.assignedToId
+      ? model.personLabel(model.findPerson(String(row.task.assignedToId)))
+      : "Unassigned";
+    return (
+      <button
+        key={String(row.task._id)}
+        type="button"
+        onClick={() => setExpandedTaskId(String(row.task._id))}
+        className="flex w-full cursor-pointer items-start justify-between gap-3 border-t border-line py-4 text-left"
+      >
+        <span className="min-w-0">
+          <span className="font-display block text-xl leading-snug text-ink">
+            {sentenceCase(row.task.name)}
+          </span>
+          <span className="mt-1 block text-sm text-ink-2">
+            {String(row.event.title)} · due {dueLabel(row.event.startsAt)}
+          </span>
+          <span className="mt-0.5 block text-sm text-ink-2">{owner}</span>
+          <span className="mt-2 block">
+            <span className={statusTone(String(row.task.status))}>
+              {formatStatusLabel(String(row.task.status))}
+            </span>
+          </span>
+        </span>
+        <span className="mt-1 shrink-0 self-center text-base text-brand underline underline-offset-4">
+          Open
+        </span>
+      </button>
+    );
+  };
+
+  const mobileExpanded = (row: LedgerRow) => {
+    const action = nextAction(row);
+    const status = String(row.task.status);
+    const owner = row.task.assignedToId
+      ? model.personLabel(model.findPerson(String(row.task.assignedToId)))
+      : "Unassigned";
+    const busyHere =
+      busy === `claim:${row.task._id}` ||
+      busy === `start:${row.task._id}` ||
+      busy === `complete:${row.task._id}` ||
+      busy === `assign:${row.task._id}`;
+    return (
+      <div
+        key={String(row.task._id)}
+        className="border-t border-line pt-4 pb-1 first:border-t-0 first:pt-3"
+      >
+        <div className="font-display text-2xl leading-tight text-ink">
+          {sentenceCase(row.task.name)}
+        </div>
+        <div className="mt-1 text-base text-ink-2">
+          {String(row.event.title)} · {dueLabel(row.event.startsAt)}
+        </div>
+        <div className="fact-row mt-3 gap-x-6 gap-y-1.5">
+          <span className="fact">
+            <b>Due:</b>
+            {dueLabel(row.event.startsAt)}
+          </span>
+          <span className="fact">
+            <b>Quantity:</b>
+            {row.task.quantity != null
+              ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
+              : "—"}
+          </span>
+          <span className="fact">
+            <b>Assignee:</b>
+            {owner}
+          </span>
+          <span className="fact">
+            <b>Status:</b>
+            {formatStatusLabel(status)}
+          </span>
+        </div>
+        {status === "blocked" ? (
+          <p className="mt-3 text-base text-danger">
+            {String(
+              (row.task as { blockReason?: string | null }).blockReason ??
+                "Blocked — reason not recorded.",
+            )}
+          </p>
+        ) : null}
+        {action ? (
+          <button
+            type="button"
+            disabled={busyHere}
+            onClick={action.run}
+            className="btn btn-primary mt-4 h-12 w-full justify-center"
+          >
+            {busyHere ? "Working…" : action.label}
+          </button>
+        ) : null}
+      </div>
+    );
+  };
+
   return (
     <div className="kitchen-command-deck pb-10">
-      <KitchenBookNav />
+      <div className="max-md:hidden">
+        <KitchenBookNav />
+      </div>
 
-      <div className="mt-5 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <div>
-          <h1 className="display-title text-ink">Kitchen</h1>
-          <div className="fact-row mt-3">
-            <span className="fact">
-              <b>Window:</b>
-              {formatDate(horizon.start().getTime())} + 7 days
-            </span>
-            <span className="fact">
-              <b>Services:</b>
-              {horizonEvents.length}
-            </span>
-            <span className="fact">
-              <b>Prep open:</b>
-              {openTotal}
-            </span>
-            <span className="fact">
-              <b>Blocked:</b>
-              <span
-                className={blockedTotal > 0 ? "font-medium text-danger" : ""}
+      {/* ───────────────── Phone ─────────────────
+          A separate composition, not the desktop workbench shrunk down. The
+          desktop board below is untouched and simply hidden here. */}
+      <div className="md:hidden">
+        <p className="font-display text-accent-deep text-lg italic underline underline-offset-4">
+          {formatDate(horizon.start().getTime())} · 7-day window
+        </p>
+        <h1 className="font-display mt-1 text-4xl leading-none tracking-tight text-ink">
+          Kitchen
+        </h1>
+        {/* Counts the scope shown below, not the whole window — a summary
+            that disagrees with the list under it is worse than none. */}
+        <p className="mt-2 text-base text-ink-2">
+          {mobileOpen} open ·{" "}
+          <span className={mobileBlocked > 0 ? "font-medium text-danger" : ""}>
+            {mobileBlocked} blocked
+          </span>{" "}
+          · {mobileServices} {mobileServices === 1 ? "service" : "services"}
+        </p>
+
+        {/* Three controls, nothing else. The full filter form stays on desktop. */}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((v) => !v)}
+            aria-expanded={filtersOpen}
+            className="btn btn-ghost h-11"
+          >
+            Filters
+          </button>
+          <label className="sr-only" htmlFor="kcd-m-service">
+            Service
+          </label>
+          <select
+            id="kcd-m-service"
+            className="input h-11 min-w-0 flex-1"
+            value={selectedEventId}
+            onChange={(e) => setSelectedEventId(e.target.value)}
+          >
+            <option value="">Every service</option>
+            {horizonEvents.map((e) => (
+              <option key={e._id} value={e._id}>
+                {String(e.title)}
+              </option>
+            ))}
+          </select>
+          <ActionMenu>
+            <Link to="/kitchen/yield">Yield variance</Link>
+            <Link to="/kitchen">Components</Link>
+            <Link to="/kitchen/ingredients">Ingredients</Link>
+            <Link to="/kitchen/dishes">Dishes</Link>
+            <Link to="/kitchen/menus">Menus</Link>
+          </ActionMenu>
+        </div>
+
+        {/* Active filters read back as removable pills; nothing shows when
+            nothing is filtering. */}
+        {filter !== "all" || assigneeFilter || horizonOffset !== 0 ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {filter !== "all" ? (
+              <button
+                type="button"
+                onClick={() => setFilter("all")}
+                className="chip-meta h-9 gap-2"
               >
-                {blockedTotal}
-              </span>
-            </span>
+                {formatStatusLabel(filter)} <span aria-hidden="true">×</span>
+                <span className="sr-only">Clear status filter</span>
+              </button>
+            ) : null}
+            {assigneeFilter ? (
+              <button
+                type="button"
+                onClick={() => setAssigneeFilter("")}
+                className="chip-meta h-9 gap-2"
+              >
+                {model.personLabel(model.findPerson(assigneeFilter))}{" "}
+                <span aria-hidden="true">×</span>
+                <span className="sr-only">Clear assignee filter</span>
+              </button>
+            ) : null}
+            {horizonOffset !== 0 ? (
+              <button
+                type="button"
+                onClick={() => setHorizonOffset(0)}
+                className="chip-meta h-9 gap-2"
+              >
+                From {formatDate(horizon.start().getTime())}{" "}
+                <span aria-hidden="true">×</span>
+                <span className="sr-only">Back to today</span>
+              </button>
+            ) : null}
           </div>
-        </div>
-        <Link to="/kitchen/yield" className="btn btn-ghost">
-          Yield variance
-        </Link>
-      </div>
+        ) : null}
 
-      {/* One ruled toolbar: window, status, event, assignee. */}
-      <div className="mt-6 border-y border-line">
-        <button
-          type="button"
-          onClick={() => setFiltersOpen((v) => !v)}
-          aria-expanded={filtersOpen}
-          className="flex h-11 w-full cursor-pointer items-center justify-between text-sm font-semibold tracking-[0.09em] text-ink uppercase md:hidden"
-        >
-          Filters
-          <span className="text-ink-2 font-normal tracking-normal normal-case">
-            {horizonOffset === 0
-              ? "From today"
-              : formatDate(horizon.start().getTime())}
-            {filter !== "all" ? ` · ${filter}` : ""}
-          </span>
-        </button>
-        <div
-          className={`flex-wrap items-center gap-x-5 gap-y-3 py-3 max-md:pb-4 md:flex ${
-            filtersOpen ? "flex" : "hidden"
-          }`}
-        >
-          <fieldset className="kcd-horizon-nav">
-            <legend>Window</legend>
-            <button
-              type="button"
-              onClick={() => setHorizonOffset((v) => v - 7)}
-            >
-              Earlier
-            </button>
-            <button
-              type="button"
-              data-active={horizonOffset === 0 ? "true" : "false"}
-              onClick={() => setHorizonOffset(0)}
-            >
-              From today
-            </button>
-            <button
-              type="button"
-              onClick={() => setHorizonOffset((v) => v + 7)}
-            >
-              Later
-            </button>
-            <BoundedDateInput
-              aria-label="Jump to date"
-              title="Jump to date"
-              value={horizon.startDateValue()}
-              onChange={(e) => {
-                const offset = KitchenCommandDeckHorizon.offsetForDateValue(
-                  e.target.value,
-                );
-                if (offset != null) setHorizonOffset(offset);
-              }}
-            />
-          </fieldset>
-          <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
-          <label className="kcd-field">
-            <span>Event</span>
-            <select
-              value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-              aria-label="Filter by event"
-            >
-              <option value="">Every service</option>
-              {horizonEvents.map((e) => (
-                <option key={e._id} value={e._id}>
-                  {String(e.title)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="kcd-field">
-            <span>Assignee</span>
-            <select
-              value={assigneeFilter}
-              onChange={(e) => setAssigneeFilter(e.target.value)}
-            >
-              <option value="">Anyone</option>
-              {(people ?? [])
-                .filter((person) => person.deletedAt == null)
-                .map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {model.personLabel(person)}
-                  </option>
-                ))}
-            </select>
-          </label>
-        </div>
-      </div>
+        {filtersOpen ? (
+          <div className="mt-4 border-y border-line py-4">
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+              <fieldset className="kcd-horizon-nav">
+                <legend>Window</legend>
+                <button
+                  type="button"
+                  onClick={() => setHorizonOffset((v) => v - 7)}
+                >
+                  Earlier
+                </button>
+                <button
+                  type="button"
+                  data-active={horizonOffset === 0 ? "true" : "false"}
+                  onClick={() => setHorizonOffset(0)}
+                >
+                  From today
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHorizonOffset((v) => v + 7)}
+                >
+                  Later
+                </button>
+              </fieldset>
+              <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
+              <label className="kcd-field">
+                <span>Assignee</span>
+                <select
+                  value={assigneeFilter}
+                  onChange={(e) => setAssigneeFilter(e.target.value)}
+                >
+                  <option value="">Anyone</option>
+                  {(people ?? [])
+                    .filter((person) => person.deletedAt == null)
+                    .map((person) => (
+                      <option key={person._id} value={person._id}>
+                        {model.personLabel(person)}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            </div>
+          </div>
+        ) : null}
 
-      {failure ? (
-        <div className="mt-4">
-          <CulinaryFailureBanner error={failure} />
-        </div>
-      ) : null}
-
-      {loading ? (
-        <div className="mt-6">
-          <TableSkeleton rows={8} />
-        </div>
-      ) : horizonEvents.length === 0 ? (
-        <div className="mt-10 max-w-prose">
-          <h2 className="font-display text-3xl text-ink">
-            No service in this window.
-          </h2>
-          <p className="mt-2 text-base text-ink-2">
-            Nothing is booked between {formatDate(horizon.start().getTime())}{" "}
-            and {formatDate(horizon.start().getTime() + 6 * 86_400_000)}. Move
-            the window, or open the events book to see what is coming.
-          </p>
-          <div className="mt-5 flex flex-wrap items-center gap-3">
+        {loading ? (
+          <div className="mt-6">
+            <TableSkeleton rows={6} />
+          </div>
+        ) : horizonEvents.length === 0 ? (
+          <div className="mt-8">
+            <h2 className="font-display text-2xl text-ink">
+              No service in this window.
+            </h2>
+            <p className="mt-2 text-base text-ink-2">
+              Nothing is booked between {formatDate(horizon.start().getTime())}{" "}
+              and {formatDate(horizon.start().getTime() + 6 * 86_400_000)}.
+            </p>
             <button
               type="button"
-              className="btn btn-primary"
+              className="btn btn-primary mt-4 w-full justify-center"
               onClick={() => setHorizonOffset((v) => v + 7)}
             >
               Next 7 days
             </button>
-            <Link to={eventsIndexPath()} className="btn btn-ghost">
+            <Link
+              to={eventsIndexPath()}
+              className="btn btn-ghost mt-3 w-full justify-center"
+            >
               Open the events book
             </Link>
           </div>
-        </div>
-      ) : (
-        // Split workbench: the ledger reads left, the selected service works
-        // right — Galley's two-pane treatment, the active pane marked.
-        <div className="mt-2 grid grid-cols-[minmax(0,1fr)_368px] gap-x-9 max-lg:grid-cols-1">
-          <div>
-            {sections.map((section) =>
+        ) : (
+          <>
+            {/* The attention band, same pale sage as Today's service. */}
+            <div className="attention-band mt-6 -mx-4 px-4 py-5">
+              <div className="section-rule">
+                <span>Needs attention</span>
+                <i />
+                <em>{mobileAttention.length}</em>
+              </div>
+              {mobileAttention.length === 0 ? (
+                <p className="mt-3 text-base text-ink-2">
+                  Nothing is blocked or unclaimed.
+                </p>
+              ) : (
+                <>
+                  {mobileUrgent ? mobileExpanded(mobileUrgent) : null}
+                  {mobileAttention
+                    .filter((r) => r.task._id !== mobileUrgent?.task._id)
+                    .slice(0, attentionAll ? undefined : 0)
+                    .map((row) =>
+                      expandedTaskId === String(row.task._id)
+                        ? mobileExpanded(row)
+                        : mobileCollapsed(row),
+                    )}
+                  {!attentionAll && mobileAttention.length > 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => setAttentionAll(true)}
+                      className="mt-1 flex h-11 w-full cursor-pointer items-center border-t border-sage-2 text-base text-brand underline underline-offset-4"
+                    >
+                      {mobileAttention.length - 1} more need attention
+                    </button>
+                  ) : null}
+                </>
+              )}
+            </div>
+
+            {mobileSections.map((section) =>
               section.rows.length === 0 ? null : (
                 <section key={section.id} className="mt-7">
                   <div className="section-rule">
                     <span>{section.label}</span>
                     <i />
-                    {armedPersonId &&
-                    model.assignableTasks(section.rows.map((r) => r.task))
-                      .length > 0 ? (
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() =>
-                          onAssignDish(
-                            model.assignableTasks(
-                              section.rows.map((r) => r.task),
-                            ),
-                          )
-                        }
-                      >
-                        Assign{" "}
-                        {
-                          model.assignableTasks(section.rows.map((r) => r.task))
-                            .length
-                        }{" "}
-                        to {model.personLabel(model.findPerson(armedPersonId))}
-                      </button>
-                    ) : null}
                     <em>{section.rows.length}</em>
                   </div>
-                  {section.rows.map(ledgerRow)}
+                  {section.rows.map((row) =>
+                    expandedTaskId === String(row.task._id)
+                      ? mobileExpanded(row)
+                      : mobileCollapsed(row),
+                  )}
                 </section>
               ),
             )}
-            {horizonTasks.length === 0 ? (
-              <div className="mt-8 max-w-prose">
-                <h2 className="font-display text-2xl text-ink">
-                  No prep matches this view.
-                </h2>
-                <p className="mt-2 text-base text-ink-2">
-                  {model.filterIsActive(filter, assigneeFilter)
-                    ? "Clear the status or assignee filter to see the rest of the board."
-                    : "These services have menus but no prep yet. Sync prep on the right to build the steps from the event menu."}
-                </p>
-              </div>
+
+            {mobileSections.every((s) => s.rows.length === 0) &&
+            mobileAttention.length === 0 ? (
+              <p className="mt-7 text-base text-ink-2">
+                No prep matches this view.
+              </p>
             ) : null}
-          </div>
+          </>
+        )}
+        {/* The bottom tab bar floats over the sheet; keep the last row clear. */}
+        <div className="h-24" aria-hidden="true" />
+      </div>
 
-          <aside className="max-lg:mt-8">
-            <div className="sticky top-2 rounded-md border-2 border-accent bg-panel p-5">
-              {selectedEvent ? (
-                <>
-                  <div className="font-display text-2xl leading-tight text-ink">
-                    {String(selectedEvent.title)}
-                  </div>
-                  <div className="fact-row mt-3 gap-x-5">
-                    <span className="fact">
-                      <b>Service:</b>
-                      {formatDate(Number(selectedEvent.startsAt))}
-                    </span>
-                    <span className="fact">
-                      <b>Covers:</b>
-                      {String(selectedEvent.expectedHeadcount ?? "—")}
-                    </span>
-                  </div>
-                  <div className="fact-row mt-2 gap-x-5">
-                    <span className="fact">
-                      <b>Prep:</b>
-                      {model.progress(selectedEvent._id).completed}/
-                      {model.progress(selectedEvent._id).total} done
-                    </span>
-                    <span className="fact">
-                      <b>Venue:</b>
-                      {venues?.find((v) => v._id === selectedEvent.venueId)
-                        ?.name ?? "No venue"}
-                    </span>
-                  </div>
-                  <div className="mt-4 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm"
-                      disabled={
-                        !prepSyncReady || busy === `sync:${selectedEvent._id}`
-                      }
-                      onClick={onSyncPrep}
-                    >
-                      {busy === `sync:${selectedEvent._id}`
-                        ? "Syncing…"
-                        : "Sync prep"}
-                    </button>
-                    <Link
-                      to={eventMenuRedirectPath(selectedEvent._id)}
-                      className="btn btn-ghost btn-sm"
-                    >
-                      Event menu
-                    </Link>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setSelectedEventId("")}
-                    >
-                      Every service
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="font-display text-2xl leading-tight text-ink">
-                    Every service in the window
-                  </div>
-                  <p className="mt-2 text-base text-ink-2">
-                    Pick a service from the toolbar or a row to work it on its
-                    own.
-                  </p>
-                </>
-              )}
-
-              <div className="section-rule mt-6">
-                <span>Crew</span>
-                <i />
-                <em>{assignableInView} assignable</em>
-              </div>
-              {crewRows.length === 0 ? (
-                <p className="mt-3 text-base text-ink-2">
-                  Nobody holds prep in this window. Arm a cook, then assign.
-                </p>
-              ) : (
-                <div className="mt-1">
-                  {crewRows.map((crew) => {
-                    const id = String(crew.person._id);
-                    const armed = armedPersonId === id;
-                    return (
-                      <button
-                        key={id}
-                        type="button"
-                        aria-pressed={armed}
-                        onClick={() => setArmedPersonId(armed ? null : id)}
-                        className={`flex w-full cursor-pointer items-baseline justify-between gap-3 border-t border-line py-3 text-left ${
-                          armed ? "text-brand" : "hover:bg-inset"
-                        }`}
-                      >
-                        <span className="min-w-0">
-                          <span className="block truncate text-base text-ink">
-                            {model.personLabel(crew.person)}
-                          </span>
-                          <span className="block text-sm text-ink-2">
-                            {crew.inProgress} doing · {crew.claimed} claimed ·{" "}
-                            {crew.completed} done
-                          </span>
-                        </span>
-                        <span className="shrink-0 text-sm font-semibold text-ink-2">
-                          {armed ? "Armed" : `${crew.load} open`}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+      <div className="max-md:hidden">
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+          <div>
+            <h1 className="display-title text-ink">Kitchen</h1>
+            <div className="fact-row mt-3">
+              <span className="fact">
+                <b>Window:</b>
+                {formatDate(horizon.start().getTime())} + 7 days
+              </span>
+              <span className="fact">
+                <b>Services:</b>
+                {horizonEvents.length}
+              </span>
+              <span className="fact">
+                <b>Prep open:</b>
+                {openTotal}
+              </span>
+              <span className="fact">
+                <b>Blocked:</b>
+                <span
+                  className={blockedTotal > 0 ? "font-medium text-danger" : ""}
+                >
+                  {blockedTotal}
+                </span>
+              </span>
             </div>
-          </aside>
+          </div>
+          <Link to="/kitchen/yield" className="btn btn-ghost">
+            Yield variance
+          </Link>
         </div>
-      )}
+
+        {/* One ruled toolbar: window, status, event, assignee. */}
+        <div className="mt-6 border-y border-line">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((v) => !v)}
+            aria-expanded={filtersOpen}
+            className="flex h-11 w-full cursor-pointer items-center justify-between text-sm font-semibold tracking-[0.09em] text-ink uppercase md:hidden"
+          >
+            Filters
+            <span className="text-ink-2 font-normal tracking-normal normal-case">
+              {horizonOffset === 0
+                ? "From today"
+                : formatDate(horizon.start().getTime())}
+              {filter !== "all" ? ` · ${filter}` : ""}
+            </span>
+          </button>
+          <div
+            className={`flex-wrap items-center gap-x-5 gap-y-3 py-3 max-md:pb-4 md:flex ${
+              filtersOpen ? "flex" : "hidden"
+            }`}
+          >
+            <fieldset className="kcd-horizon-nav">
+              <legend>Window</legend>
+              <button
+                type="button"
+                onClick={() => setHorizonOffset((v) => v - 7)}
+              >
+                Earlier
+              </button>
+              <button
+                type="button"
+                data-active={horizonOffset === 0 ? "true" : "false"}
+                onClick={() => setHorizonOffset(0)}
+              >
+                From today
+              </button>
+              <button
+                type="button"
+                onClick={() => setHorizonOffset((v) => v + 7)}
+              >
+                Later
+              </button>
+              <BoundedDateInput
+                aria-label="Jump to date"
+                title="Jump to date"
+                value={horizon.startDateValue()}
+                onChange={(e) => {
+                  const offset = KitchenCommandDeckHorizon.offsetForDateValue(
+                    e.target.value,
+                  );
+                  if (offset != null) setHorizonOffset(offset);
+                }}
+              />
+            </fieldset>
+            <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
+            <label className="kcd-field">
+              <span>Event</span>
+              <select
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
+                aria-label="Filter by event"
+              >
+                <option value="">Every service</option>
+                {horizonEvents.map((e) => (
+                  <option key={e._id} value={e._id}>
+                    {String(e.title)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="kcd-field">
+              <span>Assignee</span>
+              <select
+                value={assigneeFilter}
+                onChange={(e) => setAssigneeFilter(e.target.value)}
+              >
+                <option value="">Anyone</option>
+                {(people ?? [])
+                  .filter((person) => person.deletedAt == null)
+                  .map((person) => (
+                    <option key={person._id} value={person._id}>
+                      {model.personLabel(person)}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        {failure ? (
+          <div className="mt-4">
+            <CulinaryFailureBanner error={failure} />
+          </div>
+        ) : null}
+
+        {loading ? (
+          <div className="mt-6">
+            <TableSkeleton rows={8} />
+          </div>
+        ) : horizonEvents.length === 0 ? (
+          <div className="mt-10 max-w-prose">
+            <h2 className="font-display text-3xl text-ink">
+              No service in this window.
+            </h2>
+            <p className="mt-2 text-base text-ink-2">
+              Nothing is booked between {formatDate(horizon.start().getTime())}{" "}
+              and {formatDate(horizon.start().getTime() + 6 * 86_400_000)}. Move
+              the window, or open the events book to see what is coming.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => setHorizonOffset((v) => v + 7)}
+              >
+                Next 7 days
+              </button>
+              <Link to={eventsIndexPath()} className="btn btn-ghost">
+                Open the events book
+              </Link>
+            </div>
+          </div>
+        ) : (
+          // Split workbench: the ledger reads left, the selected service works
+          // right — Galley's two-pane treatment, the active pane marked.
+          <div className="mt-2 grid grid-cols-[minmax(0,1fr)_368px] gap-x-9 max-lg:grid-cols-1">
+            <div>
+              {sections.map((section) =>
+                section.rows.length === 0 ? null : (
+                  <section key={section.id} className="mt-7">
+                    <div className="section-rule">
+                      <span>{section.label}</span>
+                      <i />
+                      {armedPersonId &&
+                      model.assignableTasks(section.rows.map((r) => r.task))
+                        .length > 0 ? (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          onClick={() =>
+                            onAssignDish(
+                              model.assignableTasks(
+                                section.rows.map((r) => r.task),
+                              ),
+                            )
+                          }
+                        >
+                          Assign{" "}
+                          {
+                            model.assignableTasks(
+                              section.rows.map((r) => r.task),
+                            ).length
+                          }{" "}
+                          to{" "}
+                          {model.personLabel(model.findPerson(armedPersonId))}
+                        </button>
+                      ) : null}
+                      <em>{section.rows.length}</em>
+                    </div>
+                    {section.rows.map(ledgerRow)}
+                  </section>
+                ),
+              )}
+              {horizonTasks.length === 0 ? (
+                <div className="mt-8 max-w-prose">
+                  <h2 className="font-display text-2xl text-ink">
+                    No prep matches this view.
+                  </h2>
+                  <p className="mt-2 text-base text-ink-2">
+                    {model.filterIsActive(filter, assigneeFilter)
+                      ? "Clear the status or assignee filter to see the rest of the board."
+                      : "These services have menus but no prep yet. Sync prep on the right to build the steps from the event menu."}
+                  </p>
+                </div>
+              ) : null}
+            </div>
+
+            <aside className="max-lg:mt-8">
+              <div className="sticky top-2 rounded-md border-2 border-accent bg-panel p-5">
+                {selectedEvent ? (
+                  <>
+                    <div className="font-display text-2xl leading-tight text-ink">
+                      {String(selectedEvent.title)}
+                    </div>
+                    <div className="fact-row mt-3 gap-x-5">
+                      <span className="fact">
+                        <b>Service:</b>
+                        {formatDate(Number(selectedEvent.startsAt))}
+                      </span>
+                      <span className="fact">
+                        <b>Covers:</b>
+                        {String(selectedEvent.expectedHeadcount ?? "—")}
+                      </span>
+                    </div>
+                    <div className="fact-row mt-2 gap-x-5">
+                      <span className="fact">
+                        <b>Prep:</b>
+                        {model.progress(selectedEvent._id).completed}/
+                        {model.progress(selectedEvent._id).total} done
+                      </span>
+                      <span className="fact">
+                        <b>Venue:</b>
+                        {venues?.find((v) => v._id === selectedEvent.venueId)
+                          ?.name ?? "No venue"}
+                      </span>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        className="btn btn-primary btn-sm"
+                        disabled={
+                          !prepSyncReady || busy === `sync:${selectedEvent._id}`
+                        }
+                        onClick={onSyncPrep}
+                      >
+                        {busy === `sync:${selectedEvent._id}`
+                          ? "Syncing…"
+                          : "Sync prep"}
+                      </button>
+                      <Link
+                        to={eventMenuRedirectPath(selectedEvent._id)}
+                        className="btn btn-ghost btn-sm"
+                      >
+                        Event menu
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => setSelectedEventId("")}
+                      >
+                        Every service
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="font-display text-2xl leading-tight text-ink">
+                      Every service in the window
+                    </div>
+                    <p className="mt-2 text-base text-ink-2">
+                      Pick a service from the toolbar or a row to work it on its
+                      own.
+                    </p>
+                  </>
+                )}
+
+                <div className="section-rule mt-6">
+                  <span>Crew</span>
+                  <i />
+                  <em>{assignableInView} assignable</em>
+                </div>
+                {crewRows.length === 0 ? (
+                  <p className="mt-3 text-base text-ink-2">
+                    Nobody holds prep in this window. Arm a cook, then assign.
+                  </p>
+                ) : (
+                  <div className="mt-1">
+                    {crewRows.map((crew) => {
+                      const id = String(crew.person._id);
+                      const armed = armedPersonId === id;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          aria-pressed={armed}
+                          onClick={() => setArmedPersonId(armed ? null : id)}
+                          className={`flex w-full cursor-pointer items-baseline justify-between gap-3 border-t border-line py-3 text-left ${
+                            armed ? "text-brand" : "hover:bg-inset"
+                          }`}
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate text-base text-ink">
+                              {model.personLabel(crew.person)}
+                            </span>
+                            <span className="block text-sm text-ink-2">
+                              {crew.inProgress} doing · {crew.claimed} claimed ·{" "}
+                              {crew.completed} done
+                            </span>
+                          </span>
+                          <span className="shrink-0 text-sm font-semibold text-ink-2">
+                            {armed ? "Armed" : `${crew.load} open`}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </aside>
+          </div>
+        )}
+      </div>
 
       {toast ? <output className="kcd-toast">{toast}</output> : null}
     </div>
