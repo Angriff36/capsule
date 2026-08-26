@@ -162,9 +162,11 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               ([, value]) => value != null && Number(value) > 0,
             ),
           );
-          const pendingNutrition =
-            scaleNutritionFromGramsToUnit(gramNutrition, unit) ?? gramNutrition;
-          if (Object.keys(pendingNutrition).length > 0) {
+          const pendingNutrition = scaleNutritionFromGramsToUnit(
+            gramNutrition,
+            unit,
+          );
+          if (pendingNutrition && Object.keys(pendingNutrition).length > 0) {
             await setIngredientNutrition({
               docId: created.docId,
               version: ingredientVersion,

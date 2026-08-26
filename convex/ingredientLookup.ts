@@ -347,12 +347,23 @@ export const applyToIngredient = action({
     doc = await ctx.runQuery(api.queries.getIngredient, { id: args.docId });
     if (!doc) throw new Error("Ingredient not found");
 
-    await ctx.runMutation(api.mutations.Ingredient_classifyAllergens, {
-      docId: args.docId,
-      version: doc.version,
-      allergens: args.profile.allergens,
-      isGlutenFree: args.profile.isGlutenFree,
-    });
+    const incomingAllergens = args.profile.allergens;
+    const shouldUpdateAllergens =
+      incomingAllergens.length > 0 || args.profile.isGlutenFree;
+    if (shouldUpdateAllergens) {
+      await ctx.runMutation(api.mutations.Ingredient_classifyAllergens, {
+        docId: args.docId,
+        version: doc.version,
+        allergens:
+          incomingAllergens.length > 0
+            ? incomingAllergens
+            : (doc.allergens ?? []),
+        isGlutenFree: args.profile.isGlutenFree,
+      });
+    }
+
+    doc = await ctx.runQuery(api.queries.getIngredient, { id: args.docId });
+    if (!doc) throw new Error("Ingredient not found");
 
     const nutritionEntries = Object.entries(args.profile.nutrition).filter(
       ([, value]) => value != null && Number(value) > 0,

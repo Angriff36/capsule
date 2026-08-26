@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStorageUrls } from "../../lib/fileStorageClient";
 import type { IngredientCatalogRow } from "./IngredientCatalogLabel";
 
@@ -93,6 +93,19 @@ export function IngredientOptionPicker({
     if (onChange) onChange(id);
     else setInternalValue(id);
   };
+
+  useEffect(() => {
+    const form = document
+      .querySelector(`input[name="${name}"]`)
+      ?.closest("form");
+    if (!form || onChange) return;
+    const resetSelection = () => {
+      setInternalValue("");
+      setFilter("");
+    };
+    form.addEventListener("reset", resetSelection);
+    return () => form.removeEventListener("reset", resetSelection);
+  }, [name, onChange]);
 
   return (
     <div className="space-y-2">

@@ -4,6 +4,7 @@ import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 const KITCHEN_LOOKUP_ROLES = new Set([
   "admin",
   "owner",
+  "system",
   "kitchen_lead",
   "kitchen_manager",
   "kitchen_staff",
