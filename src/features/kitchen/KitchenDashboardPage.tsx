@@ -422,6 +422,15 @@ export function KitchenDashboardPage() {
     (r) => String(r.task.status) === "blocked",
   ).length;
   const mobileServices = selectedEventId ? 1 : horizonEvents.length;
+  const sheetTotals = useMemo(() => {
+    const s2 = horizonTasks.map((r) => String(r.task.status));
+    return {
+      total: s2.length,
+      doing: s2.filter((x) => x === "in_progress" || x === "claimed").length,
+      blocked: s2.filter((x) => x === "blocked").length,
+      done: s2.filter((x) => x === "completed").length,
+    };
+  }, [horizonTasks]);
 
   const mobileSections = useMemo(() => {
     const inProgress: LedgerRow[] = [];
@@ -441,6 +450,87 @@ export function KitchenDashboardPage() {
       { id: "m-done", label: "Completed", rows: done },
     ];
   }, [horizonTasks, mobileAttention]);
+
+  // ── The printed prep sheet ────────────────────────────────────────────
+  // work/list3.jpg and list5.jpg: category, then the item with its portion
+  // basis, then that item's steps in order, each with its own quantity/unit.
+  // The transcription in work/prep-lists-from-photos.csv names the columns.
+  const SHEET_ORDER = [
+    "Finish at Kitchen",
+    "Finish at Event",
+    "Drop Off",
+    "Drop Off Items",
+    "Bev - Non Alcohol",
+    "Side Items",
+  ];
+
+  const prepSheet = useMemo(() => {
+    const dishName = (id: unknown) =>
+      dishes?.find((d) => d._id === String(id))?.name ?? null;
+    const byCategory = new Map<string, Map<string, LedgerRow[]>>();
+    for (const row of horizonTasks) {
+      const category = String(row.task.category ?? "Other");
+      const itemKey = String(
+        row.task.eventDishId ?? row.task.dishId ?? row.task._id,
+      );
+      let items = byCategory.get(category);
+      if (!items) byCategory.set(category, (items = new Map()));
+      const steps = items.get(itemKey);
+      if (steps) steps.push(row);
+      else items.set(itemKey, [row]);
+    }
+    const rank = (c: string) => {
+      const i = SHEET_ORDER.indexOf(c);
+      return i < 0 ? SHEET_ORDER.length : i;
+    };
+    return [...byCategory.entries()]
+      .sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]))
+      .map(([category, items]) => {
+        const built = [...items.entries()].map(([key, steps]) => {
+          const first = steps[0]!;
+          const servings = eventDishes?.find(
+            (ed) => ed._id === String(first.task.eventDishId),
+          )?.quantityServings;
+          return {
+            key,
+            // The sheet prints the ITEM (the dish); the step text is the row.
+            name: (
+              dishName(first.task.dishId) ??
+              String(first.task.name).split("—")[0] ??
+              "Item"
+            )
+              .trim()
+              .toUpperCase(),
+            portionBasis:
+              servings != null ? `P: ${Number(servings)} Serving` : null,
+            steps,
+          };
+        });
+        const all = built.flatMap((i) => i.steps);
+        return {
+          category,
+          items: built,
+          totalSteps: all.length,
+          doneSteps: all.filter((r) => String(r.task.status) === "completed")
+            .length,
+        };
+      });
+  }, [horizonTasks, dishes, eventDishes]);
+
+  /** The sheet never repeats the item in its own steps: the heading already
+   *  says CHICKEN ROULADE, so the step reads "PIPE PESTO CREAM", not
+   *  "PIPE PESTO CREAM — Chicken Roulade". */
+  const stepText = (raw: unknown, itemName: string) => {
+    const text = String(raw ?? "").trim();
+    const cut = text.split(/\s+[—-]\s+/);
+    if (cut.length > 1) {
+      const tail = cut[cut.length - 1]!.trim().toUpperCase();
+      if (tail && itemName.includes(tail)) {
+        return cut.slice(0, -1).join(" — ").trim();
+      }
+    }
+    return text;
+  };
 
   /** Prep names arrive shouting from the recipe import; calm them down. */
   const sentenceCase = (raw: unknown) => {
@@ -686,30 +776,29 @@ export function KitchenDashboardPage() {
         {loading ? null : (
           <div className="mt-4 grid grid-cols-4 gap-2">
             {[
+              // A prep sheet is measured in steps, not tickets.
               {
-                // Mirrors the sections below. A strip counting something
-                // other than the lists under it is just noise.
-                id: "m-band",
-                label: "Attention",
-                n: mobileAttention.length,
-                tone: mobileBlocked > 0 ? "text-danger" : "text-ink",
+                id: "m-steps",
+                label: "Steps",
+                n: sheetTotals.total,
+                tone: "text-ink",
               },
               {
-                id: "m-active",
+                id: "m-doing",
                 label: "Doing",
-                n: mobileSections[0].rows.length,
+                n: sheetTotals.doing,
                 tone: "text-warn",
               },
               {
-                id: "m-next",
-                label: "To do",
-                n: mobileSections[1].rows.length,
-                tone: "text-ink",
+                id: "m-blocked",
+                label: "Blocked",
+                n: sheetTotals.blocked,
+                tone: sheetTotals.blocked > 0 ? "text-danger" : "text-ink-3",
               },
               {
                 id: "m-done",
                 label: "Done",
-                n: mobileSections[2].rows.length,
+                n: sheetTotals.done,
                 tone: "text-ok",
               },
             ].map((c) => (
@@ -721,7 +810,7 @@ export function KitchenDashboardPage() {
                     .getElementById(c.id)
                     ?.scrollIntoView({ block: "start" })
                 }
-                className="flex h-16 cursor-pointer flex-col items-start justify-center rounded-sm bg-inset px-3"
+                className="flex h-16 flex-col items-start justify-center rounded-sm bg-inset px-3"
               >
                 <span className={`font-mono text-xl leading-none ${c.tone}`}>
                   {c.n}
@@ -761,51 +850,129 @@ export function KitchenDashboardPage() {
           </div>
         ) : (
           <>
-            {/* The attention band, same pale sage as Today's service. */}
-            <div id="m-band" className="attention-band mt-5 -mx-4 px-4 py-5">
-              <div className="section-rule">
-                <span>Needs attention</span>
-                <i />
-                <em>{mobileAttention.length}</em>
-              </div>
-              {mobileAttention.length === 0 ? (
-                <p className="mt-3 text-base text-ink-2">
-                  Nothing is blocked or unclaimed.
-                </p>
-              ) : (
-                <>
-                  {mobileAttention.map((row) =>
-                    expandedTaskId === String(row.task._id)
-                      ? mobileExpanded(row)
-                      : mobileCollapsed(row),
-                  )}
-                </>
-              )}
-            </div>
-
-            {mobileSections.map((section) =>
-              section.rows.length === 0 ? null : (
-                <section key={section.id} id={section.id} className="mt-7">
-                  <div className="section-rule">
-                    <span>{section.label}</span>
-                    <i />
-                    <em>{section.rows.length}</em>
-                  </div>
-                  {section.rows.map((row) =>
-                    expandedTaskId === String(row.task._id)
-                      ? mobileExpanded(row)
-                      : mobileCollapsed(row),
-                  )}
-                </section>
-              ),
-            )}
-
-            {mobileSections.every((s) => s.rows.length === 0) &&
-            mobileAttention.length === 0 ? (
+            {/* The printed prep sheet, on a phone: category, then item with
+                its portion basis, then the steps — quantity on the left,
+                instruction reading across. Same shape as work/list3.jpg. */}
+            {prepSheet.length === 0 ? (
               <p className="mt-7 text-base text-ink-2">
                 No prep matches this view.
               </p>
-            ) : null}
+            ) : (
+              prepSheet.map((group) => (
+                <section key={group.category} className="mt-7">
+                  <div className="section-rule">
+                    <span>{group.category}</span>
+                    <i />
+                    <em>
+                      {group.doneSteps}/{group.totalSteps}
+                    </em>
+                  </div>
+
+                  {group.items.map((item) => (
+                    <div key={item.key} className="mt-4">
+                      <div className="flex items-baseline justify-between gap-3 border-b border-line-2 pb-1.5">
+                        <h3 className="font-display text-xl leading-snug text-ink">
+                          {item.name}
+                        </h3>
+                        {item.portionBasis ? (
+                          <span className="font-mono shrink-0 text-sm text-ink-2">
+                            {item.portionBasis}
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {item.steps.map((row) => {
+                        const status = String(row.task.status);
+                        const done = status === "completed";
+                        const blocked = status === "blocked";
+                        const action = nextAction(row);
+                        const busyHere =
+                          busy === `claim:${row.task._id}` ||
+                          busy === `start:${row.task._id}` ||
+                          busy === `complete:${row.task._id}` ||
+                          busy === `assign:${row.task._id}`;
+                        const owner = row.task.assignedToId
+                          ? model.personLabel(
+                              model.findPerson(String(row.task.assignedToId)),
+                            )
+                          : null;
+                        return (
+                          <button
+                            key={String(row.task._id)}
+                            type="button"
+                            disabled={busyHere || !action}
+                            onClick={() => action?.run()}
+                            className="flex w-full items-start gap-3 border-b border-line py-3 text-left disabled:cursor-default"
+                          >
+                            {/* Hand-ticked on paper; tapped here. */}
+                            <span
+                              aria-hidden="true"
+                              className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border ${
+                                done
+                                  ? "border-ok bg-ok text-white"
+                                  : blocked
+                                    ? "border-danger text-danger"
+                                    : "border-line-2 text-ink-3"
+                              }`}
+                            >
+                              {done ? "✓" : blocked ? "!" : ""}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="flex flex-wrap items-baseline gap-x-2">
+                                <span className="font-mono shrink-0 text-base text-ink">
+                                  {row.task.quantity != null
+                                    ? `${row.task.quantity} ${row.task.unit ?? ""}`.trim()
+                                    : "—"}
+                                </span>
+                                <span
+                                  className={`text-base ${
+                                    done
+                                      ? "text-ink-3 line-through"
+                                      : "text-ink"
+                                  }`}
+                                >
+                                  {stepText(row.task.name, item.name)}
+                                </span>
+                              </span>
+                              {row.task.specialInstructions ? (
+                                <span className="mt-0.5 block text-sm text-ink-2">
+                                  {String(row.task.specialInstructions)}
+                                </span>
+                              ) : null}
+                              {blocked ? (
+                                <span className="mt-0.5 block text-sm text-danger">
+                                  {String(
+                                    (
+                                      row.task as {
+                                        blockReason?: string | null;
+                                      }
+                                    ).blockReason ?? "Blocked",
+                                  )}
+                                </span>
+                              ) : null}
+                              {owner || action ? (
+                                <span className="mt-1 flex flex-wrap items-baseline gap-x-3">
+                                  {owner ? (
+                                    <span className="text-sm text-ink-2">
+                                      {owner}
+                                    </span>
+                                  ) : null}
+                                  {action ? (
+                                    <span className="text-sm font-semibold text-brand">
+                                      {busyHere ? "Working…" : action.label}
+                                    </span>
+                                  ) : null}
+                                </span>
+                              ) : null}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </section>
+              ))
+            )}
           </>
         )}
         {/* The bottom tab bar floats over the sheet; keep the last row clear. */}
