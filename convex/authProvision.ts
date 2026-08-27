@@ -17,12 +17,8 @@ import {
 } from "./lib/staffSignInMailer";
 import { StaffSignInPasswordFactory } from "./lib/staffSignInPassword";
 
-const CAN_PROVISION = new Set([
-  "admin",
-  "owner",
-  "system",
-  "workforce_manager",
-]);
+const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
+const CAN_PROVISION = new Set([...ADMIN_ROLES, "workforce_manager"]);
 
 export type StaffSignInProvisionResult = {
   emailed: true;
@@ -44,6 +40,7 @@ export const loadPersonForProvision = internalQuery({
       tenantId: row.tenantId,
       givenName: row.givenName,
       familyName: row.familyName,
+      role: String(row.role ?? ""),
       email: await readStoredEmail(ctx, row.email),
       authSubjectId:
         typeof row.authSubjectId === "string" ? row.authSubjectId : null,
@@ -127,6 +124,9 @@ export const provisionStaffSignIn = action({
     if (!person || !person.email) {
       throw new Error("Team member not found or has no email.");
     }
+    if (ADMIN_ROLES.has(person.role) && !ADMIN_ROLES.has(auth.role)) {
+      throw new Error("Only an admin can send a sign-in for an admin.");
+    }
 
     const directory = new ClerkStaffAccountDirectory(secret);
     const existing = await directory.findByEmail(person.email);
@@ -141,7 +141,9 @@ export const provisionStaffSignIn = action({
         familyName: person.familyName,
         password: issuedPassword,
       });
-    } else if (!account.passwordEnabled) {
+    } else if (!account.passwordEnabled || !account.hasSignedIn) {
+      // Re-issue until they have actually opened the app so a failed first
+      // email does not leave a password nobody knows.
       issuedPassword = passwords.next();
       await directory.setPassword(account.userId, issuedPassword);
     }

@@ -53,10 +53,7 @@ export class StaffSignInMailer {
         subject: email.subject,
         html: email.html,
         text: email.text,
-        tags: [
-          { name: "category", value: "staff_signin" },
-          { name: "staff_email", value: input.email },
-        ],
+        tags: [{ name: "category", value: "staff_signin" }],
       }),
     });
     if (!response.ok) {
