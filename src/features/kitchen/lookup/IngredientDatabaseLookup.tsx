@@ -38,11 +38,35 @@ function nutritionStatusMessage(
   if (applyResult?.nutritionApplied) {
     return profile.nutritionNote;
   }
-  if (catalogUnit && hasNutrition && !canScaleNutritionToUnit(catalogUnit)) {
-    return `Nutrition from the lookup was not applied — unit "${catalogUnit}" cannot be scaled from per-gram values. Switch to gram, kilogram, ounce, or pound to store nutrition automatically.`;
+  if (
+    catalogUnit &&
+    hasNutrition &&
+    !canScaleNutritionToUnit(catalogUnit) &&
+    !profile.servingGramsPerUnit
+  ) {
+    return `Nutrition from the lookup was not applied — unit "${catalogUnit}" cannot be scaled from per-gram values. Switch to gram, kilogram, ounce, or pound, or pick a product with label serving size.`;
   }
   return profile.nutritionNote;
 }
+
+function imageStatusMessage(
+  profile: IngredientAutofillProfile,
+  applyResult: IngredientLookupApplyResult | void,
+): string {
+  if (applyResult?.imageApplied) {
+    return "Product photo imported.";
+  }
+  if (applyResult && applyResult.imageApplied === false && profile.imageUrl) {
+    return "Product photo could not be imported — upload manually if needed.";
+  }
+  if (profile.imageUrl && !applyResult) {
+    return "Product photo will import when you save this ingredient.";
+  }
+  return profile.imageNote;
+}
+
+/** Wait for a typing pause before hitting USDA/OFF — cuts typo partial searches. */
+const SEARCH_DEBOUNCE_MS = 750;
 
 /** Search USDA FoodData Central and apply autofill to a parent ingredient form. */
 export function IngredientDatabaseLookup({
@@ -108,7 +132,7 @@ export function IngredientDatabaseLookup({
           }
         }
       })();
-    }, 320);
+    }, SEARCH_DEBOUNCE_MS);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
@@ -217,6 +241,7 @@ export function IngredientDatabaseLookup({
         >
           Applied <strong>{applied.profile.name}</strong> from{" "}
           {applied.profile.sourceLabel}. {nutritionMessage}{" "}
+          {imageStatusMessage(applied.profile, applied.applyResult)}{" "}
           {applied.profile.allergenNote}
         </p>
       ) : null}

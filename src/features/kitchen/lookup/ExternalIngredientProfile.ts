@@ -8,6 +8,7 @@ export type IngredientLookupSource = "usda_fdc" | "open_food_facts";
 export type IngredientLookupApplyResult = {
   nutritionApplied: boolean;
   nutritionSkippedReason?: string;
+  imageApplied?: boolean;
 };
 
 export type IngredientAutofillProfile = {
@@ -23,6 +24,9 @@ export type IngredientAutofillProfile = {
   nutritionNote: string;
   allergenNote: string;
   sourceLabel: string;
+  imageUrl?: string;
+  imageNote: string;
+  servingGramsPerUnit?: number;
 };
 
 export type IngredientLookupHit = {

@@ -13,3 +13,7 @@ export function useIngredientLookupGetFoodAutofill() {
 export function useIngredientLookupApplyToIngredient() {
   return useAction(api.ingredientLookup.applyToIngredient);
 }
+
+export function useIngredientLookupApplyImageToIngredient() {
+  return useAction(api.ingredientLookup.applyImageToIngredient);
+}

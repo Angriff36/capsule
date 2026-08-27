@@ -27,9 +27,18 @@ function round(value: number, digits: number) {
 export function scaleNutritionFromGramsToUnit(
   nutrition: NutritionFields,
   unit: string,
+  gramsPerCatalogUnit?: number,
 ): NutritionFields | null {
-  const factor = GRAMS_PER_UNIT[unit];
-  if (!factor) return null;
+  let factor = GRAMS_PER_UNIT[unit];
+  if (
+    factor == null &&
+    unit === "each" &&
+    gramsPerCatalogUnit != null &&
+    gramsPerCatalogUnit > 0
+  ) {
+    factor = gramsPerCatalogUnit;
+  }
+  if (factor == null) return null;
 
   const scaled: NutritionFields = {};
   for (const [key, value] of Object.entries(nutrition) as Array<

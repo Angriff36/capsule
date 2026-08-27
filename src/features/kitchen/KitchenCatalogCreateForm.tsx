@@ -70,6 +70,10 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   const [lookupGramNutrition, setLookupGramNutrition] = useState<
     Partial<IngredientNutritionFields>
   >({});
+  const [lookupImageUrl, setLookupImageUrl] = useState("");
+  const [lookupServingGrams, setLookupServingGrams] = useState<
+    number | undefined
+  >(undefined);
   const scaledLookupNutrition = useMemo(() => {
     const gramFields: NutritionFields = {};
     for (const nutrient of NUTRIENTS) {
@@ -78,8 +82,8 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
         gramFields[nutrient.field] = Number(value);
       }
     }
-    return scaleNutritionFromGramsToUnit(gramFields, unit);
-  }, [lookupGramNutrition, unit]);
+    return scaleNutritionFromGramsToUnit(gramFields, unit, lookupServingGrams);
+  }, [lookupGramNutrition, unit, lookupServingGrams]);
 
   const applyAutofill = (profile: IngredientAutofillProfile) => {
     setName(profile.name);
@@ -96,6 +100,8 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
       return existing;
     });
     setLookupGramNutrition(profile.nutrition);
+    setLookupImageUrl(profile.imageUrl ?? "");
+    setLookupServingGrams(profile.servingGramsPerUnit);
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {
@@ -124,6 +130,20 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 disabled={busy}
                 catalogUnit={unit}
                 onApply={applyAutofill}
+              />
+              <input
+                type="hidden"
+                name="lookupImageUrl"
+                value={lookupImageUrl}
+              />
+              <input
+                type="hidden"
+                name="lookupServingGrams"
+                value={
+                  lookupServingGrams != null && lookupServingGrams > 0
+                    ? String(lookupServingGrams)
+                    : ""
+                }
               />
             </div>
             <label className="field-label">

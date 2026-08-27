@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
+import type { Id } from "../../lib/api";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import {
   useCreateDish,
@@ -45,6 +46,7 @@ import {
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
+import { useIngredientLookupApplyImageToIngredient } from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -76,6 +78,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const createAttachment = useCreateAttachment();
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
+  const applyLookupImage = useIngredientLookupApplyImageToIngredient();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -162,9 +165,18 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               ([, value]) => value != null && Number(value) > 0,
             ),
           );
+          const servingGramsRaw = optional(data.get("lookupServingGrams"));
+          const parsedServingGrams = servingGramsRaw
+            ? Number(servingGramsRaw)
+            : NaN;
+          const servingGramsPerUnit =
+            Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
+              ? parsedServingGrams
+              : undefined;
           const pendingNutrition = scaleNutritionFromGramsToUnit(
             gramNutrition,
             unit,
+            servingGramsPerUnit,
           );
           if (pendingNutrition && Object.keys(pendingNutrition).length > 0) {
             await setIngredientNutrition({
@@ -187,6 +199,26 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                 setPrimaryImage: setIngredientPrimaryImage,
               },
             );
+          } else {
+            const lookupImageUrl = optional(data.get("lookupImageUrl"));
+            if (lookupImageUrl) {
+              const imageResult = await applyLookupImage({
+                docId: created.docId as Id<"ingredients">,
+                imageUrl: lookupImageUrl,
+              });
+              if (!imageResult.imageApplied) {
+                setFailure(
+                  new Error(
+                    "Ingredient saved, but the lookup photo could not be imported.",
+                  ),
+                );
+                notifySuccess(
+                  `Created ${name}. Photo import failed — open the ingredient to upload manually.`,
+                );
+                navigate(ingredientPath(created.docId));
+                return;
+              }
+            }
           }
         } catch (enrichmentError) {
           setFailure(enrichmentError);
