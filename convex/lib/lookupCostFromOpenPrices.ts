@@ -1,4 +1,9 @@
 import { openFoodFactsUserAgent } from "./foodDatabaseClient";
+import {
+  discoverOffBarcodesForProduct,
+  fetchOpenPricesProductMeta,
+} from "./lookupCostBarcodeDiscovery";
+import { resolveTenantCatalogCostFallback } from "./lookupCostTenantFallback";
 
 const OPEN_PRICES_BASE = "https://prices.openfoodfacts.org/api/v1/prices";
 const GRAMS_PER_OZ = 28.3495;
@@ -18,6 +23,13 @@ type OpenPriceRow = {
   };
 };
 
+type TenantIngredientRow = {
+  name?: string | null;
+  category?: string | null;
+  unit?: string | null;
+  costPerUnit?: number | null;
+};
+
 export type LookupCostHint = {
   costPerUnit?: number;
   costNote: string;
@@ -26,10 +38,6 @@ export type LookupCostHint = {
 function normalizeBarcode(raw?: string | null): string | undefined {
   const digits = raw?.replace(/\D/g, "") ?? "";
   return digits.length >= 8 ? digits : undefined;
-}
-
-function roundMoney(value: number): number {
-  return Math.round(value * 100) / 100;
 }
 
 function gramsPerCatalogUnit(
@@ -70,7 +78,7 @@ export function computeCostPerCatalogUnit(
   }
   const catalogGrams = gramsPerCatalogUnit(catalogUnit, servingGramsPerUnit);
   if (catalogGrams == null || catalogGrams <= 0) return null;
-  return roundMoney((packagePrice / packageGrams) * catalogGrams);
+  return Math.round(((packagePrice / packageGrams) * catalogGrams) * 100) / 100;
 }
 
 function pickBestPriceRow(rows: OpenPriceRow[]): OpenPriceRow | undefined {
@@ -114,50 +122,97 @@ async function fetchOpenPrices(barcode: string): Promise<OpenPriceRow[]> {
   return Array.isArray(payload.items) ? payload.items : [];
 }
 
-/** Resolve a catalog unit cost from Open Prices when a barcode match exists. */
-export async function resolveLookupCostHint(
-  barcodeRaw: string | undefined,
+async function resolveOpenPricesCost(
+  barcodeCandidates: string[],
   catalogUnit: string,
   servingGramsPerUnit?: number,
-): Promise<LookupCostHint> {
-  const barcode = normalizeBarcode(barcodeRaw);
-  if (!barcode) {
+): Promise<LookupCostHint | null> {
+  for (const candidate of barcodeCandidates) {
+    const rows = await fetchOpenPrices(candidate);
+    const best = pickBestPriceRow(rows);
+    if (!best?.price) continue;
+
+    let packageGrams = best.product?.product_quantity;
+    if (packageGrams == null || packageGrams <= 0) {
+      const meta = await fetchOpenPricesProductMeta(candidate);
+      packageGrams = meta?.product_quantity;
+    }
+    if (packageGrams == null || packageGrams <= 0) continue;
+
+    const costPerUnit = computeCostPerCatalogUnit(
+      best.price,
+      packageGrams,
+      catalogUnit,
+      servingGramsPerUnit,
+    );
+    if (costPerUnit == null || costPerUnit <= 0) continue;
+
+    const when = best.date ? ` (${best.date})` : "";
     return {
-      costNote:
-        "USDA does not publish retail prices and this record has no barcode — enter cost manually.",
+      costPerUnit,
+      costNote: `Catalog cost from Open Prices retail data (${best.price.toFixed(2)} USD for ${packageGrams} g${when}).`,
     };
   }
+  return null;
+}
 
-  const rows = await fetchOpenPrices(barcode);
-  const best = pickBestPriceRow(rows);
-  if (!best?.price || !best.product?.product_quantity) {
-    return {
-      costNote:
-        "No USD retail price found for this barcode — enter cost manually.",
-    };
-  }
-
-  const packageGrams = best.product.product_quantity;
-  const costPerUnit = computeCostPerCatalogUnit(
-    best.price,
-    packageGrams,
-    catalogUnit,
-    servingGramsPerUnit,
+/** Resolve catalog unit cost from Open Prices, OFF barcode discovery, or tenant catalog. */
+export async function resolveLookupCostHint(args: {
+  barcode?: string;
+  productName: string;
+  brandOwner?: string;
+  category?: string;
+  catalogUnit: string;
+  servingGramsPerUnit?: number;
+  tenantIngredients?: readonly TenantIngredientRow[];
+}): Promise<LookupCostHint> {
+  const barcodeCandidates: string[] = [];
+  const direct = normalizeBarcode(args.barcode);
+  if (direct) barcodeCandidates.push(direct);
+  const discovered = await discoverOffBarcodesForProduct(
+    args.productName,
+    args.brandOwner,
   );
+  for (const code of discovered) {
+    if (!barcodeCandidates.includes(code)) barcodeCandidates.push(code);
+  }
 
-  if (costPerUnit == null || costPerUnit <= 0) {
+  if (barcodeCandidates.length > 0) {
+    const openPrices = await resolveOpenPricesCost(
+      barcodeCandidates,
+      args.catalogUnit,
+      args.servingGramsPerUnit,
+    );
+    if (openPrices?.costPerUnit) return openPrices;
+  }
+
+  const tenantFallback = resolveTenantCatalogCostFallback(
+    args.tenantIngredients ?? [],
+    {
+      productName: args.productName,
+      category: args.category,
+      catalogUnit: args.catalogUnit,
+      excludeName: args.productName,
+    },
+  );
+  if (tenantFallback.costPerUnit != null && tenantFallback.costPerUnit > 0) {
     return {
+      costPerUnit: tenantFallback.costPerUnit,
       costNote:
-        catalogUnit === "each" && !servingGramsPerUnit
-          ? "A retail price was found but cost per each needs a label serving size — enter cost manually or switch unit."
-          : "A retail price was found but could not be scaled to this stock unit — enter cost manually.",
+        tenantFallback.costNote ??
+        "Catalog cost estimated from similar items in your catalog.",
     };
   }
 
-  const currency = best.currency ?? "USD";
-  const when = best.date ? ` (${best.date})` : "";
+  if (barcodeCandidates.length === 0) {
+    return {
+      costNote:
+        "No barcode for retail pricing — try a branded Open Food Facts match; cost will inherit from similar catalog items when available.",
+    };
+  }
+
   return {
-    costPerUnit,
-    costNote: `Catalog cost estimated from Open Prices retail data (${best.price.toFixed(2)} ${currency} for ${packageGrams} g package${when}). Verify before relying on it.`,
+    costNote:
+      "No USD retail price on file for this barcode yet — cost will inherit from similar catalog items when available.",
   };
 }

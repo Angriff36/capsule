@@ -33,8 +33,14 @@ import {
   usdaServingGramsPerEach,
 } from "./lib/servingWeightGrams";
 import { applyCatalogImageFromUrl } from "./lib/ingredientCatalogImageImport";
-import { applyLookupCostToIngredient } from "./lib/ingredientLookupApplyCost";
-import { resolveLookupCostHint } from "./lib/lookupCostFromOpenPrices";
+import {
+  applyLookupCostToIngredient,
+  resolveLookupCostForCreate,
+} from "./lib/ingredientLookupApplyCost";
+import {
+  resolveLookupCostHint,
+  type LookupCostHint,
+} from "./lib/lookupCostFromOpenPrices";
 import {
   scaleNutritionFromGramsToUnit,
   mergeScaledNutritionWithExisting,
@@ -315,8 +321,8 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
     servingGramsPerUnit,
     barcode,
     costNote: barcode
-      ? "Cost imports from Open Prices crowd-sourced retail data when available."
-      : "USDA does not publish retail prices — enter cost manually.",
+      ? "Cost imports automatically from Open Prices or similar items in your catalog."
+      : "Cost imports from similar items in your catalog when available.",
   };
 }
 
@@ -387,7 +393,7 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
     servingGramsPerUnit,
     barcode,
     costNote:
-      "Cost imports from Open Prices crowd-sourced retail data when available.",
+      "Cost imports automatically from Open Prices or similar items in your catalog.",
   };
 }
 
@@ -438,6 +444,7 @@ export const applyToIngredient = action({
       imageUrl: v.optional(v.string()),
       servingGramsPerUnit: v.optional(v.number()),
       barcode: v.optional(v.string()),
+      brandOwner: v.optional(v.string()),
     }),
   },
   handler: async (ctx, args) => {
@@ -526,9 +533,16 @@ export const applyToIngredient = action({
       ctx,
       auth,
       args.docId,
-      args.profile.barcode,
-      String(doc.unit),
-      args.profile.servingGramsPerUnit,
+      {
+        barcode: args.profile.barcode,
+        productName: args.profile.name,
+        brandOwner: args.profile.brandOwner,
+        category:
+          incomingCategory ||
+          (typeof doc.category === "string" ? doc.category : undefined),
+        catalogUnit: String(doc.unit),
+        servingGramsPerUnit: args.profile.servingGramsPerUnit,
+      },
     );
 
     return {
@@ -546,17 +560,53 @@ export const applyToIngredient = action({
 export const resolveLookupCost = action({
   args: {
     barcode: v.optional(v.string()),
+    productName: v.string(),
+    brandOwner: v.optional(v.string()),
+    category: v.optional(v.string()),
     catalogUnit: v.string(),
     servingGramsPerUnit: v.optional(v.number()),
+  },
+  handler: async (ctx, args): Promise<LookupCostHint> => {
+    const auth = await getAuthContext(ctx);
+    requireKitchenStaff(auth);
+    const tenantIngredients = (await ctx.runQuery(
+      api.queries.listIngredient,
+      {},
+    )) as Array<{
+      name?: string | null;
+      category?: string | null;
+      unit?: string | null;
+      costPerUnit?: number | null;
+    }>;
+    return resolveLookupCostHint({
+      barcode: args.barcode,
+      productName: args.productName,
+      brandOwner: args.brandOwner,
+      category: args.category,
+      catalogUnit: args.catalogUnit,
+      servingGramsPerUnit: args.servingGramsPerUnit,
+      tenantIngredients,
+    });
+  },
+});
+
+/** Resolve create-form cost from lookup metadata. */
+export const resolveCreateLookupCost = action({
+  args: {
+    barcode: v.optional(v.string()),
+    productName: v.string(),
+    brandOwner: v.optional(v.string()),
+    category: v.optional(v.string()),
+    catalogUnit: v.string(),
+    servingGramsPerUnit: v.optional(v.number()),
+    formCost: v.number(),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     requireKitchenStaff(auth);
-    return resolveLookupCostHint(
-      args.barcode,
-      args.catalogUnit,
-      args.servingGramsPerUnit,
-    );
+    return {
+      costPerUnit: await resolveLookupCostForCreate(ctx, args),
+    };
   },
 });
 
@@ -565,20 +615,16 @@ export const applyCostToIngredient = action({
   args: {
     docId: v.id("ingredients"),
     barcode: v.optional(v.string()),
+    productName: v.string(),
+    brandOwner: v.optional(v.string()),
+    category: v.optional(v.string()),
     catalogUnit: v.string(),
     servingGramsPerUnit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     requireKitchenStaff(auth);
-    return applyLookupCostToIngredient(
-      ctx,
-      auth,
-      args.docId,
-      args.barcode,
-      args.catalogUnit,
-      args.servingGramsPerUnit,
-    );
+    return applyLookupCostToIngredient(ctx, auth, args.docId, args);
   },
 });
 

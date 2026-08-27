@@ -43,7 +43,9 @@ import type * as lib_ingredientCatalogImageImport from "../lib/ingredientCatalog
 import type * as lib_ingredientLookupApplyCost from "../lib/ingredientLookupApplyCost.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
+import type * as lib_lookupCostBarcodeDiscovery from "../lib/lookupCostBarcodeDiscovery.js";
 import type * as lib_lookupCostFromOpenPrices from "../lib/lookupCostFromOpenPrices.js";
+import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallback.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
@@ -119,7 +121,9 @@ declare const fullApi: ApiFromModules<{
   "lib/ingredientLookupApplyCost": typeof lib_ingredientLookupApplyCost;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
+  "lib/lookupCostBarcodeDiscovery": typeof lib_lookupCostBarcodeDiscovery;
   "lib/lookupCostFromOpenPrices": typeof lib_lookupCostFromOpenPrices;
+  "lib/lookupCostTenantFallback": typeof lib_lookupCostTenantFallback;
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;

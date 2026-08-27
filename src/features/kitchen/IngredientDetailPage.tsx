@@ -411,6 +411,7 @@ export function IngredientDetailPage() {
                     imageUrl: profile.imageUrl,
                     servingGramsPerUnit: profile.servingGramsPerUnit,
                     barcode: profile.barcode,
+                    brandOwner: profile.brandOwner,
                   },
                 });
               } catch (error) {

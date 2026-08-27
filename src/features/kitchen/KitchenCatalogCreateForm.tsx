@@ -75,6 +75,8 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     number | undefined
   >(undefined);
   const [lookupBarcode, setLookupBarcode] = useState("");
+  const [lookupBrandOwner, setLookupBrandOwner] = useState("");
+  const [lookupCategory, setLookupCategory] = useState("");
   const scaledLookupNutrition = useMemo(() => {
     const gramFields: NutritionFields = {};
     for (const nutrient of NUTRIENTS) {
@@ -104,6 +106,8 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     setLookupImageUrl(profile.imageUrl ?? "");
     setLookupServingGrams(profile.servingGramsPerUnit);
     setLookupBarcode(profile.barcode ?? "");
+    setLookupBrandOwner(profile.brandOwner ?? "");
+    setLookupCategory(profile.category ?? "");
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {
@@ -148,6 +152,17 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 }
               />
               <input type="hidden" name="lookupBarcode" value={lookupBarcode} />
+              <input
+                type="hidden"
+                name="lookupBrandOwner"
+                value={lookupBrandOwner}
+              />
+              <input
+                type="hidden"
+                name="lookupCategory"
+                value={lookupCategory}
+              />
+              <input type="hidden" name="lookupProductName" value={name} />
             </div>
             <label className="field-label">
               Name

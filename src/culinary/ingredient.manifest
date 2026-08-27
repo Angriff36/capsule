@@ -239,7 +239,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   command updateCosting(costPerUnit: money(12, 2)) {
     guard self.status == "active"
     guard self.deletedAt == null
-    guard roleAllows(user.role, "kitchenManageAccess")
+    guard roleAllows(user.role, "kitchenAccess")
     constraint costingNonnegative: costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
     compute previousCostPerUnit = self.costPerUnit
     mutate costPerUnit = costPerUnit

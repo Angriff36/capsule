@@ -46,7 +46,10 @@ import {
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
-import { useIngredientLookupApplyImageToIngredient } from "../../lib/ingredientLookupClient";
+import {
+  useIngredientLookupApplyImageToIngredient,
+  useIngredientLookupResolveCreateCost,
+} from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -79,6 +82,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
   const applyLookupImage = useIngredientLookupApplyImageToIngredient();
+  const resolveCreateLookupCost = useIngredientLookupResolveCreateCost();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -157,10 +161,24 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
             ? parsedServingGrams
             : undefined;
+        const lookupProductName =
+          optional(data.get("lookupProductName")) ?? name;
+        const formCost = Number(data.get("costPerUnit"));
+        const resolvedCost = await resolveCreateLookupCost({
+          barcode: optional(data.get("lookupBarcode")),
+          productName: lookupProductName,
+          brandOwner: optional(data.get("lookupBrandOwner")),
+          category:
+            optional(data.get("lookupCategory")) ??
+            optional(data.get("category")),
+          catalogUnit: unit,
+          servingGramsPerUnit,
+          formCost: Number.isFinite(formCost) && formCost >= 0 ? formCost : 0,
+        });
         const created = (await createIngredient({
           name,
           unit: unit as (typeof UNITS)[number],
-          costPerUnit: Number(data.get("costPerUnit")),
+          costPerUnit: resolvedCost.costPerUnit,
           category: optional(data.get("category")),
           allergens: allergens.length ? allergens : undefined,
           isGlutenFree,

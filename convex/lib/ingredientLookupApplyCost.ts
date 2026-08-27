@@ -1,66 +1,52 @@
 import type { AppAuthContext } from "./authContext";
-import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import type { GenericActionCtx } from "convex/server";
 import type { DataModel, Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
 import { resolveLookupCostHint } from "./lookupCostFromOpenPrices";
 
-const KITCHEN_MANAGE_ROLES = new Set([
-  "admin",
-  "owner",
-  "system",
-  "kitchen_lead",
-  "kitchen_manager",
-]);
-
 type ApplyCtx = Pick<GenericActionCtx<DataModel>, "runMutation" | "runQuery">;
-
-function canManageIngredientCost(auth: AppAuthContext): boolean {
-  if (!auth.tenantId || auth.role === "anonymous") return false;
-  if (orgCapabilityDeniesAction("kitchenAccess", auth.disabledCapabilities)) {
-    return false;
-  }
-  return KITCHEN_MANAGE_ROLES.has(auth.role);
-}
 
 export async function applyLookupCostToIngredient(
   ctx: ApplyCtx,
-  auth: AppAuthContext,
+  _auth: AppAuthContext,
   docId: Id<"ingredients">,
-  barcode: string | undefined,
-  catalogUnit: string,
-  servingGramsPerUnit?: number,
+  args: {
+    barcode?: string;
+    productName: string;
+    brandOwner?: string;
+    category?: string;
+    catalogUnit: string;
+    servingGramsPerUnit?: number;
+  },
 ): Promise<{
   costApplied: boolean;
   costNote: string;
   suggestedCostPerUnit?: number;
 }> {
-  const hint = await resolveLookupCostHint(
-    barcode,
-    catalogUnit,
-    servingGramsPerUnit,
-  );
+  const doc = await ctx.runQuery(api.queries.getIngredient, { id: docId });
+  if (!doc) throw new Error("Ingredient not found");
+
+  const tenantIngredients = await ctx.runQuery(api.queries.listIngredient, {});
+  const hint = await resolveLookupCostHint({
+    barcode: args.barcode,
+    productName: args.productName,
+    brandOwner: args.brandOwner,
+    category: args.category ?? (typeof doc.category === "string" ? doc.category : undefined),
+    catalogUnit: args.catalogUnit,
+    servingGramsPerUnit: args.servingGramsPerUnit,
+    tenantIngredients,
+  });
+
   if (hint.costPerUnit == null || hint.costPerUnit <= 0) {
     return { costApplied: false, costNote: hint.costNote };
   }
-
-  const doc = await ctx.runQuery(api.queries.getIngredient, { id: docId });
-  if (!doc) throw new Error("Ingredient not found");
 
   const existingCost = Number(doc.costPerUnit ?? 0);
   if (existingCost > 0) {
     return {
       costApplied: false,
       suggestedCostPerUnit: hint.costPerUnit,
-      costNote: `Existing catalog cost kept (${existingCost.toFixed(2)}). Lookup estimate was ${hint.costPerUnit.toFixed(2)} — update manually if you prefer it.`,
-    };
-  }
-
-  if (!canManageIngredientCost(auth)) {
-    return {
-      costApplied: false,
-      suggestedCostPerUnit: hint.costPerUnit,
-      costNote: `Suggested catalog cost ${hint.costPerUnit.toFixed(2)} per ${catalogUnit} — enter it in Catalog Costing below (manager role required to auto-save).`,
+      costNote: `Existing catalog cost kept (${existingCost.toFixed(2)}). Lookup estimate was ${hint.costPerUnit.toFixed(2)}.`,
     };
   }
 
@@ -74,7 +60,7 @@ export async function applyLookupCostToIngredient(
     return {
       costApplied: false,
       suggestedCostPerUnit: hint.costPerUnit,
-      costNote: `Suggested catalog cost ${hint.costPerUnit.toFixed(2)} per ${catalogUnit} — save it manually in Catalog Costing.`,
+      costNote: `Lookup found ${hint.costPerUnit.toFixed(2)} per ${args.catalogUnit} but could not save — retry Save cost below.`,
     };
   }
 
@@ -83,4 +69,32 @@ export async function applyLookupCostToIngredient(
     suggestedCostPerUnit: hint.costPerUnit,
     costNote: hint.costNote,
   };
+}
+
+export async function resolveLookupCostForCreate(
+  ctx: ApplyCtx,
+  args: {
+    barcode?: string;
+    productName: string;
+    brandOwner?: string;
+    category?: string;
+    catalogUnit: string;
+    servingGramsPerUnit?: number;
+    formCost: number;
+  },
+): Promise<number> {
+  if (Number.isFinite(args.formCost) && args.formCost > 0) {
+    return args.formCost;
+  }
+  const tenantIngredients = await ctx.runQuery(api.queries.listIngredient, {});
+  const hint = await resolveLookupCostHint({
+    barcode: args.barcode,
+    productName: args.productName,
+    brandOwner: args.brandOwner,
+    category: args.category,
+    catalogUnit: args.catalogUnit,
+    servingGramsPerUnit: args.servingGramsPerUnit,
+    tenantIngredients,
+  });
+  return hint.costPerUnit != null && hint.costPerUnit > 0 ? hint.costPerUnit : 0;
 }

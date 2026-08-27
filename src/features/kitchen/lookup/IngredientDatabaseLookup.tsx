@@ -206,7 +206,8 @@ export function IngredientDatabaseLookup({
       <p className="text-xs text-ink-3">
         USDA FoodData Central and Open Food Facts. Selecting a result fills
         name, category, nutrition, and allergens when label data is available.
-        Cost imports from Open Prices when the product has a barcode match.
+        Cost imports automatically from Open Prices or similar items already in
+        your catalog when a barcode or category match exists.
       </p>
       {searching ? (
         <p className="text-sm text-ink-2" role="status">

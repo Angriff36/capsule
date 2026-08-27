@@ -63,9 +63,9 @@ export function IngredientCostingEditor({
         {!canEdit && <span>Reinstate to edit</span>}
       </div>
       <p className="max-w-160 text-base text-ink-2">
-        Sets the catalog cost used when no receipt price is available. Changing
-        it needs kitchen manage access. Confirmed receipt prices still come from
-        purchasing receives.
+        Sets the catalog cost used when no receipt price is available. Lookup
+        apply can fill this automatically. Confirmed receipt prices still come
+        from purchasing receives.
       </p>
       <form
         className="mt-4 flex flex-wrap items-end gap-2"
