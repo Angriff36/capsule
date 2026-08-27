@@ -30,13 +30,7 @@
   padding: clamp(1.5rem, 4vw, 3rem);
   border: 1px solid rgb(34 75 67 / 0.15);
   border-radius: 1rem;
-  background:
-    radial-gradient(
-      circle at 84% 22%,
-      rgb(214 147 70 / 0.22),
-      transparent 15rem
-    ),
-    linear-gradient(125deg, #f9f6eb 0%, #eef3e9 60%, #d8e6d8 100%);
+  background: var(--color-inset);
   box-shadow: 0 24px 60px -46px rgb(34 75 67 / 0.75);
 }
 
@@ -140,7 +134,7 @@
 }
 
 .capacity-scoreboard article.is-alert {
-  background: linear-gradient(135deg, #fff9f2, var(--color-danger-soft));
+  background: var(--color-inset);
 }
 
 .capacity-scoreboard span,
@@ -250,15 +244,7 @@
 }
 
 .capacity-day.is-outside {
-  background:
-    linear-gradient(
-      135deg,
-      transparent 48%,
-      rgb(34 75 67 / 0.035) 48%,
-      rgb(34 75 67 / 0.035) 52%,
-      transparent 52%
-    ),
-    #edf0e8;
+  background: #edf0e8;
   background-size: 12px 12px;
 }
 
@@ -410,7 +396,7 @@
   padding: clamp(1.25rem, 3vw, 2rem);
   border: 1px solid rgb(178 74 55 / 0.24);
   border-radius: 0.8rem;
-  background: linear-gradient(125deg, #fffdf7, #fbede7);
+  background: var(--color-inset);
 }
 
 .capacity-conflict-ledger h2 {

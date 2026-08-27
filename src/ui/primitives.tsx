@@ -52,7 +52,7 @@ export function PageHeader({
   return (
     <header className="page-header flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line pb-3">
       <div className="min-w-0">
-        <h1 className="text-xl font-semibold tracking-tight text-ink">
+        <h1 className="font-display text-3xl leading-none tracking-tight text-ink">
           {title}
         </h1>
         {lead ? <p className="mt-0.5 text-sm text-ink-2">{lead}</p> : null}

@@ -46,7 +46,7 @@ export function PageGuide() {
 
   return (
     <aside
-      className="mb-3 flex items-start gap-3 rounded-sm border border-info/30 bg-info-soft px-3 py-2 text-sm text-ink"
+      className="mb-4 flex items-start gap-3 border-y border-sage-2 bg-sage px-4 py-2.5 text-sm text-ink-2"
       aria-label={`About ${guide.title}`}
     >
       <p className="min-w-0 flex-1 leading-snug">

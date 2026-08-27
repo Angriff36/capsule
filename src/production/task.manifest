@@ -159,7 +159,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     optional ingredientId: uuid,
     optional componentId: uuid
   ) {
-    guard self.status == "pending"
+    guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     constraint reviseNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
     constraint reviseQuantityPositive: quantity == null or quantity > 0 "Prep quantity must be positive"
@@ -237,14 +237,19 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   // Lead/manager puts a cook on a prep line (or moves it) before work starts.
   // Pending → claimed with assignee; claimed → reassign without restarting the clock.
   command assign(personId: uuid) {
-    guard self.status == "pending" or self.status == "claimed"
+    // Work changes hands while it is live, not only before it starts: a cook
+    // goes home, a station is behind, a lead pulls several steps together as
+    // one job. Handing over never rewinds the step - a started step stays
+    // started and a blocked step stays blocked, so nothing hides a stall.
+    guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard personId != null
     constraint assignQuantityReady: self.quantity > 0 "Prep quantity must be positive before assign"
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
+    compute nextStatus = self.status == "in_progress" ? "in_progress" : (self.status == "blocked" ? "blocked" : "claimed")
     mutate assignedToId = personId
-    mutate status = "claimed"
+    mutate status = nextStatus
     mutate claimedAt = self.claimedAt != null ? self.claimedAt : now()
     emit PrepTaskAssigned {
       prepTaskId: self.id
@@ -257,7 +262,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       quantity: self.quantity
       unit: self.unit
       previousStatus: previousStatus
-      status: "claimed"
+      status: nextStatus
     }
   }
 
@@ -362,10 +367,13 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenLeadAccess")
     compute previousStatus = self.status
+    // Unblocking clears the block, not the handover. A blocked task can be
+    // handed to another cook while it is stuck; erasing assignedToId here
+    // threw that away the moment work resumed. The task returns to the
+    // pending pool still naming whoever owns it, and they claim it as usual.
     mutate status = "pending"
     mutate blockedAt = null
     mutate blockReason = null
-    mutate assignedToId = null
     mutate claimedAt = null
     mutate startedAt = null
     emit PrepTaskUnblocked {

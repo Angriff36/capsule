@@ -15,14 +15,7 @@
   position: relative;
   overflow: hidden;
   border-color: rgba(49, 87, 79, 0.25);
-  background:
-    linear-gradient(135deg, rgba(49, 87, 79, 0.13), transparent 44%),
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 79px,
-      rgba(49, 87, 79, 0.05) 80px
-    ),
-    var(--food-cost-paper);
+  background: var(--food-cost-paper);
 }
 
 .food-cost-masthead::after {

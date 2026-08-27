@@ -54,10 +54,7 @@
   border: 1px solid
     color-mix(in srgb, var(--color-line) 75%, var(--dispatch-ink));
   border-radius: 12px;
-  background:
-    linear-gradient(90deg, var(--dispatch-grid) 1px, transparent 1px) 0 0 / 22px
-      22px,
-    var(--dispatch-paper);
+  background: var(--dispatch-paper);
   color: var(--dispatch-ink);
   box-shadow: 0 16px 36px color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
@@ -220,11 +217,7 @@
 }
 
 .equipment-checklist__row[data-status="checked_out"] {
-  background: linear-gradient(
-    90deg,
-    var(--dispatch-signal-soft),
-    var(--dispatch-surface) 42%
-  );
+  background: var(--dispatch-paper);
 }
 
 .equipment-checklist__row[data-status="returned"],

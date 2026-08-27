@@ -98,15 +98,7 @@
 
 .profit-range-stamp {
   position: relative;
-  background:
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 7px,
-      color-mix(in srgb, var(--profit-green) 5%, transparent) 7px,
-      color-mix(in srgb, var(--profit-green) 5%, transparent) 8px
-    ),
-    var(--color-inset);
+  background: var(--color-inset);
 }
 
 .profit-range-stamp strong {
@@ -147,11 +139,7 @@
 
 .profit-margin-scorecard > div:first-child {
   border-left: 0;
-  background: linear-gradient(
-    135deg,
-    var(--profit-green-soft),
-    color-mix(in srgb, var(--profit-green-soft) 20%, transparent)
-  );
+  background: var(--color-inset);
 }
 
 .profit-margin-scorecard span,
@@ -329,9 +317,7 @@
 .profit-segment-grid article {
   display: grid;
   align-content: center;
-  background:
-    linear-gradient(150deg, transparent 55%, rgba(255, 255, 255, 0.4)),
-    var(--color-inset);
+  background: var(--color-inset);
 }
 
 .profit-segment-grid article.is-best {

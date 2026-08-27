@@ -14,17 +14,7 @@
   height: 9rem;
   pointer-events: none;
   z-index: 0;
-  background:
-    radial-gradient(
-      ellipse 65% 75% at 6% 0%,
-      color-mix(in srgb, var(--color-accent) 12%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 45% 55% at 94% 8%,
-      color-mix(in srgb, var(--color-brand) 10%, transparent),
-      transparent 65%
-    );
+  background: var(--color-inset);
 }
 
 .culinary-studio > * {

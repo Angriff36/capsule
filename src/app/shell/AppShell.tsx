@@ -55,27 +55,33 @@ export function AppShell() {
     // icon rail on laptop-height windows, a wide board on an event tab) grows
     // the document itself, adding a second dead window scrollbar that reveals
     // the dark canvas "void" under the app instead of reaching the content.
-    <div className="flex h-dvh overflow-clip bg-canvas">
-      <Sidebar />
-      <div className="relative flex min-w-0 flex-1 flex-col">
-        <Topbar onOpenPalette={() => setPaletteOpen(true)} />
-        {!online && (
-          <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-sm font-medium text-warn">
-            <WifiOffIcon width={13} height={13} />
-            Offline — showing the last synced data. Changes will fail until the
-            connection returns.
-          </div>
-        )}
-        <AnnouncementBanner />
-        <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
-          <div className="workspace-sheet px-6 py-4 max-md:px-4 max-md:py-3">
-            <PageGuide />
-            <RouteErrorBoundary>
-              <Outlet />
-            </RouteErrorBoundary>
-          </div>
-        </main>
-        <MobileTabBar />
+    // The botanical canvas frames ONE warm-paper sheet, and the rail lives
+    // inside that sheet behind a hairline (DESIGN.md navigation-rail +
+    // workspace-sheet). On phones the frame collapses so the sheet is the
+    // whole screen.
+    <div className="flex h-dvh overflow-clip bg-canvas p-3.5 max-md:p-0">
+      <div className="app-sheet flex min-w-0 flex-1 overflow-clip">
+        <Sidebar />
+        <div className="relative flex min-w-0 flex-1 flex-col">
+          <Topbar onOpenPalette={() => setPaletteOpen(true)} />
+          {!online && (
+            <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-sm font-medium text-warn">
+              <WifiOffIcon width={13} height={13} />
+              Offline — showing the last synced data. Changes will fail until
+              the connection returns.
+            </div>
+          )}
+          <AnnouncementBanner />
+          <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
+            <div className="workspace-sheet px-8 py-6 max-md:px-4 max-md:py-3">
+              <PageGuide />
+              <RouteErrorBoundary>
+                <Outlet />
+              </RouteErrorBoundary>
+            </div>
+          </main>
+          <MobileTabBar />
+        </div>
       </div>
       <CommandPalette
         open={paletteOpen}

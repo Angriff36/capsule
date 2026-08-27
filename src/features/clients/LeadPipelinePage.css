@@ -3,17 +3,7 @@
   --pipeline-qualified: #397c75;
   --pipeline-proposal: #9b4f3f;
   --pipeline-negotiating: #536b8b;
-  background:
-    radial-gradient(
-      circle at 86% 2%,
-      color-mix(in srgb, var(--color-accent) 9%, transparent),
-      transparent 28rem
-    ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-inset) 60%, transparent),
-      transparent 22rem
-    );
+  background: var(--color-inset);
 }
 
 .lead-pipeline-masthead {
@@ -171,13 +161,7 @@
   border: 1px solid var(--color-line-2);
   border-top: 4px solid var(--pipeline-new);
   padding: 1.25rem;
-  background:
-    linear-gradient(
-      115deg,
-      color-mix(in srgb, var(--pipeline-new) 7%, transparent),
-      transparent 48%
-    ),
-    var(--color-panel);
+  background: var(--color-panel);
 }
 
 .lead-capture-heading {

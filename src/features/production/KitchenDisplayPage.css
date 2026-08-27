@@ -94,8 +94,7 @@
 
 .kds-card.kds-waiting {
   border-left-color: #d29a3f;
-  background:
-    linear-gradient(135deg, rgb(210 154 63 / 12%), transparent 52%), #fffefa;
+  background: #fffefa;
 }
 
 .kds-card-top {

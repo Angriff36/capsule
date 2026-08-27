@@ -16,11 +16,7 @@
   bottom: -1px;
   width: min(42vw, 410px);
   height: 4px;
-  background: repeating-linear-gradient(
-    90deg,
-    var(--count-safety) 0 18px,
-    transparent 18px 25px
-  );
+  background: repeating-var(--color-inset);
   content: "";
 }
 
@@ -40,9 +36,7 @@
   border: 1px solid var(--color-line);
   border-top: 4px solid var(--count-safety);
   border-radius: 5px;
-  background:
-    linear-gradient(118deg, var(--count-safety-soft), transparent 34%),
-    var(--color-panel);
+  background: var(--color-inset);
 }
 
 .stock-count-setup-copy h2,
@@ -162,9 +156,7 @@
   min-height: 250px;
   padding: 2rem;
   border: 1px solid var(--color-line);
-  background:
-    repeating-linear-gradient(0deg, transparent 0 31px, var(--count-grid) 32px),
-    var(--color-panel);
+  background: var(--color-panel);
 }
 
 .stock-count-empty > span {
@@ -186,7 +178,7 @@
 
 .stock-count-session-rail {
   border-right: 1px solid var(--color-line);
-  background: var(--color-inset);
+  background: var(--color-panel);
 }
 
 .stock-count-session-rail-heading {
@@ -334,13 +326,7 @@
   gap: 0.1rem;
   padding: 1.2rem 0.7rem;
   border-right: 1px solid var(--color-line);
-  background:
-    repeating-linear-gradient(
-      135deg,
-      transparent 0 10px,
-      var(--count-safety-soft) 10px 12px
-    ),
-    var(--color-inset);
+  background: var(--color-inset);
 }
 
 .stock-count-counter-index span,
@@ -569,13 +555,7 @@
   margin-top: 1.5rem;
   padding: 1rem;
   border: 1px solid var(--color-line);
-  background:
-    linear-gradient(
-      105deg,
-      color-mix(in srgb, var(--color-ok) 8%, transparent),
-      transparent 55%
-    ),
-    var(--color-inset);
+  background: var(--color-inset);
 }
 
 .stock-count-closeout div > strong,

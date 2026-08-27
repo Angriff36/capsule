@@ -4,13 +4,7 @@
   margin-bottom: 2.5rem;
   border: 1px solid var(--color-line-2);
   border-top: 3px solid var(--color-brand);
-  background:
-    linear-gradient(
-      110deg,
-      color-mix(in srgb, var(--color-sage) 58%, transparent),
-      transparent 46%
-    ),
-    var(--color-panel);
+  background: var(--color-panel);
   box-shadow: 9px 10px 0 -5px var(--color-sage-2);
 }
 
@@ -20,11 +14,7 @@
   right: 0;
   width: 8rem;
   height: 8rem;
-  background: repeating-linear-gradient(
-    -45deg,
-    transparent 0 7px,
-    color-mix(in srgb, var(--color-brand) 9%, transparent) 7px 8px
-  );
+  background: repeating-var(--color-inset);
   content: "";
   pointer-events: none;
 }

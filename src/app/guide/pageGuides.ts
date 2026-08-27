@@ -13,18 +13,11 @@ export type PageGuide = {
   steps: string[];
 };
 
+// Home carries no guide. Today's service says what it is by composition — the
+// date, the title, the decisions, the schedule — so a standing paragraph only
+// pushes the work down the page. (Its copy also still advertised "Customize
+// widgets", a feature the screen no longer has.)
 export const PAGE_GUIDES: PageGuide[] = [
-  {
-    prefix: "/",
-    title: "Home",
-    purpose:
-      "Your morning glance — upcoming events, money owed, low stock, and staffing gaps, all in one place.",
-    steps: [
-      "Scan the boards for anything red or flagged.",
-      "Click any board to jump to the full page behind it.",
-      "Use Customize widgets to pin only what you care about.",
-    ],
-  },
   {
     prefix: "/events",
     title: "Events",
