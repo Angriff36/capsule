@@ -252,6 +252,7 @@ export function PayrollPage() {
         error={payrollExport.error}
         hourlyRateByPersonId={ratesLoaded ? rateByPersonId : null}
         onNotice={setNotice}
+        onFailure={setFailure}
       />
 
       {showPrepare ? (
