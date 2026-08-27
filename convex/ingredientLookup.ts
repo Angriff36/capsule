@@ -28,6 +28,10 @@ import {
   resolveOffImageByBarcode,
   pickOffImageUrl,
 } from "./lib/foodDatabaseImage";
+import {
+  offServingGramsPerEach,
+  usdaServingGramsPerEach,
+} from "./lib/servingWeightGrams";
 import { applyCatalogImageFromUrl } from "./lib/ingredientCatalogImageImport";
 import {
   scaleNutritionFromGramsToUnit,
@@ -110,6 +114,7 @@ type AutofillProfile = SearchHit & {
   sourceLabel: string;
   imageUrl?: string;
   imageNote: string;
+  servingGramsPerUnit?: number;
 };
 
 async function offFetch<T>(path: string): Promise<T> {
@@ -244,6 +249,8 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
     brandedFoodCategory?: string;
     brandOwner?: string;
     gtinUpc?: string;
+    servingSize?: number;
+    servingSizeUnit?: string;
     foodNutrients?: FdcNutrientRow[];
     brandedFood?: { ingredients?: string };
     ingredients?: string;
@@ -261,6 +268,7 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
   const imageUrl = food.gtinUpc
     ? await resolveOffImageByBarcode(food.gtinUpc)
     : undefined;
+  const servingGramsPerUnit = usdaServingGramsPerEach(food);
 
   return {
     source: "usda_fdc",
@@ -283,6 +291,7 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
     imageNote: imageUrl
       ? "Product photo imported from Open Food Facts when a barcode match exists."
       : "USDA does not host product photos — no barcode match in Open Food Facts.",
+    servingGramsPerUnit,
   };
 }
 
@@ -299,9 +308,11 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
       nutriments?: Record<string, number | undefined>;
       image_front_url?: unknown;
       image_url?: unknown;
+      serving_size?: number;
+      serving_quantity?: number;
     };
   }>(
-    `/product/${encodeURIComponent(barcode)}?fields=product_name,brands,categories_tags,allergens_tags,labels_tags,ingredients_text,nutriments,image_front_url,image_url`,
+    `/product/${encodeURIComponent(barcode)}?fields=product_name,brands,categories_tags,allergens_tags,labels_tags,ingredients_text,nutriments,image_front_url,image_url,serving_size,serving_quantity`,
   );
 
   const product = payload.product;
@@ -327,6 +338,7 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
   const nutrition = mapOffNutrimentsPerGram(product.nutriments);
   const hasNutrition = Object.values(nutrition).some((value) => value > 0);
   const imageUrl = pickOffImageUrl(product);
+  const servingGramsPerUnit = offServingGramsPerEach(product);
 
   return {
     source: "open_food_facts" as const,
@@ -347,6 +359,7 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
     imageNote: imageUrl
       ? "Product photo will import from Open Food Facts when applied."
       : "No product photo on this Open Food Facts record.",
+    servingGramsPerUnit,
   };
 }
 
@@ -395,6 +408,7 @@ export const applyToIngredient = action({
       isGlutenFree: v.boolean(),
       nutrition: autofillNutritionValidator,
       imageUrl: v.optional(v.string()),
+      servingGramsPerUnit: v.optional(v.number()),
     }),
   },
   handler: async (ctx, args) => {
@@ -404,13 +418,14 @@ export const applyToIngredient = action({
     let doc = await ctx.runQuery(api.queries.getIngredient, { id: args.docId });
     if (!doc) throw new Error("Ingredient not found");
 
+    const incomingCategory = args.profile.category?.trim();
     await ctx.runMutation(api.mutations.Ingredient_updateDetails, {
       docId: args.docId,
       version: doc.version,
       name: args.profile.name,
       unit: doc.unit,
       category:
-        args.profile.category ??
+        incomingCategory ||
         (typeof doc.category === "string" ? doc.category : undefined),
     });
 
@@ -450,7 +465,8 @@ export const applyToIngredient = action({
       if (!doc) throw new Error("Ingredient not found");
       const scaled = scaleNutritionFromGramsToUnit(
         args.profile.nutrition,
-        doc.unit,
+        String(doc.unit),
+        args.profile.servingGramsPerUnit,
       );
       if (scaled) {
         const merged = mergeScaledNutritionWithExisting(doc, scaled);
@@ -461,7 +477,10 @@ export const applyToIngredient = action({
         });
         nutritionApplied = true;
       } else {
-        nutritionSkippedReason = `Nutrition was not saved — unit "${String(doc.unit)}" cannot be scaled from per-gram lookup values. Switch to gram, kilogram, ounce, or pound, or enter nutrition manually.`;
+        nutritionSkippedReason =
+          String(doc.unit) === "each" && !args.profile.servingGramsPerUnit
+            ? `Nutrition was not saved — unit "${String(doc.unit)}" needs a label serving size from the lookup, or switch to gram, kilogram, ounce, or pound.`
+            : `Nutrition was not saved — unit "${String(doc.unit)}" cannot be scaled from per-gram lookup values. Switch to gram, kilogram, ounce, or pound, or enter nutrition manually.`;
       }
     }
 

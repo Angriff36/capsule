@@ -26,6 +26,7 @@ export type IngredientAutofillProfile = {
   sourceLabel: string;
   imageUrl?: string;
   imageNote: string;
+  servingGramsPerUnit?: number;
 };
 
 export type IngredientLookupHit = {

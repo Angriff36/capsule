@@ -394,6 +394,7 @@ export function IngredientDetailPage() {
           <IngredientDatabaseLookup
             disabled={busy != null}
             label="Update from food database"
+            catalogUnit={String(ingredient.unit)}
             onApply={async (profile: IngredientAutofillProfile) => {
               setFailure(null);
               setBusy("lookup");
@@ -408,6 +409,7 @@ export function IngredientDetailPage() {
                     isGlutenFree: profile.isGlutenFree,
                     nutrition: nutritionPayload(profile.nutrition),
                     imageUrl: profile.imageUrl,
+                    servingGramsPerUnit: profile.servingGramsPerUnit,
                   },
                 });
               } catch (error) {

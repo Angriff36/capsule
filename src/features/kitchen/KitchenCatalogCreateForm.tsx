@@ -71,6 +71,9 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     Partial<IngredientNutritionFields>
   >({});
   const [lookupImageUrl, setLookupImageUrl] = useState("");
+  const [lookupServingGrams, setLookupServingGrams] = useState<
+    number | undefined
+  >(undefined);
   const scaledLookupNutrition = useMemo(() => {
     const gramFields: NutritionFields = {};
     for (const nutrient of NUTRIENTS) {
@@ -79,8 +82,8 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
         gramFields[nutrient.field] = Number(value);
       }
     }
-    return scaleNutritionFromGramsToUnit(gramFields, unit);
-  }, [lookupGramNutrition, unit]);
+    return scaleNutritionFromGramsToUnit(gramFields, unit, lookupServingGrams);
+  }, [lookupGramNutrition, unit, lookupServingGrams]);
 
   const applyAutofill = (profile: IngredientAutofillProfile) => {
     setName(profile.name);
@@ -98,6 +101,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     });
     setLookupGramNutrition(profile.nutrition);
     setLookupImageUrl(profile.imageUrl ?? "");
+    setLookupServingGrams(profile.servingGramsPerUnit);
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {
