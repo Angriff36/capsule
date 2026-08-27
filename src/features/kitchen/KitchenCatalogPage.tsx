@@ -46,10 +46,7 @@ import {
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
-import {
-  useIngredientLookupApplyImageToIngredient,
-  useIngredientLookupResolveCost,
-} from "../../lib/ingredientLookupClient";
+import { useIngredientLookupApplyImageToIngredient } from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -82,7 +79,6 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
   const applyLookupImage = useIngredientLookupApplyImageToIngredient();
-  const resolveLookupCost = useIngredientLookupResolveCost();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -153,7 +149,6 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         const { allergens, isGlutenFree } =
           parseIngredientAllergensFromForm(data);
         const unit = String(data.get("unit"));
-        const formCost = Number(data.get("costPerUnit"));
         const servingGramsRaw = optional(data.get("lookupServingGrams"));
         const parsedServingGrams = servingGramsRaw
           ? Number(servingGramsRaw)
@@ -162,23 +157,10 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
             ? parsedServingGrams
             : undefined;
-        const lookupBarcode = optional(data.get("lookupBarcode"));
-        let costPerUnit =
-          Number.isFinite(formCost) && formCost >= 0 ? formCost : 0;
-        if (costPerUnit === 0 && lookupBarcode) {
-          const costHint = await resolveLookupCost({
-            barcode: lookupBarcode,
-            catalogUnit: unit,
-            servingGramsPerUnit,
-          });
-          if (costHint.costPerUnit != null && costHint.costPerUnit > 0) {
-            costPerUnit = costHint.costPerUnit;
-          }
-        }
         const created = (await createIngredient({
           name,
           unit: unit as (typeof UNITS)[number],
-          costPerUnit,
+          costPerUnit: Number(data.get("costPerUnit")),
           category: optional(data.get("category")),
           allergens: allergens.length ? allergens : undefined,
           isGlutenFree,

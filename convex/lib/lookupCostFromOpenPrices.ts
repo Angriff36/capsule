@@ -97,8 +97,8 @@ function pickBestPriceRow(rows: OpenPriceRow[]): OpenPriceRow | undefined {
   };
 
   const usdRows = usable.filter((row) => row.currency?.toUpperCase() === "USD");
-  const pool = usdRows.length > 0 ? usdRows : usable;
-  return [...pool].sort((a, b) => score(b) - score(a))[0];
+  if (usdRows.length === 0) return undefined;
+  return [...usdRows].sort((a, b) => score(b) - score(a))[0];
 }
 
 async function fetchOpenPrices(barcode: string): Promise<OpenPriceRow[]> {
