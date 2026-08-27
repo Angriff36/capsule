@@ -161,6 +161,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
             ? parsedServingGrams
             : undefined;
+        const gramsPerMlRaw = optional(data.get("lookupGramsPerMl"));
+        const parsedGramsPerMl = gramsPerMlRaw ? Number(gramsPerMlRaw) : NaN;
+        const lookupGramsPerMl =
+          Number.isFinite(parsedGramsPerMl) && parsedGramsPerMl > 0
+            ? parsedGramsPerMl
+            : undefined;
         const lookupProductName =
           optional(data.get("lookupProductName")) ?? name;
         const lookupUsed = data.get("lookupUsed") === "true";
@@ -204,6 +210,10 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             gramNutrition,
             unit,
             servingGramsPerUnit,
+            {
+              gramsPerMl: lookupGramsPerMl,
+              foodName: lookupProductName,
+            },
           );
           if (pendingNutrition && Object.keys(pendingNutrition).length > 0) {
             await setIngredientNutrition({

@@ -413,6 +413,8 @@ export function IngredientDetailPage() {
                     nutrition: nutritionPayload(profile.nutrition),
                     imageUrl: profile.imageUrl,
                     servingGramsPerUnit: profile.servingGramsPerUnit,
+                    gramsPerMl: profile.gramsPerMl,
+                    densitySource: profile.densitySource,
                     barcode: profile.barcode,
                     brandOwner: profile.brandOwner,
                   },

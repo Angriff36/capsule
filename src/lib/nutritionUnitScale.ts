@@ -1,11 +1,6 @@
 /** Client-side mirror of convex/lib/nutritionUnitScaler for create forms. */
 
-const GRAMS_PER_UNIT: Readonly<Record<string, number>> = {
-  gram: 1,
-  kilogram: 1000,
-  ounce: 28.3495,
-  pound: 453.592,
-};
+import { CatalogUnitGrams } from "./catalogUnitGrams";
 
 export type NutritionFields = {
   caloriesPerUnit?: number;
@@ -27,17 +22,14 @@ function round(value: number, digits: number) {
 export function scaleNutritionFromGramsToUnit(
   nutrition: NutritionFields,
   unit: string,
-  gramsPerCatalogUnit?: number,
+  servingGramsPerEach?: number,
+  hints?: { gramsPerMl?: number; foodName?: string },
 ): NutritionFields | null {
-  let factor = GRAMS_PER_UNIT[unit];
-  if (
-    factor == null &&
-    unit === "each" &&
-    gramsPerCatalogUnit != null &&
-    gramsPerCatalogUnit > 0
-  ) {
-    factor = gramsPerCatalogUnit;
-  }
+  const factor = CatalogUnitGrams.resolve(unit, {
+    servingGramsPerEach,
+    gramsPerMl: hints?.gramsPerMl,
+    foodName: hints?.foodName,
+  });
   if (factor == null) return null;
 
   const scaled: NutritionFields = {};
@@ -52,5 +44,5 @@ export function scaleNutritionFromGramsToUnit(
 }
 
 export function canScaleNutritionToUnit(unit: string): boolean {
-  return GRAMS_PER_UNIT[unit] != null;
+  return CatalogUnitGrams.canScale(unit);
 }
