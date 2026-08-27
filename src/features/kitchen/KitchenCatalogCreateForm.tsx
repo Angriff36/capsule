@@ -70,6 +70,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   const [lookupGramNutrition, setLookupGramNutrition] = useState<
     Partial<IngredientNutritionFields>
   >({});
+  const [lookupImageUrl, setLookupImageUrl] = useState("");
   const scaledLookupNutrition = useMemo(() => {
     const gramFields: NutritionFields = {};
     for (const nutrient of NUTRIENTS) {
@@ -96,6 +97,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
       return existing;
     });
     setLookupGramNutrition(profile.nutrition);
+    setLookupImageUrl(profile.imageUrl ?? "");
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {
@@ -124,6 +126,11 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 disabled={busy}
                 catalogUnit={unit}
                 onApply={applyAutofill}
+              />
+              <input
+                type="hidden"
+                name="lookupImageUrl"
+                value={lookupImageUrl}
               />
             </div>
             <label className="field-label">

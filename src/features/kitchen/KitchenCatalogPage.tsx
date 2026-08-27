@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
+import type { Id } from "../../lib/api";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import {
   useCreateDish,
@@ -45,6 +46,7 @@ import {
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
+import { useIngredientLookupApplyImageToIngredient } from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -76,6 +78,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const createAttachment = useCreateAttachment();
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
+  const applyLookupImage = useIngredientLookupApplyImageToIngredient();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -187,6 +190,14 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                 setPrimaryImage: setIngredientPrimaryImage,
               },
             );
+          } else {
+            const lookupImageUrl = optional(data.get("lookupImageUrl"));
+            if (lookupImageUrl) {
+              await applyLookupImage({
+                docId: created.docId as Id<"ingredients">,
+                imageUrl: lookupImageUrl,
+              });
+            }
           }
         } catch (enrichmentError) {
           setFailure(enrichmentError);

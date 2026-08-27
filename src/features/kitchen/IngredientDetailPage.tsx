@@ -407,6 +407,7 @@ export function IngredientDetailPage() {
                     allergens: profile.allergens,
                     isGlutenFree: profile.isGlutenFree,
                     nutrition: nutritionPayload(profile.nutrition),
+                    imageUrl: profile.imageUrl,
                   },
                 });
               } catch (error) {

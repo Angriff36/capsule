@@ -44,6 +44,9 @@ function nutritionStatusMessage(
   return profile.nutritionNote;
 }
 
+/** Wait for a typing pause before hitting USDA/OFF — cuts typo partial searches. */
+const SEARCH_DEBOUNCE_MS = 750;
+
 /** Search USDA FoodData Central and apply autofill to a parent ingredient form. */
 export function IngredientDatabaseLookup({
   onApply,
@@ -108,7 +111,7 @@ export function IngredientDatabaseLookup({
           }
         }
       })();
-    }, 320);
+    }, SEARCH_DEBOUNCE_MS);
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
@@ -217,6 +220,11 @@ export function IngredientDatabaseLookup({
         >
           Applied <strong>{applied.profile.name}</strong> from{" "}
           {applied.profile.sourceLabel}. {nutritionMessage}{" "}
+          {applied.applyResult?.imageApplied
+            ? "Product photo imported."
+            : applied.profile.imageUrl
+              ? "Product photo could not be imported — upload manually if needed."
+              : applied.profile.imageNote}{" "}
           {applied.profile.allergenNote}
         </p>
       ) : null}

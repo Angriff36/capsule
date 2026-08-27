@@ -25,6 +25,11 @@ import {
   offCategory,
 } from "./lib/openFoodFactsMapper";
 import {
+  resolveOffImageByBarcode,
+  pickOffImageUrl,
+} from "./lib/foodDatabaseImage";
+import { applyCatalogImageFromUrl } from "./lib/ingredientCatalogImageImport";
+import {
   scaleNutritionFromGramsToUnit,
   mergeScaledNutritionWithExisting,
 } from "./lib/nutritionUnitScaler";
@@ -103,6 +108,8 @@ type AutofillProfile = SearchHit & {
   nutritionNote: string;
   allergenNote: string;
   sourceLabel: string;
+  imageUrl?: string;
+  imageNote: string;
 };
 
 async function offFetch<T>(path: string): Promise<T> {
@@ -234,7 +241,9 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
     fdcId?: number;
     description?: string;
     foodCategory?: string | { description?: string | null };
+    brandedFoodCategory?: string;
     brandOwner?: string;
+    gtinUpc?: string;
     foodNutrients?: FdcNutrientRow[];
     brandedFood?: { ingredients?: string };
     ingredients?: string;
@@ -249,12 +258,17 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
 
   const nutrition = mapFdcNutrientsPerGram(food.foodNutrients ?? []);
   const hasNutrition = Object.values(nutrition).some((value) => value > 0);
+  const imageUrl = food.gtinUpc
+    ? await resolveOffImageByBarcode(food.gtinUpc)
+    : undefined;
 
   return {
     source: "usda_fdc",
     externalId: String(food.fdcId ?? externalId),
     name,
-    category: normalizeFdcCategory(food.foodCategory),
+    category: normalizeFdcCategory(
+      food.brandedFoodCategory ?? food.foodCategory,
+    ),
     brandOwner: food.brandOwner?.trim() || undefined,
     unit: "gram",
     allergens: allergenParse.allergens,
@@ -265,6 +279,10 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
       : "No nutrition values on this USDA record — enter manually if needed.",
     allergenNote: allergenParse.allergenNote,
     sourceLabel: "USDA FoodData Central",
+    imageUrl,
+    imageNote: imageUrl
+      ? "Product photo imported from Open Food Facts when a barcode match exists."
+      : "USDA does not host product photos — no barcode match in Open Food Facts.",
   };
 }
 
@@ -279,9 +297,11 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
       labels_tags?: string[];
       ingredients_text?: string;
       nutriments?: Record<string, number | undefined>;
+      image_front_url?: unknown;
+      image_url?: unknown;
     };
   }>(
-    `/product/${encodeURIComponent(barcode)}?fields=product_name,brands,categories_tags,allergens_tags,labels_tags,ingredients_text,nutriments`,
+    `/product/${encodeURIComponent(barcode)}?fields=product_name,brands,categories_tags,allergens_tags,labels_tags,ingredients_text,nutriments,image_front_url,image_url`,
   );
 
   const product = payload.product;
@@ -306,6 +326,7 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
 
   const nutrition = mapOffNutrimentsPerGram(product.nutriments);
   const hasNutrition = Object.values(nutrition).some((value) => value > 0);
+  const imageUrl = pickOffImageUrl(product);
 
   return {
     source: "open_food_facts" as const,
@@ -322,6 +343,10 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
       : "No nutrition values on this product — enter manually if needed.",
     allergenNote: allergenParse.allergenNote,
     sourceLabel: "Open Food Facts",
+    imageUrl,
+    imageNote: imageUrl
+      ? "Product photo will import from Open Food Facts when applied."
+      : "No product photo on this Open Food Facts record.",
   };
 }
 
@@ -369,6 +394,7 @@ export const applyToIngredient = action({
       allergens: v.array(v.string()),
       isGlutenFree: v.boolean(),
       nutrition: autofillNutritionValidator,
+      imageUrl: v.optional(v.string()),
     }),
   },
   handler: async (ctx, args) => {
@@ -439,6 +465,34 @@ export const applyToIngredient = action({
       }
     }
 
-    return { nutritionApplied, nutritionSkippedReason };
+    let imageApplied = false;
+    if (args.profile.imageUrl?.trim()) {
+      imageApplied = await applyCatalogImageFromUrl(
+        ctx,
+        args.docId,
+        args.profile.imageUrl.trim(),
+      );
+    }
+
+    return { nutritionApplied, nutritionSkippedReason, imageApplied };
+  },
+});
+
+/** Import only a lookup product photo onto an existing ingredient. */
+export const applyImageToIngredient = action({
+  args: {
+    docId: v.id("ingredients"),
+    imageUrl: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    requireKitchenStaff(auth);
+
+    const imageApplied = await applyCatalogImageFromUrl(
+      ctx,
+      args.docId,
+      args.imageUrl.trim(),
+    );
+    return { imageApplied };
   },
 });
