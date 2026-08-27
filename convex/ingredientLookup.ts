@@ -33,6 +33,7 @@ import {
   usdaServingGramsPerEach,
 } from "./lib/servingWeightGrams";
 import { applyCatalogImageFromUrl } from "./lib/ingredientCatalogImageImport";
+import { applyLookupCostToIngredient } from "./lib/ingredientLookupApplyCost";
 import {
   scaleNutritionFromGramsToUnit,
   mergeScaledNutritionWithExisting,
@@ -115,6 +116,8 @@ type AutofillProfile = SearchHit & {
   imageUrl?: string;
   imageNote: string;
   servingGramsPerUnit?: number;
+  barcode?: string;
+  costNote: string;
 };
 
 async function offFetch<T>(path: string): Promise<T> {
@@ -282,6 +285,8 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
       food.householdServingFullText ??
       food.brandedFood?.householdServingFullText,
   });
+  const normalizedBarcode = String(food.gtinUpc ?? "").replace(/\D/g, "");
+  const barcode = normalizedBarcode.length >= 8 ? normalizedBarcode : undefined;
 
   return {
     source: "usda_fdc",
@@ -307,6 +312,10 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
       ? "Product photo imported from Open Food Facts when a barcode match exists."
       : "USDA does not host product photos — no barcode match in Open Food Facts.",
     servingGramsPerUnit,
+    barcode,
+    costNote: barcode
+      ? "Cost imports from Open Prices crowd-sourced retail data when available."
+      : "USDA does not publish retail prices — enter cost manually.",
   };
 }
 
@@ -375,6 +384,9 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
       ? "Product photo will import from Open Food Facts when applied."
       : "No product photo on this Open Food Facts record.",
     servingGramsPerUnit,
+    barcode,
+    costNote:
+      "Cost imports from Open Prices crowd-sourced retail data when available.",
   };
 }
 
@@ -424,6 +436,7 @@ export const applyToIngredient = action({
       nutrition: autofillNutritionValidator,
       imageUrl: v.optional(v.string()),
       servingGramsPerUnit: v.optional(v.number()),
+      barcode: v.optional(v.string()),
     }),
   },
   handler: async (ctx, args) => {
@@ -508,7 +521,42 @@ export const applyToIngredient = action({
       );
     }
 
-    return { nutritionApplied, nutritionSkippedReason, imageApplied };
+    const costResult = await applyLookupCostToIngredient(
+      ctx,
+      args.docId,
+      args.profile.barcode,
+      String(doc.unit),
+      args.profile.servingGramsPerUnit,
+    );
+
+    return {
+      nutritionApplied,
+      nutritionSkippedReason,
+      imageApplied,
+      costApplied: costResult.costApplied,
+      costNote: costResult.costNote,
+    };
+  },
+});
+
+/** Import crowd-sourced retail cost from Open Prices when a barcode exists. */
+export const applyCostToIngredient = action({
+  args: {
+    docId: v.id("ingredients"),
+    barcode: v.optional(v.string()),
+    catalogUnit: v.string(),
+    servingGramsPerUnit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    requireKitchenStaff(auth);
+    return applyLookupCostToIngredient(
+      ctx,
+      args.docId,
+      args.barcode,
+      args.catalogUnit,
+      args.servingGramsPerUnit,
+    );
   },
 });
 

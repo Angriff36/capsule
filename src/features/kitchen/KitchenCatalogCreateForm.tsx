@@ -74,6 +74,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   const [lookupServingGrams, setLookupServingGrams] = useState<
     number | undefined
   >(undefined);
+  const [lookupBarcode, setLookupBarcode] = useState("");
   const scaledLookupNutrition = useMemo(() => {
     const gramFields: NutritionFields = {};
     for (const nutrient of NUTRIENTS) {
@@ -102,6 +103,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     setLookupGramNutrition(profile.nutrition);
     setLookupImageUrl(profile.imageUrl ?? "");
     setLookupServingGrams(profile.servingGramsPerUnit);
+    setLookupBarcode(profile.barcode ?? "");
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {
@@ -145,6 +147,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                     : ""
                 }
               />
+              <input type="hidden" name="lookupBarcode" value={lookupBarcode} />
             </div>
             <label className="field-label">
               Name

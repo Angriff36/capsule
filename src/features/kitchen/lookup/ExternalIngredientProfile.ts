@@ -9,6 +9,8 @@ export type IngredientLookupApplyResult = {
   nutritionApplied: boolean;
   nutritionSkippedReason?: string;
   imageApplied?: boolean;
+  costApplied?: boolean;
+  costNote?: string;
 };
 
 export type IngredientAutofillProfile = {
@@ -27,6 +29,8 @@ export type IngredientAutofillProfile = {
   imageUrl?: string;
   imageNote: string;
   servingGramsPerUnit?: number;
+  barcode?: string;
+  costNote: string;
 };
 
 export type IngredientLookupHit = {

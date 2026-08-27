@@ -65,6 +65,16 @@ function imageStatusMessage(
   return profile.imageNote;
 }
 
+function costStatusMessage(
+  profile: IngredientAutofillProfile,
+  applyResult: IngredientLookupApplyResult | void,
+): string {
+  if (applyResult?.costNote) {
+    return applyResult.costNote;
+  }
+  return profile.costNote;
+}
+
 /** Wait for a typing pause before hitting USDA/OFF — cuts typo partial searches. */
 const SEARCH_DEBOUNCE_MS = 750;
 
@@ -162,6 +172,10 @@ export function IngredientDatabaseLookup({
     ? nutritionStatusMessage(applied.profile, applied.applyResult, catalogUnit)
     : null;
 
+  const costMessage = applied
+    ? costStatusMessage(applied.profile, applied.applyResult)
+    : null;
+
   const nutritionWarning =
     nutritionMessage?.startsWith("Nutrition") &&
     nutritionMessage.includes("not");
@@ -192,6 +206,7 @@ export function IngredientDatabaseLookup({
       <p className="text-xs text-ink-3">
         USDA FoodData Central and Open Food Facts. Selecting a result fills
         name, category, nutrition, and allergens when label data is available.
+        Cost imports from Open Prices when the product has a barcode match.
       </p>
       {searching ? (
         <p className="text-sm text-ink-2" role="status">
@@ -242,7 +257,7 @@ export function IngredientDatabaseLookup({
           Applied <strong>{applied.profile.name}</strong> from{" "}
           {applied.profile.sourceLabel}. {nutritionMessage}{" "}
           {imageStatusMessage(applied.profile, applied.applyResult)}{" "}
-          {applied.profile.allergenNote}
+          {costMessage} {applied.profile.allergenNote}
         </p>
       ) : null}
     </div>

@@ -40,8 +40,10 @@ import type * as lib_foodDatabaseImage from "../lib/foodDatabaseImage.js";
 import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_ingredientAllergenParser from "../lib/ingredientAllergenParser.js";
 import type * as lib_ingredientCatalogImageImport from "../lib/ingredientCatalogImageImport.js";
+import type * as lib_ingredientLookupApplyCost from "../lib/ingredientLookupApplyCost.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
+import type * as lib_lookupCostFromOpenPrices from "../lib/lookupCostFromOpenPrices.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
@@ -51,6 +53,7 @@ import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
 import type * as lib_proposalRevision from "../lib/proposalRevision.js";
 import type * as lib_qboSync from "../lib/qboSync.js";
+import type * as lib_servingWeightGrams from "../lib/servingWeightGrams.js";
 import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
 import type * as messageInbox from "../messageInbox.js";
@@ -113,8 +116,10 @@ declare const fullApi: ApiFromModules<{
   "lib/googleCalendar": typeof lib_googleCalendar;
   "lib/ingredientAllergenParser": typeof lib_ingredientAllergenParser;
   "lib/ingredientCatalogImageImport": typeof lib_ingredientCatalogImageImport;
+  "lib/ingredientLookupApplyCost": typeof lib_ingredientLookupApplyCost;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
+  "lib/lookupCostFromOpenPrices": typeof lib_lookupCostFromOpenPrices;
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
@@ -124,6 +129,7 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalPricing": typeof lib_proposalPricing;
   "lib/proposalRevision": typeof lib_proposalRevision;
   "lib/qboSync": typeof lib_qboSync;
+  "lib/servingWeightGrams": typeof lib_servingWeightGrams;
   "lib/twilio": typeof lib_twilio;
   "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
   messageInbox: typeof messageInbox;

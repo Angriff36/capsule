@@ -46,7 +46,10 @@ import {
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
-import { useIngredientLookupApplyImageToIngredient } from "../../lib/ingredientLookupClient";
+import {
+  useIngredientLookupApplyImageToIngredient,
+  useIngredientLookupApplyCostToIngredient,
+} from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -79,6 +82,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
   const applyLookupImage = useIngredientLookupApplyImageToIngredient();
+  const applyLookupCost = useIngredientLookupApplyCostToIngredient();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -185,6 +189,15 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               ...pendingNutrition,
             });
             ingredientVersion += 1;
+          }
+          const lookupBarcode = optional(data.get("lookupBarcode"));
+          if (lookupBarcode) {
+            await applyLookupCost({
+              docId: created.docId as Id<"ingredients">,
+              barcode: lookupBarcode,
+              catalogUnit: unit,
+              servingGramsPerUnit,
+            });
           }
           const photo = data.get("photo");
           if (photo instanceof File && photo.size > 0) {

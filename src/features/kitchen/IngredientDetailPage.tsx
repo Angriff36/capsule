@@ -410,6 +410,7 @@ export function IngredientDetailPage() {
                     nutrition: nutritionPayload(profile.nutrition),
                     imageUrl: profile.imageUrl,
                     servingGramsPerUnit: profile.servingGramsPerUnit,
+                    barcode: profile.barcode,
                   },
                 });
               } catch (error) {
