@@ -214,7 +214,7 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
   const food = await fdcFetch<{
     fdcId?: number;
     description?: string;
-    foodCategory?: string;
+    foodCategory?: string | { description?: string | null };
     brandOwner?: string;
     foodNutrients?: FdcNutrientRow[];
     brandedFood?: { ingredients?: string };
