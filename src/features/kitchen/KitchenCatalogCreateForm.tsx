@@ -75,6 +75,9 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   const [lookupServingGrams, setLookupServingGrams] = useState<
     number | undefined
   >(undefined);
+  const [lookupGramsPerMl, setLookupGramsPerMl] = useState<number | undefined>(
+    undefined,
+  );
   const [lookupBarcode, setLookupBarcode] = useState("");
   const [lookupBrandOwner, setLookupBrandOwner] = useState("");
   const [lookupCategory, setLookupCategory] = useState("");
@@ -91,8 +94,11 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
         gramFields[nutrient.field] = Number(value);
       }
     }
-    return scaleNutritionFromGramsToUnit(gramFields, unit, lookupServingGrams);
-  }, [lookupGramNutrition, unit, lookupServingGrams]);
+    return scaleNutritionFromGramsToUnit(gramFields, unit, lookupServingGrams, {
+      gramsPerMl: lookupGramsPerMl,
+      foodName: name,
+    });
+  }, [lookupGramNutrition, unit, lookupServingGrams, lookupGramsPerMl, name]);
 
   const applyAutofill = (profile: IngredientAutofillProfile) => {
     setLookupUsed(true);
@@ -112,6 +118,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     setLookupGramNutrition(profile.nutrition);
     setLookupImageUrl(profile.imageUrl ?? "");
     setLookupServingGrams(profile.servingGramsPerUnit);
+    setLookupGramsPerMl(profile.gramsPerMl);
     setLookupBarcode(profile.barcode ?? "");
     setLookupBrandOwner(profile.brandOwner ?? "");
     setLookupCategory(profile.category ?? "");
@@ -181,6 +188,15 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 value={
                   lookupServingGrams != null && lookupServingGrams > 0
                     ? String(lookupServingGrams)
+                    : ""
+                }
+              />
+              <input
+                type="hidden"
+                name="lookupGramsPerMl"
+                value={
+                  lookupGramsPerMl != null && lookupGramsPerMl > 0
+                    ? String(lookupGramsPerMl)
                     : ""
                 }
               />

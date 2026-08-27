@@ -36,15 +36,16 @@ function nutritionStatusMessage(
     return profile.nutritionNote;
   }
   if (applyResult?.nutritionApplied) {
-    return profile.nutritionNote;
+    return applyResult.nutritionAppliedNote ?? profile.nutritionNote;
   }
   if (
     catalogUnit &&
     hasNutrition &&
     !canScaleNutritionToUnit(catalogUnit) &&
-    !profile.servingGramsPerUnit
+    !profile.servingGramsPerUnit &&
+    !profile.gramsPerMl
   ) {
-    return `Nutrition from the lookup was not applied — unit "${catalogUnit}" cannot be scaled from per-gram values. Switch to gram, kilogram, ounce, or pound, or pick a product with label serving size.`;
+    return `Nutrition from the lookup was not applied — unit "${catalogUnit}" could not be scaled. Enter nutrition manually.`;
   }
   return profile.nutritionNote;
 }

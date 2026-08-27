@@ -44,7 +44,6 @@ export function scaleNutritionFromGramsToUnit(
   let factor = GRAMS_PER_UNIT[unit];
   if (
     factor == null &&
-    unit === "each" &&
     gramsPerCatalogUnit != null &&
     gramsPerCatalogUnit > 0
   ) {

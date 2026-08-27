@@ -8,6 +8,7 @@ export type IngredientLookupSource = "usda_fdc" | "open_food_facts";
 export type IngredientLookupApplyResult = {
   nutritionApplied: boolean;
   nutritionSkippedReason?: string;
+  nutritionAppliedNote?: string;
   imageApplied?: boolean;
   costApplied?: boolean;
   costNote?: string;
@@ -30,6 +31,8 @@ export type IngredientAutofillProfile = {
   imageUrl?: string;
   imageNote: string;
   servingGramsPerUnit?: number;
+  gramsPerMl?: number;
+  densitySource?: "usda_portion" | "label_household" | "typical" | "water";
   barcode?: string;
   costNote: string;
 };
