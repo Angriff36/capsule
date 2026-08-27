@@ -49,6 +49,22 @@ function nutritionStatusMessage(
   return profile.nutritionNote;
 }
 
+function imageStatusMessage(
+  profile: IngredientAutofillProfile,
+  applyResult: IngredientLookupApplyResult | void,
+): string {
+  if (applyResult?.imageApplied) {
+    return "Product photo imported.";
+  }
+  if (applyResult && applyResult.imageApplied === false && profile.imageUrl) {
+    return "Product photo could not be imported — upload manually if needed.";
+  }
+  if (profile.imageUrl && !applyResult) {
+    return "Product photo will import when you save this ingredient.";
+  }
+  return profile.imageNote;
+}
+
 /** Wait for a typing pause before hitting USDA/OFF — cuts typo partial searches. */
 const SEARCH_DEBOUNCE_MS = 750;
 
@@ -225,11 +241,7 @@ export function IngredientDatabaseLookup({
         >
           Applied <strong>{applied.profile.name}</strong> from{" "}
           {applied.profile.sourceLabel}. {nutritionMessage}{" "}
-          {applied.applyResult?.imageApplied
-            ? "Product photo imported."
-            : applied.profile.imageUrl
-              ? "Product photo could not be imported — upload manually if needed."
-              : applied.profile.imageNote}{" "}
+          {imageStatusMessage(applied.profile, applied.applyResult)}{" "}
           {applied.profile.allergenNote}
         </p>
       ) : null}

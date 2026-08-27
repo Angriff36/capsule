@@ -165,9 +165,18 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               ([, value]) => value != null && Number(value) > 0,
             ),
           );
+          const servingGramsRaw = optional(data.get("lookupServingGrams"));
+          const parsedServingGrams = servingGramsRaw
+            ? Number(servingGramsRaw)
+            : NaN;
+          const servingGramsPerUnit =
+            Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
+              ? parsedServingGrams
+              : undefined;
           const pendingNutrition = scaleNutritionFromGramsToUnit(
             gramNutrition,
             unit,
+            servingGramsPerUnit,
           );
           if (pendingNutrition && Object.keys(pendingNutrition).length > 0) {
             await setIngredientNutrition({

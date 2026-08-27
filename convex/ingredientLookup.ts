@@ -252,7 +252,12 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
     servingSize?: number;
     servingSizeUnit?: string;
     foodNutrients?: FdcNutrientRow[];
-    brandedFood?: { ingredients?: string };
+    brandedFood?: {
+      ingredients?: string;
+      brandedFoodCategory?: string;
+      servingSize?: number;
+      servingSizeUnit?: string;
+    };
     ingredients?: string;
   }>(`/food/${encodeURIComponent(externalId)}?${params.toString()}`);
 
@@ -268,14 +273,19 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
   const imageUrl = food.gtinUpc
     ? await resolveOffImageByBarcode(food.gtinUpc)
     : undefined;
-  const servingGramsPerUnit = usdaServingGramsPerEach(food);
+  const servingGramsPerUnit = usdaServingGramsPerEach({
+    servingSize: food.servingSize ?? food.brandedFood?.servingSize,
+    servingSizeUnit: food.servingSizeUnit ?? food.brandedFood?.servingSizeUnit,
+  });
 
   return {
     source: "usda_fdc",
     externalId: String(food.fdcId ?? externalId),
     name,
     category: normalizeFdcCategory(
-      food.brandedFoodCategory ?? food.foodCategory,
+      food.brandedFoodCategory ??
+        food.brandedFood?.brandedFoodCategory ??
+        food.foodCategory,
     ),
     brandOwner: food.brandOwner?.trim() || undefined,
     unit: "gram",
@@ -308,7 +318,7 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
       nutriments?: Record<string, number | undefined>;
       image_front_url?: unknown;
       image_url?: unknown;
-      serving_size?: number;
+      serving_size?: string | number;
       serving_quantity?: number;
     };
   }>(
@@ -507,10 +517,15 @@ export const applyImageToIngredient = action({
     const auth = await getAuthContext(ctx);
     requireKitchenStaff(auth);
 
+    const trimmed = args.imageUrl.trim();
+    if (!trimmed) {
+      return { imageApplied: false };
+    }
+
     const imageApplied = await applyCatalogImageFromUrl(
       ctx,
       args.docId,
-      args.imageUrl.trim(),
+      trimmed,
     );
     return { imageApplied };
   },

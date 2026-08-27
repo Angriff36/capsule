@@ -136,6 +136,15 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 name="lookupImageUrl"
                 value={lookupImageUrl}
               />
+              <input
+                type="hidden"
+                name="lookupServingGrams"
+                value={
+                  lookupServingGrams != null && lookupServingGrams > 0
+                    ? String(lookupServingGrams)
+                    : ""
+                }
+              />
             </div>
             <label className="field-label">
               Name
