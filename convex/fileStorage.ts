@@ -29,6 +29,7 @@ export const listForParent = query({
       v.literal("delivery"),
       v.literal("closeout"),
       v.literal("dish"),
+      v.literal("ingredient"),
     ),
     parentId: v.string(),
   },

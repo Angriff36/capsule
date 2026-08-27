@@ -33,6 +33,8 @@ import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
+import { IngredientCatalogLabel } from "./IngredientCatalogLabel";
+import { IngredientOptionPicker } from "./IngredientOptionPicker";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -493,12 +495,11 @@ export function ComponentDetailPage() {
                     ) : null}
                   </strong>
                   <span>
-                    <CulinaryEntityLink
-                      kind="ingredient"
-                      id={line.ingredientId}
-                    >
-                      {ingredientName(line.ingredientId)}
-                    </CulinaryEntityLink>
+                    <IngredientCatalogLabel
+                      ingredientId={line.ingredientId}
+                      ingredients={ingredients}
+                      link
+                    />
                   </span>
                   <span>{line.prepNotes || "No preparation note"}</span>
                   <div className="culinary-line-actions">
@@ -595,22 +596,9 @@ export function ComponentDetailPage() {
 
           {showLineForm ? (
             <form className="culinary-line-form" onSubmit={submitLine}>
-              <label className="field-label">
+              <label className="field-label sm:col-span-2">
                 Ingredient
-                <select name="ingredientId" className="input" required>
-                  <option value="">Select ingredient</option>
-                  {(ingredients ?? [])
-                    .filter(
-                      (ingredient) =>
-                        ingredient.deletedAt == null &&
-                        ingredient.status === "active",
-                    )
-                    .map((ingredient) => (
-                      <option key={ingredient._id} value={ingredient._id}>
-                        {ingredient.name}
-                      </option>
-                    ))}
-                </select>
+                <IngredientOptionPicker ingredients={ingredients} required />
               </label>
               <label className="field-label">
                 Quantity

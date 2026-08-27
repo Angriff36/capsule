@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useIngredientLookupApplyToIngredient } from "../../lib/ingredientLookupClient";
 import {
   useGetIngredient,
   useIngredientPurge,
@@ -18,6 +19,7 @@ import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
+import { IngredientPrimaryImageUploader } from "../attachments/IngredientPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
 import {
   latestPriceByIngredient,
@@ -30,6 +32,42 @@ import { IngredientDetailsEditor } from "./IngredientDetailsEditor";
 import { IngredientNutritionEditor } from "./IngredientNutritionEditor";
 import { IngredientSubstitutionEditor } from "./IngredientSubstitutionEditor";
 import { kitchenCatalogPath } from "./kitchenRoutes";
+import { IngredientDatabaseLookup } from "./lookup/IngredientDatabaseLookup";
+import type { IngredientAutofillProfile } from "./lookup/ExternalIngredientProfile";
+
+function nutritionPayload(nutrition: IngredientAutofillProfile["nutrition"]) {
+  const out: Record<string, number> = {};
+  const entries: [
+    keyof IngredientAutofillProfile["nutrition"],
+    number | null | undefined,
+  ][] = [
+    ["caloriesPerUnit", nutrition.caloriesPerUnit],
+    ["proteinGramsPerUnit", nutrition.proteinGramsPerUnit],
+    ["carbsGramsPerUnit", nutrition.carbsGramsPerUnit],
+    ["fatGramsPerUnit", nutrition.fatGramsPerUnit],
+    ["fiberGramsPerUnit", nutrition.fiberGramsPerUnit],
+    ["sugarGramsPerUnit", nutrition.sugarGramsPerUnit],
+    ["sodiumMgPerUnit", nutrition.sodiumMgPerUnit],
+    ["calciumMgPerUnit", nutrition.calciumMgPerUnit],
+    ["ironMgPerUnit", nutrition.ironMgPerUnit],
+  ];
+  for (const [field, value] of entries) {
+    if (value != null && Number.isFinite(Number(value)) && Number(value) >= 0) {
+      out[field] = Number(value);
+    }
+  }
+  return out as {
+    caloriesPerUnit?: number;
+    proteinGramsPerUnit?: number;
+    carbsGramsPerUnit?: number;
+    fatGramsPerUnit?: number;
+    fiberGramsPerUnit?: number;
+    sugarGramsPerUnit?: number;
+    sodiumMgPerUnit?: number;
+    calciumMgPerUnit?: number;
+    ironMgPerUnit?: number;
+  };
+}
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -268,6 +306,7 @@ export function IngredientDetailPage() {
   const priceObservations = useListIngredientPriceObservation();
   const purge = useIngredientPurge();
   const reinstate = useIngredientReinstate();
+  const applyLookup = useIngredientLookupApplyToIngredient();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
@@ -350,6 +389,36 @@ export function IngredientDetailPage() {
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
+      {ingredient.status === "active" ? (
+        <div className="mt-4">
+          <IngredientDatabaseLookup
+            disabled={busy != null}
+            label="Update from food database"
+            onApply={async (profile: IngredientAutofillProfile) => {
+              setFailure(null);
+              setBusy("lookup");
+              try {
+                return await applyLookup({
+                  docId: ingredient._id,
+                  profile: {
+                    name: profile.name,
+                    unit: profile.unit,
+                    category: profile.category,
+                    allergens: profile.allergens,
+                    isGlutenFree: profile.isGlutenFree,
+                    nutrition: nutritionPayload(profile.nutrition),
+                  },
+                });
+              } catch (error) {
+                setFailure(error);
+                throw error;
+              } finally {
+                setBusy(null);
+              }
+            }}
+          />
+        </div>
+      ) : null}
       <header className="culinary-header-compact">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -405,13 +474,35 @@ export function IngredientDetailPage() {
           <div>
             <dt>Allergens</dt>
             <dd>
+              {ingredient.isGlutenFree ? (
+                <span className="chip border-ok/40 bg-ok-soft text-ok mr-2">
+                  Gluten free
+                </span>
+              ) : null}
               {(ingredient.allergens ?? []).length
                 ? (ingredient.allergens ?? []).join(", ")
-                : "None recorded"}
+                : ingredient.isGlutenFree
+                  ? "None flagged"
+                  : "None recorded"}
             </dd>
           </div>
         </dl>
       </header>
+
+      {ingredient.status === "active" ? (
+        <section className="culinary-section">
+          <div className="culinary-section-heading">
+            <h2>Primary image</h2>
+          </div>
+          <IngredientPrimaryImageUploader
+            ingredientId={ingredient._id}
+            ingredientVersion={ingredient.version}
+            ingredientName={ingredient.name}
+            storageId={ingredient.primaryImageStorageId}
+            onError={setFailure}
+          />
+        </section>
+      ) : null}
 
       <IngredientDetailsEditor
         key={`details:${ingredient._id}:${ingredient.version}`}

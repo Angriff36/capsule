@@ -5,6 +5,9 @@ import type { ReorderSuggestion } from "./reorderSuggestion";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
 import type { VendorPerformance } from "./vendorPerformance";
+import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
+import type { IngredientCatalogRow } from "../kitchen/IngredientCatalogLabel";
+import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 
 const formatQty = (value: number): string =>
   Number.isInteger(value) ? String(value) : value.toFixed(2);
@@ -62,6 +65,7 @@ export type PurchasingQueueSplitProps = {
   linkedLine: (need: PurchaseNeed) => VendorOrderLine | undefined;
   reorderSuggestion: (need: PurchaseNeed) => ReorderSuggestion | undefined;
   ingredientName: (id: string) => string;
+  ingredients?: readonly IngredientCatalogRow[];
   eventName: (id: string) => string;
   onNeedAction: (need: PurchaseNeed, key: string) => void;
   onOnboardVendor: () => void;
@@ -82,6 +86,7 @@ export function PurchasingQueueSplit({
   linkedLine,
   reorderSuggestion,
   ingredientName,
+  ingredients,
   eventName,
   onNeedAction,
   onOnboardVendor,
@@ -117,85 +122,95 @@ export function PurchasingQueueSplit({
             </div>
           </div>
         ) : (
-          <ul className="purchase-queue">
-            {activeNeeds.map((need) => {
-              const line = linkedLine(need);
-              const suggestion = reorderSuggestion(need);
-              return (
-                <li key={need._id}>
-                  {canSelectNeed(need) ? (
-                    <label className="flex items-center gap-2 self-start">
-                      <input
-                        type="checkbox"
-                        aria-label={`Select ${ingredientName(need.ingredientId)}`}
-                        checked={isNeedSelected(need._id)}
-                        disabled={busy != null}
-                        onChange={(event) =>
-                          onToggleNeed(need._id, event.target.checked)
-                        }
-                      />
-                    </label>
-                  ) : null}
-                  <div>
-                    <strong>{ingredientName(need.ingredientId)}</strong>
-                    <span>
-                      {eventName(need.eventId)} · {need.requiredQuantity}{" "}
-                      {need.unit}
-                    </span>
-                    {suggestion && suggestion.suggestedQuantity > 0 ? (
-                      <small
-                        className="block text-ink-2"
-                        data-testid="reorder-suggestion"
-                        title={`Demand ${formatQty(suggestion.demand)} + par top-up ${formatQty(
-                          suggestion.parShortfall,
-                        )}${
-                          suggestion.bufferFraction > 0
-                            ? ` + ${Math.round(suggestion.bufferFraction * 100)}% variance buffer`
-                            : ""
-                        }`}
-                      >
-                        Suggest order: {formatQty(suggestion.suggestedQuantity)}{" "}
-                        {need.unit}
-                      </small>
+          <IngredientCatalogImageProvider ingredients={ingredients}>
+            <ul className="purchase-queue">
+              {activeNeeds.map((need) => {
+                const line = linkedLine(need);
+                const suggestion = reorderSuggestion(need);
+                return (
+                  <li key={need._id}>
+                    {canSelectNeed(need) ? (
+                      <label className="flex items-center gap-2 self-start">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select ${ingredientName(need.ingredientId)}`}
+                          checked={isNeedSelected(need._id)}
+                          disabled={busy != null}
+                          onChange={(event) =>
+                            onToggleNeed(need._id, event.target.checked)
+                          }
+                        />
+                      </label>
                     ) : null}
-                  </div>
-                  <StatusChip status={String(need.status)} />
-                  <div className="supply-row-actions">
-                    {policy
-                      .purchaseNeedActions(String(need.status))
-                      .map((action) => (
-                        <button
-                          key={action.key}
-                          className="btn btn-ghost btn-sm"
-                          disabled={
-                            busy != null ||
-                            (action.key === "markOrdered" && !line)
-                          }
-                          title={
-                            action.key === "markOrdered" && !line
-                              ? "Add an order line linked to this demand first"
-                              : undefined
-                          }
-                          onClick={() => onNeedAction(need, action.key)}
+                    <div>
+                      {ingredients ? (
+                        <IngredientCatalogLabel
+                          ingredientId={need.ingredientId}
+                          ingredients={ingredients}
+                          link
+                        />
+                      ) : (
+                        <strong>{ingredientName(need.ingredientId)}</strong>
+                      )}
+                      <span>
+                        {eventName(need.eventId)} · {need.requiredQuantity}{" "}
+                        {need.unit}
+                      </span>
+                      {suggestion && suggestion.suggestedQuantity > 0 ? (
+                        <small
+                          className="block text-ink-2"
+                          data-testid="reorder-suggestion"
+                          title={`Demand ${formatQty(suggestion.demand)} + par top-up ${formatQty(
+                            suggestion.parShortfall,
+                          )}${
+                            suggestion.bufferFraction > 0
+                              ? ` + ${Math.round(suggestion.bufferFraction * 100)}% variance buffer`
+                              : ""
+                          }`}
                         >
-                          {busy === `${need._id}:${action.key}`
-                            ? "Working…"
-                            : action.label}
-                        </button>
-                      ))}
-                  </div>
-                  {line ? (
-                    <small>
-                      Line {line._id.slice(-8)} · order{" "}
-                      {line.vendorOrderId.slice(-8)}
-                    </small>
-                  ) : (
-                    <small>No linked order line</small>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+                          Suggest order:{" "}
+                          {formatQty(suggestion.suggestedQuantity)} {need.unit}
+                        </small>
+                      ) : null}
+                    </div>
+                    <StatusChip status={String(need.status)} />
+                    <div className="supply-row-actions">
+                      {policy
+                        .purchaseNeedActions(String(need.status))
+                        .map((action) => (
+                          <button
+                            key={action.key}
+                            className="btn btn-ghost btn-sm"
+                            disabled={
+                              busy != null ||
+                              (action.key === "markOrdered" && !line)
+                            }
+                            title={
+                              action.key === "markOrdered" && !line
+                                ? "Add an order line linked to this demand first"
+                                : undefined
+                            }
+                            onClick={() => onNeedAction(need, action.key)}
+                          >
+                            {busy === `${need._id}:${action.key}`
+                              ? "Working…"
+                              : action.label}
+                          </button>
+                        ))}
+                    </div>
+                    {line ? (
+                      <small>
+                        Line {line._id.slice(-8)} · order{" "}
+                        {line.vendorOrderId.slice(-8)}
+                      </small>
+                    ) : (
+                      <small>No linked order line</small>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </IngredientCatalogImageProvider>
         )}
       </section>
       <aside className="vendor-index">

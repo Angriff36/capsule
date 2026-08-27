@@ -81,7 +81,7 @@ export function CulinaryRecordPicker({
             key={row._id}
             className="flex flex-wrap items-center gap-3 border-b border-line/70 pb-2"
           >
-            {kind === "dish" ? (
+            {kind === "dish" || kind === "ingredient" ? (
               <DishPrimaryImage
                 storageId={row.primaryImageStorageId}
                 alt={row.name}
