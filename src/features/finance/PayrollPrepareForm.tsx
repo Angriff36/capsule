@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from "react";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { usePersonPeriodLaborSummary } from "../facilities/useLaborSummary";
-import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { localDayEndExclusive, localDayStart } from "./payrollPeriod";
+
+export { PayrollPreparePayloadBuilder } from "./PayrollPreparePayloadBuilder";
 
 type PersonOption = {
   _id: string;
@@ -18,53 +21,6 @@ type EventOption = {
 
 const personLabel = (person: PersonOption) =>
   `${person.givenName ?? ""} ${person.familyName ?? ""}`.trim() || "Person";
-
-const minutes = (value: FormDataEntryValue | null) => {
-  const amount = Number(String(value ?? "").trim());
-  return Number.isFinite(amount) ? Math.trunc(amount) : Number.NaN;
-};
-
-/** Builds a PayrollInput.prepare payload from the prepare form. */
-export class PayrollPreparePayloadBuilder {
-  fromForm(data: FormData) {
-    const personId = String(data.get("personId") || "").trim();
-    const periodStartRaw = String(data.get("periodStart") || "").trim();
-    const periodEndRaw = String(data.get("periodEnd") || "").trim();
-    const regularMinutes = minutes(data.get("regularMinutes"));
-    const overtimeMinutes = minutes(data.get("overtimeMinutes"));
-    const eventId = String(data.get("eventId") || "").trim();
-    if (!personId || !periodStartRaw || !periodEndRaw) {
-      throw new Error("Person and payroll period are required.");
-    }
-    if (
-      [regularMinutes, overtimeMinutes].some((n) => Number.isNaN(n) || n < 0)
-    ) {
-      throw new Error("Regular and overtime minutes must be non-negative.");
-    }
-    const periodStart = new Date(periodStartRaw).getTime();
-    const periodEnd = new Date(periodEndRaw).getTime();
-    if (
-      !Number.isFinite(periodStart) ||
-      !Number.isFinite(periodEnd) ||
-      periodEnd < periodStart
-    ) {
-      throw new Error("Period end must be on or after period start.");
-    }
-    // Rates/grossAmount are private encrypted money in source; Convex schema
-    // still projects them as number while encryption stores ciphertext — omit
-    // until Manifest projects encrypted money storage correctly (issue #76).
-    return {
-      personId,
-      periodStart,
-      periodEnd,
-      regularMinutes,
-      overtimeMinutes,
-      totalMinutes: regularMinutes + overtimeMinutes,
-      eventId: eventId || undefined,
-      notes: String(data.get("notes") || "").trim() || undefined,
-    };
-  }
-}
 
 export function PayrollPrepareForm({
   people,
@@ -84,15 +40,21 @@ export function PayrollPrepareForm({
   // Manual edit wins over the clocked prefill until person/period changes.
   const [regularOverride, setRegularOverride] = useState<string | null>(null);
 
-  const startAt = periodStart ? new Date(periodStart).getTime() : Number.NaN;
-  const endAt = periodEnd ? new Date(periodEnd).getTime() : Number.NaN;
+  // Whole local days, end date inclusive — the export preview's rule — so
+  // the clocked prefill and the preview count the same records.
+  const startAt = periodStart ? localDayStart(periodStart) : Number.NaN;
+  const endExclusiveAt = periodEnd
+    ? localDayEndExclusive(periodEnd)
+    : Number.NaN;
   const windowReady =
     personId !== "" &&
     Number.isFinite(startAt) &&
-    Number.isFinite(endAt) &&
-    endAt >= startAt;
+    Number.isFinite(endExclusiveAt) &&
+    endExclusiveAt > startAt;
   const clocked = usePersonPeriodLaborSummary(
-    windowReady ? { personId, periodStart: startAt, periodEnd: endAt } : null,
+    windowReady
+      ? { personId, periodStart: startAt, periodEnd: endExclusiveAt }
+      : null,
   );
 
   const activePeople = people.filter(
@@ -155,7 +117,7 @@ export function PayrollPrepareForm({
       <div className="supply-form-grid">
         <label className="field-label">
           Period start
-          <BoundedDateTimeLocalInput
+          <BoundedDateInput
             className="input"
             name="periodStart"
             required
@@ -168,7 +130,7 @@ export function PayrollPrepareForm({
         </label>
         <label className="field-label">
           Period end
-          <BoundedDateTimeLocalInput
+          <BoundedDateInput
             className="input"
             name="periodEnd"
             required

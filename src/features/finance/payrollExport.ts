@@ -1,3 +1,12 @@
+import {
+  cleanText,
+  finiteNumber,
+  localDayEndExclusive,
+  localDayStart,
+  payrollReadyClockedMinutes,
+  roundPayrollHours,
+  timestamp,
+} from "./payrollPeriod";
 import { parseTipPayrollNote, payrollNoteDisplayText } from "./tipDistribution";
 
 export type PayrollProcessor = "gusto" | "adp" | "paychex";
@@ -55,6 +64,7 @@ type PayrollInputRow = {
 
 export type PayrollExportRow = {
   personId: string;
+  /** Payroll employee number; empty when none is set — never a raw Capsule _id. */
   employeeId: string;
   employeeName: string;
   regularHours: number;
@@ -65,7 +75,7 @@ export type PayrollExportRow = {
   memo: string;
   timeRecordCount: number;
   payrollInputCount: number;
-  usesFallbackEmployeeId: boolean;
+  missingEmployeeNumber: boolean;
 };
 
 export type PayrollExportDocument = {
@@ -77,7 +87,7 @@ export type PayrollExportDocument = {
   rows: PayrollExportRow[];
   timeRecordCount: number;
   payrollInputCount: number;
-  fallbackEmployeeIdCount: number;
+  missingEmployeeNumberCount: number;
 };
 
 type BuildPayrollExportInput = {
@@ -102,37 +112,6 @@ type Accumulator = {
   minuteInputCount: number;
 };
 
-const PAYROLL_READY_TIME_STATUSES = new Set(["closed", "corrected"]);
-
-function localDayStart(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return Number.NaN;
-  const date = new Date(`${value}T00:00:00`);
-  return date.getFullYear() === Number(value.slice(0, 4)) &&
-    date.getMonth() + 1 === Number(value.slice(5, 7)) &&
-    date.getDate() === Number(value.slice(8, 10))
-    ? date.getTime()
-    : Number.NaN;
-}
-
-function timestamp(value: unknown) {
-  if (value instanceof Date) return value.getTime();
-  if (typeof value === "number") return value;
-  if (typeof value === "string" && value.trim()) {
-    const parsed = new Date(value).getTime();
-    return Number.isFinite(parsed) ? parsed : Number.NaN;
-  }
-  return Number.NaN;
-}
-
-function finiteNumber(value: unknown, fallback = 0) {
-  const number = typeof value === "number" ? value : Number(value);
-  return Number.isFinite(number) ? number : fallback;
-}
-
-function cleanText(value: unknown) {
-  return typeof value === "string" ? value.trim() : "";
-}
-
 function getAccumulator(map: Map<string, Accumulator>, personId: string) {
   const current = map.get(personId);
   if (current) return current;
@@ -150,10 +129,6 @@ function getAccumulator(map: Map<string, Accumulator>, personId: string) {
   };
   map.set(personId, created);
   return created;
-}
-
-function roundHours(minutes: number) {
-  return Math.round((minutes / 60) * 100) / 100;
 }
 
 function spreadsheetSafe(value: string) {
@@ -249,6 +224,17 @@ function processorCsv(
   ].join("\r\n")}\r\n`;
 }
 
+/** CSV download is off while any row lacks a payroll employee number. */
+export function payrollCsvDownloadAllowed(
+  document: PayrollExportDocument | null,
+): boolean {
+  return (
+    document != null &&
+    document.rows.length > 0 &&
+    document.missingEmployeeNumberCount === 0
+  );
+}
+
 /**
  * Compiles payroll-ready time plus finalized payroll inputs without writing a
  * second source of truth. A finalized input is the reviewed person/period
@@ -270,38 +256,14 @@ export function buildPayrollExport({
   if (endAt < startAt) {
     throw new Error("Payroll period end must be on or after its start.");
   }
-  const endExclusive = new Date(endAt);
-  endExclusive.setDate(endExclusive.getDate() + 1);
-  const endExclusiveAt = endExclusive.getTime();
+  const endExclusiveAt = localDayEndExclusive(periodEnd);
   const accumulators = new Map<string, Accumulator>();
 
   for (const record of timeRecords) {
-    if (
-      record.deletedAt != null ||
-      !PAYROLL_READY_TIME_STATUSES.has(String(record.status))
-    ) {
-      continue;
-    }
-    const personId = cleanText(record.personId);
-    const clockInAt = timestamp(record.clockInAt);
-    const clockOutAt = timestamp(record.clockOutAt);
-    if (
-      !personId ||
-      !Number.isFinite(clockInAt) ||
-      !Number.isFinite(clockOutAt) ||
-      clockOutAt < clockInAt ||
-      clockInAt < startAt ||
-      clockOutAt > endExclusiveAt
-    ) {
-      continue;
-    }
-    const workedMinutes = Math.max(
-      0,
-      (clockOutAt - clockInAt) / 60_000 -
-        Math.max(0, finiteNumber(record.breakMinutes)),
-    );
-    const accumulator = getAccumulator(accumulators, personId);
-    accumulator.recordedMinutes += workedMinutes;
+    const clocked = payrollReadyClockedMinutes(record, startAt, endExclusiveAt);
+    if (!clocked) continue;
+    const accumulator = getAccumulator(accumulators, clocked.personId);
+    accumulator.recordedMinutes += clocked.minutes;
     accumulator.timeRecordCount += 1;
   }
 
@@ -369,19 +331,21 @@ export function buildPayrollExport({
       const memo = [sourceSummary, ...entry.notes].join(" | ");
       return {
         personId: entry.personId,
-        employeeId: employeeNumber || entry.personId,
+        // Never fall back to the raw Capsule _id: a CSV of r5…-style IDs is
+        // not importable payroll, and the preview must not print ID slices.
+        employeeId: employeeNumber,
         employeeName,
-        regularHours: roundHours(regularMinutes),
-        overtimeHours: roundHours(overtimeMinutes),
-        recordedHours: roundHours(entry.recordedMinutes),
-        manualAdjustmentHours: roundHours(manualAdjustmentMinutes),
+        regularHours: roundPayrollHours(regularMinutes),
+        overtimeHours: roundPayrollHours(overtimeMinutes),
+        recordedHours: roundPayrollHours(entry.recordedMinutes),
+        manualAdjustmentHours: roundPayrollHours(manualAdjustmentMinutes),
         grossAmount: entry.hasGrossAmount
           ? Math.round(entry.grossAmount * 100) / 100
           : null,
         memo,
         timeRecordCount: entry.timeRecordCount,
         payrollInputCount: entry.payrollInputCount,
-        usesFallbackEmployeeId: !employeeNumber,
+        missingEmployeeNumber: !employeeNumber,
       };
     })
     .sort(
@@ -405,7 +369,7 @@ export function buildPayrollExport({
       (total, row) => total + row.payrollInputCount,
       0,
     ),
-    fallbackEmployeeIdCount: rows.filter((row) => row.usesFallbackEmployeeId)
+    missingEmployeeNumberCount: rows.filter((row) => row.missingEmployeeNumber)
       .length,
   };
 }

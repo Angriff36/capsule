@@ -146,6 +146,7 @@ export function TeamRolesPanel({
     const email = String(data.get("email") ?? "").trim();
     const phone = String(data.get("phone") ?? "").trim();
     const role = String(data.get("role") ?? "staff");
+    const employeeNumber = String(data.get("employeeNumber") ?? "").trim();
     const authSubjectId = String(data.get("authSubjectId") ?? "").trim();
     if (!givenName || !familyName || !email) {
       setError("First name, last name, and email are required.");
@@ -165,6 +166,7 @@ export function TeamRolesPanel({
         email,
         role,
         ...(phone ? { phone } : {}),
+        ...(employeeNumber ? { employeeNumber } : {}),
         ...(authSubjectId ? { authSubjectId } : {}),
       });
       form.reset();
@@ -325,6 +327,14 @@ export function TeamRolesPanel({
           <label className="block text-sm">
             <span className="meta-term">Phone (for SMS alerts)</span>
             <input name="phone" type="tel" className="input mt-1" />
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Employee number</span>
+            <input
+              name="employeeNumber"
+              className="input mt-1"
+              autoComplete="off"
+            />
           </label>
           <label className="block text-sm">
             <span className="meta-term">Capsule role</span>
