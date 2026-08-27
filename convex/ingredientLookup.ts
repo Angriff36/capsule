@@ -1,9 +1,15 @@
 // AUTHOR-OWNED — USDA FoodData Central + Open Food Facts proxy for ingredient autofill.
 // Keys stay on the Convex deployment (USDA_FDC_API_KEY); falls back to DEMO_KEY locally.
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { action } from "./_generated/server";
 import { api } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
+import {
+  fdcApiKey,
+  fdcFetch,
+  offFetchJson,
+  safeLookupString,
+} from "./lib/foodDatabaseClient";
 import { requireKitchenAccess } from "./lib/kitchenAccessGate";
 import {
   mapFdcNutrientsPerGram,
@@ -43,7 +49,6 @@ function resolveGlutenFree(
   return Boolean(existing);
 }
 
-const FDC_BASE = "https://api.nal.usda.gov/fdc/v1";
 const OFF_BASE = "https://world.openfoodfacts.org/api/v2";
 const OFF_SEARCH_BASE = "https://world.openfoodfacts.org/cgi/search.pl";
 
@@ -51,10 +56,6 @@ const lookupSource = v.union(
   v.literal("usda_fdc"),
   v.literal("open_food_facts"),
 );
-
-function fdcApiKey(): string {
-  return process.env.USDA_FDC_API_KEY?.trim() || "DEMO_KEY";
-}
 
 function requireKitchenStaff(auth: Awaited<ReturnType<typeof getAuthContext>>) {
   requireKitchenAccess(auth);
@@ -80,24 +81,9 @@ type AutofillProfile = SearchHit & {
   sourceLabel: string;
 };
 
-async function fdcFetch<T>(path: string): Promise<T> {
-  const response = await fetch(`${FDC_BASE}${path}`, {
-    headers: { Accept: "application/json" },
-  });
-  if (!response.ok) {
-    throw new Error(`Food database request failed (${response.status})`);
-  }
-  return (await response.json()) as T;
-}
-
 async function offFetch<T>(path: string): Promise<T> {
-  const response = await fetch(`${OFF_BASE}${path}`, {
-    headers: { Accept: "application/json", "User-Agent": "Capsule/1.0" },
-  });
-  if (!response.ok) {
-    throw new Error(`Open Food Facts request failed (${response.status})`);
-  }
-  return (await response.json()) as T;
+  const body = await offFetchJson(`${OFF_BASE}${path}`);
+  return body as T;
 }
 
 async function searchUsdaFoods(
@@ -114,21 +100,28 @@ async function searchUsdaFoods(
   const payload = await fdcFetch<{
     foods?: Array<{
       fdcId?: number;
-      description?: string;
-      foodCategory?: string;
-      brandOwner?: string;
+      description?: unknown;
+      foodCategory?: string | { description?: string | null };
+      brandOwner?: unknown;
     }>;
   }>(`/foods/search?${params.toString()}`);
 
-  return (payload.foods ?? [])
-    .filter((row) => row.fdcId != null && row.description?.trim())
-    .map((row) => ({
-      source: "usda_fdc" as const,
+  const rows = Array.isArray(payload.foods) ? payload.foods : [];
+  const hits: SearchHit[] = [];
+
+  for (const row of rows) {
+    const name = safeLookupString(row.description);
+    if (row.fdcId == null || !name) continue;
+    hits.push({
+      source: "usda_fdc",
       externalId: String(row.fdcId),
-      name: row.description!.trim(),
+      name,
       category: normalizeFdcCategory(row.foodCategory),
-      brandOwner: row.brandOwner?.trim() || undefined,
-    }));
+      brandOwner: safeLookupString(row.brandOwner),
+    });
+  }
+
+  return hits;
 }
 
 async function searchOpenFoodFacts(
@@ -143,30 +136,34 @@ async function searchOpenFoodFacts(
     fields: "code,product_name,brands,categories_tags",
   });
 
-  const response = await fetch(`${OFF_SEARCH_BASE}?${params.toString()}`, {
-    headers: { Accept: "application/json", "User-Agent": "Capsule/1.0" },
-  });
-  if (!response.ok) {
-    throw new Error(`Open Food Facts request failed (${response.status})`);
-  }
-  const payload = (await response.json()) as {
+  const payload = (await offFetchJson(
+    `${OFF_SEARCH_BASE}?${params.toString()}`,
+  )) as {
     products?: Array<{
-      code?: string;
-      product_name?: string;
-      brands?: string;
-      categories_tags?: string[];
+      code?: unknown;
+      product_name?: unknown;
+      brands?: unknown;
+      categories_tags?: unknown[];
     }>;
   };
 
-  return (payload.products ?? [])
-    .filter((row) => row.code?.trim() && row.product_name?.trim())
-    .map((row) => ({
-      source: "open_food_facts" as const,
-      externalId: row.code!.trim(),
-      name: row.product_name!.trim(),
+  const rows = Array.isArray(payload.products) ? payload.products : [];
+  const hits: SearchHit[] = [];
+
+  for (const row of rows) {
+    const externalId = safeLookupString(row.code);
+    const name = safeLookupString(row.product_name);
+    if (!externalId || !name) continue;
+    hits.push({
+      source: "open_food_facts",
+      externalId,
+      name,
       category: offCategory(row.categories_tags),
-      brandOwner: row.brands?.trim() || undefined,
-    }));
+      brandOwner: safeLookupString(row.brands),
+    });
+  }
+
+  return hits;
 }
 
 /** Typeahead search against USDA FoodData Central and Open Food Facts. */
@@ -200,8 +197,8 @@ export const searchFoods = action({
 
     const hits = [...usda, ...off].slice(0, pageSize);
     if (hits.length === 0 && (usdaError || offError)) {
-      throw new Error(
-        "Food database search is unavailable right now — try again in a moment.",
+      throw new ConvexError(
+        "Food database search is unavailable right now — wait a moment and try again. If this keeps happening, add a USDA FoodData Central API key to the Convex deployment.",
       );
     }
 
@@ -222,7 +219,7 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
   }>(`/food/${encodeURIComponent(externalId)}?${params.toString()}`);
 
   const name = food.description?.trim();
-  if (!name) throw new Error("Food record has no description");
+  if (!name) throw new ConvexError("Food record has no description");
 
   const ingredientsText =
     food.brandedFood?.ingredients?.trim() || food.ingredients?.trim() || null;
@@ -266,10 +263,10 @@ async function loadOffAutofill(externalId: string): Promise<AutofillProfile> {
   );
 
   const product = payload.product;
-  if (!product) throw new Error("Product not found in Open Food Facts");
+  if (!product) throw new ConvexError("Product not found in Open Food Facts");
 
   const name = product.product_name?.trim();
-  if (!name) throw new Error("Product has no name in Open Food Facts");
+  if (!name) throw new ConvexError("Product has no name in Open Food Facts");
 
   const allergenParse =
     (product.allergens_tags?.length ?? 0) > 0
@@ -317,7 +314,7 @@ export const getFoodAutofill = action({
     requireKitchenStaff(auth);
 
     const externalId = args.externalId.trim();
-    if (!externalId) throw new Error("Food record id is required");
+    if (!externalId) throw new ConvexError("Food record id is required");
 
     const source = args.source ?? "usda_fdc";
     if (source === "open_food_facts") {

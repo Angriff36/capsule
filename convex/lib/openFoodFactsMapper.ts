@@ -19,8 +19,11 @@ export function mapOffNutrimentsPerGram(nutriments?: Record<string, number | und
   return mapFdcNutrientsPerGram(rows);
 }
 
-export function offCategory(tags?: string[]): string | undefined {
-  const tag = (tags ?? []).find((value) => value.startsWith("en:"));
+export function offCategory(tags?: readonly unknown[]): string | undefined {
+  const tag = (tags ?? []).find(
+    (value): value is string =>
+      typeof value === "string" && value.startsWith("en:"),
+  );
   if (!tag) return undefined;
   return tag
     .replace(/^en:/, "")
