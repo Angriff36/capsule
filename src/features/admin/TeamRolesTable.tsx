@@ -2,6 +2,7 @@ import { formatStatusLabel } from "../../lib/statusLabels";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
 import { PersonEmployeeNumberField } from "./PersonEmployeeNumberField";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
+import { StaffSignInCell } from "./StaffSignInCell";
 import type { TeamPerson } from "./TeamPerson";
 
 export function TeamRolesTable({
@@ -12,9 +13,7 @@ export function TeamRolesTable({
   onAssignRole,
   onSetPayRate,
   rateByPersonId,
-  clerkMembers,
-  linkedSubjectIds,
-  onLinkAccount,
+  onSendSignIn,
   onUnlinkAccount,
   onNotice,
   onError,
@@ -27,13 +26,7 @@ export function TeamRolesTable({
   onAssignRole: (person: TeamPerson, role: string) => Promise<void>;
   onSetPayRate: (person: TeamPerson, hourlyRate: number) => Promise<void>;
   rateByPersonId: ReadonlyMap<string, number | null>;
-  clerkMembers: readonly {
-    userId: string;
-    name: string;
-    identifier?: string | null;
-  }[];
-  linkedSubjectIds: ReadonlySet<string>;
-  onLinkAccount: (person: TeamPerson, authSubjectId: string) => Promise<void>;
+  onSendSignIn: (person: TeamPerson) => Promise<void>;
   onUnlinkAccount: (person: TeamPerson) => Promise<void>;
   onNotice: (message: string | null) => void;
   onError: (message: string | null) => void;
@@ -46,7 +39,7 @@ export function TeamRolesTable({
     return (
       <EmptyState
         title="No hired team members yet"
-        hint="Hire people here and link their Clerk sign-in. Until then, Capsule falls back to the Clerk org role claim."
+        hint="Hire someone here and Capsule emails them a sign-in. They open the app from that email."
       />
     );
   }
@@ -56,7 +49,7 @@ export function TeamRolesTable({
         <thead>
           <tr>
             <th className="th">Member</th>
-            <th className="th">Linked sign-in</th>
+            <th className="th">Sign-in</th>
             <th className="th">Capsule role</th>
             <th className="th">Employee number</th>
             <th className="th">Hourly rate</th>
@@ -74,13 +67,11 @@ export function TeamRolesTable({
                 </span>
               </td>
               <td className="border-b border-line px-3 py-3 text-xs">
-                <PersonLinkCell
+                <StaffSignInCell
                   person={person}
                   canEdit={canEdit}
                   busy={busy === person._id}
-                  clerkMembers={clerkMembers}
-                  linkedSubjectIds={linkedSubjectIds}
-                  onLink={onLinkAccount}
+                  onSendSignIn={onSendSignIn}
                   onUnlink={onUnlinkAccount}
                 />
               </td>
@@ -220,97 +211,5 @@ function PersonPayRateCell({
       </button>
       {hasRate ? null : <span className="text-xs text-warn">unset</span>}
     </form>
-  );
-}
-
-function PersonLinkCell({
-  person,
-  canEdit,
-  busy,
-  clerkMembers,
-  linkedSubjectIds,
-  onLink,
-  onUnlink,
-}: Readonly<{
-  person: TeamPerson;
-  canEdit: boolean;
-  busy: boolean;
-  clerkMembers: readonly {
-    userId: string;
-    name: string;
-    identifier?: string | null;
-  }[];
-  linkedSubjectIds: ReadonlySet<string>;
-  onLink: (person: TeamPerson, authSubjectId: string) => Promise<void>;
-  onUnlink: (person: TeamPerson) => Promise<void>;
-}>) {
-  if (person.authSubjectId) {
-    const member = clerkMembers.find(
-      (row) => row.userId === person.authSubjectId,
-    );
-    return (
-      <div className="grid gap-1">
-        <span className="text-ink-2">{member?.name ?? "Linked account"}</span>
-        <code className="font-mono text-2xs text-ink-3">
-          {person.authSubjectId}
-        </code>
-        {canEdit ? (
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm justify-self-start"
-            disabled={busy}
-            onClick={() => void onUnlink(person)}
-          >
-            {busy ? "Working…" : "Unlink"}
-          </button>
-        ) : null}
-      </div>
-    );
-  }
-
-  if (!canEdit) {
-    return (
-      <span className="text-warn">Not linked — still using Clerk role</span>
-    );
-  }
-
-  // Only accounts not already claimed by another staff row.
-  // Only the provider account whose verified primary email is THIS row's
-  // email — never another staff member's account.
-  const personEmail = person.email.trim().toLowerCase();
-  const available = clerkMembers.filter(
-    (row) =>
-      !linkedSubjectIds.has(row.userId) &&
-      (row.identifier ?? "").trim().toLowerCase() === personEmail,
-  );
-
-  return (
-    <div className="grid gap-1">
-      <span className="text-warn">Not linked — still using Clerk role</span>
-      {available.length === 0 ? (
-        <span className="text-ink-3">
-          No sign-in matches an unlinked staff email yet. Ask them to sign in
-          once, then retry.
-        </span>
-      ) : (
-        <select
-          className="input"
-          defaultValue=""
-          disabled={busy}
-          onChange={(event) => {
-            const value = event.target.value;
-            if (value) void onLink(person, value);
-          }}
-        >
-          <option value="">{busy ? "Working…" : "Link an account…"}</option>
-          {available.map((member) => (
-            <option key={member.userId} value={member.userId}>
-              {member.name}
-              {member.identifier ? ` · ${member.identifier}` : ""}
-            </option>
-          ))}
-        </select>
-      )}
-    </div>
   );
 }

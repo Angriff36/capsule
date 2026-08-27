@@ -9,6 +9,7 @@
  */
 
 import type * as authLink from "../authLink.js";
+import type * as authProvision from "../authProvision.js";
 import type * as authStatus from "../authStatus.js";
 import type * as clientPortal from "../clientPortal.js";
 import type * as computed from "../computed.js";
@@ -31,6 +32,8 @@ import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as kmParser from "../kmParser.js";
 import type * as laborSummary from "../laborSummary.js";
 import type * as lib_authContext from "../lib/authContext.js";
+import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
+import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
 import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
 import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
@@ -56,6 +59,8 @@ import type * as lib_proposalPricing from "../lib/proposalPricing.js";
 import type * as lib_proposalRevision from "../lib/proposalRevision.js";
 import type * as lib_qboSync from "../lib/qboSync.js";
 import type * as lib_servingWeightGrams from "../lib/servingWeightGrams.js";
+import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
+import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
 import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
 import type * as messageInbox from "../messageInbox.js";
@@ -88,6 +93,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   authLink: typeof authLink;
+  authProvision: typeof authProvision;
   authStatus: typeof authStatus;
   clientPortal: typeof clientPortal;
   computed: typeof computed;
@@ -110,6 +116,8 @@ declare const fullApi: ApiFromModules<{
   kmParser: typeof kmParser;
   laborSummary: typeof laborSummary;
   "lib/authContext": typeof lib_authContext;
+  "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
+  "lib/clerkStaffAccount": typeof lib_clerkStaffAccount;
   "lib/clientPortalToken": typeof lib_clientPortalToken;
   "lib/encryption": typeof lib_encryption;
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
@@ -135,6 +143,8 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalRevision": typeof lib_proposalRevision;
   "lib/qboSync": typeof lib_qboSync;
   "lib/servingWeightGrams": typeof lib_servingWeightGrams;
+  "lib/staffSignInMailer": typeof lib_staffSignInMailer;
+  "lib/staffSignInPassword": typeof lib_staffSignInPassword;
   "lib/twilio": typeof lib_twilio;
   "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
   messageInbox: typeof messageInbox;
