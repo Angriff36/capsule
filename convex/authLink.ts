@@ -4,9 +4,8 @@
 // that Person's authSubjectId. After that, getAuthContext resolves tenant and
 // role from the Person — no identity-provider organization needed. Nothing
 // here grants a role; the Person already has one, set by an admin under Team
-// roles. Admin-capable Persons are never self-linked: mailbox control alone
-// must not hand out adminAccess (Person.linkAccount keeps that behind an
-// admin, see src/identity/person.manifest).
+// roles. Hire already assigned that role; self-link only connects the
+// verified mailbox so the hire → email → open-app path is not blocked.
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation, internalQuery } from "./_generated/server";
@@ -157,9 +156,9 @@ export const linkBySubjectEmail = internalMutation({
     if (matches.length > 1) return { linked: false, reason: "ambiguous" };
 
     const person = matches[0]!;
-    if (ADMIN_ROLES.has(String(person.role))) {
-      return { linked: false, reason: "needs_admin_link" };
-    }
+    // Hire already assigned the role to this email. Linking connects the
+    // mailbox we hired — it does not grant a new role. Admin rows used to
+    // require a manual paste; that blocked the hire → email → open-app path.
     // A link left on a terminated/deleted row is cleared first, so a later
     // reactivation can never make two active rows claim this sign-in.
     for (const stale of linkedRows) {

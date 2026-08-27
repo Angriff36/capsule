@@ -8,11 +8,15 @@
 - **Workspace membership** — `src/app/auth/WorkspaceMembershipPolicy.ts` decides claim / org readiness.
 - **Server auth context** — `convex/lib/authContext.ts` maps `ctx.auth.getUserIdentity()` to `{ id, role, tenantId, roleSource }`. **Capsule role is owned by `Person`** (Admin → Permissions → Team roles) when an active Person is linked via `authSubjectId`. Clerk/IdP org-role claims are only a bootstrap fallback until that link exists. Fail-closed anonymous sentinels when unauthenticated.
 
+## Staff sign-in (hire path)
+
+Hiring on Admin → Permissions → Team roles creates the identity-provider account, links `Person.authSubjectId`, and emails a Capsule link (plus a password when they do not already have one). Staff open that email and land in the app. They do not visit a separate sign-up site or paste account ids. Resend uses `RESEND_API_KEY`, `CAPSULE_PUBLIC_APP_URL`, and `INVOICE_REMINDER_FROM_EMAIL` (or `CAPSULE_SIGNIN_FROM_EMAIL`). The identity provider secret (`CLERK_SECRET_KEY`) stays on the Convex deployment.
+
 ## Client gate flow
 
 1. Missing `VITE_CLERK_PUBLISHABLE_KEY` → setup-required screen (no silent dev identity).
-2. Unauthenticated → Clerk `<SignIn />`.
-3. Authenticated → ClaimGate / membership checks (org switcher when needed).
+2. Unauthenticated → Capsule sign-in screen (embedded provider widget; no self-serve sign-up). Ticket links from hire email sign them in.
+3. Authenticated → ClaimGate / membership checks (self-link by verified email if hire has not linked yet).
 4. Ready → children (AppShell + routes).
 
 ## Role source of truth

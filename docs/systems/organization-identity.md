@@ -23,7 +23,7 @@ Use an **organization folio** with organization identity and lifecycle at the to
 
 - Register, rename, suspend, reactivate, or deactivate the organization through generated commands.
 - Hire a Person, correct identity, assign a Capsule role, deactivate/reactivate, and terminate.
-- Link a Person to Clerk identity only through trusted/authored seams; never accept tenant or auth subject from arbitrary form state.
+- Hire emails a Capsule sign-in and links the Person through the authored provision seam (`convex/authProvision.ts`). Never accept tenant or auth subject from arbitrary form state.
 - Navigate from a Person to workforce-owned operational records without duplicating those editing surfaces.
 
 ## Cross-system handoffs

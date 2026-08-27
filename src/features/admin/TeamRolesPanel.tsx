@@ -1,18 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-} from "react";
-import { useUser } from "@clerk/react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
 import { usePayRates } from "../facilities/useLaborSummary";
 import {
   useCreatePerson,
   usePersonAssignRole,
-  usePersonLinkAccount,
   usePersonSetPayRate,
   usePersonUnlinkAccount,
 } from "../../lib/manifest-convex-react";
@@ -30,11 +22,9 @@ export function TeamRolesPanel({
 }>) {
   const createPerson = useCreatePerson();
   const assignRole = usePersonAssignRole();
-  const linkAccount = usePersonLinkAccount();
   const unlinkAccount = usePersonUnlinkAccount();
   const setPayRate = usePersonSetPayRate();
-  // hourlyRate is private (stripped from listPerson); rates come from the
-  // laborSummary seam, readable by workforce/finance managers and admins.
+  const provisionSignIn = useAction(api.authProvision.provisionStaffSignIn);
   const payRates = usePayRates();
   const rateByPersonId = useMemo(
     () =>
@@ -43,7 +33,6 @@ export function TeamRolesPanel({
       ),
     [payRates],
   );
-  const { user } = useUser();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -56,69 +45,14 @@ export function TeamRolesPanel({
     [people],
   );
 
-  // Sign-ins known to the identity provider (admin-only, tenant-scoped action)
-  // — covers admin-capable staff that self-link refuses.
-  const listSignIns = useAction(api.authLink.listSignIns);
-  const [signIns, setSignIns] = useState<
-    Array<{ userId: string; name: string; email: string | null }>
-  >([]);
-  const [catalogError, setCatalogError] = useState<string | null>(null);
-  const loadSignIns = useCallback(() => {
-    listSignIns({})
-      .then((catalog) => {
-        setSignIns(catalog.signIns);
-        setCatalogError(
-          catalog.error === "not_configured"
-            ? "Sign-in list unavailable: CLERK_SECRET_KEY is not set on this deployment."
-            : catalog.error === "provider_error"
-              ? "Sign-in list unavailable: the sign-in service did not answer."
-              : null,
-        );
-      })
-      .catch(() =>
-        setCatalogError("Sign-in list unavailable: the request failed."),
-      );
-  }, [listSignIns]);
-  // Reload when the roster changes (a hire or unlink makes new emails wanted).
-  const unlinkedKey = (people ?? [])
-    .filter(
-      (row) =>
-        row.deletedAt == null &&
-        String(row.status) === "active" &&
-        !row.authSubjectId,
-    )
-    .map((row) => row._id)
-    .join(",");
-  useEffect(() => {
-    loadSignIns();
-  }, [loadSignIns, unlinkedKey]);
-
-  // Tenant-scoped catalog from the server (convex/authLink.ts): only
-  // sign-ins whose email matches one of this tenant's unlinked staff rows.
-  const clerkMembers = useMemo(
-    () =>
-      signIns.map((row) => ({
-        userId: row.userId,
-        name: row.name,
-        identifier: row.email ?? undefined,
-      })),
-    [signIns],
-  );
-
-  // Two staff rows sharing one sign-in would make getAuthContext's lookup
-  // ambiguous (it takes .first()), so an account already spoken for is not
-  // offered again.
-  const linkedSubjectIds = useMemo(
-    () =>
-      new Set(
-        activePeople
-          .map((row) => row.authSubjectId)
-          .filter(
-            (id): id is string => typeof id === "string" && id.length > 0,
-          ),
-      ),
-    [activePeople],
-  );
+  async function sendSignIn(personId: string, name: string): Promise<void> {
+    const result = await provisionSignIn({ personId: personId as never });
+    setNotice(
+      result.passwordIssued
+        ? `Emailed ${name} a sign-in link and a password at ${result.email}.`
+        : `Emailed ${name} a sign-in link at ${result.email}.`,
+    );
+  }
 
   async function onHire(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -131,7 +65,6 @@ export function TeamRolesPanel({
     const phone = String(data.get("phone") ?? "").trim();
     const role = String(data.get("role") ?? "staff");
     const employeeNumber = String(data.get("employeeNumber") ?? "").trim();
-    const authSubjectId = String(data.get("authSubjectId") ?? "").trim();
     if (!givenName || !familyName || !email) {
       setError("First name, last name, and email are required.");
       return;
@@ -144,21 +77,30 @@ export function TeamRolesPanel({
     setError(null);
     setNotice(null);
     try {
-      await createPerson({
+      const hired = (await createPerson({
         givenName,
         familyName,
         email,
         role,
         ...(phone ? { phone } : {}),
         ...(employeeNumber ? { employeeNumber } : {}),
-        ...(authSubjectId ? { authSubjectId } : {}),
-      });
+      })) as { docId?: string };
       form.reset();
-      setNotice(
-        authSubjectId
-          ? "Team member hired and linked. Their Capsule role now comes from this record."
-          : "Team member hired. When they sign in with this email their account links on its own; admin-role staff get linked here in their row.",
-      );
+      if (!hired?.docId) {
+        setNotice(
+          `${givenName} ${familyName} is hired. Send them a sign-in from their row.`,
+        );
+        return;
+      }
+      try {
+        await sendSignIn(hired.docId, `${givenName} ${familyName}`);
+      } catch (provisionError) {
+        setError(
+          provisionError instanceof Error
+            ? `${givenName} ${familyName} is hired, but the sign-in email failed: ${provisionError.message} Use Email sign-in on their row.`
+            : `${givenName} ${familyName} is hired, but the sign-in email failed. Use Email sign-in on their row.`,
+        );
+      }
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "Could not hire.");
     } finally {
@@ -166,22 +108,19 @@ export function TeamRolesPanel({
     }
   }
 
-  async function onLinkAccount(person: TeamPerson, authSubjectId: string) {
-    if (!canEdit || !authSubjectId) return;
+  async function onSendSignIn(person: TeamPerson) {
+    if (!canEdit) return;
     setBusy(person._id);
     setError(null);
     setNotice(null);
     try {
-      await linkAccount({
-        docId: person._id,
-        authSubjectId,
-        version: person.version,
-      });
-      setNotice(
-        `Linked ${person.givenName} ${person.familyName}. They can now use their day sheet, comments, and self-service pages.`,
-      );
+      await sendSignIn(person._id, `${person.givenName} ${person.familyName}`);
     } catch (error_) {
-      setError(error_ instanceof Error ? error_.message : "Could not link.");
+      setError(
+        error_ instanceof Error
+          ? error_.message
+          : "Could not send the sign-in.",
+      );
     } finally {
       setBusy(null);
     }
@@ -195,7 +134,7 @@ export function TeamRolesPanel({
     try {
       await unlinkAccount({ docId: person._id, version: person.version });
       setNotice(
-        `Unlinked ${person.givenName} ${person.familyName}. Their Capsule role falls back to Clerk until relinked.`,
+        `Unlinked ${person.givenName} ${person.familyName}. Email them a new sign-in when you want them back in.`,
       );
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "Could not unlink.");
@@ -253,36 +192,12 @@ export function TeamRolesPanel({
 
   return (
     <Section title="Team roles" count={activePeople.length}>
-      <p className="flex flex-wrap items-center gap-2 text-sm text-ink-3">
-        {catalogError ? (
-          <span className="text-warn">{catalogError}</span>
-        ) : (
-          <span>
-            Sign-ins that match an unlinked staff email appear in each row's
-            account picker.
-          </span>
-        )}
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={loadSignIns}
-        >
-          Refresh sign-ins
-        </button>
-      </p>
       <div className="space-y-4 border-b border-line p-4">
         <p className="max-w-3xl text-sm leading-relaxed text-ink-3">
-          Capsule permissions come from the role on each hired team member once
-          they are linked to a sign-in. Clerk only proves who signed in and
-          which organization they belong to — it does not decide kitchen vs
-          sales vs admin inside Capsule.
+          Hire someone and Capsule emails them a sign-in. They open that email
+          and they are in the app. Their Capsule role on this row is what they
+          can do — not a separate login website.
         </p>
-        {user?.id ? (
-          <p className="text-xs text-ink-3">
-            Your Clerk user id (paste when hiring yourself):{" "}
-            <code className="font-mono text-ink-2">{user.id}</code>
-          </p>
-        ) : null}
         {error ? (
           <ErrorState title="Team role update failed" detail={error} />
         ) : null}
@@ -350,9 +265,7 @@ export function TeamRolesPanel({
         onAssignRole={onAssignRole}
         onSetPayRate={onSetPayRate}
         rateByPersonId={rateByPersonId}
-        clerkMembers={clerkMembers}
-        linkedSubjectIds={linkedSubjectIds}
-        onLinkAccount={onLinkAccount}
+        onSendSignIn={onSendSignIn}
         onUnlinkAccount={onUnlinkAccount}
         onNotice={setNotice}
         onError={setError}

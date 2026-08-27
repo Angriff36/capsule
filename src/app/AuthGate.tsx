@@ -73,10 +73,14 @@ function SignInScreen() {
     <div className="grid min-h-dvh place-items-center bg-canvas px-6 py-10">
       <div className="flex flex-col items-center gap-6">
         <CapsuleWordmark />
-        <SignIn />
+        <SignIn
+          withSignUp={false}
+          fallbackRedirectUrl="/"
+          forceRedirectUrl="/"
+        />
         <p className="max-w-90 text-center text-xs leading-relaxed text-ink-3">
-          Operations access is granted by your workspace administrator. Signing
-          in does not create a workspace.
+          Use the sign-in email you received when you were hired. Ask your
+          manager to send another one if you need it.
         </p>
       </div>
     </div>
@@ -154,7 +158,7 @@ function MembershipRequired() {
     released:
       "An admin unlinked this sign-in from your staff profile. Ask them to link it again under Administration → Permissions → Team roles.",
     needs_admin_link:
-      "Your staff profile has an admin role, so another admin must link it under Administration → Permissions → Team roles.",
+      "Ask your manager to email you a sign-in from Administration → Permissions → Team roles.",
     error: "The link could not be checked. Tap Try again.",
   };
 
