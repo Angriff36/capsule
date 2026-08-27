@@ -21,3 +21,7 @@ export function useIngredientLookupApplyImageToIngredient() {
 export function useIngredientLookupApplyCostToIngredient() {
   return useAction(api.ingredientLookup.applyCostToIngredient);
 }
+
+export function useIngredientLookupResolveCost() {
+  return useAction(api.ingredientLookup.resolveLookupCost);
+}

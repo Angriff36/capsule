@@ -11,6 +11,7 @@ export type IngredientLookupApplyResult = {
   imageApplied?: boolean;
   costApplied?: boolean;
   costNote?: string;
+  suggestedCostPerUnit?: number;
 };
 
 export type IngredientAutofillProfile = {

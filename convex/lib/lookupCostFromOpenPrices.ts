@@ -81,7 +81,8 @@ function pickBestPriceRow(rows: OpenPriceRow[]): OpenPriceRow | undefined {
       row.price > 0 &&
       row.product?.product_quantity != null &&
       Number.isFinite(row.product.product_quantity) &&
-      row.product.product_quantity > 0,
+      row.product.product_quantity > 0 &&
+      (row.product.product_quantity_unit ?? "g").toLowerCase() === "g",
   );
   if (usable.length === 0) return undefined;
 
@@ -90,12 +91,14 @@ function pickBestPriceRow(rows: OpenPriceRow[]): OpenPriceRow | undefined {
     const currency = row.currency?.toUpperCase();
     const date = Date.parse(row.date ?? "");
     const usBoost = country === "US" ? 1000 : 0;
-    const usdBoost = currency === "USD" ? 100 : 0;
+    const usdBoost = currency === "USD" ? 200 : 0;
     const recency = Number.isFinite(date) ? date : 0;
     return usBoost + usdBoost + recency / 1_000_000_000;
   };
 
-  return [...usable].sort((a, b) => score(b) - score(a))[0];
+  const usdRows = usable.filter((row) => row.currency?.toUpperCase() === "USD");
+  const pool = usdRows.length > 0 ? usdRows : usable;
+  return [...pool].sort((a, b) => score(b) - score(a))[0];
 }
 
 async function fetchOpenPrices(barcode: string): Promise<OpenPriceRow[]> {
@@ -130,7 +133,7 @@ export async function resolveLookupCostHint(
   if (!best?.price || !best.product?.product_quantity) {
     return {
       costNote:
-        "No crowd-sourced retail price found for this barcode — enter cost manually.",
+        "No USD retail price found for this barcode — enter cost manually.",
     };
   }
 

@@ -48,7 +48,7 @@ import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
 import {
   useIngredientLookupApplyImageToIngredient,
-  useIngredientLookupApplyCostToIngredient,
+  useIngredientLookupResolveCost,
 } from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
@@ -82,7 +82,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
   const applyLookupImage = useIngredientLookupApplyImageToIngredient();
-  const applyLookupCost = useIngredientLookupApplyCostToIngredient();
+  const resolveLookupCost = useIngredientLookupResolveCost();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -152,31 +152,45 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         }
         const { allergens, isGlutenFree } =
           parseIngredientAllergensFromForm(data);
+        const unit = String(data.get("unit"));
+        const formCost = Number(data.get("costPerUnit"));
+        const servingGramsRaw = optional(data.get("lookupServingGrams"));
+        const parsedServingGrams = servingGramsRaw
+          ? Number(servingGramsRaw)
+          : NaN;
+        const servingGramsPerUnit =
+          Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
+            ? parsedServingGrams
+            : undefined;
+        const lookupBarcode = optional(data.get("lookupBarcode"));
+        let costPerUnit =
+          Number.isFinite(formCost) && formCost >= 0 ? formCost : 0;
+        if (costPerUnit === 0 && lookupBarcode) {
+          const costHint = await resolveLookupCost({
+            barcode: lookupBarcode,
+            catalogUnit: unit,
+            servingGramsPerUnit,
+          });
+          if (costHint.costPerUnit != null && costHint.costPerUnit > 0) {
+            costPerUnit = costHint.costPerUnit;
+          }
+        }
         const created = (await createIngredient({
           name,
-          unit: String(data.get("unit")) as (typeof UNITS)[number],
-          costPerUnit: Number(data.get("costPerUnit")),
+          unit: unit as (typeof UNITS)[number],
+          costPerUnit,
           category: optional(data.get("category")),
           allergens: allergens.length ? allergens : undefined,
           isGlutenFree,
         })) as { docId: string };
         let ingredientVersion = 1;
         try {
-          const unit = String(data.get("unit"));
           const rawNutrition = parseIngredientNutritionFromForm(data);
           const gramNutrition = Object.fromEntries(
             Object.entries(rawNutrition).filter(
               ([, value]) => value != null && Number(value) > 0,
             ),
           );
-          const servingGramsRaw = optional(data.get("lookupServingGrams"));
-          const parsedServingGrams = servingGramsRaw
-            ? Number(servingGramsRaw)
-            : NaN;
-          const servingGramsPerUnit =
-            Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
-              ? parsedServingGrams
-              : undefined;
           const pendingNutrition = scaleNutritionFromGramsToUnit(
             gramNutrition,
             unit,
@@ -189,15 +203,6 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               ...pendingNutrition,
             });
             ingredientVersion += 1;
-          }
-          const lookupBarcode = optional(data.get("lookupBarcode"));
-          if (lookupBarcode) {
-            await applyLookupCost({
-              docId: created.docId as Id<"ingredients">,
-              barcode: lookupBarcode,
-              catalogUnit: unit,
-              servingGramsPerUnit,
-            });
           }
           const photo = data.get("photo");
           if (photo instanceof File && photo.size > 0) {

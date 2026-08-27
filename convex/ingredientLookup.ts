@@ -34,6 +34,7 @@ import {
 } from "./lib/servingWeightGrams";
 import { applyCatalogImageFromUrl } from "./lib/ingredientCatalogImageImport";
 import { applyLookupCostToIngredient } from "./lib/ingredientLookupApplyCost";
+import { resolveLookupCostHint } from "./lib/lookupCostFromOpenPrices";
 import {
   scaleNutritionFromGramsToUnit,
   mergeScaledNutritionWithExisting,
@@ -523,6 +524,7 @@ export const applyToIngredient = action({
 
     const costResult = await applyLookupCostToIngredient(
       ctx,
+      auth,
       args.docId,
       args.profile.barcode,
       String(doc.unit),
@@ -535,7 +537,26 @@ export const applyToIngredient = action({
       imageApplied,
       costApplied: costResult.costApplied,
       costNote: costResult.costNote,
+      suggestedCostPerUnit: costResult.suggestedCostPerUnit,
     };
+  },
+});
+
+/** Resolve lookup cost without writing (create flow + previews). */
+export const resolveLookupCost = action({
+  args: {
+    barcode: v.optional(v.string()),
+    catalogUnit: v.string(),
+    servingGramsPerUnit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    requireKitchenStaff(auth);
+    return resolveLookupCostHint(
+      args.barcode,
+      args.catalogUnit,
+      args.servingGramsPerUnit,
+    );
   },
 });
 
@@ -552,6 +573,7 @@ export const applyCostToIngredient = action({
     requireKitchenStaff(auth);
     return applyLookupCostToIngredient(
       ctx,
+      auth,
       args.docId,
       args.barcode,
       args.catalogUnit,
