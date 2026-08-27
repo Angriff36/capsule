@@ -1,5 +1,6 @@
 import { formatCountNoun } from "../../lib/format";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { PersonEmployeeNumberField } from "../admin/PersonEmployeeNumberField";
 import {
   PAYROLL_PROCESSORS,
   payrollCsvDownloadAllowed,
@@ -30,6 +31,7 @@ export function PayrollExportPanel({
   error,
   hourlyRateByPersonId,
   onNotice,
+  onFailure,
 }: {
   loading: boolean;
   periodStart: string;
@@ -43,6 +45,7 @@ export function PayrollExportPanel({
   /** null while rates are loading/unavailable — no missing-rate flags then. */
   hourlyRateByPersonId: ReadonlyMap<string, number | null> | null;
   onNotice: (message: string) => void;
+  onFailure: (error: unknown) => void;
 }) {
   const missingRate = (personId: string) =>
     hourlyRateByPersonId != null && hourlyRateByPersonId.get(personId) == null;
@@ -148,6 +151,8 @@ export function PayrollExportPanel({
           missingNumberNames={missingNumberNames}
           missingRate={missingRate}
           estimatedGross={estimatedGross}
+          onNotice={onNotice}
+          onFailure={onFailure}
         />
       ) : null}
     </section>
@@ -159,11 +164,15 @@ function PayrollExportPreview({
   missingNumberNames,
   missingRate,
   estimatedGross,
+  onNotice,
+  onFailure,
 }: {
   document: PayrollExportDocument;
   missingNumberNames: readonly string[];
   missingRate: (personId: string) => boolean;
   estimatedGross: (personId: string, totalHours: number) => number | null;
+  onNotice: (message: string) => void;
+  onFailure: (error: unknown) => void;
 }) {
   return (
     <>
@@ -176,7 +185,7 @@ function PayrollExportPreview({
       </div>
       {missingNumberNames.length > 0 ? (
         <p className="mb-3 text-sm text-warn" role="status">
-          {`CSV download is off until every employee has a payroll employee number — missing for ${missingNumberNames.join(", ")}. Add it when hiring under Admin → Permissions; raw Capsule IDs are never sent to a payroll processor.`}
+          {`CSV download is off until every employee has a payroll employee number — missing for ${missingNumberNames.join(", ")}. Type the number next to their name below. Raw Capsule IDs are never sent to a payroll processor.`}
         </p>
       ) : null}
       {document.rows.length === 0 ? (
@@ -214,7 +223,19 @@ function PayrollExportPreview({
                         <small className="text-warn">No hourly rate set</small>
                       ) : null}
                       {row.missingEmployeeNumber ? (
-                        <small className="text-warn">No employee number</small>
+                        <PersonEmployeeNumberField
+                          personId={row.personId}
+                          personName={row.employeeName}
+                          currentNumber=""
+                          canEdit
+                          busy={false}
+                          onSaved={(employeeNumber) =>
+                            onNotice(
+                              `Saved ${row.employeeName}'s employee number ${employeeNumber}. Download turns on once everyone has one.`,
+                            )
+                          }
+                          onError={(message) => onFailure(new Error(message))}
+                        />
                       ) : (
                         <small>{row.employeeId}</small>
                       )}

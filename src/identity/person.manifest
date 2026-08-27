@@ -165,6 +165,22 @@ entity Person mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Payroll employee number after hire. hire() already accepts it, but
+  // existing rows had no command — Finance could not fix a missing number
+  // without re-hiring. Same write tier as setPayRate (workforce managers);
+  // the authored convex/personEmployeeNumber.ts seam also lets finance
+  // managers set it from the payroll preview until regen emits this command.
+  command setEmployeeNumber(employeeNumber: string) {
+    guard self.deletedAt == null
+    constraint employeeNumberPresent: length(trim(employeeNumber)) > 0 "Employee number is required"
+    mutate employeeNumber = employeeNumber
+    emit PersonEmployeeNumberSet {
+      personId: self.id
+      tenantId: self.tenantId
+      employeeNumber: employeeNumber
+    }
+  }
+
   // Set the high-urgency SMS alert opt-in. Uses the default workforce write
   // policy (managers manage staff contact preferences); recording consent is
   // a low-stakes preference edit, not a role/identity change.
@@ -296,6 +312,12 @@ event PersonPayRateSet: "person.pay_rate_set" {
   personId: string
   tenantId: string
   hourlyRate: number
+}
+
+event PersonEmployeeNumberSet: "person.employee_number_set" {
+  personId: string
+  tenantId: string
+  employeeNumber: string
 }
 
 event PersonSmsAlertsChanged: "person.sms_alerts_changed" {

@@ -163,13 +163,12 @@ describe("preview source contract — no raw _id slices", () => {
     expect(panel).not.toMatch(/_id\.slice/);
     expect(panel).not.toMatch(/personId\.slice/);
     expect(panel).toContain("missingEmployeeNumber");
-    expect(panel).toContain("No employee number");
+    expect(panel).toContain("PersonEmployeeNumberField");
     expect(panel).toContain("No hourly rate set");
     expect(panel).toContain("payrollCsvDownloadAllowed");
-    // employeeId is shown only after the missing-number check — never as a
-    // raw _id fallback printed under the name.
+    // Missing numbers get an in-place Set field — never a raw _id under the name.
     expect(panel).toMatch(
-      /missingEmployeeNumber \?[\s\S]*No employee number[\s\S]*:\s*\([\s\S]*row\.employeeId/,
+      /missingEmployeeNumber \?[\s\S]*PersonEmployeeNumberField[\s\S]*:\s*\([\s\S]*row\.employeeId/,
     );
   });
 });
