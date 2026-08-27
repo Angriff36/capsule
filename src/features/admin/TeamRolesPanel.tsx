@@ -12,6 +12,7 @@ import { ErrorState, Section } from "../../ui/primitives";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
 import { TeamRolesTable } from "./TeamRolesTable";
 import type { TeamPerson } from "./TeamPerson";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 export function TeamRolesPanel({
   people,
@@ -34,8 +35,8 @@ export function TeamRolesPanel({
     [payRates],
   );
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
 
   const activePeople = useMemo(
     () =>

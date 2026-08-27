@@ -16,6 +16,7 @@ import {
   useListEmailNotificationSubscription,
 } from "../../lib/manifest-convex-react";
 import { ErrorState, PageHeader, TableSkeleton } from "../../ui/primitives";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 const PREVIEW_CONTENT: Record<
   EmailNotificationCategory,
@@ -98,8 +99,8 @@ export function EmailNotificationSettingsPage() {
   const [optimistic, setOptimistic] =
     useState<Required<EmailNotificationPreferences> | null>(null);
   const [busy, setBusy] = useState<EmailNotificationCategory | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
+  const { error, setError } = useActionFailure();
 
   const record = rows?.[0] ?? null;
   const preferences = optimistic ?? preferenceSnapshot(record);

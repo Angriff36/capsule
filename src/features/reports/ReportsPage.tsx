@@ -19,6 +19,7 @@ import {
 } from "./ReportCreateForm";
 import { ReportLifecyclePolicy } from "./ReportLifecyclePolicy";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new ReportLifecyclePolicy();
 const payloadBuilder = new ReportCreatePayloadBuilder();
@@ -34,7 +35,7 @@ export function ReportsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeRows = (reports ?? []).filter((row) => row.deletedAt == null);

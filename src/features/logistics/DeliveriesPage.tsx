@@ -31,6 +31,7 @@ import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -59,7 +60,7 @@ export function DeliveriesPage() {
   const [showTerminal, setShowTerminal] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [photoDeliveryId, setPhotoDeliveryId] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 

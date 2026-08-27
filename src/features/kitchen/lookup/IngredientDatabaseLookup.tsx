@@ -5,6 +5,7 @@ import {
 } from "../../../lib/ingredientLookupClient";
 import { convexActionErrorMessage } from "../../../lib/convexActionErrorMessage";
 import { canScaleNutritionToUnit } from "../../../lib/nutritionUnitScale";
+import { useActionFailure } from "../../../ui/action-result";
 import type {
   IngredientAutofillProfile,
   IngredientLookupApplyResult,
@@ -94,7 +95,7 @@ export function IngredientDatabaseLookup({
   const [open, setOpen] = useState(false);
   const [searching, setSearching] = useState(false);
   const [loadingId, setLoadingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
   const [applied, setApplied] = useState<{
     profile: IngredientAutofillProfile;
     applyResult?: IngredientLookupApplyResult | void;

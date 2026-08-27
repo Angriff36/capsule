@@ -14,6 +14,7 @@ import {
 } from "../../ui/primitives";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 const CATEGORY_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: "policyUpdate", label: "New policy" },
@@ -50,8 +51,8 @@ export function AnnouncementsPage() {
 
   const [busy, setBusy] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
 
   const canManage = canManageAnnouncements(authStatus?.role);
 

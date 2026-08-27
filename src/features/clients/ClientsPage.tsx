@@ -26,6 +26,7 @@ import {
   type ClientDuplicateCandidate,
 } from "./contactDedup";
 import { CrmFailureBanner } from "./CrmFailureBanner";
+import { useActionNotice } from "../../ui/action-result";
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -59,7 +60,7 @@ export function ClientsPage() {
   const [clientType, setClientType] = useState<"company" | "person">("company");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
     null,
   );

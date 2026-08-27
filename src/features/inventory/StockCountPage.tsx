@@ -18,6 +18,7 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import "./StockCountPage.css";
+import { useActionNotice } from "../../ui/action-result";
 
 const quantity = (value: number) => Math.round(value * 10_000) / 10_000;
 
@@ -57,7 +58,7 @@ export function StockCountPage() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const activeLocations = useMemo(
     () =>

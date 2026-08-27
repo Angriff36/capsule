@@ -10,6 +10,7 @@ import {
 } from "../../../lib/manifest-convex-react";
 import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
+import { useActionNotice, useActionFailure } from "../../../ui/action-result";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -60,8 +61,8 @@ export function ExternalRecordsReconcilePage() {
   >(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   // Per-row "Match to Capsule payment" picker state.
   const [matchingId, setMatchingId] = useState<string | null>(null);
   const [matchPaymentId, setMatchPaymentId] = useState("");

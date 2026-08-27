@@ -22,6 +22,7 @@ import {
 import { applyDishIngredientRemoval } from "./dishIngredientRemoval";
 import { IngredientCatalogLabel } from "./IngredientCatalogLabel";
 import { IngredientOptionPicker } from "./IngredientOptionPicker";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 type Props = {
   dishId: string;
@@ -41,8 +42,8 @@ export function DishIngredientsPanel({ dishId }: Props) {
   const removeLine = useDishIngredientRemove();
 
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   // Same reasoning as the prep-template form: a dish's lines share a unit far
   // more often than not, so it holds its last value instead of resetting.
   const [unit, setUnit] = useState("each");

@@ -9,6 +9,7 @@ import { formatStatusLabel } from "../../lib/statusLabels";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
+import { useActionNotice } from "../../ui/action-result";
 
 const OWNERSHIP = ["owned", "leased"] as const;
 const OPERATIONAL_STATUSES = [
@@ -45,7 +46,7 @@ export function VehicleFleetPage() {
   );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const rows = ((vehicles ?? []) as VehicleRow[]).filter(
     (vehicle) => vehicle.deletedAt == null,

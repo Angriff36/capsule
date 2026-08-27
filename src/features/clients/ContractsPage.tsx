@@ -19,6 +19,7 @@ import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new CrmLifecyclePolicy();
 
@@ -36,7 +37,7 @@ export function ContractsPage() {
   const [showTerminal, setShowTerminal] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeClients = (clients ?? []).filter(

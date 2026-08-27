@@ -54,6 +54,7 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
+import { useActionNotice } from "../../ui/action-result";
 import "./taxWorkspace.css";
 
 const policy = new CommercialLifecyclePolicy();
@@ -100,7 +101,7 @@ export function InvoiceDetailPage() {
     useInvoicePaymentActions();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [showCreditMemo, setShowCreditMemo] = useState(false);
   const [creditDisposition, setCreditDisposition] =
     useState<CreditMemoDisposition>("carry_forward");

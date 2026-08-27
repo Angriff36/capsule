@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Doc } from "../../lib/api";
 import { usePersonSetSmsAlerts } from "../../lib/manifest-convex-react";
+import { useActionFailure } from "../../ui/action-result";
 
 /**
  * Manager-facing control for the high-urgency SMS alert opt-in stored on each
@@ -11,7 +12,7 @@ import { usePersonSetSmsAlerts } from "../../lib/manifest-convex-react";
 export function SmsAlertOptInSection({ people }: { people: Doc<"people">[] }) {
   const setSmsAlerts = usePersonSetSmsAlerts();
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
 
   const roster = [...people].sort((a, b) =>
     `${a.givenName} ${a.familyName}`.localeCompare(

@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { reportActionFail } from "../../ui/action-result";
 import type { CommandFailure } from "./CommandFailure";
 
 export function FailureBanner({
@@ -7,6 +9,10 @@ export function FailureBanner({
   failure: CommandFailure;
   onDismiss?: () => void;
 }) {
+  useEffect(() => {
+    reportActionFail(`${failure.title} ${failure.detail}`.trim());
+  }, [failure.title, failure.detail]);
+
   return (
     <div
       role="alert"

@@ -43,6 +43,7 @@ import { generateAcceptanceUrl } from "./proposalSignatureRequest";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
+import { useActionNotice } from "../../ui/action-result";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
 // EventDish.confirmFromProposal stage guard).
@@ -95,7 +96,7 @@ export function ProposalsPage() {
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeClients = (clients ?? []).filter(

@@ -67,6 +67,7 @@ import {
   type RecipeEditorField,
   type RecipeSearchState,
 } from "./eventMenuRecipeSearch";
+import { useActionFailure } from "../../ui/action-result";
 import {
   isSelectAllChord,
   trapSingleKeyNav,
@@ -87,7 +88,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   const removeLine = useDishIngredientRemove();
   const defineContainer = useCreateDishContainer();
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
   const [unit, setUnit] = useState("each");
   const [ingredientQuery, setIngredientQuery] = useState("");
   const [selectedIngredientId, setSelectedIngredientId] = useState("");

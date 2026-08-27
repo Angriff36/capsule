@@ -19,6 +19,7 @@ import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
 import { PasteIncomingMessageForm } from "./PasteIncomingMessageForm";
 import { SyncErrorsPanel } from "./SyncErrorsPanel";
 import type { Doc } from "../../lib/api";
+import { useActionNotice } from "../../ui/action-result";
 
 type Thread = Doc<"messageThreads">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
@@ -68,7 +69,7 @@ export function MessageInboxPage() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [qualifying, setQualifying] = useState(false);

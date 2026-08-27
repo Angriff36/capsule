@@ -8,6 +8,7 @@ import {
   useCreateAttachment,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, Skeleton } from "../../ui/primitives";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 export type PhotoParentType = "delivery" | "closeout" | "eventRecord";
 
@@ -127,8 +128,8 @@ export function RecordPhotoCapture({
   const setSurveySelection = useAttachmentSetSurveySelection();
   const [busy, setBusy] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
 
   async function upload(file: File, evidenceType?: PhotoEvidenceType) {
     if (file.type && !file.type.startsWith("image/")) {

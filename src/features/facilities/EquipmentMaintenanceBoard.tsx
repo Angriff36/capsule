@@ -10,6 +10,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import "./EquipmentMaintenanceBoard.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { useActionNotice } from "../../ui/action-result";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SOON_MS = 7 * DAY_MS;
@@ -43,7 +44,7 @@ export function EquipmentMaintenanceBoard({
   const [serviceTaskId, setServiceTaskId] = useState<string | null>(null);
   const [busy, setBusy] = useState<"schedule" | "service" | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const now = Date.now();
 
   const equipmentById = useMemo(

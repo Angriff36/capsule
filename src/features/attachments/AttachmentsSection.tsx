@@ -7,6 +7,7 @@ import {
   useCreateAttachment,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
+import { useActionFailure } from "../../ui/action-result";
 
 export type AttachmentParentType =
   | "eventRecord"
@@ -41,7 +42,7 @@ export function AttachmentsSection({
   const removeAttachment = useAttachmentRemove();
   const fileInput = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
 
   async function upload(file: File) {
     setBusy(true);

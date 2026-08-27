@@ -7,6 +7,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { StripeConnectSection } from "./StripeConnectSection";
 import { WebhooksSection } from "./WebhooksSection";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 function formatWhen(value: number | null | undefined): string {
   return value == null
@@ -37,8 +38,8 @@ export function IntegrationsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const callbackHandled = useRef(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
 
   useEffect(() => {
     if (callbackHandled.current) return;
