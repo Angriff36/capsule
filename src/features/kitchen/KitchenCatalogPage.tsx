@@ -46,7 +46,10 @@ import {
 import { uploadCatalogPrimaryImage } from "../attachments/catalogPrimaryImageUpload";
 import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
-import { useIngredientLookupApplyImageToIngredient } from "../../lib/ingredientLookupClient";
+import {
+  useIngredientLookupApplyImageToIngredient,
+  useIngredientLookupApplyCostToIngredient,
+} from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -79,6 +82,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
   const applyLookupImage = useIngredientLookupApplyImageToIngredient();
+  const applyLookupCost = useIngredientLookupApplyCostToIngredient();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -148,31 +152,54 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         }
         const { allergens, isGlutenFree } =
           parseIngredientAllergensFromForm(data);
+        const unit = String(data.get("unit"));
+        const servingGramsRaw = optional(data.get("lookupServingGrams"));
+        const parsedServingGrams = servingGramsRaw
+          ? Number(servingGramsRaw)
+          : NaN;
+        const servingGramsPerUnit =
+          Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
+            ? parsedServingGrams
+            : undefined;
+        const lookupProductName =
+          optional(data.get("lookupProductName")) ?? name;
+        const lookupUsed = data.get("lookupUsed") === "true";
+        const formCost = Number(data.get("costPerUnit"));
+        const costPerUnit =
+          Number.isFinite(formCost) && formCost >= 0 ? formCost : 0;
         const created = (await createIngredient({
           name,
-          unit: String(data.get("unit")) as (typeof UNITS)[number],
-          costPerUnit: Number(data.get("costPerUnit")),
+          unit: unit as (typeof UNITS)[number],
+          costPerUnit,
           category: optional(data.get("category")),
           allergens: allergens.length ? allergens : undefined,
           isGlutenFree,
         })) as { docId: string };
+        if (lookupUsed && costPerUnit <= 0) {
+          try {
+            await applyLookupCost({
+              docId: created.docId as Id<"ingredients">,
+              barcode: optional(data.get("lookupBarcode")),
+              productName: lookupProductName,
+              brandOwner: optional(data.get("lookupBrandOwner")),
+              category:
+                optional(data.get("lookupCategory")) ??
+                optional(data.get("category")),
+              catalogUnit: unit,
+              servingGramsPerUnit,
+            });
+          } catch {
+            // Ingredient exists; cost can be filled from the detail page.
+          }
+        }
         let ingredientVersion = 1;
         try {
-          const unit = String(data.get("unit"));
           const rawNutrition = parseIngredientNutritionFromForm(data);
           const gramNutrition = Object.fromEntries(
             Object.entries(rawNutrition).filter(
               ([, value]) => value != null && Number(value) > 0,
             ),
           );
-          const servingGramsRaw = optional(data.get("lookupServingGrams"));
-          const parsedServingGrams = servingGramsRaw
-            ? Number(servingGramsRaw)
-            : NaN;
-          const servingGramsPerUnit =
-            Number.isFinite(parsedServingGrams) && parsedServingGrams > 0
-              ? parsedServingGrams
-              : undefined;
           const pendingNutrition = scaleNutritionFromGramsToUnit(
             gramNutrition,
             unit,

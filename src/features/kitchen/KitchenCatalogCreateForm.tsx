@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   NUTRIENTS,
   type IngredientNutritionFields,
@@ -12,6 +12,7 @@ import { IngredientAllergenFieldset } from "./IngredientAllergenFieldset";
 import type { CulinaryAllergenCode } from "./CulinaryAllergenVocabulary";
 import { IngredientDatabaseLookup } from "./lookup/IngredientDatabaseLookup";
 import type { IngredientAutofillProfile } from "./lookup/ExternalIngredientProfile";
+import { useIngredientLookupResolveCost } from "../../lib/ingredientLookupClient";
 import { KITCHEN_SECTION_SINGULAR, type KitchenSection } from "./kitchenRoutes";
 import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
 import type { NutritionFields } from "../../lib/nutritionUnitScale";
@@ -74,6 +75,14 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   const [lookupServingGrams, setLookupServingGrams] = useState<
     number | undefined
   >(undefined);
+  const [lookupBarcode, setLookupBarcode] = useState("");
+  const [lookupBrandOwner, setLookupBrandOwner] = useState("");
+  const [lookupCategory, setLookupCategory] = useState("");
+  const [lookupUsed, setLookupUsed] = useState(false);
+  const [costPerUnit, setCostPerUnit] = useState("0.00");
+  const [lookupCostNote, setLookupCostNote] = useState("");
+  const costUserEdited = useRef(false);
+  const resolveLookupCost = useIngredientLookupResolveCost();
   const scaledLookupNutrition = useMemo(() => {
     const gramFields: NutritionFields = {};
     for (const nutrient of NUTRIENTS) {
@@ -86,6 +95,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   }, [lookupGramNutrition, unit, lookupServingGrams]);
 
   const applyAutofill = (profile: IngredientAutofillProfile) => {
+    setLookupUsed(true);
     setName(profile.name);
     setUnit(profile.unit);
     setCategory((existing) => profile.category ?? existing);
@@ -102,6 +112,35 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     setLookupGramNutrition(profile.nutrition);
     setLookupImageUrl(profile.imageUrl ?? "");
     setLookupServingGrams(profile.servingGramsPerUnit);
+    setLookupBarcode(profile.barcode ?? "");
+    setLookupBrandOwner(profile.brandOwner ?? "");
+    setLookupCategory(profile.category ?? "");
+    void (async () => {
+      try {
+        const hint = await resolveLookupCost({
+          barcode: profile.barcode,
+          productName: profile.name,
+          brandOwner: profile.brandOwner,
+          category: profile.category,
+          catalogUnit: profile.unit,
+          servingGramsPerUnit: profile.servingGramsPerUnit,
+        });
+        setLookupCostNote(
+          hint.suggestedCostPerUnit != null && hint.suggestedCostPerUnit > 0
+            ? `${hint.costNote} Suggested: ${hint.suggestedCostPerUnit.toFixed(2)}.`
+            : hint.costNote,
+        );
+        if (
+          !costUserEdited.current &&
+          hint.costPerUnit != null &&
+          hint.costPerUnit > 0
+        ) {
+          setCostPerUnit(hint.costPerUnit.toFixed(2));
+        }
+      } catch {
+        setLookupCostNote(profile.costNote);
+      }
+    })();
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {
@@ -145,6 +184,23 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                     : ""
                 }
               />
+              <input type="hidden" name="lookupBarcode" value={lookupBarcode} />
+              <input
+                type="hidden"
+                name="lookupBrandOwner"
+                value={lookupBrandOwner}
+              />
+              <input
+                type="hidden"
+                name="lookupCategory"
+                value={lookupCategory}
+              />
+              <input type="hidden" name="lookupProductName" value={name} />
+              <input
+                type="hidden"
+                name="lookupUsed"
+                value={lookupUsed ? "true" : "false"}
+              />
             </div>
             <label className="field-label">
               Name
@@ -171,10 +227,22 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 type="number"
                 min={0}
                 step="0.01"
-                defaultValue={0}
+                value={costPerUnit}
                 className="input"
                 required
+                disabled={busy}
+                onChange={(event) => {
+                  costUserEdited.current = true;
+                  setCostPerUnit(event.target.value);
+                }}
               />
+              {lookupCostNote ? (
+                <span className="field-hint">{lookupCostNote}</span>
+              ) : lookupUsed ? (
+                <span className="field-hint">
+                  Cost imports automatically when retail or catalog data exists.
+                </span>
+              ) : null}
             </label>
             <label className="field-label">
               Category

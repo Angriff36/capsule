@@ -11,15 +11,23 @@ export type IngredientCostingTarget = {
 
 export function IngredientCostingEditor({
   ingredient,
+  suggestedCostPerUnit,
   onFailure,
 }: Readonly<{
   ingredient: IngredientCostingTarget;
+  suggestedCostPerUnit?: number;
   onFailure: (error: unknown) => void;
 }>) {
   const updateCosting = useIngredientUpdateCosting();
   const initialCost = Number(ingredient.costPerUnit);
+  const seedCost =
+    suggestedCostPerUnit != null &&
+    suggestedCostPerUnit > 0 &&
+    (!Number.isFinite(initialCost) || initialCost <= 0)
+      ? suggestedCostPerUnit
+      : initialCost;
   const [costPerUnit, setCostPerUnit] = useState(
-    Number.isFinite(initialCost) ? initialCost.toFixed(2) : "0.00",
+    Number.isFinite(seedCost) ? seedCost.toFixed(2) : "0.00",
   );
   const [saving, setSaving] = useState(false);
 
@@ -63,9 +71,9 @@ export function IngredientCostingEditor({
         {!canEdit && <span>Reinstate to edit</span>}
       </div>
       <p className="max-w-160 text-base text-ink-2">
-        Sets the catalog cost used when no receipt price is available. Changing
-        it needs kitchen manage access. Confirmed receipt prices still come from
-        purchasing receives.
+        Sets the catalog cost used when no receipt price is available. Lookup
+        apply can fill this automatically. Confirmed receipt prices still come
+        from purchasing receives.
       </p>
       <form
         className="mt-4 flex flex-wrap items-end gap-2"
