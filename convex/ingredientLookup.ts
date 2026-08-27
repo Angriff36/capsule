@@ -600,6 +600,7 @@ export const resolveCreateLookupCost = action({
     catalogUnit: v.string(),
     servingGramsPerUnit: v.optional(v.number()),
     formCost: v.number(),
+    lookupUsed: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);

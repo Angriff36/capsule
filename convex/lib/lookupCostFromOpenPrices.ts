@@ -3,7 +3,10 @@ import {
   discoverOffBarcodesForProduct,
   fetchOpenPricesProductMeta,
 } from "./lookupCostBarcodeDiscovery";
-import { resolveTenantCatalogCostFallback } from "./lookupCostTenantFallback";
+import {
+  resolveTenantCatalogCostFallback,
+  resolveTenantUnitMedianSuggestion,
+} from "./lookupCostTenantFallback";
 
 const OPEN_PRICES_BASE = "https://prices.openfoodfacts.org/api/v1/prices";
 const GRAMS_PER_OZ = 28.3495;
@@ -30,9 +33,17 @@ type TenantIngredientRow = {
   costPerUnit?: number | null;
 };
 
+export type LookupCostSource =
+  | "open_prices"
+  | "tenant_category"
+  | "tenant_name"
+  | "none";
+
 export type LookupCostHint = {
   costPerUnit?: number;
   costNote: string;
+  source?: LookupCostSource;
+  suggestedCostPerUnit?: number;
 };
 
 function normalizeBarcode(raw?: string | null): string | undefined {
@@ -90,7 +101,7 @@ function pickBestPriceRow(rows: OpenPriceRow[]): OpenPriceRow | undefined {
       row.product?.product_quantity != null &&
       Number.isFinite(row.product.product_quantity) &&
       row.product.product_quantity > 0 &&
-      (row.product.product_quantity_unit ?? "g").toLowerCase() === "g",
+      (row.product.product_quantity_unit ?? "").toLowerCase() === "g",
   );
   if (usable.length === 0) return undefined;
 
@@ -110,16 +121,20 @@ function pickBestPriceRow(rows: OpenPriceRow[]): OpenPriceRow | undefined {
 }
 
 async function fetchOpenPrices(barcode: string): Promise<OpenPriceRow[]> {
-  const params = new URLSearchParams({
-    product_code: barcode,
-    page_size: "25",
-  });
-  const response = await fetch(`${OPEN_PRICES_BASE}?${params.toString()}`, {
-    headers: { "User-Agent": openFoodFactsUserAgent() },
-  });
-  if (!response.ok) return [];
-  const payload = (await response.json()) as { items?: OpenPriceRow[] };
-  return Array.isArray(payload.items) ? payload.items : [];
+  try {
+    const params = new URLSearchParams({
+      product_code: barcode,
+      size: "25",
+    });
+    const response = await fetch(`${OPEN_PRICES_BASE}?${params.toString()}`, {
+      headers: { "User-Agent": openFoodFactsUserAgent() },
+    });
+    if (!response.ok) return [];
+    const payload = (await response.json()) as { items?: OpenPriceRow[] };
+    return Array.isArray(payload.items) ? payload.items : [];
+  } catch {
+    return [];
+  }
 }
 
 async function resolveOpenPricesCost(
@@ -151,6 +166,7 @@ async function resolveOpenPricesCost(
     return {
       costPerUnit,
       costNote: `Catalog cost from Open Prices retail data (${best.price.toFixed(2)} USD for ${packageGrams} g${when}).`,
+      source: "open_prices",
     };
   }
   return null;
@@ -169,12 +185,14 @@ export async function resolveLookupCostHint(args: {
   const barcodeCandidates: string[] = [];
   const direct = normalizeBarcode(args.barcode);
   if (direct) barcodeCandidates.push(direct);
-  const discovered = await discoverOffBarcodesForProduct(
-    args.productName,
-    args.brandOwner,
-  );
-  for (const code of discovered) {
-    if (!barcodeCandidates.includes(code)) barcodeCandidates.push(code);
+  if (!direct) {
+    const discovered = await discoverOffBarcodesForProduct(
+      args.productName,
+      args.brandOwner,
+    );
+    for (const code of discovered) {
+      if (!barcodeCandidates.includes(code)) barcodeCandidates.push(code);
+    }
   }
 
   if (barcodeCandidates.length > 0) {
@@ -201,6 +219,20 @@ export async function resolveLookupCostHint(args: {
       costNote:
         tenantFallback.costNote ??
         "Catalog cost estimated from similar items in your catalog.",
+      source: tenantFallback.source ?? "tenant_name",
+    };
+  }
+
+  const unitSuggestion = resolveTenantUnitMedianSuggestion(
+    args.tenantIngredients ?? [],
+    args.catalogUnit,
+    args.productName,
+  );
+  if (unitSuggestion.suggestedCostPerUnit != null) {
+    return {
+      costNote: unitSuggestion.costNote ?? "",
+      suggestedCostPerUnit: unitSuggestion.suggestedCostPerUnit,
+      source: "none",
     };
   }
 

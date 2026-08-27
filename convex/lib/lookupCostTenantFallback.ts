@@ -1,5 +1,7 @@
 /** Infer catalog cost from the tenant's own ingredient catalog. */
 
+import type { LookupCostSource } from "./lookupCostFromOpenPrices";
+
 type IngredientRow = {
   name?: string | null;
   category?: string | null;
@@ -31,7 +33,7 @@ export function resolveTenantCatalogCostFallback(
     catalogUnit: string;
     excludeName?: string;
   },
-): { costPerUnit?: number; costNote?: string } {
+): { costPerUnit?: number; costNote?: string; source?: LookupCostSource } {
   const unit = args.catalogUnit;
   const priced = rows.filter(
     (row) =>
@@ -55,6 +57,7 @@ export function resolveTenantCatalogCostFallback(
       return {
         costPerUnit: Math.round(categoryMedian * 100) / 100,
         costNote: `Catalog cost estimated from your other "${category}" ingredients (median ${categoryMedian.toFixed(2)} per ${unit}).`,
+        source: "tenant_category",
       };
     }
   }
@@ -70,22 +73,33 @@ export function resolveTenantCatalogCostFallback(
       return {
         costPerUnit: Math.round(nameMedian * 100) / 100,
         costNote: `Catalog cost estimated from similar ingredients already in your catalog (median ${nameMedian.toFixed(2)} per ${unit}).`,
+        source: "tenant_name",
       };
     }
   }
 
-  return catalogUnitMedianFallback(priced, unit);
+  return {};
 }
 
-function catalogUnitMedianFallback(
-  priced: IngredientRow[],
-  unit: string,
-): { costPerUnit?: number; costNote?: string } {
+/** Loose same-unit median — suggestion only, never auto-written. */
+export function resolveTenantUnitMedianSuggestion(
+  rows: readonly IngredientRow[],
+  catalogUnit: string,
+  excludeName?: string,
+): { suggestedCostPerUnit?: number; costNote?: string } {
+  const priced = rows.filter(
+    (row) =>
+      String(row.unit) === catalogUnit &&
+      Number(row.costPerUnit) > 0 &&
+      String(row.name ?? "")
+        .trim()
+        .toLowerCase() !== excludeName?.trim().toLowerCase(),
+  );
   if (priced.length < 2) return {};
   const catalogMedian = median(priced.map((row) => Number(row.costPerUnit)));
   if (catalogMedian == null || catalogMedian <= 0) return {};
   return {
-    costPerUnit: Math.round(catalogMedian * 100) / 100,
-    costNote: `Catalog cost estimated from your other "${unit}" ingredients (median ${catalogMedian.toFixed(2)} per ${unit}).`,
+    suggestedCostPerUnit: Math.round(catalogMedian * 100) / 100,
+    costNote: `No exact match — your other "${catalogUnit}" items average about ${catalogMedian.toFixed(2)} per ${catalogUnit}.`,
   };
 }

@@ -38,7 +38,25 @@ export async function applyLookupCostToIngredient(
   });
 
   if (hint.costPerUnit == null || hint.costPerUnit <= 0) {
-    return { costApplied: false, costNote: hint.costNote };
+    return {
+      costApplied: false,
+      costNote: hint.costNote,
+      suggestedCostPerUnit: hint.suggestedCostPerUnit,
+    };
+  }
+
+  const autoSaveSources = new Set([
+    "open_prices",
+    "tenant_category",
+    "tenant_name",
+  ]);
+  const mayAutoSave = hint.source != null && autoSaveSources.has(hint.source);
+  if (!mayAutoSave) {
+    return {
+      costApplied: false,
+      suggestedCostPerUnit: hint.costPerUnit,
+      costNote: hint.costNote,
+    };
   }
 
   const existingCost = Number(doc.costPerUnit ?? 0);
@@ -60,7 +78,7 @@ export async function applyLookupCostToIngredient(
     return {
       costApplied: false,
       suggestedCostPerUnit: hint.costPerUnit,
-      costNote: `Lookup found ${hint.costPerUnit.toFixed(2)} per ${args.catalogUnit} but could not save — retry Save cost below.`,
+      costNote: `Lookup found ${hint.costPerUnit.toFixed(2)} per ${args.catalogUnit} — cost is filled below; tap Save cost to keep it.`,
     };
   }
 
@@ -81,10 +99,14 @@ export async function resolveLookupCostForCreate(
     catalogUnit: string;
     servingGramsPerUnit?: number;
     formCost: number;
+    lookupUsed?: boolean;
   },
 ): Promise<number> {
   if (Number.isFinite(args.formCost) && args.formCost > 0) {
     return args.formCost;
+  }
+  if (!args.lookupUsed) {
+    return 0;
   }
   const tenantIngredients = await ctx.runQuery(api.queries.listIngredient, {});
   const hint = await resolveLookupCostHint({
@@ -96,5 +118,15 @@ export async function resolveLookupCostForCreate(
     servingGramsPerUnit: args.servingGramsPerUnit,
     tenantIngredients,
   });
-  return hint.costPerUnit != null && hint.costPerUnit > 0 ? hint.costPerUnit : 0;
+  if (hint.costPerUnit != null && hint.costPerUnit > 0) {
+    const autoSaveSources = new Set([
+      "open_prices",
+      "tenant_category",
+      "tenant_name",
+    ]);
+    if (hint.source != null && autoSaveSources.has(hint.source)) {
+      return hint.costPerUnit;
+    }
+  }
+  return 0;
 }

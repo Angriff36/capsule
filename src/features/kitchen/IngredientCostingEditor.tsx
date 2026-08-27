@@ -11,15 +11,23 @@ export type IngredientCostingTarget = {
 
 export function IngredientCostingEditor({
   ingredient,
+  suggestedCostPerUnit,
   onFailure,
 }: Readonly<{
   ingredient: IngredientCostingTarget;
+  suggestedCostPerUnit?: number;
   onFailure: (error: unknown) => void;
 }>) {
   const updateCosting = useIngredientUpdateCosting();
   const initialCost = Number(ingredient.costPerUnit);
+  const seedCost =
+    suggestedCostPerUnit != null &&
+    suggestedCostPerUnit > 0 &&
+    (!Number.isFinite(initialCost) || initialCost <= 0)
+      ? suggestedCostPerUnit
+      : initialCost;
   const [costPerUnit, setCostPerUnit] = useState(
-    Number.isFinite(initialCost) ? initialCost.toFixed(2) : "0.00",
+    Number.isFinite(seedCost) ? seedCost.toFixed(2) : "0.00",
   );
   const [saving, setSaving] = useState(false);
 

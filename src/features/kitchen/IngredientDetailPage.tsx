@@ -309,6 +309,9 @@ export function IngredientDetailPage() {
   const applyLookup = useIngredientLookupApplyToIngredient();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [lookupSuggestedCost, setLookupSuggestedCost] = useState<
+    number | undefined
+  >(undefined);
 
   if (!id) return <ErrorState title="Ingredient not found" />;
   if (ingredient === undefined) {
@@ -399,7 +402,7 @@ export function IngredientDetailPage() {
               setFailure(null);
               setBusy("lookup");
               try {
-                return await applyLookup({
+                const result = await applyLookup({
                   docId: ingredient._id,
                   profile: {
                     name: profile.name,
@@ -414,6 +417,16 @@ export function IngredientDetailPage() {
                     brandOwner: profile.brandOwner,
                   },
                 });
+                if (
+                  !result.costApplied &&
+                  result.suggestedCostPerUnit != null &&
+                  result.suggestedCostPerUnit > 0
+                ) {
+                  setLookupSuggestedCost(result.suggestedCostPerUnit);
+                } else {
+                  setLookupSuggestedCost(undefined);
+                }
+                return result;
               } catch (error) {
                 setFailure(error);
                 throw error;
@@ -516,8 +529,9 @@ export function IngredientDetailPage() {
       />
 
       <IngredientCostingEditor
-        key={`costing:${ingredient._id}:${ingredient.version}`}
+        key={`costing:${ingredient._id}:${ingredient.version}:${lookupSuggestedCost ?? "none"}`}
         ingredient={ingredient}
+        suggestedCostPerUnit={lookupSuggestedCost}
         onFailure={setFailure}
       />
 

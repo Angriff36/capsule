@@ -10,6 +10,11 @@ export async function discoverOffBarcodesForProduct(
   const query = [brandOwner, productName].filter(Boolean).join(" ").trim();
   if (query.length < 2) return [];
 
+  const nameTokens = productName
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((token) => token.length >= 4);
+
   const params = new URLSearchParams({
     action: "process",
     search_terms: query,
@@ -27,6 +32,13 @@ export async function discoverOffBarcodesForProduct(
     const rows = Array.isArray(payload.products) ? payload.products : [];
     const codes: string[] = [];
     for (const row of rows) {
+      const label = String(row.product_name ?? "").toLowerCase();
+      if (
+        nameTokens.length > 0 &&
+        !nameTokens.some((token) => label.includes(token))
+      ) {
+        continue;
+      }
       const digits = String(row.code ?? "").replace(/\D/g, "");
       if (digits.length >= 8 && !codes.includes(digits)) {
         codes.push(digits);

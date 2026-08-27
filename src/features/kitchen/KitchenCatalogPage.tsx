@@ -174,6 +174,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           catalogUnit: unit,
           servingGramsPerUnit,
           formCost: Number.isFinite(formCost) && formCost >= 0 ? formCost : 0,
+          lookupUsed: data.get("lookupUsed") === "true",
         });
         const created = (await createIngredient({
           name,
