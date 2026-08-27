@@ -53,8 +53,14 @@ export function mapFdcNutrientsPerGram(nutrients: readonly FdcNutrientRow[]) {
   };
 }
 
-export function normalizeFdcCategory(raw?: string | null): string | undefined {
-  const trimmed = raw?.trim();
+export function normalizeFdcCategory(
+  raw?: string | { description?: string | null } | null,
+): string | undefined {
+  if (raw == null) return undefined;
+  if (typeof raw === "object") {
+    return normalizeFdcCategory(raw.description ?? undefined);
+  }
+  const trimmed = raw.trim();
   if (!trimmed) return undefined;
   return trimmed.replace(/\s+/g, " ");
 }
