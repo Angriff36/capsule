@@ -11,6 +11,7 @@ import {
   useListWeeklyPurchasingConfig,
 } from "../../lib/manifest-convex-react";
 import { EventDraftPoCoordinator } from "./EventDraftPoCoordinator";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 type Props = {
   eventId: string;
@@ -27,8 +28,8 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
   const createOrder = useCreateVendorOrder();
   const createLine = useCreateVendorOrderLine();
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
+  const { error, setError } = useActionFailure();
   const [orderId, setOrderId] = useState<string | null>(null);
   const [vendorId, setVendorId] = useState("");
 

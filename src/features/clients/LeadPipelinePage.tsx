@@ -24,6 +24,7 @@ import { CrmFailureBanner } from "./CrmFailureBanner";
 import { LeadSourceReport } from "./LeadSourceReport";
 import "./LeadPipelinePage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { useActionNotice } from "../../ui/action-result";
 
 const STAGES = [
   { key: "new", label: "New", caption: "Fresh inquiries" },
@@ -115,7 +116,7 @@ export function LeadPipelinePage() {
   const [proposalLeadId, setProposalLeadId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const activeLeads = ((leads ?? []) as LeadRow[]).filter(
     (lead) => lead.deletedAt == null && lead.capturedAt != null,

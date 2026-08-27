@@ -11,6 +11,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { RolePermissionAudit } from "./RolePermissionAuditPanel";
 import { TeamRolesPanel } from "./TeamRolesPanel";
+import { useActionFailure } from "../../ui/action-result";
 
 const CAPABILITIES = [
   ["kitchen", "Kitchen", "Components, dishes, menus, and prep work."],
@@ -37,7 +38,7 @@ export function PermissionsPage() {
   const createSetting = useCreateOrganizationCapabilitySetting();
   const setEnabled = useOrganizationCapabilitySettingSetEnabled();
   const [saving, setSaving] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
   const settings = useMemo(
     () => new Map((rows ?? []).map((row) => [row.capability, row])),
     [rows],

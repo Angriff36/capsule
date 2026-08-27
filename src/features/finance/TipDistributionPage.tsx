@@ -25,6 +25,7 @@ import {
   type TipPoolingMethod,
 } from "./tipDistribution";
 import "./TipDistributionPage.css";
+import { useActionNotice } from "../../ui/action-result";
 
 const roleLabel = (value: string) =>
   value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -62,7 +63,7 @@ export function TipDistributionPage() {
   );
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const activeEvents = useMemo(
     () =>

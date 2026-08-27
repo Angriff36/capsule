@@ -2,6 +2,7 @@ import { useAction, useQuery } from "convex/react";
 import { useState, type FormEvent } from "react";
 import { api } from "../../lib/api";
 import { EmptyState, ErrorState, Section, Skeleton } from "../../ui/primitives";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 function formatWhen(value: number | null | undefined): string {
   return value == null
@@ -27,8 +28,8 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [secret, setSecret] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   const [pendingId, setPendingId] = useState<string | null>(null);
 
   function toggleEvent(type: string) {

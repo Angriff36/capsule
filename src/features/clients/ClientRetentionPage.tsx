@@ -14,6 +14,7 @@ import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
+import { useActionNotice } from "../../ui/action-result";
 
 interface RetentionRow {
   clientId: string;
@@ -95,7 +96,7 @@ export function ClientRetentionPage() {
   const dismissOutreachTask = useClientOutreachTaskDismiss();
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const loading =
     clients === undefined ||

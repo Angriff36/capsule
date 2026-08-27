@@ -24,6 +24,7 @@ import {
   dayStartOfTimestamp,
 } from "./payrollPeriod";
 import { PayrollWorksheet } from "./PayrollWorksheet";
+import { useActionNotice } from "../../ui/action-result";
 import {
   PayrollPrepareForm,
   PayrollPreparePayloadBuilder,
@@ -59,7 +60,7 @@ export function PayrollPage() {
   const [showTerminal, setShowTerminal] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [period] = useState(initialPeriod);
   const [periodStart, setPeriodStart] = useState(period.start);
   const [periodEnd, setPeriodEnd] = useState(period.end);

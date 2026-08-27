@@ -9,6 +9,7 @@ import {
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 // DishComponent attach/detach — the first hop of the purchasing chain.
 //
@@ -31,8 +32,8 @@ export function DishComponentsPanel({ dishId }: Props) {
   const detachComponent = useDishComponentDetach();
 
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host: promptHost } = useActionPrompt();
 
   const rows = (dishComponents ?? [])

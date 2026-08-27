@@ -45,6 +45,7 @@ import { duplicateMenu } from "./menuTemplates";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { downloadMenuPdf, type MenuPdfLayout } from "./menuPdf";
 import { deriveAllergenRows } from "./AllergenMatrixPage";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -71,7 +72,7 @@ export function MenuDetailPage() {
   const createMenuDish = useCreateMenuDish();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [pdfLayout, setPdfLayout] = useState<MenuPdfLayout>("card");
   const { prompt, host } = useActionPrompt();
   const selectedMenuDishes = useMemo(

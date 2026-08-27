@@ -21,6 +21,7 @@ import { KitchenDashboardPage } from "../features/kitchen/KitchenDashboardPage";
 import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { ComponentDetailPage } from "../features/kitchen/ComponentDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
+import { ActionResultHost } from "../ui/action-result";
 import { AuthGate } from "./AuthGate";
 import { AppShell } from "./shell/AppShell";
 
@@ -519,6 +520,7 @@ export function App() {
   if (clientPortalMatch?.params.token) {
     return (
       <AppErrorBoundary>
+        <ActionResultHost />
         <ClientPortalPage token={clientPortalMatch.params.token} />
       </AppErrorBoundary>
     );
@@ -527,6 +529,7 @@ export function App() {
   if (acceptanceMatch?.params.callbackToken) {
     return (
       <AppErrorBoundary>
+        <ActionResultHost />
         <ProposalAcceptancePage
           callbackToken={acceptanceMatch.params.callbackToken}
         />
@@ -537,6 +540,7 @@ export function App() {
   if (shareMatch?.params.token) {
     return (
       <AppErrorBoundary>
+        <ActionResultHost />
         <SharedProposalPage token={shareMatch.params.token} />
       </AppErrorBoundary>
     );
@@ -545,6 +549,7 @@ export function App() {
   if (quoteMatch) {
     return (
       <AppErrorBoundary>
+        <ActionResultHost />
         <QuoteSubmissionPage />
       </AppErrorBoundary>
     );
@@ -559,6 +564,7 @@ export function App() {
             path="/my"
             element={
               <SupplyRoute>
+                <ActionResultHost />
                 <MyDayPage />
               </SupplyRoute>
             }
@@ -568,6 +574,7 @@ export function App() {
             path="/kitchen/display"
             element={
               <SupplyRoute>
+                <ActionResultHost />
                 <KitchenDisplayPage />
               </SupplyRoute>
             }

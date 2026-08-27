@@ -21,6 +21,7 @@ import { useActionPrompt } from "../../../ui/action-prompt";
 import { formatCountNoun, formatDate } from "@/lib/format";
 import { useAuthStatus } from "@/lib/useAuthStatus";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
+import { useActionFailure } from "../../../ui/action-result";
 
 interface ValidationCheck {
   passed: boolean;
@@ -53,7 +54,7 @@ export function CutoverPage() {
   // Local state
   const [localApproval, setLocalApproval] = useState(false);
   const [localRollbackPlan, setLocalRollbackPlan] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Execute go/no-go decision

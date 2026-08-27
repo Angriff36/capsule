@@ -48,6 +48,7 @@ import {
   ErrorState,
   StatusChip,
 } from "../../ui/primitives";
+import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
@@ -330,7 +331,10 @@ export function EventDetailPage() {
               })),
             branding,
           })
-            .then(() => setPdfNotice("BEO PDF downloaded."))
+            .then(() => {
+              setPdfNotice("BEO PDF downloaded.");
+              reportActionOk("BEO PDF downloaded.");
+            })
             .catch((error) => setFailure(classifyCommandFailure(error)));
         }}
       >

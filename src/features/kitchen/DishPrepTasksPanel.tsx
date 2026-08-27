@@ -10,6 +10,7 @@ import {
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 type Props = {
   dishId: string;
@@ -58,8 +59,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   const retireTask = useDishTaskRetire();
 
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   // A dish's tasks come off one sheet, so they share a category and mostly
   // share a unit — those two hold their last value instead of resetting.
   // Station is free text and clears with the rest of the form: a stale

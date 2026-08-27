@@ -16,6 +16,7 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -32,7 +33,7 @@ export function PackListsPage() {
   const [showCancelled, setShowCancelled] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeRows = (packLists ?? []).filter((row) => row.deletedAt == null);

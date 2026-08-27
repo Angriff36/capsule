@@ -31,6 +31,7 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { InvoiceIssueForm } from "./InvoiceIssueForm";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new CommercialLifecyclePolicy();
 
@@ -77,7 +78,7 @@ export function InvoicesPage() {
   const [showClosed, setShowClosed] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeClients = (clients ?? []).filter(

@@ -15,6 +15,7 @@ import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { localDateTime } from "./eventDetailFormHelpers";
 import "./EventEquipmentPanel.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { useActionNotice } from "../../ui/action-result";
 
 const CONDITIONS = [
   "excellent",
@@ -64,7 +65,7 @@ export function EventEquipmentPanel({
   );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const equipmentRows = (equipment ?? []).filter(

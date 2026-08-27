@@ -20,6 +20,7 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 // chunks, so landing directly on this page without this import gets no styles
 // and the header stat runs together ("Pending approval00 total").
 import "./taxWorkspace.css";
+import { useActionNotice } from "../../ui/action-result";
 
 const usd = formatMoneyExact;
 
@@ -48,7 +49,7 @@ export function RevenueAttributionsPage() {
   const update = useRevenueAttributionUpdate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const configuredAttributions = (attributions ?? [])

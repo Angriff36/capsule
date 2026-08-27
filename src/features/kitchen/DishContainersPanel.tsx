@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { formatCountNoun } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import {
   useCreateDishContainer,
   useDishContainerRetire,
@@ -35,8 +36,8 @@ export function DishContainersPanel({ dishId }: Props) {
   const retireContainer = useDishContainerRetire();
 
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host: promptHost } = useActionPrompt();
 
   const rows = (containers ?? [])

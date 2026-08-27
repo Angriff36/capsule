@@ -45,6 +45,7 @@ import {
   prepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import "./PrepTaskDependencies.css";
+import { useActionNotice } from "../../ui/action-result";
 
 const UNITS = [
   "each",
@@ -103,7 +104,7 @@ export function PrepBoardPage() {
   const [selectedEventDishId, setSelectedEventDishId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [reasonRequest, setReasonRequest] = useState<ReasonRequest | null>(
     null,
   );

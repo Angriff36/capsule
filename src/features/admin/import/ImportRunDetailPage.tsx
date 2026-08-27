@@ -16,6 +16,7 @@ import { importRunsListPath } from "./importRoutes";
 import { StatusChip } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
+import { useActionNotice, useActionFailure } from "../../../ui/action-result";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -90,8 +91,8 @@ export function ImportRunDetailPage() {
 
   const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   const [showRecordCountsForm, setShowRecordCountsForm] = useState(false);
   const [recordCountsInput, setRecordCountsInput] = useState("{}");
   // Final-counts confirmation card for Approve & Commit (prefilled from the

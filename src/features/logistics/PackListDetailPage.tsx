@@ -34,6 +34,7 @@ import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PackListItemForm } from "./PackListItemForm";
 import { PackListItemTable } from "./PackListItemTable";
 import { PACK_LIST_UNITS } from "./packListUnits";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -71,7 +72,7 @@ export function PackListDetailPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [failureItemId, setFailureItemId] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(packList);
   const bulk = useBulkRun();

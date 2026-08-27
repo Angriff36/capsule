@@ -19,6 +19,7 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { PaymentsLedgerPresenter } from "./PaymentsLedgerPresenter";
+import { useActionNotice } from "../../ui/action-result";
 
 const policy = new CommercialLifecyclePolicy();
 const ledger = new PaymentsLedgerPresenter();
@@ -42,7 +43,7 @@ export function PaymentsPage() {
   const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
   const payableInvoices = (invoices ?? []).filter(

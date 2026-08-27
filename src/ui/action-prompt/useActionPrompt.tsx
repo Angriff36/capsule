@@ -6,6 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { reportActionOk } from "../action-result";
 import { ActionPromptController } from "./ActionPromptController";
 import { ActionPromptPanel } from "./ActionPromptPanel";
 import type {
@@ -74,6 +75,7 @@ export function useActionPrompt(busy = false): {
 
   const announceDismissed = useCallback(() => {
     setNotice(DISMISSED_NOTICE);
+    reportActionOk(DISMISSED_NOTICE);
   }, []);
 
   const prompt = useMemo(

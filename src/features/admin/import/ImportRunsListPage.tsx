@@ -10,6 +10,7 @@ import { importRunDetailPath } from "./importRoutes";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
+import { useActionNotice, useActionFailure } from "../../../ui/action-result";
 
 type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
 type DatasetType =
@@ -60,8 +61,8 @@ export function ImportRunsListPage() {
 
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
 
   // Filters
   const [sourceSystemFilter, setSourceSystemFilter] = useState<string>("");

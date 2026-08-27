@@ -9,6 +9,7 @@ import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, Section, Skeleton } from "../../ui/primitives";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { useActionNotice } from "../../ui/action-result";
 
 const MEDIA = ["call", "email", "meeting"] as const;
 
@@ -98,7 +99,7 @@ export function ClientCommunicationPanelView({
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const contacts = target.kind === "contacts" ? target.contacts : [];
   const activeContacts = contacts.filter(

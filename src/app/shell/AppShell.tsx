@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
 import { AnnouncementBanner } from "../../features/announcements/AnnouncementBanner";
+import { ActionResultHost } from "../../ui/action-result";
 import { CommandPalette } from "./CommandPalette";
 import { MobileTabBar } from "./MobileTabBar";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
@@ -72,6 +73,7 @@ export function AppShell() {
             </div>
           )}
           <AnnouncementBanner />
+          <ActionResultHost />
           <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
             <div className="workspace-sheet px-8 py-6 max-md:px-4 max-md:py-3">
               <PageGuide />

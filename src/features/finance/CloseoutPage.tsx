@@ -30,6 +30,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
+import { useActionNotice } from "../../ui/action-result";
 import {
   closeoutListedCost,
   isCloseoutListProfitPending,
@@ -51,7 +52,7 @@ export function CloseoutPage() {
   const [draft, setDraft] = useState<CloseoutDraft | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const [summaryCloseoutId, setSummaryCloseoutId] = useState<string | null>(
     null,
   );

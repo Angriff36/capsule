@@ -5,6 +5,7 @@ import { api, type Id } from "../../lib/api";
 import { ArrowLeftIcon, CheckIcon } from "../../ui/icons";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { useActionFailure } from "../../ui/action-result";
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -75,7 +76,7 @@ function quoteFieldRules(data: FormData): Record<string, string> {
  */
 export function QuoteSubmissionPage() {
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
   const [success, setSuccess] = useState<{
     submissionId: string;
     message: string;

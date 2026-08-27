@@ -10,6 +10,7 @@ import {
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import {
   suspectPrepQuantityFlag,
   suspectRowsFromRecipeLines,
@@ -28,8 +29,8 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
   const prepTasks = useListPrepTask();
   const { ready, syncPrepForDish } = useEventMenuSync();
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
+  const { error, setError } = useActionFailure();
 
   const selections = useMemo(
     () =>

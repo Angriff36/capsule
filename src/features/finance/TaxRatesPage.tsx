@@ -12,6 +12,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { calculateTaxRemittance } from "./invoiceTax";
 import "./taxWorkspace.css";
+import { useActionNotice } from "../../ui/action-result";
 
 const usd = formatMoneyExact;
 
@@ -35,7 +36,7 @@ export function TaxRatesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const activeRates = (taxRates ?? []).filter(
     (rate) => rate.deletedAt == null && rate.active === true,

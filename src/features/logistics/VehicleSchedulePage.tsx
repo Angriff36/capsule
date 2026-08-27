@@ -12,6 +12,7 @@ import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { useAssignVehicle } from "../facilities/vehicleAssignment";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { useActionNotice } from "../../ui/action-result";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MARKS = [0, 6, 12, 18, 24];
@@ -56,7 +57,7 @@ export function VehicleSchedulePage() {
   const [day, setDay] = useState(() => toDateInputValue(new Date()));
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const dayStart = new Date(`${day}T00:00`).getTime();
   const dayEnd = dayStart + DAY_MS;

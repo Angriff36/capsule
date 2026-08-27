@@ -9,6 +9,7 @@ import {
 } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { useActionNotice } from "../../ui/action-result";
 import {
   createPersonalDataExportDocument,
   type PersonalDataExportFormat,
@@ -75,7 +76,7 @@ export function PersonalDataExportView({
   onSearchChange: (value: string) => void;
   onSelectedKeyChange: (value: string) => void;
 }) {
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
   const filteredSubjects = useMemo(() => {
     const needle = search.trim().toLocaleLowerCase();
     if (!needle) return subjects ?? [];

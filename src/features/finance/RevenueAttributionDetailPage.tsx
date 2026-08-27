@@ -18,6 +18,7 @@ import {
   formatMoneyExact,
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
+import { useActionNotice } from "../../ui/action-result";
 
 const usd = formatMoneyExact;
 
@@ -68,7 +69,7 @@ export function RevenueAttributionDetailPage() {
 
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   // Form state
   const [attributionType, setAttributionType] =

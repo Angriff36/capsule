@@ -16,6 +16,7 @@ import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 // directly on this page otherwise gets no styles and the header stat runs
 // together ("Active terms00 configured").
 import "./taxWorkspace.css";
+import { useActionNotice } from "../../ui/action-result";
 
 const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
@@ -48,7 +49,7 @@ export function VenueCommissionTermsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { notice, setNotice } = useActionNotice();
 
   const configuredTerms = (venueTerms ?? [])
     .filter((term) => term.deletedAt == null)

@@ -16,6 +16,7 @@ import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { isValidBrandColor, useTenantBranding } from "./tenantBranding";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 const LOGO_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
 const MAX_LOGO_BYTES = 10 * 1024 * 1024;
@@ -46,8 +47,8 @@ export function BrandingPage() {
   const [currencyError, setCurrencyError] = useState<string | null>(null);
   const [currencyNotice, setCurrencyNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   const canEdit = canManageBranding(authStatus?.role);
 
   useEffect(() => {

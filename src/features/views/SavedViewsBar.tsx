@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { type ReportSubjectArea, useSavedViews } from "./useSavedViews";
+import { useActionFailure } from "../../ui/action-result";
 
 type Props<S> = {
   /** Stable key for this list page, e.g. "events" or "invoices". */
@@ -30,7 +31,7 @@ export function SavedViewsBar<S>({
   );
   const [selected, setSelected] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
   const { prompt, host } = useActionPrompt(busy);
   const appliedDefault = useRef(false);
 

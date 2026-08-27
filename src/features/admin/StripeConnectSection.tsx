@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { api } from "../../lib/api";
 import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { ErrorState, Section, StatusChip } from "../../ui/primitives";
+import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
 // Stripe Connect (issue #112) — a tenant's invoice payments settle to that
 // tenant's own Stripe account, never to the platform. Standard connected
@@ -63,8 +64,8 @@ export function StripeConnectSection() {
 
   const [view, setView] = useState<ConnectionView | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const { error, setError } = useActionFailure();
+  const { notice, setNotice } = useActionNotice();
   const [searchParams, setSearchParams] = useSearchParams();
   const returnHandled = useRef(false);
 

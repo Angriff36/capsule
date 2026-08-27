@@ -22,6 +22,7 @@ import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { reportActionOk } from "../../ui/action-result";
 import { ActionMenu, TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -100,7 +101,6 @@ export function KitchenDashboardPage() {
   /** Ticked rows. The board works in batches — one cook, many steps. */
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
   const [failure, setFailure] = useState<unknown>(null);
-  const [toast, setToast] = useState<string | null>(null);
 
   const horizon = useMemo(
     () => new KitchenCommandDeckHorizon(7, horizonOffset),
@@ -157,8 +157,7 @@ export function KitchenDashboardPage() {
     people === undefined;
 
   const showToast = (message: string) => {
-    setToast(message);
-    globalThis.setTimeout(() => setToast(null), 1800);
+    reportActionOk(message);
   };
 
   const run = async (
@@ -1895,8 +1894,6 @@ export function KitchenDashboardPage() {
           </div>
         )}
       </div>
-
-      {toast ? <output className="kcd-toast">{toast}</output> : null}
     </div>
   );
 }
