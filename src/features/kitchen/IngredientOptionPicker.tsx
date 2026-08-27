@@ -109,16 +109,22 @@ export function IngredientOptionPicker({
 
   return (
     <div className="space-y-2">
-      <input
+      <select
         className="sr-only"
         name={name}
         value={selectedId}
-        readOnly
         required={required}
         tabIndex={-1}
         aria-hidden="true"
-        onChange={() => undefined}
-      />
+        onChange={(event) => pick(event.target.value)}
+      >
+        <option value="">Select ingredient</option>
+        {rows.map((row) => (
+          <option key={row._id} value={row._id}>
+            {row.name}
+          </option>
+        ))}
+      </select>
       <label className="field-label">
         Filter ingredients
         <input

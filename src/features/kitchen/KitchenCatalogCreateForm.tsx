@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   NUTRIENTS,
   type IngredientNutritionFields,
@@ -13,6 +13,8 @@ import type { CulinaryAllergenCode } from "./CulinaryAllergenVocabulary";
 import { IngredientDatabaseLookup } from "./lookup/IngredientDatabaseLookup";
 import type { IngredientAutofillProfile } from "./lookup/ExternalIngredientProfile";
 import { KITCHEN_SECTION_SINGULAR, type KitchenSection } from "./kitchenRoutes";
+import { scaleNutritionFromGramsToUnit } from "../../lib/nutritionUnitScale";
+import type { NutritionFields } from "../../lib/nutritionUnitScale";
 
 const UNITS = SELECTABLE_UNITS;
 
@@ -65,9 +67,19 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
     CulinaryAllergenCode[]
   >([]);
   const [createGlutenFree, setCreateGlutenFree] = useState(false);
-  const [nutrition, setNutrition] = useState<
+  const [lookupGramNutrition, setLookupGramNutrition] = useState<
     Partial<IngredientNutritionFields>
   >({});
+  const scaledLookupNutrition = useMemo(() => {
+    const gramFields: NutritionFields = {};
+    for (const nutrient of NUTRIENTS) {
+      const value = lookupGramNutrition[nutrient.field];
+      if (value != null && Number(value) > 0) {
+        gramFields[nutrient.field] = Number(value);
+      }
+    }
+    return scaleNutritionFromGramsToUnit(gramFields, unit);
+  }, [lookupGramNutrition, unit]);
 
   const applyAutofill = (profile: IngredientAutofillProfile) => {
     setName(profile.name);
@@ -83,17 +95,11 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
       if (profile.allergens.includes("wheat")) return false;
       return existing;
     });
-    if (
-      Object.values(profile.nutrition).some(
-        (value) => value != null && Number(value) > 0,
-      )
-    ) {
-      setNutrition(profile.nutrition);
-    }
+    setLookupGramNutrition(profile.nutrition);
   };
 
   const hasNutrition = NUTRIENTS.some((nutrient) => {
-    const value = nutrition[nutrient.field];
+    const value = lookupGramNutrition[nutrient.field];
     return value != null && Number(value) > 0;
   });
 
@@ -177,17 +183,22 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 <p className="font-medium text-ink">Nutrition from lookup</p>
                 <p className="mt-1">
                   {NUTRIENTS.filter((nutrient) => {
-                    const value = nutrition[nutrient.field];
+                    const value = lookupGramNutrition[nutrient.field];
                     return value != null && Number(value) > 0;
                   })
-                    .map(
-                      (nutrient) =>
-                        `${nutrient.label}: ${nutrition[nutrient.field]} ${nutrient.unit}/${unit}`,
-                    )
+                    .map((nutrient) => {
+                      const scaledValue =
+                        scaledLookupNutrition?.[nutrient.field] ??
+                        lookupGramNutrition[nutrient.field];
+                      const unitLabel = scaledLookupNutrition
+                        ? unit
+                        : "gram (lookup)";
+                      return `${nutrient.label}: ${scaledValue} ${nutrient.unit}/${unitLabel}`;
+                    })
                     .join(" · ")}
                 </p>
                 {NUTRIENTS.map((nutrient) => {
-                  const value = nutrition[nutrient.field];
+                  const value = lookupGramNutrition[nutrient.field];
                   if (value == null || Number(value) <= 0) return null;
                   return (
                     <input

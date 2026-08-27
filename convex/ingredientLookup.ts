@@ -364,9 +364,9 @@ export const applyToIngredient = action({
       version: doc.version,
       name: args.profile.name,
       unit: doc.unit,
-      ...(args.profile.category !== undefined
-        ? { category: args.profile.category }
-        : {}),
+      category:
+        args.profile.category ??
+        (typeof doc.category === "string" ? doc.category : undefined),
     });
 
     doc = await ctx.runQuery(api.queries.getIngredient, { id: args.docId });
