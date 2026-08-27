@@ -1,18 +1,12 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  formatCount,
-  formatDate,
-  formatMoney,
-  relativeDays,
-} from "../../lib/format";
+import { formatCount } from "../../lib/format";
 import { useListClient, useListEvent } from "../../lib/manifest-convex-react";
 import { PlusIcon } from "../../ui/icons";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   ActionMenu,
   EmptyState,
-  PageHeader,
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
@@ -52,6 +46,28 @@ const TAB_LABEL: Record<"upcoming" | "attention" | "all", string> = {
   all: "All",
 };
 
+/** Ledger group heading: "Today" / "Tomorrow" / "Fri 28 August". */
+function dayLabel(day: number, now: number): string {
+  const today = new Date(now).setHours(0, 0, 0, 0);
+  if (day === today) return "Today";
+  if (day === today + DAY) return "Tomorrow";
+  if (day === today - DAY) return "Yesterday";
+  return new Date(day).toLocaleDateString(undefined, {
+    weekday: "short",
+    day: "numeric",
+    month: "long",
+  });
+}
+
+/** Service time — the column an operator scans first. */
+function timeLabel(startsAt: number | null | undefined): string {
+  if (startsAt == null) return "—";
+  return new Date(startsAt).toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 export function EventsListPage() {
   const navigate = useNavigate();
   const events = useListEvent();
@@ -61,6 +77,7 @@ export function EventsListPage() {
   const [chosenTab, setTab] = useState<Tab | null>(null);
   const [search, setSearch] = useState("");
   const [dir, setDir] = useState<"asc" | "desc">("asc");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const now = Date.now();
 
   const live = useMemo(
@@ -123,110 +140,185 @@ export function EventsListPage() {
         : tab === "all"
           ? "All events"
           : `${STAGE_LABEL[tab as EventStage]} events`;
+  const totalCovers = rows.reduce(
+    (sum, e) => sum + (Number(e.expectedHeadcount) || 0),
+    0,
+  );
+
+  // Group into service days. A ledger reads by day, not by row number: the
+  // operator asks what is on Thursday, never what is in row 14.
+  const groups = useMemo(() => {
+    const byDay = new Map<number, typeof rows>();
+    const undated: typeof rows = [];
+    for (const e of rows) {
+      if (e.startsAt == null) {
+        undated.push(e);
+        continue;
+      }
+      const key = new Date(e.startsAt).setHours(0, 0, 0, 0);
+      const bucket = byDay.get(key);
+      if (bucket) bucket.push(e);
+      else byDay.set(key, [e]);
+    }
+    const ordered = [...byDay.entries()].sort((a, b) =>
+      dir === "asc" ? a[0] - b[0] : b[0] - a[0],
+    );
+    const out = ordered.map(([day, list]) => ({
+      key: String(day),
+      label: dayLabel(day, now),
+      list,
+    }));
+    if (undated.length > 0) {
+      out.push({ key: "undated", label: "Date to confirm", list: undated });
+    }
+    return out;
+  }, [rows, dir, now]);
+
+  const filterControls = (
+    <>
+      <div
+        role="tablist"
+        aria-label="Show"
+        className="flex rounded-full bg-inset p-1"
+      >
+        {questionTabs.map((t) => (
+          <button
+            key={t}
+            type="button"
+            role="tab"
+            aria-selected={tab === t}
+            onClick={() => setTab(t)}
+            className={`h-11 cursor-pointer rounded-full px-4 text-sm font-semibold whitespace-nowrap transition-colors md:h-9 ${
+              tab === t
+                ? "bg-panel text-ink shadow-[0_1px_2px_rgb(30_40_36/0.15)]"
+                : "text-ink-2 hover:text-ink"
+            }`}
+          >
+            {TAB_LABEL[t as keyof typeof TAB_LABEL]}
+            <span
+              className={`ml-1.5 ${t === "attention" && (counts[t] ?? 0) > 0 ? "font-bold text-warn" : "text-ink-2"}`}
+            >
+              {counts[t] ?? 0}
+            </span>
+          </button>
+        ))}
+      </div>
+      <label className="flex items-center gap-2 text-sm font-medium text-ink-2">
+        Stage
+        <select
+          className="input h-11 w-44 md:h-9"
+          aria-label="Filter by stage"
+          value={stageFilter}
+          onChange={(e) =>
+            setTab(e.target.value ? (e.target.value as EventStage) : "all")
+          }
+        >
+          <option value="">Any stage</option>
+          {EVENT_STAGES.map((s) => (
+            <option key={s} value={s}>
+              {STAGE_LABEL[s]} ({counts[s] ?? 0})
+            </option>
+          ))}
+        </select>
+      </label>
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search title, client, venue…"
+        className="input h-11 min-w-0 flex-1 basis-56 md:h-9"
+        aria-label="Filter events"
+      />
+      <button
+        type="button"
+        className="btn btn-ghost btn-sm h-11 md:h-8"
+        onClick={() => setDir((d) => (d === "asc" ? "desc" : "asc"))}
+        aria-label={`Sort by date, currently ${dir === "asc" ? "soonest first" : "latest first"}`}
+      >
+        {dir === "asc" ? "Soonest first" : "Latest first"}
+      </button>
+      <div className="max-md:w-full">
+        <SavedViewsBar<EventsView>
+          pageKey="events"
+          subjectArea="events"
+          currentState={{ tab, search, dir }}
+          onApply={(s) => {
+            setTab(s.tab);
+            setSearch(s.search);
+            setDir(s.dir);
+          }}
+        />
+      </div>
+    </>
+  );
 
   return (
-    <div className="space-y-5">
-      <PageHeader
-        title="Events"
-        lead={`${counts.upcoming ?? 0} upcoming · ${counts.attention ?? 0} need action`}
-        actions={[
-          <Link key="new" to="/events/new" className="btn btn-primary">
+    <div className="pb-10">
+      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+        <div>
+          <h1 className="display-title text-ink">Events</h1>
+          <div className="fact-row mt-3">
+            <span className="fact">
+              <b>Upcoming:</b>
+              {counts.upcoming ?? 0}
+            </span>
+            <span className="fact">
+              <b>Needs action:</b>
+              <span
+                className={
+                  (counts.attention ?? 0) > 0 ? "font-medium text-warn" : ""
+                }
+              >
+                {counts.attention ?? 0}
+              </span>
+            </span>
+            <span className="fact">
+              <b>Covers booked:</b>
+              {formatCount(totalCovers)}
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/events/new" className="btn btn-primary">
             <PlusIcon /> New event
-          </Link>,
-          <ActionMenu key="more">
+          </Link>
+          <ActionMenu>
             <Link to="/events/capacity">Capacity calendar</Link>
             <Link to="/events/templates">Templates</Link>
-          </ActionMenu>,
-        ]}
-      />
-
-      <div className="card flex flex-wrap items-center gap-3 px-4 py-3">
-        <div
-          role="tablist"
-          aria-label="Show"
-          className="flex rounded-full bg-inset p-1"
-        >
-          {questionTabs.map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tab === t}
-              onClick={() => setTab(t)}
-              className={`h-8 cursor-pointer rounded-full px-3.5 text-sm font-semibold whitespace-nowrap transition-colors ${
-                tab === t
-                  ? "bg-panel text-ink shadow-[0_1px_2px_rgb(30_40_36/0.15)]"
-                  : "text-ink-2 hover:text-ink"
-              }`}
-            >
-              {TAB_LABEL[t as keyof typeof TAB_LABEL]}
-              <span
-                className={`ml-1.5 text-xs ${t === "attention" && (counts[t] ?? 0) > 0 ? "font-bold text-warn" : "text-ink-2"}`}
-              >
-                {counts[t] ?? 0}
-              </span>
-            </button>
-          ))}
-        </div>
-        <label className="flex items-center gap-2 text-sm font-medium text-ink-2">
-          Stage
-          <select
-            className="input w-44"
-            aria-label="Filter by stage"
-            value={stageFilter}
-            onChange={(e) =>
-              setTab(e.target.value ? (e.target.value as EventStage) : "all")
-            }
-          >
-            <option value="">Any stage</option>
-            {EVENT_STAGES.map((s) => (
-              <option key={s} value={s}>
-                {STAGE_LABEL[s]} ({counts[s] ?? 0})
-              </option>
-            ))}
-          </select>
-        </label>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search title, client, venue…"
-          className="input min-w-0 flex-1 basis-56"
-          aria-label="Filter events"
-        />
-        <button
-          type="button"
-          className="btn btn-ghost"
-          onClick={() => setDir((d) => (d === "asc" ? "desc" : "asc"))}
-          aria-label={`Sort by date, currently ${dir === "asc" ? "soonest first" : "latest first"}`}
-        >
-          {dir === "asc" ? "Soonest first" : "Latest first"}
-        </button>
-        <div className="max-md:w-full">
-          <SavedViewsBar<EventsView>
-            pageKey="events"
-            subjectArea="events"
-            currentState={{ tab, search, dir }}
-            onApply={(s) => {
-              setTab(s.tab);
-              setSearch(s.search);
-              setDir(s.dir);
-            }}
-          />
+          </ActionMenu>
         </div>
       </div>
 
-      <section className="card" aria-labelledby="events-list-title">
-        <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
-          <h2 id="events-list-title" className="text-lg font-semibold text-ink">
-            {listTitle}
-            <span className="ml-2 text-base font-medium text-ink-2">
-              {rows.length}
-            </span>
-          </h2>
+      {/* Filters are one composed strip between rules, not a floating card. On
+          a phone they collapse behind a single control so the ledger leads. */}
+      <div className="mt-6 border-y border-line">
+        <button
+          type="button"
+          onClick={() => setFiltersOpen((v) => !v)}
+          aria-expanded={filtersOpen}
+          className="flex h-11 w-full cursor-pointer items-center justify-between text-sm font-semibold tracking-[0.09em] text-ink uppercase md:hidden"
+        >
+          Filters
+          <span className="font-normal tracking-normal text-ink-2 normal-case">
+            {TAB_LABEL[tab as keyof typeof TAB_LABEL] ??
+              STAGE_LABEL[tab as EventStage]}
+            {search ? ` · ${search}` : ""}
+          </span>
+        </button>
+        <div
+          className={`flex-wrap items-center gap-3 py-3 max-md:pb-4 md:flex ${
+            filtersOpen ? "flex" : "hidden"
+          }`}
+        >
+          {filterControls}
         </div>
-        {events === undefined ? (
+      </div>
+
+      {events === undefined ? (
+        <div className="mt-6">
           <TableSkeleton rows={8} />
-        ) : rows.length === 0 ? (
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="mt-10">
           <EmptyState
             title={
               search || tab !== "all"
@@ -244,106 +336,108 @@ export function EventsListPage() {
               </Link>
             }
           />
-        ) : (
-          <>
-            <table className="w-full max-md:hidden">
-              <thead>
-                <tr>
-                  <th className="th">Date</th>
-                  <th className="th w-full">Event</th>
-                  <th className="th">Stage</th>
-                  <th className="th">Client</th>
-                  <th className="th text-right">Guests</th>
-                  <th className="th text-right">Budget</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((e) => (
-                  <tr
+        </div>
+      ) : (
+        <div aria-label={listTitle}>
+          {groups.map((group) => {
+            const covers = group.list.reduce(
+              (sum, e) => sum + (Number(e.expectedHeadcount) || 0),
+              0,
+            );
+            return (
+              <section key={group.key} className="mt-7">
+                <div className="section-rule">
+                  <span>{group.label}</span>
+                  <i />
+                  <em>
+                    {group.list.length}{" "}
+                    {group.list.length === 1 ? "service" : "services"}
+                    {covers > 0 ? ` · ${formatCount(covers)} covers` : ""}
+                  </em>
+                </div>
+                {group.list.map((e) => (
+                  <div
                     key={e._id}
                     onClick={() => navigate(`/events/${e._id}`)}
-                    className="cursor-pointer transition-colors hover:bg-inset"
+                    className="grid cursor-pointer grid-cols-[104px_minmax(0,1fr)_180px_78px_142px_104px] items-center gap-x-5 border-b border-line py-4 transition-colors hover:bg-inset max-md:grid-cols-1 max-md:gap-y-1.5 max-md:py-3.5"
                   >
-                    <td className="td h-12">
-                      <span className="block font-semibold text-ink">
-                        {formatDate(e.startsAt)}
-                      </span>
-                      {e.startsAt != null ? (
-                        <span
-                          className={`block text-xs ${needsAction(e, now) ? "font-semibold text-warn" : "text-ink-2"}`}
-                        >
-                          {relativeDays(e.startsAt, now)}
-                        </span>
+                    <div>
+                      <div className="font-mono text-base font-semibold text-ink">
+                        {timeLabel(e.startsAt)}
+                      </div>
+                      {needsAction(e, now) ? (
+                        <div className="text-sm font-semibold text-warn">
+                          Needs action
+                        </div>
                       ) : null}
-                    </td>
-                    <td className="td h-12 w-full max-w-0">
+                    </div>
+                    <div className="min-w-0">
                       <Link
                         to={`/events/${e._id}`}
-                        className="block truncate text-base font-semibold text-ink hover:underline"
                         onClick={(click) => click.stopPropagation()}
+                        className="font-display block truncate text-xl text-ink hover:underline"
                       >
                         {e.title}
                       </Link>
-                      <span className="block truncate text-xs text-ink-2">
-                        {formatStatusLabel(e.eventType)}
-                        {e.venueName ? ` · ${e.venueName}` : ""}
-                      </span>
-                    </td>
-                    <td className="td h-12">
-                      <StatusChip status={String(e.stage)} />
-                    </td>
-                    <td className="td h-12 text-ink-2">
-                      {clientDisplayName(e.clientId, clients)}
-                    </td>
-                    <td className="td h-12 text-right">
+                      <div className="truncate text-sm text-ink-2">
+                        {formatStatusLabel(e.eventType)} ·{" "}
+                        {clientDisplayName(e.clientId, clients)}
+                      </div>
+                      {/* Venue and covers take their own line on a phone.
+                          Appended to the line above they truncate away at
+                          360px, and covers is the number being looked up. */}
+                      <div className="text-sm text-ink-2 md:hidden">
+                        {e.venueName ?? "Venue to confirm"} ·{" "}
+                        {formatCount(e.expectedHeadcount)} covers
+                      </div>
+                    </div>
+                    <div className="truncate text-base text-ink-2 max-md:hidden">
+                      {e.venueName ?? "Venue to confirm"}
+                    </div>
+                    <div className="text-base text-ink max-md:hidden">
                       {formatCount(e.expectedHeadcount)}
-                    </td>
-                    <td className="td h-12 text-right">
-                      {formatMoney(e.budgetAmount)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <ul className="divide-y divide-line md:hidden">
-              {rows.map((e) => (
-                <li key={e._id}>
-                  <Link
-                    to={`/events/${e._id}`}
-                    className="block px-4 py-3 hover:bg-inset"
-                  >
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="min-w-0 text-base font-semibold text-ink">
-                        {e.title}
-                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 max-md:mt-1">
                       <StatusChip status={String(e.stage)} />
-                    </span>
-                    <span className="mt-1 block text-sm text-ink-2">
-                      {formatDate(e.startsAt)}
-                      {e.startsAt != null ? (
-                        <span
-                          className={
-                            needsAction(e, now) ? "font-semibold text-warn" : ""
-                          }
-                        >
-                          {" "}
-                          · {relativeDays(e.startsAt, now)}
-                        </span>
-                      ) : null}
-                      {" · "}
-                      {formatCount(e.expectedHeadcount)} guests
-                    </span>
-                    <span className="block truncate text-sm text-ink-2">
-                      {clientDisplayName(e.clientId, clients)}
-                      {e.venueName ? ` · ${e.venueName}` : ""}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-      </section>
+                      <Link
+                        to={`/events/${e._id}`}
+                        onClick={(click) => click.stopPropagation()}
+                        className="text-base text-brand underline underline-offset-4 md:hidden"
+                      >
+                        Open brief
+                      </Link>
+                    </div>
+                    <div className="text-right max-md:hidden">
+                      <Link
+                        to={`/events/${e._id}`}
+                        onClick={(click) => click.stopPropagation()}
+                        className="text-base text-brand underline underline-offset-4"
+                      >
+                        Open brief
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+              </section>
+            );
+          })}
+          <p className="mt-7 text-base text-ink-2">
+            {rows.length} {rows.length === 1 ? "event" : "events"} in this view.
+            {tab !== "all" ? (
+              <>
+                {" "}
+                <button
+                  type="button"
+                  onClick={() => setTab("all")}
+                  className="cursor-pointer text-brand underline underline-offset-4"
+                >
+                  See all {counts.all ?? 0}
+                </button>
+              </>
+            ) : null}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

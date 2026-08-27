@@ -87,11 +87,7 @@
   margin: 1rem 0;
   border-radius: 12px;
   border: 1px solid var(--color-line);
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-panel)),
-    var(--color-panel)
-  );
+  background: var(--color-inset);
 }
 
 .culinary-studio table {

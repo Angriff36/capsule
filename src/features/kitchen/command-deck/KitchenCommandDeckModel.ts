@@ -208,35 +208,45 @@ export class KitchenCommandDeckModel {
   crewLoad(eventIds: string[]): CrewLoadRow[] {
     const eventSet = new Set(eventIds);
     const activePeople = this.people.filter((p) => p.deletedAt == null);
-    return activePeople
-      .map((person) => {
-        let open = 0;
-        let claimed = 0;
-        let inProgress = 0;
-        let completed = 0;
-        for (const t of this.tasks) {
-          if (t.deletedAt != null || t.assignedToId !== person._id) continue;
-          if (!eventSet.has(t.eventId)) continue;
-          if (t.status === "cancelled") continue;
-          if (t.status === "completed") completed += 1;
-          else if (t.status === "in_progress") inProgress += 1;
-          else if (t.status === "claimed") claimed += 1;
-          else open += 1;
-        }
-        const load = open + claimed + inProgress;
-        return { person, open, claimed, inProgress, completed, load };
-      })
-      .filter((row) => row.load > 0 || row.completed > 0)
-      .sort(
-        (a, b) =>
-          b.load - a.load ||
-          this.personLabel(a.person).localeCompare(this.personLabel(b.person)),
-      );
+    return (
+      activePeople
+        .map((person) => {
+          let open = 0;
+          let claimed = 0;
+          let inProgress = 0;
+          let completed = 0;
+          for (const t of this.tasks) {
+            if (t.deletedAt != null || t.assignedToId !== person._id) continue;
+            if (!eventSet.has(t.eventId)) continue;
+            if (t.status === "cancelled") continue;
+            if (t.status === "completed") completed += 1;
+            else if (t.status === "in_progress") inProgress += 1;
+            else if (t.status === "claimed") claimed += 1;
+            else open += 1;
+          }
+          const load = open + claimed + inProgress;
+          return { person, open, claimed, inProgress, completed, load };
+        })
+        // Every active person, busy or not. Filtering to people who already
+        // hold prep made a freshly synced board impossible to assign: the
+        // picker offered nobody, so nobody could ever be given the first task.
+        .sort(
+          (a, b) =>
+            b.load - a.load ||
+            this.personLabel(a.person).localeCompare(
+              this.personLabel(b.person),
+            ),
+        )
+    );
   }
 
+  /** Mirrors the PrepTask.assign guard: live work changes hands, closed work
+   *  does not. Kept in step with task.manifest. */
   assignableTasks(tasks: PrepTaskLike[]): PrepTaskLike[] {
-    return tasks.filter(
-      (t) => t.status === "pending" || t.status === "claimed",
+    return tasks.filter((t) =>
+      ["pending", "claimed", "in_progress", "blocked"].includes(
+        String(t.status),
+      ),
     );
   }
 }

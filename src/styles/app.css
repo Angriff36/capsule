@@ -6,18 +6,21 @@
    ink, and a small saffron gesture. Dense controls stay crisp; key pages read
    like beautifully composed service documents. */
 @theme {
-  /* One typeface. font-display and font-mono resolve to the same sans so the
-     old serif mastheads and mono figures render in the workspace face; body
-     already sets tabular-nums for aligned numbers. */
+  /* Three faces, per DESIGN.md: the serif carries page and object identity,
+     Archivo carries controls and dense work, IBM Plex Mono carries times,
+     money and counts. */
   --font-sans: "Archivo Variable", "Archivo", system-ui, sans-serif;
-  --font-mono: "Archivo Variable", "Archivo", system-ui, sans-serif;
-  --font-display: "Archivo Variable", "Archivo", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+  --font-display:
+    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
+    serif;
 
-  --color-canvas: #f3f2ee;
-  --color-panel: #ffffff;
-  --color-inset: #f5f4f0;
+  --color-canvas: #dfe8da;
+  --color-panel: #fffefa;
+  --color-inset: #f1f3ed;
   --color-sage: #dfe8da;
   --color-sage-2: #cbd9c6;
+  --color-on-brand: #ffffff;
 
   --color-ink: #24322d;
   --color-ink-2: #3f4b46;
@@ -27,11 +30,13 @@
 
   --color-line: #e2e1dc;
   --color-line-2: #b9bcb4;
-  --color-rail: #1e3a31;
-  --color-rail-2: #2a4d42;
-  --color-rail-active: #3a7a65;
-  --color-rail-ink: #ffffff;
-  --color-rail-dim: #a9c0b6;
+  /* Light rail. It sits inside the workspace sheet behind a hairline, so its
+     surface is paper — not a slab of chrome down the side of the app. */
+  --color-rail: #f7f8f4;
+  --color-rail-2: #edf1ea;
+  --color-rail-active: #31574f;
+  --color-rail-ink: #46534e;
+  --color-rail-dim: #87918b;
   --color-service: #31574f;
 
   --color-accent: #c8783f;
@@ -46,23 +51,38 @@
   --color-danger: #a23a2b;
   --color-danger-soft: #f7e2dc;
   --color-mute-soft: #eae5d7;
+  /* DESIGN.md names these success/warning; ok/warn above are the same values
+     under the shorter name the app already uses at ~200 call sites. */
+  --color-success: #3d7253;
+  --color-success-soft: #e4efe2;
+  --color-warning: #8a641c;
+  --color-warning-soft: #f5ecd4;
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
+  --radius-xs: 3px;
+  --radius-sm: 5px;
   --radius-md: 10px;
+  --radius-ledger: 14px;
+  --radius-sheet: 22px;
+  --radius-pill: 9999px;
 
   /* Type scale — the ONLY text sizes in the app. Raw text-[Npx] is rejected by
      scripts/check-type-scale.ts; add a step here instead of a one-off size.
      Font-size only, no paired line-height: every call site inherits normal
      leading, so a size change never also shifts vertical rhythm. */
-  --text-2xs: 11px;
-  --text-xs: 12px;
+  /* DESIGN.md sets a 13px floor for supporting metadata, and
+     scripts/check-design-vocab.ts now enforces it. 2xs and xs are kept as
+     aliases of the floor so ~550 existing call sites keep resolving; they
+     collapse into --text-sm when someone sweeps the call sites. */
+  --text-2xs: 13px;
+  --text-xs: 13px;
   --text-sm: 13px;
-  --text-base: 14px;
+  --text-base: 15px;
   --text-lg: 18px;
-  --text-xl: 20px;
+  --text-xl: 21px;
   --text-2xl: 24px;
   --text-3xl: 30px;
+  --text-4xl: 36px;
+  --text-5xl: 45px;
 }
 
 /* Dark scheme — same editorial palette shifted to lamplight: deep green-black
@@ -123,7 +143,7 @@
   background: #232b26;
 }
 .dark .component-empty-state {
-  background: linear-gradient(105deg, #262e29 0%, #212824 74%);
+  background: var(--color-inset);
 }
 .dark .schedule-publish-status span,
 .dark .schedule-notice-item {
@@ -156,7 +176,7 @@
 
 @layer components {
   .btn {
-    @apply inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-sm border px-3.5 text-base font-semibold transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
+    @apply inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border px-5 text-base font-semibold tracking-[0.06em] uppercase transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
   }
   .btn-primary {
     @apply border-brand bg-brand text-white hover:-translate-y-px hover:bg-ink;
@@ -172,7 +192,7 @@
     @apply border-danger/40 bg-panel text-danger hover:bg-danger-soft;
   }
   .btn-sm {
-    @apply h-7 px-2.5 text-sm font-medium;
+    @apply h-8 px-3.5 text-sm;
   }
   .input {
     @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink shadow-[inset_0_1px_1px_rgb(36_50_45/0.06)] placeholder:text-ink-3 focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:border-line disabled:bg-inset disabled:text-ink-3 disabled:shadow-none;
@@ -191,6 +211,57 @@
   }
   .card {
     @apply rounded-md border border-line bg-panel shadow-[0_1px_2px_rgb(30_40_36/0.05),0_2px_8px_-2px_rgb(30_40_36/0.08)];
+  }
+
+  /* --- DESIGN.md document grammar -------------------------------------- */
+
+  /* fact-pair: `VENUE: Willow Barn`. The default way a value is shown. */
+  .fact {
+    @apply text-base text-ink;
+  }
+  .fact > b {
+    @apply pr-1.5 text-sm font-bold tracking-[0.04em] uppercase text-ink;
+  }
+  .fact-row {
+    @apply flex flex-wrap items-baseline gap-x-7 gap-y-2;
+  }
+
+  /* section-rule: LABEL ————————————— trailing context */
+  .section-rule {
+    @apply flex items-center gap-3.5;
+  }
+  /* A section label may carry a tick-all box; style the label the same. */
+  .section-rule > span:first-child,
+  .section-rule > label:first-child > span {
+    @apply text-sm font-bold tracking-[0.09em] whitespace-nowrap uppercase text-ink;
+  }
+  .section-rule > i {
+    @apply h-px flex-1 bg-ink;
+  }
+  .section-rule > em {
+    @apply text-base font-normal text-ink-3 not-italic;
+  }
+
+  /* attention-band: the one surface change allowed inside the sheet. */
+  .attention-band {
+    @apply border-y border-sage-2 bg-sage;
+  }
+
+  /* status-chip vs meta-chip: solid fill claims state, inset carries tags. */
+  .chip-state {
+    @apply inline-flex h-[30px] items-center rounded-full px-4 text-sm font-semibold tracking-[0.06em] whitespace-nowrap text-on-brand uppercase;
+  }
+  .chip-state-ok {
+    @apply bg-ok;
+  }
+  .chip-state-warn {
+    @apply bg-warn;
+  }
+  .chip-state-danger {
+    @apply bg-danger;
+  }
+  .chip-meta {
+    @apply inline-flex h-7 items-center rounded-full bg-inset px-3.5 text-base whitespace-nowrap text-ink-2;
   }
   .th {
     @apply border-b border-line-2 bg-inset px-3 py-1.5 text-left text-xs font-semibold tracking-[0.02em] whitespace-nowrap text-ink-2;
@@ -219,7 +290,7 @@
   }
   .display-title {
     font-family: var(--font-display);
-    font-size: clamp(3rem, 5vw, 5.25rem);
+    font-size: clamp(2.1rem, 3.2vw, 2.9rem);
     font-weight: 400;
     letter-spacing: -0.045em;
     line-height: 0.92;
@@ -228,7 +299,7 @@
     font-family: var(--font-display);
     margin-top: 0.65rem;
     max-width: 42rem;
-    font-size: clamp(2rem, 3.25vw, 3.6rem);
+    font-size: clamp(1.4rem, 2.1vw, 1.85rem);
     font-weight: 400;
     letter-spacing: -0.035em;
     line-height: 0.98;
@@ -340,33 +411,69 @@
 }
 
 @layer utilities {
-  /* The work surface IS the page: no floating sheet inside a padded canvas.
-     Content runs edge to edge inside the shell so wide tables and boards get
-     the whole viewport. */
+  /* One warm-paper sheet inside the botanical canvas. It is the only rounded
+     surface on the page and it holds the rail as well as the document. */
+  .app-sheet {
+    background: var(--color-panel);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sheet);
+    box-shadow: 0 20px 46px -30px rgb(36 50 45 / 0.3);
+  }
   .app-canvas {
     padding: 0;
-    background: var(--color-canvas);
+    background: transparent;
   }
   .workspace-sheet {
     min-height: 100%;
   }
+  @media (max-width: 767px) {
+    .app-sheet {
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
 
-  /* Labeled sidebar. Expanded (default) shows icon + label for every
-     workspace under its group heading; collapsed keeps a 56px icon rail with
-     native title tooltips. The choice persists per browser. */
+  /* Slim light icon rail. The <aside> reserves a 94px gutter; .rail-inner is
+     the surface and floats, so hover/focus reveals the labels OVER the page
+     instead of reflowing it. Pinning keeps .rail-inner at full width. */
   .app-shell-sidebar {
     position: relative;
     z-index: 40;
-    display: flex;
     width: 232px;
     flex-shrink: 0;
+    border-right: 1px solid var(--color-line);
+    color: var(--color-rail-ink);
+  }
+  .rail-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    width: 100%;
     flex-direction: column;
+    overflow: hidden;
     background: var(--color-rail);
     color: var(--color-rail-ink);
-    transition: width 160ms ease;
+    transition:
+      width 140ms ease,
+      box-shadow 140ms ease;
   }
   .app-shell-sidebar[data-collapsed="true"] {
-    width: 56px;
+    width: 94px;
+  }
+  .app-shell-sidebar[data-collapsed="true"] .rail-inner {
+    width: 94px;
+  }
+  .app-shell-sidebar[data-collapsed="true"]:hover .rail-inner,
+  .app-shell-sidebar[data-collapsed="true"]:focus-within .rail-inner {
+    width: 232px;
+    border-right: 1px solid var(--color-line);
+    box-shadow: 14px 0 34px -22px rgb(36 50 45 / 0.45);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rail-inner {
+      transition: none;
+    }
   }
   .sidebar-brand {
     display: flex;
@@ -375,7 +482,7 @@
     align-items: center;
     gap: 10px;
     padding: 0 14px;
-    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    border-bottom: 1px solid var(--color-line);
   }
   .sidebar-brand strong {
     font-size: 17px;
@@ -386,15 +493,16 @@
   }
   .capsule-mark {
     display: grid;
-    width: 32px;
-    height: 32px;
+    width: 42px;
+    height: 42px;
     flex-shrink: 0;
     place-items: center;
-    border-radius: 8px;
-    background: var(--color-rail-ink);
-    color: var(--color-rail);
-    font-size: 18px;
-    font-weight: 800;
+    border-radius: var(--radius-pill);
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 400;
   }
   .sidebar-nav {
     display: flex;
@@ -436,43 +544,54 @@
   }
   .sidebar-nav a:hover {
     background: var(--color-rail-2);
+    color: var(--color-ink);
     opacity: 1;
   }
+  .sidebar-nav a.active:hover {
+    background: var(--color-brand);
+    color: var(--color-on-brand);
+  }
   .sidebar-nav a.active {
-    background: var(--color-rail-active);
-    color: var(--color-rail-ink);
+    background: var(--color-brand);
+    color: var(--color-on-brand);
     font-weight: 600;
     opacity: 1;
-    box-shadow: inset 3px 0 0 rgb(255 255 255 / 0.85);
   }
   .sidebar-nav a > span {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .app-shell-sidebar[data-collapsed="true"] .sidebar-brand strong,
-  .app-shell-sidebar[data-collapsed="true"] .sidebar-group,
-  .app-shell-sidebar[data-collapsed="true"] .sidebar-nav a > span,
-  .app-shell-sidebar[data-collapsed="true"] .sidebar-foot span {
+  .app-shell-sidebar[data-collapsed="true"]:not(:hover):not(:focus-within)
+    :is(
+      .sidebar-brand strong,
+      .sidebar-group,
+      .sidebar-nav a > span,
+      .sidebar-foot span
+    ) {
     display: none;
   }
   .app-shell-sidebar[data-collapsed="true"] .sidebar-nav {
-    padding: 6px;
-    gap: 3px;
+    padding: 10px 18px;
+    gap: 4px;
+  }
+  .app-shell-sidebar[data-collapsed="true"]:not(:hover):not(:focus-within)
+    :is(.sidebar-nav a, .sidebar-brand, .sidebar-foot) {
+    justify-content: center;
+    padding-inline: 0;
   }
   .app-shell-sidebar[data-collapsed="true"] .sidebar-nav a {
-    justify-content: center;
-    padding: 0;
+    height: 46px;
   }
-  .app-shell-sidebar[data-collapsed="true"] .sidebar-brand {
-    justify-content: center;
-    padding: 0;
+  .app-shell-sidebar[data-collapsed="true"]:hover .sidebar-nav,
+  .app-shell-sidebar[data-collapsed="true"]:focus-within .sidebar-nav {
+    padding: 10px;
   }
   .sidebar-foot {
     display: flex;
     flex-shrink: 0;
     align-items: center;
     gap: 2px;
-    border-top: 1px solid rgb(255 255 255 / 0.1);
+    border-top: 1px solid var(--color-line);
     padding: 8px;
   }
   .sidebar-foot button,
@@ -797,7 +916,7 @@
     white-space: nowrap;
   }
   .kitchen-book-nav a:hover {
-    background: var(--color-inset);
+    background: var(--color-panel);
     color: var(--color-ink);
   }
   .kitchen-book-nav a.active {
@@ -866,7 +985,7 @@
   }
   .component-status-tabs button:hover,
   .component-status-tabs button[aria-selected="true"] {
-    background: var(--color-inset);
+    background: var(--color-panel);
     color: var(--color-brand);
   }
   .component-status-tabs button span {
@@ -892,7 +1011,7 @@
   .component-index > li > a:hover {
     padding-right: 0.7rem;
     padding-left: 0.7rem;
-    background: var(--color-inset);
+    background: var(--color-panel);
   }
   .culinary-index-row {
     display: grid;
@@ -908,7 +1027,7 @@
     display: contents;
   }
   .culinary-index-row:hover {
-    background: var(--color-inset);
+    background: var(--color-panel);
   }
   .culinary-row-actions {
     display: flex;
@@ -1022,7 +1141,7 @@
     gap: 4rem;
     overflow: hidden;
     border-top: 1px solid var(--color-ink);
-    background: linear-gradient(105deg, #f2f5ef 0%, #fffefa 74%);
+    background: var(--color-inset);
     padding: 3rem 5rem;
   }
   .component-book-mark {
@@ -1347,7 +1466,7 @@
     margin-top: 1.5rem;
     border-left: 2px solid var(--color-sage-2);
     padding: 1rem 1.3rem;
-    background: var(--color-inset);
+    background: var(--color-panel);
   }
   .document-empty p {
     font-family: var(--font-display);
@@ -1832,9 +1951,7 @@
   gap: 1rem 1.5rem;
   padding: 1rem;
   border-bottom: 1px solid var(--color-line-2);
-  background:
-    linear-gradient(105deg, rgb(49 87 79 / 0.08), transparent 48%),
-    var(--color-panel);
+  background: var(--color-inset);
 }
 
 .schedule-publish-heading {
@@ -1932,9 +2049,7 @@
 .schedule-notice-card {
   overflow: hidden;
   border-color: var(--color-sage-2);
-  background:
-    linear-gradient(145deg, rgb(203 217 198 / 0.45), transparent 55%),
-    var(--color-panel);
+  background: var(--color-inset);
 }
 
 .schedule-notice-count {
@@ -2061,7 +2176,20 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: 13px;
+}
+
+/* A table wider than the phone must scroll INSIDE itself. Clipping at the
+   sheet edge hides the columns that carry state, and letting the page scroll
+   sideways drags the whole app with it. One rule covers all 69 tables without
+   a wrapper element in every file. */
+@media (max-width: 767px) {
+  .workspace-sheet table {
+    display: block;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    white-space: nowrap;
+  }
 }
 
 .supply-table {
@@ -2320,7 +2448,7 @@
     padding-bottom: 2.3rem;
   }
   .display-title {
-    font-size: clamp(2.8rem, 13vw, 4rem);
+    font-size: clamp(1.9rem, 8.5vw, 2.5rem);
   }
   .service-brief {
     padding-top: 1.8rem;
@@ -2841,9 +2969,7 @@
   border: 1px solid var(--color-line-2);
   border-left: 4px solid var(--color-accent-deep);
   padding: 1.35rem 1.5rem;
-  background:
-    linear-gradient(120deg, var(--color-inset), transparent 62%),
-    var(--color-panel);
+  background: var(--color-inset);
   box-shadow: 0 14px 34px color-mix(in srgb, var(--color-ink) 7%, transparent);
 }
 
@@ -2969,9 +3095,7 @@
   overflow: hidden;
   border: 1px solid var(--color-line-2);
   border-top: 4px solid var(--color-brand);
-  background:
-    linear-gradient(115deg, var(--color-inset), transparent 48%),
-    var(--color-panel);
+  background: var(--color-inset);
   box-shadow: 0 16px 38px -32px
     color-mix(in srgb, var(--color-ink) 60%, transparent);
 }
@@ -3511,7 +3635,7 @@
   display: grid;
   grid-template-columns: 1.25fr repeat(3, minmax(0, 1fr));
   border-block: 1px solid var(--color-line-2);
-  background: linear-gradient(90deg, var(--color-inset), transparent 42%);
+  background: var(--color-inset);
 }
 
 .revenue-scorecard > div {
@@ -3561,9 +3685,7 @@
   border: 1px solid var(--color-line);
   border-top: 3px solid var(--color-brand);
   padding: 1.4rem 1.5rem 1rem;
-  background:
-    linear-gradient(135deg, rgb(223 232 218 / 0.28), transparent 34%),
-    var(--color-panel);
+  background: var(--color-inset);
   box-shadow: 0 18px 45px -38px rgb(36 50 45 / 0.65);
 }
 

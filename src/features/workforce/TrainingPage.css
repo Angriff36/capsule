@@ -16,13 +16,7 @@
   gap: 2rem;
   border: 1px solid color-mix(in srgb, var(--training-ink) 22%, transparent);
   padding: clamp(1.5rem, 4vw, 3.25rem);
-  background:
-    radial-gradient(
-      circle at 86% 18%,
-      rgb(214 239 114 / 0.82) 0 7%,
-      transparent 7.3%
-    ),
-    linear-gradient(118deg, var(--training-mint), var(--training-paper) 63%);
+  background: var(--color-inset);
   box-shadow: 0 24px 70px -52px var(--training-ink);
 }
 
@@ -92,9 +86,7 @@
 
 .training-form {
   border-top: 4px solid var(--training-coral);
-  background:
-    linear-gradient(90deg, rgb(216 238 226 / 0.34), transparent 58%),
-    var(--color-panel);
+  background: var(--color-panel);
 }
 
 .training-starters {
@@ -156,9 +148,7 @@
   border: 1px solid var(--color-line);
   border-top: 4px solid var(--training-lime);
   padding: 1rem;
-  background:
-    linear-gradient(145deg, rgb(216 238 226 / 0.42), transparent 52%),
-    var(--training-paper);
+  background: var(--training-paper);
   animation: training-card-in 360ms ease both;
   animation-delay: calc(var(--module-index) * 55ms);
 }
