@@ -34,7 +34,14 @@ function gramsFromAmountAndUnit(
 /** Leading count from household text such as "2 cookies" or "1 tortilla". */
 export function parseHouseholdServingQuantity(text?: string | null): number {
   if (!text?.trim()) return 1;
-  const leading = text.trim().match(/^([\d.,]+)/);
+  const trimmed = text.trim();
+
+  // Mass-only label text ("30 g", "1 oz") describes one serving, not N items.
+  if (/^[\d.,]+\s*(g|gr|gram|grams|kg|ml|oz|lb)\b/i.test(trimmed)) {
+    return 1;
+  }
+
+  const leading = trimmed.match(/^([\d.,]+)/);
   if (!leading) return 1;
   const normalized = leading[1].replace(",", ".");
   const qty = Number(normalized);
