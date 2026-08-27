@@ -61,6 +61,30 @@ function requireKitchenStaff(auth: Awaited<ReturnType<typeof getAuthContext>>) {
   requireKitchenAccess(auth);
 }
 
+function searchUnavailableMessage(
+  usdaError: unknown,
+  offError: unknown,
+): string {
+  let message =
+    "Food database search is unavailable right now — wait a moment and try again.";
+  const usdaHint = convexErrorData(usdaError);
+  if (
+    usdaHint.includes("rate-limited") ||
+    usdaHint.includes("API key is invalid")
+  ) {
+    message +=
+      " USDA is on the shared demo key — add USDA_FDC_API_KEY on the Convex deployment.";
+  } else if (offError && !usdaError) {
+    message += " Open Food Facts did not respond.";
+  }
+  return message;
+}
+
+function convexErrorData(error: unknown): string {
+  if (!(error instanceof ConvexError)) return "";
+  return typeof error.data === "string" ? error.data : "";
+}
+
 type LookupSource = "usda_fdc" | "open_food_facts";
 
 type SearchHit = {
@@ -197,9 +221,7 @@ export const searchFoods = action({
 
     const hits = [...usda, ...off].slice(0, pageSize);
     if (hits.length === 0 && (usdaError || offError)) {
-      throw new ConvexError(
-        "Food database search is unavailable right now — wait a moment and try again. If this keeps happening, add a USDA FoodData Central API key to the Convex deployment.",
-      );
+      throw new ConvexError(searchUnavailableMessage(usdaError, offError));
     }
 
     return hits;

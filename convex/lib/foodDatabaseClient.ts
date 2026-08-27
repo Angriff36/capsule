@@ -1,8 +1,12 @@
 import { ConvexError } from "convex/values";
 
 /** OFF requires App/Version (contact) — bare "Capsule/1.0" gets HTTP 503. */
-export const OPEN_FOOD_FACTS_USER_AGENT =
-  "Capsule/1.0 (https://github.com/Angriff36/capsule)";
+export function openFoodFactsUserAgent(): string {
+  const contact =
+    process.env.OPEN_FOOD_FACTS_CONTACT_EMAIL?.trim() ||
+    "capsule-app@users.noreply.github.com";
+  return `Capsule/1.0 (${contact})`;
+}
 
 const FDC_BASE = "https://api.nal.usda.gov/fdc/v1";
 
@@ -57,7 +61,7 @@ export async function offFetchJson(url: string): Promise<unknown> {
   const response = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "User-Agent": OPEN_FOOD_FACTS_USER_AGENT,
+      "User-Agent": openFoodFactsUserAgent(),
     },
   });
   const text = await response.text();
