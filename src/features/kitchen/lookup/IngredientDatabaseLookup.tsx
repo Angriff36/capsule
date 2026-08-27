@@ -3,6 +3,7 @@ import {
   useIngredientLookupGetFoodAutofill,
   useIngredientLookupSearchFoods,
 } from "../../../lib/ingredientLookupClient";
+import { convexActionErrorMessage } from "../../../lib/convexActionErrorMessage";
 import { canScaleNutritionToUnit } from "../../../lib/nutritionUnitScale";
 import type {
   IngredientAutofillProfile,
@@ -95,9 +96,10 @@ export function IngredientDatabaseLookup({
         } catch (cause) {
           if (generation !== searchGenerationRef.current) return;
           setError(
-            cause instanceof Error
-              ? cause.message
-              : "Could not search the food database",
+            convexActionErrorMessage(
+              cause,
+              "Could not search the food database",
+            ),
           );
           setHits([]);
         } finally {
@@ -126,9 +128,7 @@ export function IngredientDatabaseLookup({
       const applyResult = await onApply(profile);
       setApplied({ profile, applyResult });
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "Could not load food details",
-      );
+      setError(convexActionErrorMessage(cause, "Could not load food details"));
     } finally {
       setLoadingId(null);
     }
