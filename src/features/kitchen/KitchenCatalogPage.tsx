@@ -48,7 +48,7 @@ import { parseIngredientAllergensFromForm } from "./IngredientAllergenFieldset";
 import { parseIngredientNutritionFromForm } from "./lookup/parseIngredientNutritionFromForm";
 import {
   useIngredientLookupApplyImageToIngredient,
-  useIngredientLookupResolveCreateCost,
+  useIngredientLookupApplyCostToIngredient,
 } from "../../lib/ingredientLookupClient";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
@@ -82,7 +82,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const setIngredientPrimaryImage = useIngredientSetPrimaryImage();
   const setIngredientNutrition = useIngredientSetNutrition();
   const applyLookupImage = useIngredientLookupApplyImageToIngredient();
-  const resolveCreateLookupCost = useIngredientLookupResolveCreateCost();
+  const applyLookupCost = useIngredientLookupApplyCostToIngredient();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
@@ -163,27 +163,35 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             : undefined;
         const lookupProductName =
           optional(data.get("lookupProductName")) ?? name;
+        const lookupUsed = data.get("lookupUsed") === "true";
         const formCost = Number(data.get("costPerUnit"));
-        const resolvedCost = await resolveCreateLookupCost({
-          barcode: optional(data.get("lookupBarcode")),
-          productName: lookupProductName,
-          brandOwner: optional(data.get("lookupBrandOwner")),
-          category:
-            optional(data.get("lookupCategory")) ??
-            optional(data.get("category")),
-          catalogUnit: unit,
-          servingGramsPerUnit,
-          formCost: Number.isFinite(formCost) && formCost >= 0 ? formCost : 0,
-          lookupUsed: data.get("lookupUsed") === "true",
-        });
+        const costPerUnit =
+          Number.isFinite(formCost) && formCost >= 0 ? formCost : 0;
         const created = (await createIngredient({
           name,
           unit: unit as (typeof UNITS)[number],
-          costPerUnit: resolvedCost.costPerUnit,
+          costPerUnit,
           category: optional(data.get("category")),
           allergens: allergens.length ? allergens : undefined,
           isGlutenFree,
         })) as { docId: string };
+        if (lookupUsed && costPerUnit <= 0) {
+          try {
+            await applyLookupCost({
+              docId: created.docId as Id<"ingredients">,
+              barcode: optional(data.get("lookupBarcode")),
+              productName: lookupProductName,
+              brandOwner: optional(data.get("lookupBrandOwner")),
+              category:
+                optional(data.get("lookupCategory")) ??
+                optional(data.get("category")),
+              catalogUnit: unit,
+              servingGramsPerUnit,
+            });
+          } catch {
+            // Ingredient exists; cost can be filled from the detail page.
+          }
+        }
         let ingredientVersion = 1;
         try {
           const rawNutrition = parseIngredientNutritionFromForm(data);

@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   NUTRIENTS,
   type IngredientNutritionFields,
@@ -81,6 +81,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
   const [lookupUsed, setLookupUsed] = useState(false);
   const [costPerUnit, setCostPerUnit] = useState("0.00");
   const [lookupCostNote, setLookupCostNote] = useState("");
+  const costUserEdited = useRef(false);
   const resolveLookupCost = useIngredientLookupResolveCost();
   const scaledLookupNutrition = useMemo(() => {
     const gramFields: NutritionFields = {};
@@ -124,11 +125,17 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
           catalogUnit: profile.unit,
           servingGramsPerUnit: profile.servingGramsPerUnit,
         });
-        setLookupCostNote(hint.costNote);
-        const resolved =
-          hint.costPerUnit ?? hint.suggestedCostPerUnit ?? undefined;
-        if (resolved != null && resolved > 0) {
-          setCostPerUnit(resolved.toFixed(2));
+        setLookupCostNote(
+          hint.suggestedCostPerUnit != null && hint.suggestedCostPerUnit > 0
+            ? `${hint.costNote} Suggested: ${hint.suggestedCostPerUnit.toFixed(2)}.`
+            : hint.costNote,
+        );
+        if (
+          !costUserEdited.current &&
+          hint.costPerUnit != null &&
+          hint.costPerUnit > 0
+        ) {
+          setCostPerUnit(hint.costPerUnit.toFixed(2));
         }
       } catch {
         setLookupCostNote(profile.costNote);
@@ -224,7 +231,10 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 className="input"
                 required
                 disabled={busy}
-                onChange={(event) => setCostPerUnit(event.target.value)}
+                onChange={(event) => {
+                  costUserEdited.current = true;
+                  setCostPerUnit(event.target.value);
+                }}
               />
               {lookupCostNote ? (
                 <span className="field-hint">{lookupCostNote}</span>

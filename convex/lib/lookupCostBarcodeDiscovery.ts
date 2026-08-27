@@ -30,12 +30,20 @@ export async function discoverOffBarcodesForProduct(
       products?: Array<{ code?: unknown; product_name?: unknown }>;
     };
     const rows = Array.isArray(payload.products) ? payload.products : [];
+    const brandNeedle = brandOwner?.trim().toLowerCase();
     const codes: string[] = [];
     for (const row of rows) {
       const label = String(row.product_name ?? "").toLowerCase();
+      const brands = String((row as { brands?: unknown }).brands ?? "").toLowerCase();
+      const tokenMatches = nameTokens.filter((token) => label.includes(token));
+      const brandMatches =
+        brandNeedle != null &&
+        brandNeedle.length >= 3 &&
+        (brands.includes(brandNeedle) || label.includes(brandNeedle));
       if (
         nameTokens.length > 0 &&
-        !nameTokens.some((token) => label.includes(token))
+        tokenMatches.length < 2 &&
+        !brandMatches
       ) {
         continue;
       }

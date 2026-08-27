@@ -74,7 +74,11 @@ export async function applyLookupCostToIngredient(
       version: doc.version,
       costPerUnit: hint.costPerUnit,
     });
-  } catch {
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (/denied|permission|forbidden|unauthorized|not allowed/i.test(message)) {
+      throw error;
+    }
     return {
       costApplied: false,
       suggestedCostPerUnit: hint.costPerUnit,

@@ -50,15 +50,17 @@ export function resolveTenantCatalogCostFallback(
   const category = args.category?.trim();
   if (category) {
     const categoryPeers = priced.filter((row) => row.category === category);
-    const categoryMedian = median(
-      categoryPeers.map((row) => Number(row.costPerUnit)),
-    );
-    if (categoryMedian != null && categoryMedian > 0) {
-      return {
-        costPerUnit: Math.round(categoryMedian * 100) / 100,
-        costNote: `Catalog cost estimated from your other "${category}" ingredients (median ${categoryMedian.toFixed(2)} per ${unit}).`,
-        source: "tenant_category",
-      };
+    if (categoryPeers.length >= 2) {
+      const categoryMedian = median(
+        categoryPeers.map((row) => Number(row.costPerUnit)),
+      );
+      if (categoryMedian != null && categoryMedian > 0) {
+        return {
+          costPerUnit: Math.round(categoryMedian * 100) / 100,
+          costNote: `Catalog cost estimated from your other "${category}" ingredients (median ${categoryMedian.toFixed(2)} per ${unit}).`,
+          source: "tenant_category",
+        };
+      }
     }
   }
 
@@ -68,13 +70,17 @@ export function resolveTenantCatalogCostFallback(
       const haystack = String(row.name ?? "").toLowerCase();
       return tokens.some((token) => haystack.includes(token));
     });
-    const nameMedian = median(namePeers.map((row) => Number(row.costPerUnit)));
-    if (nameMedian != null && nameMedian > 0) {
-      return {
-        costPerUnit: Math.round(nameMedian * 100) / 100,
-        costNote: `Catalog cost estimated from similar ingredients already in your catalog (median ${nameMedian.toFixed(2)} per ${unit}).`,
-        source: "tenant_name",
-      };
+    if (namePeers.length >= 2) {
+      const nameMedian = median(
+        namePeers.map((row) => Number(row.costPerUnit)),
+      );
+      if (nameMedian != null && nameMedian > 0) {
+        return {
+          costPerUnit: Math.round(nameMedian * 100) / 100,
+          costNote: `Catalog cost estimated from similar ingredients already in your catalog (median ${nameMedian.toFixed(2)} per ${unit}).`,
+          source: "tenant_name",
+        };
+      }
     }
   }
 
