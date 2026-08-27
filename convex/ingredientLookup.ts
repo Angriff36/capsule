@@ -251,12 +251,14 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
     gtinUpc?: string;
     servingSize?: number;
     servingSizeUnit?: string;
+    householdServingFullText?: string;
     foodNutrients?: FdcNutrientRow[];
     brandedFood?: {
       ingredients?: string;
       brandedFoodCategory?: string;
       servingSize?: number;
       servingSizeUnit?: string;
+      householdServingFullText?: string;
     };
     ingredients?: string;
   }>(`/food/${encodeURIComponent(externalId)}?${params.toString()}`);
@@ -276,6 +278,9 @@ async function loadUsdaAutofill(externalId: string): Promise<AutofillProfile> {
   const servingGramsPerUnit = usdaServingGramsPerEach({
     servingSize: food.servingSize ?? food.brandedFood?.servingSize,
     servingSizeUnit: food.servingSizeUnit ?? food.brandedFood?.servingSizeUnit,
+    householdServingFullText:
+      food.householdServingFullText ??
+      food.brandedFood?.householdServingFullText,
   });
 
   return {

@@ -202,10 +202,22 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           } else {
             const lookupImageUrl = optional(data.get("lookupImageUrl"));
             if (lookupImageUrl) {
-              await applyLookupImage({
+              const imageResult = await applyLookupImage({
                 docId: created.docId as Id<"ingredients">,
                 imageUrl: lookupImageUrl,
               });
+              if (!imageResult.imageApplied) {
+                setFailure(
+                  new Error(
+                    "Ingredient saved, but the lookup photo could not be imported.",
+                  ),
+                );
+                notifySuccess(
+                  `Created ${name}. Photo import failed — open the ingredient to upload manually.`,
+                );
+                navigate(ingredientPath(created.docId));
+                return;
+              }
             }
           }
         } catch (enrichmentError) {
