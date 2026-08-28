@@ -20,6 +20,7 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     "convex/**/*.ts",
+    "api/**/*.ts",
     "tests/**/*.ts",
     "vite.config.ts"
   ],

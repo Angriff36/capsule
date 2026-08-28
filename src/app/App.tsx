@@ -412,6 +412,11 @@ const VenueLayoutTemplatesPage = lazy(() =>
     default: module.VenueLayoutTemplatesPage,
   })),
 );
+const ApiKeysPage = lazy(() =>
+  import("../features/admin/ApiKeysPage").then((module) => ({
+    default: module.ApiKeysPage,
+  })),
+);
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
@@ -1271,6 +1276,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PermissionsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/api-keys"
+              element={
+                <SupplyRoute>
+                  <ApiKeysPage />
                 </SupplyRoute>
               }
             />
