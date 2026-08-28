@@ -329,7 +329,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
         }
         expectedHeadcount={event?.expectedHeadcount ?? null}
         venueNotes={venueNotes}
-        accessibilityNeeds={event?.accessibilityNeeds ?? null}
+        accessibilityNeeds={event?.accessibilityNeeds?.trim() || null}
         templatesPath={venueLayoutTemplatesListPath(
           event?.venueId ?? undefined,
         )}

@@ -159,7 +159,7 @@ export function EventLayoutsSidebar({
           to={templatesPath}
           className="btn btn-ghost w-full justify-center"
         >
-          Browse saved templates
+          Saved templates
         </Link>
       </section>
     </aside>
