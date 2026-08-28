@@ -12,6 +12,7 @@ import { action, internalMutation, internalQuery } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
 import {
+  decidePersonEmailLink,
   pickLivePerson,
   tenantIdFromIdentityClaims,
 } from "./lib/personAuthPick";
@@ -133,10 +134,6 @@ export const linkBySubjectEmail = internalMutation({
     const activeLinks = linkedRows.filter(
       (row) => row.deletedAt == null && String(row.status) === "active",
     );
-    if (activeLinks.length >= 1) {
-      const linked = pickLivePerson(activeLinks, { subject, tenantId });
-      if (linked) return { linked: true, reason: "already" };
-    }
 
     // Candidates are only NEVER-LINKED people: rows where the field was never
     // set (a fresh hire). Rows an admin explicitly unlinked carry null
@@ -154,7 +151,7 @@ export const linkBySubjectEmail = internalMutation({
     for (const person of active(unset)) {
       if ((await readEmail(ctx, person.email)) === email) matches.push(person);
     }
-    if (matches.length === 0) {
+    if (matches.length === 0 && activeLinks.length === 0) {
       const released = await ctx.db
         .query("people")
         .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", null))
@@ -167,7 +164,22 @@ export const linkBySubjectEmail = internalMutation({
       return { linked: false, reason: "no_match" };
     }
 
-    const person = pickLivePerson(matches, { subject, tenantId });
+    // pickLivePerson is the shared live-row order. decidePersonEmailLink
+    // refuses an unhinted cross-tenant persist and rematches when the JWT
+    // hint does not match the already-linked pick.
+    const decision = decidePersonEmailLink({
+      subject,
+      tenantId,
+      linkedLive: activeLinks,
+      neverLinkedLiveMatches: matches,
+    });
+    if (decision.kind === "already") {
+      return { linked: true, reason: "already" };
+    }
+    if (decision.kind === "ambiguous") {
+      return { linked: false, reason: "ambiguous" };
+    }
+    const person = pickLivePerson([decision.person], { subject, tenantId });
     if (!person) return { linked: false, reason: "ambiguous" };
     // Hire already assigned the role to this email. Linking connects the
     // mailbox we hired — it does not grant a new role. Admin rows used to
