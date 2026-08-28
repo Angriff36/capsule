@@ -4,6 +4,7 @@ import {
   SignOutButton,
   useOrganization,
   useOrganizationList,
+  useSession,
   useUser,
 } from "@clerk/react";
 import {
@@ -20,6 +21,7 @@ import {
   type AuthStatusSnapshot,
   workspaceMembershipPolicy,
 } from "./auth/WorkspaceMembershipPolicy";
+import { waitForSessionTenantClaim } from "./auth/sessionTenantClaim";
 
 /** True once VITE_CLERK_PUBLISHABLE_KEY exists in the (uncommitted) local env. */
 export function isAuthConfigured(
@@ -112,6 +114,7 @@ type LinkOutcome =
  */
 function MembershipRequired() {
   const { user } = useUser();
+  const { session } = useSession();
   const { organization } = useOrganization();
   // Legacy org-based sign-ins (no linked Person yet) that have memberships
   // but no active organization still need a way to pick one. Selecting a
@@ -134,21 +137,51 @@ function MembershipRequired() {
       .then((result) => setOutcome(result.reason))
       .catch(() => setOutcome("error"));
   }, [linkSelf]);
+  const readSessionToken = useCallback(async () => {
+    if (!session) return null;
+    return await session.getToken({ skipCache: true });
+  }, [session]);
   useEffect(() => {
-    attempt();
-  }, [attempt, activeOrgId]);
+    if (!activeOrgId) {
+      attempt();
+      return;
+    }
+    let cancelled = false;
+    void waitForSessionTenantClaim({
+      organizationId: activeOrgId,
+      getToken: readSessionToken,
+    }).then((ready) => {
+      if (!cancelled && ready) attempt();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [attempt, activeOrgId, readSessionToken]);
 
   const openWorkspace = useCallback(
     async (organizationId: string) => {
       setOutcome("linking");
+      if (!setActive) {
+        setOutcome("error");
+        return;
+      }
       try {
-        await setActive?.({ organization: organizationId });
+        await setActive({ organization: organizationId });
       } catch {
-        // setActive failed — still try the email pick so the gate can clear.
+        setOutcome("error");
+        return;
+      }
+      const jwtReady = await waitForSessionTenantClaim({
+        organizationId,
+        getToken: readSessionToken,
+      });
+      if (!jwtReady) {
+        setOutcome("error");
+        return;
       }
       attempt();
     },
-    [attempt, setActive],
+    [attempt, setActive, readSessionToken],
   );
 
   const who = email ? (
@@ -174,7 +207,7 @@ function MembershipRequired() {
     no_match:
       "No staff profile uses this email yet. Ask your manager to add you under Administration → Permissions → Team roles with this exact email, then tap Try again.",
     ambiguous:
-      "More than one staff profile uses this email. Open the workspace you want, or tap Try again — Capsule will use the admin profile if one exists, otherwise the oldest live profile.",
+      "More than one staff profile uses this email. Open the workspace you want, then tap Try again if it does not open on its own.",
     released:
       "An admin unlinked this sign-in from your staff profile. Ask them to link it again under Administration → Permissions → Team roles.",
     needs_admin_link:
