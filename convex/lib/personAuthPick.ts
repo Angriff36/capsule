@@ -96,3 +96,62 @@ export function pickLivePerson<T extends LivePersonCandidate>(
     return idKey(a._id).localeCompare(idKey(b._id));
   })[0]!;
 }
+
+export type PersonEmailLinkDecision<T extends LivePersonCandidate> =
+  | { kind: "already"; person: T }
+  | { kind: "persist"; person: T }
+  | { kind: "ambiguous" };
+
+/**
+ * Persist policy around pickLivePerson.
+ *
+ * Unhinted cross-tenant picks must not write authSubjectId — ClaimGate stays
+ * not-ready and workspace buttons remain the recovery. When a tenant hint is
+ * present and does not match the already-linked pick, rematch onto a live
+ * never-linked email row in the hinted tenant (caller clears the previous
+ * subject).
+ */
+export function decidePersonEmailLink<T extends LivePersonCandidate>(opts: {
+  subject: string;
+  tenantId?: string | null;
+  linkedLive: readonly T[];
+  neverLinkedLiveMatches: readonly T[];
+}): PersonEmailLinkDecision<T> {
+  const hint = opts.tenantId?.trim() ?? "";
+  const linked = opts.linkedLive.filter(isLivePerson);
+  const neverLinked = opts.neverLinkedLiveMatches.filter(isLivePerson);
+  const pool = [...linked, ...neverLinked];
+
+  if (!hint) {
+    const tenants = new Set(
+      pool
+        .map((row) => row.tenantId)
+        .filter((id): id is string => typeof id === "string" && id.length > 0),
+    );
+    if (tenants.size > 1) return { kind: "ambiguous" };
+    const person = pickLivePerson(pool, { subject: opts.subject });
+    if (!person) return { kind: "ambiguous" };
+    if (person.authSubjectId === opts.subject) {
+      return { kind: "already", person };
+    }
+    return { kind: "persist", person };
+  }
+
+  const linkedPick = pickLivePerson(linked, {
+    subject: opts.subject,
+    tenantId: hint,
+  });
+  if (linkedPick && linkedPick.tenantId === hint) {
+    return { kind: "already", person: linkedPick };
+  }
+
+  const rematch = pickLivePerson(neverLinked, {
+    subject: opts.subject,
+    tenantId: hint,
+  });
+  if (rematch && rematch.tenantId === hint) {
+    return { kind: "persist", person: rematch };
+  }
+
+  return { kind: "ambiguous" };
+}
