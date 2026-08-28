@@ -14,12 +14,14 @@ import { venueLayoutTemplatesListPath } from "../facilities/facilitiesRoutes";
 import { BATTLE_BOARD_LAYOUT_TYPES } from "./battleBoardLayoutTypes";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventLayoutSectionCard } from "./EventLayoutSectionCard";
-import {
-  EventLayoutsSidebar,
-  type LayoutCategoryCount,
-  type VenueNote,
-} from "./EventLayoutsSidebar";
+import { EventLayoutsSidebar, type VenueNote } from "./EventLayoutsSidebar";
 import { FailureBanner } from "./FailureBanner";
+import {
+  layoutAccessibilityText,
+  layoutCategoryCounts,
+  layoutHasInstructions,
+  trimLayoutField,
+} from "./layoutTrim";
 
 // Mirrors a VenueLayoutTemplate's stored sections JSON (see §8.2): each entry
 // is the editable shape of an EventLayoutSection, copied verbatim into the
@@ -92,16 +94,10 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [templates, event]);
 
-  const categories: LayoutCategoryCount[] = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const section of eventSections) {
-      const label = section.type.trim() || "Unnamed area";
-      counts.set(label, (counts.get(label) ?? 0) + 1);
-    }
-    return [...counts.entries()]
-      .map(([label, count]) => ({ label, count }))
-      .sort((left, right) => right.count - left.count);
-  }, [eventSections]);
+  const categories = useMemo(
+    () => layoutCategoryCounts(eventSections),
+    [eventSections],
+  );
 
   const venueNotes: VenueNote[] = useMemo(() => {
     const candidates: readonly (readonly [string, string, unknown])[] = [
@@ -119,8 +115,8 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       .map(([key, label, text]) => ({ key, label, text }));
   }, [venue]);
 
-  const describedSections = eventSections.filter(
-    (section) => (section.instructions ?? "").trim().length > 0,
+  const describedSections = eventSections.filter((section) =>
+    layoutHasInstructions(section.instructions),
   ).length;
 
   const run = async (key: string, work: () => Promise<unknown>) => {
@@ -159,7 +155,9 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
     }
     // Validate every section BEFORE any mutation so a bad template (e.g. a
     // blank type from a hand-edit) fails fast instead of leaving a partial copy.
-    const invalidIndex = templateSections.findIndex((s) => !s.type.trim());
+    const invalidIndex = templateSections.findIndex(
+      (s) => !trimLayoutField(s.type),
+    );
     if (invalidIndex >= 0) {
       setFailure(
         classifyCommandFailure(
@@ -273,8 +271,11 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
                 key={section._id}
                 section={{
                   id: String(section._id),
-                  type: section.type,
-                  instructions: section.instructions ?? "",
+                  type: typeof section.type === "string" ? section.type : "",
+                  instructions:
+                    typeof section.instructions === "string"
+                      ? section.instructions
+                      : "",
                   version: section.version,
                 }}
                 disabled={busy != null}
@@ -329,7 +330,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
         }
         expectedHeadcount={event?.expectedHeadcount ?? null}
         venueNotes={venueNotes}
-        accessibilityNeeds={event?.accessibilityNeeds?.trim() || null}
+        accessibilityNeeds={layoutAccessibilityText(event?.accessibilityNeeds)}
         templatesPath={venueLayoutTemplatesListPath(
           event?.venueId ?? undefined,
         )}
