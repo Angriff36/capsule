@@ -4,7 +4,7 @@
 
 - **Clerk** — browser identity (`@clerk/react`), publishable key in Vite env.
 - **Convex + Clerk JWT** — `convex/auth.config.ts` validates tokens via `CLERK_JWT_ISSUER_DOMAIN`.
-- **Machine (M2M) auth** — remote agents call the HTTP command dispatcher with a Clerk M2M JWT (`tokenFormat: "jwt"`, `sub` = `mch_…`), accepted by the `customJwt` provider in `convex/auth.config.ts` (same issuer + JWKS as session tokens, no `aud`). A machine gets tenant + role ONLY from a Person row linked by `authSubjectId`; token claims are ignored (`isMachineSubject`). Employee sign-in is unchanged. Remote how-to: the `capsule-command-api` skill.
+- **Machine (M2M) auth** — remote agents call the HTTP command dispatcher with a Clerk M2M JWT (`tokenFormat: "jwt"`, `sub` = `mch_…`), accepted by the `customJwt` provider in `convex/auth.config.ts` (same issuer + JWKS as session tokens; `aud` must equal `CLERK_M2M_AUDIENCE`, the receiver machine id the agent machine is scoped to). A machine gets tenant + role ONLY from a Person row linked by `authSubjectId`; token claims are ignored (`isMachineSubject`). Employee sign-in is unchanged. Remote how-to: the `capsule-command-api` skill.
 - **AuthGate** — `src/app/AuthGate.tsx` blocks the shell until session + membership are ok.
 - **Workspace membership** — `src/app/auth/WorkspaceMembershipPolicy.ts` decides claim / org readiness.
 - **Server auth context** — `convex/lib/authContext.ts` maps `ctx.auth.getUserIdentity()` to `{ id, role, tenantId, roleSource }`. **Capsule role is owned by `Person`** (Admin → Permissions → Team roles) when an active Person is linked via `authSubjectId`. Clerk/IdP org-role claims are only a bootstrap fallback until that link exists. Fail-closed anonymous sentinels when unauthenticated.
