@@ -130,35 +130,41 @@ export function InlineEdit({
     if (!editing) setDraft(String(value));
   }, [value, editing]);
 
+  const inFlight = useRef(false);
+
   useEffect(() => {
-    if (editing) inputRef.current?.select();
+    if (editing) {
+      inFlight.current = false;
+      inputRef.current?.select();
+    }
   }, [editing]);
 
-  const commit = useCallback(
-    async (thenBlur: boolean) => {
-      const message = validate?.(draft);
-      if (message) {
-        setError(message);
-        return;
-      }
-      if (draft === String(value)) {
-        setEditing(false);
-        return;
-      }
-      setError(undefined);
-      setPending(true);
-      try {
-        await onCommit(draft);
-        setEditing(false);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not save");
-      } finally {
-        setPending(false);
-      }
-      if (thenBlur) setEditing(false);
-    },
-    [draft, onCommit, validate, value],
-  );
+  const commit = useCallback(async () => {
+    if (inFlight.current) return;
+    const message = validate?.(draft);
+    if (message) {
+      setError(message);
+      return;
+    }
+    if (draft === String(value)) {
+      setEditing(false);
+      return;
+    }
+    setError(undefined);
+    inFlight.current = true;
+    setPending(true);
+    try {
+      await onCommit(draft);
+      // inFlight stays set: the blur fired by unmounting must not commit again.
+      setEditing(false);
+    } catch (e) {
+      // Stay in edit mode so the failure reason and the draft are not lost.
+      inFlight.current = false;
+      setError(e instanceof Error ? e.message : "Could not save");
+    } finally {
+      setPending(false);
+    }
+  }, [draft, onCommit, validate, value]);
 
   if (!editing) {
     const shown = format ? format(value) : (value ?? "");
@@ -199,18 +205,17 @@ export function InlineEdit({
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            void commit(false);
+            void commit();
           } else if (e.key === "Escape") {
             e.preventDefault();
             setDraft(String(value));
             setError(undefined);
             setEditing(false);
-          } else if (e.key === "Tab") {
-            void commit(true);
           }
+          // Tab is not handled here: the blur it causes commits once.
         }}
         onBlur={() => {
-          if (!error && !pending) void commit(true);
+          if (!error) void commit();
         }}
       />
       {error && <span className="cx-inline-err">{error}</span>}

@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "./next.css";
 
 /* ============================================================================
@@ -65,7 +71,7 @@ export function LedgerTable<T>({
 
   const [sort, setSort] = useState<{ key: string; dir: 1 | -1 } | null>(null);
   const [cursor, setCursor] = useState(0);
-  const lastClicked = useRef<number | null>(null);
+  const lastClicked = useRef<string | null>(null);
   const bodyRef = useRef<HTMLTableSectionElement>(null);
 
   const raw = useCallback((row: T, col: LedgerColumn<T>): number | string => {
@@ -119,8 +125,10 @@ export function LedgerTable<T>({
 
   const toggle = (index: number, shift: boolean) => {
     const id = rowKey(dataRows[index]);
-    if (shift && lastClicked.current != null) {
-      const [a, b] = [lastClicked.current, index].sort((x, y) => x - y);
+    const anchor =
+      lastClicked.current == null ? -1 : allIds.indexOf(lastClicked.current);
+    if (shift && anchor >= 0) {
+      const [a, b] = [anchor, index].sort((x, y) => x - y);
       const range = dataRows.slice(a, b + 1).map(rowKey);
       const add = !picked.includes(id);
       setPicked(
@@ -132,7 +140,7 @@ export function LedgerTable<T>({
       setPicked(
         picked.includes(id) ? picked.filter((p) => p !== id) : [...picked, id],
       );
-      lastClicked.current = index;
+      lastClicked.current = id;
     }
   };
 
@@ -142,8 +150,22 @@ export function LedgerTable<T>({
       return acc + (typeof v === "number" ? v : 0);
     }, 0);
 
+  useEffect(() => {
+    setCursor((c) => Math.max(0, Math.min(dataRows.length - 1, c)));
+  }, [dataRows.length]);
+
   const onKeyDown = (e: React.KeyboardEvent) => {
+    // Keys typed into an input, button or other control inside a cell belong
+    // to that control, not to the table.
+    if (
+      e.target !== e.currentTarget &&
+      (e.target as HTMLElement).closest(
+        "input, textarea, select, button, a, [contenteditable]",
+      )
+    )
+      return;
     const max = dataRows.length - 1;
+    if (max < 0) return;
     if (e.key === "ArrowDown" || e.key === "j") {
       e.preventDefault();
       setCursor((c) => Math.min(max, c + 1));
