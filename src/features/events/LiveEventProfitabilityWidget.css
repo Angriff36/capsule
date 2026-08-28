@@ -1,15 +1,20 @@
+/* Live P&L card. Paper, ink and signal bind to the app theme tokens so the
+   card follows DESIGN.md and dark mode instead of carrying its own palette. */
 .live-profitability {
-  --profit-paper: #eef0e8;
-  --profit-ink: #17251f;
-  --profit-muted: #657069;
-  --profit-line: rgba(23, 37, 31, 0.16);
-  --profit-signal: #2d6955;
+  --profit-paper: var(--color-panel);
+  --profit-ink: var(--color-ink);
+  --profit-muted: var(--color-ink-3);
+  --profit-line: var(--color-line);
+  --profit-signal: var(--color-brand);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(45, 105, 85, 0.28);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
   background: var(--profit-paper);
   background-size: 36px 100%;
-  box-shadow: 0 16px 44px rgba(22, 38, 31, 0.09);
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--color-ink) 5%, transparent),
+    0 2px 8px -2px color-mix(in srgb, var(--color-ink) 8%, transparent);
   color: var(--profit-ink);
 }
 
@@ -22,7 +27,7 @@
 }
 
 .live-profitability.is-negative {
-  --profit-signal: #a24532;
+  --profit-signal: var(--color-danger);
 }
 
 .live-profitability__header {
@@ -45,7 +50,7 @@
   align-items: center;
   gap: 8px;
   color: var(--profit-signal);
-  font-size: 10px;
+  font-size: var(--text-sm);
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -62,9 +67,7 @@
 
 .live-profitability__header h2 {
   margin-top: 6px;
-  font-family:
-    Archivo Variable,
-    sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(20px, 3vw, 29px);
   font-variation-settings:
     "wdth" 88,
@@ -74,10 +77,8 @@
 
 .live-profitability__refresh {
   color: var(--profit-muted);
-  font-family:
-    IBM Plex Mono,
-    monospace;
-  font-size: 10px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   text-align: right;
 }
 
@@ -90,7 +91,7 @@
 
 .live-profitability__margin,
 .live-profitability__flow {
-  background: color-mix(in srgb, var(--profit-paper) 94%, white);
+  background: var(--profit-paper);
 }
 
 .live-profitability__margin {
@@ -102,7 +103,7 @@
 .live-profitability__buckets p {
   display: block;
   color: var(--profit-muted);
-  font-size: 10px;
+  font-size: var(--text-sm);
   font-weight: 700;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -112,9 +113,7 @@
   display: block;
   margin: 5px 0 2px;
   color: var(--profit-signal);
-  font-family:
-    IBM Plex Mono,
-    monospace;
+  font-family: var(--font-mono);
   font-size: clamp(37px, 6vw, 58px);
   font-weight: 650;
   letter-spacing: -0.075em;
@@ -125,7 +124,7 @@
 .live-profitability__flow small,
 .live-profitability__buckets small {
   color: var(--profit-muted);
-  font-size: 10px;
+  font-size: var(--text-sm);
 }
 
 .live-profitability__flow {
@@ -144,9 +143,7 @@
 .live-profitability__flow strong {
   display: block;
   margin: 9px 0 4px;
-  font-family:
-    IBM Plex Mono,
-    monospace;
+  font-family: var(--font-mono);
   font-size: clamp(22px, 3vw, 31px);
   letter-spacing: -0.055em;
 }
@@ -155,7 +152,8 @@
   height: 7px;
   margin: 23px 28px 0;
   overflow: hidden;
-  background: rgba(23, 37, 31, 0.1);
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
 }
 
 .live-profitability__rail span {
@@ -171,10 +169,8 @@
   justify-content: space-between;
   padding: 6px 28px 0;
   color: var(--profit-muted);
-  font-family:
-    IBM Plex Mono,
-    monospace;
-  font-size: 9px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
   text-transform: uppercase;
 }
 
@@ -199,19 +195,15 @@
 
 .live-profitability__bucket-code {
   color: color-mix(in srgb, var(--profit-signal) 65%, var(--profit-muted));
-  font-family:
-    IBM Plex Mono,
-    monospace;
-  font-size: 10px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
 }
 
 .live-profitability__buckets strong {
   display: block;
   margin: 4px 0 2px;
-  font-family:
-    IBM Plex Mono,
-    monospace;
-  font-size: 20px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
   letter-spacing: -0.04em;
 }
 
@@ -226,18 +218,19 @@
   gap: 12px;
   margin: 0 28px 24px;
   padding: 11px 13px;
-  border: 1px solid rgba(161, 101, 27, 0.25);
-  background: rgba(222, 174, 80, 0.12);
-  color: #725019;
-  font-size: 11px;
+  border: 1px solid color-mix(in srgb, var(--color-warn) 40%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--color-warn-soft);
+  color: var(--color-warn);
+  font-size: var(--text-sm);
 }
 
 .live-profitability__footer {
   padding: 13px 28px 15px;
   border-top: 1px solid var(--profit-line);
-  background: rgba(45, 105, 85, 0.055);
+  background: var(--color-inset);
   color: var(--profit-muted);
-  font-size: 9px;
+  font-size: var(--text-sm);
   line-height: 1.55;
 }
 

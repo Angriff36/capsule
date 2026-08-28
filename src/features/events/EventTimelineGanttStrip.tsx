@@ -39,7 +39,8 @@ export function GanttStrip({
   );
   const span = Math.max(max - min, MILESTONE_MS);
   return (
-    <div className="space-y-1 rounded-sm border border-line-2 bg-panel p-3">
+    <div className="space-y-1">
+      <p className="eyebrow mb-2">Run of show</p>
       {timed.map((activity, index) => {
         const start = Number(activity.startsAt);
         const end = Number(activity.endsAt ?? start + MILESTONE_MS);

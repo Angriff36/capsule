@@ -11,8 +11,14 @@ import {
   useListInventoryReservation,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
-import { StatusChip } from "../../ui/primitives";
 import { EventDraftPoButton } from "./EventDraftPoButton";
+import { EventInventorySummaryAside } from "./EventInventorySummaryAside";
+import {
+  EventInventoryDemandGroups,
+  EventInventoryHoldsTable,
+  type EventInventoryDemandRow,
+  type EventInventoryHoldRow,
+} from "./EventInventoryTables";
 import { EventStockIssueCoordinator } from "./EventStockIssueCoordinator";
 import {
   EventStockReservationCoordinator,
@@ -94,6 +100,33 @@ export function EventInventoryPanel({
       ? (inventoryLots?.find((lot) => lot._id === inventoryLotId)
           ?.supplierLotNumber ?? "Unknown lot")
       : "Unattributed";
+  const ingredientCategory = (ingredientId: string) =>
+    ingredients?.find((ingredient) => ingredient._id === ingredientId)
+      ?.category ?? "";
+
+  const demandRows: EventInventoryDemandRow[] = eventDemands.map((demand) => ({
+    id: demand._id,
+    ingredientName: ingredientName(demand.ingredientId),
+    category: String(ingredientCategory(demand.ingredientId) ?? ""),
+    required: Number(demand.requiredQuantity),
+    reserved: activeReservations
+      .filter((reservation) => reservation.ingredientId === demand.ingredientId)
+      .reduce((sum, reservation) => sum + Number(reservation.quantity), 0),
+    unit: String(demand.unit),
+    status: String(demand.status),
+  }));
+
+  const holdRows: EventInventoryHoldRow[] = eventReservations.map(
+    (reservation) => ({
+      id: reservation._id,
+      ingredientName: ingredientName(reservation.ingredientId),
+      location: locationName(reservation.inventoryItemId),
+      lot: lotNumber(reservation.inventoryLotId),
+      quantity: Number(reservation.quantity),
+      status: String(reservation.status),
+      canIssue: eligible && reservation.status === "active",
+    }),
+  );
 
   const reserveStock = () => {
     if (
@@ -231,9 +264,9 @@ export function EventInventoryPanel({
     eventReservations.length === 0
   ) {
     return (
-      <section className="card space-y-2 px-3 py-3">
+      <section className="card space-y-2 px-4 py-3.5">
         <p className="eyebrow">Inventory</p>
-        <h2 className="text-lg font-semibold text-ink">Stock reservations</h2>
+        <h2 className="font-display text-xl text-ink">Stock reservations</h2>
         <p className="text-base text-ink-2">
           Nothing to reserve yet. Add dishes on the Menu tab to create
           ingredient demand, then approve the event to reserve stock against it.
@@ -245,186 +278,116 @@ export function EventInventoryPanel({
   }
 
   return (
-    <section className="card space-y-3 px-3 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <p className="eyebrow">Inventory</p>
-          <h2 className="text-lg font-semibold text-ink">Stock reservations</h2>
-          <p className="mt-1 text-sm text-ink-3">
+    <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]">
+      <div className="flex min-w-0 flex-col gap-4">
+        <section className="card px-4 py-3.5">
+          <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
+            <div className="min-w-0">
+              <h2 className="font-display text-xl leading-none text-ink">
+                Event inventory &amp; supplies
+              </h2>
+              <p className="mt-1.5 text-base text-ink-2">
+                {demandRows.length} demand line
+                {demandRows.length === 1 ? "" : "s"} ·{" "}
+                {holdRows.filter((row) => row.status === "active").length}{" "}
+                active hold
+                {holdRows.filter((row) => row.status === "active").length === 1
+                  ? ""
+                  : "s"}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <EventDraftPoButton eventId={eventId} eventStage={eventStage} />
+              {eligible ? (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={
+                    busy ||
+                    demands === undefined ||
+                    items === undefined ||
+                    inventoryLots === undefined ||
+                    reservations === undefined ||
+                    eventDemands.length === 0
+                  }
+                  onClick={reserveStock}
+                >
+                  Reserve stock
+                </button>
+              ) : (
+                <p className="text-base text-ink-3">
+                  Approve the event to reserve stock.
+                </p>
+              )}
+            </div>
+          </div>
+          <p className="mt-2.5 border-t border-line pt-2.5 text-base text-ink-3">
             Reserve available stock, then issue holds when product leaves
             storage for the event.
           </p>
-        </div>
-        {eligible ? (
-          <button
-            type="button"
-            className="btn btn-primary"
-            disabled={
-              busy ||
-              demands === undefined ||
-              items === undefined ||
-              inventoryLots === undefined ||
-              reservations === undefined ||
-              eventDemands.length === 0
-            }
-            onClick={reserveStock}
-          >
-            Reserve stock
-          </button>
-        ) : (
-          <p className="text-sm text-ink-3">
-            Approve the event to reserve stock.
+        </section>
+
+        {demandRows.length === 0 ? (
+          <p className="card empty-state">
+            <strong>No ingredient demand yet</strong>
+            <span>
+              Add dishes on the Menu tab to raise demand for this event.
+            </span>
           </p>
+        ) : (
+          <EventInventoryDemandGroups rows={demandRows} />
         )}
+
+        {holdRows.length > 0 ? (
+          <EventInventoryHoldsTable
+            rows={holdRows}
+            busy={busy || items === undefined || reservations === undefined}
+            onIssue={issueStock}
+            lastIssue={lastIssue}
+          />
+        ) : null}
+
+        {ran ? (
+          <section
+            className="card px-4 py-3.5"
+            data-testid="event-inventory-run"
+          >
+            <h3 className="text-sm font-bold tracking-[0.06em] text-ink uppercase">
+              Last reserve run
+            </h3>
+            {created.length === 0 && shortages.length === 0 ? (
+              <p className="mt-2 text-base text-ink-2">
+                Nothing new to reserve — demand is already covered by active
+                holds.
+              </p>
+            ) : null}
+            {created.length > 0 ? (
+              <ul className="mt-2 flex flex-col gap-1">
+                {created.map((row) => (
+                  <li
+                    key={`${row.inventoryItemId}:${row.quantity}`}
+                    className="flex items-baseline justify-between gap-3 border-b border-line pb-1 last:border-b-0"
+                  >
+                    <span className="text-base text-ink">
+                      {ingredientName(row.ingredientId)}
+                    </span>
+                    <span className="font-mono text-base text-ok">
+                      +{row.quantity} {row.unit}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        ) : null}
       </div>
 
-      <EventDraftPoButton eventId={eventId} eventStage={eventStage} />
-
-      {eventDemands.length === 0 ? (
-        <p className="text-base text-ink-3">
-          No ingredient demand rows for this event yet.
-        </p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-base">
-            <thead className="text-xs uppercase tracking-wide text-ink-3">
-              <tr>
-                <th className="py-1 pr-3 font-medium">Ingredient</th>
-                <th className="py-1 pr-3 font-medium">Need</th>
-                <th className="py-1 pr-3 font-medium">Reserved</th>
-                <th className="py-1 font-medium">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {eventDemands.map((demand) => {
-                const reserved = activeReservations
-                  .filter(
-                    (reservation) =>
-                      reservation.ingredientId === demand.ingredientId,
-                  )
-                  .reduce(
-                    (sum, reservation) => sum + Number(reservation.quantity),
-                    0,
-                  );
-                return (
-                  <tr key={demand._id} className="border-t border-line/60">
-                    <td className="py-2 pr-3">
-                      {ingredientName(demand.ingredientId)}
-                    </td>
-                    <td className="py-2 pr-3 font-mono">
-                      {Number(demand.requiredQuantity)} {String(demand.unit)}
-                    </td>
-                    <td className="py-2 pr-3 font-mono">
-                      {reserved} {String(demand.unit)}
-                    </td>
-                    <td className="py-2">
-                      <StatusChip status={String(demand.status)} />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {eventReservations.length > 0 ? (
-        <div className="space-y-2 border-t border-line/60 pt-3">
-          <p className="text-sm font-medium text-ink">Event holds</p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-base">
-              <thead className="text-xs uppercase tracking-wide text-ink-3">
-                <tr>
-                  <th className="py-1 pr-3 font-medium">Ingredient</th>
-                  <th className="py-1 pr-3 font-medium">Location</th>
-                  <th className="py-1 pr-3 font-medium">Supplier lot</th>
-                  <th className="py-1 pr-3 font-medium">Qty</th>
-                  <th className="py-1 pr-3 font-medium">Status</th>
-                  <th className="py-1 font-medium">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {eventReservations.map((reservation) => (
-                  <tr key={reservation._id} className="border-t border-line/60">
-                    <td className="py-2 pr-3">
-                      {ingredientName(reservation.ingredientId)}
-                    </td>
-                    <td className="py-2 pr-3">
-                      {locationName(reservation.inventoryItemId)}
-                    </td>
-                    <td className="py-2 pr-3 font-mono">
-                      {lotNumber(reservation.inventoryLotId)}
-                    </td>
-                    <td className="py-2 pr-3 font-mono">
-                      {Number(reservation.quantity)}
-                    </td>
-                    <td className="py-2 pr-3">
-                      <StatusChip status={String(reservation.status)} />
-                    </td>
-                    <td className="py-2">
-                      {eligible && reservation.status === "active" ? (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          disabled={
-                            busy ||
-                            items === undefined ||
-                            reservations === undefined
-                          }
-                          onClick={() => issueStock(reservation._id)}
-                        >
-                          Issue stock
-                        </button>
-                      ) : (
-                        <span className="text-sm text-ink-3">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {lastIssue ? <p className="text-sm text-ink-2">{lastIssue}</p> : null}
-        </div>
-      ) : null}
-
-      {ran ? (
-        <div className="space-y-2 border-t border-line/60 pt-3 text-base">
-          {created.length === 0 && shortages.length === 0 ? (
-            <p className="text-ink-2">
-              Nothing new to reserve — demand is already covered by active
-              holds.
-            </p>
-          ) : null}
-          {created.length > 0 ? (
-            <div>
-              <p className="font-medium text-ink">Reserved this run</p>
-              <ul className="mt-1 list-disc pl-5 text-ink-2">
-                {created.map((row) => (
-                  <li key={`${row.inventoryItemId}:${row.quantity}`}>
-                    {ingredientName(row.ingredientId)}: {row.quantity}{" "}
-                    {row.unit}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          {shortages.length > 0 ? (
-            <div>
-              <p className="font-medium text-danger">Shortages</p>
-              <ul className="mt-1 list-disc pl-5 text-ink-2">
-                {shortages.map((row) => (
-                  <li key={`${row.ingredientId}:${row.unit}`}>
-                    {ingredientName(row.ingredientId)}: short{" "}
-                    {row.shortageQuantity} {row.unit} (need{" "}
-                    {row.requiredQuantity}, held {row.reservedQuantity})
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </section>
+      <EventInventorySummaryAside
+        demandRows={demandRows}
+        holdRows={holdRows}
+        shortages={shortages}
+        ingredientName={ingredientName}
+      />
+    </div>
   );
 }

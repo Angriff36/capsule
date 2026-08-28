@@ -1,6 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import type { Id } from "../../lib/api";
-import { formatDate, formatTime } from "../../lib/format";
 import {
   useEquipmentReservationCancel,
   useEquipmentReservationCheckOut,
@@ -9,39 +8,24 @@ import {
   useListEquipmentReservation,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { TableSkeleton } from "../../ui/primitives";
 import { useReserveEquipment } from "../facilities/equipmentCheckout";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
-import { localDateTime } from "./eventDetailFormHelpers";
 import "./EventEquipmentPanel.css";
-import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { useActionNotice } from "../../ui/action-result";
-
-const CONDITIONS = [
-  "excellent",
-  "good",
-  "fair",
-  "poor",
-  "out_of_service",
-] as const;
-
-type EquipmentCondition = (typeof CONDITIONS)[number];
-type ChecklistMode = "checkout" | "return";
-
-type ChecklistDraft = {
-  reservationId: Id<"equipmentReservations">;
-  mode: ChecklistMode;
-  condition: EquipmentCondition;
-  note: string;
-};
-
-const CONDITION_RANK: Record<EquipmentCondition, number> = {
-  excellent: 0,
-  good: 1,
-  fair: 2,
-  poor: 3,
-  out_of_service: 4,
-};
+import { PlusIcon } from "../../ui/icons";
+import {
+  EventEquipmentSheet,
+  type ChecklistDraft,
+  type ChecklistMode,
+  type EquipmentCondition,
+  type EquipmentSheetRow,
+} from "./EventEquipmentSheet";
+import {
+  EventEquipmentSidebar,
+  type EquipmentCategoryCount,
+} from "./EventEquipmentSidebar";
+import { EventEquipmentReserveForm } from "./EventEquipmentReserveForm";
 
 export function EventEquipmentPanel({
   eventId,
@@ -87,7 +71,6 @@ export function EventEquipmentPanel({
   const equipmentById = new Map(
     (equipment ?? []).map((row) => [String(row._id), row]),
   );
-  const selectedEquipment = equipmentById.get(selectedEquipmentId);
   const reservedCount = eventReservations.filter(
     (row) => row.status === "reserved",
   ).length;
@@ -99,6 +82,46 @@ export function EventEquipmentPanel({
   ).length;
   const defaultStart = startsAt ?? Date.now();
   const defaultEnd = endsAt ?? defaultStart + 4 * 60 * 60 * 1000;
+
+  const sheetRows: EquipmentSheetRow[] = eventReservations.map(
+    (reservation) => {
+      const item = equipmentById.get(String(reservation.equipmentId));
+      return {
+        id: reservation._id,
+        status: String(reservation.status),
+        name: item?.name ?? "Unknown equipment",
+        assetTag: item?.assetTag ?? "No asset tag",
+        category: item?.category?.trim() || "Uncategorised",
+        quantity: reservation.quantity,
+        startsAt: reservation.startsAt,
+        endsAt: reservation.endsAt,
+        checkedOutAt: reservation.checkedOutAt,
+        checkoutCondition: reservation.checkoutCondition,
+        checkoutNote: reservation.checkoutNote,
+        returnedAt: reservation.returnedAt,
+        returnCondition: reservation.returnCondition,
+        returnNote: reservation.returnNote,
+      };
+    },
+  );
+
+  const categories: EquipmentCategoryCount[] = [
+    ...sheetRows
+      .reduce((counts, row) => {
+        counts.set(row.category, (counts.get(row.category) ?? 0) + 1);
+        return counts;
+      }, new Map<string, number>())
+      .entries(),
+  ]
+    .map(([name, count]) => ({ name, count }))
+    .sort((left, right) => right.count - left.count);
+
+  const startTimes = eventReservations
+    .map((row) => Number(row.startsAt ?? 0))
+    .filter((value) => value > 0);
+  const endTimes = eventReservations
+    .map((row) => Number(row.endsAt ?? 0))
+    .filter((value) => value > 0);
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -133,7 +156,11 @@ export function EventEquipmentPanel({
     });
   };
 
-  const openChecklist = (reservation: (typeof eventReservations)[number]) => {
+  const openChecklist = (row: EquipmentSheetRow) => {
+    const reservation = eventReservations.find(
+      (candidate) => candidate._id === row.id,
+    );
+    if (!reservation) return;
     const item = equipmentById.get(String(reservation.equipmentId));
     const mode: ChecklistMode =
       reservation.status === "checked_out" ? "return" : "checkout";
@@ -175,7 +202,11 @@ export function EventEquipmentPanel({
     });
   };
 
-  const cancel = async (reservation: (typeof eventReservations)[number]) => {
+  const cancel = async (row: EquipmentSheetRow) => {
+    const reservation = eventReservations.find(
+      (candidate) => candidate._id === row.id,
+    );
+    if (!reservation) return;
     const confirmed = await prompt.askConfirm({
       title: "Cancel this equipment reservation?",
       description:
@@ -193,357 +224,149 @@ export function EventEquipmentPanel({
     });
   };
 
+  const loading = equipment === undefined || reservations === undefined;
+
   return (
     <section className="equipment-dispatch" aria-labelledby="equipment-title">
-      <header className="equipment-dispatch__header">
-        <div>
-          <p className="equipment-dispatch__kicker">Event equipment control</p>
-          <h2 id="equipment-title">Dispatch &amp; return board</h2>
-          <p>
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+          <h2 id="equipment-title" className="text-lg font-semibold text-ink">
+            Dispatch &amp; return board
+          </h2>
+          <p className="text-sm text-ink-2">
             Reserve the load window, confirm what left, then compare its return
             condition against the outbound check.
           </p>
         </div>
-        <div className="equipment-dispatch__header-actions">
-          <div
-            className="equipment-dispatch__totals"
-            aria-label="Checklist totals"
-          >
-            <span>
-              <b>{reservedCount}</b> staged
-            </span>
-            <span>
-              <b>{checkedOutCount}</b> out
-            </span>
-            <span>
-              <b>{returnedCount}</b> back
-            </span>
-          </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => setShowReserveForm((value) => !value)}
-          >
-            {showReserveForm ? "Close reservation" : "Reserve equipment"}
-          </button>
-        </div>
-      </header>
 
-      {failure ? <SupplyFailureBanner error={failure} /> : null}
-      {notice ? (
-        <p className="equipment-dispatch__notice" role="status">
-          {notice}
-        </p>
-      ) : null}
-      {host}
+        {failure ? <SupplyFailureBanner error={failure} /> : null}
+        {notice ? (
+          <p className="banner banner-ok" role="status">
+            {notice}
+          </p>
+        ) : null}
+        {host}
 
-      {showReserveForm ? (
-        <form
-          className="equipment-reserve-form"
-          onSubmit={submitReservation}
-          data-testid="equipment-reservation-form"
-        >
-          <div className="equipment-reserve-form__title">
-            <span>New allocation</span>
-            <strong>Lock a load window</strong>
-          </div>
-          <label className="field-label equipment-reserve-form__asset">
-            Equipment
-            <select
-              name="equipmentId"
-              className="input"
-              required
-              value={selectedEquipmentId}
-              onChange={(event) => setSelectedEquipmentId(event.target.value)}
-            >
-              <option value="">Choose equipment</option>
-              {equipmentRows.map((item) => (
-                <option key={item._id} value={item._id}>
-                  {item.name} · {item.assetTag} · {item.quantity} available in
-                  catalog
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field-label">
-            Quantity
-            <input
-              name="quantity"
-              type="number"
-              className="input"
-              min={1}
-              max={selectedEquipment?.quantity ?? undefined}
-              defaultValue={1}
-              required
-            />
-          </label>
-          <label className="field-label">
-            Checkout
-            <BoundedDateTimeLocalInput
-              name="startsAt"
-              className="input"
-              defaultValue={localDateTime(defaultStart)}
-              required
-            />
-          </label>
-          <label className="field-label">
-            Expected back
-            <BoundedDateTimeLocalInput
-              name="endsAt"
-              className="input"
-              defaultValue={localDateTime(defaultEnd)}
-              required
-            />
-          </label>
-          <button
-            className="btn btn-primary equipment-reserve-form__submit"
-            disabled={busy != null || !selectedEquipmentId}
-          >
-            {busy === "reserve" ? "Checking availability…" : "Reserve item"}
-          </button>
-        </form>
-      ) : null}
+        <div className="flex flex-col gap-5 xl:flex-row">
+          <div className="min-w-0 flex-1 space-y-5">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <SummaryTile
+                label="Total items"
+                value={eventReservations.length}
+                hint={`across ${categories.length} ${
+                  categories.length === 1 ? "category" : "categories"
+                }`}
+              />
+              <SummaryTile
+                label="Out with the event"
+                value={checkedOutCount}
+                tone="ok"
+                hint={
+                  eventReservations.length > 0
+                    ? `${Math.round(
+                        (checkedOutCount / eventReservations.length) * 100,
+                      )}% of the sheet`
+                    : "nothing checked out"
+                }
+              />
+              <SummaryTile
+                label="Staged"
+                value={reservedCount}
+                tone="warn"
+                hint="awaiting checkout"
+              />
+            </div>
 
-      {equipment === undefined || reservations === undefined ? (
-        <div className="equipment-dispatch__loading">
-          <TableSkeleton rows={3} />
-        </div>
-      ) : eventReservations.length === 0 ? (
-        <div className="equipment-dispatch__empty">
-          <span>00</span>
-          <div>
-            <strong>No equipment reserved</strong>
-            <p>Add the first item to create this event&apos;s handoff sheet.</p>
-          </div>
-        </div>
-      ) : (
-        <div className="equipment-checklist">
-          {eventReservations.map((reservation, index) => {
-            const item = equipmentById.get(String(reservation.equipmentId));
-            const isEditing = checklistDraft?.reservationId === reservation._id;
-            return (
-              <article
-                className="equipment-checklist__row"
-                key={reservation._id}
-                data-status={reservation.status}
-                data-testid="equipment-checklist-row"
+            {loading ? (
+              <div className="card p-4">
+                <TableSkeleton rows={3} />
+              </div>
+            ) : sheetRows.length === 0 ? (
+              <div className="card empty-state">
+                <strong className="text-base text-ink">
+                  No equipment reserved
+                </strong>
+                <span>
+                  Add the first item to create this event&apos;s handoff sheet.
+                </span>
+              </div>
+            ) : (
+              <EventEquipmentSheet
+                rows={sheetRows}
+                busy={busy}
+                draft={checklistDraft}
+                onOpenChecklist={openChecklist}
+                onDraftChange={setChecklistDraft}
+                onDismissDraft={() => setChecklistDraft(null)}
+                onSubmitDraft={submitChecklist}
+                onRelease={(row) => void cancel(row)}
+              />
+            )}
+
+            {showReserveForm ? (
+              <EventEquipmentReserveForm
+                equipment={equipmentRows}
+                selectedEquipmentId={selectedEquipmentId}
+                onSelectEquipment={setSelectedEquipmentId}
+                defaultStart={defaultStart}
+                defaultEnd={defaultEnd}
+                busy={busy}
+                onSubmit={submitReservation}
+                onDismiss={() => setShowReserveForm(false)}
+              />
+            ) : (
+              <button
+                type="button"
+                className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-line-2 px-5 py-3 font-semibold text-brand hover:border-brand hover:bg-inset"
+                onClick={() => setShowReserveForm(true)}
               >
-                <div className="equipment-checklist__identity">
-                  <span className="equipment-checklist__sequence">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <div>
-                    <strong>{item?.name ?? "Unknown equipment"}</strong>
-                    <span>
-                      {item?.assetTag ?? "No asset tag"} · qty{" "}
-                      {reservation.quantity}
-                    </span>
-                  </div>
-                  <StatusChip status={String(reservation.status)} />
-                </div>
+                <PlusIcon />
+                Reserve equipment
+              </button>
+            )}
+          </div>
 
-                <div className="equipment-checklist__window">
-                  <span>Load window</span>
-                  <strong>
-                    {formatDate(reservation.startsAt)} ·{" "}
-                    {formatTime(reservation.startsAt)}
-                  </strong>
-                  <small>
-                    Back {formatDate(reservation.endsAt)} ·{" "}
-                    {formatTime(reservation.endsAt)}
-                  </small>
-                </div>
-
-                <Checkpoint
-                  label="Outbound"
-                  complete={reservation.checkedOutAt != null}
-                  condition={reservation.checkoutCondition}
-                  note={reservation.checkoutNote}
-                  timestamp={reservation.checkedOutAt}
-                  pendingLabel="Confirm checkout"
-                  disabled={reservation.status !== "reserved" || busy != null}
-                  onAction={() => openChecklist(reservation)}
-                />
-
-                <Checkpoint
-                  label="Return"
-                  complete={reservation.returnedAt != null}
-                  condition={reservation.returnCondition}
-                  note={reservation.returnNote}
-                  timestamp={reservation.returnedAt}
-                  pendingLabel={
-                    reservation.status === "reserved"
-                      ? "Waiting for checkout"
-                      : "Confirm return"
-                  }
-                  disabled={
-                    reservation.status !== "checked_out" || busy != null
-                  }
-                  onAction={() => openChecklist(reservation)}
-                  comparison={conditionComparison(
-                    reservation.checkoutCondition,
-                    reservation.returnCondition,
-                  )}
-                />
-
-                {reservation.status === "reserved" ? (
-                  <button
-                    type="button"
-                    className="equipment-checklist__release"
-                    disabled={busy != null}
-                    onClick={() => void cancel(reservation)}
-                  >
-                    Release
-                  </button>
-                ) : null}
-
-                {isEditing && checklistDraft ? (
-                  <form
-                    className="equipment-inspection"
-                    onSubmit={submitChecklist}
-                    data-testid="equipment-condition-form"
-                  >
-                    <div>
-                      <span>
-                        {checklistDraft.mode === "checkout"
-                          ? "Outbound check"
-                          : "Return check"}
-                      </span>
-                      <strong>Record condition</strong>
-                    </div>
-                    <label className="field-label">
-                      Condition
-                      <select
-                        className="input"
-                        value={checklistDraft.condition}
-                        onChange={(event) =>
-                          setChecklistDraft({
-                            ...checklistDraft,
-                            condition: event.target.value as EquipmentCondition,
-                          })
-                        }
-                      >
-                        {CONDITIONS.map((condition) => (
-                          <option key={condition} value={condition}>
-                            {condition.replaceAll("_", " ")}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="field-label equipment-inspection__note">
-                      Condition notes
-                      <textarea
-                        className="input"
-                        rows={2}
-                        placeholder="Optional: scratches, missing parts, damp linens…"
-                        value={checklistDraft.note}
-                        onChange={(event) =>
-                          setChecklistDraft({
-                            ...checklistDraft,
-                            note: event.target.value,
-                          })
-                        }
-                      />
-                    </label>
-                    <div className="equipment-inspection__actions">
-                      <button
-                        type="button"
-                        className="btn btn-ghost"
-                        onClick={() => setChecklistDraft(null)}
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        className="btn btn-primary"
-                        disabled={busy != null}
-                      >
-                        {busy
-                          ? "Saving…"
-                          : checklistDraft.mode === "checkout"
-                            ? "Confirm left site"
-                            : "Confirm returned"}
-                      </button>
-                    </div>
-                  </form>
-                ) : null}
-              </article>
-            );
-          })}
+          <EventEquipmentSidebar
+            categories={categories}
+            statuses={[
+              { label: "Staged", count: reservedCount, tone: "pending" },
+              { label: "Checked out", count: checkedOutCount, tone: "out" },
+              { label: "Returned", count: returnedCount, tone: "done" },
+            ]}
+            totalItems={eventReservations.length}
+            loadOut={startTimes.length > 0 ? Math.min(...startTimes) : null}
+            loadBack={endTimes.length > 0 ? Math.max(...endTimes) : null}
+            eventStartsAt={startsAt}
+            eventEndsAt={endsAt}
+          />
         </div>
-      )}
+      </div>
     </section>
   );
 }
 
-function Checkpoint({
+function SummaryTile({
   label,
-  complete,
-  condition,
-  note,
-  timestamp,
-  pendingLabel,
-  disabled,
-  onAction,
-  comparison,
+  value,
+  hint,
+  tone,
 }: {
   label: string;
-  complete: boolean;
-  condition?: string | null;
-  note?: string | null;
-  timestamp?: number | null;
-  pendingLabel: string;
-  disabled: boolean;
-  onAction: () => void;
-  comparison?: { label: string; tone: "match" | "changed" } | null;
+  value: number;
+  hint: ReactNode;
+  tone?: "ok" | "warn";
 }) {
+  const valueTone =
+    tone === "ok" ? "text-ok" : tone === "warn" ? "text-warn" : "text-ink";
+  const hintTone =
+    tone === "ok" ? "text-ok" : tone === "warn" ? "text-warn" : "text-ink-3";
   return (
-    <div className="equipment-checkpoint" data-complete={complete}>
-      <div className="equipment-checkpoint__label">
-        <span aria-hidden="true">{complete ? "✓" : "○"}</span>
-        {label}
-      </div>
-      {complete ? (
-        <div className="equipment-checkpoint__record">
-          <strong>{condition?.replaceAll("_", " ") ?? "Recorded"}</strong>
-          {comparison ? (
-            <span data-tone={comparison.tone}>{comparison.label}</span>
-          ) : null}
-          {note ? <small>{note}</small> : null}
-          {timestamp ? (
-            <time>
-              {formatDate(timestamp)} · {formatTime(timestamp)}
-            </time>
-          ) : null}
-        </div>
-      ) : (
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          disabled={disabled}
-          onClick={onAction}
-        >
-          {pendingLabel}
-        </button>
-      )}
+    <div className="card p-5">
+      <div className="mb-1 text-sm text-ink-3">{label}</div>
+      <div className={`text-3xl font-semibold ${valueTone}`}>{value}</div>
+      <div className={`mt-1 text-xs ${hintTone}`}>{hint}</div>
     </div>
   );
-}
-
-function conditionComparison(
-  outbound?: string | null,
-  returned?: string | null,
-): { label: string; tone: "match" | "changed" } | null {
-  if (!outbound || !returned) return null;
-  const outboundRank = CONDITION_RANK[outbound as EquipmentCondition];
-  const returnRank = CONDITION_RANK[returned as EquipmentCondition];
-  if (outboundRank === undefined || returnRank === undefined) return null;
-  if (returnRank <= outboundRank) {
-    return { label: "Matches outbound", tone: "match" };
-  }
-  return {
-    label: `Changed from ${outbound.replaceAll("_", " ")}`,
-    tone: "changed",
-  };
 }
 
 function statusOrder(status: string): number {

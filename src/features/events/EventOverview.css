@@ -1,0 +1,181 @@
+/* Event overview — a wide main column of working cards beside a narrow rail of
+   readiness, ownership, and standing facts. The rail folds under the main
+   column below 1280px and on phones. */
+.event-overview-grid {
+  display: grid;
+  align-items: start;
+  gap: 20px;
+}
+@media (min-width: 1280px) {
+  .event-overview-grid {
+    grid-template-columns: minmax(0, 1fr) 360px;
+  }
+}
+
+.event-overview-main,
+.event-overview-rail {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* Pipeline stepper: one node per lifecycle stage, connected left to right.
+   Done nodes carry a check, the current node its ordinal, the rest sit quiet. */
+.event-stage-track {
+  display: flex;
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+.event-stage-step {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 62px;
+  align-items: flex-start;
+}
+.event-stage-node {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.event-stage-dot {
+  display: grid;
+  height: 22px;
+  width: 22px;
+  flex-shrink: 0;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--color-inset);
+  color: var(--color-ink-3);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.event-stage-label {
+  color: var(--color-ink-3);
+  font-size: var(--text-sm);
+  line-height: 1.25;
+  text-align: center;
+}
+.event-stage-step[data-state="done"] .event-stage-dot {
+  background: var(--color-ok);
+  color: var(--color-panel);
+}
+.event-stage-step[data-state="done"] .event-stage-label {
+  color: var(--color-ok);
+}
+.event-stage-step[data-state="current"] .event-stage-dot {
+  background: var(--color-accent);
+  color: var(--color-panel);
+}
+.event-stage-step[data-state="current"] .event-stage-label {
+  color: var(--color-accent-deep);
+  font-weight: 600;
+}
+.event-stage-line {
+  height: 1px;
+  flex: 1 1 0;
+  margin-top: 11px;
+  background: var(--color-line-2);
+}
+.event-stage-step[data-state="done"] .event-stage-line {
+  background: var(--color-ok);
+}
+
+/* Read-only fact rows: a quiet glyph, a label, then the value under it. */
+.event-fact-grid {
+  display: grid;
+  gap: 12px 32px;
+}
+@media (min-width: 768px) {
+  .event-fact-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.event-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.event-fact > svg {
+  margin-top: 3px;
+  flex-shrink: 0;
+  color: var(--color-ink-3);
+}
+.event-fact dt {
+  color: var(--color-ink-3);
+  font-size: var(--text-sm);
+}
+.event-fact dd {
+  margin-top: 1px;
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+/* Money tiles inside Budget & Pricing. */
+.event-money-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.event-money-tile {
+  border-radius: var(--radius-sm);
+  background: var(--color-inset);
+  padding: 12px;
+}
+.event-money-tile[data-tone="ok"] {
+  background: var(--color-ok-soft);
+}
+.event-money-tile[data-tone="warn"] {
+  background: var(--color-warn-soft);
+}
+.event-money-label {
+  color: var(--color-ink-3);
+  font-size: var(--text-sm);
+}
+.event-money-value {
+  margin-top: 3px;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.event-money-tile[data-tone="ok"] .event-money-value {
+  color: var(--color-ok);
+}
+.event-money-tile[data-tone="warn"] .event-money-value {
+  color: var(--color-warn);
+}
+
+/* Rail rows: label on the left, value hard right. */
+.event-rail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.event-rail-label {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-ink-2);
+  font-size: var(--text-base);
+}
+.event-rail-label > svg {
+  flex-shrink: 0;
+  color: var(--color-ink-3);
+}
+.event-rail-value {
+  flex-shrink: 0;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-ink);
+}

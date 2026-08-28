@@ -66,18 +66,18 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
 
   return (
     <div
-      className="mt-2 border-t border-line-2 pt-2"
+      className="mt-2 border-t border-line pt-2"
       data-testid="timeline-block-questions"
     >
       <button
         type="button"
-        className="btn btn-ghost btn-sm"
+        className="btn-link"
         onClick={() => setOpen((value) => !value)}
       >
-        {open ? "Hide questions" : "Questions"}
+        {open ? "Hide questions & details" : "Questions & details"}
         {blockComments.length > 0 ? (
-          <span className="ml-1 font-mono text-ink-3">
-            ({blockComments.length})
+          <span className="rounded-sm bg-info-soft px-1.5 py-0.5 text-xs font-semibold text-info">
+            {blockComments.length}
           </span>
         ) : null}
       </button>

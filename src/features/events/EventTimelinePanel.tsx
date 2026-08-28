@@ -7,14 +7,26 @@ import {
   useListEventAssignment,
   useListEventStaffNeed,
   useListEventTimelineActivity,
+  useListEventTimelineComment,
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, Skeleton } from "../../ui/primitives";
+import { PlusIcon } from "../../ui/icons";
 import type { BattleBoardTaskTemplate } from "./battleBoardTaskTemplates";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import type { TimelineAssigneeSelection } from "./EventTimelineAssigneePicker";
 import { EventTimelineActivityList } from "./EventTimelineActivityList";
-import { EventTimelineTemplatesMenu } from "./EventTimelineTemplatesMenu";
+import { EventTimelineAddForm } from "./EventTimelineAddForm";
+import {
+  EventTimelineSidebar,
+  type TimelineKeyStaff,
+} from "./EventTimelineSidebar";
+import {
+  timelineCategoryCounts,
+  timelineSiteNotes,
+  timelineWindow,
+} from "./eventTimelineSummary";
+import { EventTimelineRunSheetHeader } from "./EventTimelineRunSheetHeader";
 import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
 import {
@@ -22,7 +34,6 @@ import {
   isTimelineAssigneeTeam,
 } from "./timelineAssigneeOptions";
 import { TimelineSlotRemapper } from "./timelineSlotRemapper";
-import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type TimelineActivity = Doc<"eventTimelineActivities">;
 
@@ -77,6 +88,7 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
   const assignments = useListEventAssignment();
   const staffNeeds = useListEventStaffNeed();
   const people = useListPerson();
+  const comments = useListEventTimelineComment();
   const records = useMemo(
     () => allRecords?.filter((row) => row.eventId === eventId),
     [allRecords, eventId],
@@ -111,6 +123,20 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
     [assignments, eventId, people, staffNeeds],
   );
 
+  const keyStaff: TimelineKeyStaff[] = useMemo(() => {
+    const entries = EventTimelineStaffRoster.staffingRosterEntries({
+      eventId,
+      assignments,
+      people,
+      staffNeeds,
+    });
+    return entries.map((entry) => ({
+      key: entry.key,
+      name: entry.label,
+      role: entry.role,
+    }));
+  }, [assignments, eventId, people, staffNeeds]);
+
   const personNameById = useMemo(() => {
     const map = new Map<string, string>();
     for (const option of staffOptions) {
@@ -118,6 +144,20 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
     }
     return map;
   }, [staffOptions]);
+
+  const categories = useMemo(
+    () => timelineCategoryCounts(activities),
+    [activities],
+  );
+  const siteNotes = useMemo(() => timelineSiteNotes(activities), [activities]);
+  const { start: windowStart, end: windowEnd } = useMemo(
+    () => timelineWindow(activities),
+    [activities],
+  );
+
+  const questionCount = (comments ?? []).filter(
+    (row) => row.deletedAt == null && row.eventId === eventId,
+  ).length;
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -262,10 +302,12 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
     );
   } else if (activities.length === 0) {
     body = (
-      <EmptyState
-        title="No timeline activities"
-        hint="Pick a template or add an activity to build the day-of run sheet."
-      />
+      <div className="card">
+        <EmptyState
+          title="No timeline activities"
+          hint="Pick a template or add an activity to build the day-of run sheet."
+        />
+      </div>
     );
   } else {
     body = (
@@ -300,71 +342,49 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
   }
 
   return (
-    <div className="space-y-3" data-testid="event-timeline-panel">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-ink-2">
-          Event timeline{" "}
-          <span className="font-mono text-ink-3 normal-case">
-            {activities.length} {activities.length === 1 ? "entry" : "entries"}
-          </span>
-        </p>
-        <div className="flex flex-wrap gap-2">
-          <EventTimelineTemplatesMenu
-            disabled={busy != null}
-            onPick={addFromTemplate}
+    <div
+      className="flex flex-col gap-5 xl:flex-row"
+      data-testid="event-timeline-panel"
+    >
+      <div className="min-w-0 flex-1 space-y-5">
+        <EventTimelineRunSheetHeader
+          windowStart={windowStart}
+          windowEnd={windowEnd}
+          blockCount={activities.length}
+          disabled={busy != null}
+          onPickTemplate={addFromTemplate}
+        />
+
+        {failure ? <FailureBanner failure={failure} /> : null}
+
+        {body}
+
+        {showAdd ? (
+          <EventTimelineAddForm
+            busy={busy === "add"}
+            onSubmit={submitAdd}
+            onDismiss={() => setShowAdd(false)}
           />
+        ) : (
           <button
             type="button"
-            className="btn btn-primary min-h-10"
-            onClick={() => setShowAdd((value) => !value)}
+            className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-line-2 px-5 py-3 font-semibold text-brand hover:border-brand hover:bg-inset"
+            onClick={() => setShowAdd(true)}
           >
-            {showAdd ? "Dismiss" : "+ Add"}
+            <PlusIcon />
+            Add timeline activity
           </button>
-        </div>
+        )}
       </div>
-      {failure ? <FailureBanner failure={failure} /> : null}
-      {showAdd ? (
-        <form
-          onSubmit={submitAdd}
-          className="grid gap-2 rounded-sm border border-line-2 bg-panel p-3 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          <label className="field-label">
-            <span>Activity</span>
-            <input
-              name="name"
-              className="input"
-              placeholder="Vendor arrival, service, breakdown…"
-              required
-              autoFocus
-            />
-          </label>
-          <label className="field-label">
-            <span>Starts</span>
-            <BoundedDateTimeLocalInput
-              name="startsAt"
-              className="input"
-              required
-            />
-          </label>
-          <label className="field-label">
-            <span>Ends (optional)</span>
-            <BoundedDateTimeLocalInput name="endsAt" className="input" />
-          </label>
-          <label className="field-label">
-            <span>Notes</span>
-            <input name="notes" className="input" />
-          </label>
-          <button
-            type="submit"
-            className="btn btn-primary min-h-10 self-end"
-            disabled={busy === "add"}
-          >
-            {busy === "add" ? "Adding…" : "Add activity"}
-          </button>
-        </form>
-      ) : null}
 
-      {body}
+      <EventTimelineSidebar
+        windowStart={windowStart}
+        windowEnd={windowEnd}
+        categories={categories}
+        keyStaff={keyStaff}
+        siteNotes={siteNotes}
+        questionCount={questionCount}
+      />
     </div>
   );
 }

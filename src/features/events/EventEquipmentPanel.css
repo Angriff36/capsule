@@ -6,447 +6,185 @@
 .equipment-dispatch {
   --dispatch-ink: var(--color-ink);
   --dispatch-paper: var(--color-panel);
-  --dispatch-signal: var(--color-accent);
-  --dispatch-signal-soft: color-mix(
-    in srgb,
-    var(--color-accent) 14%,
-    transparent
-  );
-  --dispatch-grid: color-mix(in srgb, var(--color-ink) 6%, transparent);
   --dispatch-muted: var(--color-ink-2);
   --dispatch-faint: var(--color-ink-3);
-  --dispatch-surface: color-mix(
-    in srgb,
-    var(--color-ink) 5%,
-    var(--color-panel)
-  );
-  --dispatch-surface-strong: color-mix(
-    in srgb,
-    var(--color-ink) 8%,
-    var(--color-panel)
-  );
-  --dispatch-surface-soft: color-mix(
-    in srgb,
-    var(--color-ink) 3%,
-    var(--color-panel)
-  );
+  --dispatch-line: var(--color-line);
   --dispatch-inset: var(--color-inset);
-  --dispatch-header-veil: linear-gradient(
-    110deg,
-    color-mix(in srgb, var(--color-panel) 70%, transparent),
-    color-mix(in srgb, var(--color-inset) 88%, var(--color-ink) 6%)
-  );
+  --dispatch-signal: var(--color-accent);
   --dispatch-ok: var(--color-ok);
-  --dispatch-ok-ink: var(--color-ok);
-  --dispatch-ok-soft: color-mix(in srgb, var(--color-ok) 14%, transparent);
-  --dispatch-alert-ink: var(--color-danger);
-  --dispatch-alert-soft: color-mix(
-    in srgb,
-    var(--color-danger) 16%,
-    transparent
-  );
-  --dispatch-release: color-mix(
-    in srgb,
-    var(--color-accent) 55%,
-    var(--color-ink-2)
-  );
+  --dispatch-warn: var(--color-warn);
+  color: var(--dispatch-ink);
+}
+
+/* --- the handoff sheet ------------------------------------------------- */
+
+.equipment-sheet {
   overflow-x: auto;
-  border: 1px solid
-    color-mix(in srgb, var(--color-line) 75%, var(--dispatch-ink));
-  border-radius: 12px;
-  background: var(--dispatch-paper);
-  color: var(--dispatch-ink);
-  box-shadow: 0 16px 36px color-mix(in srgb, var(--color-ink) 12%, transparent);
-}
-
-.equipment-dispatch__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  padding: 22px 24px 20px;
-  border-bottom: 1px solid
-    color-mix(in srgb, var(--dispatch-ink) 20%, transparent);
-  background: var(--dispatch-header-veil);
-}
-
-.equipment-dispatch__kicker,
-.equipment-reserve-form__title span,
-.equipment-checklist__window > span,
-.equipment-inspection > div:first-child span {
-  margin: 0 0 5px;
-  color: var(--dispatch-muted);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-.equipment-dispatch__header h2 {
-  margin: 0;
-  font-family: "Archivo Variable", sans-serif;
-  font-size: clamp(24px, 3vw, 36px);
-  font-variation-settings:
-    "wdth" 88,
-    "wght" 720;
-  letter-spacing: -0.035em;
-}
-
-.equipment-dispatch__header p:not(.equipment-dispatch__kicker) {
-  max-width: 650px;
-  margin: 7px 0 0;
-  color: var(--dispatch-muted);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-.equipment-dispatch__header-actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.equipment-dispatch__totals {
-  display: grid;
-  grid-template-columns: repeat(3, auto);
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--dispatch-ink) 25%, transparent);
-  border-radius: 7px;
-  background: var(--dispatch-surface);
-}
-
-.equipment-dispatch__totals span {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-  padding: 7px 9px;
-  color: var(--dispatch-muted);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 9px;
-  text-transform: uppercase;
-}
-
-.equipment-dispatch__totals span + span {
-  border-left: 1px solid
-    color-mix(in srgb, var(--dispatch-ink) 16%, transparent);
-}
-
-.equipment-dispatch__totals b {
-  color: var(--dispatch-ink);
-  font-size: 15px;
-}
-
-.equipment-dispatch__notice {
-  margin: 14px 18px 0;
-  border-left: 3px solid var(--dispatch-ok);
-  background: var(--dispatch-ok-soft);
-  padding: 9px 12px;
-  color: var(--dispatch-ok-ink);
-  font-size: 12px;
-}
-
-.equipment-reserve-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  align-items: end;
-  gap: 12px;
-  margin: 16px 18px;
-  padding: 16px;
-  border: 1px solid color-mix(in srgb, var(--dispatch-ink) 28%, transparent);
-  border-left: 5px solid var(--dispatch-signal);
-  background: var(--dispatch-surface-strong);
-  box-shadow: 5px 5px 0 color-mix(in srgb, var(--color-ink) 12%, transparent);
-}
-
-.equipment-reserve-form__title {
-  align-self: center;
-}
-
-.equipment-reserve-form__title strong,
-.equipment-inspection > div:first-child strong {
-  display: block;
-  font-size: 15px;
-}
-
-.equipment-reserve-form__submit {
-  margin-bottom: 1px;
-  white-space: nowrap;
-}
-
-.equipment-dispatch__loading {
-  padding: 18px;
-}
-
-.equipment-dispatch__empty {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  margin: 18px;
-  padding: 24px;
-  border: 1px dashed color-mix(in srgb, var(--dispatch-ink) 34%, transparent);
-  background: var(--dispatch-surface-soft);
-}
-
-.equipment-dispatch__empty > span {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 34px;
-  font-weight: 700;
-  opacity: 0.22;
-}
-
-.equipment-dispatch__empty p {
-  margin: 4px 0 0;
-  color: var(--dispatch-muted);
-  font-size: 12px;
-}
-
-.equipment-checklist {
-  display: grid;
-}
-
-.equipment-checklist__row {
-  position: relative;
-  display: grid;
-  grid-template-columns:
-    minmax(220px, 1.25fr) minmax(170px, 0.8fr) minmax(165px, 0.8fr)
-    minmax(165px, 0.8fr);
-  gap: 0;
-  border-top: 1px solid color-mix(in srgb, var(--dispatch-ink) 18%, transparent);
-  background: var(--dispatch-surface);
-}
-
-.equipment-checklist__row[data-status="checked_out"] {
   background: var(--dispatch-paper);
 }
 
-.equipment-checklist__row[data-status="returned"],
-.equipment-checklist__row[data-status="cancelled"] {
-  opacity: 0.78;
+.equipment-sheet table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
 }
 
-.equipment-checklist__identity,
-.equipment-checklist__window,
-.equipment-checkpoint {
-  min-width: 0;
-  padding: 17px 16px;
-}
-
-.equipment-checklist__window,
-.equipment-checkpoint {
-  border-left: 1px solid
-    color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
-}
-
-.equipment-checklist__identity {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-}
-
-.equipment-checklist__sequence {
-  color: var(--dispatch-signal);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.equipment-checklist__identity strong,
-.equipment-checklist__identity span:not(.equipment-checklist__sequence) {
-  display: block;
-}
-
-.equipment-checklist__identity strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 14px;
-}
-
-.equipment-checklist__identity div > span,
-.equipment-checklist__window small {
-  margin-top: 4px;
-  color: var(--dispatch-muted);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-}
-
-.equipment-checklist__window strong,
-.equipment-checklist__window small {
-  display: block;
-}
-
-.equipment-checklist__window strong {
-  font-size: 12px;
-}
-
-.equipment-checkpoint__label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 9px;
-  color: var(--dispatch-muted);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+.equipment-sheet thead th {
+  border-bottom: 1px solid var(--dispatch-line);
+  background: var(--dispatch-inset);
+  padding: 0.7rem 1.1rem;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--dispatch-muted);
 }
 
-.equipment-checkpoint[data-complete="true"] .equipment-checkpoint__label span {
-  color: var(--dispatch-ok);
+.equipment-sheet tbody td {
+  border-bottom: 1px solid var(--dispatch-line);
+  padding: 0.75rem 1.1rem;
+  vertical-align: top;
+  color: var(--dispatch-ink);
 }
 
-.equipment-checkpoint__record strong,
-.equipment-checkpoint__record small,
-.equipment-checkpoint__record time {
+.equipment-sheet tbody tr:last-child > td {
+  border-bottom: 0;
+}
+
+.equipment-sheet__numeric {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.equipment-sheet__item strong {
   display: block;
+  font-weight: 600;
 }
 
-.equipment-checkpoint__record strong {
-  font-size: 13px;
+.equipment-sheet__item span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: var(--text-xs);
+  color: var(--dispatch-faint);
+}
+
+.equipment-sheet__window {
+  display: grid;
+  gap: 0.15rem;
+  white-space: nowrap;
+}
+
+.equipment-sheet__window small {
+  font-size: var(--text-xs);
+  color: var(--dispatch-faint);
+}
+
+/* Outbound / return checkpoint cell: a recorded condition, or the button
+   that records it. */
+.equipment-checkpoint {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 9rem;
+}
+
+.equipment-checkpoint strong {
+  font-weight: 600;
   text-transform: capitalize;
 }
 
-.equipment-checkpoint__record > span {
-  display: inline-block;
-  margin-top: 5px;
-  border-radius: 999px;
-  padding: 2px 6px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 9px;
-}
-
-.equipment-checkpoint__record > span[data-tone="match"] {
-  background: var(--dispatch-ok-soft);
-  color: var(--dispatch-ok-ink);
-}
-
-.equipment-checkpoint__record > span[data-tone="changed"] {
-  background: var(--dispatch-alert-soft);
-  color: var(--dispatch-alert-ink);
-}
-
-.equipment-checkpoint__record small {
-  margin-top: 5px;
-  color: var(--dispatch-muted);
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-.equipment-checkpoint__record time {
-  margin-top: 5px;
+.equipment-checkpoint small,
+.equipment-checkpoint time {
+  font-size: var(--text-xs);
   color: var(--dispatch-faint);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 9px;
 }
 
-.equipment-checklist__release {
-  position: absolute;
-  right: 8px;
-  top: 8px;
-  border: 0;
-  background: transparent;
-  color: var(--dispatch-release);
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 9px;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.equipment-checkpoint span[data-tone="match"] {
+  font-size: var(--text-xs);
+  color: var(--dispatch-ok);
 }
+
+.equipment-checkpoint span[data-tone="changed"] {
+  font-size: var(--text-xs);
+  color: var(--dispatch-signal);
+}
+
+.equipment-checkpoint__waiting {
+  font-size: var(--text-xs);
+  color: var(--dispatch-faint);
+}
+
+/* --- inline condition capture ----------------------------------------- */
 
 .equipment-inspection {
-  grid-column: 1 / -1;
   display: grid;
-  grid-template-columns:
-    minmax(150px, 0.8fr) minmax(170px, 0.7fr) minmax(280px, 1.8fr)
-    auto;
-  align-items: end;
-  gap: 12px;
-  padding: 14px 16px;
-  border-top: 1px solid color-mix(in srgb, var(--dispatch-ink) 18%, transparent);
+  gap: 0.6rem;
+  border-left: 3px solid var(--dispatch-signal);
   background: var(--dispatch-inset);
-  box-shadow: inset 5px 0 0 var(--dispatch-signal);
+  padding: 0.85rem 1.1rem;
 }
 
-.equipment-inspection__note textarea {
-  min-height: 62px;
-  resize: vertical;
+@media (min-width: 900px) {
+  .equipment-inspection {
+    grid-template-columns: 14rem 1fr auto;
+    align-items: end;
+  }
+}
+
+.equipment-inspection__title {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.equipment-inspection__title span {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dispatch-faint);
 }
 
 .equipment-inspection__actions {
   display: flex;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
-@media (max-width: 1100px) {
-  .equipment-dispatch__header,
-  .equipment-dispatch__header-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
+/* --- sidebar meters ---------------------------------------------------- */
 
-  .equipment-reserve-form {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .equipment-reserve-form__title,
-  .equipment-reserve-form__asset,
-  .equipment-reserve-form__submit {
-    grid-column: 1 / -1;
-  }
-
-  .equipment-checklist__row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .equipment-checkpoint:nth-of-type(3) {
-    border-left: 0;
-    border-top: 1px solid
-      color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
-  }
-
-  .equipment-checkpoint:nth-of-type(4) {
-    border-top: 1px solid
-      color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
-  }
-
-  .equipment-inspection {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.equipment-meter {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--dispatch-inset);
 }
 
-@media (max-width: 680px) {
-  .equipment-dispatch__header {
-    padding: 18px;
-  }
+.equipment-meter > i {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--dispatch-ok);
+}
 
-  .equipment-dispatch__totals {
-    width: 100%;
-  }
+.equipment-meter[data-tone="pending"] > i {
+  background: var(--dispatch-warn);
+}
 
-  .equipment-dispatch__totals span {
-    justify-content: center;
-    flex: 1;
-  }
+.equipment-meter[data-tone="done"] > i {
+  background: var(--dispatch-signal);
+}
 
-  .equipment-reserve-form,
-  .equipment-checklist__row,
-  .equipment-inspection {
-    grid-template-columns: 1fr;
-  }
+/* Tailwind utilities lose to `.equipment-sheet tbody td` on specificity, so the
+   two cell variants the sheet needs are declared here instead. */
+.equipment-sheet tbody td.equipment-sheet__muted {
+  color: var(--dispatch-muted);
+}
 
-  .equipment-reserve-form > *,
-  .equipment-inspection > * {
-    grid-column: 1;
-  }
+.equipment-sheet tbody td.equipment-sheet__bleed {
+  padding: 0;
+}
 
-  .equipment-checklist__window,
-  .equipment-checkpoint,
-  .equipment-checkpoint:nth-of-type(3),
-  .equipment-checkpoint:nth-of-type(4) {
-    border-top: 1px solid
-      color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
-    border-left: 0;
-  }
+.equipment-sheet thead th.equipment-sheet__numeric,
+.equipment-sheet tbody td.equipment-sheet__numeric {
+  text-align: center;
 }

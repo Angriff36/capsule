@@ -39,7 +39,15 @@ import {
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
-import { ArrowLeftIcon } from "../../ui/icons";
+import {
+  ArrowLeftIcon,
+  BuildingIcon,
+  CalendarIcon,
+  ClockIcon,
+  DownloadIcon,
+  UsersIcon,
+} from "../../ui/icons";
+import { MapPinIcon, TagIcon } from "./eventDetailIcons";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import {
@@ -75,7 +83,6 @@ import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
 import { EventStaffingTab } from "./EventStaffingTab";
 import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
-import { EventWeatherPanel } from "./EventWeatherPanel";
 import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
@@ -254,31 +261,99 @@ export function EventDetailPage() {
     people !== undefined &&
     timelineActivities !== undefined;
 
+  // On desktop the prominent stage moves live in the overview's Stage actions
+  // card and the menu keeps every one of them reachable from every tab. Phones
+  // have no such card, so the next step stays a button in the header.
+  const headerPrimary = mobile ? primaryAction : undefined;
+  const menuStageActions = [
+    ...(primaryAction && primaryAction !== headerPrimary
+      ? [primaryAction]
+      : []),
+    ...secondaryActions,
+  ];
+
+  const exportBeo = () => {
+    setPdfNotice(null);
+    void downloadBeoPdf({
+      event,
+      clientName: clientDisplayName(event.clientId, clients),
+      dishes: (eventDishes ?? [])
+        .filter(
+          (selection) =>
+            selection.deletedAt == null &&
+            selection.removedAt == null &&
+            selection.eventId === event._id,
+        )
+        .map((selection) => ({
+          selection,
+          dish: dishes?.find((dish) => dish._id === selection.dishId),
+        })),
+      timeline: (timelineActivities ?? []).filter(
+        (activity) =>
+          activity.eventId === event._id &&
+          activity.scheduledAt != null &&
+          activity.deletedAt == null,
+      ),
+      staff: (eventAssignments ?? [])
+        .filter(
+          (assignment) =>
+            assignment.deletedAt == null &&
+            assignment.eventId === event._id &&
+            assignment.status !== "unassigned",
+        )
+        .map((assignment) => ({
+          assignment,
+          person: people?.find((person) => person._id === assignment.personId),
+        })),
+      branding,
+    })
+      .then(() => {
+        setPdfNotice("BEO PDF downloaded.");
+        reportActionOk("BEO PDF downloaded.");
+      })
+      .catch((error) => setFailure(classifyCommandFailure(error)));
+  };
+
+  const dishCount = (eventDishes ?? []).filter(
+    (selection) =>
+      selection.eventId === event._id &&
+      selection.deletedAt == null &&
+      selection.removedAt == null,
+  ).length;
+  const staffCount = (eventAssignments ?? []).filter(
+    (assignment) =>
+      assignment.eventId === event._id &&
+      assignment.deletedAt == null &&
+      assignment.status !== "unassigned",
+  ).length;
+  const timelineCount = (timelineActivities ?? []).filter(
+    (activity) => activity.eventId === event._id && activity.deletedAt == null,
+  ).length;
+
   const headerActions = [
-    ...(primaryAction
+    ...(headerPrimary
       ? [
           <button
-            key={primaryAction.key}
+            key={headerPrimary.key}
             type="button"
             disabled={busy}
-            onClick={() => runAction(primaryAction.key)}
+            onClick={() => runAction(headerPrimary.key)}
             className="btn btn-primary"
           >
-            {primaryAction.label}
+            {headerPrimary.label}
           </button>,
         ]
       : []),
-    ...secondaryActions.map((action) => (
-      <button
-        key={action.key}
-        type="button"
-        disabled={busy}
-        onClick={() => runAction(action.key)}
-        className={`btn ${action.kind === "primary" ? "btn-secondary" : "btn-ghost"}`}
-      >
-        {action.label}
-      </button>
-    )),
+    <button
+      key="export-beo"
+      type="button"
+      className="btn btn-ghost"
+      disabled={!beoReady}
+      onClick={exportBeo}
+    >
+      <DownloadIcon width={14} height={14} />
+      Export BEO
+    </button>,
     <ActionMenu key="more">
       {mobile ? (
         <Link
@@ -289,57 +364,17 @@ export function EventDetailPage() {
         </Link>
       ) : null}
       <EventClientPortalShare key="client-portal-share" eventId={event._id} />
-      <button
-        key="download-beo"
-        type="button"
-        className="btn btn-ghost"
-        disabled={!beoReady}
-        onClick={() => {
-          setPdfNotice(null);
-          void downloadBeoPdf({
-            event,
-            clientName: clientDisplayName(event.clientId, clients),
-            dishes: (eventDishes ?? [])
-              .filter(
-                (selection) =>
-                  selection.deletedAt == null &&
-                  selection.removedAt == null &&
-                  selection.eventId === event._id,
-              )
-              .map((selection) => ({
-                selection,
-                dish: dishes?.find((dish) => dish._id === selection.dishId),
-              })),
-            timeline: (timelineActivities ?? []).filter(
-              (activity) =>
-                activity.eventId === event._id &&
-                activity.scheduledAt != null &&
-                activity.deletedAt == null,
-            ),
-            staff: (eventAssignments ?? [])
-              .filter(
-                (assignment) =>
-                  assignment.deletedAt == null &&
-                  assignment.eventId === event._id &&
-                  assignment.status !== "unassigned",
-              )
-              .map((assignment) => ({
-                assignment,
-                person: people?.find(
-                  (person) => person._id === assignment.personId,
-                ),
-              })),
-            branding,
-          })
-            .then(() => {
-              setPdfNotice("BEO PDF downloaded.");
-              reportActionOk("BEO PDF downloaded.");
-            })
-            .catch((error) => setFailure(classifyCommandFailure(error)));
-        }}
-      >
-        Download BEO
-      </button>
+      {menuStageActions.map((action) => (
+        <button
+          key={action.key}
+          type="button"
+          className="btn btn-ghost"
+          disabled={busy}
+          onClick={() => runAction(action.key)}
+        >
+          {action.label}
+        </button>
+      ))}
       <Link
         key="create-proposal"
         className="btn btn-ghost"
@@ -448,58 +483,68 @@ export function EventDetailPage() {
                 </h1>
                 <StatusChip status={String(event.stage)} />
               </div>
-              <p className="mt-1 text-base text-ink-2">
-                {formatStatusLabel(event.eventType)}
-                {event.startsAt != null
-                  ? ` · ${relativeDays(event.startsAt)}`
-                  : ""}
-              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-base text-ink-2">
+                <span className="inline-flex min-w-0 items-center gap-1.5">
+                  <BuildingIcon width={14} height={14} />
+                  {(() => {
+                    const client = clients?.find(
+                      (c) => c._id === event.clientId,
+                    );
+                    const name = clientDisplayName(event.clientId, clients);
+                    if (!client) return name;
+                    return (
+                      <HoverPreview
+                        card={<ClientPreviewCard client={client} />}
+                      >
+                        <Link
+                          to={`/clients/${client._id}`}
+                          className="hover:underline"
+                        >
+                          {name}
+                        </Link>
+                      </HoverPreview>
+                    );
+                  })()}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <CalendarIcon width={14} height={14} />
+                  {formatDate(event.startsAt)}
+                  {event.startsAt != null
+                    ? ` · ${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
+                    : ""}
+                </span>
+                <span className="inline-flex min-w-0 items-center gap-1.5">
+                  <MapPinIcon width={14} height={14} />
+                  {venue ? (
+                    <Link to="/facilities" className="hover:underline">
+                      {venue.name}
+                    </Link>
+                  ) : (
+                    "No venue yet"
+                  )}
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <UsersIcon width={14} height={14} />
+                  {formatCount(event.expectedHeadcount)} guests
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <TagIcon width={14} height={14} />
+                  {formatStatusLabel(event.eventType)}
+                </span>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {headerActions}
+            <div className="flex flex-col items-end gap-2">
+              {typeof event.updatedAt === "number" ? (
+                <span className="inline-flex items-center gap-1.5 text-sm text-ink-3">
+                  <ClockIcon width={13} height={13} />
+                  Last updated {relativeDays(event.updatedAt)}
+                </span>
+              ) : null}
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {headerActions}
+              </div>
             </div>
           </div>
-          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-4 md:grid-cols-3 xl:grid-cols-6">
-            <HeroFact label="Date">{formatDate(event.startsAt)}</HeroFact>
-            <HeroFact label="Time">
-              {event.startsAt != null
-                ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
-                : "—"}
-            </HeroFact>
-            <HeroFact label="Headcount">
-              {formatCount(event.expectedHeadcount)} guests
-            </HeroFact>
-            <HeroFact label="Venue">
-              {venue ? (
-                <Link to="/facilities" className="hover:underline">
-                  {venue.name}
-                </Link>
-              ) : (
-                "No venue yet"
-              )}
-            </HeroFact>
-            <HeroFact label="Client">
-              {(() => {
-                const client = clients?.find((c) => c._id === event.clientId);
-                const name = clientDisplayName(event.clientId, clients);
-                if (!client) return name;
-                return (
-                  <HoverPreview card={<ClientPreviewCard client={client} />}>
-                    <Link
-                      to={`/clients/${client._id}`}
-                      className="hover:underline"
-                    >
-                      {name}
-                    </Link>
-                  </HoverPreview>
-                );
-              })()}
-            </HeroFact>
-            <HeroFact label="Budget / quoted">
-              {formatMoney(event.budgetAmount, currencyCode)} /{" "}
-              {formatMoney(event.quotedPrice, currencyCode)}
-            </HeroFact>
-          </dl>
         </section>
       )}
 
@@ -607,6 +652,13 @@ export function EventDetailPage() {
             serviceRequirements={event.serviceRequirements}
             operationalRequirements={event.operationalRequirements}
             stage={String(event.stage)}
+            currencyCode={currencyCode}
+            lifecycleActions={lifecycle}
+            onAction={runAction}
+            people={people}
+            dishCount={dishCount}
+            staffCount={staffCount}
+            timelineCount={timelineCount}
             run={run}
             onReschedule={reschedule}
             onChangeHeadcount={changeHeadcount}
@@ -615,10 +667,7 @@ export function EventDetailPage() {
             onChangePrimaryContact={changePrimaryContact}
             onChangeRequirements={changeRequirements}
           />
-          <div className="mt-4">
-            <EventWeatherPanel venue={venue} />
-          </div>
-          <div className="mt-4">
+          <div className="mt-5">
             <EventSourceProvenancePanel capsuleId={event._id} />
           </div>
         </EventTabErrorBoundary>
