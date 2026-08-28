@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   layoutAccessibilityText,
@@ -14,6 +15,11 @@ const NON_STRINGS: readonly unknown[] = [
   { name: "Bar" },
   ["ramp"],
 ];
+
+const layoutsPanel = readFileSync(
+  "src/features/events/EventBattleBoardLayoutsPanel.tsx",
+  "utf8",
+);
 
 describe("layoutTrim", () => {
   it("does not throw when a field the load path trims is not a string", () => {
@@ -48,5 +54,14 @@ describe("layoutTrim", () => {
     expect(layoutAccessibilityText("   ")).toBeNull();
     expect(layoutAccessibilityText(null)).toBeNull();
     expect(layoutAccessibilityText({ note: "ramp" })).toBeNull();
+  });
+
+  it("wires the Layouts panel through the trim helpers", () => {
+    expect(layoutsPanel).toContain("layoutAccessibilityText");
+    expect(layoutsPanel).toContain("layoutCategoryCounts");
+    expect(layoutsPanel).toContain("trimLayoutField");
+    expect(layoutsPanel).toContain("layoutHasInstructions");
+    expect(layoutsPanel).not.toContain("accessibilityNeeds.trim");
+    expect(layoutsPanel).not.toContain("accessibilityNeeds?.trim");
   });
 });
