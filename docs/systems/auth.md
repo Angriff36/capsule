@@ -18,7 +18,8 @@ Hiring on Admin → Permissions → Team roles creates the identity-provider acc
 1. Missing `VITE_CLERK_PUBLISHABLE_KEY` → setup-required screen (no silent dev identity).
 2. Unauthenticated → Capsule sign-in screen (embedded provider widget; no self-serve sign-up). Ticket links from hire email sign them in.
 3. Authenticated → ClaimGate / membership checks (self-link by verified email if hire has not linked yet).
-4. Ready → children (AppShell + routes).
+4. If several live Person rows share that email (or the same `authSubjectId`), pick one instead of failing closed: hinted workspace (active Clerk org), then a row already linked to this sign-in, then Admin/owner/system, then the oldest live row. Persist that `authSubjectId` so the shell loads. Opening a workspace button calls `setActive` so the tenant hint is real — Team roles is not the only recovery.
+5. Ready → children (AppShell + routes).
 
 ## Role source of truth
 
