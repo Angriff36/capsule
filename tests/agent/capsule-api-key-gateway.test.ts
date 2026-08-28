@@ -134,6 +134,32 @@ describe("API-key gateway for the command API", () => {
     expect(h.minted).toHaveLength(2);
   });
 
+  it("rejects a key Clerk returns as revoked or expired", async () => {
+    for (const key of [
+      { subject: OWNER, revoked: true },
+      { subject: OWNER, expiration: 5 },
+    ]) {
+      const forwarded: Request[] = [];
+      const handle = createApiKeyGateway({
+        convexSiteUrl: CONVEX,
+        now: () => 10,
+        verifyApiKey: async () => key,
+        mintSessionToken: async () => "never",
+        forward: async (request) => {
+          forwarded.push(request);
+          return new Response("{}");
+        },
+      });
+      const res = await handle(
+        new Request(`${APP}/api/manifest/commands`, {
+          headers: { Authorization: "Bearer ak_dead" },
+        }),
+      );
+      expect(res.status).toBe(401);
+      expect(forwarded).toHaveLength(0);
+    }
+  });
+
   it("refuses keys that do not belong to a user", async () => {
     const forwarded: Request[] = [];
     const handle = createApiKeyGateway({

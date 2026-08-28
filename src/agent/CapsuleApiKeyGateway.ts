@@ -15,8 +15,15 @@ import { createClerkClient } from "@clerk/backend";
 import { createHash } from "node:crypto";
 
 export interface ApiKeyGatewayDeps {
-  /** Throws when the key is invalid, revoked, or expired. */
-  verifyApiKey: (secret: string) => Promise<{ subject: string }>;
+  /**
+   * Throws when the key is unknown. Clerk may also RETURN a revoked or
+   * expired key (seen live 2026-08-28), so the gateway checks those fields.
+   */
+  verifyApiKey: (secret: string) => Promise<{
+    subject: string;
+    revoked?: boolean;
+    expiration?: number | null;
+  }>;
   /** Clerk session JWT for the key owner, accepted by Convex auth. */
   mintSessionToken: (userId: string) => Promise<string>;
   forward: (request: Request) => Promise<Response>;
@@ -48,7 +55,11 @@ export function createApiKeyGateway(deps: ApiKeyGatewayDeps) {
 
     let subject: string;
     try {
-      subject = (await deps.verifyApiKey(secret)).subject;
+      const key = await deps.verifyApiKey(secret);
+      const expired =
+        typeof key.expiration === "number" && key.expiration <= now();
+      if (key.revoked || expired) throw new Error("revoked or expired");
+      subject = key.subject;
     } catch {
       return json(401, { error: "Unauthorized" });
     }
