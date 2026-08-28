@@ -56,3 +56,6 @@ output/
 .vercel
 
 .playwright-mcp/
+
+# Storybook static output
+storybook-static/
