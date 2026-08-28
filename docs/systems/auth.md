@@ -4,6 +4,7 @@
 
 - **Clerk** — browser identity (`@clerk/react`), publishable key in Vite env.
 - **Convex + Clerk JWT** — `convex/auth.config.ts` validates tokens via `CLERK_JWT_ISSUER_DOMAIN`.
+- **API keys (remote agents)** — a Capsule user creates a long-lived Clerk API key under Administration → API keys (`<APIKeys />`). Agents send it as `Authorization: Bearer ak_…` to `/api/manifest/*` on the APP host; `src/agent/CapsuleApiKeyGateway.ts` (Vercel function `api/manifest/[...path].ts`, Vite dev middleware) verifies it with Clerk, mints the OWNER's session JWT server-side, and forwards to the generated Convex dispatcher — so the key has exactly the owner's tenant + role and every guard runs unchanged. Revoke = instant. Clerk needs "User API keys" enabled once (Dashboard → API keys).
 - **AuthGate** — `src/app/AuthGate.tsx` blocks the shell until session + membership are ok.
 - **Workspace membership** — `src/app/auth/WorkspaceMembershipPolicy.ts` decides claim / org readiness.
 - **Server auth context** — `convex/lib/authContext.ts` maps `ctx.auth.getUserIdentity()` to `{ id, role, tenantId, roleSource }`. **Capsule role is owned by `Person`** (Admin → Permissions → Team roles) when an active Person is linked via `authSubjectId`. Clerk/IdP org-role claims are only a bootstrap fallback until that link exists. Fail-closed anonymous sentinels when unauthenticated.
