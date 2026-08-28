@@ -432,7 +432,7 @@ function TimeSegments({
         typed.current = "";
         if (seg === "ampm") return onChange({ ...value, pm: !value.pm });
         const cur = seg === "h" ? value.h : value.m;
-        const max = seg === "h" ? 12 : 60;
+        const max = seg === "h" ? 12 : 59;
         const min = seg === "h" ? 1 : 0;
         let n = cur + step;
         if (n > max) n = min;
