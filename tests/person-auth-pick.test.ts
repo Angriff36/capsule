@@ -1,8 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  decidePersonEmailLink,
   pickLivePerson,
   tenantIdFromIdentityClaims,
 } from "../convex/lib/personAuthPick";
+import {
+  decodeJwtPayload,
+  waitForSessionTenantClaim,
+} from "../src/app/auth/sessionTenantClaim";
 
 const staffOld = {
   _id: "p_staff_old",
@@ -139,5 +144,148 @@ describe("tenantIdFromIdentityClaims", () => {
       "org_legacy",
     );
     expect(tenantIdFromIdentityClaims({})).toBe("");
+  });
+});
+
+type LinkRow = {
+  _id: string;
+  tenantId: string;
+  role: string;
+  status: string;
+  deletedAt: number | null;
+  authSubjectId?: string | null;
+  createdAt: number;
+};
+
+function applyEmailLink(
+  rows: LinkRow[],
+  opts: { subject: string; tenantId?: string },
+) {
+  const linkedLive = rows.filter((row) => row.authSubjectId === opts.subject);
+  const neverLinkedLiveMatches = rows.filter(
+    (row) => row.authSubjectId == null,
+  );
+  const decision = decidePersonEmailLink({
+    subject: opts.subject,
+    tenantId: opts.tenantId,
+    linkedLive,
+    neverLinkedLiveMatches,
+  });
+  if (decision.kind === "persist") {
+    for (const row of rows) {
+      if (row.authSubjectId === opts.subject) row.authSubjectId = null;
+    }
+    const target = rows.find((row) => row._id === decision.person._id);
+    if (target) target.authSubjectId = opts.subject;
+  }
+  return decision;
+}
+
+describe("decidePersonEmailLink persist rematch", () => {
+  const subject = "user_ostwind";
+
+  function fixture(): LinkRow[] {
+    return [
+      {
+        _id: "p_other",
+        tenantId: "org_other",
+        role: "admin",
+        status: "active",
+        deletedAt: null,
+        authSubjectId: undefined,
+        createdAt: 10,
+      },
+      {
+        _id: "p_mangia",
+        tenantId: "org_mangia",
+        role: "admin",
+        status: "active",
+        deletedAt: null,
+        authSubjectId: undefined,
+        createdAt: 20,
+      },
+    ];
+  }
+
+  it("does not write authSubjectId on an unhinted cross-tenant pick", () => {
+    const rows = fixture();
+    const decision = applyEmailLink(rows, { subject });
+    expect(decision.kind).toBe("ambiguous");
+    expect(rows[0]?.authSubjectId).toBeUndefined();
+    expect(rows[1]?.authSubjectId).toBeUndefined();
+  });
+
+  it("persists the hinted Mangia Admin and clears the other subject", () => {
+    const rows = fixture();
+    applyEmailLink(rows, { subject });
+    const hinted = applyEmailLink(rows, {
+      subject,
+      tenantId: "org_mangia",
+    });
+    expect(hinted.kind).toBe("persist");
+    expect(rows.find((row) => row._id === "p_mangia")?.authSubjectId).toBe(
+      subject,
+    );
+    expect(
+      rows.find((row) => row._id === "p_other")?.authSubjectId,
+    ).toBeUndefined();
+    expect(pickLivePerson(rows, { subject, tenantId: "org_mangia" })?._id).toBe(
+      "p_mangia",
+    );
+  });
+
+  it("rematches a leftover other-tenant link onto the hinted never-linked row", () => {
+    const rows = fixture();
+    rows[0]!.authSubjectId = subject;
+    const rematch = applyEmailLink(rows, {
+      subject,
+      tenantId: "org_mangia",
+    });
+    expect(rematch.kind).toBe("persist");
+    expect(rows.find((row) => row._id === "p_mangia")?.authSubjectId).toBe(
+      subject,
+    );
+    expect(rows.find((row) => row._id === "p_other")?.authSubjectId).toBeNull();
+    expect(pickLivePerson(rows, { subject, tenantId: "org_mangia" })?._id).toBe(
+      "p_mangia",
+    );
+  });
+});
+
+function jwtWithTenant(tenantId: string): string {
+  const payload = Buffer.from(
+    JSON.stringify({ o: { id: tenantId } }),
+    "utf8",
+  ).toString("base64url");
+  return `hdr.${payload}.sig`;
+}
+
+describe("waitForSessionTenantClaim", () => {
+  it("does not succeed until the JWT tenant equals the chosen org", async () => {
+    const tokens = [jwtWithTenant("org_other"), jwtWithTenant("org_mangia")];
+    const ready = await waitForSessionTenantClaim({
+      organizationId: "org_mangia",
+      getToken: async () => tokens.shift() ?? jwtWithTenant("org_mangia"),
+      tries: 3,
+      delayMs: 0,
+    });
+    expect(ready).toBe(true);
+    expect(tokens).toHaveLength(0);
+  });
+
+  it("returns false when the JWT tenant never matches", async () => {
+    const ready = await waitForSessionTenantClaim({
+      organizationId: "org_mangia",
+      getToken: async () => jwtWithTenant("org_other"),
+      tries: 2,
+      delayMs: 0,
+    });
+    expect(ready).toBe(false);
+  });
+
+  it("reads Clerk org id from the session JWT payload", () => {
+    expect(decodeJwtPayload(jwtWithTenant("org_mangia"))).toEqual({
+      o: { id: "org_mangia" },
+    });
   });
 });
