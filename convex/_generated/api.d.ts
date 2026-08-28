@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as apiKeys from "../apiKeys.js";
 import type * as authLink from "../authLink.js";
 import type * as authProvision from "../authProvision.js";
 import type * as authStatus from "../authStatus.js";
@@ -32,6 +33,7 @@ import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as kmParser from "../kmParser.js";
 import type * as laborSummary from "../laborSummary.js";
 import type * as lib_authContext from "../lib/authContext.js";
+import type * as lib_catalogUnitGrams from "../lib/catalogUnitGrams.js";
 import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
 import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
 import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
@@ -40,10 +42,14 @@ import type * as lib_equipmentReservationAvailability from "../lib/equipmentRese
 import type * as lib_fdcNutrientMapper from "../lib/fdcNutrientMapper.js";
 import type * as lib_foodDatabaseClient from "../lib/foodDatabaseClient.js";
 import type * as lib_foodDatabaseImage from "../lib/foodDatabaseImage.js";
+import type * as lib_foodDensityFromLookup from "../lib/foodDensityFromLookup.js";
 import type * as lib_googleCalendar from "../lib/googleCalendar.js";
+import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
 import type * as lib_ingredientAllergenParser from "../lib/ingredientAllergenParser.js";
 import type * as lib_ingredientCatalogImageImport from "../lib/ingredientCatalogImageImport.js";
 import type * as lib_ingredientLookupApplyCost from "../lib/ingredientLookupApplyCost.js";
+import type * as lib_ingredientLookupApplyNutrition from "../lib/ingredientLookupApplyNutrition.js";
+import type * as lib_ingredientLookupAutofill from "../lib/ingredientLookupAutofill.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
 import type * as lib_lookupCostBarcodeDiscovery from "../lib/lookupCostBarcodeDiscovery.js";
@@ -62,7 +68,9 @@ import type * as lib_servingWeightGrams from "../lib/servingWeightGrams.js";
 import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
 import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
 import type * as lib_twilio from "../lib/twilio.js";
+import type * as lib_typicalKitchenDensity from "../lib/typicalKitchenDensity.js";
 import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
+import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as mutations from "../mutations.js";
 import type * as notifications from "../notifications.js";
@@ -92,6 +100,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  apiKeys: typeof apiKeys;
   authLink: typeof authLink;
   authProvision: typeof authProvision;
   authStatus: typeof authStatus;
@@ -116,6 +125,7 @@ declare const fullApi: ApiFromModules<{
   kmParser: typeof kmParser;
   laborSummary: typeof laborSummary;
   "lib/authContext": typeof lib_authContext;
+  "lib/catalogUnitGrams": typeof lib_catalogUnitGrams;
   "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
   "lib/clerkStaffAccount": typeof lib_clerkStaffAccount;
   "lib/clientPortalToken": typeof lib_clientPortalToken;
@@ -124,10 +134,14 @@ declare const fullApi: ApiFromModules<{
   "lib/fdcNutrientMapper": typeof lib_fdcNutrientMapper;
   "lib/foodDatabaseClient": typeof lib_foodDatabaseClient;
   "lib/foodDatabaseImage": typeof lib_foodDatabaseImage;
+  "lib/foodDensityFromLookup": typeof lib_foodDensityFromLookup;
   "lib/googleCalendar": typeof lib_googleCalendar;
+  "lib/householdVolumeParse": typeof lib_householdVolumeParse;
   "lib/ingredientAllergenParser": typeof lib_ingredientAllergenParser;
   "lib/ingredientCatalogImageImport": typeof lib_ingredientCatalogImageImport;
   "lib/ingredientLookupApplyCost": typeof lib_ingredientLookupApplyCost;
+  "lib/ingredientLookupApplyNutrition": typeof lib_ingredientLookupApplyNutrition;
+  "lib/ingredientLookupAutofill": typeof lib_ingredientLookupAutofill;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
   "lib/lookupCostBarcodeDiscovery": typeof lib_lookupCostBarcodeDiscovery;
@@ -146,7 +160,9 @@ declare const fullApi: ApiFromModules<{
   "lib/staffSignInMailer": typeof lib_staffSignInMailer;
   "lib/staffSignInPassword": typeof lib_staffSignInPassword;
   "lib/twilio": typeof lib_twilio;
+  "lib/typicalKitchenDensity": typeof lib_typicalKitchenDensity;
   "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
+  "lib/volumeUnitMl": typeof lib_volumeUnitMl;
   messageInbox: typeof messageInbox;
   mutations: typeof mutations;
   notifications: typeof notifications;
