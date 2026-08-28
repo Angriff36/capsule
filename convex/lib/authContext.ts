@@ -152,6 +152,8 @@ async function loadPersonBySubject(
     .collect()) as PersonRow[];
   const person = pickLivePerson(rows, { subject: authSubjectId, tenantId });
   if (!person) return null;
+  const hint = tenantId?.trim() ?? "";
+  if (hint && person.tenantId !== hint) return null;
   if (typeof person.role !== "string" || person.role.length === 0) return null;
   if (typeof person.tenantId !== "string" || person.tenantId.length === 0) {
     return null;
