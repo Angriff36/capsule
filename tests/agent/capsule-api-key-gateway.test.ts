@@ -5,7 +5,10 @@
  * body can change it.
  */
 import { describe, expect, it } from "vitest";
-import { createApiKeyGateway } from "../../src/agent/CapsuleApiKeyGateway";
+import {
+  createApiKeyGateway,
+  restoreGatewayPath,
+} from "../../src/agent/CapsuleApiKeyGateway";
 
 const VALID_KEY = "ak_live_valid";
 const REVOKED_KEY = "ak_live_revoked";
@@ -158,6 +161,27 @@ describe("API-key gateway for the command API", () => {
       expect(res.status).toBe(401);
       expect(forwarded).toHaveLength(0);
     }
+  });
+
+  it("restores the command path from the Vercel rewrite query", async () => {
+    const rewritten = new Request(
+      `${APP}/api/manifest?p=Client/commands/register`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${VALID_KEY}` },
+        body: "{}",
+      },
+    );
+    const restored = restoreGatewayPath(rewritten);
+    expect(new URL(restored.url).pathname).toBe(
+      "/api/manifest/Client/commands/register",
+    );
+    expect(new URL(restored.url).search).toBe("");
+    expect(restored.method).toBe("POST");
+    expect(restored.headers.get("authorization")).toBe(`Bearer ${VALID_KEY}`);
+    // Untouched when there is no rewrite.
+    const direct = new Request(`${APP}/api/manifest/commands`);
+    expect(restoreGatewayPath(direct)).toBe(direct);
   });
 
   it("refuses keys that do not belong to a user", async () => {

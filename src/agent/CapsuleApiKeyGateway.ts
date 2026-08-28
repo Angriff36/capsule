@@ -108,6 +108,20 @@ export function createApiKeyGateway(deps: ApiKeyGatewayDeps) {
   };
 }
 
+/**
+ * Vercel rewrites `/api/manifest/:path*` to the fixed function as
+ * `/api/manifest?p=:path*`. Put the original path back so the gateway (and
+ * Convex) see `/api/manifest/{Entity}/commands/{command}` unchanged.
+ */
+export function restoreGatewayPath(request: Request): Request {
+  const url = new URL(request.url);
+  const p = url.searchParams.get("p");
+  if (p === null) return request;
+  url.searchParams.delete("p");
+  url.pathname = `/api/manifest/${p.replace(/^\/+/, "")}`;
+  return new Request(url, request);
+}
+
 /** Production deps: Clerk Backend API + fetch. */
 export function createClerkApiKeyGatewayDeps(
   env: Record<string, string | undefined>,
