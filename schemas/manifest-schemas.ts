@@ -6295,6 +6295,13 @@ export const PersonReactivateParamsSchema = z.object({});
 
 export type PersonReactivateParams = z.infer<typeof PersonReactivateParamsSchema>;
 
+// Command: setEmployeeNumber on Person
+export const PersonSetEmployeeNumberParamsSchema = z.object({
+  employeeNumber: z.string(),
+});
+
+export type PersonSetEmployeeNumberParams = z.infer<typeof PersonSetEmployeeNumberParamsSchema>;
+
 // Command: setPayRate on Person
 export const PersonSetPayRateParamsSchema = z.object({
   hourlyRate: z.number(),

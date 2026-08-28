@@ -1094,6 +1094,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Person_reactivate", () => {
     expect(typeof (mutations as any).Person_reactivate).toBe("function");
   });
+  it("exports mutation Person_setEmployeeNumber", () => {
+    expect(typeof (mutations as any).Person_setEmployeeNumber).toBe("function");
+  });
   it("exports mutation Person_setPayRate", () => {
     expect(typeof (mutations as any).Person_setPayRate).toBe("function");
   });
@@ -1753,4 +1756,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 582 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 583 as const;

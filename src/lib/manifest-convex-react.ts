@@ -364,6 +364,7 @@ import {
   PersonHireParamsSchema,
   PersonLinkAccountParamsSchema,
   PersonReactivateParamsSchema,
+  PersonSetEmployeeNumberParamsSchema,
   PersonSetPayRateParamsSchema,
   PersonSetSmsAlertsParamsSchema,
   PersonTerminateParamsSchema,
@@ -5722,6 +5723,16 @@ export function usePersonReactivate() {
   };
 }
 
+/** Mutation hook for Person.setEmployeeNumber. */
+export function usePersonSetEmployeeNumber() {
+  const mutate = useMutation(api.mutations.Person_setEmployeeNumber);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonSetEmployeeNumberParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Person.setPayRate. */
 export function usePersonSetPayRate() {
   const mutate = useMutation(api.mutations.Person_setPayRate);
@@ -9055,4 +9066,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 965 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 966 as const;
