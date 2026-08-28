@@ -8,7 +8,7 @@ import {
   createApiKeyGateway,
   createClerkApiKeyGatewayDeps,
   restoreGatewayPath,
-} from "../src/agent/CapsuleApiKeyGateway";
+} from "../src/agent/CapsuleApiKeyGateway.js";
 
 let gateway: ((request: Request) => Promise<Response>) | undefined;
 const handle = (request: Request) =>
