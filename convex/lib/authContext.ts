@@ -97,6 +97,19 @@ export async function getAuthContext(ctx: {
     };
   }
 
+  // Machine credentials (Clerk M2M JWTs, subject `mch_…`) authorize ONLY
+  // through a linked Person. Their token claims are chosen by whoever holds
+  // the machine secret, so they are never a tenant or role source.
+  if (isMachineSubject(identity.subject)) {
+    return {
+      id: identity.subject,
+      role: ANONYMOUS.role,
+      tenantId: "",
+      roleSource: "anonymous",
+      disabledCapabilities: [],
+    };
+  }
+
   // 2. Bootstrap fallback: tenant/role claims from the IdP (org membership or
   //    a JWT template) for sign-ins that are not linked to a Person yet.
   const claims = identity as Record<string, unknown>;
@@ -175,6 +188,11 @@ async function loadPersonBySubject(
     personId: String(person._id),
     tenantId: person.tenantId,
   };
+}
+
+/** Clerk machine ids (M2M tokens) are prefixed `mch_`; users are `user_`. */
+export function isMachineSubject(subject: string): boolean {
+  return subject.startsWith("mch_");
 }
 
 /** Strip IdP role namespaces (e.g. Clerk org:admin → admin) for Manifest guards. */
