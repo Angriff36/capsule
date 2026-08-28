@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import { CheckIcon, ChevronRightIcon } from "../../ui/icons";
+import { CheckIcon } from "../../ui/icons";
+import { MinusIcon } from "./eventDetailIcons";
+import { EventOverviewCard } from "./EventOverviewCard";
 
 type SetupItem = {
   key: string;
@@ -35,57 +37,46 @@ export function EventSetupProgress({
       label: "Client assigned",
       ready: event == null ? undefined : Boolean(event.hasAssignedClient),
       fixTo: "/clients",
-      fixLabel: "Assign client",
+      fixLabel: "Assign",
     },
     {
       key: "headcount",
-      label: "Expected headcount set",
+      label: "Headcount set",
       ready: event == null ? undefined : Boolean(event.hasExpectedHeadcount),
       fixTo: `/events/${eventId}?tab=overview#event-setup-basics`,
-      fixLabel: "Set headcount",
+      fixLabel: "Set",
     },
     {
       key: "dishes",
-      label: "Menu dishes selected",
+      label: "Menu dishes added",
       ready: event == null ? undefined : Boolean(event.hasMenuDishes),
       fixTo: `/events/${eventId}?tab=menu`,
-      fixLabel: "Add dishes",
+      fixLabel: "Add",
     },
     {
       key: "staff",
       label: "Staff assigned",
       ready: event == null ? undefined : Boolean(event.hasStaffAssigned),
       fixTo: `/events/${eventId}?tab=staffing`,
-      fixLabel: "Assign staff",
+      fixLabel: "Assign",
     },
   ];
 
-  const gaps = items.filter((item) => item.ready === false).length;
   const done = items.filter((item) => item.ready === true).length;
-  const gapWord = gaps === 1 ? "gap" : "gaps";
-  const description =
-    gaps > 0
-      ? `${gaps} ${gapWord} block prep, demand, and staffing automation. Resolve each to let the event derive downstream work.`
-      : "Client, headcount, menu, and staff are set. Downstream work can derive from this event.";
-
   const percent = Math.round((done / items.length) * 100);
+
   return (
-    <section className="card p-5" data-testid="event-setup-progress">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-ink">Setup readiness</h2>
-          <p className="mt-0.5 text-sm text-ink-2">{description}</p>
-        </div>
-        <p className="text-2xl font-bold text-ink">
-          {done}
-          <span className="text-base font-medium text-ink-2">
-            {" "}
-            of {items.length} ready
-          </span>
-        </p>
-      </div>
+    <EventOverviewCard
+      title="Setup readiness"
+      testId="event-setup-progress"
+      aside={
+        <span className="text-base font-semibold text-ink-2">
+          {done}/{items.length}
+        </span>
+      }
+    >
       <div
-        className="mt-3 h-2 overflow-hidden rounded-full bg-inset"
+        className="h-1.5 overflow-hidden rounded-full bg-inset"
         role="progressbar"
         aria-valuenow={done}
         aria-valuemin={0}
@@ -93,74 +84,60 @@ export function EventSetupProgress({
         aria-label="Setup readiness"
       >
         <div
-          className={`h-full rounded-full ${gaps === 0 ? "bg-ok" : "bg-warn"}`}
+          className={`h-full rounded-full ${done === items.length ? "bg-ok" : "bg-accent"}`}
           style={{ width: `${percent}%` }}
         />
       </div>
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+      <ul className="mt-4 grid gap-2.5">
         {items.map((item) => (
           <SetupProgressRow key={item.key} item={item} />
         ))}
       </ul>
-    </section>
+    </EventOverviewCard>
   );
 }
 
 function SetupReadyIcon({ ready }: { readonly ready: boolean | undefined }) {
   if (ready === true) {
-    return <CheckIcon className="text-ok" width={16} height={16} />;
-  }
-  if (ready === false) {
     return (
-      <span
-        className="inline-block h-2.5 w-2.5 rounded-full bg-warn"
-        aria-hidden="true"
-      />
+      <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-ok-soft text-ok">
+        <CheckIcon width={11} height={11} />
+      </span>
     );
   }
   return (
     <span
-      className="inline-block h-2.5 w-2.5 rounded-full bg-line-2"
-      aria-hidden="true"
-    />
+      className={`grid h-4 w-4 shrink-0 place-items-center rounded-full text-ink-3 ${
+        ready === false ? "bg-warn-soft" : "bg-inset"
+      }`}
+    >
+      <MinusIcon width={11} height={11} />
+    </span>
   );
 }
 
 function SetupProgressRow({ item }: { readonly item: SetupItem }) {
-  let action;
+  const linkClass = "text-sm font-medium text-link";
+  let action = null;
   if (item.ready === false) {
-    const linkClass =
-      "inline-flex items-center gap-0.5 text-sm font-medium text-link";
     action = item.fixTo.startsWith("#") ? (
       <a href={item.fixTo} className={linkClass}>
         {item.fixLabel}
-        <ChevronRightIcon width={13} height={13} />
       </a>
     ) : (
       <Link to={item.fixTo} className={linkClass}>
         {item.fixLabel}
-        <ChevronRightIcon width={13} height={13} />
       </Link>
-    );
-  } else {
-    action = (
-      <span className="text-sm text-ink-3">
-        {item.ready === true ? "Ready" : "Checking…"}
-      </span>
     );
   }
 
   return (
-    <li
-      className={`flex items-center justify-between gap-3 rounded-sm border px-3 py-2.5 text-base ${
-        item.ready === false
-          ? "border-warn/40 bg-warn-soft"
-          : "border-line bg-inset"
-      }`}
-    >
-      <span className="flex items-center gap-2">
+    <li className="event-rail-row">
+      <span className="event-rail-label">
         <SetupReadyIcon ready={item.ready} />
-        <span className="font-medium text-ink">{item.label}</span>
+        <span className={item.ready === true ? "text-ink" : "text-ink-2"}>
+          {item.label}
+        </span>
       </span>
       {action}
     </li>

@@ -38,6 +38,25 @@ type Props = {
   ) => void;
 };
 
+/** Block-type badge tone. Service leads, guest-facing reads info, back-of-house
+ *  prep reads warn, and load in/out stays quiet. */
+const CATEGORY_TONE: Record<string, string> = {
+  service: "border-accent/40 bg-accent-soft text-accent-deep",
+  guest_arrival: "border-info/40 bg-info-soft text-info",
+  staff_arrival: "border-info/40 bg-info-soft text-info",
+  kitchen_setup: "border-warn/40 bg-warn-soft text-warn",
+  bar_setup: "border-warn/40 bg-warn-soft text-warn",
+  setup: "border-line-2 bg-inset text-ink-2",
+  load_in: "border-line-2 bg-inset text-ink-2",
+  load_out: "border-line-2 bg-mute-soft text-ink-2",
+  breakdown: "border-line-2 bg-mute-soft text-ink-2",
+};
+
+function categoryLabel(category: string): string {
+  const words = category.replaceAll("_", " ").trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 function selectionFor(activity: TimelineActivity): TimelineAssigneeSelection {
   const fromLists = (activity.assigneeTeams ?? []).filter(
     isTimelineAssigneeTeam,
@@ -115,13 +134,16 @@ export function EventTimelineActivityList({
 
   return (
     <>
-      <GanttStrip activities={activities} />
-      <div className="divide-y divide-line-2 rounded-sm border border-line-2 bg-panel">
+      {activities.some((activity) => activity.startsAt != null) ? (
+        <div className="card p-4">
+          <GanttStrip activities={activities} />
+        </div>
+      ) : null}
+      <div className="space-y-3">
         {activities.map((activity) => {
           const isBusy = busy?.endsWith(activity._id) ?? false;
-          const endsLabel =
-            activity.endsAt == null ? "" : ` – ${formatTime(activity.endsAt)}`;
           const selection = selectionFor(activity);
+          const category = (activity.category ?? "").trim();
           const partyLabel = formatAssigneeLabel({
             teams: selection.teams,
             personNames: personNamesFor(selection.personIds, staffOptions),
@@ -131,7 +153,7 @@ export function EventTimelineActivityList({
           return (
             <article
               key={activity._id}
-              className={`p-3 ${isOver ? "bg-brand/5" : ""} ${
+              className={`card p-4 ${isOver ? "border-brand" : ""} ${
                 dragId === activity._id ? "opacity-60" : ""
               }`}
               onDragOver={onDragOver(activity._id)}
@@ -141,65 +163,90 @@ export function EventTimelineActivityList({
                 setOverId(null);
               }}
             >
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="flex min-w-0 gap-2">
-                  <button
-                    type="button"
-                    className="mt-0.5 cursor-grab rounded-sm border border-line-2 bg-canvas px-1.5 py-1 font-mono text-xs text-ink-3 active:cursor-grabbing"
-                    draggable={!isBusy}
-                    onDragStart={onDragStart(activity._id)}
-                    aria-label={`Drag to reorder ${activity.name}`}
-                    title="Drag to reorder"
-                  >
-                    ::
-                  </button>
-                  <div className="min-w-0">
-                    <h4 className="font-medium text-ink">{activity.name}</h4>
-                    <p className="mt-1 font-mono text-xs text-ink-3">
-                      {formatDate(activity.startsAt)}{" "}
-                      {formatTime(activity.startsAt)}
-                      {endsLabel}
+              <div className="flex items-start gap-3">
+                <button
+                  type="button"
+                  className="mt-0.5 cursor-grab rounded-sm border border-line-2 bg-canvas px-1.5 py-1 font-mono text-xs text-ink-3 active:cursor-grabbing"
+                  draggable={!isBusy}
+                  onDragStart={onDragStart(activity._id)}
+                  aria-label={`Drag to reorder ${activity.name}`}
+                  title="Drag to reorder"
+                >
+                  ::
+                </button>
+
+                <div className="w-24 shrink-0 text-right">
+                  <p className="text-base font-semibold text-ink">
+                    {formatTime(activity.startsAt)}
+                    {activity.endsAt == null ? "" : " –"}
+                  </p>
+                  {activity.endsAt == null ? null : (
+                    <p className="text-base font-semibold text-ink">
+                      {formatTime(activity.endsAt)}
                     </p>
-                    {activity.notes ? (
-                      <p className="mt-1 text-xs text-ink-2">
-                        {activity.notes}
-                      </p>
-                    ) : null}
-                  </div>
+                  )}
+                  <p className="mt-0.5 text-xs text-ink-3">
+                    {formatDate(activity.startsAt)}
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
+
+                <div className="min-w-0 flex-1 space-y-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {category ? (
+                      <span
+                        className={`chip ${
+                          CATEGORY_TONE[category] ??
+                          "border-line-2 bg-inset text-ink-2"
+                        }`}
+                      >
+                        {categoryLabel(category)}
+                      </span>
+                    ) : null}
+                    <h4 className="font-semibold text-ink">{activity.name}</h4>
+                  </div>
+
+                  <EventTimelineAssigneePicker
+                    selection={selection}
+                    staffOptions={staffOptions}
                     disabled={isBusy}
-                    onClick={() => onToggleEdit(activity._id)}
-                  >
-                    Adjust
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    disabled={isBusy}
-                    onClick={() => onRemove(activity)}
-                  >
-                    Remove
-                  </button>
+                    summaryLabel={partyLabel}
+                    onChange={(next) => onAssigneesChange(activity, next)}
+                  />
+
+                  {activity.notes ? (
+                    <p className="text-base text-ink-2">{activity.notes}</p>
+                  ) : null}
+                  {activity.siteNotes ? (
+                    <p className="text-xs text-ink-3">
+                      <span className="font-semibold">Site:</span>{" "}
+                      {activity.siteNotes}
+                    </p>
+                  ) : null}
                 </div>
               </div>
 
-              <div className="mt-3">
-                <EventTimelineAssigneePicker
-                  selection={selection}
-                  staffOptions={staffOptions}
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-2">
+                <button
+                  type="button"
+                  className="btn-link"
                   disabled={isBusy}
-                  summaryLabel={partyLabel}
-                  onChange={(next) => onAssigneesChange(activity, next)}
-                />
+                  onClick={() => onToggleEdit(activity._id)}
+                >
+                  {editingId === activity._id ? "Close editor" : "Edit block"}
+                </button>
+                <button
+                  type="button"
+                  className="btn-link text-ink-3"
+                  disabled={isBusy}
+                  onClick={() => onRemove(activity)}
+                >
+                  Remove block
+                </button>
               </div>
 
               {editingId === activity._id ? (
                 <form
-                  className="mt-3 grid gap-2 border-t border-line-2 pt-3 sm:grid-cols-2 lg:grid-cols-3"
+                  className="mt-3 grid gap-2 border-t border-line pt-3 sm:grid-cols-2 lg:grid-cols-3"
                   onSubmit={(formEvent) => onAdjust(formEvent, activity)}
                 >
                   <label className="field-label">

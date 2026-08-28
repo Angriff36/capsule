@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { EventTabPanel } from "./EventTabPanel";
+import { CloudSunIcon } from "./eventDetailIcons";
+import { EventOverviewCard } from "./EventOverviewCard";
 import {
   fetchVenueForecast,
   locationQuery,
@@ -61,12 +62,19 @@ export function EventWeatherPanel({
           : "No adverse weather in the 7-day outlook.";
 
   return (
-    <EventTabPanel
-      eyebrow="Venue weather"
-      title="7-day outlook"
-      description={description}
+    <EventOverviewCard
+      title="Weather forecast"
       testId="event-weather-panel"
+      aside={
+        query ? (
+          <span className="flex items-center gap-1.5 text-sm text-ink-3">
+            <CloudSunIcon width={15} height={15} />
+            {query}
+          </span>
+        ) : null
+      }
     >
+      <p className="mb-3 text-sm text-ink-2">{description}</p>
       {days && days.length > 0 ? (
         <ul className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
           {days.map((day) => (
@@ -93,6 +101,6 @@ export function EventWeatherPanel({
           ))}
         </ul>
       ) : null}
-    </EventTabPanel>
+    </EventOverviewCard>
   );
 }

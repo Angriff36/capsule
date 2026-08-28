@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useQuery } from "convex/react";
 import { api, type Id } from "../../lib/api";
-import { formatDate, formatTime } from "../../lib/format";
+
 import {
   useEventGuestAssignTable,
   useEventGuestCheckIn,
@@ -10,18 +10,26 @@ import {
   useEventGuestWithdraw,
   useCreateEventGuest,
 } from "../../lib/manifest-convex-react";
-import { EmptyState, Section, Skeleton, StatusChip } from "../../ui/primitives";
+import { EmptyState, Skeleton } from "../../ui/primitives";
+import { PlusIcon, SearchIcon } from "../../ui/icons";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
-import { eventGuestPolicy } from "./EventGuestPolicy";
 import { FailureBanner } from "./FailureBanner";
 import {
   assessGuestListCoverage,
   GuestListCoverageNotice,
 } from "./GuestListCoverageNotice";
-import { guestTableLabel } from "./guestTableLabel";
+import { EventGuestInviteForm } from "./EventGuestInviteForm";
+import { EventGuestRow, type GuestRowAction } from "./EventGuestRow";
+import { EventGuestSidebar } from "./EventGuestSidebar";
+import {
+  GUEST_FILTERS,
+  matchesGuestFilter,
+  summarizeEventGuests,
+  type GuestFilterKey,
+} from "./eventGuestSummary";
 
 type GuestAction = {
-  kind: "decline" | "table" | "withdraw";
+  kind: GuestRowAction;
   guestId: Id<"eventGuests">;
 } | null;
 
@@ -32,6 +40,36 @@ function list(value: string): string[] | undefined {
     .map((item) => item.trim())
     .filter(Boolean);
   return values.length ? values : undefined;
+}
+
+function Tile({
+  label,
+  value,
+  note,
+  tone = "ink",
+}: {
+  label: string;
+  value: number;
+  note: string;
+  tone?: "ink" | "ok" | "warn" | "info";
+}) {
+  const valueTone =
+    tone === "ok"
+      ? "text-ok"
+      : tone === "warn"
+        ? "text-warn"
+        : tone === "info"
+          ? "text-info"
+          : "text-ink";
+  return (
+    <div className="card px-4 py-3.5">
+      <p className="eyebrow">{label}</p>
+      <p className={`mt-1 font-mono text-3xl font-semibold ${valueTone}`}>
+        {value}
+      </p>
+      <p className="mt-0.5 text-sm text-ink-3">{note}</p>
+    </div>
+  );
 }
 
 export function EventGuestPanel({
@@ -54,6 +92,8 @@ export function EventGuestPanel({
   const [action, setAction] = useState<GuestAction>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [filter, setFilter] = useState<GuestFilterKey>("all");
+  const [search, setSearch] = useState("");
 
   const guests = useMemo(
     () =>
@@ -62,6 +102,12 @@ export function EventGuestPanel({
         .sort((left, right) => left.name.localeCompare(right.name)),
     [eventGuests],
   );
+  const summary = useMemo(() => summarizeEventGuests(guests), [guests]);
+  const visible = useMemo(
+    () => guests.filter((guest) => matchesGuestFilter(guest, filter, search)),
+    [filter, guests, search],
+  );
+  const headcount = Number(expectedHeadcount) || 0;
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -101,78 +147,93 @@ export function EventGuestPanel({
   };
 
   return (
-    <Section
-      title="Guests"
-      count={guests.length}
-      actions={
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={() => setShowInvite((value) => !value)}
-        >
-          {showInvite ? "Dismiss" : "Invite guest"}
-        </button>
-      }
-    >
-      <div className="space-y-3 p-3">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+      <div className="min-w-0 flex-1 space-y-4">
         {failure ? <FailureBanner failure={failure} /> : null}
         {eventGuests !== undefined ? (
           <GuestListCoverageNotice
             coverage={assessGuestListCoverage(guests.length, expectedHeadcount)}
           />
         ) : null}
-        {showInvite ? (
-          <form
-            onSubmit={submitInvite}
-            className="grid gap-2 rounded-xs border border-line bg-inset/40 p-3 sm:grid-cols-2 lg:grid-cols-4"
-          >
-            <label className="field-label">
-              Guest name
-              <input name="name" className="input" required autoFocus />
-            </label>
-            <label className="field-label">
-              Email
-              <input name="email" type="email" className="input" />
-            </label>
-            <label className="field-label">
-              Phone
-              <input name="phone" type="tel" className="input" />
-            </label>
-            <label className="field-label">
-              Dietary restrictions
-              <input
-                name="dietaryRestrictions"
-                className="input"
-                placeholder="One per comma — e.g. vegan, gluten-free"
+
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <Tile
+            label="Total invited"
+            value={summary.total}
+            note={headcount > 0 ? `of ${headcount} headcount` : "recorded"}
+          />
+          <Tile
+            label="Confirmed"
+            value={summary.confirmed}
+            tone="ok"
+            note={
+              summary.total > 0
+                ? `${summary.acceptanceRate}% acceptance`
+                : "no responses yet"
+            }
+          />
+          <Tile
+            label="Pending"
+            value={summary.pending}
+            tone="warn"
+            note="awaiting response"
+          />
+          <Tile
+            label="Checked in"
+            value={summary.checkedIn}
+            tone="info"
+            note="day-of arrival"
+          />
+        </div>
+
+        <div className="card flex flex-wrap items-center gap-2 p-3">
+          {GUEST_FILTERS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              className={
+                filter === option.key
+                  ? "btn btn-secondary btn-sm"
+                  : "btn btn-ghost btn-sm"
+              }
+              aria-pressed={filter === option.key}
+              onClick={() => setFilter(option.key)}
+            >
+              {option.label}
+            </button>
+          ))}
+          <div className="ml-auto flex items-center gap-2">
+            <label className="relative flex items-center">
+              <SearchIcon
+                width={14}
+                height={14}
+                className="pointer-events-none absolute left-2.5 text-ink-3"
               />
-            </label>
-            <label className="field-label">
-              Allergens
+              <span className="sr-only">Search guests</span>
               <input
-                name="allergenRestrictions"
-                className="input"
-                placeholder="One per comma — e.g. peanuts, shellfish"
+                className="input w-48 pl-8"
+                placeholder="Search guests…"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
               />
-            </label>
-            <label className="field-label">
-              Accessibility needs
-              <input
-                name="accessibilityNeeds"
-                className="input"
-                placeholder="One per comma — e.g. wheelchair access"
-              />
-            </label>
-            <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-2">
-              <input name="specialMealRequired" type="checkbox" /> Special meal
-              required
             </label>
             <button
-              className="btn btn-primary self-end"
-              disabled={busy === "invite"}
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => setShowInvite((value) => !value)}
             >
-              {busy === "invite" ? "Inviting…" : "Invite guest"}
+              <PlusIcon width={13} height={13} />
+              {showInvite ? "Dismiss" : "Invite guest"}
             </button>
-          </form>
+          </div>
+        </div>
+
+        {showInvite ? (
+          <EventGuestInviteForm
+            busy={busy === "invite"}
+            onSubmit={submitInvite}
+            onDismiss={() => setShowInvite(false)}
+          />
         ) : null}
 
         {eventGuests === undefined ? (
@@ -181,125 +242,67 @@ export function EventGuestPanel({
             <Skeleton className="h-16" />
           </div>
         ) : guests.length === 0 ? (
-          <EmptyState
-            title="No guests invited"
-            hint="Invite the first guest to begin attendance planning."
-          />
+          <div className="card">
+            <EmptyState
+              title="No guests invited"
+              hint="Invite the first guest to begin attendance planning."
+            />
+          </div>
+        ) : visible.length === 0 ? (
+          <div className="card">
+            <EmptyState
+              title="No guests match this view"
+              hint="Clear the search or choose another filter."
+            />
+          </div>
         ) : (
-          <div className="divide-y divide-line rounded-xs border border-line">
-            {guests.map((guest) => {
-              const version =
-                typeof guest.version === "number" ? guest.version : undefined;
-              const isBusy = busy?.endsWith(guest._id) ?? false;
-              const guestAction = action?.guestId === guest._id ? action : null;
-              return (
-                <article key={guest._id} className="p-3">
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="font-medium">{guest.name}</h3>
-                        <StatusChip status={guest.rsvpStatus} />
-                        {guest.checkedInAt != null ? (
-                          <span className="chip border-ok/30 bg-ok-soft text-ok">
-                            Checked in
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="mt-1 text-xs text-ink-3">
-                        {guest.email ?? guest.phone ?? "No contact recorded"}
-                        {guest.tableAssignment
-                          ? ` · ${guestTableLabel(guest.tableAssignment)}`
-                          : ""}
-                      </p>
-                      {guest.dietaryRestrictions?.length ||
-                      guest.allergenRestrictions?.length ||
-                      guest.accessibilityNeeds?.length ? (
-                        <p className="mt-1 text-xs text-ink-2">
-                          {[
-                            ...(guest.dietaryRestrictions ?? []),
-                            ...(guest.allergenRestrictions ?? []),
-                            ...(guest.accessibilityNeeds ?? []),
-                          ].join(" · ")}
-                        </p>
-                      ) : null}
-                      {guest.checkedInAt != null ? (
-                        <p className="mt-1 font-mono text-2xs text-ink-3">
-                          {formatDate(guest.checkedInAt)}{" "}
-                          {formatTime(guest.checkedInAt)}
-                        </p>
-                      ) : null}
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        disabled={!eventGuestPolicy.canConfirm(guest) || isBusy}
-                        onClick={() =>
-                          void run(`confirm-${guest._id}`, () =>
-                            confirm({ docId: guest._id, version }),
-                          )
-                        }
-                      >
-                        Confirm
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        disabled={!eventGuestPolicy.canDecline(guest) || isBusy}
-                        onClick={() =>
-                          setAction({ kind: "decline", guestId: guest._id })
-                        }
-                      >
-                        Decline
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        disabled={!eventGuestPolicy.canCheckIn(guest) || isBusy}
-                        onClick={() =>
-                          void run(`checkin-${guest._id}`, () =>
-                            checkIn({ docId: guest._id, version }),
-                          )
-                        }
-                      >
-                        Check in
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        disabled={
-                          !eventGuestPolicy.canAssignTable(guest) || isBusy
-                        }
-                        onClick={() =>
-                          setAction({ kind: "table", guestId: guest._id })
-                        }
-                      >
-                        Assign table
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-danger btn-sm"
-                        disabled={
-                          !eventGuestPolicy.canWithdraw(guest) || isBusy
-                        }
-                        onClick={() =>
-                          setAction({ kind: "withdraw", guestId: guest._id })
-                        }
-                      >
-                        Withdraw
-                      </button>
-                    </div>
-                  </div>
-                  {guestAction ? (
-                    <form
-                      className="mt-3 flex flex-wrap items-end gap-2 border-t border-line pt-3"
-                      onSubmit={(event) => {
-                        event.preventDefault();
-                        const value = String(
-                          new FormData(event.currentTarget).get("value") ?? "",
-                        ).trim();
-                        if (guestAction.kind !== "decline" && !value) return;
-                        if (guestAction.kind === "decline")
+          <div className="card overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="th">Guest</th>
+                  <th className="th">Contact</th>
+                  <th className="th">RSVP</th>
+                  <th className="th">Check-in</th>
+                  <th className="th">Dietary</th>
+                  <th className="th">Allergens</th>
+                  <th className="th">Special meal</th>
+                  <th className="th">Table</th>
+                  <th className="th" />
+                </tr>
+              </thead>
+              <tbody>
+                {visible.map((guest) => {
+                  const version =
+                    typeof guest.version === "number"
+                      ? guest.version
+                      : undefined;
+                  return (
+                    <EventGuestRow
+                      key={guest._id}
+                      guest={guest}
+                      isBusy={busy?.endsWith(guest._id) ?? false}
+                      openAction={
+                        action != null && action.guestId === guest._id
+                          ? action.kind
+                          : null
+                      }
+                      onConfirm={() =>
+                        void run(`confirm-${guest._id}`, () =>
+                          confirm({ docId: guest._id, version }),
+                        )
+                      }
+                      onCheckIn={() =>
+                        void run(`checkin-${guest._id}`, () =>
+                          checkIn({ docId: guest._id, version }),
+                        )
+                      }
+                      onOpenAction={(kind) =>
+                        setAction({ kind, guestId: guest._id })
+                      }
+                      onCloseAction={() => setAction(null)}
+                      onSubmitAction={(kind, value) => {
+                        if (kind === "decline")
                           void run(`decline-${guest._id}`, () =>
                             decline({
                               docId: guest._id,
@@ -307,7 +310,7 @@ export function EventGuestPanel({
                               version,
                             }),
                           );
-                        if (guestAction.kind === "table")
+                        if (kind === "table")
                           void run(`table-${guest._id}`, () =>
                             assignTable({
                               docId: guest._id,
@@ -315,7 +318,7 @@ export function EventGuestPanel({
                               version,
                             }),
                           );
-                        if (guestAction.kind === "withdraw")
+                        if (kind === "withdraw")
                           void run(`withdraw-${guest._id}`, () =>
                             withdraw({
                               docId: guest._id,
@@ -324,39 +327,22 @@ export function EventGuestPanel({
                             }),
                           );
                       }}
-                    >
-                      <label className="field-label min-w-0 flex-1 basis-48">
-                        {guestAction.kind === "table"
-                          ? "Table assignment"
-                          : `${guestAction.kind === "decline" ? "Decline" : "Withdrawal"} reason${guestAction.kind === "decline" ? " (optional)" : ""}`}
-                        <input
-                          name="value"
-                          className="input"
-                          required={guestAction.kind !== "decline"}
-                          autoFocus
-                        />
-                      </label>
-                      <button
-                        className="btn btn-primary btn-sm"
-                        disabled={isBusy}
-                      >
-                        Apply
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => setAction(null)}
-                      >
-                        Dismiss
-                      </button>
-                    </form>
-                  ) : null}
-                </article>
-              );
-            })}
+                    />
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
-    </Section>
+
+      {guests.length > 0 ? (
+        <EventGuestSidebar
+          summary={summary}
+          expectedHeadcount={expectedHeadcount}
+          briefingPath={`/events/${eventId}/allergen-briefing`}
+        />
+      ) : null}
+    </div>
   );
 }

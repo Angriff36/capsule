@@ -9,7 +9,7 @@ type Props = {
 /** Venue layout sections (Buffet, Bar, Seating…) for the event battle board. */
 export function EventLayoutsTab({ eventId }: Props) {
   return (
-    <section className="space-y-4" data-testid="event-layouts-tab">
+    <section className="space-y-5" data-testid="event-layouts-tab">
       <EventTabIntro
         title="Layouts"
         description="Define venue areas for this event and write setup notes for each section. Areas take any name, so two Bars can be told apart (“Main Bar”, “Patio Bar”)."

@@ -1,3 +1,4 @@
+import { UsersIcon } from "../../ui/icons";
 import {
   TIMELINE_ASSIGNEE_TEAMS,
   type TimelineAssigneeTeam,
@@ -58,28 +59,56 @@ export function EventTimelineAssigneePicker({
     });
   };
 
-  const chosen = summaryLabel?.trim()
-    ? summaryLabel.split(", ").filter(Boolean)
-    : [];
-  const summary =
-    chosen.length === 0
-      ? "Anyone"
-      : chosen.length <= 2
-        ? chosen.join(", ")
-        : `${chosen.slice(0, 2).join(", ")} +${chosen.length - 2}`;
+  const labels = new Map(
+    staffOptions.map((option) => [option.personId, option.label] as const),
+  );
+  const assignedNames = selection.personIds.map(
+    (personId) => labels.get(personId) ?? "Staff",
+  );
+  // Blocks written before the multi-select shipped carry only the legacy
+  // responsibleParty string; show it as chips so nothing reads as unassigned.
+  const legacyNames =
+    assignedNames.length === 0 &&
+    selection.teams.length === 0 &&
+    summaryLabel?.trim()
+      ? summaryLabel.split(", ").filter(Boolean)
+      : [];
+  const names = assignedNames.length > 0 ? assignedNames : legacyNames;
+  const shown = names.slice(0, 4);
+  const overflow = names.length - shown.length;
+  const teamLabel =
+    selection.teams.length > 0
+      ? selection.teams.join(" · ")
+      : names.length === 0
+        ? "Anyone"
+        : "";
 
   return (
     <details
       className="group rounded-sm border border-line-2 bg-canvas px-2.5 py-1.5"
       data-testid="timeline-assignee-picker"
     >
-      <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-ink-2 marker:content-none">
-        <span className="text-xs font-semibold tracking-[0.06em] text-ink-3 uppercase">
-          Assigned to
-        </span>
-        <span className={chosen.length === 0 ? "text-ink-3" : "text-ink"}>
-          {summary}
-        </span>
+      <summary className="flex cursor-pointer list-none flex-wrap items-center gap-x-2 gap-y-1.5 text-sm text-ink-2 marker:content-none">
+        <UsersIcon className="shrink-0 text-ink-3" />
+        {teamLabel ? (
+          <span
+            className={
+              selection.teams.length === 0
+                ? "text-ink-3"
+                : "font-medium text-ink"
+            }
+          >
+            {teamLabel}
+          </span>
+        ) : null}
+        {shown.map((name) => (
+          <span key={name} className="chip-meta text-sm">
+            {name}
+          </span>
+        ))}
+        {overflow > 0 ? (
+          <span className="chip-meta text-sm text-ink-3">+{overflow} more</span>
+        ) : null}
         <span className="ml-auto text-xs text-ink-3 group-open:hidden">
           Edit
         </span>

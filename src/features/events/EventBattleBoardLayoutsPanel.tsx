@@ -5,13 +5,20 @@ import {
   useEventLayoutSectionRemove,
   useEventLayoutSectionUpdate,
   useGetEvent,
+  useGetVenue,
   useListEventLayoutSection,
   useListVenueLayoutTemplate,
 } from "../../lib/manifest-convex-react";
+import { PlusIcon } from "../../ui/icons";
+import { venueLayoutTemplatesListPath } from "../facilities/facilitiesRoutes";
 import { BATTLE_BOARD_LAYOUT_TYPES } from "./battleBoardLayoutTypes";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
-import { EventFormCluster } from "./EventFormCluster";
-import { EventTabPanel } from "./EventTabPanel";
+import { EventLayoutSectionCard } from "./EventLayoutSectionCard";
+import {
+  EventLayoutsSidebar,
+  type LayoutCategoryCount,
+  type VenueNote,
+} from "./EventLayoutsSidebar";
 import { FailureBanner } from "./FailureBanner";
 
 // Mirrors a VenueLayoutTemplate's stored sections JSON (see §8.2): each entry
@@ -52,6 +59,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   const updateSection = useEventLayoutSectionUpdate();
   const removeSection = useEventLayoutSectionRemove();
   const event = useGetEvent(eventId);
+  const venue = useGetVenue(event?.venueId ?? "skip");
   const templates = useListVenueLayoutTemplate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
@@ -73,16 +81,47 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   // Active templates for this event's venue (spec §8.2). When the event has no
   // venue yet, offer all active templates so setup can still be seeded.
   const copyable = useMemo(() => {
-    const venue = event?.venueId ?? null;
+    const venueId = event?.venueId ?? null;
     return (templates ?? [])
       .filter(
         (t) =>
           t.deletedAt == null &&
           t.status === "active" &&
-          (venue == null || t.venueId === venue),
+          (venueId == null || t.venueId === venueId),
       )
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [templates, event]);
+
+  const categories: LayoutCategoryCount[] = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const section of eventSections) {
+      const label = section.type.trim() || "Unnamed area";
+      counts.set(label, (counts.get(label) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .map(([label, count]) => ({ label, count }))
+      .sort((left, right) => right.count - left.count);
+  }, [eventSections]);
+
+  const venueNotes: VenueNote[] = useMemo(() => {
+    const candidates: readonly (readonly [string, string, unknown])[] = [
+      ["access", "Access", venue?.accessNotes],
+      ["loadIn", "Load-in", venue?.loadInInstructions],
+      ["logistics", "Logistics", venue?.logisticsNotes],
+      ["kitchen", "Kitchen", venue?.kitchenAccess],
+      ["waste", "Waste", venue?.wasteRules],
+    ];
+    return candidates
+      .filter(
+        (entry): entry is readonly [string, string, string] =>
+          typeof entry[2] === "string" && entry[2].trim().length > 0,
+      )
+      .map(([key, label, text]) => ({ key, label, text }));
+  }, [venue]);
+
+  const describedSections = eventSections.filter(
+    (section) => (section.instructions ?? "").trim().length > 0,
+  ).length;
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -95,6 +134,16 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       setBusy(null);
     }
   };
+
+  const addBlankSection = () =>
+    void run("add", () =>
+      addSection({
+        eventId,
+        type: "Buffet",
+        instructions: "",
+        sortOrder: eventSections.length,
+      }),
+    );
 
   const copyFromTemplate = () => {
     const template = copyable.find((t) => t._id === copyTemplateId);
@@ -140,154 +189,151 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   };
 
   return (
-    <EventTabPanel
-      eyebrow="Layout & setup"
-      title={`${eventSections.length} ${eventSections.length === 1 ? "section" : "sections"}`}
-      description="Name each area — pick a preset (Buffet, Bar, Kitchen…) or type your own, like “Main Bar” and “Patio Bar” — then write setup notes for this event."
-      actions={
-        <button
-          type="button"
-          className="btn btn-primary min-h-10"
-          disabled={busy != null}
-          onClick={() =>
-            void run("add", () =>
-              addSection({
-                eventId,
-                type: "Buffet",
-                instructions: "",
-                sortOrder: eventSections.length,
-              }),
-            )
-          }
-        >
-          + Add Section
-        </button>
-      }
-      testId="event-battle-board-layouts"
+    <div
+      className="flex flex-col gap-5 xl:flex-row"
+      data-testid="event-battle-board-layouts"
     >
-      {failure ? <FailureBanner failure={failure} /> : null}
-
-      {/* Preset suggestions for every area-name input below. The stored value
-          is a free string, so “Main Bar” and “Patio Bar” are both valid. */}
-      <datalist id="battle-board-layout-type-presets">
-        {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
-          <option key={type} value={type} />
-        ))}
-      </datalist>
-
-      {copyable.length > 0 ? (
-        <div className="mb-3 flex flex-wrap items-end gap-2">
-          <label className="field-label min-w-[12rem] flex-1">
-            <span>Copy from venue template</span>
-            <select
-              className="input"
-              value={copyTemplateId}
+      <div className="min-w-0 flex-1 space-y-5">
+        <section className="card p-5" aria-label="Layout & setup">
+          <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+            <div className="min-w-0">
+              <h3 className="text-lg font-semibold text-ink">
+                Venue layout &amp; setup
+              </h3>
+              <p className="mt-1 text-sm text-ink-2">
+                {venue?.name ?? "No venue linked to this event yet"}
+              </p>
+              <p className="mt-1 text-sm text-ink-3">
+                Name each area — pick a preset (Buffet, Bar, Kitchen…) or type
+                your own, like “Main Bar” and “Patio Bar” — then write setup
+                notes for this event.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary"
               disabled={busy != null}
-              onChange={(changeEvent) =>
-                setCopyTemplateId(changeEvent.target.value)
-              }
+              onClick={addBlankSection}
             >
-              <option value="">Select a template…</option>
-              {copyable.map((template) => (
-                <option key={template._id} value={template._id}>
-                  {template.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="button"
-            className="btn btn-ghost min-h-10"
-            disabled={busy != null || copyTemplateId === ""}
-            onClick={copyFromTemplate}
-          >
-            Copy sections
-          </button>
-        </div>
-      ) : null}
+              + Add Section
+            </button>
+          </div>
 
-      {eventSections.length === 0 ? (
-        <p className="text-base text-ink-3">
-          No layout sections yet. Add Buffet, Bar, Parking, or another area.
-        </p>
-      ) : (
-        <div className="grid gap-3 md:grid-cols-2">
-          {eventSections.map((section) => (
-            <EventFormCluster
-              key={section._id}
-              title={section.type || "Section"}
-              hint="Setup instructions for this area"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <label className="field-label min-w-0 flex-1">
-                  <span>Area name</span>
-                  <input
-                    className="input"
-                    defaultValue={section.type}
-                    key={`${section._id}:${section.version}:${section.type}`}
-                    list="battle-board-layout-type-presets"
-                    disabled={busy != null}
-                    placeholder="Buffet, Main Bar, Patio Bar…"
-                    onBlur={(blurEvent) => {
-                      const next = blurEvent.target.value.trim();
-                      if (!next) {
-                        // Blank names are rejected by the domain; restore.
-                        blurEvent.target.value = section.type;
-                        return;
-                      }
-                      if (next === section.type) return;
-                      void run(`type:${section._id}`, () =>
-                        updateSection({
-                          docId: section._id,
-                          version: section.version,
-                          type: next,
-                        }),
-                      );
-                    }}
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="btn btn-ghost min-h-10"
+          {copyable.length > 0 ? (
+            <div className="mt-4 flex flex-wrap items-end gap-2 border-t border-line pt-4">
+              <label className="field-label min-w-[12rem] flex-1">
+                <span>Copy from venue template</span>
+                <select
+                  className="input"
+                  value={copyTemplateId}
                   disabled={busy != null}
-                  onClick={() =>
-                    void run(`rm:${section._id}`, () =>
-                      removeSection({
-                        docId: section._id,
-                        version: section.version,
-                      }),
-                    )
+                  onChange={(changeEvent) =>
+                    setCopyTemplateId(changeEvent.target.value)
                   }
                 >
-                  Remove
-                </button>
-              </div>
-              <label className="field-label">
-                <span>Instructions</span>
-                <textarea
-                  className="input min-h-[5rem] py-2"
-                  defaultValue={section.instructions ?? ""}
-                  key={`${section._id}:${section.version}:${section.instructions ?? ""}`}
-                  disabled={busy != null}
-                  placeholder="Setup instructions, equipment, positioning…"
-                  onBlur={(blurEvent) => {
-                    const next = blurEvent.target.value;
-                    const prev = section.instructions ?? "";
-                    if (next === prev) return;
-                    void run(`notes:${section._id}`, () =>
-                      updateSection({
-                        docId: section._id,
-                        version: section.version,
-                        instructions: next,
-                      }),
-                    );
-                  }}
-                />
+                  <option value="">Select a template…</option>
+                  {copyable.map((template) => (
+                    <option key={template._id} value={template._id}>
+                      {template.name}
+                    </option>
+                  ))}
+                </select>
               </label>
-            </EventFormCluster>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                disabled={busy != null || copyTemplateId === ""}
+                onClick={copyFromTemplate}
+              >
+                Copy sections
+              </button>
+            </div>
+          ) : null}
+        </section>
+
+        {failure ? <FailureBanner failure={failure} /> : null}
+
+        {/* Preset suggestions for every area-name input below. The stored value
+            is a free string, so “Main Bar” and “Patio Bar” are both valid. */}
+        <datalist id="battle-board-layout-type-presets">
+          {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
+            <option key={type} value={type} />
           ))}
-        </div>
-      )}
-    </EventTabPanel>
+        </datalist>
+
+        {eventSections.length === 0 ? (
+          <div className="card empty-state">
+            <strong className="text-base text-ink">No layout sections</strong>
+            <span>Add Buffet, Bar, Parking, or another area.</span>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {eventSections.map((section) => (
+              <EventLayoutSectionCard
+                key={section._id}
+                section={{
+                  id: String(section._id),
+                  type: section.type,
+                  instructions: section.instructions ?? "",
+                  version: section.version,
+                }}
+                disabled={busy != null}
+                onRename={(next) =>
+                  void run(`type:${section._id}`, () =>
+                    updateSection({
+                      docId: section._id,
+                      version: section.version,
+                      type: next,
+                    }),
+                  )
+                }
+                onInstructions={(next) =>
+                  void run(`notes:${section._id}`, () =>
+                    updateSection({
+                      docId: section._id,
+                      version: section.version,
+                      instructions: next,
+                    }),
+                  )
+                }
+                onRemove={() =>
+                  void run(`rm:${section._id}`, () =>
+                    removeSection({
+                      docId: section._id,
+                      version: section.version,
+                    }),
+                  )
+                }
+              />
+            ))}
+          </div>
+        )}
+
+        <button
+          type="button"
+          className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-line-2 px-5 py-3 font-semibold text-brand hover:border-brand hover:bg-inset"
+          disabled={busy != null}
+          onClick={addBlankSection}
+        >
+          <PlusIcon />
+          Add layout section
+        </button>
+      </div>
+
+      <EventLayoutsSidebar
+        totalSections={eventSections.length}
+        describedSections={describedSections}
+        categories={categories}
+        venueCapacity={
+          venue?.capacity != null && venue.capacity > 0 ? venue.capacity : null
+        }
+        expectedHeadcount={event?.expectedHeadcount ?? null}
+        venueNotes={venueNotes}
+        accessibilityNeeds={event?.accessibilityNeeds ?? null}
+        templatesPath={venueLayoutTemplatesListPath(
+          event?.venueId ?? undefined,
+        )}
+      />
+    </div>
   );
 }

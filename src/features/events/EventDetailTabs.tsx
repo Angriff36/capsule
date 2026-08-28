@@ -1,80 +1,100 @@
-import { useState } from "react";
-import { ChevronDownIcon } from "../../ui/icons";
+import { useState, type ComponentType, type SVGProps } from "react";
+import {
+  AlertTriangleIcon,
+  BoxIcon,
+  CheckCircleIcon,
+  ChevronDownIcon,
+  ClockIcon,
+  ContactIcon,
+  FlameIcon,
+  HomeIcon,
+  UsersIcon,
+} from "../../ui/icons";
+import {
+  HardHatIcon,
+  ImageIcon,
+  MapIcon,
+  PackageIcon,
+  RepeatIcon,
+  TrendingUpIcon,
+} from "./eventDetailIcons";
 import type { EventDetailTab } from "./eventRoutes";
 import {
   EVENT_DETAIL_TABS,
   EVENT_TAB_GROUPS,
   eventTabGroupFor,
 } from "./eventRoutes";
+import "./EventDetailTabs.css";
 
 type Props = {
   active: EventDetailTab;
   onChange: (tab: EventDetailTab) => void;
-  /** Phone: one compact selector + a menu instead of two scrolling rows. */
+  /** Phone: one compact selector + a menu instead of a scrolling row. */
   compact?: boolean;
 };
+
+type IconComponent = ComponentType<SVGProps<SVGSVGElement>>;
+
+/** Short bar labels. The picker keeps the descriptive names from eventRoutes. */
+const BAR: readonly {
+  key: EventDetailTab;
+  label: string;
+  Icon: IconComponent;
+}[] = [
+  { key: "overview", label: "Overview", Icon: HomeIcon },
+  { key: "menu", label: "Menu", Icon: FlameIcon },
+  { key: "prep", label: "Prep", Icon: CheckCircleIcon },
+  { key: "equipment", label: "Equipment", Icon: BoxIcon },
+  { key: "client", label: "Client Info", Icon: ContactIcon },
+  { key: "guests", label: "Guests", Icon: UsersIcon },
+  { key: "photos", label: "Photos", Icon: ImageIcon },
+  { key: "timeline", label: "Timeline", Icon: ClockIcon },
+  { key: "layouts", label: "Layouts", Icon: MapIcon },
+  { key: "recurring", label: "Recurring", Icon: RepeatIcon },
+  { key: "staffing", label: "Staffing", Icon: HardHatIcon },
+  { key: "inventory", label: "Inventory", Icon: PackageIcon },
+  { key: "incidents", label: "Incidents", Icon: AlertTriangleIcon },
+  { key: "margin", label: "Margin", Icon: TrendingUpIcon },
+];
 
 const labelFor = (key: EventDetailTab) =>
   EVENT_DETAIL_TABS.find((tab) => tab.key === key)?.label ?? key;
 
 /**
- * Desktop: workflow group pills (Plan / Food / Day-of / Records / Money) then
- * that group's sections. Phone (`compact`): a single button naming the current
- * section that opens a menu of every destination, grouped the same way.
+ * Desktop: one flat row of icon + label sections, the active one underlined.
+ * Phone (`compact`): a single button naming the current section that opens a
+ * menu of every destination, grouped by workflow.
  */
 export function EventDetailTabs({ active, onChange, compact = false }: Props) {
-  const activeGroup = eventTabGroupFor(active);
   if (compact) {
     return (
       <EventSectionPicker
         active={active}
-        groupLabel={activeGroup.label}
+        groupLabel={eventTabGroupFor(active).label}
         onChange={onChange}
       />
     );
   }
   return (
     <nav className="event-detail-tabs" aria-label="Event sections">
-      <div className="event-tab-groups" role="tablist" aria-label="Workflow">
-        {EVENT_TAB_GROUPS.map((group) => {
-          const isActive = group.key === activeGroup.key;
+      <div className="event-tabbar" role="tablist" aria-label="Event sections">
+        {BAR.map(({ key, label, Icon }) => {
+          const isActive = key === active;
           return (
             <button
-              key={group.key}
+              key={key}
               type="button"
               role="tab"
               aria-selected={isActive}
               aria-current={isActive ? "page" : undefined}
-              onClick={() => onChange(group.tabs[0] ?? "overview")}
+              onClick={() => onChange(key)}
             >
-              {group.label}
+              <Icon width={14} height={14} />
+              {label}
             </button>
           );
         })}
       </div>
-      {activeGroup.tabs.length > 1 ? (
-        <div
-          className="event-tab-sections"
-          role="tablist"
-          aria-label={`${activeGroup.label} sections`}
-        >
-          {activeGroup.tabs.map((key) => {
-            const isActive = key === active;
-            return (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-current={isActive ? "page" : undefined}
-                onClick={() => onChange(key)}
-              >
-                {labelFor(key)}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
     </nav>
   );
 }

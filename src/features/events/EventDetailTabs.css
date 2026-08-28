@@ -1,0 +1,44 @@
+/* Event detail tab bar — one flat row of icon+label sections under the page
+   header, the active one carrying an accent underline. Scrolls sideways when
+   the row is wider than the sheet so every section stays reachable. */
+.event-tabbar {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-line);
+  scrollbar-width: thin;
+}
+
+.event-tabbar button {
+  display: inline-flex;
+  height: 42px;
+  cursor: pointer;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 0 11px;
+  color: var(--color-ink-2);
+  font-size: var(--text-base);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.event-tabbar button:hover {
+  color: var(--color-ink);
+}
+
+.event-tabbar button[aria-current="page"] {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-accent-deep);
+  font-weight: 600;
+}
+
+.event-tabbar button > svg {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
