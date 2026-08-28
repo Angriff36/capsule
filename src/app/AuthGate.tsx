@@ -2,6 +2,7 @@ import {
   OrganizationSwitcher,
   SignIn,
   SignOutButton,
+  useOrganization,
   useOrganizationList,
   useUser,
 } from "@clerk/react";
@@ -111,12 +112,18 @@ type LinkOutcome =
  */
 function MembershipRequired() {
   const { user } = useUser();
+  const { organization } = useOrganization();
   // Legacy org-based sign-ins (no linked Person yet) that have memberships
-  // but no active organization still need a way to pick one.
-  const { userMemberships } = useOrganizationList({
+  // but no active organization still need a way to pick one. Selecting a
+  // workspace must actually setActive so the JWT tenant hint reaches the
+  // self-link pick — the Clerk popover alone was a no-op on an already-
+  // displayed org while the gate stayed up.
+  const { userMemberships, setActive } = useOrganizationList({
     userMemberships: { infinite: false, pageSize: 10 },
   });
-  const hasOrgMemberships = (userMemberships?.data?.length ?? 0) > 0;
+  const memberships = userMemberships?.data ?? [];
+  const hasOrgMemberships = memberships.length > 0;
+  const activeOrgId = organization?.id ?? "";
   // Display only — the server re-reads the verified email from the provider.
   const email = user?.primaryEmailAddress?.emailAddress ?? null;
   const linkSelf = useAction(api.authLink.linkSelfByEmail);
@@ -129,7 +136,20 @@ function MembershipRequired() {
   }, [linkSelf]);
   useEffect(() => {
     attempt();
-  }, [attempt]);
+  }, [attempt, activeOrgId]);
+
+  const openWorkspace = useCallback(
+    async (organizationId: string) => {
+      setOutcome("linking");
+      try {
+        await setActive?.({ organization: organizationId });
+      } catch {
+        // setActive failed — still try the email pick so the gate can clear.
+      }
+      attempt();
+    },
+    [attempt, setActive],
+  );
 
   const who = email ? (
     <>
@@ -154,7 +174,7 @@ function MembershipRequired() {
     no_match:
       "No staff profile uses this email yet. Ask your manager to add you under Administration → Permissions → Team roles with this exact email, then tap Try again.",
     ambiguous:
-      "More than one staff profile uses this email. Ask your manager to fix that under Team roles, then tap Try again.",
+      "More than one staff profile uses this email. Open the workspace you want, or tap Try again — Capsule will use the admin profile if one exists, otherwise the oldest live profile.",
     released:
       "An admin unlinked this sign-in from your staff profile. Ask them to link it again under Administration → Permissions → Team roles.",
     needs_admin_link:
@@ -183,10 +203,33 @@ function MembershipRequired() {
         </SignOutButton>
       </div>
       {hasOrgMemberships ? (
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-4 flex flex-col gap-3">
           <span className="text-sm text-ink-3">
             Or open the workspace your account already belongs to:
           </span>
+          <div className="flex flex-wrap items-center gap-2">
+            {memberships.map((membership) => {
+              const orgId = membership.organization.id;
+              const role = String(membership.role ?? "").replace(/^org:/, "");
+              const selected = orgId === activeOrgId;
+              return (
+                <button
+                  key={orgId}
+                  type="button"
+                  className={
+                    selected
+                      ? "btn btn-primary min-h-11"
+                      : "btn btn-ghost min-h-11"
+                  }
+                  disabled={outcome === "linking"}
+                  onClick={() => void openWorkspace(orgId)}
+                >
+                  {membership.organization.name}
+                  {role ? ` / ${role}` : ""}
+                </button>
+              );
+            })}
+          </div>
           <OrganizationSwitcher hidePersonal afterSelectOrganizationUrl="/" />
         </div>
       ) : null}
