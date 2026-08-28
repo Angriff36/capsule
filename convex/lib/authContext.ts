@@ -20,6 +20,10 @@ import {
   loadDisabledOrgCapabilities,
   type OrgCapabilityId,
 } from "./orgCapabilityGate";
+import {
+  pickLivePerson,
+  tenantIdFromIdentityClaims,
+} from "./personAuthPick";
 
 export interface AppAuthContext {
   id: string;
@@ -70,20 +74,18 @@ export async function getAuthContext(ctx: {
   }
 
   // 1. A linked, active Person decides tenant and role. No organization needed.
+  //    Duplicate live rows (same email / same subject) pick deterministically
+  //    instead of failing closed — AuthGate cannot send anyone to Team roles
+  //    when Team roles is behind the same wall.
+  const claims = identity as Record<string, unknown>;
+  const org =
+    typeof claims.o === "object" && claims.o !== null
+      ? (claims.o as Record<string, unknown>)
+      : undefined;
+  const tenantClaim = tenantIdFromIdentityClaims(claims);
   const linked = ctx.db
-    ? await loadPersonBySubject(ctx.db, identity.subject)
+    ? await loadPersonBySubject(ctx.db, identity.subject, tenantClaim)
     : null;
-  if (linked === "ambiguous") {
-    // Two active Persons claim this sign-in: fail closed. No IdP fallback,
-    // which could otherwise hand out a broader role than either Person.
-    return {
-      id: identity.subject,
-      role: ANONYMOUS.role,
-      tenantId: "",
-      roleSource: "anonymous",
-      disabledCapabilities: [],
-    };
-  }
   if (linked) {
     return {
       id: identity.subject,
@@ -99,20 +101,9 @@ export async function getAuthContext(ctx: {
 
   // 2. Bootstrap fallback: tenant/role claims from the IdP (org membership or
   //    a JWT template) for sign-ins that are not linked to a Person yet.
-  const claims = identity as Record<string, unknown>;
-  const org =
-    typeof claims.o === "object" && claims.o !== null
-      ? (claims.o as Record<string, unknown>)
-      : undefined;
-
   const roleClaim =
     (typeof claims.role === "string" && claims.role) ||
     (typeof org?.rol === "string" && org.rol) ||
-    "";
-  const tenantClaim =
-    (typeof claims.tenantId === "string" && claims.tenantId) ||
-    (typeof org?.id === "string" && org.id) ||
-    (typeof claims.org_id === "string" && claims.org_id) ||
     "";
 
   if (!tenantClaim) {
@@ -143,9 +134,8 @@ async function loadPersonBySubject(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: { query: (table: "people") => any },
   authSubjectId: string,
-): Promise<
-  { role: string; personId: string; tenantId: string } | "ambiguous" | null
-> {
+  tenantId?: string,
+): Promise<{ role: string; personId: string; tenantId: string } | null> {
   const rows = (await db
     .query("people")
     .withIndex(
@@ -160,12 +150,10 @@ async function loadPersonBySubject(
       }) => q.eq(q.field("status"), "active"),
     )
     .collect()) as PersonRow[];
-  const active = rows.filter((row) => row.deletedAt == null);
-  // One sign-in, one active Person. Two active rows (e.g. the same subject
-  // linked in two tenants) is ambiguous: the caller fails closed.
-  if (active.length > 1) return "ambiguous";
-  if (active.length === 0) return null;
-  const person = active[0]!;
+  const person = pickLivePerson(rows, { subject: authSubjectId, tenantId });
+  if (!person) return null;
+  const hint = tenantId?.trim() ?? "";
+  if (hint && person.tenantId !== hint) return null;
   if (typeof person.role !== "string" || person.role.length === 0) return null;
   if (typeof person.tenantId !== "string" || person.tenantId.length === 0) {
     return null;
