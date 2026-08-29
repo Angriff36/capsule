@@ -14,6 +14,7 @@ export type TimelineBlockRow = {
 
 export type ShiftRow = {
   readonly _id: string;
+  readonly version: number;
   readonly personId: string;
   readonly eventId?: string | null;
   readonly status: string;

@@ -140,6 +140,28 @@ export const scheduleShift = mutation({
       );
     }
 
+    // One live shift per person per event: a retried or concurrent call for
+    // the same event returns the shift that already exists instead of adding
+    // a second one to schedules, publication counts and utilization.
+    if (args.eventId) {
+      const existing = (
+        await ctx.db
+          .query("shifts")
+          .withIndex("by_personId", (query) =>
+            query.eq("personId", args.personId),
+          )
+          .collect()
+      ).find(
+        (shift) =>
+          shift.tenantId === tenantId &&
+          shift.eventId === args.eventId &&
+          shift.deletedAt == null &&
+          shift.status !== "cancelled" &&
+          shift.status !== "no_show",
+      );
+      if (existing) return { docId: existing._id, existing: true };
+    }
+
     const now = Date.now();
     const notes = args.notes?.trim();
     let encryptedNotes: string | undefined;
@@ -199,6 +221,6 @@ export const scheduleShift = mutation({
       createdAt: now,
     });
 
-    return { docId: shiftId };
+    return { docId: shiftId, existing: false };
   },
 });

@@ -6,6 +6,7 @@ import {
   useEventStaffNeedCancel,
   useEventStaffNeedClaim,
   useEventStaffNeedFill,
+  useShiftCancel,
   useListAvailabilityWindow,
   useListEventAssignment,
   useListEventStaffNeed,
@@ -62,6 +63,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
   // Authored atomic seam: repeats Shift.schedule checks and rejects approved
   // time-off overlap in one transaction (docs/systems/workforce.md).
   const scheduleShift = useScheduleShift();
+  const cancelShift = useShiftCancel();
   const unassign = useEventAssignmentUnassign();
   const createNeed = useCreateEventStaffNeed();
   const claimNeed = useEventStaffNeedClaim();
@@ -257,7 +259,10 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
               disabled={busy != null || !shiftDataReady}
               onClick={() =>
                 void run("syncShifts", async () => {
+                  const done = new Set<string>();
                   for (const entry of rosterMissingShift) {
+                    if (done.has(entry.personId)) continue;
+                    done.add(entry.personId);
                     await scheduleEventShift(entry.personId, entry.role);
                   }
                   setShiftNotice(null);
@@ -399,12 +404,30 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
             onUnassign={(entry) => {
               const target = entry.unassign;
               if (!target) return;
-              void run(`unassign:${target.docId}`, () =>
-                unassign({
+              void run(`unassign:${target.docId}`, async () => {
+                await unassign({
                   docId: target.docId,
                   version: target.version,
-                }),
-              );
+                });
+                // Their last roster row for this event: retire the linked
+                // shift too, so workforce views stop showing them scheduled.
+                const stillOnRoster = roster.some(
+                  (row) =>
+                    row.personId === entry.personId && row.key !== entry.key,
+                );
+                const shift = eventShiftFor(
+                  shiftsRef.current,
+                  eventId,
+                  entry.personId,
+                );
+                if (!stillOnRoster && shift) {
+                  await cancelShift({
+                    docId: shift._id,
+                    version: shift.version,
+                    reason: "Unassigned from the event",
+                  });
+                }
+              });
             }}
             onClaim={(need, personId) =>
               void run(`claim:${need._id}`, () =>
