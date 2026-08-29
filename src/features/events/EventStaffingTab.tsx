@@ -166,6 +166,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
       role,
       startsAt: window.startsAt,
       endsAt: window.endsAt,
+      onePerEvent: true,
     });
   };
   const rosterMissingShift = roster.filter(
