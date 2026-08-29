@@ -162,8 +162,8 @@ export const scheduleShift = mutation({
           shift.tenantId === tenantId &&
           shift.eventId === args.eventId &&
           shift.deletedAt == null &&
-          shift.status !== "cancelled" &&
-          shift.status !== "no_show",
+          // completed and no_show are attendance history, not a gap
+          shift.status !== "cancelled",
       );
       if (existing) return { docId: existing._id, existing: true };
     }
