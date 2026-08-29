@@ -36,11 +36,9 @@
 
 .maintenance-board__header h2 {
   margin: 0;
-  font-family: "Archivo Variable", sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(28px, 3.5vw, 42px);
-  font-variation-settings:
-    "wdth" 84,
-    "wght" 760;
+  font-weight: 700;
   letter-spacing: -0.045em;
 }
 

@@ -1,101 +1,100 @@
 ---
 version: alpha
 name: CapsuleX
-description: CapsuleX is an event-centered catering operations system that makes one governed plan legible across commercial, culinary, inventory, production, workforce, logistics, quality, finance, and reporting work through warm working paper, pale botanical framing, deep culinary-green ink, restrained saffron gestures, editorial serif display type, and dense rule-led operational documents.
+description: CapsuleX is an event-centered catering operations system that makes one governed plan legible across commercial, culinary, inventory, production, workforce, logistics, quality, finance, and reporting work through a light neutral canvas, white cards, near-black ink, one warm orange action color, a single sans face (DM Sans), and dense rule-led operational documents.
 
 colors:
-  canvas: "#dfe8da"
-  panel: "#fffefa"
-  inset: "#f1f3ed"
-  sage: "#dfe8da"
-  sage-2: "#cbd9c6"
-  ink: "#24322d"
-  ink-2: "#3f4b46"
-  ink-3: "#5f6b65"
-  brand: "#31574f"
-  line: "#e2e1dc"
-  line-2: "#b9bcb4"
-  rail: "#f7f8f4"
-  rail-2: "#edf1ea"
-  rail-ink: "#46534e"
-  rail-dim: "#87918b"
-  accent: "#c8783f"
-  accent-deep: "#9c572d"
-  accent-soft: "#f3e2d4"
-  success: "#3d7253"
-  success-soft: "#e4efe2"
-  info: "#40598a"
-  info-soft: "#e4e9f4"
-  warning: "#8a641c"
-  warning-soft: "#f5ecd4"
-  danger: "#a23a2b"
-  danger-soft: "#f7e2dc"
+  canvas: "#f0f1f3"
+  panel: "#ffffff"
+  inset: "#f6f7f9"
+  sage: "#eaeced"
+  sage-2: "#d9dce1"
+  ink: "#0f0f11"
+  ink-2: "#3b3e45"
+  ink-3: "#65686f"
+  brand: "#b04f18"
+  line: "#d9dce1"
+  line-2: "#c3c7ce"
+  rail: "#eaeced"
+  rail-2: "#dfe2e6"
+  rail-ink: "#3b3e45"
+  rail-dim: "#65686f"
+  accent: "#b04f18"
+  accent-deep: "#8f3f11"
+  accent-soft: "#fdf0e8"
+  success: "#276749"
+  success-soft: "#e6f5f0"
+  info: "#1d4ed8"
+  info-soft: "#dbeafe"
+  warning: "#9a4f12"
+  warning-soft: "#fef3e6"
+  danger: "#b91c1c"
+  danger-soft: "#fee2e2"
   on-brand: "#ffffff"
 
 typography:
   journal-display:
-    fontFamily: Iowan Old Style
+    fontFamily: DM Sans Variable
     fontSize: clamp(39px, 5vw, 68px)
-    fontWeight: 400
+    fontWeight: 700
     lineHeight: 0.92
     letterSpacing: -0.045em
   object-display:
-    fontFamily: Iowan Old Style
+    fontFamily: DM Sans Variable
     fontSize: clamp(35px, 4.7vw, 66px)
-    fontWeight: 400
+    fontWeight: 700
     lineHeight: 0.92
     letterSpacing: -0.05em
   section-display:
-    fontFamily: Iowan Old Style
+    fontFamily: DM Sans Variable
     fontSize: clamp(26px, 3.25vw, 47px)
-    fontWeight: 400
+    fontWeight: 700
     lineHeight: 0.98
     letterSpacing: -0.035em
   section-heading:
-    fontFamily: Iowan Old Style
+    fontFamily: DM Sans Variable
     fontSize: 30px
-    fontWeight: 400
+    fontWeight: 700
     lineHeight: 1
     letterSpacing: -0.02em
   card-heading:
-    fontFamily: Iowan Old Style
+    fontFamily: DM Sans Variable
     fontSize: 22px
-    fontWeight: 400
+    fontWeight: 700
     lineHeight: 1.1
     letterSpacing: -0.01em
   breadcrumb:
-    fontFamily: Iowan Old Style
+    fontFamily: DM Sans Variable
     fontSize: 19px
     fontWeight: 400
-    fontStyle: italic
     lineHeight: 1.3
     letterSpacing: 0
   body-large:
-    fontFamily: Archivo Variable
+    fontFamily: DM Sans Variable
     fontSize: 16px
     fontWeight: 400
     lineHeight: 1.7
     letterSpacing: 0
   body:
-    fontFamily: Archivo Variable
+    fontFamily: DM Sans Variable
     fontSize: 15px
     fontWeight: 400
     lineHeight: 1.6
     letterSpacing: 0
   button:
-    fontFamily: Archivo Variable
+    fontFamily: DM Sans Variable
     fontSize: 14px
     fontWeight: 600
     lineHeight: 1
     letterSpacing: 0.06em
   label:
-    fontFamily: Archivo Variable
+    fontFamily: DM Sans Variable
     fontSize: 14px
     fontWeight: 700
     lineHeight: 1.4
     letterSpacing: 0.04em
   eyebrow:
-    fontFamily: Archivo Variable
+    fontFamily: DM Sans Variable
     fontSize: 14px
     fontWeight: 700
     lineHeight: 1.4
@@ -107,25 +106,25 @@ typography:
     lineHeight: 1.4
     letterSpacing: 0.02em
   micro:
-    fontFamily: Archivo Variable
+    fontFamily: DM Sans Variable
     fontSize: 13px
     fontWeight: 600
     lineHeight: 1.4
     letterSpacing: 0.06em
 
 rounded:
-  xs: 3px
-  sm: 5px
-  md: 10px
-  ledger: 14px
-  sheet: 22px
+  xs: 4px
+  sm: 6px
+  md: 8px
+  ledger: 12px
+  sheet: 16px
   pill: 9999px
 
 spacing:
   xxs: 3px
-  xs: 6px
-  sm: 8px
-  md: 12px
+  xs: 4px
+  sm: 6px
+  md: 8px
   lg: 16px
   xl: 24px
   xxl: 32px

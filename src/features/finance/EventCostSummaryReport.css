@@ -87,13 +87,9 @@
 .event-cost-report-header h2 {
   max-width: 650px;
   margin: 8px 0 6px;
-  font-family:
-    Archivo Variable,
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(28px, 5vw, 54px);
-  font-variation-settings:
-    "wdth" 88,
-    "wght" 680;
+  font-weight: 700;
   letter-spacing: -0.045em;
   line-height: 0.98;
 }

@@ -11,7 +11,7 @@
       "sha256": "314ff07afc4555022347bc4c0d2c565f3633b49fc56bbe69e5f2c35648826cdb"
     },
     "convex/lib/authContext.ts": {
-      "sha256": "3dad7066d4bc9abf616d0db01844fac22bd0377965183c2e90214e5cb10f1626",
+      "sha256": "ee98a50d1d9b7db6bed6f2aedfd9ba45fa0bc8e245abdc4a230dc84b6f0aa5ad",
       "baselined": true
     },
     "convex/lib/encryption.ts": {
@@ -33,7 +33,7 @@
       "sha256": "56e2a61466dd9fa4cd0ef4c4c99fa2c3f9fd747dec8a19fcd6c144aadc0ce8d9"
     },
     "package.json": {
-      "sha256": "b6d364aaa80d7e3680d97909d942b37f0bceeb6ce601c71f6b3af16048da1ef9"
+      "sha256": "4946f4e076d18eab36e1d2c06918c1d262e67fd57b62623bd84427f6bb95a872"
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"

@@ -1,6 +1,6 @@
 import React from "react";
 import type { Preview } from "@storybook/react-vite";
-import "@fontsource-variable/archivo";
+import "@fontsource-variable/dm-sans";
 import "@fontsource/ibm-plex-mono";
 import "../src/styles/app.css";
 
