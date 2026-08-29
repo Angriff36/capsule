@@ -2,6 +2,9 @@
  * Converts prep-sheet batch totals into stored per-guest template quantities.
  * Sheets print "97.50 lb for 260 servings"; storage stays per-guest for event
  * fan-out (defaultQuantity × quantityServings).
+ *
+ * The add-form toggle can show Total-for-batch, but DishTask.defaultQuantity
+ * is always the derived per-guest rate. Persist that rate — never a default 1.
  */
 
 export type PrepQuantityEntryMode = "per_guest" | "batch_total";
@@ -10,6 +13,9 @@ export const PREP_QUANTITY_SCALE = 4;
 
 export type PrepQuantityCommit =
   { ok: true; perGuest: number } | { ok: false; error: string };
+
+export type PrepTemplateQuantityPersist =
+  { ok: true; defaultQuantity?: number } | { ok: false; error: string };
 
 const SCALE = 10 ** PREP_QUANTITY_SCALE;
 const MAX_SCALED = 10 ** 12 - 1;
@@ -47,6 +53,38 @@ function positiveIntFromRaw(raw: unknown): number | null {
   const value = Number(text);
   if (!Number.isInteger(value) || value <= 0) return null;
   return value;
+}
+
+function fieldText(raw: unknown): string {
+  return String(raw ?? "").trim();
+}
+
+/** Whether the add form is trying to persist a quantity (vs omit / one-each). */
+export function prepTemplateWantsQuantity(
+  mode: PrepQuantityEntryMode,
+  perGuestRaw: unknown,
+  batchTotalRaw: unknown,
+  batchServingsRaw: unknown,
+): boolean {
+  if (mode === "per_guest") {
+    const text = fieldText(perGuestRaw);
+    return text !== "" && Number(text) !== 0;
+  }
+  return fieldText(batchTotalRaw) !== "" || fieldText(batchServingsRaw) !== "";
+}
+
+/**
+ * Exact stored per-guest rate for the dish template row.
+ * Cook-sheet labels ceil whole units (0.375 each → 1); the catalog row must
+ * not, or a 97.50/260 save looks like a default 1 each/guest.
+ */
+export function prepTemplateQuantityMeta(
+  quantity: number | undefined | null,
+  unit: string | undefined | null,
+): string | null {
+  if (quantity == null || quantity <= 0) return null;
+  const unitLabel = String(unit ?? "");
+  return `${String(Number(quantity.toFixed(PREP_QUANTITY_SCALE)))} ${unitLabel}/guest`;
 }
 
 export class PrepTemplateQuantityCoordinator {
@@ -102,5 +140,34 @@ export class PrepTemplateQuantityCoordinator {
       };
     }
     return { ok: true, perGuest };
+  }
+
+  /**
+   * Mutation payload for Add prep template. Total-for-batch writes
+   * batch_total ÷ servings, never a default 1.
+   */
+  static persist(
+    mode: PrepQuantityEntryMode,
+    perGuestRaw: unknown,
+    batchTotalRaw: unknown,
+    batchServingsRaw: unknown,
+  ): PrepTemplateQuantityPersist {
+    const commit = PrepTemplateQuantityCoordinator.commit(
+      mode,
+      perGuestRaw,
+      batchTotalRaw,
+      batchServingsRaw,
+    );
+    const wants = prepTemplateWantsQuantity(
+      mode,
+      perGuestRaw,
+      batchTotalRaw,
+      batchServingsRaw,
+    );
+    if (wants && !commit.ok) return commit;
+    return {
+      ok: true,
+      defaultQuantity: commit.ok ? commit.perGuest : undefined,
+    };
   }
 }
