@@ -164,7 +164,11 @@ export function EventStaffingCoverageView({
                       </p>
                     </td>
                     <td className="px-3 py-2 align-top font-mono text-xs whitespace-nowrap text-ink-2">
-                      {entry.startsAt ? formatTime(entry.startsAt) : "—"}
+                      {entry.startsAt
+                        ? entry.endsAt
+                          ? `${formatTime(entry.startsAt)} – ${formatTime(entry.endsAt)}`
+                          : formatTime(entry.startsAt)
+                        : "—"}
                     </td>
                     <td className="px-3 py-2 align-top">
                       <AvailabilityChips conflict={conflict} />

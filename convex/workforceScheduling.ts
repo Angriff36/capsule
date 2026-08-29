@@ -30,6 +30,12 @@ export const scheduleShift = mutation({
     requiredQualificationId: v.optional(v.id("qualifications")),
     requiredTrainingCompletionId: v.optional(v.id("trainingCompletions")),
     notes: v.optional(v.string()),
+    /**
+     * Timeline sync: return the person's existing live shift on this event
+     * instead of adding one. Manual scheduling (split or multi-day shifts)
+     * leaves this off and always inserts.
+     */
+    onePerEvent: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
@@ -140,6 +146,28 @@ export const scheduleShift = mutation({
       );
     }
 
+    // One live shift per person per event: a retried or concurrent call for
+    // the same event returns the shift that already exists instead of adding
+    // a second one to schedules, publication counts and utilization.
+    if (args.onePerEvent && args.eventId) {
+      const existing = (
+        await ctx.db
+          .query("shifts")
+          .withIndex("by_personId", (query) =>
+            query.eq("personId", args.personId),
+          )
+          .collect()
+      ).find(
+        (shift) =>
+          shift.tenantId === tenantId &&
+          shift.eventId === args.eventId &&
+          shift.deletedAt == null &&
+          // completed and no_show are attendance history, not a gap
+          shift.status !== "cancelled",
+      );
+      if (existing) return { docId: existing._id, existing: true };
+    }
+
     const now = Date.now();
     const notes = args.notes?.trim();
     let encryptedNotes: string | undefined;
@@ -199,6 +227,6 @@ export const scheduleShift = mutation({
       createdAt: now,
     });
 
-    return { docId: shiftId };
+    return { docId: shiftId, existing: false };
   },
 });
