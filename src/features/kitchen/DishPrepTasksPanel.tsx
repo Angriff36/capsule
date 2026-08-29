@@ -11,6 +11,11 @@ import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
+import {
+  PrepTemplateQuantityCoordinator,
+  type PrepQuantityEntryMode,
+} from "./PrepTemplateQuantityCoordinator";
+import { prepQuantityLabel } from "./prepQuantityLabel";
 
 type Props = {
   dishId: string;
@@ -51,6 +56,20 @@ const UNITS = [
   "bottle",
 ] as const;
 
+const QUANTITY_MODES: { value: PrepQuantityEntryMode; label: string }[] = [
+  { value: "per_guest", label: "Per guest" },
+  { value: "batch_total", label: "Total for batch" },
+];
+
+function templateQuantityMeta(
+  quantity: number | undefined | null,
+  unit: string | undefined | null,
+) {
+  if (quantity == null || quantity <= 0) return null;
+  const unitLabel = String(unit ?? "");
+  return `${prepQuantityLabel(quantity, unitLabel)} ${unitLabel}/guest`;
+}
+
 /** Dish-level prep task templates with component hyperlinks when linked. */
 export function DishPrepTasksPanel({ dishId }: Props) {
   const tasks = useListDishTask();
@@ -65,9 +84,18 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   // share a unit — those two hold their last value instead of resetting.
   // Station is free text and clears with the rest of the form: a stale
   // station silently mislabels the next row (issue #151 item 11).
+  // Fully controlled — never call form.reset(); native reset fights React
+  // state on category/unit and silently snaps selects back to defaults.
+  const [taskName, setTaskName] = useState("");
   const [category, setCategory] = useState("Finish at Event");
   const [station, setStation] = useState("");
+  const [quantityMode, setQuantityMode] =
+    useState<PrepQuantityEntryMode>("batch_total");
+  const [perGuestQty, setPerGuestQty] = useState("");
+  const [batchTotalQty, setBatchTotalQty] = useState("");
+  const [batchServings, setBatchServings] = useState("");
   const [unit, setUnit] = useState("each");
+  const [instructions, setInstructions] = useState("");
   const { prompt, host: promptHost } = useActionPrompt();
 
   const rows = (tasks ?? [])
@@ -79,16 +107,41 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     )
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 
+  function clearAddFields() {
+    setTaskName("");
+    setStation("");
+    setPerGuestQty("");
+    setBatchTotalQty("");
+    setInstructions("");
+    // category, unit, quantityMode, batchServings hold for the next row.
+  }
+
   async function onAdd(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const name = String(data.get("name") ?? "").trim();
+    const name = taskName.trim();
     if (!name) {
       setError("A task name is required.");
       return;
     }
-    const quantity = Number(data.get("defaultQuantity") ?? 0);
+
+    const qtyCommit = PrepTemplateQuantityCoordinator.commit(
+      quantityMode,
+      perGuestQty,
+      batchTotalQty,
+      batchServings,
+    );
+    const wantsQuantity =
+      quantityMode === "per_guest"
+        ? perGuestQty.trim() !== "" && Number(perGuestQty.trim()) !== 0
+        : batchTotalQty.trim() !== "" || batchServings.trim() !== "";
+
+    if (wantsQuantity && !qtyCommit.ok) {
+      setError(qtyCommit.error);
+      return;
+    }
+
+    const perGuest = qtyCommit.ok ? qtyCommit.perGuest : null;
+
     setBusy("add");
     setError(null);
     setNotice(null);
@@ -98,14 +151,12 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         name,
         category,
         station: station.trim() || undefined,
-        defaultQuantity: quantity > 0 ? quantity : undefined,
-        defaultUnit: quantity > 0 ? unit : undefined,
-        instructions:
-          String(data.get("instructions") ?? "").trim() || undefined,
+        defaultQuantity: perGuest ?? undefined,
+        defaultUnit: perGuest != null ? unit : undefined,
+        instructions: instructions.trim() || undefined,
         sortOrder: rows.length,
       });
-      form.reset();
-      setStation("");
+      clearAddFields();
       setNotice(
         "Template added. Every event this dish is added to now opens this prep task.",
       );
@@ -177,6 +228,10 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             const component = task.componentId
               ? components?.find((entry) => entry._id === task.componentId)
               : null;
+            const qtyMeta = templateQuantityMeta(
+              task.defaultQuantity,
+              task.defaultUnit,
+            );
             return (
               <li
                 key={task._id}
@@ -188,10 +243,14 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                   <p className="font-mono text-xs text-ink-3">
                     {task.category} · {task.taskType}
                     {task.station ? ` · ${task.station}` : ""}
-                    {task.defaultQuantity != null
-                      ? ` · ${task.defaultQuantity} ${String(task.defaultUnit ?? "")}`
-                      : ""}
+                    {qtyMeta ? ` · ${qtyMeta}` : ""}
                   </p>
+                  {task.instructions ? (
+                    <p className="mt-1 text-sm text-ink-2">
+                      <span className="font-medium text-ink-3">Notes: </span>
+                      {task.instructions}
+                    </p>
+                  ) : null}
                 </div>
                 <div className="flex items-center gap-3">
                   {component ? (
@@ -231,15 +290,16 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             className="input mt-1"
             placeholder="BRINE AIRLINE CHICKEN"
             required
+            value={taskName}
+            onChange={(event) => setTaskName(event.target.value)}
           />
         </label>
         <label className="block text-sm">
           <span className="meta-term">Category</span>
           <select
-            name="category"
             className="input mt-1"
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(event) => setCategory(event.target.value)}
           >
             {CATEGORIES.map((c) => (
               <option key={c.value} value={c.value}>
@@ -255,30 +315,72 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             className="input mt-1"
             placeholder="Apps - Passed - Finish at Event"
             value={station}
-            onChange={(e) => setStation(e.target.value)}
+            onChange={(event) => setStation(event.target.value)}
           />
         </label>
-        <label className="block text-sm">
-          <span className="meta-term">Per guest (0 = one each)</span>
-          <input
-            name="defaultQuantity"
-            type="number"
-            min={0}
-            // Real per-guest rates are finer than cents: the 5673 sheet works
-            // out to 0.0313 lb butter and 0.0156 pints Grand Marnier per guest,
-            // and step="0.01" made the browser reject both.
-            step="any"
-            defaultValue={0}
+        <label className="block text-sm sm:col-span-2">
+          <span className="meta-term">Quantity mode</span>
+          <select
             className="input mt-1"
-          />
+            value={quantityMode}
+            onChange={(event) =>
+              setQuantityMode(event.target.value as PrepQuantityEntryMode)
+            }
+          >
+            {QUANTITY_MODES.map((mode) => (
+              <option key={mode.value} value={mode.value}>
+                {mode.label}
+              </option>
+            ))}
+          </select>
         </label>
+        {quantityMode === "per_guest" ? (
+          <label className="block text-sm">
+            <span className="meta-term">Per guest (0 = one each)</span>
+            <input
+              name="defaultQuantity"
+              type="text"
+              inputMode="decimal"
+              placeholder="0.0313"
+              value={perGuestQty}
+              onChange={(event) => setPerGuestQty(event.target.value)}
+              className="input mt-1"
+            />
+          </label>
+        ) : (
+          <>
+            <label className="block text-sm">
+              <span className="meta-term">Total for batch</span>
+              <input
+                name="batchTotal"
+                type="text"
+                inputMode="decimal"
+                placeholder="97.50"
+                value={batchTotalQty}
+                onChange={(event) => setBatchTotalQty(event.target.value)}
+                className="input mt-1"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="meta-term">Servings on sheet</span>
+              <input
+                name="batchServings"
+                type="text"
+                inputMode="numeric"
+                placeholder="260"
+                value={batchServings}
+                onChange={(event) => setBatchServings(event.target.value)}
+                className="input mt-1"
+              />
+            </label>
+          </>
+        )}
         <label className="block text-sm">
           <span className="meta-term">Unit</span>
           <select
-            name="defaultUnit"
             className="input mt-1"
             value={unit}
-            onChange={(e) => setUnit(e.target.value)}
+            onChange={(event) => setUnit(event.target.value)}
           >
             {UNITS.map((u) => (
               <option key={u} value={u}>
@@ -293,6 +395,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             name="instructions"
             className="input mt-1"
             placeholder="Weight after cooked"
+            value={instructions}
+            onChange={(event) => setInstructions(event.target.value)}
           />
         </label>
         <div className="sm:col-span-2">

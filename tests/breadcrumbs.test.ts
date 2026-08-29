@@ -27,13 +27,33 @@ describe("breadcrumbsForPath", () => {
     expect(labels("/inventory")).toEqual(["Inventory"]);
   });
 
+  it("links catalog section crumbs on detail pages so Dishes returns to the index", () => {
+    const crumbs = breadcrumbsForPath("/kitchen/dishes/abc123");
+    expect(crumbs.map((crumb) => crumb.label)).toEqual([
+      "Kitchen",
+      "Dishes",
+      "Dish",
+    ]);
+    expect(crumbs[1]?.to).toBe("/kitchen/dishes");
+    expect(crumbs.at(-1)?.to).toBeUndefined();
+  });
+
   it("lets sub-tabs read as themselves without a Detail suffix", () => {
     expect(labels("/inventory/purchasing")).toEqual([
       "Inventory",
       "Purchasing",
     ]);
     expect(labels("/kitchen/dishes")).toEqual(["Kitchen", "Dishes"]);
-    expect(labels("/kitchen/dishes/abc")).toEqual(["Kitchen", "Dishes"]);
+    expect(labels("/kitchen/dishes/abc")).toEqual([
+      "Kitchen",
+      "Dishes",
+      "Dish",
+    ]);
+    expect(labels("/kitchen/components/abc")).toEqual([
+      "Kitchen",
+      "Recipes & components",
+      "Component",
+    ]);
     expect(labels("/events/new")).toEqual(["Events", "New event"]);
   });
 });

@@ -59,6 +59,7 @@ import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
 import type * as lib_parseSearchQuery from "../lib/parseSearchQuery.js";
+import type * as lib_personAuthPick from "../lib/personAuthPick.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
 import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
@@ -151,6 +152,7 @@ declare const fullApi: ApiFromModules<{
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
   "lib/parseSearchQuery": typeof lib_parseSearchQuery;
+  "lib/personAuthPick": typeof lib_personAuthPick;
   "lib/proposalDraft": typeof lib_proposalDraft;
   "lib/proposalEventCreation": typeof lib_proposalEventCreation;
   "lib/proposalPricing": typeof lib_proposalPricing;
