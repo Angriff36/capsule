@@ -13,9 +13,9 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import {
   PrepTemplateQuantityCoordinator,
+  prepTemplateQuantityMeta,
   type PrepQuantityEntryMode,
 } from "./PrepTemplateQuantityCoordinator";
-import { prepQuantityLabel } from "./prepQuantityLabel";
 
 type Props = {
   dishId: string;
@@ -60,15 +60,6 @@ const QUANTITY_MODES: { value: PrepQuantityEntryMode; label: string }[] = [
   { value: "per_guest", label: "Per guest" },
   { value: "batch_total", label: "Total for batch" },
 ];
-
-function templateQuantityMeta(
-  quantity: number | undefined | null,
-  unit: string | undefined | null,
-) {
-  if (quantity == null || quantity <= 0) return null;
-  const unitLabel = String(unit ?? "");
-  return `${prepQuantityLabel(quantity, unitLabel)} ${unitLabel}/guest`;
-}
 
 /** Dish-level prep task templates with component hyperlinks when linked. */
 export function DishPrepTasksPanel({ dishId }: Props) {
@@ -124,23 +115,16 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       return;
     }
 
-    const qtyCommit = PrepTemplateQuantityCoordinator.commit(
+    const qtySave = PrepTemplateQuantityCoordinator.persist(
       quantityMode,
       perGuestQty,
       batchTotalQty,
       batchServings,
     );
-    const wantsQuantity =
-      quantityMode === "per_guest"
-        ? perGuestQty.trim() !== "" && Number(perGuestQty.trim()) !== 0
-        : batchTotalQty.trim() !== "" || batchServings.trim() !== "";
-
-    if (wantsQuantity && !qtyCommit.ok) {
-      setError(qtyCommit.error);
+    if (!qtySave.ok) {
+      setError(qtySave.error);
       return;
     }
-
-    const perGuest = qtyCommit.ok ? qtyCommit.perGuest : null;
 
     setBusy("add");
     setError(null);
@@ -151,8 +135,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         name,
         category,
         station: station.trim() || undefined,
-        defaultQuantity: perGuest ?? undefined,
-        defaultUnit: perGuest != null ? unit : undefined,
+        defaultQuantity: qtySave.defaultQuantity,
+        defaultUnit: qtySave.defaultQuantity != null ? unit : undefined,
         instructions: instructions.trim() || undefined,
         sortOrder: rows.length,
       });
@@ -228,7 +212,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             const component = task.componentId
               ? components?.find((entry) => entry._id === task.componentId)
               : null;
-            const qtyMeta = templateQuantityMeta(
+            const qtyMeta = prepTemplateQuantityMeta(
               task.defaultQuantity,
               task.defaultUnit,
             );
