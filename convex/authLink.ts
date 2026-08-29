@@ -11,6 +11,11 @@ import { internal } from "./_generated/api";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
+import {
+  decidePersonEmailLink,
+  pickLivePerson,
+  tenantIdFromIdentityClaims,
+} from "./lib/personAuthPick";
 
 /** Roles that carry adminAccess in src/foundation/base.manifest. */
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
@@ -55,6 +60,9 @@ export const linkSelfByEmail = action({
     return await ctx.runMutation(internal.authLink.linkBySubjectEmail, {
       subject: identity.subject,
       email: email.value,
+      tenantId: tenantIdFromIdentityClaims(
+        identity as unknown as Record<string, unknown>,
+      ),
     });
   },
 });
@@ -113,8 +121,12 @@ function primaryEmail(user: ClerkUser) {
 }
 
 export const linkBySubjectEmail = internalMutation({
-  args: { subject: v.string(), email: v.string() },
-  handler: async (ctx, { subject, email }): Promise<LinkOutcome> => {
+  args: {
+    subject: v.string(),
+    email: v.string(),
+    tenantId: v.optional(v.string()),
+  },
+  handler: async (ctx, { subject, email, tenantId }): Promise<LinkOutcome> => {
     const linkedRows = await ctx.db
       .query("people")
       .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
@@ -122,8 +134,6 @@ export const linkBySubjectEmail = internalMutation({
     const activeLinks = linkedRows.filter(
       (row) => row.deletedAt == null && String(row.status) === "active",
     );
-    if (activeLinks.length > 1) return { linked: false, reason: "ambiguous" };
-    if (activeLinks.length === 1) return { linked: true, reason: "already" };
 
     // Candidates are only NEVER-LINKED people: rows where the field was never
     // set (a fresh hire). Rows an admin explicitly unlinked carry null
@@ -141,7 +151,7 @@ export const linkBySubjectEmail = internalMutation({
     for (const person of active(unset)) {
       if ((await readEmail(ctx, person.email)) === email) matches.push(person);
     }
-    if (matches.length === 0) {
+    if (matches.length === 0 && activeLinks.length === 0) {
       const released = await ctx.db
         .query("people")
         .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", null))
@@ -153,9 +163,24 @@ export const linkBySubjectEmail = internalMutation({
       }
       return { linked: false, reason: "no_match" };
     }
-    if (matches.length > 1) return { linked: false, reason: "ambiguous" };
 
-    const person = matches[0]!;
+    // pickLivePerson is the shared live-row order. decidePersonEmailLink
+    // refuses an unhinted cross-tenant persist and rematches when the JWT
+    // hint does not match the already-linked pick.
+    const decision = decidePersonEmailLink({
+      subject,
+      tenantId,
+      linkedLive: activeLinks,
+      neverLinkedLiveMatches: matches,
+    });
+    if (decision.kind === "already") {
+      return { linked: true, reason: "already" };
+    }
+    if (decision.kind === "ambiguous") {
+      return { linked: false, reason: "ambiguous" };
+    }
+    const person = pickLivePerson([decision.person], { subject, tenantId });
+    if (!person) return { linked: false, reason: "ambiguous" };
     // Hire already assigned the role to this email. Linking connects the
     // mailbox we hired — it does not grant a new role. Admin rows used to
     // require a manual paste; that blocked the hire → email → open-app path.
