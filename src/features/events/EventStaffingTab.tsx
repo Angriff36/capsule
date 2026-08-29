@@ -405,28 +405,38 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
               const target = entry.unassign;
               if (!target) return;
               void run(`unassign:${target.docId}`, async () => {
-                await unassign({
-                  docId: target.docId,
-                  version: target.version,
-                });
-                // Their last roster row for this event: retire the linked
-                // shift too, so workforce views stop showing them scheduled.
-                const stillOnRoster = roster.some(
-                  (row) =>
-                    row.personId === entry.personId && row.key !== entry.key,
-                );
+                // Their last row for this event (other live assignments or a
+                // filled open shift keep them staffed): retire the linked
+                // shift first. If the unassign then fails, the roster still
+                // shows them and "Sync shifts" offers the retry — never a
+                // scheduled shift for someone who is off the roster.
+                const stillStaffed =
+                  eventAssignments.some(
+                    (row) =>
+                      row.personId === entry.personId &&
+                      row._id !== target.docId,
+                  ) ||
+                  eventNeeds.some(
+                    (need) =>
+                      need.status === "filled" &&
+                      need.filledByPersonId === entry.personId,
+                  );
                 const shift = eventShiftFor(
                   shiftsRef.current,
                   eventId,
                   entry.personId,
                 );
-                if (!stillOnRoster && shift) {
+                if (!stillStaffed && shift) {
                   await cancelShift({
                     docId: shift._id,
                     version: shift.version,
                     reason: "Unassigned from the event",
                   });
                 }
+                await unassign({
+                  docId: target.docId,
+                  version: target.version,
+                });
               });
             }}
             onClaim={(need, personId) =>

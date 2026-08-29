@@ -66,6 +66,7 @@ export function eventShiftFor(
       shift.deletedAt == null &&
       shift.eventId === eventId &&
       shift.personId === personId &&
-      shift.status !== "cancelled",
+      shift.status !== "cancelled" &&
+      shift.status !== "no_show",
   );
 }
