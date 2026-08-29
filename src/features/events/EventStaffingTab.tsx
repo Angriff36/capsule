@@ -1,8 +1,7 @@
-import { useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   useCreateEventAssignment,
   useCreateEventStaffNeed,
-  useCreateShift,
   useEventAssignmentUnassign,
   useEventStaffNeedCancel,
   useEventStaffNeedClaim,
@@ -16,6 +15,8 @@ import {
   useListShiftType,
   useListTimeOffRequest,
 } from "../../lib/manifest-convex-react";
+import type { Id } from "../../lib/api";
+import { useScheduleShift } from "../../lib/workforceScheduling";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import {
@@ -32,12 +33,7 @@ import {
   collectStaffRoles,
   readStaffRole,
 } from "./EventStaffingRoleSelect";
-import {
-  eventShiftFor,
-  eventShiftIdempotencyKey,
-  retiredEventShiftCount,
-  shiftWindowFor,
-} from "./eventStaffShifts";
+import { eventShiftFor, shiftWindowFor } from "./eventStaffShifts";
 import {
   EventTimelineStaffRoster,
   type PersonRow,
@@ -63,7 +59,9 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
   const timeOff = useListTimeOffRequest();
   const availability = useListAvailabilityWindow();
   const createAssignment = useCreateEventAssignment();
-  const createShift = useCreateShift();
+  // Authored atomic seam: repeats Shift.schedule checks and rejects approved
+  // time-off overlap in one transaction (docs/systems/workforce.md).
+  const scheduleShift = useScheduleShift();
   const unassign = useEventAssignmentUnassign();
   const createNeed = useCreateEventStaffNeed();
   const claimNeed = useEventStaffNeedClaim();
@@ -156,22 +154,23 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
       eventEndsAt: endsAt,
     });
     if (!window) return;
-    await createShift({
-      personId,
-      eventId,
+    await scheduleShift({
+      personId: personId as Id<"people">,
+      eventId: eventId as Id<"events">,
       role,
       startsAt: window.startsAt,
       endsAt: window.endsAt,
-      idempotencyKey: eventShiftIdempotencyKey(
-        eventId,
-        personId,
-        retiredEventShiftCount(liveShifts, eventId, personId),
-      ),
     });
   };
   const rosterMissingShift = roster.filter(
     (entry) => !eventShiftFor(shifts, eventId, entry.personId),
   );
+  // The notice is about a missing shift; once none is missing it is stale.
+  useEffect(() => {
+    if (shiftNotice && shiftDataReady && rosterMissingShift.length === 0) {
+      setShiftNotice(null);
+    }
+  }, [rosterMissingShift.length, shiftDataReady, shiftNotice]);
 
   const conflictsFor = (personId: string) => {
     const overlappingShifts = (shifts ?? []).filter(
@@ -261,6 +260,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
                   for (const entry of rosterMissingShift) {
                     await scheduleEventShift(entry.personId, entry.role);
                   }
+                  setShiftNotice(null);
                 })
               }
             >
