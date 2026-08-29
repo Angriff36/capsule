@@ -6,63 +6,61 @@
    ink, and a small saffron gesture. Dense controls stay crisp; key pages read
    like beautifully composed service documents. */
 @theme {
-  /* Three faces, per DESIGN.md: the serif carries page and object identity,
-     Archivo carries controls and dense work, IBM Plex Mono carries times,
-     money and counts. */
-  --font-sans: "Archivo Variable", "Archivo", system-ui, sans-serif;
+  /* Two faces, per DESIGN.md: DM Sans carries everything from page titles to
+     controls (titles are simply heavier), IBM Plex Mono carries times, money
+     and counts. */
+  --font-sans: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
-  --font-display:
-    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
-    serif;
+  --font-display: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
 
-  --color-canvas: #dfe8da;
-  --color-panel: #fffefa;
-  --color-inset: #f1f3ed;
-  --color-sage: #dfe8da;
-  --color-sage-2: #cbd9c6;
+  --color-canvas: #f0f1f3;
+  --color-panel: #ffffff;
+  --color-inset: #f6f7f9;
+  --color-sage: #eaeced;
+  --color-sage-2: #d9dce1;
   --color-on-brand: #ffffff;
 
-  --color-ink: #24322d;
-  --color-ink-2: #3f4b46;
-  --color-ink-3: #5f6b65;
-  --color-brand: #31574f;
-  --color-brand-soft: #e0eae4;
+  --color-ink: #0f0f11;
+  --color-ink-2: #3b3e45;
+  --color-ink-3: #65686f;
+  --color-brand: #d86422;
+  --color-brand-soft: #fce8dd;
 
-  --color-line: #e2e1dc;
-  --color-line-2: #b9bcb4;
+  --color-line: #d9dce1;
+  --color-line-2: #c3c7ce;
   /* Light rail. It sits inside the workspace sheet behind a hairline, so its
      surface is paper — not a slab of chrome down the side of the app. */
-  --color-rail: #f7f8f4;
-  --color-rail-2: #edf1ea;
-  --color-rail-active: #31574f;
-  --color-rail-ink: #46534e;
-  --color-rail-dim: #87918b;
-  --color-service: #31574f;
+  --color-rail: #eaeced;
+  --color-rail-2: #dfe2e6;
+  --color-rail-active: #d86422;
+  --color-rail-ink: #3b3e45;
+  --color-rail-dim: #65686f;
+  --color-service: #d86422;
 
-  --color-accent: #c8783f;
-  --color-accent-deep: #9c572d;
-  --color-accent-soft: #f3e2d4;
-  --color-ok: #3d7253;
-  --color-ok-soft: #e4efe2;
-  --color-info: #40598a;
-  --color-info-soft: #e4e9f4;
-  --color-warn: #8a641c;
-  --color-warn-soft: #f5ecd4;
-  --color-danger: #a23a2b;
-  --color-danger-soft: #f7e2dc;
-  --color-mute-soft: #eae5d7;
+  --color-accent: #d86422;
+  --color-accent-deep: #b04f18;
+  --color-accent-soft: #fce8dd;
+  --color-ok: #2f855a;
+  --color-ok-soft: #e6f5f0;
+  --color-info: #2563eb;
+  --color-info-soft: #dbeafe;
+  --color-warn: #b5651d;
+  --color-warn-soft: #fef3e6;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+  --color-mute-soft: #e6e8ec;
   /* DESIGN.md names these success/warning; ok/warn above are the same values
      under the shorter name the app already uses at ~200 call sites. */
-  --color-success: #3d7253;
-  --color-success-soft: #e4efe2;
-  --color-warning: #8a641c;
-  --color-warning-soft: #f5ecd4;
+  --color-success: #2f855a;
+  --color-success-soft: #e6f5f0;
+  --color-warning: #b5651d;
+  --color-warning-soft: #fef3e6;
 
-  --radius-xs: 3px;
-  --radius-sm: 5px;
-  --radius-md: 10px;
-  --radius-ledger: 14px;
-  --radius-sheet: 22px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-ledger: 12px;
+  --radius-sheet: 16px;
   --radius-pill: 9999px;
 
   /* Type scale — the ONLY text sizes in the app. Raw text-[Npx] is rejected by
@@ -291,7 +289,7 @@
   .display-title {
     font-family: var(--font-display);
     font-size: clamp(2.1rem, 3.2vw, 2.9rem);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.045em;
     line-height: 0.92;
   }
@@ -300,7 +298,7 @@
     margin-top: 0.65rem;
     max-width: 42rem;
     font-size: clamp(1.4rem, 2.1vw, 1.85rem);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.035em;
     line-height: 0.98;
   }
@@ -502,7 +500,7 @@
     color: var(--color-on-brand);
     font-family: var(--font-display);
     font-size: 21px;
-    font-weight: 400;
+    font-weight: 700;
   }
   .sidebar-nav {
     display: flex;
@@ -1047,7 +1045,7 @@
     color: var(--color-ink);
     font-family: var(--font-display);
     font-size: 22px;
-    font-weight: 400;
+    font-weight: 700;
     line-height: 1.05;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1288,7 +1286,7 @@
     display: block;
     font-family: var(--font-display);
     font-size: 21px;
-    font-weight: 400;
+    font-weight: 700;
   }
   .event-dish-list span {
     color: var(--color-ink-3);
@@ -1312,7 +1310,7 @@
     color: var(--color-ink);
     font-family: var(--font-display);
     font-size: clamp(3.5rem, 6.8vw, 7rem);
-    font-weight: 400;
+    font-weight: 700;
     letter-spacing: -0.055em;
     line-height: 0.88;
   }
@@ -1405,7 +1403,7 @@
     margin-top: 8px;
     font-family: var(--font-display);
     font-size: 25px;
-    font-weight: 400;
+    font-weight: 700;
   }
   .ingredient-list,
   .method-list,
@@ -1511,7 +1509,7 @@
   .dish-uses strong {
     font-family: var(--font-display);
     font-size: 20px;
-    font-weight: 400;
+    font-weight: 700;
   }
   .dish-uses small,
   .dish-uses li > span:last-child {
@@ -1855,7 +1853,7 @@
   margin-top: 0.2rem;
   font-family: var(--font-display);
   font-size: 28px;
-  font-weight: 400;
+  font-weight: 700;
   line-height: 1;
 }
 
@@ -1970,7 +1968,7 @@
   margin-top: 0.2rem;
   font-family: var(--font-display);
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .schedule-publish-heading small {
@@ -2088,7 +2086,7 @@
 .schedule-notice-item-heading strong {
   font-family: var(--font-display);
   font-size: 18px;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .schedule-notice-item-heading small {
@@ -2320,7 +2318,7 @@
 .order-state strong {
   font-family: var(--font-display);
   font-size: 32px;
-  font-weight: 400;
+  font-weight: 700;
 }
 
 .order-state span {
@@ -3654,7 +3652,7 @@
   margin-top: 0.6rem;
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3vw, 2.8rem);
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 1;
   text-overflow: ellipsis;
@@ -3700,7 +3698,7 @@
   margin-top: 0.35rem;
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3vw, 2.7rem);
-  font-weight: 400;
+  font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1;
 }

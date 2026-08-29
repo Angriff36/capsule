@@ -1,4 +1,4 @@
-import "@fontsource-variable/archivo";
+import "@fontsource-variable/dm-sans";
 import "@fontsource/ibm-plex-mono";
 import "./styles/app.css";
 
