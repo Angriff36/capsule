@@ -132,7 +132,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     );
     const wantsQuantity =
       quantityMode === "per_guest"
-        ? perGuestQty.trim() !== "" && perGuestQty.trim() !== "0"
+        ? perGuestQty.trim() !== "" && Number(perGuestQty.trim()) !== 0
         : batchTotalQty.trim() !== "" || batchServings.trim() !== "";
 
     if (wantsQuantity && !qtyCommit.ok) {

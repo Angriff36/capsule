@@ -21,11 +21,12 @@ function isKitchenCatalogDetail(
   pathname: string,
   guidePrefix: string,
 ): boolean {
-  return (
-    KITCHEN_CATALOG_PREFIXES.has(guidePrefix) &&
-    pathname.startsWith(`${guidePrefix}/`) &&
-    pathname.length > guidePrefix.length + 1
-  );
+  if (!KITCHEN_CATALOG_PREFIXES.has(guidePrefix)) return false;
+  if (!pathname.startsWith(`${guidePrefix}/`)) return false;
+  // One trailing segment that is a record id — not a named sub-route such
+  // as /kitchen/components/import.
+  const rest = pathname.slice(guidePrefix.length + 1);
+  return rest !== "" && !rest.includes("/") && rest !== "import";
 }
 
 /**

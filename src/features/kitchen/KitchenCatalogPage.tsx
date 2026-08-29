@@ -36,6 +36,7 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCatalogCards } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
 import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   KITCHEN_SECTION_SINGULAR,
   COMPONENT_IMPORT_PATH,
@@ -69,6 +70,7 @@ function csv(value: FormDataEntryValue | null) {
 }
 
 export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
+  const tenantId = useAuthStatus()?.tenantId ?? null;
   const navigate = useNavigate();
   const ingredients = useListIngredient();
   const components = useListComponent();
@@ -118,10 +120,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
       .sort((a, b) => String(a.name).localeCompare(String(b.name)));
   }, [data, search, showHidden]);
   if (data !== undefined) {
-    KitchenCatalogDisplayCache.write(section, rows);
+    KitchenCatalogDisplayCache.write(tenantId, section, rows);
   }
   const displayRows =
-    data === undefined ? KitchenCatalogDisplayCache.read(section) : rows;
+    data === undefined
+      ? KitchenCatalogDisplayCache.read(tenantId, section)
+      : rows;
   const listLoading = data === undefined && displayRows.length === 0;
 
   const run = async (key: string, work: () => Promise<void>) => {

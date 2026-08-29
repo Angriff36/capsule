@@ -12,6 +12,7 @@ export type PrepQuantityCommit =
   { ok: true; perGuest: number } | { ok: false; error: string };
 
 const SCALE = 10 ** PREP_QUANTITY_SCALE;
+const MAX_SCALED = 10 ** 12 - 1;
 const TYPED_DECIMAL = /^(?:\d+|\d+\.\d*|\.\d+)$/;
 
 function scaledIntFromDecimalText(text: string): number | null {
@@ -26,10 +27,10 @@ function scaledIntFromDecimalText(text: string): number | null {
   if (rest !== "" && Number(rest[0] ?? "0") >= 5) {
     frac += 1;
   }
-  if (frac >= SCALE) {
-    return (whole + 1) * SCALE;
-  }
-  return whole * SCALE + frac;
+  const scaled = frac >= SCALE ? (whole + 1) * SCALE : whole * SCALE + frac;
+  // decimal(12, 4): 8 integer digits at most, also after a rounding carry.
+  if (scaled > MAX_SCALED) return null;
+  return scaled;
 }
 
 function decimalFromRaw(raw: unknown): number | null {
