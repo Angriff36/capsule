@@ -21,7 +21,7 @@ colors:
   rail-dim: "#65686f"
   accent: "#b04f18"
   accent-deep: "#8f3f11"
-  accent-soft: "#fce8dd"
+  accent-soft: "#fdf0e8"
   success: "#276749"
   success-soft: "#e6f5f0"
   info: "#1d4ed8"
