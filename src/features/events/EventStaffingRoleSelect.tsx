@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /** Roles every catering roster starts with; tenant data adds the rest. */
 export const DEFAULT_STAFF_ROLES = [
@@ -54,9 +54,19 @@ export function StaffRoleSelect({
   readonly defaultRole?: string;
 }) {
   const [other, setOther] = useState(false);
+  const selectRef = useRef<HTMLSelectElement>(null);
+  // form.reset() puts the select back on its default; follow it.
+  useEffect(() => {
+    const form = selectRef.current?.form;
+    if (!form) return;
+    const onReset = () => setOther(false);
+    form.addEventListener("reset", onReset);
+    return () => form.removeEventListener("reset", onReset);
+  }, []);
   return (
     <span className="flex flex-col gap-1">
       <select
+        ref={selectRef}
         name={name}
         className="field-input"
         required

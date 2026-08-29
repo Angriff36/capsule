@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import {
   useCreateEventAssignment,
   useCreateEventStaffNeed,
@@ -35,6 +35,7 @@ import {
 import {
   eventShiftFor,
   eventShiftIdempotencyKey,
+  retiredEventShiftCount,
   shiftWindowFor,
 } from "./eventStaffShifts";
 import {
@@ -70,6 +71,14 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
   const cancelNeed = useEventStaffNeedCancel();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [shiftNotice, setShiftNotice] = useState<string | null>(null);
+  // Handlers read the latest rows, not the render they were created in.
+  const shiftsRef = useRef(shifts);
+  shiftsRef.current = shifts;
+  const activitiesRef = useRef(activities);
+  activitiesRef.current = activities;
+  /** Shift scheduling needs both lists loaded to avoid duplicates. */
+  const shiftDataReady = shifts !== undefined && activities !== undefined;
   const [needPersonIds, setNeedPersonIds] = useState<Record<string, string>>(
     {},
   );
@@ -136,11 +145,13 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
 
   /** Schedule a Shift for this person from their timeline blocks (or the event window). */
   const scheduleEventShift = async (personId: string, role: string) => {
-    if (eventShiftFor(shifts, eventId, personId)) return;
+    const liveShifts = shiftsRef.current;
+    if (liveShifts === undefined) return;
+    if (eventShiftFor(liveShifts, eventId, personId)) return;
     const window = shiftWindowFor({
       eventId,
       personId,
-      activities,
+      activities: activitiesRef.current,
       eventStartsAt: startsAt,
       eventEndsAt: endsAt,
     });
@@ -151,7 +162,11 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
       role,
       startsAt: window.startsAt,
       endsAt: window.endsAt,
-      idempotencyKey: eventShiftIdempotencyKey(eventId, personId),
+      idempotencyKey: eventShiftIdempotencyKey(
+        eventId,
+        personId,
+        retiredEventShiftCount(liveShifts, eventId, personId),
+      ),
     });
   };
   const rosterMissingShift = roster.filter(
@@ -240,7 +255,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
             <button
               type="button"
               className="btn btn-ghost"
-              disabled={busy != null}
+              disabled={busy != null || !shiftDataReady}
               onClick={() =>
                 void run("syncShifts", async () => {
                   for (const entry of rosterMissingShift) {
@@ -256,6 +271,14 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
         </div>
       </header>
       {failure ? <FailureBanner failure={failure} /> : null}
+      {shiftNotice ? (
+        <p
+          role="status"
+          className="rounded-sm border border-warn/40 bg-warn-soft px-3 py-2 text-sm text-warn"
+        >
+          {shiftNotice}
+        </p>
+      ) : null}
       {host}
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]">
@@ -268,6 +291,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
               const personId = String(data.get("personId") ?? "");
               const role = readStaffRole(data, "role");
               if (!personId || !role) return;
+              setShiftNotice(null);
               void run("assign", async () => {
                 await createAssignment({
                   eventId,
@@ -276,7 +300,14 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
                   startsAt: startsAt ?? undefined,
                   endsAt: endsAt ?? undefined,
                 });
-                await scheduleEventShift(personId, role);
+                try {
+                  await scheduleEventShift(personId, role);
+                } catch {
+                  // The assignment is saved; only the shift is missing.
+                  setShiftNotice(
+                    "Assignment saved, but the shift could not be scheduled. Use “Sync shifts from timeline” to retry.",
+                  );
+                }
               });
               formEvent.currentTarget.reset();
             }}
@@ -306,7 +337,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
             <button
               type="submit"
               className="btn btn-primary self-end"
-              disabled={busy != null}
+              disabled={busy != null || !shiftDataReady}
             >
               Assign
             </button>

@@ -69,7 +69,29 @@ export function eventShiftFor(
   );
 }
 
-/** Deterministic key so a retried assign never schedules a second shift. */
-export function eventShiftIdempotencyKey(eventId: string, personId: string) {
-  return `event-shift:${eventId}:${personId}`;
+/** Shifts for this person on this event that were cancelled or deleted. */
+export function retiredEventShiftCount(
+  shifts: readonly ShiftRow[] | undefined,
+  eventId: string,
+  personId: string,
+): number {
+  return (shifts ?? []).filter(
+    (shift) =>
+      shift.eventId === eventId &&
+      shift.personId === personId &&
+      (shift.deletedAt != null || shift.status === "cancelled"),
+  ).length;
+}
+
+/**
+ * Deterministic key so a retried assign never schedules a second shift, with
+ * a generation so a replacement after a cancelled shift is a new key (the
+ * server caches a key forever and would otherwise return the old shift).
+ */
+export function eventShiftIdempotencyKey(
+  eventId: string,
+  personId: string,
+  generation = 0,
+) {
+  return `event-shift:${eventId}:${personId}:${generation}`;
 }
