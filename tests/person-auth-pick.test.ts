@@ -288,4 +288,23 @@ describe("waitForSessionTenantClaim", () => {
       o: { id: "org_mangia" },
     });
   });
+
+  it("returns null for a non-object or malformed JWT payload", () => {
+    const nonObject = `h.${btoa("42")}.s`;
+    expect(decodeJwtPayload(nonObject)).toBeNull();
+    expect(decodeJwtPayload("h.%%%not-base64%%%.s")).toBeNull();
+    expect(decodeJwtPayload(null)).toBeNull();
+    expect(decodeJwtPayload("")).toBeNull();
+    expect(decodeJwtPayload("no-dots")).toBeNull();
+    expect(decodeJwtPayload("h..s")).toBeNull();
+  });
+
+  it("uses the default retry budget when none is given", async () => {
+    await expect(
+      waitForSessionTenantClaim({
+        organizationId: "org_mangia",
+        getToken: async () => jwtWithTenant("org_mangia"),
+      }),
+    ).resolves.toBe(true);
+  });
 });
