@@ -55,18 +55,43 @@ export function shiftWindowFor(input: {
   return null;
 }
 
-/** The live shift already scheduled for this person on this event, if any. */
+/**
+ * Every shift on record for this person on this event except cancelled ones.
+ * Completed and no-show shifts count: they are attendance history, and a
+ * person with one is not "missing a shift" to be scheduled again.
+ */
+export function eventShiftsFor(
+  shifts: readonly ShiftRow[] | undefined,
+  eventId: string,
+  personId: string,
+): ShiftRow[] {
+  return (shifts ?? []).filter(
+    (shift) =>
+      shift.deletedAt == null &&
+      shift.eventId === eventId &&
+      shift.personId === personId &&
+      shift.status !== "cancelled",
+  );
+}
+
+/** The shift shown on the roster row (the earliest on record), if any. */
 export function eventShiftFor(
   shifts: readonly ShiftRow[] | undefined,
   eventId: string,
   personId: string,
 ): ShiftRow | undefined {
-  return (shifts ?? []).find(
-    (shift) =>
-      shift.deletedAt == null &&
-      shift.eventId === eventId &&
-      shift.personId === personId &&
-      shift.status !== "cancelled" &&
-      shift.status !== "no_show",
+  return eventShiftsFor(shifts, eventId, personId).sort(
+    (a, b) => Number(a.startsAt ?? 0) - Number(b.startsAt ?? 0),
+  )[0];
+}
+
+/** Shift.cancel accepts only scheduled or started shifts. */
+export function cancellableEventShifts(
+  shifts: readonly ShiftRow[] | undefined,
+  eventId: string,
+  personId: string,
+): ShiftRow[] {
+  return eventShiftsFor(shifts, eventId, personId).filter(
+    (shift) => shift.status === "scheduled" || shift.status === "started",
   );
 }

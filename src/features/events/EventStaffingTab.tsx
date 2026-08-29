@@ -34,7 +34,11 @@ import {
   collectStaffRoles,
   readStaffRole,
 } from "./EventStaffingRoleSelect";
-import { eventShiftFor, shiftWindowFor } from "./eventStaffShifts";
+import {
+  cancellableEventShifts,
+  eventShiftFor,
+  shiftWindowFor,
+} from "./eventStaffShifts";
 import {
   EventTimelineStaffRoster,
   type PersonRow,
@@ -421,17 +425,20 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
                       need.status === "filled" &&
                       need.filledByPersonId === entry.personId,
                   );
-                const shift = eventShiftFor(
-                  shiftsRef.current,
-                  eventId,
-                  entry.personId,
-                );
-                if (!stillStaffed && shift) {
-                  await cancelShift({
-                    docId: shift._id,
-                    version: shift.version,
-                    reason: "Unassigned from the event",
-                  });
+                if (!stillStaffed) {
+                  // Every linked shift that can still be cancelled; completed
+                  // and no-show shifts are attendance history and stay.
+                  for (const shift of cancellableEventShifts(
+                    shiftsRef.current,
+                    eventId,
+                    entry.personId,
+                  )) {
+                    await cancelShift({
+                      docId: shift._id,
+                      version: shift.version,
+                      reason: "Unassigned from the event",
+                    });
+                  }
                 }
                 await unassign({
                   docId: target.docId,
