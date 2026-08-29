@@ -35,6 +35,7 @@ import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCatalogCards } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
+import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
 import {
   KITCHEN_SECTION_SINGULAR,
   COMPONENT_IMPORT_PATH,
@@ -116,6 +117,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
       )
       .sort((a, b) => String(a.name).localeCompare(String(b.name)));
   }, [data, search, showHidden]);
+  if (data !== undefined) {
+    KitchenCatalogDisplayCache.write(section, rows);
+  }
+  const displayRows =
+    data === undefined ? KitchenCatalogDisplayCache.read(section) : rows;
+  const listLoading = data === undefined && displayRows.length === 0;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -403,7 +410,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           <h2 className="text-lg font-semibold text-ink">
             All {section}
             <span className="ml-2 text-sm font-medium text-ink-2">
-              {formatCountNoun(rows.length, "record")}
+              {formatCountNoun(displayRows.length, "record")}
             </span>
           </h2>
         </div>
@@ -431,11 +438,11 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           ) : null}
         </div>
 
-        {data === undefined ? (
+        {listLoading ? (
           <div className="card">
             <TableSkeleton rows={7} />
           </div>
-        ) : rows.length === 0 ? (
+        ) : displayRows.length === 0 ? (
           search ? (
             <div className="component-filter-empty">
               <p>No records match this search.</p>
@@ -459,7 +466,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         ) : (
           <KitchenCatalogCards
             section={section}
-            rows={rows as never}
+            rows={displayRows as never}
             busy={busy}
             showHidden={showHidden}
             run={run}

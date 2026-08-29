@@ -101,8 +101,11 @@ export function DishDetailPage() {
 
   return (
     <article className="culinary-document culinary-document-compact culinary-studio">
-      <Link to={kitchenCatalogPath("dishes")} className="culinary-studio-back">
-        ← Dish index
+      <Link
+        to={kitchenCatalogPath("dishes")}
+        className="culinary-studio-back relative z-[2]"
+      >
+        ← Dishes
       </Link>
       <KitchenBookNav />
       {failure ? (
@@ -119,6 +122,13 @@ export function DishDetailPage() {
               Dish · Edition {dish.editionNumber ?? 1} · Rev {dish.version}
             </p>
             <h1 className="culinary-title-compact">{dish.name}</h1>
+            {dish.category ? (
+              <p className="mt-1.5">
+                <span className="chip border-line-2 bg-inset text-ink-2 capitalize">
+                  {dish.category}
+                </span>
+              </p>
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-2">
             {actions.map((action) => (
@@ -156,6 +166,10 @@ export function DishDetailPage() {
             <dd>
               {dish.portionSize} {String(dish.portionUnit)}
             </dd>
+          </div>
+          <div>
+            <dt>Category</dt>
+            <dd>{dish.category || "—"}</dd>
           </div>
           <div>
             <dt>Course</dt>

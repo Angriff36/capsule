@@ -144,6 +144,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  position: relative;
+  z-index: 2;
   margin-bottom: 0.65rem;
   font-size: 0.75rem;
   font-weight: 600;

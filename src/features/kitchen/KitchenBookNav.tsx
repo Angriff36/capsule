@@ -10,6 +10,7 @@ export function KitchenBookNav() {
         <NavLink
           key={section.key}
           to={section.path}
+          end={section.key !== "prep"}
           className={({ isActive }) => (isActive ? "active" : undefined)}
         >
           {section.label}
