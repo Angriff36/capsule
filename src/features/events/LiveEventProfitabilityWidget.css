@@ -69,9 +69,7 @@
   margin-top: 6px;
   font-family: var(--font-display);
   font-size: clamp(20px, 3vw, 29px);
-  font-variation-settings:
-    "wdth" 88,
-    "wght" 680;
+  font-weight: 700;
   letter-spacing: -0.035em;
 }
 

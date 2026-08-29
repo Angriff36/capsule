@@ -23,7 +23,7 @@
   --color-ink: #0f0f11;
   --color-ink-2: #3b3e45;
   --color-ink-3: #65686f;
-  --color-brand: #d86422;
+  --color-brand: #b04f18;
   --color-brand-soft: #fce8dd;
 
   --color-line: #d9dce1;
@@ -32,28 +32,28 @@
      surface is paper — not a slab of chrome down the side of the app. */
   --color-rail: #eaeced;
   --color-rail-2: #dfe2e6;
-  --color-rail-active: #d86422;
+  --color-rail-active: #b04f18;
   --color-rail-ink: #3b3e45;
   --color-rail-dim: #65686f;
-  --color-service: #d86422;
+  --color-service: #b04f18;
 
-  --color-accent: #d86422;
-  --color-accent-deep: #b04f18;
+  --color-accent: #b04f18;
+  --color-accent-deep: #8f3f11;
   --color-accent-soft: #fce8dd;
-  --color-ok: #2f855a;
+  --color-ok: #276749;
   --color-ok-soft: #e6f5f0;
-  --color-info: #2563eb;
+  --color-info: #1d4ed8;
   --color-info-soft: #dbeafe;
-  --color-warn: #b5651d;
+  --color-warn: #9a4f12;
   --color-warn-soft: #fef3e6;
-  --color-danger: #dc2626;
+  --color-danger: #b91c1c;
   --color-danger-soft: #fee2e2;
   --color-mute-soft: #e6e8ec;
   /* DESIGN.md names these success/warning; ok/warn above are the same values
      under the shorter name the app already uses at ~200 call sites. */
-  --color-success: #2f855a;
+  --color-success: #276749;
   --color-success-soft: #e6f5f0;
-  --color-warning: #b5651d;
+  --color-warning: #9a4f12;
   --color-warning-soft: #fef3e6;
 
   --radius-xs: 4px;

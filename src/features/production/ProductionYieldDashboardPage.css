@@ -134,9 +134,7 @@
 .production-yield-scorecard strong {
   margin: 10px 0 7px;
   color: var(--yield-ink);
-  font-family:
-    Archivo Variable,
-    sans-serif;
+  font-family: var(--font-sans);
   font-size: clamp(26px, 3vw, 39px);
   font-weight: 720;
   letter-spacing: -0.045em;
