@@ -11,7 +11,7 @@
       "sha256": "314ff07afc4555022347bc4c0d2c565f3633b49fc56bbe69e5f2c35648826cdb"
     },
     "convex/lib/authContext.ts": {
-      "sha256": "3dad7066d4bc9abf616d0db01844fac22bd0377965183c2e90214e5cb10f1626",
+      "sha256": "ee98a50d1d9b7db6bed6f2aedfd9ba45fa0bc8e245abdc4a230dc84b6f0aa5ad",
       "baselined": true
     },
     "convex/lib/encryption.ts": {
