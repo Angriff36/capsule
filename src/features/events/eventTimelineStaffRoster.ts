@@ -41,6 +41,7 @@ export type StaffingRosterEntry = {
   readonly status: string;
   readonly source: "assignment" | "filled_need";
   readonly startsAt?: number | null;
+  readonly endsAt?: number | null;
   readonly unassign?: {
     readonly docId: string;
     readonly version: number;
