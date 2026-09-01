@@ -21,6 +21,7 @@ export interface AppNotification {
     | "certification_expiry"
     | "allergen_incident"
     | "staff_message"
+    | "mention"
     | "prep_task_comment";
   message: string;
   /** Route to the relevant record. */
@@ -40,6 +41,7 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     certification_expiry: "Certification",
     allergen_incident: "Allergen",
     staff_message: "Message",
+    mention: "Mention",
     prep_task_comment: "Prep note",
   };
 
@@ -80,6 +82,10 @@ export interface NotificationSources {
   vendorOrders: Doc<"vendorOrders">[] | undefined;
   staffMessages: Doc<"staffMessages">[] | undefined;
   prepTaskComments: Doc<"prepTaskComments">[] | undefined;
+  /** The caller's own chat read cursors — a mention hides once its channel is read. */
+  staffChatReadCursors?: Doc<"staffChatReadCursors">[] | undefined;
+  /** Titles for mention channels whose events the caller's role cannot list. */
+  mentionEventTitles?: Record<string, string>;
 }
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
@@ -250,9 +256,61 @@ export function deriveNotifications(
       id: `staff-message:${message._id}`,
       kind: "staff_message",
       message: `New message from ${who}`,
-      link: "/staff/messages",
+      link: `/staff/messages?dm=${message.senderPersonId}`,
       at: message.createdAt,
     });
+  }
+
+  // @mentions in event channels. The body is encrypted and never read here;
+  // the sender stamps the mentioned Person ids alongside the message.
+  const myPersonId =
+    src.currentAuthSubjectId == null
+      ? null
+      : (((src.people ?? []).find(
+          (p) =>
+            p.authSubjectId === src.currentAuthSubjectId && p.deletedAt == null,
+        )?._id as string | undefined) ?? null);
+  if (myPersonId != null) {
+    const readUpTo = new Map<string, number>();
+    for (const cursor of src.staffChatReadCursors ?? []) {
+      if (cursor.authSubjectId !== src.currentAuthSubjectId) continue;
+      readUpTo.set(
+        cursor.channelKey,
+        Math.max(readUpTo.get(cursor.channelKey) ?? 0, cursor.lastReadAt),
+      );
+    }
+    for (const message of src.staffMessages ?? []) {
+      if (
+        message.deletedAt != null ||
+        message.eventId == null ||
+        message.createdAt == null ||
+        (message.senderPersonId as string) === myPersonId ||
+        now - message.createdAt > RECENT_WINDOW_MS
+      ) {
+        continue;
+      }
+      const mentioned = (message.mentionedPersonIds ?? "")
+        .split(",")
+        .map((id) => id.trim());
+      if (!mentioned.includes(myPersonId)) continue;
+      const eventId = message.eventId as string;
+      if ((readUpTo.get(`event:${eventId}`) ?? 0) >= message.createdAt) {
+        continue;
+      }
+      const who =
+        personNames.get(message.senderPersonId as string) ?? "A teammate";
+      const title =
+        eventTitles.get(eventId) ??
+        src.mentionEventTitles?.[eventId] ??
+        "an event";
+      out.push({
+        id: `mention:${message._id}`,
+        kind: "mention",
+        message: `${who} mentioned you in "${title}" chat`,
+        link: `/events/${eventId}?tab=chat`,
+        at: message.createdAt,
+      });
+    }
   }
 
   for (const comment of src.prepTaskComments ?? []) {

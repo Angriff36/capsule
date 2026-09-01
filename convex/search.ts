@@ -32,7 +32,7 @@ export interface SearchHit {
   score: number;
 }
 
-interface SearchTarget {
+export interface SearchTarget {
   kind: string;
   table: string;
   index: string;
@@ -44,7 +44,8 @@ interface SearchTarget {
   label: (doc: any) => string;
 }
 
-const TEXT_TARGETS: SearchTarget[] = [
+/** Full-text targets, shared with the team-chat record picker (convex/teamChat.ts). */
+export const TEXT_TARGETS: SearchTarget[] = [
   {
     kind: "event",
     table: "events",

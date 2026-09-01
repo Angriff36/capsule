@@ -18,6 +18,7 @@
 // generated as non-exported locals, so the role → capability map is mirrored
 // here (same pattern as sourceProvenance.ts / hiringPipeline.ts). Keep in
 // sync with src/foundation/base.manifest if a role grant moves.
+import type { Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
@@ -108,6 +109,7 @@ export const listNotifications = query({
       vendorOrders,
       staffMessages,
       prepTaskComments,
+      staffChatReadCursors,
     ] = await Promise.all([
       when(can(auth, "eventAccess", "salesAccess"), () =>
         ctx.db.query("events").withIndex("by_tenantId", byTenant).collect(),
@@ -168,7 +170,40 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect(),
       ),
+      // Only the caller's own cursors (by_authSubjectId) — a mention hides
+      // once its channel has been read.
+      when(can(auth, "staffAccess") && auth.id !== "", () =>
+        ctx.db
+          .query("staffChatReadCursors")
+          .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", auth.id))
+          .collect(),
+      ),
     ]);
+
+    // Roles without eventAccess cannot list events, but a mention still
+    // needs its channel's title: hydrate only the mentioned events, tenant-
+    // checked, title only (same narrow projection as eventDayBriefing).
+    const mentionEventTitles: Record<string, string> = {};
+    if (!events && staffMessages) {
+      const ids = new Set<string>();
+      for (const message of staffMessages) {
+        if (
+          message.eventId &&
+          message.deletedAt == null &&
+          (message.mentionedPersonIds ?? "").length > 0
+        ) {
+          ids.add(String(message.eventId));
+        }
+      }
+      await Promise.all(
+        [...ids].map(async (id) => {
+          const event = await ctx.db.get(id as Id<"events">);
+          if (event && event.tenantId === tenantId && event.deletedAt == null) {
+            mentionEventTitles[id] = String(event.title ?? "Untitled event");
+          }
+        }),
+      );
+    }
 
     return deriveNotifications({
       now: Date.now(),
@@ -185,6 +220,10 @@ export const listNotifications = query({
       vendorOrders,
       staffMessages,
       prepTaskComments,
+      staffChatReadCursors: staffChatReadCursors?.filter(
+        (row) => row.tenantId === tenantId,
+      ),
+      mentionEventTitles,
     });
   },
 });
