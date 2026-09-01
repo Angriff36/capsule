@@ -61,7 +61,9 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   property required fileName: string
   property required contentType: string
   property required fileSize: int = 0
-  property required storageId: string
+  // Indexed so an orphaned upload (a blob no live row references) can be
+  // recognised and discarded (convex/fileStorage.ts discardOrphanUploads).
+  property required indexed storageId: string
   property evidenceType: AttachmentEvidenceType?
   property uploadedById: string?
   property uploadedAt: datetime?

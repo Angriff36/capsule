@@ -18,6 +18,41 @@ export const generateUploadUrl = mutation({
   },
 });
 
+/** Uploads a client may discard in one call (a chat message holds at most 20). */
+const DISCARD_CAP = 25;
+
+/**
+ * Delete uploaded blobs that no live Attachment row references — the files a
+ * client uploaded for a send that then failed or was rolled back. A blob some
+ * live row still references is left alone, so this can never remove a file
+ * that is in use. Staff only; ids are only known to the uploader.
+ */
+export const discardOrphanUploads = mutation({
+  args: { storageIds: v.array(v.string()) },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || auth.role === "anonymous") {
+      throw new Error("Sign in to manage uploads");
+    }
+    let discarded = 0;
+    for (const storageId of [...new Set(args.storageIds)].slice(
+      0,
+      DISCARD_CAP,
+    )) {
+      const references = await ctx.db
+        .query("attachments")
+        .withIndex("by_storageId", (q) => q.eq("storageId", storageId))
+        .take(10);
+      if (references.some((row) => row.deletedAt == null)) continue;
+      const blob = await ctx.db.system.get(storageId as Id<"_storage">);
+      if (!blob) continue;
+      await ctx.storage.delete(storageId as Id<"_storage">);
+      discarded += 1;
+    }
+    return { discarded };
+  },
+});
+
 /** Live attachments for one parent record, with download URLs resolved. */
 export const listForParent = query({
   args: {

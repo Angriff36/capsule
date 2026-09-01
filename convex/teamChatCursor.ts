@@ -11,7 +11,7 @@
  */
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
-import { chatAuth, CURSOR_ROWS_PER_CHANNEL } from "./lib/teamChatRead";
+import { chatAuth, CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
 
 export const markChannelRead = mutation({
   args: {
@@ -30,13 +30,16 @@ export const markChannelRead = mutation({
       throw new Error("Read position cannot be in the future");
     }
 
-    const rows = await ctx.db
-      .query("staffChatReadCursors")
-      .withIndex("by_channelKey", (q) => q.eq("channelKey", channelKey))
-      .take(CURSOR_ROWS_PER_CHANNEL);
-    const mine = rows.filter(
-      (row) => row.tenantId === auth.tenantId && row.authSubjectId === auth.id,
-    );
+    // The caller's own rows for this channel, directly (composite index);
+    // more than one only from history or a race — folded below.
+    const mine = (
+      await ctx.db
+        .query("staffChatReadCursors")
+        .withIndex("by_channelKey_and_authSubjectId", (q) =>
+          q.eq("channelKey", channelKey).eq("authSubjectId", auth.id),
+        )
+        .take(CURSOR_DUPLICATES_CAP)
+    ).filter((row) => row.tenantId === auth.tenantId);
 
     if (mine.length === 0) {
       const cursorId = await ctx.db.insert("staffChatReadCursors", {

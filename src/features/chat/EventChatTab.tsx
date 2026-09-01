@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { EmptyState } from "../../ui/primitives";
 import { EventTabPanel } from "../events/EventTabPanel";
@@ -61,17 +61,36 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
     [identity],
   );
 
+  // A send finishes on the channel it left from (the tab is reused when the
+  // route moves to another event); its pin and notice never land elsewhere.
+  const channelRef = useRef(channelKey);
+  channelRef.current = channelKey;
+  const pendingNotices = useRef(new Map<string, string>());
+  useEffect(() => {
+    const notice = pendingNotices.current.get(channelKey);
+    if (notice !== undefined) {
+      pendingNotices.current.delete(channelKey);
+      setError(notice);
+    }
+  }, [channelKey]);
+
   const onSubmit = async (submit: ChatComposerSubmit) => {
+    const sentFrom = channelKey;
     setError(null);
     setSending(true);
     try {
       const warning = await sendMessage(channel, submit);
-      setPinSignal((n) => n + 1);
-      if (warning) setError(warning);
+      if (channelRef.current === sentFrom) {
+        setPinSignal((n) => n + 1);
+        if (warning) setError(warning);
+      } else if (warning) {
+        pendingNotices.current.set(sentFrom, warning);
+      }
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "The message was not sent.",
-      );
+      const reason =
+        cause instanceof Error ? cause.message : "The message was not sent.";
+      if (channelRef.current === sentFrom) setError(reason);
+      else pendingNotices.current.set(sentFrom, reason);
       throw cause;
     } finally {
       setSending(false);

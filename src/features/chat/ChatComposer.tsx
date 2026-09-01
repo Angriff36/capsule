@@ -17,6 +17,7 @@ import { ChatComposerToolbar } from "./ChatComposerToolbar";
 import { ChatPeoplePicker } from "./ChatPeoplePicker";
 import { ChatRecordPicker } from "./ChatRecordPicker";
 import { chatLinkToken } from "./chatLinkTokens";
+import { CHAT_MAX_FILES } from "./chatTypes";
 import {
   restoreDraftFiles,
   restoreDraftLinks,
@@ -121,13 +122,23 @@ export function ChatComposer({
       ),
   });
 
+  const [fileNote, setFileNote] = useState<string | null>(null);
+  const fileCountRef = useRef(files.length);
+  fileCountRef.current = files.length;
   const addFiles = (incoming: FileList | null) => {
     if (!incoming || incoming.length === 0) return;
-    const added = Array.from(incoming, (file) => ({
-      key: `f${nextFileKeyRef.current++}`,
-      file,
-    }));
-    setFiles((prev) => [...prev, ...added]);
+    // One message carries at most CHAT_MAX_FILES; the rest wait for the next.
+    const room = Math.max(0, CHAT_MAX_FILES - fileCountRef.current);
+    const kept = Array.from(incoming)
+      .slice(0, room)
+      .map((file) => ({ key: `f${nextFileKeyRef.current++}`, file }));
+    const leftOff = incoming.length - kept.length;
+    setFileNote(
+      leftOff > 0
+        ? `Up to ${CHAT_MAX_FILES} files per message — ${leftOff} left off. Send this message, then attach the rest.`
+        : null,
+    );
+    if (kept.length > 0) setFiles((prev) => [...prev, ...kept]);
   };
 
   const { dragActive, dropHandlers } = useChatDropzone(addFiles);
@@ -200,6 +211,7 @@ export function ChatComposer({
     setFiles([]);
     setLinks([]);
     setMentions([]);
+    setFileNote(null);
     pickers.resetDismissal();
     try {
       await onSubmit({
@@ -375,6 +387,11 @@ export function ChatComposer({
       {error ? (
         <p role="alert" className="mt-2 text-sm text-danger">
           {error}
+        </p>
+      ) : null}
+      {fileNote ? (
+        <p role="status" className="mt-2 text-sm text-warn">
+          {fileNote}
         </p>
       ) : null}
       <ChatComposerToolbar

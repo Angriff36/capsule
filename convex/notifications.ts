@@ -23,7 +23,7 @@ import { query } from "./_generated/server";
 import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
 import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
-import { CURSOR_ROWS_PER_CHANNEL } from "./lib/teamChatRead";
+import { CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
 
 const ALL_ACCESS = [
   "eventAccess",
@@ -215,8 +215,8 @@ export const listNotifications = query({
       ),
     ]);
 
-    // A mention hides once its channel has been read. Cursors are read per
-    // mention channel through by_channelKey (bounded by the team size), never
+    // A mention hides once its channel has been read. The caller's cursor is
+    // read per mention channel through the (channel, account) index, never
     // the account's whole cursor history.
     const mentionChannelKeys = new Set<string>();
     if (staffMessages && auth.personId) {
@@ -240,15 +240,15 @@ export const listNotifications = query({
         [...mentionChannelKeys].map((channelKey) =>
           ctx.db
             .query("staffChatReadCursors")
-            .withIndex("by_channelKey", (q) => q.eq("channelKey", channelKey))
-            .take(CURSOR_ROWS_PER_CHANNEL),
+            .withIndex("by_channelKey_and_authSubjectId", (q) =>
+              q.eq("channelKey", channelKey).eq("authSubjectId", auth.id),
+            )
+            .take(CURSOR_DUPLICATES_CAP),
         ),
       )
     )
       .flat()
-      .filter(
-        (row) => row.tenantId === tenantId && row.authSubjectId === auth.id,
-      );
+      .filter((row) => row.tenantId === tenantId);
 
     // Roles without eventAccess cannot list events, but a mention still
     // needs its channel's title: hydrate only the events of the caller's own

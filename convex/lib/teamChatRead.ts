@@ -22,10 +22,11 @@ export const UNREAD_SCAN = 50;
 /** Attachment rows read per message: the sender's rows are the earliest. */
 export const ATTACHMENT_SCAN = 50;
 /**
- * Cursor rows read per channel — one per reader after the upsert seam folds
- * duplicates, so this is a team-size bound.
+ * Cursor rows read for one (channel, account): one after the upsert seam
+ * (convex/teamChatCursor.ts) has folded duplicates; the cap only guards a
+ * history of duplicates or a race.
  */
-export const CURSOR_ROWS_PER_CHANNEL = 250;
+export const CURSOR_DUPLICATES_CAP = 50;
 
 
 export type ChatAttachmentView = {
@@ -290,10 +291,10 @@ export async function previewOf(
 }
 
 /**
- * The caller's read cursor for each of the given channels. Read per channel
- * through `by_channelKey`, bounded to CURSOR_ROWS_PER_CHANNEL — one row per
- * reader once convex/teamChatCursor.ts has folded duplicates — never the
- * account's whole cursor history, which grows with every channel visited.
+ * The caller's read cursor for each of the given channels, looked up directly
+ * by (channel, account) through the composite index — never a channel-wide
+ * page that could push the caller's row out, never the account's whole
+ * cursor history, which grows with every channel visited.
  */
 export async function readCursorsForChannels(
   ctx: QueryCtx,
@@ -306,12 +307,12 @@ export async function readCursorsForChannels(
     [...new Set(channelKeys)].map(async (channelKey) => {
       const rows = await ctx.db
         .query("staffChatReadCursors")
-        .withIndex("by_channelKey", (q) => q.eq("channelKey", channelKey))
-        .take(CURSOR_ROWS_PER_CHANNEL);
+        .withIndex("by_channelKey_and_authSubjectId", (q) =>
+          q.eq("channelKey", channelKey).eq("authSubjectId", authSubjectId),
+        )
+        .take(CURSOR_DUPLICATES_CAP);
       for (const row of rows) {
-        if (row.tenantId !== tenantId || row.authSubjectId !== authSubjectId) {
-          continue;
-        }
+        if (row.tenantId !== tenantId) continue;
         const existing = cursors.get(channelKey);
         if (!existing || row.lastReadAt > existing.lastReadAt) {
           cursors.set(channelKey, {

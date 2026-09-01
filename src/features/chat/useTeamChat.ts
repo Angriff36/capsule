@@ -13,6 +13,7 @@ import {
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import type { ChatComposerSubmit } from "./ChatComposer";
 import {
+  CHAT_MAX_FILES,
   CHAT_RETENTION_MS,
   type ChatChannel,
   type ChatLinkTarget,
@@ -131,6 +132,7 @@ type UploadedFile = { file: File; storageId: string };
  */
 export function useSendChatMessage() {
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
+  const discardUploads = useMutation(api.fileStorage.discardOrphanUploads);
   const send = useCreateStaffMessage();
   const attach = useCreateAttachment();
   const removeAttachment = useAttachmentRemove();
@@ -141,7 +143,23 @@ export function useSendChatMessage() {
       channel: ChatChannel,
       submit: ChatComposerSubmit,
     ): Promise<string | null> => {
+      if (submit.files.length > CHAT_MAX_FILES) {
+        throw new Error(
+          `A message can carry up to ${CHAT_MAX_FILES} files. Send this one with fewer, then attach the rest.`,
+        );
+      }
       const uploaded: UploadedFile[] = [];
+      // Blobs uploaded for a send that does not complete are deleted again
+      // (best effort) so nothing unreferenced is left in storage.
+      const discard = () =>
+        uploaded.length === 0
+          ? Promise.resolve()
+          : discardUploads({
+              storageIds: uploaded.map((item) => item.storageId),
+            }).then(
+              () => undefined,
+              () => undefined,
+            );
       for (const file of submit.files) {
         const uploadUrl = await generateUploadUrl();
         const response = await fetch(uploadUrl, {
@@ -150,6 +168,7 @@ export function useSendChatMessage() {
           body: file,
         });
         if (!response.ok) {
+          await discard();
           throw new Error(
             `Upload of ${file.name} failed (${response.status}). Nothing was sent.`,
           );
@@ -163,16 +182,25 @@ export function useSendChatMessage() {
         channel.kind === "event"
           ? { eventId: channel.eventId }
           : { recipientPersonId: channel.personId };
-      const result = (await send({
-        ...target,
-        body: submit.body,
-        attachmentCount: uploaded.length,
-        ...(submit.mentionedPersonIds.length > 0
-          ? { mentionedPersonIds: submit.mentionedPersonIds.join(",") }
-          : {}),
-      })) as { docId?: string } | null;
+      let result: { docId?: string } | null;
+      try {
+        result = (await send({
+          ...target,
+          body: submit.body,
+          attachmentCount: uploaded.length,
+          ...(submit.mentionedPersonIds.length > 0
+            ? { mentionedPersonIds: submit.mentionedPersonIds.join(",") }
+            : {}),
+        })) as { docId?: string } | null;
+      } catch (cause) {
+        await discard();
+        throw cause;
+      }
       const docId = result?.docId;
-      if (!docId) throw new Error("The message was not created.");
+      if (!docId) {
+        await discard();
+        throw new Error("The message was not created.");
+      }
 
       const failed: string[] = [];
       const attached: string[] = [];
@@ -210,11 +238,13 @@ export function useSendChatMessage() {
           removeAttachment({ docId: attachmentId }).catch(() => undefined),
         ),
       );
+      // The message is gone and its rows are removed: the blobs are orphans.
+      await discard();
       throw new Error(
         `Could not attach ${files}, so nothing was sent. Try again.`,
       );
     },
-    [attach, generateUploadUrl, remove, removeAttachment, send],
+    [attach, discardUploads, generateUploadUrl, remove, removeAttachment, send],
   );
 }
 

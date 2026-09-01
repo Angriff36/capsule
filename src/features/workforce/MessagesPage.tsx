@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { formatDate } from "../../lib/format";
@@ -133,18 +133,38 @@ export function MessagesPage() {
     }
   }, [channel, identity.personId, markDirectRead, messages]);
 
+  // A send finishes on the channel it left from. If the user has moved on,
+  // its pin and any notice must not land on the channel now on screen; the
+  // notice waits until they come back.
+  const channelRef = useRef(channelKey);
+  channelRef.current = channelKey;
+  const pendingNotices = useRef(new Map<string, string>());
+  useEffect(() => {
+    const notice = pendingNotices.current.get(channelKey);
+    if (notice !== undefined) {
+      pendingNotices.current.delete(channelKey);
+      setError(notice);
+    }
+  }, [channelKey]);
+
   const onSubmit = async (submit: ChatComposerSubmit) => {
     if (!channel) return;
+    const sentFrom = channelKey;
     setError(null);
     setSending(true);
     try {
       const warning = await sendMessage(channel, submit);
-      setPinSignal((n) => n + 1);
-      if (warning) setError(warning);
+      if (channelRef.current === sentFrom) {
+        setPinSignal((n) => n + 1);
+        if (warning) setError(warning);
+      } else if (warning) {
+        pendingNotices.current.set(sentFrom, warning);
+      }
     } catch (cause) {
-      setError(
-        cause instanceof Error ? cause.message : "The message was not sent.",
-      );
+      const reason =
+        cause instanceof Error ? cause.message : "The message was not sent.";
+      if (channelRef.current === sentFrom) setError(reason);
+      else pendingNotices.current.set(sentFrom, reason);
       throw cause;
     } finally {
       setSending(false);

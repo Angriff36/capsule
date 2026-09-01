@@ -90,6 +90,9 @@ export function chatChannelKey(channel: ChatChannel): string {
 /** Messages older than this drop out of the UI — 90-day retention window. */
 export const CHAT_RETENTION_MS = 90 * 86_400_000;
 
+/** Files per message. The chat seam hydrates at most 50 rows per message (convex/lib/teamChatRead.ts ATTACHMENT_SCAN). */
+export const CHAT_MAX_FILES = 20;
+
 /** The guard message the send command raises for an unlinked sign-in. */
 export const CHAT_UNLINKED_REASON =
   "Link your account to a staff profile before sending messages";
