@@ -166,7 +166,11 @@ entity StaffChatReadCursor mixin TenantScoped {
 
   property indexed required channelKey: string
   property indexed required authSubjectId: string
-  property required lastReadAt: datetime
+  // Commit-time position of the newest message read (Convex _creationTime,
+  // fractional ms) — a float, not a datetime: the datetime param type is
+  // coerced through Date and would drop the fraction that keeps two
+  // same-millisecond messages apart.
+  property required lastReadAt: float
 
   // Own rows only; the chat seam reads cursors by index for the caller.
   // `authSubjectId == null` is the create-time draft escape.
@@ -177,7 +181,7 @@ entity StaffChatReadCursor mixin TenantScoped {
   // Governed creation — first time an account opens a channel. `readUpTo` is
   // the send time of the newest message the reader actually saw, so a
   // message that lands between render and this call stays unread.
-  command open(channelKey: string, readUpTo: datetime) {
+  command open(channelKey: string, readUpTo: float) {
     guard user.id != null
     // Creation only — never re-point an existing cursor at another account.
     guard self.authSubjectId == null "Cursors are opened once; use touch to move one"
@@ -195,7 +199,7 @@ entity StaffChatReadCursor mixin TenantScoped {
   }
 
   // Every later visit moves the cursor forward, never back.
-  command touch(readUpTo: datetime) {
+  command touch(readUpTo: float) {
     guard user.id != null
     guard self.authSubjectId == user.id
     constraint touchNotFuture: readUpTo <= now() "Read position cannot be in the future"
