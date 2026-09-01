@@ -620,6 +620,31 @@
   color: var(--evd-ink-3);
 }
 
+/* allergens derived from the recipe (menu sheet) */
+.evd-allergen-banner {
+  margin: 0.6rem 0 0.2rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(238, 182, 62, 0.45);
+  background: rgba(238, 182, 62, 0.12);
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--evd-review);
+}
+.evd-allergen-contains {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--evd-review);
+}
+.evd-allergen-clear {
+  font-size: 0.72rem;
+  color: var(--evd-ready);
+}
+.evd-allergen-unknown {
+  font-size: 0.72rem;
+  color: var(--evd-ink-3);
+}
+
 /* ---------- event picker ---------- */
 
 .evd-pick-head {

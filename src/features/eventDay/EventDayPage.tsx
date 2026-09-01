@@ -5,8 +5,11 @@ import { formatCount, formatDate } from "../../lib/format";
 import {
   useGetEvent,
   useListClientContact,
+  useListComponentIngredient,
   useListDelivery,
   useListDish,
+  useListDishComponent,
+  useListDishIngredient,
   useListEquipment,
   useListEquipmentReservation,
   useListEventAssignment,
@@ -14,6 +17,7 @@ import {
   useListEventLayoutSection,
   useListEventStaffNeed,
   useListEventTimelineActivity,
+  useListIngredient,
   useListPackList,
   useListPackListItem,
   useListPerson,
@@ -93,6 +97,11 @@ export function EventDayPage() {
   const activities = useListEventTimelineActivity();
   const eventDishes = useListEventDish();
   const dishes = useListDish();
+  // Recipe graph, so the menu sheet can derive allergens per dish.
+  const dishIngredients = useListDishIngredient();
+  const dishComponents = useListDishComponent();
+  const componentIngredients = useListComponentIngredient();
+  const ingredients = useListIngredient();
   const deliveries = useListDelivery();
   const vehicles = useListVehicle();
   const layoutSections = useListEventLayoutSection();
@@ -138,6 +147,10 @@ export function EventDayPage() {
         (row) => row.deletedAt == null,
       ),
       dishes: dishes ?? [],
+      dishIngredients: dishIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
+      ingredients: ingredients ?? [],
       people: people ?? [],
       vehicles: vehicles ?? [],
       equipments: equipments ?? [],
@@ -156,6 +169,10 @@ export function EventDayPage() {
     packLists,
     packListItems,
     dishes,
+    dishIngredients,
+    dishComponents,
+    componentIngredients,
+    ingredients,
     people,
     vehicles,
     equipments,
@@ -170,6 +187,10 @@ export function EventDayPage() {
     activities,
     eventDishes,
     dishes,
+    dishIngredients,
+    dishComponents,
+    componentIngredients,
+    ingredients,
     deliveries,
     vehicles,
     layoutSections,

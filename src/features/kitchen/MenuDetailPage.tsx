@@ -86,6 +86,7 @@ export function MenuDetailPage() {
     const rows = deriveAllergenRows({
       dishIds: selectedMenuDishes.map((selection) => String(selection.dishId)),
       dishes: dishes ?? [],
+      dishIngredients: dishIngredients ?? [],
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
@@ -98,6 +99,7 @@ export function MenuDetailPage() {
   }, [
     selectedMenuDishes,
     dishes,
+    dishIngredients,
     dishComponents,
     componentIngredients,
     ingredients,
@@ -312,7 +314,16 @@ export function MenuDetailPage() {
               type="button"
               className="btn btn-ghost"
               disabled={
-                busy != null || dishes === undefined || menuDishes === undefined
+                busy != null ||
+                dishes === undefined ||
+                menuDishes === undefined ||
+                // The PDF discloses allergens — never export while any
+                // recipe/allergen query is still loading (an unresolved
+                // list would silently derive an incomplete allergen set).
+                dishIngredients === undefined ||
+                dishComponents === undefined ||
+                componentIngredients === undefined ||
+                ingredients === undefined
               }
               onClick={() => {
                 setFailure(null);
