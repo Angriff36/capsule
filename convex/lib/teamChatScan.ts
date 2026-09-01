@@ -47,6 +47,8 @@ export type ChannelScan = {
   /** Live rows newer than the cursor, not sent by the caller (up to UNREAD_SCAN). */
   unread: number;
   unreadCapped: boolean;
+  /** Rows (live or not) the walk read — for a caller's aggregate budget. */
+  walked: number;
 };
 
 /**
@@ -66,6 +68,8 @@ export async function scanChannel(
     me: Id<"people"> | null;
     stopAtCursor: boolean;
     countLimit: number;
+    /** Rows walked before giving up; defaults to CHANNEL_WALK_CAP. */
+    walkCap?: number;
   },
 ): Promise<ChannelScan> {
   const scan: ChannelScan = {
@@ -74,18 +78,22 @@ export async function scanChannel(
     countCapped: false,
     unread: 0,
     unreadCapped: false,
+    walked: 0,
   };
+  const walkCap = opts.walkCap ?? CHANNEL_WALK_CAP;
   let walked = 0;
   const range = ctx.db
     .query("staffMessages")
     .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
     .order("desc");
   for await (const row of range) {
-    if (++walked > CHANNEL_WALK_CAP) {
+    scan.walked = walked;
+    if (++walked > walkCap) {
       scan.countCapped = true;
       scan.unreadCapped = scan.unreadCapped || sentAt(row) > opts.readUpTo;
       break;
     }
+    scan.walked = walked;
     if (sentAt(row) < opts.since) break;
     if (row.tenantId !== tenantId || !live(row)) continue;
     if (!scan.newest) scan.newest = row;

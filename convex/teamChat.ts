@@ -47,6 +47,15 @@ const EVENT_SCAN = 400;
 const EVENT_CANDIDATES = 80;
 /** Messages hydrated concurrently (each up to 20 attachment URL lookups). */
 const HYDRATE_BATCH = 16;
+/** Rows one rail channel may walk (own/removed rows past this read as "50+"). */
+const RAIL_WALK_CAP = 150;
+/**
+ * Rows the whole rail may walk across its channels; with the DM walks (2 ×
+ * 4000), the events page and the cursor reads it stays well under Convex's
+ * 32,000-document transaction limit. Channels past the budget are listed
+ * without a badge.
+ */
+const RAIL_WALK_BUDGET = 8000;
 
 /**
  * One thread. Pass exactly one of `eventId` (event channel) or
@@ -237,39 +246,58 @@ export const listConversations = query({
     );
 
     const events: EventConversation[] = [];
-    await Promise.all(
-      candidates.map(async (event) => {
-        const cursor = cursors.get(`event:${String(event._id)}`) ?? null;
-        const readUpTo = cursor?.lastReadAt ?? 0;
-        // Newest first, live rows only, stopping at the cursor: unread rows
-        // older than 50 own or removed rows are still counted, and a removed
-        // burst cannot hide a live channel.
-        const scan = await scanChannel(ctx, tenantId, event._id, {
-          since: args.since,
-          readUpTo,
-          me,
-          stopAtCursor: true,
-          countLimit: MAX_THREAD_MESSAGES,
-        });
-        const newest = scan.newest;
-        const lastAt = newest ? sentAt(newest) : null;
-        const upcomingEvent =
-          event.startsAt != null && event.startsAt >= args.now - DAY_MS;
-        if (!upcomingEvent && lastAt == null) return;
-        events.push({
-          eventId: String(event._id),
-          title: String(event.title ?? "Untitled event"),
-          startsAt: event.startsAt ?? null,
-          stage: String(event.stage ?? ""),
-          lastAt,
-          unread: scan.unread,
-          unreadCapped: scan.unreadCapped,
-          preview: await previewOf(ctx, newest),
-          myCursorId: cursor?.id ?? null,
-          lastReadAt: cursor?.lastReadAt ?? null,
-        });
-      }),
-    );
+    let budget = RAIL_WALK_BUDGET;
+    for (const event of candidates) {
+      const cursor = cursors.get(`event:${String(event._id)}`) ?? null;
+      const readUpTo = cursor?.lastReadAt ?? 0;
+      const upcomingEvent =
+        event.startsAt != null && event.startsAt >= args.now - DAY_MS;
+      if (budget <= 0) {
+        // Budget spent: still list what is upcoming, without a badge.
+        if (upcomingEvent) {
+          events.push({
+            eventId: String(event._id),
+            title: String(event.title ?? "Untitled event"),
+            startsAt: event.startsAt ?? null,
+            stage: String(event.stage ?? ""),
+            lastAt: null,
+            unread: 0,
+            unreadCapped: false,
+            preview: "",
+            myCursorId: cursor?.id ?? null,
+            lastReadAt: cursor?.lastReadAt ?? null,
+          });
+        }
+        continue;
+      }
+      // Newest first, live rows only, stopping at the cursor: unread rows
+      // behind own or removed rows are still counted (up to the walk cap),
+      // and a removed burst cannot hide a live channel.
+      const scan = await scanChannel(ctx, tenantId, event._id, {
+        since: args.since,
+        readUpTo,
+        me,
+        stopAtCursor: true,
+        countLimit: MAX_THREAD_MESSAGES,
+        walkCap: Math.min(RAIL_WALK_CAP, budget),
+      });
+      budget -= scan.walked;
+      const newest = scan.newest;
+      const lastAt = newest ? sentAt(newest) : null;
+      if (!upcomingEvent && lastAt == null) continue;
+      events.push({
+        eventId: String(event._id),
+        title: String(event.title ?? "Untitled event"),
+        startsAt: event.startsAt ?? null,
+        stage: String(event.stage ?? ""),
+        lastAt,
+        unread: scan.unread,
+        unreadCapped: scan.unreadCapped,
+        preview: await previewOf(ctx, newest),
+        myCursorId: cursor?.id ?? null,
+        lastReadAt: cursor?.lastReadAt ?? null,
+      });
+    }
     events.sort(
       (a, b) =>
         (a.startsAt ?? Number.MAX_SAFE_INTEGER) -
