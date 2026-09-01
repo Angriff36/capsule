@@ -42,7 +42,15 @@ export type DishAllergenReport = {
    * allergens" while this is non-zero.
    */
   unresolvedCount: number;
+  /**
+   * Live recipe lines whose ingredient has missing or empty allergen flags.
+   * Introduce writes `[]` without a review, so empty is unverified — never
+   * a green "no allergens" claim.
+   */
+  unflaggedCount: number;
 };
+
+export type DishAllergenClaim = "contains" | "clear" | "unverified";
 
 const VOCAB_ORDER = new Map<string, number>(
   CULINARY_ALLERGENS.map((allergen, index) => [allergen.code, index]),
@@ -60,6 +68,7 @@ export function deriveDishAllergens(
   };
   let lineCount = 0;
   let unresolvedCount = 0;
+  let unflaggedCount = 0;
 
   const ingredientById = new Map(
     input.ingredients.map((row) => [row._id, row]),
@@ -77,7 +86,15 @@ export function deriveDishAllergens(
       return;
     }
     lineCount += 1;
-    for (const code of (ingredient.allergens ?? []) as CulinaryAllergenCode[]) {
+    const flags = Array.isArray(ingredient.allergens)
+      ? (ingredient.allergens as CulinaryAllergenCode[])
+      : null;
+    // Missing or empty: introduce defaults to [] without a kitchen review.
+    if (flags == null || flags.length === 0) {
+      unflaggedCount += 1;
+      return;
+    }
+    for (const code of flags) {
       flag(code, String(ingredient.name));
     }
   };
@@ -105,7 +122,27 @@ export function deriveDishAllergens(
   const codes = [...sources.keys()].sort(
     (a, b) => (VOCAB_ORDER.get(a) ?? 99) - (VOCAB_ORDER.get(b) ?? 99),
   );
-  return { codes, sources, lineCount, unresolvedCount };
+  return { codes, sources, lineCount, unresolvedCount, unflaggedCount };
+}
+
+/**
+ * Green "no allergens" only when every recipe line resolved AND every
+ * ingredient actually has allergen flags. Empty/unset flags degrade to
+ * unverified — absence of a check is not a safety claim.
+ */
+export function dishAllergenClaim(
+  report: DishAllergenReport | null,
+): DishAllergenClaim {
+  if (report == null) return "unverified";
+  if (report.codes.length > 0) return "contains";
+  if (
+    report.lineCount > 0 &&
+    report.unresolvedCount === 0 &&
+    report.unflaggedCount === 0
+  ) {
+    return "clear";
+  }
+  return "unverified";
 }
 
 export function allergenLabel(code: CulinaryAllergenCode): string {

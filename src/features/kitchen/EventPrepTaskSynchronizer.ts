@@ -1,3 +1,4 @@
+import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import type {
   EventPrepDemand,
   EventPrepDish,
@@ -197,7 +198,8 @@ export class EventPrepTaskSynchronizer {
             version: item.existing.version,
             quantity: item.quantity,
             specialInstructions:
-              input.eventDish.specialInstructions ?? undefined,
+              displayEventMenuNotes(input.eventDish.specialInstructions) ||
+              undefined,
           });
         }
         continue;
@@ -341,7 +343,7 @@ export class EventPrepTaskSynchronizer {
     eventInstructions?: string | null,
   ) {
     return (
-      [templateInstructions?.trim(), eventInstructions?.trim()]
+      [templateInstructions?.trim(), displayEventMenuNotes(eventInstructions)]
         .filter(Boolean)
         .join("\n\n") || undefined
     );

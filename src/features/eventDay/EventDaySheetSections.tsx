@@ -2,12 +2,14 @@ import type { ReactNode } from "react";
 import type { Doc } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import { compareActivities } from "../events/EventTimelinePanel";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import {
   allergenLabel,
   deriveDishAllergens,
+  dishAllergenClaim,
   type DishAllergenReport,
 } from "../kitchen/dishAllergens";
 import type { EventDayInputs } from "./eventDayModel";
@@ -227,14 +229,19 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
 
 /**
  * Allergens read from the actual recipe, not a hand-kept summary. The green
- * "no allergens" claim only appears when EVERY recipe line resolved; a
- * missing dish record or unresolved line always degrades to "unverified".
+ * "no allergens" claim only appears when EVERY recipe line resolved AND
+ * every ingredient has allergen flags; missing dish, unresolved lines, or
+ * empty/unset flags always degrade to "unverified".
  */
 function AllergenLine({ report }: { report: DishAllergenReport | null }) {
-  if (report != null && report.codes.length > 0) {
-    // Codes without a fully resolved recipe (declared-only, or unresolved
-    // lines) may be incomplete — say so instead of implying a full check.
-    const incomplete = report.lineCount === 0 || report.unresolvedCount > 0;
+  const claim = dishAllergenClaim(report);
+  if (claim === "contains" && report != null) {
+    // Codes without a fully resolved/flagged recipe may be incomplete —
+    // say so instead of implying a full check.
+    const incomplete =
+      report.lineCount === 0 ||
+      report.unresolvedCount > 0 ||
+      report.unflaggedCount > 0;
     return (
       <span className="evd-allergen-contains block">
         Contains {report.codes.map(allergenLabel).join(" · ")}
@@ -242,7 +249,7 @@ function AllergenLine({ report }: { report: DishAllergenReport | null }) {
       </span>
     );
   }
-  if (report != null && report.lineCount > 0 && report.unresolvedCount === 0) {
+  if (claim === "clear" && report != null) {
     return (
       <span className="evd-allergen-clear block">
         No allergens on {report.lineCount} listed{" "}
@@ -252,9 +259,11 @@ function AllergenLine({ report }: { report: DishAllergenReport | null }) {
   }
   return (
     <span className="evd-allergen-unknown block">
-      {report != null && report.unresolvedCount > 0
-        ? "Allergens unverified — recipe lines did not resolve"
-        : "No recipe visible — allergens unverified"}
+      {report != null && report.unflaggedCount > 0
+        ? "Allergens unverified — ingredient flags not set"
+        : report != null && report.unresolvedCount > 0
+          ? "Allergens unverified — recipe lines did not resolve"
+          : "No recipe visible — allergens unverified"}
     </span>
   );
 }
@@ -292,7 +301,7 @@ export function MenuSheet({ data }: { data: EventDayDetailData }) {
           <p className="evd-kicker">{course}</p>
           {list.map((row) => {
             const dish = data.dishes.find((d) => d._id === row.dishId);
-            const instructions = String(row.specialInstructions ?? "").trim();
+            const instructions = displayEventMenuNotes(row.specialInstructions);
             return (
               <Row
                 key={row._id}
