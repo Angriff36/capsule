@@ -161,7 +161,27 @@ export function EventDayPage() {
     equipments,
   ]);
 
-  if (event === undefined)
+  // A list that has not resolved yet must not read as "empty" — that would
+  // flash false blockers like "No staff assigned" on a final event.
+  const anyListLoading = [
+    venues,
+    assignments,
+    staffNeeds,
+    activities,
+    eventDishes,
+    dishes,
+    deliveries,
+    vehicles,
+    layoutSections,
+    equipmentReservations,
+    equipments,
+    clientContacts,
+    packLists,
+    packListItems,
+    people,
+  ].some((rows) => rows === undefined);
+
+  if (event === undefined || anyListLoading)
     return <CenteredNote>Lighting the estate…</CenteredNote>;
   if (event === null || event.deletedAt != null || data == null)
     return (

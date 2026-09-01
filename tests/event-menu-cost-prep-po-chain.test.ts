@@ -14,11 +14,16 @@ const read = (path: string) => readFileSync(path, "utf8");
 
 describe("leftovers 1–6: event menu cost → prep → PO chain", () => {
   it("1. event menu rolls food cost from catalog/receipt, not estimatedCost-only dash", () => {
+    // The figures live in the extracted stats card; the tab feeds it from
+    // the rollup. The contract spans both files.
     const tab = read("src/features/events/EventMenuTab.tsx");
+    const stats = read("src/features/events/EventMenuStatsCard.tsx");
     expect(tab).toContain("buildEventMenuCost");
-    expect(tab).toContain("event-menu-food-cost");
-    expect(tab).toContain("formatMoneyExact(costRollup.foodCost)");
+    expect(tab).toContain("foodCost={costRollup.foodCost}");
+    expect(stats).toContain("event-menu-food-cost");
+    expect(stats).toContain("formatMoneyExact(foodCost)");
     expect(tab).not.toContain("6.25");
+    expect(stats).not.toContain("6.25");
     expect(tab).toContain("eventMenuDishEstimateKind");
     expect(tab).toContain("eventMenuUnpricedEstimateLabel");
     expect(tab).toContain("eventMenuHeaderUnpricedNote");
@@ -173,10 +178,11 @@ describe("leftover returns fail this suite", () => {
 
   it("event menu shows encoded sell prices and flags the 196 lb radish", () => {
     const tab = read("src/features/events/EventMenuTab.tsx");
+    const stats = read("src/features/events/EventMenuStatsCard.tsx");
     const prep = read("src/features/events/EventPrepTab.tsx");
     expect(tab).toContain("eventMenuSellTotals");
     expect(tab).toContain("unitSellPrice");
-    expect(tab).toContain("food sell");
+    expect(stats).toContain("food sell");
     expect(tab).toContain("planEventMenuLineSave");
     expect(tab).not.toContain("formatSellPriceInstruction");
     expect(tab).toContain("suspectRowsFromRecipeLines");
