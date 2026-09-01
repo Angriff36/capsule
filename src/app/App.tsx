@@ -476,6 +476,16 @@ const MyDayPage = lazy(() =>
     default: module.MyDayPage,
   })),
 );
+const EventDayPage = lazy(() =>
+  import("../features/eventDay/EventDayPage").then((module) => ({
+    default: module.EventDayPage,
+  })),
+);
+const EventDayPickerPage = lazy(() =>
+  import("../features/eventDay/EventDayPickerPage").then((module) => ({
+    default: module.EventDayPickerPage,
+  })),
+);
 const EmailNotificationSettingsPage = lazy(() =>
   import("../features/notifications/EmailNotificationSettingsPage").then(
     (module) => ({ default: module.EmailNotificationSettingsPage }),
@@ -571,6 +581,23 @@ export function App() {
               <SupplyRoute>
                 <ActionResultHost />
                 <MyDayPage />
+              </SupplyRoute>
+            }
+          />
+          {/* Event Day staff map lives outside AppShell — full-screen night view. */}
+          <Route
+            path="/event-day"
+            element={
+              <SupplyRoute>
+                <EventDayPickerPage />
+              </SupplyRoute>
+            }
+          />
+          <Route
+            path="/event-day/:id"
+            element={
+              <SupplyRoute>
+                <EventDayPage />
               </SupplyRoute>
             }
           />
