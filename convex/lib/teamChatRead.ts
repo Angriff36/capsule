@@ -123,8 +123,13 @@ export async function chatAuth(ctx: QueryCtx): Promise<AppAuthContext | null> {
 
 export const live = (row: { deletedAt?: number | null }) =>
   row.deletedAt == null;
-export const sentAt = (row: Doc<"staffMessages">) =>
-  row.createdAt ?? row._creationTime;
+/**
+ * The message's position in the channel: Convex's commit time, a total order
+ * with sub-millisecond precision. `createdAt` (the mutation's Date.now()) can
+ * collide for two messages in the same millisecond, and a read cursor set to
+ * the first would silently swallow the second.
+ */
+export const sentAt = (row: Doc<"staffMessages">) => row._creationTime;
 
 /** A referenced doc only when it is this tenant's and not soft-deleted. */
 export async function tenantEvent(
@@ -285,26 +290,38 @@ export async function previewOf(
   return files > 0 ? (files === 1 ? "Sent a file" : `Sent ${files} files`) : "";
 }
 
-/** The caller's newest read cursor per channel (duplicates collapse to the max). */
-export async function readCursorsFor(
+/**
+ * The caller's newest read cursor for each of the given channels (duplicates
+ * collapse to the max). Read per channel through `by_channelKey` — one small
+ * range per channel in view, bounded by the team size — never the account's
+ * whole cursor history, which grows with every channel ever visited.
+ */
+export async function readCursorsForChannels(
   ctx: QueryCtx,
   tenantId: string,
   authSubjectId: string,
+  channelKeys: readonly string[],
 ): Promise<Map<string, { id: string; lastReadAt: number }>> {
-  const rows = await ctx.db
-    .query("staffChatReadCursors")
-    .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", authSubjectId))
-    .collect();
   const cursors = new Map<string, { id: string; lastReadAt: number }>();
-  for (const row of rows) {
-    if (row.tenantId !== tenantId) continue;
-    const existing = cursors.get(row.channelKey);
-    if (!existing || row.lastReadAt > existing.lastReadAt) {
-      cursors.set(row.channelKey, {
-        id: String(row._id),
-        lastReadAt: row.lastReadAt,
-      });
-    }
-  }
+  await Promise.all(
+    [...new Set(channelKeys)].map(async (channelKey) => {
+      const rows = await ctx.db
+        .query("staffChatReadCursors")
+        .withIndex("by_channelKey", (q) => q.eq("channelKey", channelKey))
+        .collect();
+      for (const row of rows) {
+        if (row.tenantId !== tenantId || row.authSubjectId !== authSubjectId) {
+          continue;
+        }
+        const existing = cursors.get(channelKey);
+        if (!existing || row.lastReadAt > existing.lastReadAt) {
+          cursors.set(channelKey, {
+            id: String(row._id),
+            lastReadAt: row.lastReadAt,
+          });
+        }
+      }
+    }),
+  );
   return cursors;
 }

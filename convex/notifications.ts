@@ -118,7 +118,6 @@ export const listNotifications = query({
       vendorOrders,
       staffMessages,
       prepTaskComments,
-      staffChatReadCursors,
     ] = await Promise.all([
       when(can(auth, "eventAccess", "salesAccess"), () =>
         ctx.db.query("events").withIndex("by_tenantId", byTenant).collect(),
@@ -213,15 +212,42 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect(),
       ),
-      // Only the caller's own cursors (by_authSubjectId) — a mention hides
-      // once its channel has been read.
-      when(can(auth, "staffAccess") && auth.id !== "", () =>
-        ctx.db
-          .query("staffChatReadCursors")
-          .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", auth.id))
-          .collect(),
-      ),
     ]);
+
+    // A mention hides once its channel has been read. Cursors are read per
+    // mention channel through by_channelKey (bounded by the team size), never
+    // the account's whole cursor history.
+    const mentionChannelKeys = new Set<string>();
+    if (staffMessages && auth.personId) {
+      const now = Date.now();
+      for (const message of staffMessages) {
+        if (
+          message.eventId &&
+          message.deletedAt == null &&
+          message.createdAt != null &&
+          now - message.createdAt <= MENTION_WINDOW_MS &&
+          (message.mentionedPersonIds ?? "")
+            .split(",")
+            .some((id) => id.trim() === auth.personId)
+        ) {
+          mentionChannelKeys.add(`event:${String(message.eventId)}`);
+        }
+      }
+    }
+    const staffChatReadCursors = (
+      await Promise.all(
+        [...mentionChannelKeys].map((channelKey) =>
+          ctx.db
+            .query("staffChatReadCursors")
+            .withIndex("by_channelKey", (q) => q.eq("channelKey", channelKey))
+            .collect(),
+        ),
+      )
+    )
+      .flat()
+      .filter(
+        (row) => row.tenantId === tenantId && row.authSubjectId === auth.id,
+      );
 
     // Roles without eventAccess cannot list events, but a mention still
     // needs its channel's title: hydrate only the events of the caller's own
@@ -269,9 +295,7 @@ export const listNotifications = query({
       vendorOrders,
       staffMessages,
       prepTaskComments,
-      staffChatReadCursors: staffChatReadCursors?.filter(
-        (row) => row.tenantId === tenantId,
-      ),
+      staffChatReadCursors,
       mentionEventTitles,
     });
   },

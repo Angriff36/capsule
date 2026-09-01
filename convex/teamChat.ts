@@ -29,7 +29,7 @@ import {
   MAX_THREAD_MESSAGES,
   previewOf,
   RANGE_TAKE,
-  readCursorsFor,
+  readCursorsForChannels,
   receivedBy,
   sentAt,
   sentBy,
@@ -181,7 +181,6 @@ export const listConversations = query({
     }
 
     // --- event channels --------------------------------------------------
-    const cursors = await readCursorsFor(ctx, tenantId, auth.id);
 
     // Bounded: the newest EVENT_SCAN events by creation (there is no startsAt
     // index), then only those inside the retention window, then at most
@@ -214,6 +213,13 @@ export const listConversations = query({
       ...past.slice(0, Math.max(half, EVENT_CANDIDATES - upcoming.length)),
       ...upcoming,
     ].slice(0, EVENT_CANDIDATES);
+    // Only the cursors of the channels in view — never the account's history.
+    const cursors = await readCursorsForChannels(
+      ctx,
+      tenantId,
+      auth.id,
+      candidates.map((event) => `event:${String(event._id)}`),
+    );
 
     const events: EventConversation[] = [];
     await Promise.all(
@@ -294,9 +300,10 @@ export const channelSummary = query({
       raw.length >= UNREAD_SCAN &&
       boundary !== undefined &&
       sentAt(boundary) >= args.since;
+    const channelKey = `event:${String(event._id)}`;
     const cursor =
-      (await readCursorsFor(ctx, tenantId, auth.id)).get(
-        `event:${String(event._id)}`,
+      (await readCursorsForChannels(ctx, tenantId, auth.id, [channelKey])).get(
+        channelKey,
       ) ?? null;
     const readUpTo = cursor?.lastReadAt ?? 0;
     const newest = scanned[0];

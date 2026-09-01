@@ -11,11 +11,11 @@ export type ChatDraftRestore = {
 /**
  * Recovers a draft whose send failed after its composer was gone. The
  * composer reports the orphan (it is keyed by channel and unmounts on a
- * switch). The draft is ALWAYS written to the module store first — the page
- * itself may be gone by the time the send fails — and then, if the user is
- * back on that channel with this page still mounted, the live composer
- * merges it in and the store entry is cleared. Otherwise it seeds the
- * composer the next time that channel opens anywhere.
+ * switch) and the draft goes to the module store. Whoever is showing that
+ * channel when the store changes — this page, or a page that replaced it —
+ * merges the draft into its live composer and clears the entry; otherwise
+ * the entry seeds the composer the next time the channel opens, and stays
+ * until a composer reports that it took it in.
  */
 export function useChatDraftRecovery(channelKey: string) {
   const channelRef = useRef(channelKey);
@@ -33,9 +33,7 @@ export function useChatDraftRecovery(channelKey: string) {
   const [restore, setRestore] = useState<ChatDraftRestore | null>(null);
 
   // Peeked once per channel and held: the composer may mount a render later
-  // than this hook (the page shows a skeleton until its queries load). The
-  // store keeps the entry until a composer reports that it took the draft
-  // in, so leaving during the skeleton loses nothing.
+  // than this hook (the page shows a skeleton until its queries load).
   const initialDraft = useMemo(
     () => (channelKey ? failedDrafts.peek(channelKey) : null),
     [channelKey],
@@ -44,13 +42,23 @@ export function useChatDraftRecovery(channelKey: string) {
     if (channelKey) failedDrafts.forget(channelKey);
   }, [channelKey]);
 
+  // A draft kept for the channel on screen — by this page's own composer or
+  // by an older one that failed after this page took over — is merged live.
+  useEffect(
+    () =>
+      failedDrafts.subscribe((changedKey) => {
+        if (!mountedRef.current || changedKey !== channelRef.current) return;
+        const draft = failedDrafts.peek(changedKey);
+        if (!draft) return;
+        tokenRef.current += 1;
+        setRestore({ channelKey: changedKey, draft, token: tokenRef.current });
+      }),
+    [],
+  );
+
   const orphanedFrom = useCallback(
     (sentFrom: string, draft: ChatComposerDraft) => {
       failedDrafts.keep(sentFrom, draft);
-      if (mountedRef.current && channelRef.current === sentFrom) {
-        tokenRef.current += 1;
-        setRestore({ channelKey: sentFrom, draft, token: tokenRef.current });
-      }
     },
     [],
   );

@@ -90,6 +90,8 @@ export interface NotificationSources {
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
 const MESSAGE_RETENTION_MS = 90 * 86_400_000;
+/** Newest DM rows per pair the thread shows (convex/lib/teamChatRead.ts MAX_THREAD_MESSAGES). */
+const DM_THREAD_LIMIT = 400;
 
 export function deriveNotifications(
   src: NotificationSources,
@@ -239,10 +241,34 @@ export function deriveNotifications(
     });
   }
 
+  // Only the rows the thread can show and mark read: the newest
+  // DM_THREAD_LIMIT per sender. An older unread row would notify forever.
+  const bySender = new Map<string, Doc<"staffMessages">[]>();
   for (const message of src.staffMessages ?? []) {
     if (
       src.currentAuthSubjectId == null ||
       message.recipientAuthSubjectId !== src.currentAuthSubjectId ||
+      message.deletedAt != null
+    ) {
+      continue;
+    }
+    const key = message.senderPersonId as string;
+    const list = bySender.get(key);
+    if (list) list.push(message);
+    else bySender.set(key, [message]);
+  }
+  const visibleDm = new Set<string>();
+  for (const list of bySender.values()) {
+    list.sort((a, b) => b._creationTime - a._creationTime);
+    for (const message of list.slice(0, DM_THREAD_LIMIT)) {
+      visibleDm.add(message._id as string);
+    }
+  }
+  for (const message of src.staffMessages ?? []) {
+    if (
+      src.currentAuthSubjectId == null ||
+      message.recipientAuthSubjectId !== src.currentAuthSubjectId ||
+      !visibleDm.has(message._id as string) ||
       message.deletedAt != null ||
       message.readAt != null ||
       message.createdAt == null ||
@@ -294,7 +320,8 @@ export function deriveNotifications(
         .map((id) => id.trim());
       if (!mentioned.includes(myPersonId)) continue;
       const eventId = message.eventId as string;
-      if ((readUpTo.get(`event:${eventId}`) ?? 0) >= message.createdAt) {
+      // Cursors hold the commit-time position (a total order), so compare it.
+      if ((readUpTo.get(`event:${eventId}`) ?? 0) >= message._creationTime) {
         continue;
       }
       const who =
