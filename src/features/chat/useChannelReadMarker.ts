@@ -36,8 +36,14 @@ export function useChannelReadMarker(
         sentUpTo.current.get(channelKey) ?? 0,
       );
       if (covered >= newestAt) return;
+      // Optimistic, so a burst of reaches sends once; rolled back on failure
+      // so the next reach retries instead of leaving the badge stale.
       sentUpTo.current.set(channelKey, newestAt);
-      void moveCursor(channelKey, newestAt);
+      void moveCursor(channelKey, newestAt).then((ok) => {
+        if (!ok && sentUpTo.current.get(channelKey) === newestAt) {
+          sentUpTo.current.delete(channelKey);
+        }
+      });
     },
     [channelKey, moveCursor, summary],
   );

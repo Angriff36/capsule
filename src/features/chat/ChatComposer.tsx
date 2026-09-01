@@ -72,9 +72,11 @@ export function ChatComposer({
   // instance's counter so a newly attached file can never share a key.
   const rekey = (pending: readonly ChatPendingFile[]) =>
     pending.map((item) => ({ ...item, key: `f${nextFileKeyRef.current++}` }));
+  // Layout effect: the flag flips during the unmount commit, before a
+  // rejected send can resume and try to restore into a detached instance.
   // Armed in the setup too: StrictMode runs setup → cleanup → setup on mount.
   const mountedRef = useRef(true);
-  useEffect(() => {
+  useLayoutEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;

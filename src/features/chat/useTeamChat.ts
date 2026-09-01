@@ -285,11 +285,14 @@ export function useChatMessageActions() {
 export function useChatReadCursor() {
   const markChannelRead = useMutation(api.teamChatCursor.markChannelRead);
   return useCallback(
-    async (channelKey: string, readUpTo: number): Promise<void> => {
+    async (channelKey: string, readUpTo: number): Promise<boolean> => {
       try {
         await markChannelRead({ channelKey, readUpTo });
+        return true;
       } catch {
         // Read state is a convenience; the thread itself already rendered.
+        // The caller forgets its optimistic mark so a later reach retries.
+        return false;
       }
     },
     [markChannelRead],

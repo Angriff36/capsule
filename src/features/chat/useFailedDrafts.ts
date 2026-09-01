@@ -11,34 +11,52 @@ import {
  * user had switched channels, tabs, or pages. The composer is keyed by
  * channel, so it cannot restore them itself. Module scope: a draft kept on
  * the event Chat tab is handed back on /staff/messages?event=… too (same
- * channelKey), and a page unmount does not lose it. Two failures for one
- * channel merge (older first) instead of the later one replacing the first.
- * Observable, so a page that is already showing the channel when the old
- * send fails can pick the draft up at once.
+ * channelKey), and a page unmount does not lose it.
+ *
+ * Each channel holds a LIST of failed drafts, oldest first. Readers take a
+ * merged view of the items they can see and later consume exactly that many,
+ * so a draft parked while a composer was seeding itself is neither dropped
+ * nor duplicated. Observable, so a page already showing the channel merges a
+ * new arrival at once.
  */
-const store = new Map<string, ChatComposerDraft>();
+const store = new Map<string, ChatComposerDraft[]>();
 const listeners = new Set<(channelKey: string) => void>();
 
+function mergeAll(items: readonly ChatComposerDraft[]): ChatComposerDraft {
+  return items.reduce((older, newer) => ({
+    text: restoreDraftText(older.text, newer.text),
+    files: restoreDraftFiles(older.files, newer.files),
+    links: restoreDraftLinks(older.links, newer.links),
+    mentions: restoreDraftMentions(older.mentions, newer.mentions),
+  }));
+}
+
+export type FailedDraftView = {
+  /** All visible items merged, oldest first. */
+  readonly draft: ChatComposerDraft;
+  /** How many items the view covers — pass back to consume(). */
+  readonly count: number;
+};
+
 export const failedDrafts = {
-  peek: (channelKey: string): ChatComposerDraft | null =>
-    store.get(channelKey) ?? null,
+  /** The items for a channel after the first `skip`, merged; null when none. */
+  peek: (channelKey: string, skip = 0): FailedDraftView | null => {
+    const items = (store.get(channelKey) ?? []).slice(skip);
+    if (items.length === 0) return null;
+    return { draft: mergeAll(items), count: items.length };
+  },
   keep: (channelKey: string, draft: ChatComposerDraft): void => {
-    const prior = store.get(channelKey);
-    store.set(
-      channelKey,
-      prior
-        ? {
-            text: restoreDraftText(prior.text, draft.text),
-            files: restoreDraftFiles(prior.files, draft.files),
-            links: restoreDraftLinks(prior.links, draft.links),
-            mentions: restoreDraftMentions(prior.mentions, draft.mentions),
-          }
-        : draft,
-    );
+    const items = store.get(channelKey) ?? [];
+    items.push(draft);
+    store.set(channelKey, items);
     for (const listener of listeners) listener(channelKey);
   },
-  forget: (channelKey: string): void => {
-    store.delete(channelKey);
+  /** Drop the oldest `count` items — the ones a view handed to a composer. */
+  consume: (channelKey: string, count: number): void => {
+    const items = store.get(channelKey);
+    if (!items) return;
+    items.splice(0, count);
+    if (items.length === 0) store.delete(channelKey);
   },
   /** Called with the channelKey after every keep(). Returns the unsubscribe. */
   subscribe: (listener: (channelKey: string) => void): (() => void) => {
