@@ -58,7 +58,7 @@ export function EventDayTray({ now, next, blockers, onOpen }: Props) {
         head="Now"
         dotColor="var(--evd-ready)"
         item={now}
-        empty="All settled"
+        empty="Nothing in motion"
         onOpen={onOpen}
       />
       <Cell
