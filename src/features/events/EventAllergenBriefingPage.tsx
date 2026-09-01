@@ -10,6 +10,7 @@ import {
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { isPlausibleConvexId, useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { displayEventMenuNotes } from "./eventMenuLineFields";
 import { eventDetailPath } from "./eventRoutes";
 import {
   assessGuestListCoverage,
@@ -245,9 +246,9 @@ export function EventAllergenBriefingPage() {
                         </td>
                         <td className="py-1.5 pr-3">
                           {dish?.name ?? "Unknown dish"}
-                          {row.specialInstructions ? (
+                          {displayEventMenuNotes(row.specialInstructions) ? (
                             <span className="block text-xs text-ink-2">
-                              {row.specialInstructions}
+                              {displayEventMenuNotes(row.specialInstructions)}
                             </span>
                           ) : null}
                         </td>

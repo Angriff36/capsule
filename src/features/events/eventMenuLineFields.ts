@@ -84,6 +84,16 @@ export function parseEventMenuLineFields(
   };
 }
 
+/**
+ * Human-readable dish notes for staff/client print and PDFs.
+ * Strips the `@capsule.menu {json}` sentinel and leftover SELL: lines.
+ */
+export function displayEventMenuNotes(
+  specialInstructions?: string | null,
+): string {
+  return parseEventMenuLineFields(specialInstructions).notes;
+}
+
 export function encodeEventMenuLineFields(fields: {
   unitSellPrice?: number | null;
   containerCount?: number | null;
