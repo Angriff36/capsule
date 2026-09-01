@@ -31,8 +31,12 @@ export type ChatThreadProps = {
   readonly pinSignal: number;
   readonly onEdit: (message: ChatMessageView, body: string) => Promise<void>;
   readonly onRemove: (message: ChatMessageView) => Promise<void>;
-  /** Fires (debounced, at most once per 2s) when the user is at the bottom and the newest message is visible — the caller marks the channel read. */
-  readonly onReachBottom?: () => void;
+  /**
+   * Fires (debounced, at most once per 2s) when the user is at the bottom and
+   * the newest message is visible — the caller marks the channel read up to
+   * `newestAt`, the send time of that newest visible message.
+   */
+  readonly onReachBottom?: (newestAt: number | null) => void;
   readonly emptyTitle: string;
   readonly emptyHint: string;
 };
@@ -81,6 +85,8 @@ export function ChatThread({
 
   const reachRef = useRef(onReachBottom);
   reachRef.current = onReachBottom;
+  /** Newest visible send time, read at call time so a debounced call is current. */
+  const newestAtRef = useRef<number | null>(null);
   const lastReachRef = useRef(0);
   const reachTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -89,14 +95,14 @@ export function ChatThread({
     const wait = REACH_BOTTOM_DEBOUNCE_MS - (Date.now() - lastReachRef.current);
     if (wait <= 0) {
       lastReachRef.current = Date.now();
-      reachRef.current();
+      reachRef.current(newestAtRef.current);
       return;
     }
     if (reachTimerRef.current !== null) return;
     reachTimerRef.current = setTimeout(() => {
       reachTimerRef.current = null;
       lastReachRef.current = Date.now();
-      reachRef.current?.();
+      reachRef.current?.(newestAtRef.current);
     }, wait);
   }, []);
 
@@ -125,6 +131,10 @@ export function ChatThread({
         : [...messages].sort((a, b) => a.createdAt - b.createdAt),
     [messages],
   );
+  newestAtRef.current =
+    sorted && sorted.length > 0
+      ? (sorted[sorted.length - 1]?.createdAt ?? null)
+      : null;
 
   // Channel switch or the caller's own send: reset and pin to the bottom.
   // `sorted` is read here, not watched — the effect below owns its changes.

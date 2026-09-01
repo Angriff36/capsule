@@ -33,6 +33,10 @@ const RANGE_TAKE = 800;
 const UNREAD_SCAN = 50;
 /** Channels stay in the rail from one day before the event starts. */
 const DAY_MS = 86_400_000;
+/** Newest events (by creation) considered for the rail. */
+const EVENT_SCAN = 400;
+/** Event channels the rail reads unread counts for per run. */
+const EVENT_CANDIDATES = 80;
 
 type ChatAttachmentView = {
   _id: string;
@@ -383,16 +387,30 @@ export const listConversations = query({
       }
     }
 
-    const allEvents = await ctx.db
+    // Bounded: the newest EVENT_SCAN events by creation (there is no startsAt
+    // index), then only those inside the retention window, then at most
+    // EVENT_CANDIDATES channels — upcoming first, then the most recent past.
+    // Each candidate costs one small index read, never a tenant-wide message
+    // scan; an event booked before 400 newer ones is reachable from its tab.
+    const recentEvents = await ctx.db
       .query("events")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect();
-    const candidates = allEvents.filter(
+      .order("desc")
+      .take(EVENT_SCAN);
+    const inWindow = recentEvents.filter(
       (event) =>
         live(event) &&
         event.stage !== "cancelled" &&
-        (event.startsAt == null || event.startsAt >= args.since),
+        event.startsAt != null &&
+        event.startsAt >= args.since,
     );
+    const upcoming = inWindow
+      .filter((event) => (event.startsAt ?? 0) >= args.now - DAY_MS)
+      .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0));
+    const past = inWindow
+      .filter((event) => (event.startsAt ?? 0) < args.now - DAY_MS)
+      .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0));
+    const candidates = [...upcoming, ...past].slice(0, EVENT_CANDIDATES);
 
     const events: EventConversation[] = [];
     await Promise.all(

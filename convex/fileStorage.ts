@@ -30,7 +30,8 @@ export const listForParent = query({
       v.literal("closeout"),
       v.literal("dish"),
       v.literal("ingredient"),
-      v.literal("staffMessage"),
+      // No "staffMessage": chat files are private to the message's readers
+      // and are hydrated only by convex/teamChat.ts.
     ),
     parentId: v.string(),
   },

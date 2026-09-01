@@ -4,7 +4,8 @@
 // convex/fileStorage.ts issues upload URLs and resolves download URLs);
 // this entity records the metadata, uploader identity, and timestamp.
 // The parentType union is also hand-mirrored in convex/fileStorage.ts
-// (listForParent) and src/features/attachments/AttachmentsSection.tsx.
+// (listForParent) and src/features/attachments/AttachmentsSection.tsx —
+// minus staffMessage, whose files are read only through convex/teamChat.ts.
 
 use "../foundation/base.manifest"
 
@@ -67,7 +68,11 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   // Operator-selected photos to include in the post-event client feedback survey.
   property inFeedbackSurvey: boolean?
 
-  default policy attachmentRead read: roleAllows(user.role, "staffAccess") "Staff may read attachments"
+  // Team-chat files (parentType staffMessage) follow their message: the chat
+  // seam (convex/teamChat.ts) shows them to the message's readers, and the
+  // generated queries show them only to the uploader. `uploadedById == null`
+  // is the create-time draft escape (the read policy runs before mutates).
+  default policy attachmentRead read: roleAllows(user.role, "staffAccess") and (self.parentType != "staffMessage" or self.uploadedById == null or (user.id != null and self.uploadedById == user.id)) "Staff may read attachments; chat files stay with their message"
   default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may write attachments through commands"
   default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute attachment commands"
 

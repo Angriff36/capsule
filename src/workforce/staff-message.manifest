@@ -51,7 +51,7 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
 
   // Intent only — entity-level constraints do not project to Convex; the
   // commands below carry the enforced copies.
-  constraint staffMessageTarget: self.recipientPersonId != null or self.eventId != null "A message needs a recipient or an event channel"
+  constraint staffMessageTarget: (self.recipientPersonId != null or self.eventId != null) and (self.recipientPersonId == null or self.eventId == null) "A message goes to exactly one place: a teammate or an event channel"
   constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
   constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
 
@@ -60,10 +60,10 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   default policy staffMessageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute staff message commands"
 
   // Governed creation — one row per message. The sender is always the
-  // caller's linked staff profile.
+  // caller's linked staff profile; the recipient's sign-in is copied from
+  // the tenant-checked recipient Person row, never accepted from the browser.
   command send(
     optional recipientPersonId: uuid,
-    optional recipientAuthSubjectId: string,
     optional eventId: uuid,
     body: string,
     attachmentCount: int,
@@ -75,14 +75,14 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     // Seed/API checks: a referenced event or recipient must exist in this tenant.
     guard self.eventId == null or self.event != null
     guard self.recipientPersonId == null or self.recipient != null
-    constraint sendTarget: recipientPersonId != null or eventId != null "Pick a teammate or an event channel"
+    constraint sendTarget: (recipientPersonId != null or eventId != null) and (recipientPersonId == null or eventId == null) "Pick a teammate or an event channel, not both"
     constraint sendBodyOrFiles: length(trim(body)) > 0 or attachmentCount > 0 "Message text or a file is required"
     constraint sendDistinctParties: recipientPersonId == null or recipientPersonId != user.personId "You cannot message yourself"
     constraint sendAttachmentCount: attachmentCount >= 0 "Attachment count cannot be negative"
     mutate senderPersonId = user.personId
     mutate senderAuthSubjectId = user.id
     mutate recipientPersonId = recipientPersonId
-    mutate recipientAuthSubjectId = recipientAuthSubjectId
+    mutate recipientAuthSubjectId = self.recipient != null ? self.recipient.authSubjectId : null
     mutate eventId = eventId
     mutate body = body
     mutate attachmentCount = attachmentCount
@@ -163,13 +163,16 @@ entity StaffChatReadCursor mixin TenantScoped {
   default policy staffChatReadCursorWrite write: roleAllows(user.role, "staffAccess") "Staff may write their own chat read cursors through commands"
   default policy staffChatReadCursorExecute execute: roleAllows(user.role, "staffAccess") "Staff may mark chat channels read for themselves"
 
-  // Governed creation — first time an account opens a channel.
-  command open(channelKey: string) {
+  // Governed creation — first time an account opens a channel. `readUpTo` is
+  // the send time of the newest message the reader actually saw, so a
+  // message that lands between render and this call stays unread.
+  command open(channelKey: string, readUpTo: datetime) {
     guard user.id != null
     constraint openChannelKey: length(trim(channelKey)) > 0 "Channel is required"
+    constraint openNotFuture: readUpTo <= now() "Read position cannot be in the future"
     mutate channelKey = channelKey
     mutate authSubjectId = user.id
-    mutate lastReadAt = now()
+    mutate lastReadAt = readUpTo
     emit StaffChatChannelRead {
       staffChatReadCursorId: self.id
       tenantId: self.tenantId
@@ -178,11 +181,12 @@ entity StaffChatReadCursor mixin TenantScoped {
     }
   }
 
-  // Every later visit moves the cursor forward.
-  command touch() {
+  // Every later visit moves the cursor forward, never back.
+  command touch(readUpTo: datetime) {
     guard user.id != null
     guard self.authSubjectId == user.id
-    mutate lastReadAt = now()
+    constraint touchNotFuture: readUpTo <= now() "Read position cannot be in the future"
+    mutate lastReadAt = readUpTo > self.lastReadAt ? readUpTo : self.lastReadAt
     emit StaffChatChannelRead {
       staffChatReadCursorId: self.id
       tenantId: self.tenantId

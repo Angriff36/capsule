@@ -122,11 +122,10 @@ type UploadedFile = { file: File; storageId: string };
 
 /**
  * Upload every file, create the message, then attach the files to it.
- * Uploads run first so a failed upload never leaves a half message behind;
- * if every attach fails on a text-less message the message is taken back.
- * Resolves with a `warning` when the message exists but some files did not
- * attach — a rejection there would make the composer keep and re-send the
- * whole draft.
+ * Uploads run first so a failed upload never leaves a half message behind.
+ * If any attach fails the message is taken back and the send rejects, so the
+ * stored attachmentCount never claims files that do not exist and the
+ * composer restores the draft for a clean retry.
  */
 export function useSendChatMessage() {
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
@@ -135,11 +134,7 @@ export function useSendChatMessage() {
   const remove = useStaffMessageRemove();
 
   return useCallback(
-    async (
-      channel: ChatChannel,
-      submit: ChatComposerSubmit,
-      recipientAuthSubjectId?: string | null,
-    ): Promise<{ warning?: string }> => {
+    async (channel: ChatChannel, submit: ChatComposerSubmit): Promise<void> => {
       const uploaded: UploadedFile[] = [];
       for (const file of submit.files) {
         const uploadUrl = await generateUploadUrl();
@@ -157,13 +152,11 @@ export function useSendChatMessage() {
         uploaded.push({ file, storageId });
       }
 
+      // The server copies the recipient's sign-in from the Person row itself.
       const target =
         channel.kind === "event"
           ? { eventId: channel.eventId }
-          : {
-              recipientPersonId: channel.personId,
-              ...(recipientAuthSubjectId ? { recipientAuthSubjectId } : {}),
-            };
+          : { recipientPersonId: channel.personId };
       const result = (await send({
         ...target,
         body: submit.body,
@@ -191,23 +184,15 @@ export function useSendChatMessage() {
           failed.push(file.name);
         }
       }
-      if (failed.length === 0) return {};
-      if (
-        failed.length === uploaded.length &&
-        submit.body.trim().length === 0
-      ) {
-        try {
-          await remove({ docId });
-        } catch {
-          // The seam already hides a text-less message with no files.
-        }
-        throw new Error(
-          `${failed.length === 1 ? "The file" : "The files"} could not be attached, so nothing was sent. Try again.`,
-        );
+      if (failed.length === 0) return;
+      try {
+        await remove({ docId });
+      } catch {
+        // Best effort; the message still names the files it failed to get.
       }
-      return {
-        warning: `Message sent, but ${failed.length} of ${uploaded.length} files failed to attach: ${failed.join(", ")}.`,
-      };
+      throw new Error(
+        `${failed.length === 1 ? "A file" : `${failed.length} files`} could not be attached (${failed.join(", ")}), so nothing was sent. Try again.`,
+      );
     },
     [attach, generateUploadUrl, remove, send],
   );
@@ -231,9 +216,11 @@ export function useChatMessageActions() {
 }
 
 /**
- * Move the caller's read cursor for a channel to now. Touches the row the
- * seam handed back; opens one only when none exists yet and returns the new
- * row id so the caller can touch it next time. Best effort.
+ * Move the caller's read cursor for a channel up to `readUpTo` — the send
+ * time of the newest message the reader actually saw, so a message that
+ * lands between render and this call stays unread. Touches the row the seam
+ * handed back; opens one only when none exists yet and returns the new row
+ * id so the caller can touch it next time. Best effort.
  */
 export function useChatReadCursor() {
   const open = useCreateStaffChatReadCursor();
@@ -242,13 +229,14 @@ export function useChatReadCursor() {
     async (
       channelKey: string,
       myCursorId: string | null,
+      readUpTo: number,
     ): Promise<string | null> => {
       try {
         if (myCursorId) {
-          await touch({ docId: myCursorId });
+          await touch({ docId: myCursorId, readUpTo });
           return myCursorId;
         }
-        const created = (await open({ channelKey })) as {
+        const created = (await open({ channelKey, readUpTo })) as {
           docId?: string;
         } | null;
         return created?.docId ?? null;

@@ -142,7 +142,6 @@ export function MessagesPage() {
         return {
           personId: id,
           name: identity.names.get(id) ?? "Teammate",
-          authSubjectId: person.authSubjectId ?? null,
           unread: conversation?.unread ?? 0,
           lastAt: conversation?.lastAt ?? 0,
           preview: conversation?.preview ?? "",
@@ -173,30 +172,28 @@ export function MessagesPage() {
     }
   }, [channel, identity.personId, markDirectRead, messages]);
 
-  const onReachBottom = useCallback(() => {
-    if (channel?.kind !== "event") return;
-    const known =
-      selectedEvent?.myCursorId ??
-      openedCursors.current.get(channelKey) ??
-      null;
-    if (known && (selectedEvent?.unread ?? 0) === 0) return;
-    void moveCursor(channelKey, known).then((id) => {
-      if (id) openedCursors.current.set(channelKey, id);
-    });
-  }, [channel, channelKey, moveCursor, selectedEvent]);
+  const onReachBottom = useCallback(
+    (newestAt: number | null) => {
+      if (channel?.kind !== "event" || newestAt == null) return;
+      const known =
+        selectedEvent?.myCursorId ??
+        openedCursors.current.get(channelKey) ??
+        null;
+      if (known && (selectedEvent?.lastReadAt ?? 0) >= newestAt) return;
+      void moveCursor(channelKey, known, newestAt).then((id) => {
+        if (id) openedCursors.current.set(channelKey, id);
+      });
+    },
+    [channel, channelKey, moveCursor, selectedEvent],
+  );
 
   const onSubmit = async (submit: ChatComposerSubmit) => {
     if (!channel) return;
     setError(null);
     setSending(true);
     try {
-      const { warning } = await sendMessage(
-        channel,
-        submit,
-        selectedTeammate?.authSubjectId,
-      );
+      await sendMessage(channel, submit);
       setPinSignal((n) => n + 1);
-      if (warning) setError(warning);
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "The message was not sent.",
@@ -391,6 +388,7 @@ export function MessagesPage() {
                   }
                 />
                 <ChatComposer
+                  key={channelKey}
                   placeholder={
                     channel.kind === "event"
                       ? `Message the “${headerTitle}” crew…`

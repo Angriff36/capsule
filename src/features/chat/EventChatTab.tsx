@@ -47,10 +47,11 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pinSignal, setPinSignal] = useState(0);
-  // A cursor opened this session, before the summary query catches up.
-  const openedCursorId = useRef<string | null>(null);
+  // Cursors opened this session, per channel, before the summary catches up
+  // (the tab component is reused when the route moves to another event).
+  const openedCursors = useRef(new Map<string, string>());
   // The thread reached the bottom before the summary loaded; replay it once.
-  const pendingReach = useRef(false);
+  const pendingReach = useRef<number | null | false>(false);
 
   const people = useMemo(
     () =>
@@ -63,23 +64,29 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
     [identity],
   );
 
-  const onReachBottom = useCallback(() => {
-    if (summary === undefined) {
-      pendingReach.current = true;
-      return;
-    }
-    if (summary === null) return;
-    const cursorId = summary.myCursorId ?? openedCursorId.current;
-    if (cursorId && summary.unread === 0) return;
-    void moveCursor(channelKey, cursorId).then((id) => {
-      if (id) openedCursorId.current = id;
-    });
-  }, [channelKey, moveCursor, summary]);
+  const onReachBottom = useCallback(
+    (newestAt: number | null) => {
+      if (newestAt == null) return;
+      if (summary === undefined) {
+        pendingReach.current = newestAt;
+        return;
+      }
+      if (summary === null) return;
+      const cursorId =
+        summary.myCursorId ?? openedCursors.current.get(channelKey) ?? null;
+      if (cursorId && (summary.lastReadAt ?? 0) >= newestAt) return;
+      void moveCursor(channelKey, cursorId, newestAt).then((id) => {
+        if (id) openedCursors.current.set(channelKey, id);
+      });
+    },
+    [channelKey, moveCursor, summary],
+  );
 
   useEffect(() => {
-    if (summary && pendingReach.current) {
+    if (summary && pendingReach.current !== false) {
+      const newestAt = pendingReach.current;
       pendingReach.current = false;
-      onReachBottom();
+      onReachBottom(newestAt);
     }
   }, [summary, onReachBottom]);
 
@@ -87,9 +94,8 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
     setError(null);
     setSending(true);
     try {
-      const { warning } = await sendMessage(channel, submit);
+      await sendMessage(channel, submit);
       setPinSignal((n) => n + 1);
-      if (warning) setError(warning);
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "The message was not sent.",
@@ -148,6 +154,7 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
             emptyHint="Start the crew conversation for this event."
           />
           <ChatComposer
+            key={channelKey}
             placeholder={`Message the “${eventTitle}” crew…`}
             disabledReason={
               identity.loading || identity.personId
