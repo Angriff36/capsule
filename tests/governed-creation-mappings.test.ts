@@ -100,6 +100,7 @@ describe("governed creation mappings", () => {
       "ShiftType_createViaDefine",
       "Shift_createViaSchedule",
       "SignatureRequest_createViaRequestSignature",
+      "StaffChatReadCursor_createViaOpen",
       "StaffMessage_createViaSend",
       "StockCountLine_createViaFreeze",
       "StockCountSession_createViaStart",

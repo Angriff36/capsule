@@ -1,7 +1,24 @@
-// Capsule workforce — StaffMessage (direct message between two staff members
-// in the same tenant). Distinct from client-facing communication
-// (sales/client-communication.manifest). Surfaced in the notification tray;
-// the UI shows the last 90 days (createdAt is the send time).
+// Capsule workforce — team chat.
+//
+// StaffMessage is one chat message between staff of the same tenant. Two
+// shapes share the entity:
+//   * direct message  — recipientPersonId set, eventId null
+//   * event channel   — eventId set, recipientPersonId null (every staff
+//                       member can read and post in an event's channel)
+// Distinct from client-facing communication (sales/client-communication.manifest).
+// Surfaced in the notification tray; the UI shows the last 90 days
+// (createdAt is the send time).
+//
+// Files travel as Attachment rows with parentType "staffMessage" and
+// parentId = the message id (documents/attachment.manifest); the authored
+// seam convex/teamChat.ts hydrates them with download URLs. Record links
+// (events, dishes, menus, clients) live inside the encrypted body as
+// `[[kind:id|Label]]` tokens (src/features/chat/chatLinkTokens.ts).
+//
+// Read policy is row-level: channel messages are readable by all staff, a
+// direct message only by its two parties. `self.senderAuthSubjectId == null`
+// is the create-time escape: the generated createVia evaluates the read
+// policy against the draft BEFORE mutates stamp the sender.
 
 use "../identity/person.manifest"
 
@@ -11,49 +28,76 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property indexed required senderPersonId: uuid
-  property indexed required recipientPersonId: uuid
+  // Direct messages only. Null for event-channel messages.
+  property indexed recipientPersonId: uuid?
+  // Event channel only. Null for direct messages.
+  property indexed eventId: uuid?
   // Stamped from trusted auth context on send, never accepted from the browser.
   property senderAuthSubjectId: string?
   // Copied from the recipient Person row so the recipient account can mark read.
   property recipientAuthSubjectId: string?
+  // May be empty when the message carries files (attachmentCount > 0).
   property required encrypted body: string
+  // Number of files the sender attached; lets a photo-only message have no text.
+  property attachmentCount: int = 0
+  // Comma-separated Person ids mentioned with @ — notification routing only.
+  property mentionedPersonIds: string?
+  property editedAt: datetime?
   property readAt: datetime?
 
   belongsTo sender: Person fields [tenantId, senderPersonId] references [tenantId, id]
   belongsTo recipient: Person fields [tenantId, recipientPersonId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint staffMessageBodyPresent: length(trim(self.body)) > 0 "Message text is required"
-  constraint staffMessageDistinctParties: self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
+  // Intent only — entity-level constraints do not project to Convex; the
+  // commands below carry the enforced copies.
+  constraint staffMessageTarget: self.recipientPersonId != null or self.eventId != null "A message needs a recipient or an event channel"
+  constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
+  constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
 
-  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") "Staff may read staff messages"
+  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or self.senderAuthSubjectId == null or (user.id != null and (self.senderAuthSubjectId == user.id or self.recipientAuthSubjectId == user.id))) "Staff may read channel messages and their own direct messages"
   default policy staffMessageWrite write: roleAllows(user.role, "staffAccess") "Staff may write staff messages through commands"
   default policy staffMessageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute staff message commands"
 
-  // Governed creation — one row per message.
+  // Governed creation — one row per message. The sender is always the
+  // caller's linked staff profile.
   command send(
-    senderPersonId: uuid,
-    recipientPersonId: uuid,
+    optional recipientPersonId: uuid,
     optional recipientAuthSubjectId: string,
-    body: string
+    optional eventId: uuid,
+    body: string,
+    attachmentCount: int,
+    optional mentionedPersonIds: string
   ) {
     guard self.deletedAt == null
     guard user.id != null
-    constraint sendBodyPresent: length(trim(body)) > 0 "Message text is required"
-    constraint sendDistinctParties: senderPersonId != recipientPersonId "Sender and recipient must be different people"
-    mutate senderPersonId = senderPersonId
-    mutate recipientPersonId = recipientPersonId
+    guard user.personId != null "Link your account to a staff profile before sending messages"
+    // Seed/API checks: a referenced event or recipient must exist in this tenant.
+    guard self.eventId == null or self.event != null
+    guard self.recipientPersonId == null or self.recipient != null
+    constraint sendTarget: recipientPersonId != null or eventId != null "Pick a teammate or an event channel"
+    constraint sendBodyOrFiles: length(trim(body)) > 0 or attachmentCount > 0 "Message text or a file is required"
+    constraint sendDistinctParties: recipientPersonId == null or recipientPersonId != user.personId "You cannot message yourself"
+    constraint sendAttachmentCount: attachmentCount >= 0 "Attachment count cannot be negative"
+    mutate senderPersonId = user.personId
     mutate senderAuthSubjectId = user.id
+    mutate recipientPersonId = recipientPersonId
     mutate recipientAuthSubjectId = recipientAuthSubjectId
+    mutate eventId = eventId
     mutate body = body
+    mutate attachmentCount = attachmentCount
+    mutate mentionedPersonIds = mentionedPersonIds
     emit StaffMessageSent {
       staffMessageId: self.id
       tenantId: self.tenantId
-      senderPersonId: senderPersonId
+      senderPersonId: self.senderPersonId
       recipientPersonId: recipientPersonId
+      eventId: eventId
     }
   }
 
-  // Only the linked recipient account clears its own unread marker.
+  // Only the linked recipient account clears its own unread marker (direct
+  // messages). Channel read state lives in StaffChatReadCursor.
   command markRead() {
     guard self.deletedAt == null
     guard self.readAt == null
@@ -69,19 +113,117 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Authors fix their own text. A photo-only message keeps an empty caption.
+  command edit(body: string, optional mentionedPersonIds: string) {
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.senderAuthSubjectId != null and self.senderAuthSubjectId == user.id
+    constraint editBodyOrFiles: length(trim(body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
+    mutate body = body
+    mutate mentionedPersonIds = mentionedPersonIds
+    mutate editedAt = now()
+    emit StaffMessageEdited {
+      staffMessageId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Authors take back their own message; managers moderate channels.
+  command remove() {
+    guard self.deletedAt == null
+    guard user.id != null
+    guard (self.senderAuthSubjectId != null and self.senderAuthSubjectId == user.id) or roleAllows(user.role, "manageAccess")
+    mutate deletedAt = now()
+    emit StaffMessageRemoved {
+      staffMessageId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
   store StaffMessage in durable
+}
+
+// Per-account read position in a chat channel (channelKey "event:<eventId>").
+// One row per (channel, account) by intent; Convex does not enforce the
+// alternate key, so readers take the newest lastReadAt across duplicates and
+// the UI touches the row the seam hands back instead of opening another.
+entity StaffChatReadCursor mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, channelKey, authSubjectId]
+  timestamps
+  versionProperty version: number
+
+  property indexed required channelKey: string
+  property indexed required authSubjectId: string
+  property required lastReadAt: datetime
+
+  default policy staffChatReadCursorRead read: roleAllows(user.role, "staffAccess") "Staff may read chat read cursors"
+  default policy staffChatReadCursorWrite write: roleAllows(user.role, "staffAccess") "Staff may write their own chat read cursors through commands"
+  default policy staffChatReadCursorExecute execute: roleAllows(user.role, "staffAccess") "Staff may mark chat channels read for themselves"
+
+  // Governed creation — first time an account opens a channel.
+  command open(channelKey: string) {
+    guard user.id != null
+    constraint openChannelKey: length(trim(channelKey)) > 0 "Channel is required"
+    mutate channelKey = channelKey
+    mutate authSubjectId = user.id
+    mutate lastReadAt = now()
+    emit StaffChatChannelRead {
+      staffChatReadCursorId: self.id
+      tenantId: self.tenantId
+      channelKey: channelKey
+      authSubjectId: self.authSubjectId
+    }
+  }
+
+  // Every later visit moves the cursor forward.
+  command touch() {
+    guard user.id != null
+    guard self.authSubjectId == user.id
+    mutate lastReadAt = now()
+    emit StaffChatChannelRead {
+      staffChatReadCursorId: self.id
+      tenantId: self.tenantId
+      channelKey: self.channelKey
+      authSubjectId: self.authSubjectId
+    }
+  }
+
+  store StaffChatReadCursor in durable
 }
 
 event StaffMessageSent: "staff_message.sent" {
   staffMessageId: string
   tenantId: string
   senderPersonId: string
-  recipientPersonId: string
+  recipientPersonId: string?
+  eventId: string?
 }
 
 event StaffMessageRead: "staff_message.read" {
   staffMessageId: string
   tenantId: string
-  recipientPersonId: string
+  recipientPersonId: string?
   readAt: datetime?
+}
+
+event StaffMessageEdited: "staff_message.edited" {
+  staffMessageId: string
+  tenantId: string
+  eventId: string?
+}
+
+event StaffMessageRemoved: "staff_message.removed" {
+  staffMessageId: string
+  tenantId: string
+  eventId: string?
+}
+
+event StaffChatChannelRead: "staff_chat_channel.read" {
+  staffChatReadCursorId: string
+  tenantId: string
+  channelKey: string
+  authSubjectId: string
 }

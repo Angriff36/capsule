@@ -1,7 +1,10 @@
 // Capsule documents — file attachments on Event, Client, Contract, Vendor,
-// Delivery, and Closeout records. Binary content lives in Convex file storage (authored seam
+// Delivery, Closeout, Dish, Ingredient, and StaffMessage (team chat) records.
+// Binary content lives in Convex file storage (authored seam
 // convex/fileStorage.ts issues upload URLs and resolves download URLs);
 // this entity records the metadata, uploader identity, and timestamp.
+// The parentType union is also hand-mirrored in convex/fileStorage.ts
+// (listForParent) and src/features/attachments/AttachmentsSection.tsx.
 
 use "../foundation/base.manifest"
 
@@ -17,6 +20,8 @@ enum AttachmentParentType {
   dish
   // Culinary ingredient catalog image (Ingredient.setPrimaryImage).
   ingredient
+  // Team chat photo or file; parentId is the StaffMessage id.
+  staffMessage
 }
 
 enum AttachmentEvidenceType {
