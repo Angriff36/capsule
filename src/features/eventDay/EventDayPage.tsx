@@ -1,30 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./EventDay.css";
+import { useEventDayBriefing } from "../../lib/eventDayBriefing";
 import { formatCount, formatDate } from "../../lib/format";
-import {
-  useGetEvent,
-  useListClientContact,
-  useListComponentIngredient,
-  useListDelivery,
-  useListDish,
-  useListDishComponent,
-  useListDishIngredient,
-  useListEquipment,
-  useListEquipmentReservation,
-  useListEventAssignment,
-  useListEventDish,
-  useListEventLayoutSection,
-  useListEventStaffNeed,
-  useListEventTimelineActivity,
-  useListIngredient,
-  useListPackList,
-  useListPackListItem,
-  useListPerson,
-  useListVehicle,
-  useListVenue,
-} from "../../lib/manifest-convex-react";
-import { useRouteRecord } from "../../lib/routeRecord";
 import { eventDetailPath } from "../events/eventRoutes";
 import { deriveEventDay, type EventDaySectionKey } from "./eventDayModel";
 import { EventDayMap } from "./EventDayMap";
@@ -90,126 +68,52 @@ function CenteredNote({ children }: { children: React.ReactNode }) {
  */
 export function EventDayPage() {
   const { id } = useParams();
-  const event = useRouteRecord(useGetEvent, id);
-  const venues = useListVenue();
-  const assignments = useListEventAssignment();
-  const staffNeeds = useListEventStaffNeed();
-  const activities = useListEventTimelineActivity();
-  const eventDishes = useListEventDish();
-  const dishes = useListDish();
-  // Recipe graph, so the menu sheet can derive allergens per dish.
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
-  const deliveries = useListDelivery();
-  const vehicles = useListVehicle();
-  const layoutSections = useListEventLayoutSection();
-  const equipmentReservations = useListEquipmentReservation();
-  const equipments = useListEquipment();
-  const clientContacts = useListClientContact();
-  const packLists = useListPackList();
-  const packListItems = useListPackListItem();
-  const people = useListPerson();
+  // One authored read: the day-of briefing seam (issue #258) is readable
+  // by every tenant member with a real role, so drivers and kitchen staff
+  // see the same finished map the event manager sees. Everything arrives
+  // already event-scoped, tenant-checked, and projected (no money, no HR
+  // fields), so there is no per-list loading race to guard against.
+  const briefing = useEventDayBriefing(id);
   const [open, setOpen] = useState<EventDaySectionKey | null>(null);
 
   const data: EventDayDetailData | null = useMemo(() => {
-    if (event == null || event.deletedAt != null) return null;
-    const eventId = event._id;
-    const forEvent = <T extends { eventId?: unknown; deletedAt?: unknown }>(
-      rows: readonly T[] | undefined,
-    ) =>
-      (rows ?? []).filter(
-        (row) => row.deletedAt == null && row.eventId === eventId,
-      );
+    if (briefing == null) return null;
     return {
-      event,
-      venue: (venues ?? []).find((row) => row._id === event.venueId),
-      assignments: forEvent(assignments),
-      staffNeeds: forEvent(staffNeeds),
-      activities: forEvent(activities).filter((row) => row.scheduledAt != null),
-      eventDishes: forEvent(eventDishes).filter((row) => row.removedAt == null),
-      deliveries: forEvent(deliveries),
-      layoutSections: forEvent(layoutSections).filter(
+      event: briefing.event,
+      venue: briefing.venue ?? undefined,
+      assignments: briefing.assignments,
+      staffNeeds: briefing.staffNeeds,
+      activities: briefing.activities.filter((row) => row.scheduledAt != null),
+      eventDishes: briefing.eventDishes.filter((row) => row.removedAt == null),
+      deliveries: briefing.deliveries,
+      layoutSections: briefing.layoutSections.filter(
         (row) => row.addedAt != null,
       ),
-      equipmentReservations: forEvent(equipmentReservations),
-      clientContacts: (clientContacts ?? [])
-        .filter(
-          (row) =>
-            row.deletedAt == null &&
-            row.clientId === event.clientId &&
-            String(row.status) !== "removed",
-        )
+      equipmentReservations: briefing.equipmentReservations,
+      clientContacts: [...briefing.clientContacts]
+        .filter((row) => String(row.status) !== "removed")
         .sort((a, b) => Number(b.isPrimary ?? 0) - Number(a.isPrimary ?? 0)),
-      packLists: forEvent(packLists),
-      packListItems: (packListItems ?? []).filter(
-        (row) => row.deletedAt == null,
-      ),
-      dishes: dishes ?? [],
-      dishIngredients: dishIngredients ?? [],
-      dishComponents: dishComponents ?? [],
-      componentIngredients: componentIngredients ?? [],
-      ingredients: ingredients ?? [],
-      people: people ?? [],
-      vehicles: vehicles ?? [],
-      equipments: equipments ?? [],
+      packLists: briefing.packLists,
+      packListItems: briefing.packListItems,
+      dishes: briefing.dishes,
+      dishIngredients: briefing.dishIngredients,
+      dishComponents: briefing.dishComponents,
+      componentIngredients: briefing.componentIngredients,
+      people: briefing.people,
+      vehicles: briefing.vehicles,
+      equipments: briefing.equipments,
     };
-  }, [
-    event,
-    venues,
-    assignments,
-    staffNeeds,
-    activities,
-    eventDishes,
-    deliveries,
-    layoutSections,
-    equipmentReservations,
-    clientContacts,
-    packLists,
-    packListItems,
-    dishes,
-    dishIngredients,
-    dishComponents,
-    componentIngredients,
-    ingredients,
-    people,
-    vehicles,
-    equipments,
-  ]);
+  }, [briefing]);
 
-  // A list that has not resolved yet must not read as "empty" — that would
-  // flash false blockers like "No staff assigned" on a final event.
-  const anyListLoading = [
-    venues,
-    assignments,
-    staffNeeds,
-    activities,
-    eventDishes,
-    dishes,
-    dishIngredients,
-    dishComponents,
-    componentIngredients,
-    ingredients,
-    deliveries,
-    vehicles,
-    layoutSections,
-    equipmentReservations,
-    equipments,
-    clientContacts,
-    packLists,
-    packListItems,
-    people,
-  ].some((rows) => rows === undefined);
-
-  if (event === undefined || anyListLoading)
+  if (briefing === undefined)
     return <CenteredNote>Lighting the estate…</CenteredNote>;
-  if (event === null || event.deletedAt != null || data == null)
+  if (briefing === null || data == null)
     return (
       <CenteredNote>
         This event is unavailable — it may have been removed.
       </CenteredNote>
     );
+  const event = briefing.event;
 
   const summary = deriveEventDay(data);
   const sealed = ["final", "executing", "completed", "closed_out"].includes(

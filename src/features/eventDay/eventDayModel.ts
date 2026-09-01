@@ -1,4 +1,17 @@
-import type { Doc } from "../../lib/api";
+import type {
+  EventDayAssignment,
+  EventDayClientContact,
+  EventDayDelivery,
+  EventDayEquipmentReservation,
+  EventDayEvent,
+  EventDayEventDish,
+  EventDayLayoutSection,
+  EventDayPackList,
+  EventDayPackListItem,
+  EventDayStaffNeed,
+  EventDayActivity,
+  EventDayVenue,
+} from "../../lib/eventDayBriefing";
 
 /**
  * Event Day — pure status derivation.
@@ -53,18 +66,18 @@ export type EventDaySummary = {
 };
 
 export type EventDayInputs = {
-  event: Doc<"events">;
-  venue: Doc<"venues"> | undefined;
-  assignments: readonly Doc<"eventAssignments">[];
-  staffNeeds: readonly Doc<"eventStaffNeeds">[];
-  activities: readonly Doc<"eventTimelineActivities">[];
-  eventDishes: readonly Doc<"eventDishes">[];
-  deliveries: readonly Doc<"deliveries">[];
-  layoutSections: readonly Doc<"eventLayoutSections">[];
-  equipmentReservations: readonly Doc<"equipmentReservations">[];
-  clientContacts: readonly Doc<"clientContacts">[];
-  packLists: readonly Doc<"packLists">[];
-  packListItems: readonly Doc<"packListItems">[];
+  event: EventDayEvent;
+  venue: EventDayVenue | undefined;
+  assignments: readonly EventDayAssignment[];
+  staffNeeds: readonly EventDayStaffNeed[];
+  activities: readonly EventDayActivity[];
+  eventDishes: readonly EventDayEventDish[];
+  deliveries: readonly EventDayDelivery[];
+  layoutSections: readonly EventDayLayoutSection[];
+  equipmentReservations: readonly EventDayEquipmentReservation[];
+  clientContacts: readonly EventDayClientContact[];
+  packLists: readonly EventDayPackList[];
+  packListItems: readonly EventDayPackListItem[];
 };
 
 export const SECTION_LABELS: Record<EventDaySectionKey, string> = {

@@ -1,5 +1,9 @@
 import type { ReactNode } from "react";
-import type { Doc } from "../../lib/api";
+import type {
+  EventDayBriefing,
+  EventDayEvent,
+  EventDayPerson,
+} from "../../lib/eventDayBriefing";
 import { formatDate, formatTime } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { compareActivities } from "../events/EventTimelinePanel";
@@ -17,18 +21,19 @@ import type { EventDayInputs } from "./eventDayModel";
  * needs on site, nothing they can break: no mutations anywhere in here.
  */
 
-export type EventDayDetailData = EventDayInputs & {
-  dishes: readonly Doc<"dishes">[];
-  dishIngredients: readonly Doc<"dishIngredients">[];
-  dishComponents: readonly Doc<"dishComponents">[];
-  componentIngredients: readonly Doc<"componentIngredients">[];
-  ingredients: readonly Doc<"ingredients">[];
-  people: readonly Doc<"people">[];
-  vehicles: readonly Doc<"vehicles">[];
-  equipments: readonly Doc<"equipments">[];
-};
+export type EventDayDetailData = EventDayInputs &
+  Pick<
+    EventDayBriefing,
+    | "dishes"
+    | "dishIngredients"
+    | "dishComponents"
+    | "componentIngredients"
+    | "people"
+    | "vehicles"
+    | "equipments"
+  >;
 
-function personName(person: Doc<"people"> | undefined): string {
+function personName(person: EventDayPerson | undefined): string {
   if (!person) return "";
   return (
     [person.givenName, person.familyName].filter(Boolean).join(" ") || "Staff"
@@ -267,11 +272,19 @@ export function MenuSheet({ data }: { data: EventDayDetailData }) {
     const course = String(row.course ?? "").trim() || "Menu";
     courses.set(course, [...(courses.get(course) ?? []), row]);
   }
+  // The briefing hydrates {name, allergens} onto every recipe line, so no
+  // separate ingredient list is needed — hydration is the source of truth.
+  const recipe = {
+    dishIngredients: data.dishIngredients,
+    dishComponents: data.dishComponents,
+    componentIngredients: data.componentIngredients,
+    ingredients: [],
+  };
   const reportByDish = new Map<string, DishAllergenReport>();
   for (const row of rows) {
     const dish = data.dishes.find((d) => d._id === row.dishId);
     if (!dish || reportByDish.has(String(dish._id))) continue;
-    reportByDish.set(String(dish._id), deriveDishAllergens(dish, data));
+    reportByDish.set(String(dish._id), deriveDishAllergens(dish, recipe));
   }
   const menuCodes = new Set(
     [...reportByDish.values()].flatMap((report) => report.codes),
@@ -342,7 +355,10 @@ export function VehiclesSheet({ data }: { data: EventDayDetailData }) {
             title={String(row.destination ?? "Delivery")}
             sub={[
               driver || "No driver",
-              vehicle ? `${vehicle.make} ${vehicle.model}` : "No vehicle",
+              vehicle
+                ? [vehicle.make, vehicle.model].filter(Boolean).join(" ") ||
+                  "Vehicle"
+                : "No vehicle",
             ].join(" · ")}
             flag={formatStatusLabel(String(row.status))}
             flagClass={
@@ -489,8 +505,10 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
                 return (
                   <Row
                     key={row._id}
-                    title={String(row.description)}
-                    sub={`${row.requiredQuantity} ${String(row.unit ?? "")}`}
+                    title={String(row.description ?? "Item")}
+                    sub={[row.requiredQuantity, row.unit]
+                      .filter((part) => part != null && part !== "")
+                      .join(" ")}
                     flag={missing ? "Missing" : packed ? "Packed" : undefined}
                     flagClass={missing ? "evd-missing" : "evd-tone-ok"}
                   />
@@ -504,7 +522,7 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
   );
 }
 
-export function eventDateLine(event: Doc<"events">): string {
+export function eventDateLine(event: EventDayEvent): string {
   const date =
     typeof event.startsAt === "number" ? formatDate(event.startsAt) : "";
   const time =
