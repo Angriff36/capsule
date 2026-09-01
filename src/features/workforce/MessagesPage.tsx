@@ -282,6 +282,7 @@ export function MessagesPage() {
                 <ChatComposer
                   key={channelKey}
                   initialDraft={drafts.initialDraft}
+                  onInitialDraftConsumed={drafts.onInitialDraftConsumed}
                   restoreDraft={drafts.restoreDraft}
                   onRestoreConsumed={drafts.onRestoreConsumed}
                   onDraftOrphaned={(draft) =>

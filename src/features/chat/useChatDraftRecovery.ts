@@ -33,13 +33,14 @@ export function useChatDraftRecovery(channelKey: string) {
   const [restore, setRestore] = useState<ChatDraftRestore | null>(null);
 
   // Peeked once per channel and held: the composer may mount a render later
-  // than this hook (the page shows a skeleton until its queries load), after
-  // the store entry has already been forgotten below.
+  // than this hook (the page shows a skeleton until its queries load). The
+  // store keeps the entry until a composer reports that it took the draft
+  // in, so leaving during the skeleton loses nothing.
   const initialDraft = useMemo(
     () => (channelKey ? failedDrafts.peek(channelKey) : null),
     [channelKey],
   );
-  useEffect(() => {
+  const onInitialDraftConsumed = useCallback(() => {
     if (channelKey) failedDrafts.forget(channelKey);
   }, [channelKey]);
 
@@ -63,6 +64,7 @@ export function useChatDraftRecovery(channelKey: string) {
 
   return {
     initialDraft,
+    onInitialDraftConsumed,
     /** Only the composer of the matching channel receives it. */
     restoreDraft: restore && restore.channelKey === channelKey ? restore : null,
     orphanedFrom,

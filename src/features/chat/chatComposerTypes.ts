@@ -38,6 +38,8 @@ export type ChatComposerProps = {
   readonly focusSignal?: number;
   /** A draft to start from — a send that failed after this channel was left. Read once, on mount. */
   readonly initialDraft?: ChatComposerDraft | null;
+  /** Called once on mount when `initialDraft` was taken in, so the caller can drop its copy. */
+  readonly onInitialDraftConsumed?: () => void;
   /** A failed draft to merge into the live composer (same channel re-opened before the failure). */
   readonly restoreDraft?: {
     readonly draft: ChatComposerDraft;

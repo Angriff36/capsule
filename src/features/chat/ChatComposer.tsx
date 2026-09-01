@@ -56,6 +56,7 @@ export function ChatComposer({
   error,
   focusSignal,
   initialDraft = null,
+  onInitialDraftConsumed,
   restoreDraft = null,
   onRestoreConsumed,
   onDraftOrphaned,
@@ -142,6 +143,13 @@ export function ChatComposer({
     }
   }, [text]);
   useChatTextareaGrow(textareaRef, text);
+
+  // The seed draft is now in this composer's state; the caller may drop its
+  // copy. Mount only — the caller keeps it until a composer actually shows it.
+  useEffect(() => {
+    if (initialDraft) onInitialDraftConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // A failed draft handed back while this composer is live: merge it in
   // front of whatever was typed since, once per token.

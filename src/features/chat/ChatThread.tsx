@@ -41,6 +41,14 @@ export type ChatThreadProps = {
   readonly emptyHint: string;
 };
 
+function newestOf(sorted: readonly ChatMessageView[]): {
+  id: string;
+  at: number;
+} {
+  const last = sorted[sorted.length - 1];
+  return last ? { id: last._id, at: last.createdAt } : { id: "", at: 0 };
+}
+
 function ChatThreadSkeleton() {
   return (
     <div
@@ -79,8 +87,8 @@ export function ChatThread({
   const listRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const pinnedRef = useRef(true);
-  /** Message count at the last effect; null while loading. */
-  const countRef = useRef<number | null>(null);
+  /** Newest message at the last effect ("" / 0 for an empty list); null while loading. */
+  const newestRef = useRef<{ id: string; at: number } | null>(null);
   const [showNewPill, setShowNewPill] = useState(false);
 
   const reachRef = useRef(onReachBottom);
@@ -142,25 +150,32 @@ export function ChatThread({
   // Channel switch or the caller's own send: reset and pin to the bottom.
   // `sorted` is read here, not watched — the effect below owns its changes.
   useLayoutEffect(() => {
-    countRef.current = sorted?.length ?? null;
+    newestRef.current = sorted === undefined ? null : newestOf(sorted);
     pinToBottom();
     if (sorted !== undefined && sorted.length > 0) notifyReachBottom();
   }, [channelKey, pinSignal, pinToBottom, notifyReachBottom]);
 
-  // Messages arrive: follow them while pinned, otherwise offer the pill.
+  // Messages arrive: follow them while pinned, otherwise offer the pill. An
+  // arrival is a NEWER newest message — not a longer list, because a thread
+  // capped at the seam's maximum keeps its length while it rolls forward,
+  // and not a shorter one, because removing the newest row is not news.
   useLayoutEffect(() => {
     if (sorted === undefined) {
-      countRef.current = null;
+      newestRef.current = null;
       return;
     }
-    const previous = countRef.current;
-    countRef.current = sorted.length;
+    const previous = newestRef.current;
+    const current = newestOf(sorted);
+    newestRef.current = current;
     if (previous === null) {
       pinToBottom();
       if (sorted.length > 0) notifyReachBottom();
       return;
     }
-    if (sorted.length <= previous) return;
+    const arrived =
+      current.at > previous.at ||
+      (current.at === previous.at && current.id !== previous.id);
+    if (!arrived || current.id === "") return;
     if (pinnedRef.current) {
       jumpToBottom();
       notifyReachBottom();
