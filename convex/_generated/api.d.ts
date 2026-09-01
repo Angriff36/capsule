@@ -19,6 +19,7 @@ import type * as cutover from "../cutover.js";
 import type * as driverAssignment from "../driverAssignment.js";
 import type * as emailNotifications from "../emailNotifications.js";
 import type * as equipmentCheckout from "../equipmentCheckout.js";
+import type * as eventDayBriefing from "../eventDayBriefing.js";
 import type * as fileStorage from "../fileStorage.js";
 import type * as googleCalendar from "../googleCalendar.js";
 import type * as hiringPipeline from "../hiringPipeline.js";
@@ -112,6 +113,7 @@ declare const fullApi: ApiFromModules<{
   driverAssignment: typeof driverAssignment;
   emailNotifications: typeof emailNotifications;
   equipmentCheckout: typeof equipmentCheckout;
+  eventDayBriefing: typeof eventDayBriefing;
   fileStorage: typeof fileStorage;
   googleCalendar: typeof googleCalendar;
   hiringPipeline: typeof hiringPipeline;

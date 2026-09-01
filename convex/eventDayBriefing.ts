@@ -66,6 +66,35 @@ async function briefingAuth(ctx: unknown) {
 
 const live = (row: { deletedAt?: unknown }) => row.deletedAt == null;
 
+/**
+ * Hydrate a referenced doc ONLY when it belongs to this tenant and is not
+ * soft-deleted. A foreign-key can hold another tenant's id (commands accept
+ * arbitrary valid ids), and this seam must never project foreign data.
+ */
+async function tenantDoc(
+  ctx: { db: any },
+  tenantId: string,
+  id: unknown,
+): Promise<any | null> {
+  if (id == null) return null;
+  const doc = await ctx.db.get(id as any);
+  if (!doc || doc.tenantId !== tenantId || doc.deletedAt != null) return null;
+  return doc;
+}
+
+/** Tenant-checked but soft-deletion allowed — discontinued ingredients
+ * still referenced by a live recipe line must keep their allergens. */
+async function tenantDocAllowDeleted(
+  ctx: { db: any },
+  tenantId: string,
+  id: unknown,
+): Promise<any | null> {
+  if (id == null) return null;
+  const doc = await ctx.db.get(id as any);
+  if (!doc || doc.tenantId !== tenantId) return null;
+  return doc;
+}
+
 async function byEvent(
   ctx: { db: any },
   table: string,
@@ -82,9 +111,12 @@ async function byEvent(
 }
 
 /** Minimal ingredient hydration — allergens and name, never cost. */
-async function hydrateLine(ctx: { db: any }, line: any) {
-  const ingredient =
-    line.ingredientId != null ? await ctx.db.get(line.ingredientId) : null;
+async function hydrateLine(ctx: { db: any }, tenantId: string, line: any) {
+  const ingredient = await tenantDocAllowDeleted(
+    ctx,
+    tenantId,
+    line.ingredientId,
+  );
   return {
     _id: line._id,
     deletedAt: line.deletedAt ?? null,
@@ -176,8 +208,7 @@ export const getBriefing = query({
           ).filter((row: any) => row.tenantId === tenantId && live(row))
         : [];
 
-    const venueRaw: any =
-      event.venueId != null ? await ctx.db.get(event.venueId) : null;
+    const venueRaw: any = await tenantDoc(ctx, tenantId, event.venueId);
 
     // Dish catalog + recipe graph for the menu's dishes only.
     const dishIds = [
@@ -192,7 +223,7 @@ export const getBriefing = query({
                 (other: any) => String(other.dishId) === String(row.dishId),
               ) === index,
           )
-          .map((row: any) => ctx.db.get(row.dishId)),
+          .map((row: any) => tenantDoc(ctx, tenantId, row.dishId)),
       )
     )
       .filter((dish: any) => dish != null)
@@ -246,10 +277,10 @@ export const getBriefing = query({
       .filter((row: any) => row.tenantId === tenantId && live(row));
 
     const dishIngredients = await Promise.all(
-      dishLineRows.map((line: any) => hydrateLine(ctx, line)),
+      dishLineRows.map((line: any) => hydrateLine(ctx, tenantId, line)),
     );
     const componentIngredients = await Promise.all(
-      componentLineRows.map((line: any) => hydrateLine(ctx, line)),
+      componentLineRows.map((line: any) => hydrateLine(ctx, tenantId, line)),
     );
 
     // Name lookups: people (id + name ONLY), vehicles, equipment.
@@ -262,7 +293,9 @@ export const getBriefing = query({
       for (const pid of row.assigneePersonIds ?? [])
         if (pid != null) personIds.add(String(pid));
     const people = (
-      await Promise.all([...personIds].map((pid) => ctx.db.get(pid as any)))
+      await Promise.all(
+        [...personIds].map((pid) => tenantDoc(ctx, tenantId, pid)),
+      )
     )
       .filter((person: any) => person != null)
       .map((person: any) => ({
@@ -279,7 +312,7 @@ export const getBriefing = query({
       ),
     ];
     const vehicles = (
-      await Promise.all(vehicleIds.map((vid) => ctx.db.get(vid as any)))
+      await Promise.all(vehicleIds.map((vid) => tenantDoc(ctx, tenantId, vid)))
     )
       .filter((vehicle: any) => vehicle != null)
       .map((vehicle: any) => ({
@@ -296,7 +329,9 @@ export const getBriefing = query({
       ),
     ];
     const equipments = (
-      await Promise.all(equipmentIds.map((eid) => ctx.db.get(eid as any)))
+      await Promise.all(
+        equipmentIds.map((eid) => tenantDoc(ctx, tenantId, eid)),
+      )
     )
       .filter((item: any) => item != null)
       .map((item: any) => ({ _id: item._id, name: item.name ?? null }));
