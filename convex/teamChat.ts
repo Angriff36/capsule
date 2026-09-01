@@ -7,6 +7,7 @@
  *     with its Attachment rows hydrated to download URLs.
  *   - listConversations: the rail — DM partners with unread counts and
  *     event channels with unread counts against the caller's read cursor.
+ *   - channelSummary: one channel's facts for the tab header / phone card.
  *   - searchLinkTargets: bounded record search for the `#` picker.
  *
  * Access: the generated read policy already hides other people's DMs; this
@@ -14,245 +15,38 @@
  * and tenant-checks every FK it hydrates, so a guessed id from another
  * tenant yields nothing. No auth subject ids or HR fields leave the server.
  *
- * Reads are index-bounded: never a tenant-wide scan of staffMessages
- * (the Aug 2026 read storm). Wall-clock comes in as `since` / `now`.
+ * Reads are index-bounded and time-bounded (`since` = now − retention):
+ * never a tenant-wide scan of staffMessages (the Aug 2026 read storm).
+ * Wall-clock comes in as `since` / `now`. Helpers live in lib/teamChatRead.ts.
  */
 import { v } from "convex/values";
-import { chatPreviewText } from "../src/features/chat/chatLinkTokens";
-import type { Doc, Id } from "./_generated/dataModel";
-import { query, type QueryCtx } from "./_generated/server";
-import { getAuthContext, type AppAuthContext } from "./lib/authContext";
-import { decrypt } from "./lib/encryption";
+import type { Doc } from "./_generated/dataModel";
+import { query } from "./_generated/server";
+import {
+  chatAuth,
+  inChannel,
+  live,
+  MAX_THREAD_MESSAGES,
+  previewOf,
+  RANGE_TAKE,
+  readCursorsFor,
+  receivedBy,
+  sentAt,
+  sentBy,
+  tenantEvent,
+  tenantPerson,
+  toView,
+  UNREAD_SCAN,
+  type ChatMessageView,
+} from "./lib/teamChatRead";
 import { TEXT_TARGETS } from "./search";
 
-/** Newest messages a thread returns; older ones are history, not chat. */
-const MAX_THREAD_MESSAGES = 400;
-/** Rows read per event-channel index range before the live/since filters. */
-const RANGE_TAKE = 800;
-/**
- * Hard ceiling on one person's messages walked per query. The walk is
- * time-bounded (it stops at `since`), so this only guards a runaway range.
- */
-const PERSON_RANGE_CAP = 4000;
-/** Per-channel rows scanned for unread counts; more than this reads "50+". */
-const UNREAD_SCAN = 50;
 /** Channels stay in the rail from one day before the event starts. */
 const DAY_MS = 86_400_000;
 /** Newest events (by creation) considered for the rail. */
 const EVENT_SCAN = 400;
 /** Event channels the rail reads unread counts for per run. */
 const EVENT_CANDIDATES = 80;
-
-type ChatAttachmentView = {
-  _id: string;
-  version: number;
-  fileName: string;
-  contentType: string;
-  fileSize: number;
-  url: string | null;
-};
-
-type ChatMessageView = {
-  _id: string;
-  version: number;
-  senderPersonId: string;
-  recipientPersonId: string | null;
-  eventId: string | null;
-  body: string;
-  createdAt: number;
-  editedAt: number | null;
-  readAt: number | null;
-  attachments: ChatAttachmentView[];
-};
-
-/** Same envelope handling as the generated __decryptDoc, per field. */
-async function decryptField(
-  ctx: unknown,
-  entity: string,
-  property: string,
-  raw: unknown,
-): Promise<string> {
-  if (typeof raw !== "string") return "";
-  let envelope: unknown;
-  try {
-    envelope = JSON.parse(raw);
-  } catch {
-    return raw;
-  }
-  if (
-    !envelope ||
-    typeof envelope !== "object" ||
-    !("v" in envelope) ||
-    !("kid" in envelope) ||
-    !("ct" in envelope)
-  ) {
-    return raw;
-  }
-  if ((envelope as { v: unknown }).v !== 1) {
-    throw new Error(
-      `Unsupported encryption envelope for ${entity}.${property}`,
-    );
-  }
-  return await decrypt(
-    (envelope as { ct: string }).ct,
-    (envelope as { kid: string }).kid,
-    { ctx, entity, property },
-  );
-}
-
-/** Any authenticated member of the tenant with a real role may use chat. */
-async function chatAuth(ctx: QueryCtx): Promise<AppAuthContext | null> {
-  const auth = await getAuthContext(ctx);
-  if (!auth || auth.role === "anonymous" || !auth.tenantId) return null;
-  return auth;
-}
-
-const live = (row: { deletedAt?: number | null }) => row.deletedAt == null;
-const sentAt = (row: Doc<"staffMessages">) =>
-  row.createdAt ?? row._creationTime;
-
-/** A referenced doc only when it is this tenant's and not soft-deleted. */
-async function tenantEvent(
-  ctx: QueryCtx,
-  tenantId: string,
-  id: string,
-): Promise<Doc<"events"> | null> {
-  const doc = await ctx.db.get(id as Id<"events">);
-  if (!doc || doc.tenantId !== tenantId || !live(doc)) return null;
-  return doc;
-}
-
-async function tenantPerson(
-  ctx: QueryCtx,
-  tenantId: string,
-  id: string,
-): Promise<Doc<"people"> | null> {
-  const doc = await ctx.db.get(id as Id<"people">);
-  if (!doc || doc.tenantId !== tenantId || !live(doc)) return null;
-  return doc;
-}
-
-/** Files attached to one message by its sender, with signed URLs. */
-async function attachmentsFor(
-  ctx: QueryCtx,
-  tenantId: string,
-  message: Doc<"staffMessages">,
-): Promise<ChatAttachmentView[]> {
-  if ((message.attachmentCount ?? 0) <= 0) return [];
-  const rows = await ctx.db
-    .query("attachments")
-    .withIndex("by_parentId", (q) => q.eq("parentId", String(message._id)))
-    .collect();
-  const mine = rows.filter(
-    (row) =>
-      row.parentType === "staffMessage" &&
-      row.tenantId === tenantId &&
-      live(row) &&
-      row.uploadedById != null &&
-      row.uploadedById === message.senderAuthSubjectId,
-  );
-  return Promise.all(
-    mine.map(async (row) => ({
-      _id: String(row._id),
-      version: row.version,
-      fileName: row.fileName,
-      contentType: row.contentType,
-      fileSize: row.fileSize,
-      url: await ctx.storage.getUrl(row.storageId as Id<"_storage">),
-    })),
-  );
-}
-
-async function toView(
-  ctx: QueryCtx,
-  tenantId: string,
-  row: Doc<"staffMessages">,
-): Promise<ChatMessageView | null> {
-  const [body, attachments] = await Promise.all([
-    decryptField(ctx, "StaffMessage", "body", row.body),
-    attachmentsFor(ctx, tenantId, row),
-  ]);
-  // A message whose files all failed to attach and that has no text is noise.
-  if (body.trim().length === 0 && attachments.length === 0) return null;
-  return {
-    _id: String(row._id),
-    version: row.version,
-    senderPersonId: String(row.senderPersonId),
-    recipientPersonId: row.recipientPersonId
-      ? String(row.recipientPersonId)
-      : null,
-    eventId: row.eventId ? String(row.eventId) : null,
-    body,
-    createdAt: sentAt(row),
-    editedAt: row.editedAt ?? null,
-    readAt: row.readAt ?? null,
-    attachments,
-  };
-}
-
-/**
- * Newest-first rows from one person-keyed index range, walked until the
- * first row older than `since`. The index orders by creation time, so the
- * walk is bounded by the retention window, not by a count that a busy
- * sender's other conversations could exhaust.
- */
-async function walkSince(
-  range: AsyncIterable<Doc<"staffMessages">>,
-  since: number,
-): Promise<Doc<"staffMessages">[]> {
-  const out: Doc<"staffMessages">[] = [];
-  for await (const row of range) {
-    if (sentAt(row) < since) break;
-    out.push(row);
-    if (out.length >= PERSON_RANGE_CAP) break;
-  }
-  return out;
-}
-
-/** Newest-first rows sent by one person inside the window. */
-async function sentBy(
-  ctx: QueryCtx,
-  personId: Id<"people">,
-  since: number,
-): Promise<Doc<"staffMessages">[]> {
-  return walkSince(
-    ctx.db
-      .query("staffMessages")
-      .withIndex("by_senderPersonId", (q) => q.eq("senderPersonId", personId))
-      .order("desc"),
-    since,
-  );
-}
-
-/** Newest-first rows received by one person inside the window. */
-async function receivedBy(
-  ctx: QueryCtx,
-  personId: Id<"people">,
-  since: number,
-): Promise<Doc<"staffMessages">[]> {
-  return walkSince(
-    ctx.db
-      .query("staffMessages")
-      .withIndex("by_recipientPersonId", (q) =>
-        q.eq("recipientPersonId", personId),
-      )
-      .order("desc"),
-    since,
-  );
-}
-
-/** Newest-first rows in one event channel (bounded index range). */
-async function inChannel(
-  ctx: QueryCtx,
-  eventId: Id<"events">,
-  take: number,
-): Promise<Doc<"staffMessages">[]> {
-  return ctx.db
-    .query("staffMessages")
-    .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-    .order("desc")
-    .take(take);
-}
 
 /**
  * One thread. Pass exactly one of `eventId` (event channel) or
@@ -280,14 +74,16 @@ export const listChannel = query({
       if (!auth.personId) return null;
       const other = await tenantPerson(ctx, tenantId, args.otherPersonId);
       if (!other) return null;
-      const me = auth.personId as Id<"people">;
+      const me = auth.personId as Doc<"people">["_id"];
+      // Both halves come from the caller's own DM ranges — the same rows the
+      // rail counts — never from the partner's whole sent history.
       const [sent, received] = await Promise.all([
         sentBy(ctx, me, args.since),
-        sentBy(ctx, other._id, args.since),
+        receivedBy(ctx, me, args.since),
       ]);
       rows = [
         ...sent.filter((row) => row.recipientPersonId === other._id),
-        ...received.filter((row) => row.recipientPersonId === me),
+        ...received.filter((row) => row.senderPersonId === other._id),
       ];
     } else {
       return { messages: [] as ChatMessageView[] };
@@ -301,11 +97,10 @@ export const listChannel = query({
       .sort((a, b) => sentAt(b) - sentAt(a))
       .slice(0, MAX_THREAD_MESSAGES)
       .reverse();
-    const views = await Promise.all(
-      kept.map((row) => toView(ctx, tenantId, row)),
-    );
     return {
-      messages: views.filter((view): view is ChatMessageView => view != null),
+      messages: await Promise.all(
+        kept.map((row) => toView(ctx, tenantId, row)),
+      ),
     };
   },
 });
@@ -331,18 +126,6 @@ type EventConversation = {
   lastReadAt: number | null;
 };
 
-async function previewOf(
-  ctx: QueryCtx,
-  row: Doc<"staffMessages"> | undefined,
-): Promise<string> {
-  if (!row) return "";
-  const body = await decryptField(ctx, "StaffMessage", "body", row.body);
-  const text = chatPreviewText(body);
-  if (text.length > 0) return text;
-  const files = row.attachmentCount ?? 0;
-  return files > 0 ? (files === 1 ? "Sent a file" : `Sent ${files} files`) : "";
-}
-
 /**
  * The conversation rail: direct-message partners (recency order) and event
  * channels (event date order) with unread counts. Channels appear for live,
@@ -355,7 +138,7 @@ export const listConversations = query({
     const auth = await chatAuth(ctx);
     if (!auth) return null;
     const tenantId = auth.tenantId;
-    const me = auth.personId ? (auth.personId as Id<"people">) : null;
+    const me = auth.personId ? (auth.personId as Doc<"people">["_id"]) : null;
 
     // --- direct messages -------------------------------------------------
     const direct: DirectConversation[] = [];
@@ -364,58 +147,41 @@ export const listConversations = query({
         sentBy(ctx, me, args.since),
         receivedBy(ctx, me, args.since),
       ]);
-      const byOther = new Map<
-        string,
-        { lastAt: number; unread: number; newest: Doc<"staffMessages"> }
-      >();
+      // Group by partner, then count unread only inside the newest
+      // MAX_THREAD_MESSAGES of that pair — exactly the rows the thread shows
+      // and marks read — so a badge can never point at unreachable rows.
+      const byOther = new Map<string, Doc<"staffMessages">[]>();
       const consider = (row: Doc<"staffMessages">, other: string) => {
         if (row.tenantId !== tenantId || !live(row)) return;
-        const at = sentAt(row);
-        if (at < args.since) return;
-        const entry = byOther.get(other);
-        const unread =
-          row.recipientPersonId === me && row.readAt == null ? 1 : 0;
-        if (!entry) {
-          byOther.set(other, { lastAt: at, unread, newest: row });
-        } else {
-          entry.unread += unread;
-          if (at > entry.lastAt) {
-            entry.lastAt = at;
-            entry.newest = row;
-          }
-        }
+        if (sentAt(row) < args.since) return;
+        const rows = byOther.get(other);
+        if (rows) rows.push(row);
+        else byOther.set(other, [row]);
       };
       for (const row of sent) {
         if (row.recipientPersonId) consider(row, String(row.recipientPersonId));
       }
       for (const row of received) consider(row, String(row.senderPersonId));
-      for (const [personId, entry] of byOther) {
+      for (const [personId, rows] of byOther) {
+        const shown = rows
+          .sort((a, b) => sentAt(b) - sentAt(a))
+          .slice(0, MAX_THREAD_MESSAGES);
+        const newest = shown[0];
+        if (!newest) continue;
         direct.push({
           personId,
-          lastAt: entry.lastAt,
-          unread: entry.unread,
-          preview: await previewOf(ctx, entry.newest),
+          lastAt: sentAt(newest),
+          unread: shown.filter(
+            (row) => row.recipientPersonId === me && row.readAt == null,
+          ).length,
+          preview: await previewOf(ctx, newest),
         });
       }
       direct.sort((a, b) => b.lastAt - a.lastAt);
     }
 
     // --- event channels --------------------------------------------------
-    const cursorRows = await ctx.db
-      .query("staffChatReadCursors")
-      .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", auth.id))
-      .collect();
-    const cursors = new Map<string, { id: string; lastReadAt: number }>();
-    for (const row of cursorRows) {
-      if (row.tenantId !== tenantId) continue;
-      const existing = cursors.get(row.channelKey);
-      if (!existing || row.lastReadAt > existing.lastReadAt) {
-        cursors.set(row.channelKey, {
-          id: String(row._id),
-          lastReadAt: row.lastReadAt,
-        });
-      }
-    }
+    const cursors = await readCursorsFor(ctx, tenantId, auth.id);
 
     // Bounded: the newest EVENT_SCAN events by creation (there is no startsAt
     // index), then only those inside the retention window, then at most
@@ -445,15 +211,16 @@ export const listConversations = query({
     const events: EventConversation[] = [];
     await Promise.all(
       candidates.map(async (event) => {
+        // Same window the thread shows, so a badge never counts hidden rows.
         const scanned = (await inChannel(ctx, event._id, UNREAD_SCAN)).filter(
-          (row) => row.tenantId === tenantId && live(row),
+          (row) =>
+            row.tenantId === tenantId && live(row) && sentAt(row) >= args.since,
         );
         const newest = scanned[0];
         const lastAt = newest ? sentAt(newest) : null;
-        const upcoming =
+        const upcomingEvent =
           event.startsAt != null && event.startsAt >= args.now - DAY_MS;
-        const active = lastAt != null && lastAt >= args.since;
-        if (!upcoming && !active) return;
+        if (!upcomingEvent && lastAt == null) return;
         const cursor = cursors.get(`event:${String(event._id)}`) ?? null;
         const readUpTo = cursor?.lastReadAt ?? 0;
         const unreadRows = scanned.filter(
@@ -489,32 +256,26 @@ export const listConversations = query({
 /**
  * Compact facts about one event channel for the tab header and the phone
  * overview card: bounded count, newest preview, unread against the caller's
- * cursor, and the caller's cursor row so the client can touch it.
+ * cursor, and the caller's cursor row so the client can touch it. Bounded
+ * to the same retention window the thread shows.
  */
 export const channelSummary = query({
-  args: { eventId: v.string() },
+  args: { eventId: v.string(), since: v.number() },
   handler: async (ctx, args) => {
     const auth = await chatAuth(ctx);
     if (!auth) return null;
     const tenantId = auth.tenantId;
     const event = await tenantEvent(ctx, tenantId, args.eventId);
     if (!event) return null;
-    const me = auth.personId ? (auth.personId as Id<"people">) : null;
+    const me = auth.personId ? (auth.personId as Doc<"people">["_id"]) : null;
     const scanned = (await inChannel(ctx, event._id, UNREAD_SCAN)).filter(
-      (row) => row.tenantId === tenantId && live(row),
+      (row) =>
+        row.tenantId === tenantId && live(row) && sentAt(row) >= args.since,
     );
-    const cursorRows = await ctx.db
-      .query("staffChatReadCursors")
-      .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", auth.id))
-      .collect();
-    const key = `event:${String(event._id)}`;
-    let cursor: { id: string; lastReadAt: number } | null = null;
-    for (const row of cursorRows) {
-      if (row.tenantId !== tenantId || row.channelKey !== key) continue;
-      if (!cursor || row.lastReadAt > cursor.lastReadAt) {
-        cursor = { id: String(row._id), lastReadAt: row.lastReadAt };
-      }
-    }
+    const cursor =
+      (await readCursorsFor(ctx, tenantId, auth.id)).get(
+        `event:${String(event._id)}`,
+      ) ?? null;
     const readUpTo = cursor?.lastReadAt ?? 0;
     const newest = scanned[0];
     return {

@@ -220,6 +220,11 @@ export function ChatMessageItem({
               <p className="text-base leading-relaxed break-words whitespace-pre-wrap text-ink">
                 <ChatBody body={message.body} />
               </p>
+            ) : message.attachments.length === 0 ? (
+              // Its files never attached; shown so it can be read and removed.
+              <p className="text-base text-ink-3 italic">
+                Attachment unavailable
+              </p>
             ) : null}
             <ChatAttachmentList
               attachments={message.attachments}

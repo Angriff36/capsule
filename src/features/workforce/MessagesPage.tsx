@@ -1,9 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { formatDate } from "../../lib/format";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
 import { ChatComposer, type ChatComposerSubmit } from "../chat/ChatComposer";
+import {
+  ChatConversationRail,
+  type ChatRailTeammate,
+} from "../chat/ChatConversationRail";
 import { ChatThread } from "../chat/ChatThread";
 import {
   CHAT_RETENTION_MS,
@@ -11,12 +15,14 @@ import {
   type ChatChannel,
   chatChannelKey,
 } from "../chat/chatTypes";
+import { useChannelReadMarker } from "../chat/useChannelReadMarker";
+import { useChatDraftRecovery } from "../chat/useChatDraftRecovery";
 import {
   useChatChannel,
+  useChatChannelSummary,
   useChatConversations,
   useChatIdentity,
   useChatMessageActions,
-  useChatReadCursor,
   useChatRecordSearch,
   useMarkDirectRead,
   useSendChatMessage,
@@ -26,58 +32,6 @@ import "../chat/chat.css";
 
 /** Messages older than this drop out of the UI — 90-day retention window. */
 export const MESSAGE_RETENTION_MS = CHAT_RETENTION_MS;
-
-type RailEntryProps = {
-  readonly active: boolean;
-  readonly title: string;
-  readonly meta?: string | null;
-  readonly preview?: string;
-  readonly unread: number;
-  readonly unreadCapped?: boolean;
-  readonly onClick: () => void;
-};
-
-function RailEntry({
-  active,
-  title,
-  meta,
-  preview,
-  unread,
-  unreadCapped = false,
-  onClick,
-}: RailEntryProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-current={active ? "true" : undefined}
-      className={`flex w-full cursor-pointer items-start justify-between gap-2 rounded-xs px-2 py-1.5 text-left transition-colors hover:bg-inset ${
-        active ? "bg-inset" : ""
-      }`}
-    >
-      <span className="min-w-0 flex-1">
-        <span
-          className={`block truncate text-base text-ink ${
-            active || unread > 0 ? "font-semibold" : ""
-          }`}
-        >
-          {title}
-        </span>
-        {meta ? (
-          <span className="block font-mono text-xs text-ink-3">{meta}</span>
-        ) : null}
-        {preview ? (
-          <span className="block truncate text-xs text-ink-3">{preview}</span>
-        ) : null}
-      </span>
-      {unread > 0 ? (
-        <span className="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-brand px-1 text-2xs leading-none font-semibold text-white">
-          {unreadCapped ? `${unread}+` : unread}
-        </span>
-      ) : null}
-    </button>
-  );
-}
 
 /**
  * Team chat: event channels and direct messages in one place. `?event=<id>`
@@ -102,18 +56,25 @@ export function MessagesPage() {
 
   const conversations = useChatConversations();
   const thread = useChatChannel(channel);
+  // The channel's own facts (cursor id, read position) — the rail may not
+  // list this event, and a cursor must never be opened twice.
+  const summary = useChatChannelSummary(
+    channel?.kind === "event" ? channel.eventId : null,
+  );
   const actions = useChatMessageActions();
   const sendMessage = useSendChatMessage();
   const searchRecords = useChatRecordSearch();
-  const moveCursor = useChatReadCursor();
   const markDirectRead = useMarkDirectRead();
+  const onReachBottom = useChannelReadMarker(
+    channel?.kind === "event" ? channelKey : null,
+    summary,
+  );
+  const drafts = useChatDraftRecovery(channelKey);
 
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pinSignal, setPinSignal] = useState(0);
   const [focusSignal, setFocusSignal] = useState(0);
-  // Cursors opened this session, before the rail query catches up.
-  const openedCursors = useRef(new Map<string, string>());
 
   const select = useCallback(
     (next: ChatChannel | null) => {
@@ -130,7 +91,7 @@ export function MessagesPage() {
   );
 
   const events = conversations?.events ?? [];
-  const teammates = useMemo(() => {
+  const teammates = useMemo<ChatRailTeammate[]>(() => {
     const byPerson = new Map(
       (conversations?.direct ?? []).map((row) => [row.personId, row]),
     );
@@ -172,29 +133,8 @@ export function MessagesPage() {
     }
   }, [channel, identity.personId, markDirectRead, messages]);
 
-  const onReachBottom = useCallback(
-    (newestAt: number | null) => {
-      if (channel?.kind !== "event" || newestAt == null) return;
-      const known =
-        selectedEvent?.myCursorId ??
-        openedCursors.current.get(channelKey) ??
-        null;
-      if (known && (selectedEvent?.lastReadAt ?? 0) >= newestAt) return;
-      void moveCursor(channelKey, known, newestAt).then((id) => {
-        if (id) openedCursors.current.set(channelKey, id);
-      });
-    },
-    [channel, channelKey, moveCursor, selectedEvent],
-  );
-
-  // The channel the user is looking at right now — a send that fails after
-  // they switched channels must not lose its text with the unmounted composer.
-  const channelRef = useRef(channelKey);
-  channelRef.current = channelKey;
-
   const onSubmit = async (submit: ChatComposerSubmit) => {
     if (!channel) return;
-    const sentFrom = channelKey;
     setError(null);
     setSending(true);
     try {
@@ -202,12 +142,8 @@ export function MessagesPage() {
       setPinSignal((n) => n + 1);
       if (warning) setError(warning);
     } catch (cause) {
-      const reason =
-        cause instanceof Error ? cause.message : "The message was not sent.";
       setError(
-        channelRef.current === sentFrom
-          ? reason
-          : `${reason} Your unsent text from the other conversation: “${submit.body.slice(0, 400)}”`,
+        cause instanceof Error ? cause.message : "The message was not sent.",
       );
       throw cause;
     } finally {
@@ -264,67 +200,12 @@ export function MessagesPage() {
           data-testid="staff-messages"
         >
           {showRail ? (
-            <aside className="chat-shell border-line-2 max-md:border-b md:border-r">
-              <div className="min-h-0 flex-1 overflow-y-auto pb-2">
-                <p className="eyebrow px-4 pt-4" id="chat-rail-events">
-                  Event channels
-                </p>
-                {events.length === 0 ? (
-                  <p className="px-4 py-2 text-base text-ink-3">
-                    Upcoming events appear here. Open any event's Chat tab to
-                    start its channel.
-                  </p>
-                ) : (
-                  <ul className="p-2" aria-labelledby="chat-rail-events">
-                    {events.map((row) => (
-                      <li key={row.eventId}>
-                        <RailEntry
-                          active={
-                            channel?.kind === "event" &&
-                            channel.eventId === row.eventId
-                          }
-                          title={row.title}
-                          meta={row.startsAt ? formatDate(row.startsAt) : null}
-                          preview={row.preview}
-                          unread={row.unread}
-                          unreadCapped={row.unreadCapped}
-                          onClick={() =>
-                            select({ kind: "event", eventId: row.eventId })
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <p className="eyebrow px-4 pt-4" id="chat-rail-people">
-                  Teammates
-                </p>
-                {teammates.length === 0 ? (
-                  <p className="px-4 py-2 text-base text-ink-3">
-                    Teammates appear here once they are added to the roster.
-                  </p>
-                ) : (
-                  <ul className="p-2" aria-labelledby="chat-rail-people">
-                    {teammates.map((row) => (
-                      <li key={row.personId}>
-                        <RailEntry
-                          active={
-                            channel?.kind === "direct" &&
-                            channel.personId === row.personId
-                          }
-                          title={row.name}
-                          preview={row.preview}
-                          unread={row.unread}
-                          onClick={() =>
-                            select({ kind: "direct", personId: row.personId })
-                          }
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </aside>
+            <ChatConversationRail
+              events={events}
+              teammates={teammates}
+              channel={channel}
+              onSelect={select}
+            />
           ) : null}
 
           {showThread ? (
@@ -400,6 +281,12 @@ export function MessagesPage() {
                 />
                 <ChatComposer
                   key={channelKey}
+                  initialDraft={drafts.initialDraft}
+                  restoreDraft={drafts.restoreDraft}
+                  onRestoreConsumed={drafts.onRestoreConsumed}
+                  onDraftOrphaned={(draft) =>
+                    drafts.orphanedFrom(channelKey, draft)
+                  }
                   placeholder={
                     channel.kind === "event"
                       ? `Message the “${headerTitle}” crew…`

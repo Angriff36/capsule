@@ -35949,7 +35949,7 @@ async function __runStaffMessageEdit(ctx: MutationCtx, { docId, body, mentionedP
     if (!__storedDoc) throw new Error("StaffMessage not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("StaffMessage not found");
     const doc = await __decryptDoc(ctx, "StaffMessage", ["body"], __storedDoc) as Record<string, any>;
-    if (!((checkRole(user, "staffAccess") && ((((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id)))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
+    if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id))))))) throw new Error("Staff may read channel messages and their own direct messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36001,18 +36001,18 @@ async function __runStaffMessageMarkRead(ctx: MutationCtx, { docId, version }: a
     if (!__storedDoc) throw new Error("StaffMessage not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("StaffMessage not found");
     const doc = await __decryptDoc(ctx, "StaffMessage", ["body"], __storedDoc) as Record<string, any>;
-    if (!((checkRole(user, "staffAccess") && ((((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id)))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
+    if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id))))))) throw new Error("Staff may read channel messages and their own direct messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.readAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
-    if (!(((user.personId != null) && (doc.recipientPersonId === user.personId)))) throw new Error("Guard 3 failed");
+    if (!((doc.recipientAuthSubjectId != null))) throw new Error("Guard 3 failed");
+    if (!((doc.recipientAuthSubjectId === user.id))) throw new Error("Guard 4 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      recipientAuthSubjectId: user.id,
       readAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -36050,7 +36050,7 @@ async function __runStaffMessageRemove(ctx: MutationCtx, { docId, version }: any
     if (!__storedDoc) throw new Error("StaffMessage not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("StaffMessage not found");
     const doc = await __decryptDoc(ctx, "StaffMessage", ["body"], __storedDoc) as Record<string, any>;
-    if (!((checkRole(user, "staffAccess") && ((((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id)))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
+    if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id))))))) throw new Error("Staff may read channel messages and their own direct messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36107,7 +36107,7 @@ async function __runStaffMessageSend(ctx: MutationCtx, { docId, recipientPersonI
       const __fk = ((doc as any) as any).recipientPersonId;
       ((doc as any) as any).recipient = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!((checkRole(user, "staffAccess") && ((((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id)))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
+    if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || (doc.senderAuthSubjectId == null)) || ((user.id != null) && ((doc.senderAuthSubjectId === user.id) || (doc.recipientAuthSubjectId === user.id))))))) throw new Error("Staff may read channel messages and their own direct messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36195,7 +36195,7 @@ export const StaffMessage_createViaSend = mutation({
     };
     const __rel_recipient = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.recipientPersonId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "staffAccess") && ((((__draft.eventId != null) || (__draft.senderAuthSubjectId == null)) || ((user.id != null) && ((__draft.senderAuthSubjectId === user.id) || (__draft.recipientAuthSubjectId === user.id)))) || ((user.personId != null) && ((__draft.senderPersonId === user.personId) || (__draft.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
+    if (!((checkRole(user, "staffAccess") && (((__draft.eventId != null) || (__draft.senderAuthSubjectId == null)) || ((user.id != null) && ((__draft.senderAuthSubjectId === user.id) || (__draft.recipientAuthSubjectId === user.id))))))) throw new Error("Staff may read channel messages and their own direct messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");

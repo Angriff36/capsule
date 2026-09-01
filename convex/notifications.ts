@@ -73,10 +73,14 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
   workforce_staff: ["staffAccess", "workforceAccess"],
 };
 
-/** Newest chat rows read per index range for the tray. */
+/** Newest channel rows read for @mentions (the mention window is 7 days). */
 const MESSAGE_TAKE = 400;
 /** Same window deriveNotifications uses for mentions (RECENT_WINDOW_MS). */
 const MENTION_WINDOW_MS = 7 * 86_400_000;
+/** Same retention window deriveNotifications uses for unread DMs. */
+const MESSAGE_RETENTION_MS = 90 * 86_400_000;
+/** Hard ceiling on the caller's received-DM walk (it stops at retention first). */
+const RECEIVED_CAP = 4000;
 
 function can(auth: AppAuthContext, ...capabilities: string[]): boolean {
   const granted = ROLE_CAPABILITIES[auth.role] ?? [];
@@ -165,19 +169,29 @@ export const listNotifications = query({
       ),
       // Team chat made staffMessages a high-volume table, so this is no
       // longer a tenant-wide collect: unread DMs come from the caller's own
-      // recipient index, @mentions from the newest channel traffic (the
-      // mention window is seven days). Merged and de-duplicated below.
+      // recipient index walked back through the 90-day retention window,
+      // @mentions from the newest channel traffic (the mention window is
+      // seven days). Merged and de-duplicated below.
       when(can(auth, "staffAccess"), async () => {
+        const receivedInWindow = async () => {
+          if (!auth.personId) return [];
+          const since = Date.now() - MESSAGE_RETENTION_MS;
+          const out = [];
+          const range = ctx.db
+            .query("staffMessages")
+            .withIndex("by_recipientPersonId", (q) =>
+              q.eq("recipientPersonId", auth.personId as Id<"people">),
+            )
+            .order("desc");
+          for await (const row of range) {
+            if ((row.createdAt ?? row._creationTime) < since) break;
+            out.push(row);
+            if (out.length >= RECEIVED_CAP) break;
+          }
+          return out;
+        };
         const [received, recent] = await Promise.all([
-          auth.personId
-            ? ctx.db
-                .query("staffMessages")
-                .withIndex("by_recipientPersonId", (q) =>
-                  q.eq("recipientPersonId", auth.personId as Id<"people">),
-                )
-                .order("desc")
-                .take(MESSAGE_TAKE)
-            : Promise.resolve([]),
+          receivedInWindow(),
           ctx.db
             .query("staffMessages")
             .withIndex("by_tenantId", byTenant)

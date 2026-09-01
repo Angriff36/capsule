@@ -94,11 +94,12 @@ export function useChatChannel(channel: ChatChannel | null) {
   return useQuery(api.teamChat.listChannel, args);
 }
 
-/** Header/card facts for one event channel. */
+/** Header/card facts for one event channel (same window as the thread). */
 export function useChatChannelSummary(eventId: string | null) {
+  const { since } = useChatClock();
   return useQuery(
     api.teamChat.channelSummary,
-    eventId ? { eventId } : ("skip" as const),
+    eventId ? { eventId, since } : ("skip" as const),
   );
 }
 
@@ -195,13 +196,10 @@ export function useSendChatMessage() {
       }
       if (failed.length === 0) return null;
 
-      // Roll back: the rows that did attach first, then the message.
+      // Roll back the message FIRST. If that fails the message stays, so its
+      // successful files must stay with it; only after the message is gone
+      // are its orphaned attachment rows tidied (best effort).
       const files = `${failed.length === 1 ? "a file" : `${failed.length} files`} (${failed.join(", ")})`;
-      await Promise.all(
-        attached.map((attachmentId) =>
-          removeAttachment({ docId: attachmentId }).catch(() => undefined),
-        ),
-      );
       try {
         await remove({ docId });
       } catch {
@@ -209,6 +207,11 @@ export function useSendChatMessage() {
           failed.length === 1 ? "it" : "them"
         } again in a new message.`;
       }
+      await Promise.all(
+        attached.map((attachmentId) =>
+          removeAttachment({ docId: attachmentId }).catch(() => undefined),
+        ),
+      );
       throw new Error(
         `Could not attach ${files}, so nothing was sent. Try again.`,
       );

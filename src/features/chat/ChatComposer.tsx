@@ -13,11 +13,10 @@ import {
   ChatLinkedRow,
   type ChatPendingFile,
 } from "./ChatComposerChips";
+import { ChatComposerToolbar } from "./ChatComposerToolbar";
 import { ChatPeoplePicker } from "./ChatPeoplePicker";
 import { ChatRecordPicker } from "./ChatRecordPicker";
-import { LinkIcon, PaperclipIcon } from "./chatIcons";
-import { chatLinkToken, type ChatLinkKind } from "./chatLinkTokens";
-import type { ChatLinkTarget } from "./chatTypes";
+import { chatLinkToken } from "./chatLinkTokens";
 import {
   restoreDraftFiles,
   restoreDraftLinks,
@@ -31,36 +30,17 @@ import { useChatTextareaGrow } from "./useChatTextareaGrow";
 import { useCoarsePointer } from "./useCoarsePointer";
 import "./chat.css";
 
-export type ChatComposerLink = {
-  readonly kind: ChatLinkKind;
-  readonly id: string;
-  readonly label: string;
-};
-export type ChatComposerPerson = {
-  readonly personId: string;
-  readonly name: string;
-};
-export type ChatComposerSubmit = {
-  /** Trimmed text followed by one `[[kind:id|Label]]` token per linked record (space separated). Empty string allowed when files exist. */
-  readonly body: string;
-  readonly files: readonly File[];
-  readonly mentionedPersonIds: readonly string[];
-};
-export type ChatComposerProps = {
-  readonly placeholder: string;
-  /** When set, the composer is disabled and shows this line instead of the toolbar (e.g. "Link your account to a staff profile before sending messages"). */
-  readonly disabledReason?: string | null;
-  /** Teammates for the @ picker (already excludes the current user). */
-  readonly people: readonly ChatComposerPerson[];
-  /** Record search for the # picker; resolves to [] on error. Called only with terms of ≥ 2 chars, debounced 180ms by the composer. */
-  readonly searchRecords: (term: string) => Promise<readonly ChatLinkTarget[]>;
-  readonly onSubmit: (submit: ChatComposerSubmit) => Promise<void>;
-  readonly sending: boolean;
-  /** Upload/send error from the caller; render as `role="alert"` text-sm text-danger above the toolbar. */
-  readonly error: string | null;
-  /** Optional: increments when the caller wants the textarea focused (e.g. after channel switch on desktop). */
-  readonly focusSignal?: number;
-};
+export type {
+  ChatComposerLink,
+  ChatComposerPerson,
+  ChatComposerProps,
+  ChatComposerSubmit,
+} from "./chatComposerTypes";
+import type {
+  ChatComposerLink,
+  ChatComposerPerson,
+  ChatComposerProps,
+} from "./chatComposerTypes";
 
 /**
  * Message input: text with `@` mentions and `#` record links, pending files,
@@ -75,19 +55,40 @@ export function ChatComposer({
   sending,
   error,
   focusSignal,
+  initialDraft = null,
+  restoreDraft = null,
+  onRestoreConsumed,
+  onDraftOrphaned,
 }: ChatComposerProps) {
   const coarse = useCoarsePointer();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingCaretRef = useRef<number | null>(null);
   const submittingRef = useRef(false);
   const nextFileKeyRef = useRef(0);
 
-  const [text, setText] = useState("");
-  const [caret, setCaret] = useState(0);
-  const [files, setFiles] = useState<readonly ChatPendingFile[]>([]);
-  const [links, setLinks] = useState<readonly ChatComposerLink[]>([]);
-  const [mentions, setMentions] = useState<readonly ChatComposerPerson[]>([]);
+  // Files from another composer instance are re-keyed against this
+  // instance's counter so a newly attached file can never share a key.
+  const rekey = (pending: readonly ChatPendingFile[]) =>
+    pending.map((item) => ({ ...item, key: `f${nextFileKeyRef.current++}` }));
+  const mountedRef = useRef(true);
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+    },
+    [],
+  );
+
+  const [text, setText] = useState(initialDraft?.text ?? "");
+  const [caret, setCaret] = useState(initialDraft?.text.length ?? 0);
+  const [files, setFiles] = useState<readonly ChatPendingFile[]>(() =>
+    rekey(initialDraft?.files ?? []),
+  );
+  const [links, setLinks] = useState<readonly ChatComposerLink[]>(
+    initialDraft?.links ?? [],
+  );
+  const [mentions, setMentions] = useState<readonly ChatComposerPerson[]>(
+    initialDraft?.mentions ?? [],
+  );
   const [focusWithin, setFocusWithin] = useState(false);
 
   const focusTextarea = () => textareaRef.current?.focus();
@@ -141,6 +142,23 @@ export function ChatComposer({
   }, [text]);
   useChatTextareaGrow(textareaRef, text);
 
+  // A failed draft handed back while this composer is live: merge it in
+  // front of whatever was typed since, once per token.
+  const consumedRestoreRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (!restoreDraft || consumedRestoreRef.current === restoreDraft.token) {
+      return;
+    }
+    consumedRestoreRef.current = restoreDraft.token;
+    const failed = restoreDraft.draft;
+    setText((current) => restoreDraftText(failed.text, current));
+    setFiles((current) => restoreDraftFiles(rekey(failed.files), current));
+    setLinks((current) => restoreDraftLinks(failed.links, current));
+    setMentions((current) => restoreDraftMentions(failed.mentions, current));
+    onRestoreConsumed?.(restoreDraft.token);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restoreDraft, onRestoreConsumed]);
+
   // Focus on request; the mount value only counts when it is already > 0.
   const firstFocusRef = useRef(true);
   useEffect(() => {
@@ -179,10 +197,16 @@ export function ChatComposer({
         body,
         files: draft.files.map((pending) => pending.file),
         mentionedPersonIds: draft.mentions.map((mention) => mention.personId),
+        draft,
       });
     } catch {
-      // The caller renders `error`; the failed draft goes back in front of
-      // whatever was typed since so nothing is lost.
+      // The caller renders `error`. If this composer is already gone (the
+      // user switched channels), hand the draft to the caller; otherwise it
+      // goes back in front of whatever was typed since so nothing is lost.
+      if (!mountedRef.current) {
+        onDraftOrphaned?.(draft);
+        return;
+      }
       setText((current) => restoreDraftText(draft.text, current));
       setFiles((current) => restoreDraftFiles(draft.files, current));
       setLinks((current) => restoreDraftLinks(draft.links, current));
@@ -344,45 +368,14 @@ export function ChatComposer({
           {error}
         </p>
       ) : null}
-      <div className="mt-2 flex flex-wrap items-center gap-2">
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          className="hidden"
-          tabIndex={-1}
-          aria-hidden="true"
-          onChange={(event) => {
-            addFiles(event.target.files);
-            event.target.value = "";
-          }}
-        />
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          <PaperclipIcon width={14} height={14} />
-          Attach
-        </button>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          aria-expanded={pickers.toolbarOpen}
-          aria-controls={pickers.toolbarOpen ? pickers.pickerId : undefined}
-          onClick={pickers.toggleToolbar}
-        >
-          <LinkIcon width={14} height={14} />
-          Link a record
-        </button>
-        <button
-          type="submit"
-          className="btn btn-primary ml-auto"
-          disabled={!canSend}
-        >
-          {sending ? "Sending…" : "Send"}
-        </button>
-      </div>
+      <ChatComposerToolbar
+        onAttach={addFiles}
+        toolbarOpen={pickers.toolbarOpen}
+        pickerId={pickers.pickerId}
+        onToggleToolbar={pickers.toggleToolbar}
+        canSend={canSend}
+        sending={sending}
+      />
     </form>
   );
 }

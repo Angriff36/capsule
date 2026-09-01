@@ -55,7 +55,9 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
   constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
 
-  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or self.senderAuthSubjectId == null or (user.id != null and (self.senderAuthSubjectId == user.id or self.recipientAuthSubjectId == user.id))) "Staff may read channel messages and their own direct messages"
+  // A DM party is identified by Person (the same rule the chat seam uses), so a
+  // teammate who links a sign-in after the message was sent still owns it.
+  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or self.senderAuthSubjectId == null or (user.id != null and (self.senderAuthSubjectId == user.id or self.recipientAuthSubjectId == user.id)) or (user.personId != null and (self.senderPersonId == user.personId or self.recipientPersonId == user.personId))) "Staff may read channel messages and their own direct messages"
   default policy staffMessageWrite write: roleAllows(user.role, "staffAccess") "Staff may write staff messages through commands"
   default policy staffMessageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute staff message commands"
 
@@ -100,14 +102,16 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Only the linked recipient account clears its own unread marker (direct
-  // messages). Channel read state lives in StaffChatReadCursor.
+  // Only the recipient clears their own unread marker (direct messages).
+  // Matched by Person so a recipient who linked a sign-in after the send can
+  // still mark it; their sign-in is backfilled for the notification tray.
+  // Channel read state lives in StaffChatReadCursor.
   command markRead() {
     guard self.deletedAt == null
     guard self.readAt == null
     guard user.id != null
-    guard self.recipientAuthSubjectId != null
-    guard self.recipientAuthSubjectId == user.id
+    guard user.personId != null and self.recipientPersonId == user.personId "Only the recipient can mark a message read"
+    mutate recipientAuthSubjectId = user.id
     mutate readAt = now()
     emit StaffMessageRead {
       staffMessageId: self.id
@@ -124,7 +128,8 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     guard self.senderAuthSubjectId != null and self.senderAuthSubjectId == user.id
     constraint editBodyOrFiles: length(trim(body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
     mutate body = body
-    mutate mentionedPersonIds = mentionedPersonIds
+    // Omitting the mention list keeps the existing one (and its notifications).
+    mutate mentionedPersonIds = mentionedPersonIds != null ? mentionedPersonIds : self.mentionedPersonIds
     mutate editedAt = now()
     emit StaffMessageEdited {
       staffMessageId: self.id

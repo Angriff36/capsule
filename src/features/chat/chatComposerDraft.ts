@@ -1,4 +1,4 @@
-import type { ChatComposerLink, ChatComposerPerson } from "./ChatComposer";
+import type { ChatComposerLink, ChatComposerPerson } from "./chatComposerTypes";
 import type { ChatPendingFile } from "./ChatComposerChips";
 
 /** What the composer held when Send was pressed. */

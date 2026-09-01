@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { EmptyState } from "../../ui/primitives";
 import { EventTabPanel } from "../events/EventTabPanel";
@@ -9,12 +9,13 @@ import {
   type ChatChannel,
   chatChannelKey,
 } from "./chatTypes";
+import { useChannelReadMarker } from "./useChannelReadMarker";
+import { useChatDraftRecovery } from "./useChatDraftRecovery";
 import {
   useChatChannel,
   useChatChannelSummary,
   useChatIdentity,
   useChatMessageActions,
-  useChatReadCursor,
   useChatRecordSearch,
   useSendChatMessage,
 } from "./useTeamChat";
@@ -43,15 +44,11 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
   const actions = useChatMessageActions();
   const sendMessage = useSendChatMessage();
   const searchRecords = useChatRecordSearch();
-  const moveCursor = useChatReadCursor();
+  const onReachBottom = useChannelReadMarker(channelKey, summary);
+  const drafts = useChatDraftRecovery(channelKey);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pinSignal, setPinSignal] = useState(0);
-  // Cursors opened this session, per channel, before the summary catches up
-  // (the tab component is reused when the route moves to another event).
-  const openedCursors = useRef(new Map<string, string>());
-  // The thread reached the bottom before the summary loaded; replay it once.
-  const pendingReach = useRef<number | null | false>(false);
 
   const people = useMemo(
     () =>
@@ -63,32 +60,6 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
         })),
     [identity],
   );
-
-  const onReachBottom = useCallback(
-    (newestAt: number | null) => {
-      if (newestAt == null) return;
-      if (summary === undefined) {
-        pendingReach.current = newestAt;
-        return;
-      }
-      if (summary === null) return;
-      const cursorId =
-        summary.myCursorId ?? openedCursors.current.get(channelKey) ?? null;
-      if (cursorId && (summary.lastReadAt ?? 0) >= newestAt) return;
-      void moveCursor(channelKey, cursorId, newestAt).then((id) => {
-        if (id) openedCursors.current.set(channelKey, id);
-      });
-    },
-    [channelKey, moveCursor, summary],
-  );
-
-  useEffect(() => {
-    if (summary && pendingReach.current !== false) {
-      const newestAt = pendingReach.current;
-      pendingReach.current = false;
-      onReachBottom(newestAt);
-    }
-  }, [summary, onReachBottom]);
 
   const onSubmit = async (submit: ChatComposerSubmit) => {
     setError(null);
@@ -156,6 +127,10 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
           />
           <ChatComposer
             key={channelKey}
+            initialDraft={drafts.initialDraft}
+            restoreDraft={drafts.restoreDraft}
+            onRestoreConsumed={drafts.onRestoreConsumed}
+            onDraftOrphaned={(draft) => drafts.orphanedFrom(channelKey, draft)}
             placeholder={`Message the “${eventTitle}” crew…`}
             disabledReason={
               identity.loading || identity.personId
