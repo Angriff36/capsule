@@ -70,13 +70,14 @@ export function ChatComposer({
   // instance's counter so a newly attached file can never share a key.
   const rekey = (pending: readonly ChatPendingFile[]) =>
     pending.map((item) => ({ ...item, key: `f${nextFileKeyRef.current++}` }));
+  // Armed in the setup too: StrictMode runs setup → cleanup → setup on mount.
   const mountedRef = useRef(true);
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
       mountedRef.current = false;
-    },
-    [],
-  );
+    };
+  }, []);
 
   const [text, setText] = useState(initialDraft?.text ?? "");
   const [caret, setCaret] = useState(initialDraft?.text.length ?? 0);

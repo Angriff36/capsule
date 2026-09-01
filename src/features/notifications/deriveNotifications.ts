@@ -307,7 +307,10 @@ export function deriveNotifications(
         id: `mention:${message._id}`,
         kind: "mention",
         message: `${who} mentioned you in "${title}" chat`,
-        link: `/events/${eventId}?tab=chat`,
+        // Team chat, not the event page: every chat reader can open this,
+        // while /events/:id needs eventAccess that kitchen or logistics
+        // roles do not carry.
+        link: `/staff/messages?event=${eventId}`,
         at: message.createdAt,
       });
     }

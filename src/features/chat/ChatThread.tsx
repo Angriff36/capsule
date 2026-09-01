@@ -101,6 +101,9 @@ export function ChatThread({
     if (reachTimerRef.current !== null) return;
     reachTimerRef.current = setTimeout(() => {
       reachTimerRef.current = null;
+      // The reader may have scrolled up while the timer waited; rows that
+      // arrived since are not visible and must stay unread.
+      if (!pinnedRef.current) return;
       lastReachRef.current = Date.now();
       reachRef.current?.(newestAtRef.current);
     }, wait);

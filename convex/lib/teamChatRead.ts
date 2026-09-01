@@ -7,6 +7,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { QueryCtx } from "../_generated/server";
 import { getAuthContext, type AppAuthContext } from "./authContext";
 import { decrypt } from "./encryption";
+import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import { chatPreviewText } from "../../src/features/chat/chatLinkTokens";
 
 /** Newest messages a thread returns; older ones are history, not chat. */
@@ -78,10 +79,45 @@ export async function decryptField(
   );
 }
 
-/** Any authenticated member of the tenant with a real role may use chat. */
+/**
+ * Every role base.manifest declares extends `staff`, so this is the set that
+ * carries staffAccess — the StaffMessage read policy. checkRole is a
+ * non-exported generated local, so the seam mirrors it (same pattern as
+ * convex/notifications.ts); an unknown IdP role string is denied here just as
+ * the generated queries deny it. Keep in sync with src/foundation/base.manifest.
+ */
+const STAFF_ROLES = new Set([
+  "staff",
+  "kitchen_staff",
+  "kitchen_lead",
+  "sales_staff",
+  "event_staff",
+  "inventory_staff",
+  "procurement_staff",
+  "logistics_staff",
+  "driver",
+  "workforce_staff",
+  "finance_staff",
+  "manager",
+  "kitchen_manager",
+  "sales_manager",
+  "event_manager",
+  "inventory_manager",
+  "logistics_manager",
+  "workforce_manager",
+  "finance_manager",
+  "admin",
+  "owner",
+  "system",
+]);
+
+/** A tenant member whose role grants staffAccess may use chat. */
 export async function chatAuth(ctx: QueryCtx): Promise<AppAuthContext | null> {
   const auth = await getAuthContext(ctx);
-  if (!auth || auth.role === "anonymous" || !auth.tenantId) return null;
+  if (!auth || !auth.tenantId || !STAFF_ROLES.has(auth.role)) return null;
+  if (orgCapabilityDeniesAction("staffAccess", auth.disabledCapabilities)) {
+    return null;
+  }
   return auth;
 }
 

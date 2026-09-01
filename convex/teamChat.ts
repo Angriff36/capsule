@@ -129,8 +129,8 @@ type EventConversation = {
 /**
  * The conversation rail: direct-message partners (recency order) and event
  * channels (event date order) with unread counts. Channels appear for live,
- * non-cancelled events that start from yesterday onward, plus any event
- * whose channel has messages inside the retention window.
+ * non-cancelled events whose start lies inside the retention window (the
+ * last 90 days and everything ahead), bounded to EVENT_CANDIDATES per run.
  */
 export const listConversations = query({
   args: { since: v.number(), now: v.number() },
@@ -206,13 +206,21 @@ export const listConversations = query({
     const past = inWindow
       .filter((event) => (event.startsAt ?? 0) < args.now - DAY_MS)
       .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0));
-    const candidates = [...upcoming, ...past].slice(0, EVENT_CANDIDATES);
+    // Half the budget is reserved for the most recent past events, so last
+    // night's channel stays in the rail for a tenant with a long forward
+    // calendar; upcoming fills the rest. (`events` is re-sorted below.)
+    const half = EVENT_CANDIDATES / 2;
+    const candidates = [
+      ...past.slice(0, Math.max(half, EVENT_CANDIDATES - upcoming.length)),
+      ...upcoming,
+    ].slice(0, EVENT_CANDIDATES);
 
     const events: EventConversation[] = [];
     await Promise.all(
       candidates.map(async (event) => {
         // Same window the thread shows, so a badge never counts hidden rows.
-        const scanned = (await inChannel(ctx, event._id, UNREAD_SCAN)).filter(
+        const raw = await inChannel(ctx, event._id, UNREAD_SCAN);
+        const scanned = raw.filter(
           (row) =>
             row.tenantId === tenantId && live(row) && sentAt(row) >= args.since,
         );
@@ -227,6 +235,15 @@ export const listConversations = query({
           (row) =>
             sentAt(row) > readUpTo && (me == null || row.senderPersonId !== me),
         );
+        // Capped when the RAW scan hit its boundary inside the window and
+        // that boundary is still newer than the cursor: older unread rows
+        // may exist beyond it, whatever mix (removed, own, read) the window
+        // itself held.
+        const boundary = raw[raw.length - 1];
+        const hitBoundary =
+          raw.length >= UNREAD_SCAN &&
+          boundary !== undefined &&
+          sentAt(boundary) >= args.since;
         events.push({
           eventId: String(event._id),
           title: String(event.title ?? "Untitled event"),
@@ -234,8 +251,7 @@ export const listConversations = query({
           stage: String(event.stage ?? ""),
           lastAt,
           unread: unreadRows.length,
-          unreadCapped:
-            scanned.length >= UNREAD_SCAN && unreadRows.length >= UNREAD_SCAN,
+          unreadCapped: hitBoundary && sentAt(boundary) > readUpTo,
           preview: await previewOf(ctx, newest),
           myCursorId: cursor?.id ?? null,
           lastReadAt: cursor?.lastReadAt ?? null,
@@ -268,10 +284,16 @@ export const channelSummary = query({
     const event = await tenantEvent(ctx, tenantId, args.eventId);
     if (!event) return null;
     const me = auth.personId ? (auth.personId as Doc<"people">["_id"]) : null;
-    const scanned = (await inChannel(ctx, event._id, UNREAD_SCAN)).filter(
+    const raw = await inChannel(ctx, event._id, UNREAD_SCAN);
+    const scanned = raw.filter(
       (row) =>
         row.tenantId === tenantId && live(row) && sentAt(row) >= args.since,
     );
+    const boundary = raw[raw.length - 1];
+    const hitBoundary =
+      raw.length >= UNREAD_SCAN &&
+      boundary !== undefined &&
+      sentAt(boundary) >= args.since;
     const cursor =
       (await readCursorsFor(ctx, tenantId, auth.id)).get(
         `event:${String(event._id)}`,
@@ -280,7 +302,7 @@ export const channelSummary = query({
     const newest = scanned[0];
     return {
       count: scanned.length,
-      countCapped: scanned.length >= UNREAD_SCAN,
+      countCapped: hitBoundary,
       lastAt: newest ? sentAt(newest) : null,
       preview: await previewOf(ctx, newest),
       unread: scanned.filter(
