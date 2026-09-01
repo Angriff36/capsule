@@ -86,6 +86,7 @@ export function MenuDetailPage() {
     const rows = deriveAllergenRows({
       dishIds: selectedMenuDishes.map((selection) => String(selection.dishId)),
       dishes: dishes ?? [],
+      dishIngredients: dishIngredients ?? [],
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
@@ -98,6 +99,7 @@ export function MenuDetailPage() {
   }, [
     selectedMenuDishes,
     dishes,
+    dishIngredients,
     dishComponents,
     componentIngredients,
     ingredients,

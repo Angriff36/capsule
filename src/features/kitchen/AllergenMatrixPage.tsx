@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import {
   useListDish,
   useListDishComponent,
+  useListDishIngredient,
   useListEvent,
   useListEventDish,
   useListIngredient,
@@ -16,6 +17,7 @@ import {
   CULINARY_ALLERGENS,
   type CulinaryAllergenCode,
 } from "./CulinaryAllergenVocabulary";
+import { deriveDishAllergens } from "./dishAllergens";
 import { KitchenBookNav } from "./KitchenBookNav";
 
 const ALLERGENS = CULINARY_ALLERGENS;
@@ -29,14 +31,17 @@ type MatrixRecord = {
 };
 
 /**
- * Dish rows for the matrix: allergen flags unioned from component ingredient
- * classifications (dish → DishComponent → ComponentIngredient → Ingredient.allergens)
- * plus dish-level declared allergenSummary. Each flagged cell records its
- * contributing sources for disclosure tooltips.
+ * Dish rows for the matrix: allergen flags unioned from the full recipe —
+ * direct DishIngredient lines AND component lines (dish → DishComponent →
+ * ComponentIngredient → Ingredient.allergens) — plus dish-level declared
+ * allergenSummary. Each flagged cell records its contributing sources for
+ * disclosure tooltips. Derivation lives in dishAllergens.ts, shared with
+ * the Event Day menu.
  */
 export function deriveAllergenRows(input: {
   dishIds: string[];
   dishes: MatrixRecord[];
+  dishIngredients: MatrixRecord[];
   dishComponents: MatrixRecord[];
   componentIngredients: MatrixRecord[];
   ingredients: MatrixRecord[];
@@ -45,31 +50,7 @@ export function deriveAllergenRows(input: {
     .map((dishId) => {
       const dish = input.dishes.find((item) => item._id === dishId);
       if (!dish || dish.deletedAt != null) return null;
-      const componentIds = new Set(
-        input.dishComponents
-          .filter((line) => line.deletedAt == null && line.dishId === dishId)
-          .map((line) => line.componentId),
-      );
-      const sources = new Map<AllergenCode, string[]>();
-      const flag = (code: AllergenCode, source: string) => {
-        const list = sources.get(code) ?? [];
-        if (!list.includes(source)) list.push(source);
-        sources.set(code, list);
-      };
-      for (const line of input.componentIngredients) {
-        if (line.deletedAt != null || !componentIds.has(line.componentId))
-          continue;
-        const ingredient = input.ingredients.find(
-          (item) => item._id === line.ingredientId,
-        );
-        if (!ingredient || ingredient.deletedAt != null) continue;
-        for (const code of (ingredient.allergens ?? []) as AllergenCode[]) {
-          flag(code, String(ingredient.name));
-        }
-      }
-      for (const code of (dish.allergenSummary ?? []) as AllergenCode[]) {
-        flag(code, "Declared on dish");
-      }
+      const { sources } = deriveDishAllergens(dish, input);
       return { dish, sources };
     })
     .filter((row) => row != null)
@@ -83,6 +64,7 @@ export function AllergenMatrixPage() {
   const menuDishes = useListMenuDish();
   const eventDishes = useListEventDish();
   const dishes = useListDish();
+  const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
@@ -101,6 +83,7 @@ export function AllergenMatrixPage() {
     menuDishes === undefined ||
     eventDishes === undefined ||
     dishes === undefined ||
+    dishIngredients === undefined ||
     dishComponents === undefined ||
     componentIngredients === undefined ||
     ingredients === undefined;
@@ -128,6 +111,7 @@ export function AllergenMatrixPage() {
     return deriveAllergenRows({
       dishIds,
       dishes: dishes ?? [],
+      dishIngredients: dishIngredients ?? [],
       dishComponents: dishComponents ?? [],
       componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
@@ -140,6 +124,7 @@ export function AllergenMatrixPage() {
     menuDishes,
     eventDishes,
     dishes,
+    dishIngredients,
     dishComponents,
     componentIngredients,
     ingredients,
@@ -158,8 +143,8 @@ export function AllergenMatrixPage() {
           <h1 className="display-title mt-2">Allergen matrix</h1>
           <p className="mt-3 max-w-150 text-ink-2">
             Every dish on a menu or event against the major food allergens,
-            auto-populated from component ingredient allergen flags. Print for
-            client disclosure or health inspection.
+            auto-populated from the allergen flags of every recipe ingredient.
+            Print for client disclosure or health inspection.
           </p>
         </div>
         <div className="component-book-masthead-actions">
@@ -283,10 +268,11 @@ export function AllergenMatrixPage() {
             </table>
           </div>
           <p className="allergen-matrix-footnote">
-            Flags derive from component ingredient allergen classifications and
-            dish-level declarations. Unflagged cells mean no allergen is
-            recorded, not a certified absence — verify with the kitchen before
-            guaranteeing allergen-free service.
+            Flags derive from the allergen classifications of every recipe
+            ingredient (direct lines and components) plus dish-level
+            declarations. Unflagged cells mean no allergen is recorded, not a
+            certified absence — verify with the kitchen before guaranteeing
+            allergen-free service.
           </p>
         </section>
       )}

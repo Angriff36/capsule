@@ -4,6 +4,12 @@ import { formatDate, formatTime } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { compareActivities } from "../events/EventTimelinePanel";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
+import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
+import {
+  allergenLabel,
+  deriveDishAllergens,
+  type DishAllergenReport,
+} from "../kitchen/dishAllergens";
 import type { EventDayInputs } from "./eventDayModel";
 
 /**
@@ -13,6 +19,10 @@ import type { EventDayInputs } from "./eventDayModel";
 
 export type EventDayDetailData = EventDayInputs & {
   dishes: readonly Doc<"dishes">[];
+  dishIngredients: readonly Doc<"dishIngredients">[];
+  dishComponents: readonly Doc<"dishComponents">[];
+  componentIngredients: readonly Doc<"componentIngredients">[];
+  ingredients: readonly Doc<"ingredients">[];
   people: readonly Doc<"people">[];
   vehicles: readonly Doc<"vehicles">[];
   equipments: readonly Doc<"equipments">[];
@@ -215,6 +225,31 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
   );
 }
 
+/** Allergens read from the actual recipe, not a hand-kept summary. */
+function AllergenLine({ report }: { report: DishAllergenReport | null }) {
+  if (report == null) return null;
+  if (report.codes.length > 0) {
+    return (
+      <span className="evd-allergen-contains block">
+        Contains {report.codes.map(allergenLabel).join(" · ")}
+      </span>
+    );
+  }
+  if (report.lineCount > 0) {
+    return (
+      <span className="evd-allergen-clear block">
+        No allergens on {report.lineCount} listed{" "}
+        {report.lineCount === 1 ? "ingredient" : "ingredients"}
+      </span>
+    );
+  }
+  return (
+    <span className="evd-allergen-unknown block">
+      No recipe on file — allergens unverified
+    </span>
+  );
+}
+
 export function MenuSheet({ data }: { data: EventDayDetailData }) {
   const rows = data.eventDishes;
   if (rows.length === 0) return <Empty>No dishes on this event.</Empty>;
@@ -223,18 +258,50 @@ export function MenuSheet({ data }: { data: EventDayDetailData }) {
     const course = String(row.course ?? "").trim() || "Menu";
     courses.set(course, [...(courses.get(course) ?? []), row]);
   }
+  const reportByDish = new Map<string, DishAllergenReport>();
+  for (const row of rows) {
+    const dish = data.dishes.find((d) => d._id === row.dishId);
+    if (!dish || reportByDish.has(String(dish._id))) continue;
+    reportByDish.set(String(dish._id), deriveDishAllergens(dish, data));
+  }
+  const menuCodes = new Set(
+    [...reportByDish.values()].flatMap((report) => report.codes),
+  );
+  const menuAllergens = CULINARY_ALLERGENS.filter((allergen) =>
+    menuCodes.has(allergen.code),
+  );
   return (
     <div>
+      {menuAllergens.length > 0 ? (
+        <p className="evd-allergen-banner">
+          Menu contains{" "}
+          {menuAllergens.map((allergen) => allergen.label).join(" · ")}
+        </p>
+      ) : null}
       {[...courses.entries()].map(([course, list]) => (
         <div key={course}>
           <p className="evd-kicker">{course}</p>
           {list.map((row) => {
             const dish = data.dishes.find((d) => d._id === row.dishId);
+            const instructions = String(row.specialInstructions ?? "").trim();
             return (
               <Row
                 key={row._id}
                 title={dish?.name ?? "Dish"}
-                sub={String(row.specialInstructions ?? "").trim() || undefined}
+                sub={
+                  <>
+                    <AllergenLine
+                      report={
+                        dish
+                          ? (reportByDish.get(String(dish._id)) ?? null)
+                          : null
+                      }
+                    />
+                    {instructions ? (
+                      <span className="block">{instructions}</span>
+                    ) : null}
+                  </>
+                }
                 flag={`${row.quantityServings} srv`}
               />
             );
