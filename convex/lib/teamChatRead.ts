@@ -4,7 +4,7 @@
  * retention window. Nothing here writes.
  */
 import type { Doc, Id } from "../_generated/dataModel";
-import type { QueryCtx } from "../_generated/server";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getAuthContext, type AppAuthContext } from "./authContext";
 import { decrypt } from "./encryption";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
@@ -12,15 +12,21 @@ import { chatPreviewText } from "../../src/features/chat/chatLinkTokens";
 
 /** Newest messages a thread returns; older ones are history, not chat. */
 export const MAX_THREAD_MESSAGES = 400;
-/** Rows read per event-channel index range before the live/since filters. */
-export const RANGE_TAKE = 800;
 /**
  * Hard ceiling on one person's messages walked per query. The walk is
  * time-bounded (it stops at `since`), so this only guards a runaway range.
  */
 export const PERSON_RANGE_CAP = 4000;
-/** Per-channel rows scanned for unread counts; more than this reads "50+". */
+/** Per-channel unread rows counted for a badge; more than this reads "50+". */
 export const UNREAD_SCAN = 50;
+/** Attachment rows read per message: the sender's rows are the earliest. */
+export const ATTACHMENT_SCAN = 50;
+/**
+ * Cursor rows read per channel — one per reader after the upsert seam folds
+ * duplicates, so this is a team-size bound.
+ */
+export const CURSOR_ROWS_PER_CHANNEL = 250;
+
 
 export type ChatAttachmentView = {
   _id: string;
@@ -112,7 +118,9 @@ const STAFF_ROLES = new Set([
 ]);
 
 /** A tenant member whose role grants staffAccess may use chat. */
-export async function chatAuth(ctx: QueryCtx): Promise<AppAuthContext | null> {
+export async function chatAuth(
+  ctx: QueryCtx | MutationCtx,
+): Promise<AppAuthContext | null> {
   const auth = await getAuthContext(ctx);
   if (!auth || !auth.tenantId || !STAFF_ROLES.has(auth.role)) return null;
   if (orgCapabilityDeniesAction("staffAccess", auth.disabledCapabilities)) {
@@ -159,10 +167,14 @@ export async function attachmentsFor(
   message: Doc<"staffMessages">,
 ): Promise<ChatAttachmentView[]> {
   if ((message.attachmentCount ?? 0) <= 0) return [];
+  // Ascending and bounded: the sender attaches right after sending, so its
+  // rows are the earliest; a later row someone else parks on this message id
+  // can neither hide them nor grow this read.
   const rows = await ctx.db
     .query("attachments")
     .withIndex("by_parentId", (q) => q.eq("parentId", String(message._id)))
-    .collect();
+    .order("asc")
+    .take(ATTACHMENT_SCAN);
   const mine = rows.filter(
     (row) =>
       row.parentType === "staffMessage" &&
@@ -264,19 +276,6 @@ export async function receivedBy(
   );
 }
 
-/** Newest-first rows in one event channel (bounded index range). */
-export async function inChannel(
-  ctx: QueryCtx,
-  eventId: Id<"events">,
-  take: number,
-): Promise<Doc<"staffMessages">[]> {
-  return ctx.db
-    .query("staffMessages")
-    .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-    .order("desc")
-    .take(take);
-}
-
 /** Preview line for the rail: the newest message's text, or its file count. */
 export async function previewOf(
   ctx: QueryCtx,
@@ -291,10 +290,10 @@ export async function previewOf(
 }
 
 /**
- * The caller's newest read cursor for each of the given channels (duplicates
- * collapse to the max). Read per channel through `by_channelKey` — one small
- * range per channel in view, bounded by the team size — never the account's
- * whole cursor history, which grows with every channel ever visited.
+ * The caller's read cursor for each of the given channels. Read per channel
+ * through `by_channelKey`, bounded to CURSOR_ROWS_PER_CHANNEL — one row per
+ * reader once convex/teamChatCursor.ts has folded duplicates — never the
+ * account's whole cursor history, which grows with every channel visited.
  */
 export async function readCursorsForChannels(
   ctx: QueryCtx,
@@ -308,7 +307,7 @@ export async function readCursorsForChannels(
       const rows = await ctx.db
         .query("staffChatReadCursors")
         .withIndex("by_channelKey", (q) => q.eq("channelKey", channelKey))
-        .collect();
+        .take(CURSOR_ROWS_PER_CHANNEL);
       for (const row of rows) {
         if (row.tenantId !== tenantId || row.authSubjectId !== authSubjectId) {
           continue;

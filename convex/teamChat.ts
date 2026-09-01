@@ -24,11 +24,9 @@ import type { Doc } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import {
   chatAuth,
-  inChannel,
   live,
   MAX_THREAD_MESSAGES,
   previewOf,
-  RANGE_TAKE,
   readCursorsForChannels,
   receivedBy,
   sentAt,
@@ -36,9 +34,9 @@ import {
   tenantEvent,
   tenantPerson,
   toView,
-  UNREAD_SCAN,
   type ChatMessageView,
 } from "./lib/teamChatRead";
+import { channelRows, scanChannel } from "./lib/teamChatScan";
 import { TEXT_TARGETS } from "./search";
 
 /** Channels stay in the rail from one day before the event starts. */
@@ -69,7 +67,13 @@ export const listChannel = query({
     if (args.eventId) {
       const event = await tenantEvent(ctx, tenantId, args.eventId);
       if (!event) return null;
-      rows = await inChannel(ctx, event._id, RANGE_TAKE);
+      rows = await channelRows(
+        ctx,
+        tenantId,
+        event._id,
+        args.since,
+        MAX_THREAD_MESSAGES,
+      );
     } else if (args.otherPersonId) {
       if (!auth.personId) return null;
       const other = await tenantPerson(ctx, tenantId, args.otherPersonId);
@@ -224,40 +228,31 @@ export const listConversations = query({
     const events: EventConversation[] = [];
     await Promise.all(
       candidates.map(async (event) => {
-        // Same window the thread shows, so a badge never counts hidden rows.
-        const raw = await inChannel(ctx, event._id, UNREAD_SCAN);
-        const scanned = raw.filter(
-          (row) =>
-            row.tenantId === tenantId && live(row) && sentAt(row) >= args.since,
-        );
-        const newest = scanned[0];
+        const cursor = cursors.get(`event:${String(event._id)}`) ?? null;
+        const readUpTo = cursor?.lastReadAt ?? 0;
+        // Newest first, live rows only, stopping at the cursor: unread rows
+        // older than 50 own or removed rows are still counted, and a removed
+        // burst cannot hide a live channel.
+        const scan = await scanChannel(ctx, tenantId, event._id, {
+          since: args.since,
+          readUpTo,
+          me,
+          stopAtCursor: true,
+          countLimit: MAX_THREAD_MESSAGES,
+        });
+        const newest = scan.newest;
         const lastAt = newest ? sentAt(newest) : null;
         const upcomingEvent =
           event.startsAt != null && event.startsAt >= args.now - DAY_MS;
         if (!upcomingEvent && lastAt == null) return;
-        const cursor = cursors.get(`event:${String(event._id)}`) ?? null;
-        const readUpTo = cursor?.lastReadAt ?? 0;
-        const unreadRows = scanned.filter(
-          (row) =>
-            sentAt(row) > readUpTo && (me == null || row.senderPersonId !== me),
-        );
-        // Capped when the RAW scan hit its boundary inside the window and
-        // that boundary is still newer than the cursor: older unread rows
-        // may exist beyond it, whatever mix (removed, own, read) the window
-        // itself held.
-        const boundary = raw[raw.length - 1];
-        const hitBoundary =
-          raw.length >= UNREAD_SCAN &&
-          boundary !== undefined &&
-          sentAt(boundary) >= args.since;
         events.push({
           eventId: String(event._id),
           title: String(event.title ?? "Untitled event"),
           startsAt: event.startsAt ?? null,
           stage: String(event.stage ?? ""),
           lastAt,
-          unread: unreadRows.length,
-          unreadCapped: hitBoundary && sentAt(boundary) > readUpTo,
+          unread: scan.unread,
+          unreadCapped: scan.unreadCapped,
           preview: await previewOf(ctx, newest),
           myCursorId: cursor?.id ?? null,
           lastReadAt: cursor?.lastReadAt ?? null,
@@ -290,32 +285,27 @@ export const channelSummary = query({
     const event = await tenantEvent(ctx, tenantId, args.eventId);
     if (!event) return null;
     const me = auth.personId ? (auth.personId as Doc<"people">["_id"]) : null;
-    const raw = await inChannel(ctx, event._id, UNREAD_SCAN);
-    const scanned = raw.filter(
-      (row) =>
-        row.tenantId === tenantId && live(row) && sentAt(row) >= args.since,
-    );
-    const boundary = raw[raw.length - 1];
-    const hitBoundary =
-      raw.length >= UNREAD_SCAN &&
-      boundary !== undefined &&
-      sentAt(boundary) >= args.since;
     const channelKey = `event:${String(event._id)}`;
     const cursor =
       (await readCursorsForChannels(ctx, tenantId, auth.id, [channelKey])).get(
         channelKey,
       ) ?? null;
     const readUpTo = cursor?.lastReadAt ?? 0;
-    const newest = scanned[0];
+    const scan = await scanChannel(ctx, tenantId, event._id, {
+      since: args.since,
+      readUpTo,
+      me,
+      stopAtCursor: false,
+      countLimit: MAX_THREAD_MESSAGES,
+    });
+    const newest = scan.newest;
     return {
-      count: scanned.length,
-      countCapped: hitBoundary,
+      count: scan.count,
+      countCapped: scan.countCapped,
       lastAt: newest ? sentAt(newest) : null,
       preview: await previewOf(ctx, newest),
-      unread: scanned.filter(
-        (row) =>
-          sentAt(row) > readUpTo && (me == null || row.senderPersonId !== me),
-      ).length,
+      unread: scan.unread,
+      unreadCapped: scan.unreadCapped,
       myCursorId: cursor?.id ?? null,
       lastReadAt: cursor?.lastReadAt ?? null,
     };

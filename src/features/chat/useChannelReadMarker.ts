@@ -2,29 +2,26 @@ import { useCallback, useEffect, useRef } from "react";
 import { useChatReadCursor } from "./useTeamChat";
 
 type CursorFacts = {
-  readonly myCursorId: string | null;
   readonly lastReadAt: number | null;
 };
 
 /**
  * Turns "the reader reached the newest visible message" into a cursor move
- * for one event channel. Keyed by channel throughout, so a route change to
- * another event never spends channel A's timestamp or cursor id on B:
- * - a reach that arrives before the channel's summary loads is replayed
- *   once the summary is there;
- * - a cursor opened this session is remembered per channel until the
- *   summary query catches up, and an open still in flight is awaited rather
- *   than repeated, so no duplicate rows are opened (Convex does not enforce
- *   the declared unique key).
+ * for one event channel. The server upsert (convex/teamChatCursor.ts) owns
+ * the row, so this only decides WHEN to call it: never while the channel's
+ * summary is still loading (the reach is replayed once it is there), never
+ * for a position the cursor already covers, and never twice for the same
+ * position. Keyed by channel throughout, so a route change to another event
+ * never spends channel A's timestamp on B.
  */
 export function useChannelReadMarker(
   channelKey: string | null,
   summary: CursorFacts | null | undefined,
 ): (newestAt: number | null) => void {
   const moveCursor = useChatReadCursor();
-  const openedCursors = useRef(new Map<string, string>());
-  const openingCursors = useRef(new Map<string, Promise<string | null>>());
   const pendingReach = useRef(new Map<string, number>());
+  /** Highest position already sent per channel this session. */
+  const sentUpTo = useRef(new Map<string, number>());
 
   const onReachBottom = useCallback(
     (newestAt: number | null) => {
@@ -34,27 +31,13 @@ export function useChannelReadMarker(
         return;
       }
       if (summary === null) return;
-      const cursorId =
-        summary.myCursorId ?? openedCursors.current.get(channelKey) ?? null;
-      if (cursorId) {
-        if ((summary.lastReadAt ?? 0) >= newestAt) return;
-        void moveCursor(channelKey, cursorId, newestAt);
-        return;
-      }
-      const opening = openingCursors.current.get(channelKey);
-      if (opening) {
-        // Reuse the open in flight; touch the row it creates.
-        void opening.then((id) => {
-          if (id) void moveCursor(channelKey, id, newestAt);
-        });
-        return;
-      }
-      const open = moveCursor(channelKey, null, newestAt);
-      openingCursors.current.set(channelKey, open);
-      void open.then((id) => {
-        openingCursors.current.delete(channelKey);
-        if (id) openedCursors.current.set(channelKey, id);
-      });
+      const covered = Math.max(
+        summary.lastReadAt ?? 0,
+        sentUpTo.current.get(channelKey) ?? 0,
+      );
+      if (covered >= newestAt) return;
+      sentUpTo.current.set(channelKey, newestAt);
+      void moveCursor(channelKey, newestAt);
     },
     [channelKey, moveCursor, summary],
   );

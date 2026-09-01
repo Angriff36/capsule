@@ -4,10 +4,8 @@ import { api } from "../../lib/api";
 import {
   useAttachmentRemove,
   useCreateAttachment,
-  useCreateStaffChatReadCursor,
   useCreateStaffMessage,
   useListPerson,
-  useStaffChatReadCursorTouch,
   useStaffMessageEdit,
   useStaffMessageMarkRead,
   useStaffMessageRemove,
@@ -238,36 +236,23 @@ export function useChatMessageActions() {
 }
 
 /**
- * Move the caller's read cursor for a channel up to `readUpTo` — the send
- * time of the newest message the reader actually saw, so a message that
- * lands between render and this call stays unread. Touches the row the seam
- * handed back; opens one only when none exists yet and returns the new row
- * id so the caller can touch it next time. Best effort.
+ * Move the caller's read cursor for a channel up to `readUpTo` — the
+ * position of the newest message the reader actually saw, so a message that
+ * lands between render and this call stays unread. One upsert on the server
+ * (convex/teamChatCursor.ts): it advances the caller's single row, never
+ * backwards, and folds duplicates. Best effort.
  */
 export function useChatReadCursor() {
-  const open = useCreateStaffChatReadCursor();
-  const touch = useStaffChatReadCursorTouch();
+  const markChannelRead = useMutation(api.teamChatCursor.markChannelRead);
   return useCallback(
-    async (
-      channelKey: string,
-      myCursorId: string | null,
-      readUpTo: number,
-    ): Promise<string | null> => {
+    async (channelKey: string, readUpTo: number): Promise<void> => {
       try {
-        if (myCursorId) {
-          await touch({ docId: myCursorId, readUpTo });
-          return myCursorId;
-        }
-        const created = (await open({ channelKey, readUpTo })) as {
-          docId?: string;
-        } | null;
-        return created?.docId ?? null;
+        await markChannelRead({ channelKey, readUpTo });
       } catch {
         // Read state is a convenience; the thread itself already rendered.
-        return myCursorId;
       }
     },
-    [open, touch],
+    [markChannelRead],
   );
 }
 

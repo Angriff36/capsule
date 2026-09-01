@@ -23,6 +23,7 @@ import { query } from "./_generated/server";
 import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
 import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
+import { CURSOR_ROWS_PER_CHANNEL } from "./lib/teamChatRead";
 
 const ALL_ACCESS = [
   "eventAccess",
@@ -240,7 +241,7 @@ export const listNotifications = query({
           ctx.db
             .query("staffChatReadCursors")
             .withIndex("by_channelKey", (q) => q.eq("channelKey", channelKey))
-            .collect(),
+            .take(CURSOR_ROWS_PER_CHANNEL),
         ),
       )
     )
