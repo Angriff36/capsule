@@ -232,10 +232,13 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
  */
 function AllergenLine({ report }: { report: DishAllergenReport | null }) {
   if (report != null && report.codes.length > 0) {
+    // Codes without a fully resolved recipe (declared-only, or unresolved
+    // lines) may be incomplete — say so instead of implying a full check.
+    const incomplete = report.lineCount === 0 || report.unresolvedCount > 0;
     return (
       <span className="evd-allergen-contains block">
         Contains {report.codes.map(allergenLabel).join(" · ")}
-        {report.unresolvedCount > 0 ? " · more lines unverified" : ""}
+        {incomplete ? " · recipe not fully verified" : ""}
       </span>
     );
   }

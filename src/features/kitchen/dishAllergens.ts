@@ -61,14 +61,17 @@ export function deriveDishAllergens(
   let lineCount = 0;
   let unresolvedCount = 0;
 
-  // Discontinued ingredients stay in the lookup on purpose: a soft-deleted
-  // ingredient still referenced by a live recipe line is still in the food,
-  // so its allergens must keep counting.
   const ingredientById = new Map(
     input.ingredients.map((row) => [row._id, row]),
   );
-  const takeIngredient = (ingredientId: unknown) => {
-    const ingredient = ingredientById.get(String(ingredientId));
+  const takeLine = (line: AllergenSourceRecord) => {
+    // Prefer the ingredient the server hydrated onto the line: db.get
+    // ignores soft-deletion, so a discontinued ingredient still referenced
+    // by a live recipe line keeps contributing its allergens. The list
+    // lookup is only a fallback (listIngredient omits discontinued rows).
+    const hydrated = line.ingredient as AllergenSourceRecord | null | undefined;
+    const ingredient =
+      hydrated ?? ingredientById.get(String(line.ingredientId));
     if (!ingredient) {
       unresolvedCount += 1;
       return;
@@ -81,7 +84,7 @@ export function deriveDishAllergens(
 
   for (const line of input.dishIngredients) {
     if (line.deletedAt != null || line.dishId !== dish._id) continue;
-    takeIngredient(line.ingredientId);
+    takeLine(line);
   }
 
   const componentIds = new Set(
@@ -92,7 +95,7 @@ export function deriveDishAllergens(
   for (const line of input.componentIngredients) {
     if (line.deletedAt != null || !componentIds.has(String(line.componentId)))
       continue;
-    takeIngredient(line.ingredientId);
+    takeLine(line);
   }
 
   for (const code of (dish.allergenSummary ?? []) as CulinaryAllergenCode[]) {
