@@ -55,11 +55,19 @@ import {
   formatEventMenuSellInput,
 } from "./eventMenuSellPrice";
 import {
+  encodeEventMenuLineFields,
   parseEventMenuLineFields,
   planEventMenuLineSave,
 } from "./eventMenuLineFields";
 import { suspectRowsFromRecipeLines } from "./eventMenuSuspectQuantity";
 import { useEventMenuNutrition } from "./useEventMenuNutrition";
+import { EventMenuStatsCard } from "./EventMenuStatsCard";
+import {
+  eventMenuDietaryTallies,
+  type MenuDietaryTally,
+} from "./EventMenuDietaryCard";
+import type { EventMenuNoteRow } from "./EventMenuNotesCard";
+import type { MenuTemplate } from "./EventMenuTemplateCard";
 
 type Props = {
   eventId: string;
@@ -212,6 +220,36 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     [selections],
   );
 
+  const dietaryTallies: MenuDietaryTally[] = useMemo(
+    () =>
+      eventMenuDietaryTallies(
+        selections.map(
+          (row) => dishes?.find((dish) => dish._id === row.dishId)?.dietaryTags,
+        ),
+      ),
+    [dishes, selections],
+  );
+
+  const noteRows: EventMenuNoteRow[] = useMemo(
+    () =>
+      selections.flatMap((selection) => {
+        const note = parseEventMenuLineFields(
+          selection.specialInstructions,
+        ).notes.trim();
+        if (note === "") return [];
+        return [
+          {
+            lineId: selection._id,
+            dishName:
+              dishes?.find((dish) => dish._id === selection.dishId)?.name ??
+              "Unknown dish",
+            note,
+          },
+        ];
+      }),
+    [dishes, selections],
+  );
+
   const menuAllergenCodes = useMemo(() => {
     const codes = new Set<string>();
     for (const selection of selections) {
@@ -236,6 +274,62 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const unpricedCount = costRollup.dishes.filter(
     (line) => eventMenuDishEstimateKind(line) !== "priced",
   ).length;
+
+  const applyTemplate = (template: MenuTemplate) =>
+    void run(`template:${template.menuId}`, async () => {
+      const confirmed = await prompt.askConfirm({
+        title: `Apply “${template.name}”`,
+        description: `${template.lines.length} ${template.lines.length === 1 ? "dish" : "dishes"} join this menu at the event headcount. Edit servings after applying.`,
+        confirmLabel: "Apply template",
+      });
+      if (!confirmed) return;
+      const servings = Math.max(1, expectedHeadcount || 1);
+      for (const line of template.lines) {
+        if (existingDishIds.includes(line.dishId)) continue;
+        await createEventDish({
+          eventId,
+          dishId: line.dishId,
+          quantityServings: servings,
+          headcountOverride: 0,
+          course: line.course,
+          serviceStyle: line.serviceStyle,
+        });
+      }
+      await refreshStock();
+    });
+
+  const editLineNote = (row: EventMenuNoteRow) => {
+    void (async () => {
+      const selection = selections.find((item) => item._id === row.lineId);
+      if (!selection) return;
+      const values = await prompt.askFields({
+        title: `Menu note — ${row.dishName}`,
+        description: "Shown on the menu rail. Keeps sell and pans fields.",
+        fields: [
+          {
+            name: "note",
+            label: "Note",
+            defaultValue: row.note,
+            inputType: "text",
+          },
+        ],
+        confirmLabel: "Save note",
+      });
+      if (!values) return;
+      const current = parseEventMenuLineFields(selection.specialInstructions);
+      await run(`note:${row.lineId}`, () =>
+        updateInstructions({
+          docId: selection._id,
+          version: selection.version,
+          specialInstructions: encodeEventMenuLineFields({
+            unitSellPrice: current.unitSellPrice,
+            containerCount: current.containerCount,
+            notes: values.note ?? "",
+          }),
+        }),
+      );
+    })();
+  };
 
   return (
     <section className="space-y-4" data-testid="event-menu-tab">
@@ -341,36 +435,15 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1 space-y-4">
           {selections.length > 0 ? (
-            <div
-              className="card grid grid-cols-1 divide-y divide-line sm:grid-cols-3 sm:divide-x sm:divide-y-0"
-              data-testid="event-menu-food-cost"
-            >
-              <CostFigure
-                label="Total food cost"
-                value={formatMoneyExact(costRollup.foodCost)}
-                note={
-                  sellRollup.foodSellTotal > 0
-                    ? `food sell ${formatMoneyExact(sellRollup.foodSellTotal)}`
-                    : `${formatMoneyExact(costRollup.costPerServing)} per guest`
-                }
-              />
-              <CostFigure
-                label="Dishes selected"
-                value={String(selections.length)}
-                note={
-                  unpricedCount > 0
-                    ? `${unpricedCount} ${unpricedCount === 1 ? "dish" : "dishes"} without a priced recipe`
-                    : (headerUnpricedNote ??
-                      `${formatMoneyExact(costRollup.costPerServing)} per guest`)
-                }
-                warn={unpricedCount > 0 || headerUnpricedNote != null}
-              />
-              <CostFigure
-                label="Service headcount"
-                value={String(costRollup.servings)}
-                note="guests"
-              />
-            </div>
+            <EventMenuStatsCard
+              foodCost={costRollup.foodCost}
+              costPerServing={costRollup.costPerServing}
+              foodSellTotal={sellRollup.foodSellTotal}
+              dishCount={selections.length}
+              unpricedCount={unpricedCount}
+              unpricedNote={headerUnpricedNote}
+              servings={costRollup.servings}
+            />
           ) : null}
 
           {selections.length === 0 ? (
@@ -393,14 +466,20 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           ) : (
             <div className="card overflow-hidden">
               <div
-                className={`hidden border-b border-line-2 bg-inset px-4 py-2 xl:grid xl:gap-3 ${MENU_ROW_COLUMNS}`}
+                className={`hidden border-b border-line-2 bg-inset px-4 py-2.5 xl:grid xl:gap-3 ${MENU_ROW_COLUMNS}`}
               >
-                <span className="eyebrow">Dish</span>
-                <span className="eyebrow">Course</span>
-                <span className="eyebrow">Servings</span>
-                <span className="eyebrow">Sell / serving</span>
-                <span className="eyebrow">Pans</span>
-                <span className="eyebrow text-right">Est. cost</span>
+                <span className="text-sm font-semibold text-ink-2">Dish</span>
+                <span className="text-sm font-semibold text-ink-2">Course</span>
+                <span className="text-sm font-semibold text-ink-2">
+                  Servings
+                </span>
+                <span className="text-sm font-semibold text-ink-2">
+                  Sell / serving
+                </span>
+                <span className="text-sm font-semibold text-ink-2">Pans</span>
+                <span className="text-right text-sm font-semibold text-ink-2">
+                  Est. cost
+                </span>
                 <span className="sr-only">Actions</span>
               </div>
               <ul className="divide-y divide-line">
@@ -557,6 +636,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                 {dish?.name ?? "Unknown dish"}
                               </Link>
                               <AllergenIconRow codes={dish?.allergenSummary} />
+                              <span
+                                className={`rounded-sm px-2 py-0.5 text-xs font-semibold ${
+                                  estimateKind === "priced"
+                                    ? "bg-ok-soft text-ok"
+                                    : "bg-warn-soft text-warn"
+                                }`}
+                              >
+                                {estimateKind === "priced"
+                                  ? "Priced"
+                                  : estimateKind === "unit_mismatch"
+                                    ? "Check units"
+                                    : "Needs recipe"}
+                              </span>
                             </div>
                             <p className="mt-0.5 truncate text-sm text-ink-3">
                               {dish?.description || "No description yet."}
@@ -790,19 +882,26 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           {selections.length > 0 ? (
             <button
               type="button"
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-line-2 px-5 py-3 text-base font-semibold text-brand transition-colors hover:bg-inset"
+              className="flex w-full items-center justify-center gap-2 rounded-md border-2 border-dashed border-line-2 px-5 py-3 text-base font-medium text-brand transition-colors hover:bg-brand-soft"
               disabled={busy != null}
               onClick={() => setShowPicker(true)}
             >
               <PlusIcon width={14} height={14} />
-              Add dish from the catalog
+              Add dish from library
             </button>
           ) : null}
         </div>
 
         <EventMenuSidebar
+          eventId={eventId}
           courses={courseTallies}
           allergenCodes={menuAllergenCodes}
+          dietary={dietaryTallies}
+          notes={noteRows}
+          existingDishIds={existingDishIds}
+          busy={busy != null}
+          onApplyTemplate={applyTemplate}
+          onEditNote={editLineNote}
         >
           <div className="card p-4">
             <p className="eyebrow">Purchasing</p>
@@ -829,29 +928,5 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
 
       <ComponentStockSuggestions />
     </section>
-  );
-}
-
-function CostFigure({
-  label,
-  value,
-  note,
-  warn = false,
-}: {
-  label: string;
-  value: string;
-  note?: string;
-  warn?: boolean;
-}) {
-  return (
-    <div className="px-5 py-4">
-      <p className="eyebrow">{label}</p>
-      <p className="mt-1 font-mono text-3xl font-semibold text-ink">{value}</p>
-      {note ? (
-        <p className={`mt-0.5 text-sm ${warn ? "text-warn" : "text-ink-3"}`}>
-          {note}
-        </p>
-      ) : null}
-    </div>
   );
 }
