@@ -27,8 +27,13 @@ import { TEXT_TARGETS } from "./search";
 
 /** Newest messages a thread returns; older ones are history, not chat. */
 const MAX_THREAD_MESSAGES = 400;
-/** Rows read per index range before the live/since filters. */
+/** Rows read per event-channel index range before the live/since filters. */
 const RANGE_TAKE = 800;
+/**
+ * Hard ceiling on one person's messages walked per query. The walk is
+ * time-bounded (it stops at `since`), so this only guards a runaway range.
+ */
+const PERSON_RANGE_CAP = 4000;
 /** Per-channel rows scanned for unread counts; more than this reads "50+". */
 const UNREAD_SCAN = 50;
 /** Channels stay in the rail from one day before the event starts. */
@@ -185,30 +190,55 @@ async function toView(
   };
 }
 
-/** Newest-first rows sent by one person (bounded index range). */
+/**
+ * Newest-first rows from one person-keyed index range, walked until the
+ * first row older than `since`. The index orders by creation time, so the
+ * walk is bounded by the retention window, not by a count that a busy
+ * sender's other conversations could exhaust.
+ */
+async function walkSince(
+  range: AsyncIterable<Doc<"staffMessages">>,
+  since: number,
+): Promise<Doc<"staffMessages">[]> {
+  const out: Doc<"staffMessages">[] = [];
+  for await (const row of range) {
+    if (sentAt(row) < since) break;
+    out.push(row);
+    if (out.length >= PERSON_RANGE_CAP) break;
+  }
+  return out;
+}
+
+/** Newest-first rows sent by one person inside the window. */
 async function sentBy(
   ctx: QueryCtx,
   personId: Id<"people">,
+  since: number,
 ): Promise<Doc<"staffMessages">[]> {
-  return ctx.db
-    .query("staffMessages")
-    .withIndex("by_senderPersonId", (q) => q.eq("senderPersonId", personId))
-    .order("desc")
-    .take(RANGE_TAKE);
+  return walkSince(
+    ctx.db
+      .query("staffMessages")
+      .withIndex("by_senderPersonId", (q) => q.eq("senderPersonId", personId))
+      .order("desc"),
+    since,
+  );
 }
 
-/** Newest-first rows received by one person (bounded index range). */
+/** Newest-first rows received by one person inside the window. */
 async function receivedBy(
   ctx: QueryCtx,
   personId: Id<"people">,
+  since: number,
 ): Promise<Doc<"staffMessages">[]> {
-  return ctx.db
-    .query("staffMessages")
-    .withIndex("by_recipientPersonId", (q) =>
-      q.eq("recipientPersonId", personId),
-    )
-    .order("desc")
-    .take(RANGE_TAKE);
+  return walkSince(
+    ctx.db
+      .query("staffMessages")
+      .withIndex("by_recipientPersonId", (q) =>
+        q.eq("recipientPersonId", personId),
+      )
+      .order("desc"),
+    since,
+  );
 }
 
 /** Newest-first rows in one event channel (bounded index range). */
@@ -252,8 +282,8 @@ export const listChannel = query({
       if (!other) return null;
       const me = auth.personId as Id<"people">;
       const [sent, received] = await Promise.all([
-        sentBy(ctx, me),
-        sentBy(ctx, other._id),
+        sentBy(ctx, me, args.since),
+        sentBy(ctx, other._id, args.since),
       ]);
       rows = [
         ...sent.filter((row) => row.recipientPersonId === other._id),
@@ -331,8 +361,8 @@ export const listConversations = query({
     const direct: DirectConversation[] = [];
     if (me) {
       const [sent, received] = await Promise.all([
-        sentBy(ctx, me),
-        receivedBy(ctx, me),
+        sentBy(ctx, me, args.since),
+        receivedBy(ctx, me, args.since),
       ]);
       const byOther = new Map<
         string,

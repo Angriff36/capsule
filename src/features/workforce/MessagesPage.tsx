@@ -187,16 +187,27 @@ export function MessagesPage() {
     [channel, channelKey, moveCursor, selectedEvent],
   );
 
+  // The channel the user is looking at right now — a send that fails after
+  // they switched channels must not lose its text with the unmounted composer.
+  const channelRef = useRef(channelKey);
+  channelRef.current = channelKey;
+
   const onSubmit = async (submit: ChatComposerSubmit) => {
     if (!channel) return;
+    const sentFrom = channelKey;
     setError(null);
     setSending(true);
     try {
-      await sendMessage(channel, submit);
+      const warning = await sendMessage(channel, submit);
       setPinSignal((n) => n + 1);
+      if (warning) setError(warning);
     } catch (cause) {
+      const reason =
+        cause instanceof Error ? cause.message : "The message was not sent.";
       setError(
-        cause instanceof Error ? cause.message : "The message was not sent.",
+        channelRef.current === sentFrom
+          ? reason
+          : `${reason} Your unsent text from the other conversation: “${submit.body.slice(0, 400)}”`,
       );
       throw cause;
     } finally {

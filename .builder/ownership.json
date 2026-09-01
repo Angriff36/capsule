@@ -18,10 +18,10 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "3504e404836f513d01a9d6e210aa1dd5b548d82ba722f6ee3916c8b861c0fd89"
+      "sha256": "801e6494cd49e287f0e68fb75c3213f65d13b8f96b59a460a29f70eed633219d"
     },
     "convex/queries.ts": {
-      "sha256": "197155b0c798af2dad426424fd3543615de4c7b3bbf02abbd32c1e3686bafe17"
+      "sha256": "48bba820575cbc057119de746c562c191f2f3a58d00b8c97dcafafd589a922d1"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -30,7 +30,7 @@
       "sha256": "e1c002fbed59deb29c235afc65dcbf1af9651f507d0f0e7afe3c3249658fa874"
     },
     "manifest-context-summary.json": {
-      "sha256": "e934f4fe9b222d4c302a84a59f949dc8ca3f1500c069ec42916db85fd13e3b84"
+      "sha256": "25422d28f8131a0ac9b30b754a9055544c9f3864d31824b3e7004b04977f3a2b"
     },
     "package.json": {
       "sha256": "4946f4e076d18eab36e1d2c06918c1d262e67fd57b62623bd84427f6bb95a872"
@@ -45,10 +45,10 @@
       "sha256": "08f69c61049be32c4d395a9787baf16e91f46ab0ee40f7f961d068daafedb618"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "0f72256d23dfbcc8aa38026b04e984abb5a77e627b485549bfa5c008e9e418b5"
+      "sha256": "d5b0a507bdd273aac9effdb928a315c4406e04cbd8ddfbbecefcfcae44cf6490"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "0362fd5d451ae2e87ac5a4bb207efa249008da33a257afc02a998e34e954ddc2"
+      "sha256": "d54558e5178318161854c24a053df0762fe99c931d3578d5301ef1f259857ff7"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "74780195fb9a6027f5586ef2611795ac1fffbd447c829cbc05d473edeea4dd03"
@@ -60,7 +60,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "75cfcd25a1060c7ad58355ae426d1b1550b5f25a1beaf0c00ebd432e3f78ab1d"
+      "sha256": "0edd268263f3e1dfa9fca8cc20f1799f9d67c7e3b00cf6e6239289d093f1cc98"
     }
   },
   "package": {

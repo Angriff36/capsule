@@ -2,6 +2,7 @@ import { useConvex, useMutation, useQuery } from "convex/react";
 import { useCallback, useMemo } from "react";
 import { api } from "../../lib/api";
 import {
+  useAttachmentRemove,
   useCreateAttachment,
   useCreateStaffChatReadCursor,
   useCreateStaffMessage,
@@ -123,18 +124,24 @@ type UploadedFile = { file: File; storageId: string };
 /**
  * Upload every file, create the message, then attach the files to it.
  * Uploads run first so a failed upload never leaves a half message behind.
- * If any attach fails the message is taken back and the send rejects, so the
- * stored attachmentCount never claims files that do not exist and the
- * composer restores the draft for a clean retry.
+ * If any attach fails, the rows that did attach and the message are taken
+ * back and the send rejects, so the composer restores the draft for a clean
+ * retry. Only when that rollback itself fails does the call resolve — with a
+ * warning naming the files the sent message is missing — because the
+ * message is then really there and a restored draft would duplicate it.
  */
 export function useSendChatMessage() {
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
   const send = useCreateStaffMessage();
   const attach = useCreateAttachment();
+  const removeAttachment = useAttachmentRemove();
   const remove = useStaffMessageRemove();
 
   return useCallback(
-    async (channel: ChatChannel, submit: ChatComposerSubmit): Promise<void> => {
+    async (
+      channel: ChatChannel,
+      submit: ChatComposerSubmit,
+    ): Promise<string | null> => {
       const uploaded: UploadedFile[] = [];
       for (const file of submit.files) {
         const uploadUrl = await generateUploadUrl();
@@ -169,9 +176,10 @@ export function useSendChatMessage() {
       if (!docId) throw new Error("The message was not created.");
 
       const failed: string[] = [];
+      const attached: string[] = [];
       for (const { file, storageId } of uploaded) {
         try {
-          await attach({
+          const row = (await attach({
             parentType: "staffMessage",
             parentId: docId,
             fileName: file.name,
@@ -179,22 +187,33 @@ export function useSendChatMessage() {
             fileSize: file.size,
             storageId,
             idempotencyKey: `${docId}:${storageId}`,
-          });
+          })) as { docId?: string } | null;
+          if (row?.docId) attached.push(row.docId);
         } catch {
           failed.push(file.name);
         }
       }
-      if (failed.length === 0) return;
+      if (failed.length === 0) return null;
+
+      // Roll back: the rows that did attach first, then the message.
+      const files = `${failed.length === 1 ? "a file" : `${failed.length} files`} (${failed.join(", ")})`;
+      await Promise.all(
+        attached.map((attachmentId) =>
+          removeAttachment({ docId: attachmentId }).catch(() => undefined),
+        ),
+      );
       try {
         await remove({ docId });
       } catch {
-        // Best effort; the message still names the files it failed to get.
+        return `The message was sent without ${files}. Attach ${
+          failed.length === 1 ? "it" : "them"
+        } again in a new message.`;
       }
       throw new Error(
-        `${failed.length === 1 ? "A file" : `${failed.length} files`} could not be attached (${failed.join(", ")}), so nothing was sent. Try again.`,
+        `Could not attach ${files}, so nothing was sent. Try again.`,
       );
     },
-    [attach, generateUploadUrl, remove, send],
+    [attach, generateUploadUrl, remove, removeAttachment, send],
   );
 }
 

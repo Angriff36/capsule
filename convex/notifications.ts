@@ -73,6 +73,11 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
   workforce_staff: ["staffAccess", "workforceAccess"],
 };
 
+/** Newest chat rows read per index range for the tray. */
+const MESSAGE_TAKE = 400;
+/** Same window deriveNotifications uses for mentions (RECENT_WINDOW_MS). */
+const MENTION_WINDOW_MS = 7 * 86_400_000;
+
 function can(auth: AppAuthContext, ...capabilities: string[]): boolean {
   const granted = ROLE_CAPABILITIES[auth.role] ?? [];
   return capabilities.some(
@@ -158,12 +163,36 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect(),
       ),
-      when(can(auth, "staffAccess"), () =>
-        ctx.db
-          .query("staffMessages")
-          .withIndex("by_tenantId", byTenant)
-          .collect(),
-      ),
+      // Team chat made staffMessages a high-volume table, so this is no
+      // longer a tenant-wide collect: unread DMs come from the caller's own
+      // recipient index, @mentions from the newest channel traffic (the
+      // mention window is seven days). Merged and de-duplicated below.
+      when(can(auth, "staffAccess"), async () => {
+        const [received, recent] = await Promise.all([
+          auth.personId
+            ? ctx.db
+                .query("staffMessages")
+                .withIndex("by_recipientPersonId", (q) =>
+                  q.eq("recipientPersonId", auth.personId as Id<"people">),
+                )
+                .order("desc")
+                .take(MESSAGE_TAKE)
+            : Promise.resolve([]),
+          ctx.db
+            .query("staffMessages")
+            .withIndex("by_tenantId", byTenant)
+            .order("desc")
+            .take(MESSAGE_TAKE),
+        ]);
+        const seen = new Set<string>();
+        return [...received, ...recent].filter((row) => {
+          if (row.tenantId !== tenantId || seen.has(String(row._id))) {
+            return false;
+          }
+          seen.add(String(row._id));
+          return true;
+        });
+      }),
       when(can(auth, "kitchenAccess", "manageAccess"), () =>
         ctx.db
           .query("prepTaskComments")
@@ -181,16 +210,22 @@ export const listNotifications = query({
     ]);
 
     // Roles without eventAccess cannot list events, but a mention still
-    // needs its channel's title: hydrate only the mentioned events, tenant-
-    // checked, title only (same narrow projection as eventDayBriefing).
+    // needs its channel's title: hydrate only the events of the caller's own
+    // mentions inside the mention window, tenant-checked, title only (same
+    // narrow projection as eventDayBriefing).
     const mentionEventTitles: Record<string, string> = {};
-    if (!events && staffMessages) {
+    if (!events && staffMessages && auth.personId) {
+      const now = Date.now();
       const ids = new Set<string>();
       for (const message of staffMessages) {
         if (
           message.eventId &&
           message.deletedAt == null &&
-          (message.mentionedPersonIds ?? "").length > 0
+          message.createdAt != null &&
+          now - message.createdAt <= MENTION_WINDOW_MS &&
+          (message.mentionedPersonIds ?? "")
+            .split(",")
+            .some((id) => id.trim() === auth.personId)
         ) {
           ids.add(String(message.eventId));
         }

@@ -70,6 +70,10 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     optional mentionedPersonIds: string
   ) {
     guard self.deletedAt == null
+    // Creation only: the generator also emits an instance form of every
+    // command, and re-running send on an existing row would let any staff
+    // member rewrite someone else's message. A stored row always has a sender.
+    guard self.senderPersonId == null "Messages cannot be re-sent; edit or remove them instead"
     guard user.id != null
     guard user.personId != null "Link your account to a staff profile before sending messages"
     // Seed/API checks: a referenced event or recipient must exist in this tenant.
@@ -159,7 +163,9 @@ entity StaffChatReadCursor mixin TenantScoped {
   property indexed required authSubjectId: string
   property required lastReadAt: datetime
 
-  default policy staffChatReadCursorRead read: roleAllows(user.role, "staffAccess") "Staff may read chat read cursors"
+  // Own rows only; the chat seam reads cursors by index for the caller.
+  // `authSubjectId == null` is the create-time draft escape.
+  default policy staffChatReadCursorRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id)) "Staff may read their own chat read cursors"
   default policy staffChatReadCursorWrite write: roleAllows(user.role, "staffAccess") "Staff may write their own chat read cursors through commands"
   default policy staffChatReadCursorExecute execute: roleAllows(user.role, "staffAccess") "Staff may mark chat channels read for themselves"
 
@@ -168,6 +174,8 @@ entity StaffChatReadCursor mixin TenantScoped {
   // message that lands between render and this call stays unread.
   command open(channelKey: string, readUpTo: datetime) {
     guard user.id != null
+    // Creation only — never re-point an existing cursor at another account.
+    guard self.authSubjectId == null "Cursors are opened once; use touch to move one"
     constraint openChannelKey: length(trim(channelKey)) > 0 "Channel is required"
     constraint openNotFuture: readUpTo <= now() "Read position cannot be in the future"
     mutate channelKey = channelKey
