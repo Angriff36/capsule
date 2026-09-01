@@ -160,21 +160,31 @@ export function useSendChatMessage() {
               () => undefined,
               () => undefined,
             );
-      for (const file of submit.files) {
-        const uploadUrl = await generateUploadUrl();
-        const response = await fetch(uploadUrl, {
-          method: "POST",
-          headers: { "Content-Type": file.type || "application/octet-stream" },
-          body: file,
-        });
-        if (!response.ok) {
-          await discard();
-          throw new Error(
-            `Upload of ${file.name} failed (${response.status}). Nothing was sent.`,
-          );
+      try {
+        for (const file of submit.files) {
+          const uploadUrl = await generateUploadUrl();
+          const response = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": file.type || "application/octet-stream",
+            },
+            body: file,
+          });
+          if (!response.ok) {
+            throw new Error(
+              `Upload of ${file.name} failed (${response.status}). Nothing was sent.`,
+            );
+          }
+          const { storageId } = (await response.json()) as {
+            storageId: string;
+          };
+          uploaded.push({ file, storageId });
         }
-        const { storageId } = (await response.json()) as { storageId: string };
-        uploaded.push({ file, storageId });
+      } catch (cause) {
+        // Any step failing — URL, transfer, or response — leaves the files
+        // uploaded so far unreferenced; drop them before reporting.
+        await discard();
+        throw cause;
       }
 
       // The server copies the recipient's sign-in from the Person row itself.

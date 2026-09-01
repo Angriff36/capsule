@@ -45,6 +45,8 @@ const DAY_MS = 86_400_000;
 const EVENT_SCAN = 400;
 /** Event channels the rail reads unread counts for per run. */
 const EVENT_CANDIDATES = 80;
+/** Messages hydrated concurrently (each up to 20 attachment URL lookups). */
+const HYDRATE_BATCH = 16;
 
 /**
  * One thread. Pass exactly one of `eventId` (event channel) or
@@ -101,11 +103,20 @@ export const listChannel = query({
       .sort((a, b) => sentAt(b) - sentAt(a))
       .slice(0, MAX_THREAD_MESSAGES)
       .reverse();
-    return {
-      messages: await Promise.all(
-        kept.map((row) => toView(ctx, tenantId, row)),
-      ),
-    };
+    // Hydrate in small batches: each view decrypts its body and resolves a
+    // signed URL per attachment (up to 20), so a full 400-row thread fanned
+    // out at once would exceed Convex's concurrent I/O limit.
+    const messages: ChatMessageView[] = [];
+    for (let i = 0; i < kept.length; i += HYDRATE_BATCH) {
+      messages.push(
+        ...(await Promise.all(
+          kept
+            .slice(i, i + HYDRATE_BATCH)
+            .map((row) => toView(ctx, tenantId, row)),
+        )),
+      );
+    }
+    return { messages };
   },
 });
 
