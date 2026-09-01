@@ -65,8 +65,10 @@ function templateNotes(template: BattleBoardTaskTemplate): string {
 }
 
 export function compareActivities(
-  left: TimelineActivity,
-  right: TimelineActivity,
+  // Structural: the comparator reads only these two fields, and Event Day
+  // sorts its projected briefing rows with it too.
+  left: { sortOrder?: number | null; startsAt?: number | null },
+  right: { sortOrder?: number | null; startsAt?: number | null },
 ) {
   const leftOrder = left.sortOrder;
   const rightOrder = right.sortOrder;

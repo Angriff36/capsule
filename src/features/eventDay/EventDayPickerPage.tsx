@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import "./EventDay.css";
-import type { Doc } from "../../lib/api";
-import { useListEvent } from "../../lib/manifest-convex-react";
+import {
+  useEventDayEvents,
+  type EventDayEventSummary,
+} from "../../lib/eventDayBriefing";
 import { formatStatusLabel } from "../../lib/statusLabels";
 
 function dayStart(at: number): number {
@@ -10,7 +12,13 @@ function dayStart(at: number): number {
   return date.getTime();
 }
 
-function EventCard({ event, today }: { event: Doc<"events">; today: boolean }) {
+function EventCard({
+  event,
+  today,
+}: {
+  event: EventDayEventSummary;
+  today: boolean;
+}) {
   const at =
     typeof event.startsAt === "number" ? new Date(event.startsAt) : null;
   const place = String(event.venueName ?? "").trim();
@@ -43,15 +51,14 @@ function EventCard({ event, today }: { event: Doc<"events">; today: boolean }) {
 /**
  * Event Day home: pick the event you are working. Today's events wear the
  * gold rim; upcoming events follow in date order, recent ones sit below.
+ * Reads the day-of briefing seam, so every crew role sees the shelf.
  */
 export function EventDayPickerPage() {
-  const events = useListEvent();
+  const events = useEventDayEvents();
   const todayStart = dayStart(Date.now());
 
   const rows = (events ?? []).filter(
-    (row) =>
-      row.deletedAt == null &&
-      !["cancelled", "closed_out"].includes(String(row.stage)),
+    (row) => !["cancelled", "closed_out"].includes(String(row.stage)),
   );
   const dated = rows.filter((row) => typeof row.startsAt === "number");
   const upcoming = dated
@@ -75,6 +82,11 @@ export function EventDayPickerPage() {
         <div className="evd-pick-list">
           {events === undefined ? (
             <p className="evd-empty">Lighting the estate…</p>
+          ) : events === null ? (
+            <p className="evd-empty">
+              Your sign-in is not linked to a workspace yet — ask a manager to
+              add you.
+            </p>
           ) : upcoming.length === 0 && past.length === 0 ? (
             <p className="evd-empty">No events on the calendar yet.</p>
           ) : (
