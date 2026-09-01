@@ -34,8 +34,14 @@ export type DishAllergenReport = {
   codes: CulinaryAllergenCode[];
   /** Contributing ingredient names (or "Declared on dish") per code. */
   sources: Map<CulinaryAllergenCode, string[]>;
-  /** Recipe lines that resolved to a live ingredient. 0 = no recipe on file. */
+  /** Recipe lines that resolved to an ingredient record. 0 = no recipe visible. */
   lineCount: number;
+  /**
+   * Live recipe lines whose ingredient record could not be found. Anything
+   * above zero means the derivation is incomplete — never claim "no
+   * allergens" while this is non-zero.
+   */
+  unresolvedCount: number;
 };
 
 const VOCAB_ORDER = new Map<string, number>(
@@ -53,15 +59,20 @@ export function deriveDishAllergens(
     sources.set(code, list);
   };
   let lineCount = 0;
+  let unresolvedCount = 0;
 
+  // Discontinued ingredients stay in the lookup on purpose: a soft-deleted
+  // ingredient still referenced by a live recipe line is still in the food,
+  // so its allergens must keep counting.
   const ingredientById = new Map(
-    input.ingredients
-      .filter((row) => row.deletedAt == null)
-      .map((row) => [row._id, row]),
+    input.ingredients.map((row) => [row._id, row]),
   );
   const takeIngredient = (ingredientId: unknown) => {
     const ingredient = ingredientById.get(String(ingredientId));
-    if (!ingredient) return;
+    if (!ingredient) {
+      unresolvedCount += 1;
+      return;
+    }
     lineCount += 1;
     for (const code of (ingredient.allergens ?? []) as CulinaryAllergenCode[]) {
       flag(code, String(ingredient.name));
@@ -91,7 +102,7 @@ export function deriveDishAllergens(
   const codes = [...sources.keys()].sort(
     (a, b) => (VOCAB_ORDER.get(a) ?? 99) - (VOCAB_ORDER.get(b) ?? 99),
   );
-  return { codes, sources, lineCount };
+  return { codes, sources, lineCount, unresolvedCount };
 }
 
 export function allergenLabel(code: CulinaryAllergenCode): string {

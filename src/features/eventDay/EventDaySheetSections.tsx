@@ -225,17 +225,21 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
   );
 }
 
-/** Allergens read from the actual recipe, not a hand-kept summary. */
+/**
+ * Allergens read from the actual recipe, not a hand-kept summary. The green
+ * "no allergens" claim only appears when EVERY recipe line resolved; a
+ * missing dish record or unresolved line always degrades to "unverified".
+ */
 function AllergenLine({ report }: { report: DishAllergenReport | null }) {
-  if (report == null) return null;
-  if (report.codes.length > 0) {
+  if (report != null && report.codes.length > 0) {
     return (
       <span className="evd-allergen-contains block">
         Contains {report.codes.map(allergenLabel).join(" · ")}
+        {report.unresolvedCount > 0 ? " · more lines unverified" : ""}
       </span>
     );
   }
-  if (report.lineCount > 0) {
+  if (report != null && report.lineCount > 0 && report.unresolvedCount === 0) {
     return (
       <span className="evd-allergen-clear block">
         No allergens on {report.lineCount} listed{" "}
@@ -245,7 +249,9 @@ function AllergenLine({ report }: { report: DishAllergenReport | null }) {
   }
   return (
     <span className="evd-allergen-unknown block">
-      No recipe on file — allergens unverified
+      {report != null && report.unresolvedCount > 0
+        ? "Allergens unverified — recipe lines did not resolve"
+        : "No recipe visible — allergens unverified"}
     </span>
   );
 }
