@@ -6,6 +6,7 @@ import {
   loadTenantBrandingForPdf,
   type TenantBranding,
 } from "../admin/tenantBranding";
+import { displayEventMenuNotes } from "./eventMenuLineFields";
 
 export interface BeoEventRecord {
   _id: string;
@@ -300,7 +301,7 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
           secondary: joinDetails([
             `${Number(selection.quantityServings ?? 0)} servings`,
             selection.serviceStyle,
-            selection.specialInstructions,
+            displayEventMenuNotes(selection.specialInstructions),
           ]),
         }));
   const timelineBlocks: BeoBlock[] =

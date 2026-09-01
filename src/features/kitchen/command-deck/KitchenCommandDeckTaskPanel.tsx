@@ -4,6 +4,7 @@ import { StatusChip } from "../../../ui/primitives";
 import { AllergenIconRow } from "../AllergenIconRow";
 import { DishPrimaryImage } from "../../attachments/DishPrimaryImage";
 import { eventDetailMenuPath, componentPath } from "../kitchenRoutes";
+import { displayEventMenuNotes } from "../../events/eventMenuLineFields";
 import { prepQuantityLabel } from "../prepQuantityLabel";
 import {
   commandDeckFilterNoun,
@@ -371,8 +372,10 @@ function TaskRow({
             </>
           ) : null}
         </p>
-        {task.specialInstructions ? (
-          <p className="kcd-task-note">{task.specialInstructions}</p>
+        {displayEventMenuNotes(task.specialInstructions) ? (
+          <p className="kcd-task-note">
+            {displayEventMenuNotes(task.specialInstructions)}
+          </p>
         ) : null}
         {task.notes ? <p className="kcd-task-note">{task.notes}</p> : null}
       </div>

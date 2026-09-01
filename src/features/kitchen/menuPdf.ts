@@ -7,6 +7,7 @@ import {
   loadTenantBrandingForPdf,
   type TenantBranding,
 } from "../admin/tenantBranding";
+import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import { CULINARY_ALLERGENS } from "./CulinaryAllergenVocabulary";
 
 export type MenuPdfLayout = "card" | "buffet";
@@ -60,7 +61,7 @@ const dishDetails = (line: MenuDishLine): string =>
   [
     line.dish?.description,
     line.selection.serviceStyle,
-    line.selection.specialInstructions,
+    displayEventMenuNotes(line.selection.specialInstructions),
   ]
     .filter(Boolean)
     .join(" · ");

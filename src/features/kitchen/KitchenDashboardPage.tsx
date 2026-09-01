@@ -24,6 +24,7 @@ import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
 import { ActionMenu, TableSkeleton } from "../../ui/primitives";
+import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCommandDeckFilters } from "./command-deck/KitchenCommandDeckFilters";
@@ -917,9 +918,9 @@ export function KitchenDashboardPage() {
               {stepText(row.task.name, itemName)}
             </span>
           </div>
-          {row.task.specialInstructions ? (
+          {displayEventMenuNotes(row.task.specialInstructions) ? (
             <p className="mt-0.5 text-sm text-ink-2">
-              {String(row.task.specialInstructions)}
+              {displayEventMenuNotes(row.task.specialInstructions)}
             </p>
           ) : null}
           {blocked ? (
@@ -1397,9 +1398,13 @@ export function KitchenDashboardPage() {
                                   {stepText(row.task.name, item.name)}
                                 </span>
                               </span>
-                              {row.task.specialInstructions ? (
+                              {displayEventMenuNotes(
+                                row.task.specialInstructions,
+                              ) ? (
                                 <span className="mt-0.5 block text-sm text-ink-2">
-                                  {String(row.task.specialInstructions)}
+                                  {displayEventMenuNotes(
+                                    row.task.specialInstructions,
+                                  )}
                                 </span>
                               ) : null}
                               {blocked ? (
