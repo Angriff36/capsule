@@ -42,6 +42,9 @@ export function useChatDraftRecovery(channelKey: string) {
   }, []);
   const tokenRef = useRef(0);
   const [restore, setRestore] = useState<ChatDraftRestore | null>(null);
+  // Mirror for callbacks: updaters must stay pure (StrictMode runs them twice).
+  const restoreRef = useRef<ChatDraftRestore | null>(null);
+  restoreRef.current = restore;
 
   // Items present when this channel was opened; the keyed composer seeds
   // itself from their merge on mount. Held across renders (the composer may
@@ -61,21 +64,31 @@ export function useChatDraftRecovery(channelKey: string) {
     seededCountRef.current = 0;
   }, [channelKey]);
 
-  // Offer the live composer whatever the store holds beyond the seed.
+  // Offer the live composer whatever the store holds beyond the seed — one
+  // hand-off at a time: while an offer is outstanding, a new keep() waits
+  // until the composer has acknowledged the current one, so no item is ever
+  // merged twice or consumed unmerged.
+  const outstandingRef = useRef(false);
   const offer = useCallback((changedKey: string) => {
     if (!mountedRef.current || changedKey !== channelRef.current) return;
+    if (outstandingRef.current) return;
     const rest = failedDrafts.peek(changedKey, seededCountRef.current);
     if (!rest) return;
     tokenRef.current += 1;
-    setRestore({
+    outstandingRef.current = true;
+    const next: ChatDraftRestore = {
       channelKey: changedKey,
       draft: rest.draft,
       count: rest.count,
       token: tokenRef.current,
-    });
+    };
+    restoreRef.current = next;
+    setRestore(next);
   }, []);
   useEffect(() => {
     const unsubscribe = failedDrafts.subscribe(offer);
+    // A hand-off offered to the previous channel's composer is moot here.
+    outstandingRef.current = false;
     // Anything kept between this render and now had no listener yet.
     if (channelKey) offer(channelKey);
     return unsubscribe;
@@ -88,12 +101,19 @@ export function useChatDraftRecovery(channelKey: string) {
     [],
   );
 
-  const onRestoreConsumed = useCallback(() => {
-    setRestore((current) => {
-      if (current) failedDrafts.consume(current.channelKey, current.count);
-      return null;
-    });
-  }, []);
+  const onRestoreConsumed = useCallback(
+    (token: number) => {
+      const current = restoreRef.current;
+      if (!current || current.token !== token) return;
+      failedDrafts.consume(current.channelKey, current.count);
+      outstandingRef.current = false;
+      restoreRef.current = null;
+      setRestore(null);
+      // Anything kept while this offer was outstanding goes next.
+      offer(current.channelKey);
+    },
+    [offer],
+  );
 
   return {
     initialDraft: initial?.draft ?? null,

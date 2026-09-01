@@ -239,6 +239,10 @@ export function useSendChatMessage() {
       try {
         await remove({ docId });
       } catch {
+        // The message stays with the files that did attach; the blobs of the
+        // files that did not are unreferenced — drop them (the discard keeps
+        // every blob a live row still points at).
+        await discard();
         return `The message was sent without ${files}. Attach ${
           failed.length === 1 ? "it" : "them"
         } again in a new message.`;
