@@ -370,9 +370,13 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/staff/messages",
-    title: "Messages",
-    purpose: "Announcements and direct messages to your team.",
-    steps: ["Send schedule notes here instead of group texts."],
+    title: "Team chat",
+    purpose:
+      "Event channels and direct messages for your team. Share photos, files, and links to events and dishes.",
+    steps: [
+      "Each event has its own channel — open it here or from the event's Chat tab.",
+      "Type @ to mention a teammate and # to link an event, dish, menu, or client.",
+    ],
   },
   {
     prefix: "/staff/utilization",

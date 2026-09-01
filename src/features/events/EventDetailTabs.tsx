@@ -14,6 +14,7 @@ import {
   HardHatIcon,
   ImageIcon,
   MapIcon,
+  MessageIcon,
   PackageIcon,
   RepeatIcon,
   TrendingUpIcon,
@@ -42,6 +43,7 @@ const BAR: readonly {
   Icon: IconComponent;
 }[] = [
   { key: "overview", label: "Overview", Icon: HomeIcon },
+  { key: "chat", label: "Chat", Icon: MessageIcon },
   { key: "menu", label: "Menu", Icon: FlameIcon },
   { key: "prep", label: "Prep", Icon: CheckCircleIcon },
   { key: "equipment", label: "Equipment", Icon: BoxIcon },

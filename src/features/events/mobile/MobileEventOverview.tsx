@@ -1,6 +1,7 @@
 import type { Doc } from "../../../lib/api";
 import { normalizeCurrencyCode } from "../../../lib/format";
 import { useListOrganization } from "../../../lib/manifest-convex-react";
+import { MobileEventChatCard } from "../../chat/MobileEventChatCard";
 import {
   MobileClientCard,
   MobileMoneyCard,
@@ -35,7 +36,7 @@ type Props = {
 };
 
 /**
- * Phone event overview: one scrolling page of nine section cards, each with
+ * Phone event overview: one scrolling page of ten section cards, each with
  * "See all" into the existing full tab. Replaces the Overview tab below 768px.
  */
 export function MobileEventOverview({
@@ -72,6 +73,7 @@ export function MobileEventOverview({
         assignments={assignments}
         people={people}
       />
+      <MobileEventChatCard eventId={event._id} />
       <MobilePrepCard eventId={event._id} />
       <MobilePackListCard eventId={event._id} />
       <MobileClientCard event={event} clients={clients} />

@@ -1,0 +1,116 @@
+/* Team chat — one bounded pane: ruled message rows above a hairline composer.
+   Layout, scrolling and hover reveals live here; every color, size and radius
+   comes from the app.css tokens. Class names carry the chat- prefix so the
+   design-vocab gate never mistakes them for Tailwind utilities. */
+
+.chat-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: clamp(420px, calc(100dvh - 15rem), 860px);
+}
+
+@media (max-width: 767px) {
+  /* Fill the phone viewport under the header, but never squeeze the thread
+     to nothing in a short window — the page scrolls instead. */
+  .chat-shell {
+    height: max(360px, calc(100dvh - 9rem));
+  }
+}
+
+.chat-thread {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-anchor: none;
+  scrollbar-width: thin;
+}
+
+.chat-composer {
+  flex: none;
+  border-top: 1px solid var(--color-line-2);
+  padding: 0.75rem 1rem 0.875rem;
+}
+
+.chat-dropzone[data-active="true"] {
+  outline: 2px dashed var(--color-brand);
+  outline-offset: -6px;
+}
+
+/* One row tall at rest, six at most (15px × 1.5 leading + padding + border);
+   the composer sets the height from scrollHeight and this clamps it. */
+.chat-textarea {
+  min-height: 41px;
+  max-height: 153px;
+  line-height: 1.5;
+  resize: none;
+  overflow-y: auto;
+}
+
+/* Floating @ / # menu anchored above the textarea. */
+.chat-picker {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 16rem;
+  overflow-y: auto;
+  margin-bottom: 0.375rem;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  box-shadow: 0 8px 24px -12px rgb(30 40 36 / 0.25);
+}
+
+.chat-picker-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-panel);
+}
+
+.chat-picker-note {
+  padding: 0.6rem 0.75rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-sm);
+}
+
+.chat-picker button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+  color: var(--color-ink);
+  font-size: var(--text-base);
+  cursor: pointer;
+}
+
+.chat-picker button[aria-selected="true"] {
+  background: var(--color-inset);
+}
+
+.chat-picker button > svg {
+  flex-shrink: 0;
+}
+
+/* The collapsed-row time and the Edit/Remove cluster sit beside the body and
+   reveal on hover or focus (group-hover in the markup). Touch screens have no
+   hover, so there they stay visible and drop under the message body. */
+@media (pointer: coarse) {
+  .chat-row {
+    flex-direction: column;
+  }
+  .chat-row-time,
+  .chat-row-tools {
+    opacity: 1;
+  }
+  .chat-row-tools {
+    height: auto;
+    margin-top: 0.375rem;
+  }
+}

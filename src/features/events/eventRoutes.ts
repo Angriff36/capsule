@@ -6,6 +6,7 @@ export type EventCreatePrefill = {
 
 export type EventDetailTab =
   | "overview"
+  | "chat"
   | "menu"
   | "prep"
   | "equipment"
@@ -25,6 +26,7 @@ export const EVENT_DETAIL_TABS: readonly {
   label: string;
 }[] = [
   { key: "overview", label: "Overview" },
+  { key: "chat", label: "Team Chat" },
   { key: "menu", label: "Menu" },
   { key: "prep", label: "Prep" },
   { key: "equipment", label: "Equipment" },
@@ -53,7 +55,7 @@ export const EVENT_TAB_GROUPS: readonly {
   {
     key: "plan",
     label: "Plan",
-    tabs: ["overview", "client", "guests", "recurring"],
+    tabs: ["overview", "chat", "client", "guests", "recurring"],
   },
   { key: "food", label: "Food", tabs: ["menu", "prep", "inventory"] },
   {

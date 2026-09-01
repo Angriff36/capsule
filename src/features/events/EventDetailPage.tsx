@@ -59,6 +59,7 @@ import {
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { useTenantBranding } from "../admin/tenantBranding";
+import { EventChatTab } from "../chat/EventChatTab";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { HoverPreview } from "../../ui/HoverPreview";
@@ -116,7 +117,7 @@ export function EventDetailPage() {
   const event = useRouteRecord(useGetEvent, id);
   const mobile = useMobileViewport();
   // Phones get the nine-card overview; `full=1` opens the desktop overview
-  // (edit panels, staff discussion) on a phone via "Edit" / "See all".
+  // (edit panels, planning notes) on a phone via "Edit" / "See all".
   const mobileOverview =
     mobile && activeTab === "overview" && searchParams.get("full") !== "1";
   const clients = useListClient();
@@ -670,6 +671,11 @@ export function EventDetailPage() {
           <div className="mt-5">
             <EventSourceProvenancePanel capsuleId={event._id} />
           </div>
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "chat" ? (
+        <EventTabErrorBoundary tabLabel="Team Chat" key="chat">
+          <EventChatTab eventId={event._id} eventTitle={String(event.title)} />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "menu" ? (
