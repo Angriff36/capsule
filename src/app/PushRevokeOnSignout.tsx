@@ -52,14 +52,19 @@ async function processPending(release: Release): Promise<void> {
             ? await navigator.serviceWorker.getRegistration()
             : null;
         const subscription = await registration?.pushManager.getSubscription();
-        // Only this endpoint — never a new user's fresh subscription.
+        // Only this endpoint — never a new user's fresh subscription. Re-read
+        // the marker right before the irreversible unsubscribe: an explicit
+        // enable() may have cancelled this revoke in the meantime.
         if (subscription && subscription.endpoint === endpoint) {
+          if (readPending() !== endpoint) return;
           browserClear = await subscription.unsubscribe().catch(() => false);
         }
       } catch {
         browserClear = false;
       }
       if (browserClear) {
+        // enable() may have cleared the marker while we were unsubscribing.
+        if (readPending() !== endpoint) return;
         try {
           await release({ endpoint });
           writePending(null);
