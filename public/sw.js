@@ -45,7 +45,12 @@ self.addEventListener("install", (event) => {
       // that could land on a newer deployment.
       await cache.put("/", shell);
       await self.skipWaiting();
-    })(),
+    })().catch((error) => {
+      // A failed install leaves no worker (and so no offline shell and no
+      // push); say why in the worker console instead of failing silently.
+      console.error("capsule: app-shell install failed", error);
+      throw error;
+    }),
   );
 });
 

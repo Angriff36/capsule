@@ -2,8 +2,12 @@ import { useMutation, useQuery } from "convex/react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { api } from "../../lib/api";
 
-/** How long to wait for the app-shell worker before giving up (dev has none). */
-const WORKER_WAIT_MS = 4000;
+/**
+ * How long to wait for the app-shell worker before giving up. A first visit
+ * installs it (it caches the shell first), which can take several seconds on
+ * venue Wi-Fi; the dev server has no worker at all.
+ */
+const WORKER_WAIT_MS = 15000;
 
 export type PushState = {
   /** The browser can do web push at all. */
