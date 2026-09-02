@@ -182,7 +182,8 @@ export function ChatMessageItem({
   const showTools = bubbles || !showHeader || showActions;
   const mediaOnly =
     !hasBody &&
-    message.attachments.some((a) => a.contentType.startsWith("image/"));
+    message.attachments.length > 0 &&
+    message.attachments.every((a) => a.contentType.startsWith("image/"));
   // Rows: the sender + time header opens each run. Bubbles: only the sender
   // name above the crew's runs in a channel; the time lives in the tools.
   const showHead = bubbles ? showHeader && showSenderName : showHeader;

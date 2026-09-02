@@ -13,10 +13,12 @@ import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { chatAuth } from "./lib/teamChatRead";
 
-/** Devices one sign-in may keep; more than that is a bug or a very old account. */
+/** Live devices one sign-in may keep; more is a bug or a very old account. */
 const DEVICES_CAP = 20;
 /** Rows one endpoint may have (duplicates from history are folded). */
 const ENDPOINT_DUPLICATES_CAP = 10;
+/** Rows walked over a person's history before giving up (dead rows accrue). */
+const HISTORY_WALK_CAP = 400;
 
 /**
  * The public half of the VAPID key pair, so the browser can subscribe. Read
@@ -34,16 +36,21 @@ export const mine = query({
   handler: async (ctx) => {
     const auth = await chatAuth(ctx);
     if (!auth) return [];
-    const rows = await ctx.db
+    // Newest first, LIVE rows only: a person who reset or rotated many devices
+    // accumulates soft-deleted rows, so a plain take(cap) could return only
+    // the oldest, dead ones and hide a live device.
+    const out: { endpoint: string; personId: string }[] = [];
+    let walked = 0;
+    for await (const row of ctx.db
       .query("pushSubscriptions")
       .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", auth.id))
-      .take(DEVICES_CAP);
-    return rows
-      .filter((row) => row.tenantId === auth.tenantId && row.deletedAt == null)
-      .map((row) => ({
-        endpoint: row.endpoint,
-        personId: String(row.personId),
-      }));
+      .order("desc")) {
+      if (++walked > HISTORY_WALK_CAP) break;
+      if (row.tenantId !== auth.tenantId || row.deletedAt != null) continue;
+      out.push({ endpoint: row.endpoint, personId: String(row.personId) });
+      if (out.length >= DEVICES_CAP) break;
+    }
+    return out;
   },
 });
 
@@ -70,15 +77,21 @@ export const register = mutation({
     const now = Date.now();
     const userAgent = args.userAgent?.slice(0, 200);
 
-    // The endpoint identifies the device; whoever is signed in on it now owns
-    // it, so a device that changed hands is re-pointed, never duplicated.
-    const existing = (
-      await ctx.db
-        .query("pushSubscriptions")
-        .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))
-        .take(ENDPOINT_DUPLICATES_CAP)
-    ).filter((row) => row.tenantId === auth.tenantId);
-    const keep = existing.find((row) => row.deletedAt == null) ?? existing[0];
+    // The endpoint identifies one physical browser, so it has exactly one
+    // owner: whoever is signed in on it now. Every other row for this endpoint
+    // — INCLUDING one left by a different tenant or sign-in that used this
+    // browser before — is removed, so the previous account can never receive
+    // a decrypted preview on a browser that has changed hands.
+    const existing = await ctx.db
+      .query("pushSubscriptions")
+      .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))
+      .take(ENDPOINT_DUPLICATES_CAP);
+    const keep =
+      existing.find(
+        (row) => row.tenantId === auth.tenantId && row.deletedAt == null,
+      ) ??
+      existing.find((row) => row.tenantId === auth.tenantId) ??
+      existing[0];
     if (keep) {
       await ctx.db.patch(keep._id, {
         authSubjectId: auth.id,

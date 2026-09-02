@@ -48,7 +48,7 @@ export const deliver = internalAction({
     );
 
     const used: Id<"pushSubscriptions">[] = [];
-    const gone: Id<"pushSubscriptions">[] = [];
+    const gone: { id: Id<"pushSubscriptions">; version: number }[] = [];
     results.forEach((result, index) => {
       const target = job.targets[index];
       if (!target) return;
@@ -58,8 +58,9 @@ export const deliver = internalAction({
       }
       const statusCode = (result.reason as { statusCode?: number } | null)
         ?.statusCode;
-      if (statusCode === 404 || statusCode === 410) gone.push(target.id);
-      else {
+      if (statusCode === 404 || statusCode === 410) {
+        gone.push({ id: target.id, version: target.version });
+      } else {
         console.warn(
           `push: delivery failed (${statusCode ?? "no status"}) for one device`,
         );

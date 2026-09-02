@@ -23,13 +23,17 @@ import {
 const STALE_MS = 5 * 60_000;
 /** Notification body length; the payload must stay far under 4 KB. */
 const PREVIEW_CHARS = 120;
-/** Devices per person read for one push. */
+/** Live devices per person a push targets. */
 const DEVICES_PER_PERSON = 20;
+/** Rows walked over one person's device history before giving up. */
+const HISTORY_WALK_CAP = 400;
 /** People one mention list may address. */
 const MENTION_CAP = 50;
 
 export type PushTarget = {
   readonly id: Id<"pushSubscriptions">;
+  /** The row version read here; a prune only lands if it still matches. */
+  readonly version: number;
   readonly endpoint: string;
   readonly p256dh: string;
   readonly auth: string;
@@ -113,11 +117,15 @@ export const buildPushJob = internalQuery({
       if (personId === String(message.senderPersonId)) continue;
       const person = await tenantPerson(ctx, tenantId, personId);
       if (!person || !person.authSubjectId) continue;
-      const devices = await ctx.db
+      // Newest first, LIVE rows only, bounded by the walk cap: soft-deleted
+      // rows from resets or disables must not push a live device off a take().
+      let picked = 0;
+      let walked = 0;
+      for await (const device of ctx.db
         .query("pushSubscriptions")
         .withIndex("by_personId", (q) => q.eq("personId", person._id))
-        .take(DEVICES_PER_PERSON);
-      for (const device of devices) {
+        .order("desc")) {
+        if (++walked > HISTORY_WALK_CAP || picked >= DEVICES_PER_PERSON) break;
         if (device.tenantId !== tenantId || !live(device)) continue;
         // The device must still belong to the sign-in that owns this Person,
         // and never be one of the sender's own.
@@ -125,8 +133,10 @@ export const buildPushJob = internalQuery({
         if (device.authSubjectId === message.senderAuthSubjectId) continue;
         if (seenEndpoints.has(device.endpoint)) continue;
         seenEndpoints.add(device.endpoint);
+        picked += 1;
         targets.push({
           id: device._id,
+          version: device.version,
           endpoint: device.endpoint,
           p256dh: device.p256dh,
           auth: device.auth,
@@ -141,7 +151,11 @@ export const buildPushJob = internalQuery({
 export const recordPushResults = internalMutation({
   args: {
     used: v.array(v.id("pushSubscriptions")),
-    gone: v.array(v.id("pushSubscriptions")),
+    // id + the version the delivery saw, so a row refreshed or re-owned
+    // between buildPushJob and this callback is never pruned by a stale 410.
+    gone: v.array(
+      v.object({ id: v.id("pushSubscriptions"), version: v.number() }),
+    ),
     now: v.number(),
   },
   handler: async (ctx, args) => {
@@ -150,9 +164,11 @@ export const recordPushResults = internalMutation({
       if (row && live(row)) await ctx.db.patch(id, { lastUsedAt: args.now });
     }
     // 404/410 from the push service: the browser dropped the subscription.
-    for (const id of args.gone) {
+    // Only if the row is the same one the delivery held — a re-registered or
+    // re-owned device has a newer version and stays.
+    for (const { id, version } of args.gone) {
       const row = await ctx.db.get(id);
-      if (row && live(row)) {
+      if (row && live(row) && row.version === version) {
         await ctx.db.patch(id, {
           deletedAt: args.now,
           updatedAt: args.now,
