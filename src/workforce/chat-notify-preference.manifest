@@ -1,0 +1,32 @@
+// Per-account team-chat push preference. One row per sign-in (ownerId), so
+// the choice to receive direct-message and mention notifications follows the
+// person to every device and browser — not a per-browser toggle. The actual
+// per-device push subscription still lives in PushSubscription; this only
+// records whether the person WANTS notifications, which each device applies.
+//
+// Written only by the authored seam convex/chatNotifyPreference.ts (raw
+// upsert, keyed by ownerId): the write/execute policies require a capability
+// no role holds, so the generated commands can never run.
+
+use "../foundation/base.manifest"
+
+entity ChatNotifyPreference mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, ownerId]
+  timestamps
+  versionProperty version: number
+
+  // The sign-in (auth subject) that owns this preference.
+  property indexed ownerId: string?
+  // Whether this account wants team-chat push notifications.
+  property required enabled: boolean = false
+
+  // Owner-only. `ownerId == null` is the create-time draft escape.
+  default policy chatNotifyPreferenceRead read: self.ownerId == null or self.ownerId == user.id "Users may read their own chat notification preference"
+  // The authored seam does raw writes (policy-exempt); the generated commands
+  // require a capability no role is granted, so they can never run.
+  default policy chatNotifyPreferenceWrite write: roleAllows(user.role, "pushDeviceManage") "Chat notification preference is set only through the app"
+  default policy chatNotifyPreferenceExecute execute: roleAllows(user.role, "pushDeviceManage") "Chat notification preference is set only through the app"
+
+  store ChatNotifyPreference in durable
+}

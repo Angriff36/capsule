@@ -17,33 +17,23 @@ export type PushState = {
   readonly needsHomeScreen: boolean;
   /** The deployment has no VAPID key yet; nothing can subscribe. */
   readonly keyMissing: boolean;
-  /** This device is registered for the signed-in person. */
-  readonly enabled: boolean;
+  /** The ACCOUNT wants notifications (saved server-side, every device). */
+  readonly accountEnabled: boolean;
+  /** This browser is subscribed and receiving for the signed-in person. */
+  readonly deviceActive: boolean;
+  /** Account is on but THIS browser still needs a one-time permission tap. */
+  readonly deviceNeedsSetup: boolean;
+  /** This browser has blocked notifications in its settings. */
+  readonly blocked: boolean;
   readonly busy: boolean;
   readonly error: string | null;
+  /** Turn notifications on for the account and this device. */
   readonly enable: () => Promise<void>;
+  /** Turn notifications off for the account (every device stops). */
   readonly disable: () => Promise<void>;
+  /** Account already on elsewhere: switch this device on too. */
+  readonly activateThisDevice: () => Promise<void>;
 };
-
-/** localStorage flag: this browser turned notifications off; do not re-register. */
-const OPT_OUT_KEY = "capsule-push-optout";
-
-function readOptedOut(): boolean {
-  try {
-    return window.localStorage.getItem(OPT_OUT_KEY) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function writeOptedOut(value: boolean): void {
-  try {
-    if (value) window.localStorage.setItem(OPT_OUT_KEY, "1");
-    else window.localStorage.removeItem(OPT_OUT_KEY);
-  } catch {
-    // Storage blocked: the in-flight disablingRef still guards this session.
-  }
-}
 
 function urlBase64ToUint8Array(base64: string): Uint8Array {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
@@ -57,9 +47,8 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
 async function workerRegistration(): Promise<ServiceWorkerRegistration | null> {
   if (!("serviceWorker" in navigator)) return null;
   // navigator.serviceWorker.ready resolves only once a registration has an
-  // ACTIVE worker — never one that is still installing, which pushManager
-  // cannot subscribe against. On a first visit that install can take a few
-  // seconds (it caches the shell first); dev has no worker at all.
+  // ACTIVE worker — never one still installing, which pushManager cannot
+  // subscribe against. On a first visit that install can take a few seconds.
   return await Promise.race([
     navigator.serviceWorker.ready,
     new Promise<null>((resolve) =>
@@ -93,28 +82,41 @@ function isIosSafariTab(): boolean {
   return ios && !standalone;
 }
 
+function clearPendingRevoke(): void {
+  try {
+    window.localStorage.removeItem("capsule-push-pending-revoke");
+  } catch {
+    // storage blocked; the revoke loop only targets a matching endpoint
+  }
+}
+
 /**
- * Web push for team chat on THIS device: subscribe from a tap (the browsers
- * require a user gesture), register the subscription with Convex, and keep
- * the two in step. The server sends pushes only for direct messages and
- * @mentions (convex/teamChatPush.ts).
+ * Team-chat push, driven by a per-ACCOUNT preference (convex/chatNotifyPreference).
+ * The toggle turns notifications on or off for the whole account, so the choice
+ * follows the person to every device. Each device keeps ITSELF in step with the
+ * preference: where the browser already allows notifications it subscribes
+ * automatically; a brand-new device or one whose data was cleared still needs a
+ * single "allow" tap, because the browser requires it. The server sends pushes
+ * only for direct messages and @mentions (convex/teamChatPush.ts).
  */
 export function usePushNotifications(): PushState {
   const publicKey = useQuery(api.pushSubscriptions.vapidPublicKey, {});
   const mine = useQuery(api.pushSubscriptions.mine, {});
+  const accountPref = useQuery(api.chatNotifyPreference.mine, {});
   const register = useMutation(api.pushSubscriptions.register);
   const unregister = useMutation(api.pushSubscriptions.unregister);
+  const setPreference = useMutation(api.chatNotifyPreference.set);
   const authStatus = useAuthStatus();
   const myPersonId = authStatus?.personId ?? null;
+
   const [endpoint, setEndpoint] = useState<string | null>(null);
-  // True when a browser subscription exists but was made with a superseded
-  // VAPID key; it cannot receive pushes and must be migrated on the next tap.
   const [keyStale, setKeyStale] = useState(false);
+  const [permission, setPermission] = useState<NotificationPermission | null>(
+    null,
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // A disable in progress: passive reconciliation must not re-register the
-  // subscription while unregister + unsubscribe are still running.
-  const disablingRef = useRef(false);
+  const reconcilingRef = useRef(false);
 
   const supported = useMemo(
     () =>
@@ -124,6 +126,10 @@ export function usePushNotifications(): PushState {
       "Notification" in window,
     [],
   );
+
+  useEffect(() => {
+    if (supported) setPermission(Notification.permission);
+  }, [supported]);
 
   // This device's current browser subscription, if any.
   useEffect(() => {
@@ -158,7 +164,7 @@ export function usePushNotifications(): PushState {
     };
   }, [supported, publicKey]);
 
-  const registered = useMemo(
+  const deviceActive = useMemo(
     () =>
       endpoint != null &&
       !keyStale &&
@@ -169,63 +175,40 @@ export function usePushNotifications(): PushState {
     [endpoint, keyStale, mine, myPersonId],
   );
 
-  // A browser subscription the server does not know (the push service rotated
-  // it, or the person signed in on a device that was registered before) is
-  // re-registered for the signed-in person. register() is an upsert.
-  useEffect(() => {
-    if (!supported || endpoint == null || mine === undefined || registered)
-      return;
-    if (disablingRef.current || busy || keyStale || readOptedOut()) return;
-    let cancelled = false;
-    void (async () => {
-      const registration = await navigator.serviceWorker.getRegistration();
-      const subscription = await registration?.pushManager.getSubscription();
-      const keys = subscription?.toJSON().keys;
-      if (cancelled || !subscription || !keys?.p256dh || !keys.auth) return;
-      try {
-        await register({
-          endpoint: subscription.endpoint,
-          p256dh: keys.p256dh,
-          auth: keys.auth,
-          userAgent: navigator.userAgent.slice(0, 200),
-        });
-      } catch {
-        // Not linked to a profile yet, or offline: the toggle shows "off".
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [busy, endpoint, keyStale, mine, register, registered, supported]);
-
-  const enable = useCallback(async () => {
-    if (!supported || busy) return;
-    setBusy(true);
-    setError(null);
-    try {
+  // Subscribe + register THIS browser. `fromGesture` may prompt for permission;
+  // without a gesture it proceeds only if permission is already granted.
+  const subscribeThisDevice = useCallback(
+    async (fromGesture: boolean): Promise<void> => {
       if (!publicKey) {
-        setError("Notifications are not set up on this deployment yet.");
+        if (fromGesture) {
+          setError("Notifications are not set up on this deployment yet.");
+        }
         return;
       }
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        setError(
-          permission === "denied"
-            ? "Notifications are blocked for Capsule in your browser settings."
-            : "Notifications were not allowed.",
-        );
+      let state = Notification.permission;
+      if (state === "default" && fromGesture) {
+        state = await Notification.requestPermission();
+        setPermission(state);
+      }
+      if (state !== "granted") {
+        if (fromGesture) {
+          setError(
+            state === "denied"
+              ? "Notifications are blocked for Capsule in your browser settings."
+              : "Notifications were not allowed on this device.",
+          );
+        }
         return;
       }
       const registration = await workerRegistration();
       if (!registration) {
-        setError(
-          "Notifications need the installed app. Open Capsule from your home screen, or use the production site.",
-        );
+        if (fromGesture) {
+          setError(
+            "This device needs the installed app. Open Capsule from your home screen, or use the production site.",
+          );
+        }
         return;
       }
-      // Reuse an existing subscription only if it was made with the current
-      // server key; after a VAPID rotation the old one would be rejected, so
-      // drop it and subscribe again.
       let existing = await registration.pushManager.getSubscription();
       if (existing && !keyMatches(existing, publicKey)) {
         await existing.unsubscribe().catch(() => undefined);
@@ -249,16 +232,73 @@ export function usePushNotifications(): PushState {
         auth: keys.auth,
         userAgent: navigator.userAgent.slice(0, 200),
       });
-      writeOptedOut(false);
-      // An explicit opt-in on this browser cancels any revocation the
-      // PushRevokeOnSignout loop has pending for it (same key literal).
-      try {
-        window.localStorage.removeItem("capsule-push-pending-revoke");
-      } catch {
-        // storage blocked; the revoke loop only targets a matching endpoint
-      }
+      clearPendingRevoke();
       setEndpoint(subscription.endpoint);
       setKeyStale(false);
+    },
+    [publicKey, register],
+  );
+
+  // Unsubscribe + release THIS browser (server first, so no push is sent even
+  // if the browser unsubscribe fails).
+  const unsubscribeThisDevice = useCallback(async (): Promise<void> => {
+    const registration = await navigator.serviceWorker.getRegistration();
+    const subscription = await registration?.pushManager.getSubscription();
+    if (!subscription) return;
+    await unregister({ endpoint: subscription.endpoint });
+    await subscription.unsubscribe().catch(() => false);
+    setEndpoint(null);
+    setKeyStale(false);
+  }, [unregister]);
+
+  // Keep this device in step with the account preference automatically: turn
+  // itself on where the browser already allows it, off when the account is off.
+  useEffect(() => {
+    if (!supported || busy || accountPref === undefined || mine === undefined) {
+      return;
+    }
+    if (reconcilingRef.current) return;
+    const wantsOn = accountPref === true;
+    const shouldSubscribe =
+      wantsOn && permission === "granted" && !deviceActive && !keyStale;
+    const shouldUnsubscribe = !wantsOn && endpoint != null;
+    if (!shouldSubscribe && !shouldUnsubscribe) return;
+    reconcilingRef.current = true;
+    let cancelled = false;
+    void (async () => {
+      try {
+        if (shouldSubscribe) await subscribeThisDevice(false);
+        else if (shouldUnsubscribe) await unsubscribeThisDevice();
+      } catch {
+        // silent — the toggle still reflects the account state
+      } finally {
+        if (!cancelled) reconcilingRef.current = false;
+      }
+    })();
+    return () => {
+      cancelled = true;
+      reconcilingRef.current = false;
+    };
+  }, [
+    accountPref,
+    busy,
+    deviceActive,
+    endpoint,
+    keyStale,
+    mine,
+    permission,
+    subscribeThisDevice,
+    supported,
+    unsubscribeThisDevice,
+  ]);
+
+  const enable = useCallback(async () => {
+    if (!supported || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await setPreference({ enabled: true });
+      await subscribeThisDevice(true);
     } catch (cause) {
       setError(
         cause instanceof Error && cause.message
@@ -268,32 +308,32 @@ export function usePushNotifications(): PushState {
     } finally {
       setBusy(false);
     }
-  }, [busy, publicKey, register, supported]);
+  }, [busy, setPreference, subscribeThisDevice, supported]);
+
+  const activateThisDevice = useCallback(async () => {
+    if (!supported || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await subscribeThisDevice(true);
+    } catch (cause) {
+      setError(
+        cause instanceof Error && cause.message
+          ? cause.message
+          : "Notifications could not be turned on for this device.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, subscribeThisDevice, supported]);
 
   const disable = useCallback(async () => {
     if (!supported || busy) return;
     setBusy(true);
     setError(null);
-    disablingRef.current = true;
-    // Durable: even if the browser unsubscribe below fails or the tab closes,
-    // reconciliation must not turn this browser's notifications back on.
-    writeOptedOut(true);
     try {
-      const registration = await navigator.serviceWorker.getRegistration();
-      const subscription = await registration?.pushManager.getSubscription();
-      if (subscription) {
-        // Server first: a failed browser unsubscribe still leaves the row
-        // retired, so no push is sent while the endpoint lingers.
-        await unregister({ endpoint: subscription.endpoint });
-        const dropped = await subscription.unsubscribe();
-        if (!dropped) {
-          setError(
-            "Notifications are off, but this browser could not fully release the subscription. Reload if they continue.",
-          );
-        }
-      }
-      setEndpoint(null);
-      setKeyStale(false);
+      await setPreference({ enabled: false });
+      await unsubscribeThisDevice();
     } catch (cause) {
       setError(
         cause instanceof Error && cause.message
@@ -301,19 +341,28 @@ export function usePushNotifications(): PushState {
           : "Notifications could not be turned off.",
       );
     } finally {
-      disablingRef.current = false;
       setBusy(false);
     }
-  }, [busy, supported, unregister]);
+  }, [busy, setPreference, supported, unsubscribeThisDevice]);
 
+  const accountEnabled = accountPref === true;
   return {
     supported,
     needsHomeScreen: supported ? isIosSafariTab() : false,
     keyMissing: publicKey === null,
-    enabled: registered,
+    accountEnabled,
+    deviceActive,
+    deviceNeedsSetup:
+      accountEnabled &&
+      !deviceActive &&
+      supported &&
+      publicKey != null &&
+      permission !== "denied",
+    blocked: permission === "denied",
     busy,
     error,
     enable,
     disable,
+    activateThisDevice,
   };
 }
