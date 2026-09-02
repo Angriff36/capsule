@@ -18,10 +18,10 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "85ce4a46deb0a45b14b19ad113a46bc10492f03b58261984721f5e737191549f"
+      "sha256": "31140a7e0b21a8d9040640fdccf1e2ea34d9648bcc7133f7de45ca3bb3afe690"
     },
     "convex/queries.ts": {
-      "sha256": "6ad1feedf860a823f93bb896c8b4fb710fe776e21abec41b3326462144ea9d0f"
+      "sha256": "6857868d758ef267fd7b32f0da2b6083851a2fc1e5a5d9a9fc222d0a89f8519b"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -30,7 +30,7 @@
       "sha256": "3e6ca542d35a4d4a354e4e6200f079480164ad54e25735955d43ca1771ef4afd"
     },
     "manifest-context-summary.json": {
-      "sha256": "0aff4d814473806513ce9ba1a74cf0b44f5d731dc56391430e7c651e1c740425"
+      "sha256": "c84ada76448ad05af9886169cb3b976f7a8f528cc4940c9df5a6024db4afc78c"
     },
     "package.json": {
       "sha256": "4946f4e076d18eab36e1d2c06918c1d262e67fd57b62623bd84427f6bb95a872"
@@ -45,10 +45,10 @@
       "sha256": "eb8b648e7d86c93657ebe2b83a8e5b287fd74c62af04b3be78180208f6d56896"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "07f96084c0c0324b81b1723a321104610513088480e52a3acecd5a77a131b4d7"
+      "sha256": "76e5446cd923ca56bb23ee27004388c0d8cc31cf7a03c3abc6978fe10ba303cc"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "dd938110f2b7a14fd39e846b2ec7989de1005d32ce5f4a0064b0082ae99d89d2"
+      "sha256": "513ea1b35b4db4606a5723645983b57d0294da30adbab4173595afb818e85639"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "74780195fb9a6027f5586ef2611795ac1fffbd447c829cbc05d473edeea4dd03"
@@ -60,7 +60,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "95984c4ec7157be922cd850da7315a17b08ed9a030fe9e2a59f1e9c0dd75232c"
+      "sha256": "bd3b6d57f4917794c358f27a507b831ee58601e939ca52f47ab1f47ae945a87f"
     }
   },
   "package": {

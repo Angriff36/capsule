@@ -105,11 +105,15 @@ export const sendWithFiles = mutation({
     if (!docId) throw new Error("The message was not created.");
 
     // Trust nothing the key table hands back: the row must be this tenant's,
-    // this sender's, and aimed where this call aims.
+    // sent by the caller's CURRENT linked Person (the copied sign-in id is
+    // not enough — a sign-in moved to another Person must not touch the old
+    // Person's message), and aimed where this call aims.
     const message = await ctx.db.get(docId as Id<"staffMessages">);
     if (
       !message ||
       message.tenantId !== auth.tenantId ||
+      !auth.personId ||
+      message.senderPersonId !== auth.personId ||
       message.senderAuthSubjectId !== auth.id ||
       (message.eventId ?? null) !== (args.eventId ?? null) ||
       (message.recipientPersonId ?? null) !== (args.recipientPersonId ?? null)

@@ -70,11 +70,13 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   // Operator-selected photos to include in the post-event client feedback survey.
   property inFeedbackSurvey: boolean?
 
-  // Team-chat files (parentType staffMessage) follow their message: the chat
-  // seam (convex/teamChat.ts) shows them to the message's readers, and the
-  // generated queries show them only to the uploader. `uploadedById == null`
-  // is the create-time draft escape (the read policy runs before mutates).
-  default policy attachmentRead read: roleAllows(user.role, "staffAccess") and (self.parentType != "staffMessage" or self.uploadedById == null or (user.id != null and self.uploadedById == user.id)) "Staff may read attachments; chat files stay with their message"
+  // Team-chat files (parentType staffMessage) follow their message and are
+  // readable ONLY through the chat seam (convex/teamChat.ts), which authorizes
+  // the parent message by the caller's current Person. The generated queries
+  // never return a persisted chat file: `uploadedById == null` is the
+  // create-time draft escape alone (the read policy runs before mutates), and
+  // a copied sign-in id is never an authorization.
+  default policy attachmentRead read: roleAllows(user.role, "staffAccess") and (self.parentType != "staffMessage" or self.uploadedById == null) "Staff may read attachments; chat files are read through their message"
   default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may write attachments through commands"
   default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute attachment commands"
 
