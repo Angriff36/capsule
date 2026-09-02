@@ -56,9 +56,10 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
 
 async function workerRegistration(): Promise<ServiceWorkerRegistration | null> {
   if (!("serviceWorker" in navigator)) return null;
-  const existing = await navigator.serviceWorker.getRegistration();
-  if (existing) return existing;
-  // Production registers the worker on load; give it a moment. Dev has none.
+  // navigator.serviceWorker.ready resolves only once a registration has an
+  // ACTIVE worker — never one that is still installing, which pushManager
+  // cannot subscribe against. On a first visit that install can take a few
+  // seconds (it caches the shell first); dev has no worker at all.
   return await Promise.race([
     navigator.serviceWorker.ready,
     new Promise<null>((resolve) =>

@@ -29,10 +29,26 @@ export function ChatImageViewer({
   const image = images[index];
   const many = images.length > 1;
 
+  // The body scroll lock is applied on mount and released on unmount only —
+  // never re-applied when the image set changes, so it cannot linger after the
+  // last image is gone (see the close-when-empty effect below).
   useEffect(() => {
-    closeRef.current?.focus();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  // If the message's images disappear while the viewer is open (a removal
+  // arriving over the live query), close it so the lock is released and the
+  // page is usable again.
+  useEffect(() => {
+    if (images.length === 0) onClose();
+  }, [images.length, onClose]);
+
+  useEffect(() => {
+    closeRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
       else if (event.key === "ArrowRight" && many) {
@@ -44,7 +60,6 @@ export function ChatImageViewer({
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previousOverflow;
     };
   }, [images.length, index, many, onClose, onIndexChange]);
 

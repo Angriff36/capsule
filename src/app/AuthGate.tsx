@@ -34,13 +34,13 @@ export function isAuthConfigured(
 export function AuthGate({ children }: { children?: ReactNode }) {
   return (
     <>
+      <PushRevokeOnSignout />
       <AuthLoading>
         <GateShell title="Checking your session…">
           <p className="text-ink-2">Signing you in.</p>
         </GateShell>
       </AuthLoading>
       <Unauthenticated>
-        <PushRevokeOnSignout />
         <SignInScreen />
       </Unauthenticated>
       <Authenticated>
