@@ -44,7 +44,16 @@ async function rowsForEndpoint(
  */
 export const vapidPublicKey = query({
   args: {},
-  handler: async () => process.env.VAPID_PUBLIC_KEY ?? null,
+  handler: async () => {
+    // Only advertise a key when delivery is fully configured; a public key
+    // without its private key (or subject) would let a client subscribe and
+    // read "Notifications on" while teamChatPushSend.deliver silently sends
+    // nothing.
+    if (!process.env.VAPID_PRIVATE_KEY || !process.env.VAPID_SUBJECT) {
+      return null;
+    }
+    return process.env.VAPID_PUBLIC_KEY ?? null;
+  },
 });
 
 /** The caller's live devices — enough for the UI to know whether THIS device is on. */
@@ -162,6 +171,40 @@ export const register = mutation({
       createdAt: now,
     });
     return { subscriptionId: String(subscriptionId) };
+  },
+});
+
+/**
+ * Retire a subscription by its endpoint, WITHOUT auth. The endpoint is a
+ * secret the browser holds (whoever knows it can already push to the device),
+ * so proving possession of it is enough to turn the device off. Used when the
+ * session is already gone (sign-out / expiry) and the authenticated seam can
+ * no longer run; it only soft-deletes, so a user can re-enable at any time.
+ */
+export const releaseByEndpoint = mutation({
+  args: { endpoint: v.string() },
+  handler: async (ctx, args) => {
+    const endpoint = args.endpoint.trim();
+    if (endpoint.length === 0) return { removed: 0 };
+    const now = Date.now();
+    let removed = 0;
+    for (const row of await rowsForEndpoint(ctx, endpoint)) {
+      if (row.deletedAt != null) continue;
+      await ctx.db.patch(row._id, {
+        deletedAt: now,
+        updatedAt: now,
+        version: row.version + 1,
+      });
+      await ctx.db.insert("manifestEvents", {
+        type: "PushSubscriptionRemoved",
+        entity: "PushSubscription",
+        entityId: row._id,
+        payload: { pushSubscriptionId: row._id, tenantId: row.tenantId },
+        createdAt: now,
+      });
+      removed += 1;
+    }
+    return { removed };
   },
 });
 

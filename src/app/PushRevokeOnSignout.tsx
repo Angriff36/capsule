@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../lib/api";
 
-/** Best-effort: drop this browser's push subscription, retrying a few times. */
+/** Drop this browser's push subscription, retrying a few times. */
 async function dropBrowserSubscription(): Promise<string | null> {
   if (!("serviceWorker" in navigator) || !("PushManager" in window))
     return null;
@@ -22,50 +22,35 @@ async function dropBrowserSubscription(): Promise<string | null> {
 }
 
 /**
- * Mounted inside <Authenticated> (AuthGate): its unmount is the sign-out /
- * session-loss moment while the Convex client still has a token, so it
- * retires the server row (unregister) AND drops the browser subscription.
- * PushRevokeOnSignout on the <Unauthenticated> side is the fallback when this
- * cleanup cannot finish.
- */
-export function PushRevokeGuard() {
-  const unregister = useMutation(api.pushSubscriptions.unregister);
-  const unregisterRef = useRef(unregister);
-  unregisterRef.current = unregister;
-  useEffect(() => {
-    return () => {
-      void (async () => {
-        const endpoint = await dropBrowserSubscription().catch(() => null);
-        if (endpoint) {
-          await unregisterRef.current({ endpoint }).catch(() => undefined);
-        }
-      })();
-    };
-  }, []);
-  return null;
-}
-
-/**
- * Mounted while the app is unauthenticated. A signed-out or expired session
- * must not keep this browser subscribed: it retries the browser unsubscribe
- * so a signed-out shared device stops receiving notifications even if the
- * authenticated cleanup above did not complete. Client-only (no auth needed);
- * the server row is pruned on its next failed delivery.
+ * Mounted while the app is unauthenticated (AuthGate). `<Unauthenticated>`
+ * renders only when there is genuinely no session — a real sign-out or an
+ * expired one, never an org switch or a token refresh (those are
+ * `<AuthRefreshing>`). So this is the reliable "session ended" signal: it
+ * drops this browser's push subscription and retires the server row by its
+ * endpoint (a no-auth mutation, since the token is already gone), so a
+ * signed-out shared device stops receiving direct-message and mention
+ * notifications.
  */
 export function PushRevokeOnSignout() {
+  const releaseByEndpoint = useMutation(
+    api.pushSubscriptions.releaseByEndpoint,
+  );
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      let endpoint: string | null = null;
       try {
-        await dropBrowserSubscription();
+        endpoint = await dropBrowserSubscription();
       } catch {
-        // Best effort.
+        // Best effort on the browser side.
       }
-      if (cancelled) return;
+      if (cancelled || !endpoint) return;
+      // Retire the server row too, so no delivery is even attempted.
+      await releaseByEndpoint({ endpoint }).catch(() => undefined);
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [releaseByEndpoint]);
   return null;
 }
