@@ -5,9 +5,11 @@ import { NotificationTray } from "../../features/notifications/NotificationTray"
 import { api } from "../../lib/api";
 import { WORKSPACE_NAME } from "../../lib/workspace";
 import { ChevronRightIcon, GearIcon, SearchIcon } from "../../ui/icons";
+import { useDismissibleMenu } from "../../ui/useDismissibleMenu";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { breadcrumbsForPath, type Breadcrumb } from "./breadcrumbs";
 import { RecentsMenu } from "./RecentsMenu";
+import { ThemeToggle } from "./Sidebar";
 
 function useBreadcrumbs(): Breadcrumb[] {
   const { pathname } = useLocation();
@@ -20,6 +22,9 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const mobileAreas = navigationCatalog.availableAreas(
     authStatus?.disabledCapabilities,
   );
+  // Phone "Menu": every workspace the role can reach (the rail is hidden
+  // below 768px) plus the theme toggle that otherwise lives in the rail foot.
+  const mobileMenuRef = useDismissibleMenu({ closeOnSelect: true });
   return (
     <header className="app-shell-header flex h-16 shrink-0 items-center gap-3 border-b border-line/70 bg-panel/95 px-5 max-sm:px-3">
       <Link
@@ -29,7 +34,10 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
       >
         C
       </Link>
-      <details className="group relative hidden max-md:block">
+      <details
+        ref={mobileMenuRef}
+        className="group relative hidden max-md:block"
+      >
         <summary className="flex h-8 cursor-pointer list-none items-center rounded-xs border border-line px-2.5 text-xs font-medium text-ink-2 transition-colors hover:bg-inset [&::-webkit-details-marker]:hidden">
           Menu
         </summary>
@@ -47,6 +55,9 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
               {area.label}
             </Link>
           ))}
+          <div className="mt-1 border-t border-line pt-1">
+            <ThemeToggle />
+          </div>
         </nav>
       </details>
       <nav

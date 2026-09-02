@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { type EventStage, STAGE_LABEL } from "../features/events/eventStatus";
 import { formatStatusLabel, statusChipClass } from "../lib/statusLabels";
 import { ChevronDownIcon } from "./icons";
+import { useDismissibleMenu } from "./useDismissibleMenu";
 
 const STAGE_CHIP: Record<EventStage, string> = {
   quote: "border-line-2 bg-mute-soft text-ink-2",
@@ -76,8 +77,9 @@ export function ActionMenu({
   label?: string;
   children: ReactNode;
 }) {
+  const menuRef = useDismissibleMenu({ closeOnSelect: true });
   return (
-    <details className="action-menu">
+    <details ref={menuRef} className="action-menu">
       <summary className="btn btn-ghost">
         {label}
         <ChevronDownIcon width={12} height={12} />

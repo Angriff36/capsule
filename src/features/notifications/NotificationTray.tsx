@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { api } from "../../lib/api";
 import { relativeDays } from "../../lib/format";
 import { BellIcon } from "../../ui/icons";
+import { useDismissibleMenu } from "../../ui/useDismissibleMenu";
 import {
   type AppNotification,
   NOTIFICATION_KIND_LABELS,
@@ -63,6 +64,7 @@ export function NotificationTray() {
     [notifications],
   );
 
+  const trayRef = useDismissibleMenu();
   const closeTray = (e: MouseEvent) => {
     (e.currentTarget as HTMLElement)
       .closest("details")
@@ -70,7 +72,7 @@ export function NotificationTray() {
   };
 
   return (
-    <details className="group relative">
+    <details ref={trayRef} className="group relative">
       <summary
         className="relative flex h-8 cursor-pointer list-none items-center gap-2 rounded-xs border border-transparent px-2 text-ink-2 group-open:border-line-2 group-open:bg-inset hover:text-ink [&::-webkit-details-marker]:hidden"
         aria-label={

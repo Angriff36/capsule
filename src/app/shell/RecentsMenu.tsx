@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { relativeDays } from "../../lib/format";
 import { useRecents } from "../../lib/recents";
 import { ClockIcon } from "../../ui/icons";
+import { useDismissibleMenu } from "../../ui/useDismissibleMenu";
 
 /** Quick-access dropdown of the last ~20 records the user opened. */
 export function RecentsMenu() {
   const recents = useRecents();
+  const menuRef = useDismissibleMenu();
 
   const closeMenu = (e: MouseEvent) => {
     (e.currentTarget as HTMLElement)
@@ -15,7 +17,7 @@ export function RecentsMenu() {
   };
 
   return (
-    <details className="group relative">
+    <details ref={menuRef} className="group relative">
       <summary
         className="flex h-8 cursor-pointer list-none items-center gap-2 rounded-xs border border-transparent px-2 text-ink-2 group-open:border-line-2 group-open:bg-inset hover:text-ink [&::-webkit-details-marker]:hidden"
         aria-label="Recently opened records"
