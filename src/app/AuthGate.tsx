@@ -17,6 +17,7 @@ import {
 } from "convex/react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { PushRevokeOnSignout } from "./PushRevokeOnSignout";
 import {
   type AuthStatusSnapshot,
   workspaceMembershipPolicy,
@@ -33,6 +34,7 @@ export function isAuthConfigured(
 export function AuthGate({ children }: { children?: ReactNode }) {
   return (
     <>
+      <PushRevokeOnSignout />
       <AuthLoading>
         <GateShell title="Checking your session…">
           <p className="text-ink-2">Signing you in.</p>

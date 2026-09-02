@@ -19,6 +19,13 @@
   --color-sage: #eaeced;
   --color-sage-2: #d9dce1;
   --color-on-brand: #ffffff;
+  /* Team chat "Bubbles": the crew's bubble, own-bubble text, two extra accents.
+     Own bubbles reuse --color-info / --color-ink-2 / --color-accent / --color-ok
+     for blue / graphite / orange / green. */
+  --color-chat-other: #eaeced;
+  --color-chat-on-accent: #ffffff;
+  --color-chat-plum: #6b3d7a;
+  --color-chat-teal: #0e6b6b;
 
   --color-ink: #0f0f11;
   --color-ink-2: #3b3e45;
@@ -97,6 +104,10 @@
   --color-sage-2: #38423b;
 
   --color-ink: #e3e9e2;
+  --color-chat-other: #2e3731;
+  --color-chat-on-accent: #171d1a;
+  --color-chat-plum: #c7a3d6;
+  --color-chat-teal: #7fc4bd;
   --color-ink-2: #bcc6be;
   --color-ink-3: #97a39a;
   --color-brand: #85b8a9;

@@ -89,6 +89,7 @@ describe("governed creation mappings", () => {
       "ProposalRevision_createViaCapture",
       "ProposalTemplate_createViaDefine",
       "Proposal_createViaDraft",
+      "PushSubscription_createViaRegister",
       "Qualification_createViaGrant",
       "QualityCheck_createViaOpen",
       "RecurringAvailability_createViaDeclare",

@@ -1,23 +1,22 @@
+import { useState } from "react";
 import { FileTextIcon } from "../../ui/icons";
+import { ChatImageViewer, type ChatViewerImage } from "./ChatImageViewer";
+import { formatFileSize } from "./chatFileSize";
 import type { ChatAttachmentView } from "./chatTypes";
+import "./chat.css";
 
-/** B / KB / MB / GB; one decimal above KB. */
-export function formatFileSize(bytes: number): string {
-  if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
-  if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
-  if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${bytes} B`;
-}
-
-type ImageAttachment = ChatAttachmentView & { readonly url: string };
+export { formatFileSize } from "./chatFileSize";
 
 function isImage(
   attachment: ChatAttachmentView,
-): attachment is ImageAttachment {
+): attachment is ChatViewerImage {
   return attachment.contentType.startsWith("image/") && attachment.url !== null;
 }
 
-/** Images first as a thumbnail gallery, then other files as ruled rows. */
+/**
+ * Photos first — shown in the thread, a tap opens them full screen inside
+ * the app (never a raw download tab) — then other files as ruled rows.
+ */
 export function ChatAttachmentList({
   attachments,
   onImageLoad,
@@ -25,30 +24,42 @@ export function ChatAttachmentList({
   attachments: readonly ChatAttachmentView[];
   onImageLoad?: () => void;
 }) {
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   if (attachments.length === 0) return null;
   const images = attachments.filter(isImage);
   const files = attachments.filter((attachment) => !isImage(attachment));
   return (
     <div className="mt-1.5 space-y-1.5">
       {images.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
-          {images.map((image) => (
-            <a
+        <div
+          className="chat-photos"
+          data-count={images.length === 1 ? "one" : "many"}
+        >
+          {images.map((image, position) => (
+            <button
               key={image._id}
-              href={image.url}
-              target="_blank"
-              rel="noreferrer"
-              className="block max-w-full"
+              type="button"
+              className="chat-photo"
+              aria-label={`Open photo ${image.fileName}`}
+              onClick={() => setViewerIndex(position)}
             >
               <img
                 src={image.url}
                 alt={image.fileName}
+                loading="lazy"
                 onLoad={onImageLoad}
-                className="max-h-60 max-w-full rounded-sm border border-line object-contain"
               />
-            </a>
+            </button>
           ))}
         </div>
+      ) : null}
+      {viewerIndex !== null ? (
+        <ChatImageViewer
+          images={images}
+          index={Math.min(viewerIndex, images.length - 1)}
+          onIndexChange={setViewerIndex}
+          onClose={() => setViewerIndex(null)}
+        />
       ) : null}
       {files.length > 0 ? (
         <ul className="divide-y divide-line-2">

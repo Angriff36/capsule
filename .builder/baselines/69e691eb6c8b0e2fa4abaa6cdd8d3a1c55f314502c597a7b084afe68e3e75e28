@@ -31358,8 +31358,8 @@ async function __runPushSubscriptionRegister(ctx: MutationCtx, { docId, endpoint
     if (!doc) throw new Error("PushSubscription not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PushSubscription not found");
     if (!((checkRole(user, "staffAccess") && ((doc.authSubjectId == null) || ((user.id != null) && (doc.authSubjectId === user.id)))))) throw new Error("Staff may read their own push devices");
-    if (!(checkRole(user, "pushDeviceManage"))) throw new Error("Push devices are managed only through the app");
-    if (!(checkRole(user, "pushDeviceManage"))) throw new Error("Push devices are managed only through the app");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may register their own push devices through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may manage their own push devices");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!((doc.authSubjectId == null))) throw new Error("Guard 2 failed");
@@ -31433,8 +31433,8 @@ export const PushSubscription_createViaRegister = mutation({
       userAgent: args.userAgent
     };
     if (!((checkRole(user, "staffAccess") && ((__draft.authSubjectId == null) || ((user.id != null) && (__draft.authSubjectId === user.id)))))) throw new Error("Staff may read their own push devices");
-    if (!(checkRole(user, "pushDeviceManage"))) throw new Error("Push devices are managed only through the app");
-    if (!(checkRole(user, "pushDeviceManage"))) throw new Error("Push devices are managed only through the app");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may register their own push devices through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may manage their own push devices");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((user.personId != null))) throw new Error("Guard 1 failed");
     if (!((__draft.authSubjectId == null))) throw new Error("Guard 2 failed");
@@ -31468,8 +31468,8 @@ async function __runPushSubscriptionUnregister(ctx: MutationCtx, { docId, versio
     if (!doc) throw new Error("PushSubscription not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PushSubscription not found");
     if (!((checkRole(user, "staffAccess") && ((doc.authSubjectId == null) || ((user.id != null) && (doc.authSubjectId === user.id)))))) throw new Error("Staff may read their own push devices");
-    if (!(checkRole(user, "pushDeviceManage"))) throw new Error("Push devices are managed only through the app");
-    if (!(checkRole(user, "pushDeviceManage"))) throw new Error("Push devices are managed only through the app");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may register their own push devices through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may manage their own push devices");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((user.id != null) && (doc.authSubjectId === user.id)))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {

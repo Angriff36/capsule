@@ -1,0 +1,85 @@
+// Capsule workforce — web push devices for team chat.
+//
+// One row per browser/device that asked for push notifications, owned by the
+// sign-in that registered it and addressed by the Person it was linked to at
+// the time. The authored seam convex/pushSubscriptions.ts is the write path
+// the UI uses (register = upsert by endpoint, unregister = soft delete);
+// convex/teamChatPush.ts + convex/teamChatPushSend.ts deliver pushes for new
+// direct messages and @mentions. The push keys let a holder push to that one
+// device and expose no message data, so they are stored plain.
+//
+// `unique` is intent only: Convex enforces no alternate key, which is why the
+// seam dedupes by endpoint itself.
+
+use "../identity/person.manifest"
+
+entity PushSubscription mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, endpoint]
+  timestamps
+  versionProperty version: number
+
+  // The sign-in that owns the device.
+  property indexed required authSubjectId: string
+  // The Person addressed by direct messages and mentions when registered.
+  property indexed required personId: uuid
+  // Push service URL; the dedupe key.
+  property indexed required endpoint: string
+  property required p256dh: string
+  property required auth: string
+  property userAgent: string?
+  // Last accepted delivery (ms since epoch).
+  property lastUsedAt: float?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  // Own rows only. `self.authSubjectId == null` is the create-time draft escape.
+  default policy pushSubscriptionRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id)) "Staff may read their own push devices"
+  // Write and execute require a capability no role is granted, so the
+  // GENERATED register/unregister commands can never run. Every row is
+  // created, re-owned and retired only by the authored seam
+  // convex/pushSubscriptions.ts (raw writes bypass these policies), which
+  // folds the whole endpoint key so one browser has exactly one live owner.
+  default policy pushSubscriptionWrite write: roleAllows(user.role, "pushDeviceManage") "Push devices are managed only through the app"
+  default policy pushSubscriptionExecute execute: roleAllows(user.role, "pushDeviceManage") "Push devices are managed only through the app"
+
+  // Governed creation — a device asks for notifications.
+  command register(
+    endpoint: string,
+    p256dh: string,
+    auth: string,
+    optional userAgent: string
+  ) {
+    guard user.id != null
+    guard user.personId != null "Link your account to a staff profile before turning on notifications"
+    // Creation only: the generator also emits an instance form of every
+    // command, and re-running register on a stored row would re-own a device.
+    guard self.authSubjectId == null "A device is registered once; turn notifications off and on again instead"
+    constraint registerEndpoint: length(trim(endpoint)) > 0 "Endpoint is required"
+    constraint registerKeys: length(trim(p256dh)) > 0 and length(trim(auth)) > 0 "Push keys are required"
+    mutate authSubjectId = user.id
+    mutate personId = user.personId
+    mutate endpoint = endpoint
+    mutate p256dh = p256dh
+    mutate auth = auth
+    mutate userAgent = userAgent
+    emit PushSubscriptionRegistered {
+      pushSubscriptionId: self.id
+      tenantId: self.tenantId
+      authSubjectId: self.authSubjectId
+    }
+  }
+
+  // The owner turns notifications off on this device.
+  command unregister() {
+    guard self.deletedAt == null
+    guard user.id != null and self.authSubjectId == user.id "Only the owner can remove a device"
+    mutate deletedAt = now()
+    emit PushSubscriptionRemoved {
+      pushSubscriptionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store PushSubscription in durable
+}

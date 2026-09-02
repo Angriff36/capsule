@@ -47,6 +47,15 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     void navigator.serviceWorker.register("/sw.js").catch(() => undefined);
   });
+  // A tapped chat notification asks the open page to move to its thread
+  // (public/sw.js falls back to this when it cannot navigate the client).
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    const data = event.data as { type?: string; url?: string } | null;
+    if (data?.type === "capsule:navigate" && typeof data.url === "string") {
+      const url = new URL(data.url, window.location.origin);
+      if (url.origin === window.location.origin) window.location.assign(url);
+    }
+  });
 }
 
 const root = document.getElementById("root");

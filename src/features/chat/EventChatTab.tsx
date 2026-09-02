@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { EmptyState } from "../../ui/primitives";
 import { EventTabPanel } from "../events/EventTabPanel";
+import { ChatAppearanceMenu } from "./ChatAppearanceMenu";
 import { ChatComposer, type ChatComposerSubmit } from "./ChatComposer";
 import { ChatThread } from "./ChatThread";
 import { ChatUnsentDrafts } from "./ChatUnsentDrafts";
@@ -19,6 +20,7 @@ import {
   useChatRecordSearch,
   useSendChatMessage,
 } from "./useTeamChat";
+import { useChatAppearance } from "./useChatAppearance";
 import { sendFailureReason, unsentDrafts } from "./useUnsentDrafts";
 import "./chat.css";
 
@@ -48,6 +50,7 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
   const onReachBottom = useChannelReadMarker(channelKey, summary);
   const [sending, setSending] = useState(false);
   const [pinSignal, setPinSignal] = useState(0);
+  const appearance = useChatAppearance();
 
   const people = useMemo(
     () =>
@@ -109,6 +112,7 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
           >
             All chats
           </Link>
+          <ChatAppearanceMenu />
         </>
       }
     >
@@ -118,13 +122,18 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
           hint="The event may have been removed, or it isn't part of your workspace."
         />
       ) : (
-        <div className="chat-shell">
+        <div
+          className="chat-shell"
+          data-chat-layout={appearance.layout}
+          data-chat-accent={appearance.accent}
+        >
           <ChatThread
             messages={thread?.messages}
             myPersonId={identity.personId}
             personNames={identity.names}
             channelKey={channelKey}
             canManage={identity.canManage}
+            showSenderNames
             pinSignal={pinSignal}
             onEdit={actions.edit}
             onRemove={actions.remove}

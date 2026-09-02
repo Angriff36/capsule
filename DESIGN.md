@@ -31,6 +31,12 @@ colors:
   danger: "#b91c1c"
   danger-soft: "#fee2e2"
   on-brand: "#ffffff"
+  # Team chat "Bubbles" layout: the crew's bubble fill, the only text color
+  # inside an own (accent) bubble, and two accents the palette did not have.
+  chat-other: "#eaeced"
+  chat-on-accent: "#ffffff"
+  chat-plum: "#6b3d7a"
+  chat-teal: "#0e6b6b"
 
 typography:
   journal-display:
