@@ -9,16 +9,33 @@
  * convex/teamChatCursor.ts, with the domain events recorded in manifestEvents.
  */
 import { v } from "convex/values";
-import type { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import type { Doc, Id } from "./_generated/dataModel";
+import { type MutationCtx, mutation, query } from "./_generated/server";
 import { chatAuth } from "./lib/teamChatRead";
 
 /** Live devices one sign-in may keep; more is a bug or a very old account. */
 const DEVICES_CAP = 20;
-/** Rows one endpoint may have (duplicates from history are folded). */
-const ENDPOINT_DUPLICATES_CAP = 10;
+/** Rows walked over one endpoint's history before giving up. One physical
+ *  browser should hold a single row; the generated create path could add
+ *  more, so the whole key is folded, not a fixed slice. */
+const ENDPOINT_WALK_CAP = 200;
 /** Rows walked over a person's history before giving up (dead rows accrue). */
 const HISTORY_WALK_CAP = 400;
+
+/** Every row for one endpoint (bounded), so register/unregister fold them all. */
+async function rowsForEndpoint(
+  ctx: MutationCtx,
+  endpoint: string,
+): Promise<Doc<"pushSubscriptions">[]> {
+  const out: Doc<"pushSubscriptions">[] = [];
+  for await (const row of ctx.db
+    .query("pushSubscriptions")
+    .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))) {
+    out.push(row);
+    if (out.length >= ENDPOINT_WALK_CAP) break;
+  }
+  return out;
+}
 
 /**
  * The public half of the VAPID key pair, so the browser can subscribe. Read
@@ -78,14 +95,13 @@ export const register = mutation({
     const userAgent = args.userAgent?.slice(0, 200);
 
     // The endpoint identifies one physical browser, so it has exactly one
-    // owner: whoever is signed in on it now. Every other row for this endpoint
-    // — INCLUDING one left by a different tenant or sign-in that used this
-    // browser before — is removed, so the previous account can never receive
-    // a decrypted preview on a browser that has changed hands.
-    const existing = await ctx.db
-      .query("pushSubscriptions")
-      .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))
-      .take(ENDPOINT_DUPLICATES_CAP);
+    // owner: whoever is signed in on it now. EVERY other row for this endpoint
+    // — including one left by a different tenant or sign-in that used this
+    // browser before, or an extra row the generated create path may have
+    // added — is removed, so the previous account can never receive a
+    // decrypted preview on a browser that has changed hands. The whole key is
+    // read (bounded by the walk cap), never a fixed slice.
+    const existing = await rowsForEndpoint(ctx, endpoint);
     const keep =
       existing.find(
         (row) => row.tenantId === auth.tenantId && row.deletedAt == null,
@@ -153,12 +169,7 @@ export const unregister = mutation({
     const auth = await chatAuth(ctx);
     if (!auth) throw new Error("Sign in to manage notifications");
     const endpoint = args.endpoint.trim();
-    const rows = (
-      await ctx.db
-        .query("pushSubscriptions")
-        .withIndex("by_endpoint", (q) => q.eq("endpoint", endpoint))
-        .take(ENDPOINT_DUPLICATES_CAP)
-    ).filter(
+    const rows = (await rowsForEndpoint(ctx, endpoint)).filter(
       (row) =>
         row.tenantId === auth.tenantId &&
         row.authSubjectId === auth.id &&

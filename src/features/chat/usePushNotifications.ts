@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "../../lib/api";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 
 /**
  * How long to wait for the app-shell worker before giving up. A first visit
@@ -46,6 +47,22 @@ async function workerRegistration(): Promise<ServiceWorkerRegistration | null> {
   ]);
 }
 
+/** True when the browser subscription was made with the current server key. */
+function keyMatches(
+  subscription: PushSubscription,
+  publicKey: string,
+): boolean {
+  const applied = subscription.options.applicationServerKey;
+  if (!applied) return false;
+  const current = urlBase64ToUint8Array(publicKey);
+  const have = new Uint8Array(applied as ArrayBuffer);
+  if (have.length !== current.length) return false;
+  for (let i = 0; i < have.length; i += 1) {
+    if (have[i] !== current[i]) return false;
+  }
+  return true;
+}
+
 function isIosSafariTab(): boolean {
   const ua = navigator.userAgent;
   const ios = /iPhone|iPad|iPod/.test(ua);
@@ -66,9 +83,14 @@ export function usePushNotifications(): PushState {
   const mine = useQuery(api.pushSubscriptions.mine, {});
   const register = useMutation(api.pushSubscriptions.register);
   const unregister = useMutation(api.pushSubscriptions.unregister);
+  const authStatus = useAuthStatus();
+  const myPersonId = authStatus?.personId ?? null;
   const [endpoint, setEndpoint] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // A disable in progress: passive reconciliation must not re-register the
+  // subscription while unregister + unsubscribe are still running.
+  const disablingRef = useRef(false);
 
   const supported = useMemo(
     () =>
@@ -108,8 +130,12 @@ export function usePushNotifications(): PushState {
 
   const registered = useMemo(
     () =>
-      endpoint != null && (mine ?? []).some((row) => row.endpoint === endpoint),
-    [endpoint, mine],
+      endpoint != null &&
+      myPersonId != null &&
+      (mine ?? []).some(
+        (row) => row.endpoint === endpoint && row.personId === myPersonId,
+      ),
+    [endpoint, mine, myPersonId],
   );
 
   // A browser subscription the server does not know (the push service rotated
@@ -118,6 +144,7 @@ export function usePushNotifications(): PushState {
   useEffect(() => {
     if (!supported || endpoint == null || mine === undefined || registered)
       return;
+    if (disablingRef.current || busy) return;
     let cancelled = false;
     void (async () => {
       const registration = await navigator.serviceWorker.getRegistration();
@@ -138,7 +165,7 @@ export function usePushNotifications(): PushState {
     return () => {
       cancelled = true;
     };
-  }, [endpoint, mine, register, registered, supported]);
+  }, [busy, endpoint, mine, register, registered, supported]);
 
   const enable = useCallback(async () => {
     if (!supported || busy) return;
@@ -165,8 +192,16 @@ export function usePushNotifications(): PushState {
         );
         return;
       }
+      // Reuse an existing subscription only if it was made with the current
+      // server key; after a VAPID rotation the old one would be rejected, so
+      // drop it and subscribe again.
+      let existing = await registration.pushManager.getSubscription();
+      if (existing && !keyMatches(existing, publicKey)) {
+        await existing.unsubscribe().catch(() => undefined);
+        existing = null;
+      }
       const subscription =
-        (await registration.pushManager.getSubscription()) ??
+        existing ??
         (await registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(
@@ -199,10 +234,13 @@ export function usePushNotifications(): PushState {
     if (!supported || busy) return;
     setBusy(true);
     setError(null);
+    disablingRef.current = true;
     try {
       const registration = await navigator.serviceWorker.getRegistration();
       const subscription = await registration?.pushManager.getSubscription();
       if (subscription) {
+        // Server first: a failed browser unsubscribe still leaves the row
+        // retired, so no push is sent while the endpoint lingers.
         await unregister({ endpoint: subscription.endpoint });
         await subscription.unsubscribe();
       }
@@ -214,6 +252,7 @@ export function usePushNotifications(): PushState {
           : "Notifications could not be turned off.",
       );
     } finally {
+      disablingRef.current = false;
       setBusy(false);
     }
   }, [busy, supported, unregister]);
