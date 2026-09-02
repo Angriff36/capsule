@@ -5,6 +5,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { deleteBlobIfOrphan } from "./lib/blobs";
 
 /** Short-lived URL the browser POSTs the file bytes to. Staff only. */
 export const generateUploadUrl = mutation({
@@ -39,22 +40,7 @@ export const discardOrphanUploads = mutation({
       0,
       DISCARD_CAP,
     )) {
-      // The whole exact range, not a page: one live reference anywhere keeps
-      // the blob.
-      let referenced = false;
-      for await (const row of ctx.db
-        .query("attachments")
-        .withIndex("by_storageId", (q) => q.eq("storageId", storageId))) {
-        if (row.deletedAt == null) {
-          referenced = true;
-          break;
-        }
-      }
-      if (referenced) continue;
-      const blob = await ctx.db.system.get(storageId as Id<"_storage">);
-      if (!blob) continue;
-      await ctx.storage.delete(storageId as Id<"_storage">);
-      discarded += 1;
+      if (await deleteBlobIfOrphan(ctx, storageId)) discarded += 1;
     }
     return { discarded };
   },

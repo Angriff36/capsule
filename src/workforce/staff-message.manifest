@@ -53,8 +53,8 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
   // Intent only — entity-level constraints do not project to Convex; the
-  // commands below carry the enforced copies. Text-or-files is enforced by
-  // the send seam, the only place that can see the files.
+  // commands below carry the enforced copies. A file-only message (empty
+  // body, attachmentCount > 0) exists only through the send seam.
   constraint staffMessageTarget: (self.recipientPersonId != null or self.eventId != null) and (self.recipientPersonId == null or self.eventId == null) "A message goes to exactly one place: a teammate or an event channel"
   constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
   constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
@@ -68,10 +68,11 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   // Governed creation — one row per message. The sender is always the
   // caller's linked staff profile; the recipient's sign-in is copied from
   // the tenant-checked recipient Person row, never accepted from the browser.
-  // Files ride along only through convex/teamChatSend.ts, which runs this
-  // command and every Attachment.attach in one transaction and then sets
-  // attachmentCount from the rows it made; the command alone carries no file
-  // count, so a direct caller can only post text.
+  // Text is required here, as on every direct call. Files ride along only
+  // through convex/teamChatSend.ts, which runs this command and every
+  // Attachment.attach in one transaction, sets attachmentCount from the rows
+  // it made, and clears the body of a file-only message — so a direct caller
+  // can neither post a blank message nor claim files.
   command send(
     optional recipientPersonId: uuid,
     optional eventId: uuid,
@@ -89,6 +90,7 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     guard self.eventId == null or self.event != null
     guard self.recipientPersonId == null or self.recipient != null
     constraint sendTarget: (recipientPersonId != null or eventId != null) and (recipientPersonId == null or eventId == null) "Pick a teammate or an event channel, not both"
+    constraint sendBodyPresent: length(trim(body)) > 0 "Message text is required"
     constraint sendDistinctParties: recipientPersonId == null or recipientPersonId != user.personId "You cannot message yourself"
     mutate senderPersonId = user.personId
     mutate senderAuthSubjectId = user.id

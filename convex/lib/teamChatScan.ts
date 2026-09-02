@@ -55,8 +55,10 @@ export type ChannelScan = {
  * One pass over a channel, newest first, for badges and headers. Counts
  * unread rows until UNREAD_SCAN is reached ("50+"), skips removed rows
  * without spending the budget, and stops at the retention boundary, at the
- * caller's read cursor when `stopAtCursor` (everything older is read), at
- * `countLimit` live rows, or at CHANNEL_WALK_CAP rows walked.
+ * caller's read cursor when `stopAtCursor` (everything older is read), or at
+ * the walk cap. `countLimit` caps only the live-row COUNT: a `stopAtCursor`
+ * walk keeps looking for unread rows past it (a long run of the caller's own
+ * messages must not hide a reply behind them), while a plain count stops.
  */
 export async function scanChannel(
   ctx: QueryCtx,
@@ -104,7 +106,8 @@ export async function scanChannel(
     if (!scan.newest) scan.newest = row;
     const beyondCursor = sentAt(row) > opts.readUpTo;
     if (opts.stopAtCursor && !beyondCursor) break;
-    scan.count += 1;
+    if (scan.count < opts.countLimit) scan.count += 1;
+    else scan.countCapped = true;
     if (
       beyondCursor &&
       !scan.unreadCapped &&
@@ -116,10 +119,9 @@ export async function scanChannel(
         if (opts.stopAtCursor) break;
       }
     }
-    if (scan.count >= opts.countLimit) {
-      scan.countCapped = true;
-      break;
-    }
+    // Past the count cap, only a cursor walk still has a question to answer
+    // (is anything unread further down?); a plain count is done.
+    if (scan.countCapped && !opts.stopAtCursor) break;
   }
   return scan;
 }

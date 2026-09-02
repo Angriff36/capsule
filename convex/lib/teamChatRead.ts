@@ -6,7 +6,7 @@
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getAuthContext, type AppAuthContext } from "./authContext";
-import { decrypt } from "./encryption";
+import { decrypt, encrypt } from "./encryption";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import { chatPreviewText } from "../../src/features/chat/chatLinkTokens";
 
@@ -50,6 +50,21 @@ export type ChatMessageView = {
   readAt: number | null;
   attachments: ChatAttachmentView[];
 };
+
+/** Same envelope as the generated __encryptDoc, for one field. */
+export async function encryptField(
+  ctx: unknown,
+  entity: string,
+  property: string,
+  plaintext: string,
+): Promise<string> {
+  const { ciphertext, keyId } = await encrypt(plaintext, {
+    ctx,
+    entity,
+    property,
+  });
+  return JSON.stringify({ v: 1, kid: keyId, ct: ciphertext });
+}
 
 /** Same envelope handling as the generated __decryptDoc, per field. */
 export async function decryptField(
