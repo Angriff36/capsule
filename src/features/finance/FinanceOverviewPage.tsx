@@ -38,104 +38,6 @@ const functionalAmount = (
   return amount * rate;
 };
 
-const quickLinks: { label: string; path: string; description: string }[] = [
-  {
-    label: "Invoices",
-    path: FINANCE_ROUTES.invoices,
-    description: "Issue, send, and track client invoices.",
-  },
-  {
-    label: "Payments",
-    path: FINANCE_ROUTES.payments,
-    description: "Record incoming payments and settle them against invoices.",
-  },
-  {
-    label: "Payment methods",
-    path: FINANCE_ROUTES.paymentMethods,
-    description: "Client payment details kept on file.",
-  },
-  {
-    label: "Closeout",
-    path: FINANCE_ROUTES.closeout,
-    description: "Reconcile event finances after service wraps.",
-  },
-  {
-    label: "Payroll",
-    path: FINANCE_ROUTES.payroll,
-    description: "Staff pay runs and payroll records.",
-  },
-  {
-    label: "Tips",
-    path: FINANCE_ROUTES.tips,
-    description: "Collect and distribute event tips.",
-  },
-  {
-    label: "Tax",
-    path: FINANCE_ROUTES.taxes,
-    description: "Tax rates and collected tax by jurisdiction.",
-  },
-  {
-    label: "Commission terms",
-    path: FINANCE_ROUTES.venueCommissionTerms,
-    description: "Venue commission agreements and rates.",
-  },
-  {
-    label: "Attribution",
-    path: FINANCE_ROUTES.revenueAttribution,
-    description: "Trace revenue back to the source that earned it.",
-  },
-  {
-    label: "Revenue",
-    path: FINANCE_ROUTES.revenue,
-    description: "Revenue trends across events and months.",
-  },
-  {
-    label: "Food cost",
-    path: FINANCE_ROUTES.foodCost,
-    description: "Ingredient spend measured against menu pricing.",
-  },
-  {
-    label: "Profit margins",
-    path: FINANCE_ROUTES.profitMargins,
-    description: "Margin by event and service line.",
-  },
-  {
-    label: "Sales dashboard",
-    path: FINANCE_ROUTES.salesDashboard,
-    description: "Pipeline health and sales performance.",
-  },
-  {
-    label: "Tim's KPIs",
-    path: FINANCE_ROUTES.timsKpis,
-    description: "Owner-level key performance indicators.",
-  },
-  {
-    label: "Scorecard",
-    path: FINANCE_ROUTES.scorecard,
-    description: "Weekly scorecard measurables.",
-  },
-  {
-    label: "L10",
-    path: FINANCE_ROUTES.l10,
-    description: "L10 meeting metrics, rocks, and issues.",
-  },
-  {
-    label: "Avg event value",
-    path: FINANCE_ROUTES.avgEventValue,
-    description: "Average value per booked event over time.",
-  },
-  {
-    label: "Comp Master",
-    path: FINANCE_ROUTES.compMaster,
-    description: "Comped items and what they cost the house.",
-  },
-  {
-    label: "Mangia",
-    path: FINANCE_ROUTES.mangia,
-    description: "Mangia reporting dashboard.",
-  },
-];
-
 const clientLabel = (row: {
   clientType?: string;
   companyName?: string | null;
@@ -344,19 +246,6 @@ export function FinanceOverviewPage() {
             ))}
           </ul>
         )}
-      </Section>
-
-      <Section title="Go to">
-        <ul className="grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
-          {quickLinks.map((link) => (
-            <li key={link.path} className="bg-panel">
-              <Link className="block px-3 py-2.5 hover:bg-inset" to={link.path}>
-                <p className="font-medium text-ink">{link.label}</p>
-                <p className="mt-0.5 text-sm text-ink-3">{link.description}</p>
-              </Link>
-            </li>
-          ))}
-        </ul>
       </Section>
     </div>
   );

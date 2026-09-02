@@ -14,18 +14,7 @@ import {
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
-import { LOGISTICS_SECTIONS } from "./logisticsRoutes";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
-
-const SECTION_DESCRIPTIONS: Record<string, string> = {
-  packs: "Open pack lists per event and walk them to dispatched.",
-  "pack-templates": "Reusable load-sheet templates for recurring event shapes.",
-  deliveries: "Schedule runs from packed lists, assign drivers, track transit.",
-  schedule: "See which vehicle is committed where, and when.",
-  route: "Order the day's stops into a drivable route.",
-  fleet: "Vehicle roster, capacity, and operational status.",
-  maintenance: "Log service work and keep vehicles road-ready.",
-};
 
 type AttentionRow = {
   key: string;
@@ -210,26 +199,6 @@ export function LogisticsOverviewPage() {
             ))}
           </ul>
         )}
-      </Section>
-
-      <Section title="Workspace" count={LOGISTICS_SECTIONS.length}>
-        <ul className="divide-y divide-line">
-          {LOGISTICS_SECTIONS.map((section) => (
-            <li key={section.key}>
-              <Link
-                to={section.path}
-                className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-3 py-2.5 hover:bg-inset"
-              >
-                <span className="w-36 shrink-0 font-medium text-ink">
-                  {section.label}
-                </span>
-                <span className="text-sm text-ink-2">
-                  {SECTION_DESCRIPTIONS[section.key]}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
       </Section>
     </div>
   );

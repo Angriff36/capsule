@@ -16,30 +16,10 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
-import { WORKFORCE_SECTIONS } from "./workforceRoutes";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_ATTENTION_ROWS = 8;
-
-const SECTION_DESCRIPTIONS: Record<
-  (typeof WORKFORCE_SECTIONS)[number]["key"],
-  string
-> = {
-  roster: "Assign people to events and schedule weekly shifts.",
-  swaps: "Approve shift swaps once both staff members agree.",
-  time: "Clock time, correct records, and declare availability.",
-  "time-off": "Review and decide pending time-off requests.",
-  messages: "Send announcements and direct messages to staff.",
-  utilization: "See who is over- or under-scheduled across weeks.",
-  qualifications: "Track certifications and their expiry dates.",
-  training: "Record training completions that gate shift types.",
-  reviews: "Run performance reviews across the team.",
-  "my-reviews": "Reviews written about you, in one place.",
-  scorecards: "Role scorecards that define what good looks like.",
-  "one-on-ones": "Schedule and log recurring one-on-one check-ins.",
-  hiring: "Move candidates through the hiring pipeline.",
-};
 
 interface AttentionRow {
   key: string;
@@ -211,26 +191,6 @@ export function StaffOverviewPage() {
             ))}
           </ul>
         )}
-      </Section>
-
-      <Section title="Workspaces" count={WORKFORCE_SECTIONS.length}>
-        <ul className="grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3">
-          {WORKFORCE_SECTIONS.map((section) => (
-            <li key={section.key} className="bg-panel">
-              <Link
-                to={section.path}
-                className="block px-3 py-2.5 hover:bg-inset"
-              >
-                <span className="block font-medium text-ink">
-                  {section.label}
-                </span>
-                <span className="mt-0.5 block text-sm text-ink-2">
-                  {SECTION_DESCRIPTIONS[section.key]}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
       </Section>
     </div>
   );
