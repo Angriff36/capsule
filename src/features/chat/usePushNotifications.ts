@@ -25,6 +25,26 @@ export type PushState = {
   readonly disable: () => Promise<void>;
 };
 
+/** localStorage flag: this browser turned notifications off; do not re-register. */
+const OPT_OUT_KEY = "capsule-push-optout";
+
+function readOptedOut(): boolean {
+  try {
+    return window.localStorage.getItem(OPT_OUT_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+function writeOptedOut(value: boolean): void {
+  try {
+    if (value) window.localStorage.setItem(OPT_OUT_KEY, "1");
+    else window.localStorage.removeItem(OPT_OUT_KEY);
+  } catch {
+    // Storage blocked: the in-flight disablingRef still guards this session.
+  }
+}
+
 function urlBase64ToUint8Array(base64: string): Uint8Array {
   const padding = "=".repeat((4 - (base64.length % 4)) % 4);
   const normalized = (base64 + padding).replace(/-/g, "+").replace(/_/g, "/");
@@ -86,6 +106,9 @@ export function usePushNotifications(): PushState {
   const authStatus = useAuthStatus();
   const myPersonId = authStatus?.personId ?? null;
   const [endpoint, setEndpoint] = useState<string | null>(null);
+  // True when a browser subscription exists but was made with a superseded
+  // VAPID key; it cannot receive pushes and must be migrated on the next tap.
+  const [keyStale, setKeyStale] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // A disable in progress: passive reconciliation must not re-register the
@@ -105,10 +128,18 @@ export function usePushNotifications(): PushState {
   useEffect(() => {
     if (!supported) return;
     let cancelled = false;
+    const sync = (subscription: PushSubscription | null | undefined) => {
+      if (cancelled) return;
+      setEndpoint(subscription?.endpoint ?? null);
+      setKeyStale(
+        subscription != null &&
+          publicKey != null &&
+          !keyMatches(subscription, publicKey),
+      );
+    };
     void (async () => {
       const registration = await navigator.serviceWorker.getRegistration();
-      const subscription = await registration?.pushManager.getSubscription();
-      if (!cancelled) setEndpoint(subscription?.endpoint ?? null);
+      sync(await registration?.pushManager.getSubscription());
     })();
     const onMessage = (event: MessageEvent) => {
       const data = event.data as { type?: string } | null;
@@ -116,9 +147,7 @@ export function usePushNotifications(): PushState {
         void navigator.serviceWorker
           .getRegistration()
           .then((registration) => registration?.pushManager.getSubscription())
-          .then((subscription) => {
-            if (!cancelled) setEndpoint(subscription?.endpoint ?? null);
-          });
+          .then(sync);
       }
     };
     navigator.serviceWorker.addEventListener("message", onMessage);
@@ -126,16 +155,17 @@ export function usePushNotifications(): PushState {
       cancelled = true;
       navigator.serviceWorker.removeEventListener("message", onMessage);
     };
-  }, [supported]);
+  }, [supported, publicKey]);
 
   const registered = useMemo(
     () =>
       endpoint != null &&
+      !keyStale &&
       myPersonId != null &&
       (mine ?? []).some(
         (row) => row.endpoint === endpoint && row.personId === myPersonId,
       ),
-    [endpoint, mine, myPersonId],
+    [endpoint, keyStale, mine, myPersonId],
   );
 
   // A browser subscription the server does not know (the push service rotated
@@ -144,7 +174,7 @@ export function usePushNotifications(): PushState {
   useEffect(() => {
     if (!supported || endpoint == null || mine === undefined || registered)
       return;
-    if (disablingRef.current || busy) return;
+    if (disablingRef.current || busy || keyStale || readOptedOut()) return;
     let cancelled = false;
     void (async () => {
       const registration = await navigator.serviceWorker.getRegistration();
@@ -165,7 +195,7 @@ export function usePushNotifications(): PushState {
     return () => {
       cancelled = true;
     };
-  }, [busy, endpoint, mine, register, registered, supported]);
+  }, [busy, endpoint, keyStale, mine, register, registered, supported]);
 
   const enable = useCallback(async () => {
     if (!supported || busy) return;
@@ -218,7 +248,9 @@ export function usePushNotifications(): PushState {
         auth: keys.auth,
         userAgent: navigator.userAgent.slice(0, 200),
       });
+      writeOptedOut(false);
       setEndpoint(subscription.endpoint);
+      setKeyStale(false);
     } catch (cause) {
       setError(
         cause instanceof Error && cause.message
@@ -235,6 +267,9 @@ export function usePushNotifications(): PushState {
     setBusy(true);
     setError(null);
     disablingRef.current = true;
+    // Durable: even if the browser unsubscribe below fails or the tab closes,
+    // reconciliation must not turn this browser's notifications back on.
+    writeOptedOut(true);
     try {
       const registration = await navigator.serviceWorker.getRegistration();
       const subscription = await registration?.pushManager.getSubscription();
@@ -242,9 +277,15 @@ export function usePushNotifications(): PushState {
         // Server first: a failed browser unsubscribe still leaves the row
         // retired, so no push is sent while the endpoint lingers.
         await unregister({ endpoint: subscription.endpoint });
-        await subscription.unsubscribe();
+        const dropped = await subscription.unsubscribe();
+        if (!dropped) {
+          setError(
+            "Notifications are off, but this browser could not fully release the subscription. Reload if they continue.",
+          );
+        }
       }
       setEndpoint(null);
+      setKeyStale(false);
     } catch (cause) {
       setError(
         cause instanceof Error && cause.message

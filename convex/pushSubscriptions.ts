@@ -110,6 +110,8 @@ export const register = mutation({
       existing[0];
     if (keep) {
       await ctx.db.patch(keep._id, {
+        // Re-own to the current tenant too: keep may be a previous tenant's row.
+        tenantId: auth.tenantId,
         authSubjectId: auth.id,
         personId: auth.personId as Id<"people">,
         p256dh: args.p256dh,
@@ -169,12 +171,17 @@ export const unregister = mutation({
     const auth = await chatAuth(ctx);
     if (!auth) throw new Error("Sign in to manage notifications");
     const endpoint = args.endpoint.trim();
-    const rows = (await rowsForEndpoint(ctx, endpoint)).filter(
+    const all = await rowsForEndpoint(ctx, endpoint);
+    // Only the owner may turn a device off — but once they do, EVERY live row
+    // for this physical browser is retired, so a stray row left by an earlier
+    // owner cannot keep delivering to it.
+    const ownsLive = all.some(
       (row) =>
-        row.tenantId === auth.tenantId &&
         row.authSubjectId === auth.id &&
+        row.tenantId === auth.tenantId &&
         row.deletedAt == null,
     );
+    const rows = ownsLive ? all.filter((row) => row.deletedAt == null) : [];
     const now = Date.now();
     for (const row of rows) {
       await ctx.db.patch(row._id, {

@@ -9,20 +9,12 @@
  * device counts only while its sign-in still owns the addressed Person.
  */
 import { v } from "convex/values";
-import { chatPreviewText } from "../src/features/chat/chatLinkTokens";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internalMutation, internalQuery } from "./_generated/server";
-import {
-  decryptField,
-  live,
-  tenantEvent,
-  tenantPerson,
-} from "./lib/teamChatRead";
+import { live, tenantEvent, tenantPerson } from "./lib/teamChatRead";
 
 /** A push older than this when the action finally runs is not worth sending. */
 const STALE_MS = 5 * 60_000;
-/** Notification body length; the payload must stay far under 4 KB. */
-const PREVIEW_CHARS = 120;
 /** Live devices per person a push targets. */
 const DEVICES_PER_PERSON = 20;
 /** Rows walked over one person's device history before giving up. */
@@ -99,17 +91,14 @@ export const buildPushJob = internalQuery({
       return null;
     }
 
-    const body = await decryptField(ctx, "StaffMessage", "body", message.body);
-    let preview = chatPreviewText(body).slice(0, PREVIEW_CHARS);
-    if (preview.length === 0) {
-      const files = message.attachmentCount ?? 0;
-      preview =
-        files === 1
-          ? "Sent a photo or file"
-          : files > 1
-            ? `Sent ${files} files`
-            : "";
-    }
+    // No decrypted content in the payload: a notification can surface on a
+    // lock screen or a signed-out shared device, so the body stays generic
+    // and the message itself is read in the app. The title already names the
+    // sender (and the event for a mention).
+    const preview =
+      message.recipientPersonId != null
+        ? "Sent you a message"
+        : "Mentioned you";
 
     const targets: PushTarget[] = [];
     const seenEndpoints = new Set<string>();
