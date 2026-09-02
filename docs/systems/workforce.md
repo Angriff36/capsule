@@ -69,6 +69,23 @@ clients. Every event carries the same channel as its **Team Chat** tab.
   `readAt`. The UI shows the last 90 days.
 - UI lives in `src/features/chat/**` (unguarded seam-hook directory, like
   `src/features/attachments`); `MessagesPage` and the event tab import it.
+- Photos open in an in-app viewer (`ChatImageViewer`, portal to body) rather
+  than a raw file tab; a single photo shows large, several as tiles.
+- Appearance is a per-browser preference (`useChatAppearance`, localStorage
+  `capsule-chat-appearance`): Rows (default) or Bubbles, and the accent of
+  your own bubbles (blue, graphite, orange, green, plum, teal). All bubble
+  rules in `chat.css` key on the shell's `data-chat-layout` /
+  `data-chat-accent`; the four extra colors are declared in DESIGN.md.
+- Web push: `PushSubscription` rows (`src/workforce/push-subscription.manifest`,
+  one per device, owner-only read) are written by the upsert seam
+  `convex/pushSubscriptions.ts`; `convex/teamChatSend.ts` schedules
+  `convex/teamChatPushSend.ts` (Node, web-push, VAPID) after a fresh commit,
+  which sends the job built by `convex/teamChatPush.ts`: direct messages to
+  the recipient's devices, channel messages only to the people @mentioned,
+  never to the sender, one collapsing tag per thread, 404/410 devices
+  retired. `public/sw.js` shows the notification and opens the thread.
+  Needs `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` / `VAPID_SUBJECT` on the
+  Convex deployment; without them chat works and pushes are skipped.
 
 ## Cross-system handoffs
 
