@@ -14,19 +14,11 @@ import {
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
-import { FACILITIES_SECTIONS } from "./facilitiesRoutes";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SOON_MS = 7 * DAY_MS;
 const ATTENTION_LIMIT = 8;
-
-const SECTION_HINTS: Record<string, string> = {
-  equipment: "Asset catalog, conditions, and the maintenance log.",
-  venues: "Every venue with capacity, logistics, and contacts.",
-  "layout-templates": "Reusable room layouts for recurring venues.",
-  "vendor-relationships": "Preferred and required vendors per venue.",
-};
 
 type AttentionRow = {
   key: string;
@@ -106,12 +98,6 @@ export function FacilitiesOverviewPage() {
     { label: "Layout templates", value: activeTemplates.length },
   ];
 
-  const sectionCounts: Record<string, number> = {
-    equipment: liveEquipment.length,
-    venues: activeVenues.length,
-    "layout-templates": activeTemplates.length,
-  };
-
   return (
     <div className="space-y-4">
       <PageHeader
@@ -172,30 +158,6 @@ export function FacilitiesOverviewPage() {
             ))}
           </ul>
         )}
-      </Section>
-
-      <Section title="Workspaces" count={FACILITIES_SECTIONS.length}>
-        <div className="grid grid-cols-1 gap-px bg-line sm:grid-cols-2">
-          {FACILITIES_SECTIONS.map((section) => (
-            <Link
-              key={section.key}
-              to={section.path}
-              className="block bg-panel px-4 py-3 hover:bg-inset"
-            >
-              <span className="flex items-baseline justify-between gap-2">
-                <span className="font-medium text-ink">{section.label}</span>
-                {!isLoading && sectionCounts[section.key] != null ? (
-                  <span className="font-mono text-sm text-ink-3">
-                    {sectionCounts[section.key]}
-                  </span>
-                ) : null}
-              </span>
-              <span className="mt-0.5 block text-sm text-ink-3">
-                {SECTION_HINTS[section.key]}
-              </span>
-            </Link>
-          ))}
-        </div>
       </Section>
     </div>
   );
