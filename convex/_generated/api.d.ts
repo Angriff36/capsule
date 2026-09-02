@@ -34,6 +34,7 @@ import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as kmParser from "../kmParser.js";
 import type * as laborSummary from "../laborSummary.js";
 import type * as lib_authContext from "../lib/authContext.js";
+import type * as lib_blobs from "../lib/blobs.js";
 import type * as lib_catalogUnitGrams from "../lib/catalogUnitGrams.js";
 import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
 import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
@@ -133,6 +134,7 @@ declare const fullApi: ApiFromModules<{
   kmParser: typeof kmParser;
   laborSummary: typeof laborSummary;
   "lib/authContext": typeof lib_authContext;
+  "lib/blobs": typeof lib_blobs;
   "lib/catalogUnitGrams": typeof lib_catalogUnitGrams;
   "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
   "lib/clerkStaffAccount": typeof lib_clerkStaffAccount;
