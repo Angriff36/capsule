@@ -38,3 +38,12 @@ projections:
         Attachment:
           - fields: [parentId, uploadedById]
             name: by_parentId_and_uploadedById
+        # Catalog rows hold their primary image's storage id directly. The
+        # orphan-blob check (convex/lib/blobs.ts) must find them by that id
+        # before it deletes an unreferenced upload.
+        Dish:
+          - fields: [primaryImageStorageId]
+            name: by_primaryImageStorageId
+        Ingredient:
+          - fields: [primaryImageStorageId]
+            name: by_primaryImageStorageId

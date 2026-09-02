@@ -61,7 +61,11 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
 
   // A DM party is identified by Person (the same rule the chat seam uses), so a
   // teammate who links a sign-in after the message was sent still owns it.
-  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or self.senderAuthSubjectId == null or (user.id != null and (self.senderAuthSubjectId == user.id or self.recipientAuthSubjectId == user.id)) or (user.personId != null and (self.senderPersonId == user.personId or self.recipientPersonId == user.personId))) "Staff may read channel messages and their own direct messages"
+  // `senderAuthSubjectId == null and senderPersonId == null` is the creation
+  // draft only (createVia checks this policy against the draft before the
+  // sender is stamped); a stored row always has both, so no persisted DM is
+  // ever readable through this branch.
+  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or (self.senderAuthSubjectId == null and self.senderPersonId == null) or (user.id != null and (self.senderAuthSubjectId == user.id or self.recipientAuthSubjectId == user.id)) or (user.personId != null and (self.senderPersonId == user.personId or self.recipientPersonId == user.personId))) "Staff may read channel messages and their own direct messages"
   default policy staffMessageWrite write: roleAllows(user.role, "staffAccess") "Staff may write staff messages through commands"
   default policy staffMessageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute staff message commands"
 
