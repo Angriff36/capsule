@@ -1,24 +1,86 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@clerk/react";
 import { useMutation } from "convex/react";
 import { api } from "../lib/api";
 
-type DropResult = { endpoint: string; dropped: boolean } | null;
+/**
+ * The endpoint of a push subscription that must be fully revoked. Persisted so
+ * revocation survives the tab closing, a lost connection, AND the next user
+ * signing in on a shared device — it is NEVER abandoned because someone else
+ * signed in.
+ */
+const PENDING_KEY = "capsule-push-pending-revoke";
+const RETRY_MS = 15000;
 
-/** Try once to drop this browser's push subscription. */
-async function dropBrowserSubscription(): Promise<DropResult> {
+function readPending(): string | null {
+  try {
+    return window.localStorage.getItem(PENDING_KEY);
+  } catch {
+    return null;
+  }
+}
+function writePending(endpoint: string | null): void {
+  try {
+    if (endpoint) window.localStorage.setItem(PENDING_KEY, endpoint);
+    else window.localStorage.removeItem(PENDING_KEY);
+  } catch {
+    // Storage blocked: the in-memory loop below still runs for this session.
+  }
+}
+
+type Release = (args: { endpoint: string }) => Promise<unknown>;
+
+let running = false;
+
+/**
+ * Complete a stamped revocation and keep retrying until it truly succeeds:
+ * the browser subscription for the pending endpoint is unsubscribed AND the
+ * server row is released. Module-level and self-retrying, so it is not tied to
+ * any component's lifecycle or to who is signed in.
+ */
+async function processPending(release: Release): Promise<void> {
+  if (running) return;
+  running = true;
+  try {
+    for (;;) {
+      const endpoint = readPending();
+      if (!endpoint) return;
+      let browserClear = true;
+      try {
+        const registration =
+          "serviceWorker" in navigator
+            ? await navigator.serviceWorker.getRegistration()
+            : null;
+        const subscription = await registration?.pushManager.getSubscription();
+        // Only this endpoint — never a new user's fresh subscription.
+        if (subscription && subscription.endpoint === endpoint) {
+          browserClear = await subscription.unsubscribe().catch(() => false);
+        }
+      } catch {
+        browserClear = false;
+      }
+      if (browserClear) {
+        try {
+          await release({ endpoint });
+          writePending(null);
+          return;
+        } catch {
+          // server unreachable — fall through and retry
+        }
+      }
+      await new Promise((resolve) => setTimeout(resolve, RETRY_MS));
+    }
+  } finally {
+    running = false;
+  }
+}
+
+async function currentEndpoint(): Promise<string | null> {
   if (!("serviceWorker" in navigator) || !("PushManager" in window))
     return null;
   const registration = await navigator.serviceWorker.getRegistration();
   const subscription = await registration?.pushManager.getSubscription();
-  if (!subscription) return null;
-  let dropped = false;
-  try {
-    dropped = await subscription.unsubscribe();
-  } catch {
-    dropped = false;
-  }
-  return { endpoint: subscription.endpoint, dropped };
+  return subscription?.endpoint ?? null;
 }
 
 /**
@@ -27,68 +89,47 @@ async function dropBrowserSubscription(): Promise<DropResult> {
  * not Convex's auth state, so an org switch or a token refresh (which briefly
  * drop Convex auth while the user stays signed in) never disable notifications.
  *
- * Revocation is not treated as done until it actually succeeds: both the
- * browser unsubscribe and the server-row release (a no-auth mutation, since
- * the token is gone) must complete. If either fails — e.g. the device is
- * offline at sign-out — it retries on the next `online` event and on a short
- * timer, so a signed-out shared device cannot start receiving pushes again
- * when it reconnects. Mounted once, above the auth-state branches.
+ * On a confirmed sign-out it stamps the current subscription's endpoint as
+ * pending, then a durable, self-retrying loop unsubscribes the browser and
+ * releases the server row (a no-auth mutation, since the token is gone). The
+ * loop is not abandoned if the next user signs in — so on a shared device a
+ * departing user's notifications cannot keep arriving for whoever signs in
+ * next. Any pending revocation is also resumed on mount. Mounted once, above
+ * the auth-state branches.
  */
 export function PushRevokeOnSignout() {
-  const { isLoaded, isSignedIn } = useAuth();
   const releaseByEndpoint = useMutation(
     api.pushSubscriptions.releaseByEndpoint,
   );
-  const releaseRef = useRef(releaseByEndpoint);
-  releaseRef.current = releaseByEndpoint;
 
+  // Resume a revocation left pending by a previous session, and retry on
+  // reconnect — regardless of who (if anyone) is signed in now.
+  useEffect(() => {
+    const onOnline = () => void processPending(releaseByEndpoint);
+    window.addEventListener("online", onOnline);
+    if (readPending()) void processPending(releaseByEndpoint);
+    return () => window.removeEventListener("online", onOnline);
+  }, [releaseByEndpoint]);
+
+  const { isLoaded, isSignedIn } = useAuth();
   useEffect(() => {
     if (!isLoaded || isSignedIn) return;
-
     let cancelled = false;
-    let timer: ReturnType<typeof setTimeout> | null = null;
-
-    // One attempt; resolves true only when the device is fully clean.
-    const attempt = async (): Promise<boolean> => {
-      let result: DropResult = null;
-      try {
-        result = await dropBrowserSubscription();
-      } catch {
-        return false;
+    void (async () => {
+      // Stamp the endpoint while the subscription still exists; the durable
+      // loop below finishes the job even if this component unmounts or the
+      // next user signs in first.
+      if (!readPending()) {
+        const endpoint = await currentEndpoint().catch(() => null);
+        if (cancelled) return;
+        if (endpoint) writePending(endpoint);
       }
-      if (result === null) return true; // nothing subscribed on this browser
-      if (!result.dropped) return false; // unsubscribe failed; retry later
-      try {
-        await releaseRef.current({ endpoint: result.endpoint });
-        return true;
-      } catch {
-        return false; // server unreachable; retry later
-      }
-    };
-
-    const onOnline = () => void run();
-    const cleanupListeners = () => {
-      window.removeEventListener("online", onOnline);
-      if (timer) clearTimeout(timer);
-    };
-
-    const run = async () => {
-      if (cancelled) return;
-      if (await attempt()) {
-        cleanupListeners();
-        return;
-      }
-      if (cancelled) return;
-      timer = setTimeout(() => void run(), 15000);
-    };
-
-    window.addEventListener("online", onOnline);
-    void run();
+      if (readPending()) void processPending(releaseByEndpoint);
+    })();
     return () => {
       cancelled = true;
-      cleanupListeners();
     };
-  }, [isLoaded, isSignedIn]);
+  }, [isLoaded, isSignedIn, releaseByEndpoint]);
 
   return null;
 }

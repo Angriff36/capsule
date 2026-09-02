@@ -250,6 +250,13 @@ export function usePushNotifications(): PushState {
         userAgent: navigator.userAgent.slice(0, 200),
       });
       writeOptedOut(false);
+      // An explicit opt-in on this browser cancels any revocation the
+      // PushRevokeOnSignout loop has pending for it (same key literal).
+      try {
+        window.localStorage.removeItem("capsule-push-pending-revoke");
+      } catch {
+        // storage blocked; the revoke loop only targets a matching endpoint
+      }
       setEndpoint(subscription.endpoint);
       setKeyStale(false);
     } catch (cause) {
