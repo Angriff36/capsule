@@ -7,7 +7,6 @@ import {
   useListVendorOrderLine,
 } from "../../lib/manifest-convex-react";
 import { formatCount, formatDate, formatMoneyExact } from "../../lib/format";
-import { ChevronRightIcon } from "../../ui/icons";
 import { PageHeader, Skeleton, StatusChip } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import {
@@ -25,49 +24,6 @@ const AWAITING_RECEIPT = new Set([
   "partially_received",
 ]);
 const CLOSED_ORDER = new Set(["received", "cancelled"]);
-
-const QUICK_LINKS = [
-  {
-    label: "Demand ledger",
-    path: "/inventory/demand",
-    description: "Ingredient needs by event, flowing into purchasing.",
-  },
-  {
-    label: "Stock book",
-    path: "/inventory/stock",
-    description: "On-hand by ingredient and location, with reorder points.",
-  },
-  {
-    label: "Counts",
-    path: "/inventory/counts",
-    description: "Physical counts reconciled against the book.",
-  },
-  {
-    label: "Audit log",
-    path: "/inventory/audit",
-    description: "Every stock movement and where it came from.",
-  },
-  {
-    label: "Waste",
-    path: "/inventory/waste",
-    description: "Spoilage and loss with reasons and cost.",
-  },
-  {
-    label: "Lot trace",
-    path: "/inventory/traceability",
-    description: "Supplier lots from receipt through use.",
-  },
-  {
-    label: "Purchasing",
-    path: "/inventory/purchasing",
-    description: "Weekly drafts, purchase needs, vendor orders.",
-  },
-  {
-    label: "Contracts",
-    path: "/inventory/contracts",
-    description: "Vendor agreements and negotiated pricing.",
-  },
-] as const;
 
 type Urgency = "now" | "soon" | "watch";
 
@@ -339,42 +295,6 @@ export function InventoryOverviewPage() {
             ))}
           </ul>
         )}
-      </section>
-
-      <section aria-labelledby="workspace-title">
-        <h2
-          id="workspace-title"
-          className="mb-3 text-lg font-semibold text-ink"
-        >
-          Workspace
-        </h2>
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-          {QUICK_LINKS.map((link) => (
-            <li key={link.path}>
-              <Link
-                to={link.path}
-                className="card group flex h-full items-start gap-3 px-4 py-4 transition-shadow hover:shadow-[0_4px_16px_-4px_rgb(30_40_36/0.18)]"
-              >
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-sm bg-brand-soft text-base font-bold text-brand">
-                  {link.label.slice(0, 1)}
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-base font-semibold text-ink">
-                    {link.label}
-                  </span>
-                  <span className="block text-sm text-ink-2">
-                    {link.description}
-                  </span>
-                </span>
-                <ChevronRightIcon
-                  className="mt-1 shrink-0 text-ink-3 group-hover:text-ink"
-                  width={14}
-                  height={14}
-                />
-              </Link>
-            </li>
-          ))}
-        </ul>
       </section>
     </div>
   );
