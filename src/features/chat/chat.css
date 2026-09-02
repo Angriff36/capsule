@@ -7,6 +7,9 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
+  /* A grid/flex item: never let a long unbroken line (a file name in the
+     "Not sent" row, a URL) widen the pane past its column on a phone. */
+  min-width: 0;
   height: clamp(420px, calc(100dvh - 15rem), 860px);
 }
 
@@ -135,4 +138,19 @@
 
 .chat-unsent-item + .chat-unsent-item {
   border-top: 1px solid var(--color-line);
+}
+
+.chat-unsent-item p {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+  /* No room beside the text on a phone: the buttons drop under it. */
+  .chat-unsent-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .chat-unsent-actions {
+    justify-content: flex-end;
+  }
 }

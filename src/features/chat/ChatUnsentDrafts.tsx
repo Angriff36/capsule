@@ -57,7 +57,7 @@ export function ChatUnsentDrafts({ channel, onSent }: Props) {
             <p className="text-sm text-danger">Not sent · {item.error}</p>
             <p className="truncate text-base text-ink">{previewOf(item)}</p>
           </div>
-          <div className="flex flex-none gap-2">
+          <div className="chat-unsent-actions flex flex-none gap-2">
             <button
               type="button"
               className="btn btn-ghost btn-sm"
