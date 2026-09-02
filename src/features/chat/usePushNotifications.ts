@@ -117,6 +117,10 @@ export function usePushNotifications(): PushState {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const reconcilingRef = useRef(false);
+  // What the user JUST chose, applied immediately: the account-preference query
+  // lags a round-trip, so without this the reconcile effect could re-subscribe
+  // in the window right after a disable (the query still reads the old value).
+  const [optimistic, setOptimistic] = useState<boolean | null>(null);
 
   const supported = useMemo(
     () =>
@@ -130,6 +134,18 @@ export function usePushNotifications(): PushState {
   useEffect(() => {
     if (supported) setPermission(Notification.permission);
   }, [supported]);
+
+  useEffect(() => {
+    if (
+      accountPref !== undefined &&
+      optimistic !== null &&
+      (accountPref === true) === optimistic
+    ) {
+      setOptimistic(null);
+    }
+  }, [accountPref, optimistic]);
+
+  const wantsOn = optimistic ?? accountPref === true;
 
   // This device's current browser subscription, if any.
   useEffect(() => {
@@ -258,44 +274,42 @@ export function usePushNotifications(): PushState {
       return;
     }
     if (reconcilingRef.current) return;
-    const wantsOn = accountPref === true;
+    // Subscribe only when there is NO subscription yet (endpoint == null): once
+    // subscribeThisDevice has run, deviceActive stays false until `mine`
+    // catches up, and re-running would just call register again.
     const shouldSubscribe =
-      wantsOn && permission === "granted" && !deviceActive && !keyStale;
+      wantsOn && permission === "granted" && endpoint == null;
     const shouldUnsubscribe = !wantsOn && endpoint != null;
     if (!shouldSubscribe && !shouldUnsubscribe) return;
     reconcilingRef.current = true;
-    let cancelled = false;
     void (async () => {
       try {
         if (shouldSubscribe) await subscribeThisDevice(false);
-        else if (shouldUnsubscribe) await unsubscribeThisDevice();
+        else await unsubscribeThisDevice();
       } catch {
         // silent — the toggle still reflects the account state
       } finally {
-        if (!cancelled) reconcilingRef.current = false;
+        // Always released (a per-instance ref discarded on unmount); a dep
+        // change re-runs the effect if more work is needed.
+        reconcilingRef.current = false;
       }
     })();
-    return () => {
-      cancelled = true;
-      reconcilingRef.current = false;
-    };
   }, [
-    accountPref,
     busy,
-    deviceActive,
     endpoint,
-    keyStale,
     mine,
     permission,
     subscribeThisDevice,
     supported,
     unsubscribeThisDevice,
+    wantsOn,
   ]);
 
   const enable = useCallback(async () => {
     if (!supported || busy) return;
     setBusy(true);
     setError(null);
+    setOptimistic(true);
     try {
       await setPreference({ enabled: true });
       await subscribeThisDevice(true);
@@ -331,6 +345,7 @@ export function usePushNotifications(): PushState {
     if (!supported || busy) return;
     setBusy(true);
     setError(null);
+    setOptimistic(false);
     try {
       await setPreference({ enabled: false });
       await unsubscribeThisDevice();
@@ -345,7 +360,7 @@ export function usePushNotifications(): PushState {
     }
   }, [busy, setPreference, supported, unsubscribeThisDevice]);
 
-  const accountEnabled = accountPref === true;
+  const accountEnabled = wantsOn;
   return {
     supported,
     needsHomeScreen: supported ? isIosSafariTab() : false,
