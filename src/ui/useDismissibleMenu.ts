@@ -3,7 +3,9 @@ import { useEffect, useRef } from "react";
 /**
  * A native <details> dropdown never closes itself: it lingers until the
  * summary is clicked again. This closes it on an outside pointer, on Esc,
- * and (optionally) when an item inside it is chosen.
+ * and (optionally) when an item inside it is chosen. An item that shows its
+ * result in place (a copy button with a "copied" state) opts out with
+ * `data-keep-open` on itself or a wrapper.
  */
 export function useDismissibleMenu({
   closeOnSelect = false,
@@ -31,7 +33,9 @@ export function useDismissibleMenu({
     const onSelect = (event: Event) => {
       if (!closeOnSelect || !(event.target instanceof Element)) return;
       const item = event.target.closest("a, button");
-      if (item && item !== details.querySelector("summary")) close();
+      if (!item || item === details.querySelector("summary")) return;
+      if (item.closest("[data-keep-open]")) return;
+      close();
     };
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);

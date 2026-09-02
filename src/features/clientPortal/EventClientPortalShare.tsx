@@ -35,7 +35,11 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
   };
 
   return (
-    <div className="flex items-center gap-2" key="client-portal-share">
+    <div
+      className="flex items-center gap-2"
+      key="client-portal-share"
+      data-keep-open
+    >
       <button
         type="button"
         className="btn btn-ghost"
