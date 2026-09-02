@@ -1,4 +1,10 @@
-import { Fragment, useRef, useState, type KeyboardEvent } from "react";
+import {
+  Fragment,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+} from "react";
 import { Link } from "react-router-dom";
 import { ChatAttachmentList } from "./ChatAttachmentList";
 import { chatKindIcon } from "./chatIcons";
@@ -9,6 +15,7 @@ import {
   type ChatLinkKind,
 } from "./chatLinkTokens";
 import type { ChatMessageView } from "./chatTypes";
+import type { ChatLayout } from "./useChatAppearance";
 import { useChatTextareaGrow } from "./useChatTextareaGrow";
 import { useCoarsePointer } from "./useCoarsePointer";
 
@@ -28,6 +35,11 @@ export type ChatMessageItemProps = {
   readonly senderName: string;
   readonly mine: boolean;
   readonly showHeader: boolean;
+  readonly layout: ChatLayout;
+  /** Where this message sits in a run from one sender (bubble tails, spacing). */
+  readonly groupPosition: "only" | "first" | "middle" | "last";
+  /** Bubbles: name the sender above the run (event channels, others only). */
+  readonly showSenderName: boolean;
   /** mine */
   readonly canEdit: boolean;
   /** mine || canManage */
@@ -86,12 +98,19 @@ function ChatBody({ body }: { body: string }) {
   );
 }
 
-/** One ruled message row. Own messages read "You" on an inset surface. */
+/**
+ * One message. Rows: a ruled row, own messages read "You" on an inset surface.
+ * Bubbles: the same markup styled by chat.css through the shell's
+ * data-chat-layout / data-chat-accent attributes and this row's data-*.
+ */
 export function ChatMessageItem({
   message,
   senderName,
   mine,
   showHeader,
+  layout,
+  groupPosition,
+  showSenderName,
   canEdit,
   canRemove,
   onEdit,
@@ -101,6 +120,8 @@ export function ChatMessageItem({
   const coarse = useCoarsePointer();
   const editRef = useRef<HTMLTextAreaElement>(null);
   const [mode, setMode] = useState<Mode>("view");
+  // Bubbles on a touch screen: tools show after a tap on the bubble.
+  const [revealed, setRevealed] = useState(false);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -157,16 +178,36 @@ export function ChatMessageItem({
   if (message.editedAt !== null) meta.push("Edited");
   if (isRead) meta.push("Read");
   const showActions = mode === "view" && (canEdit || canRemove);
-  const showTools = !showHeader || showActions;
+  const bubbles = layout === "bubbles";
+  const showTools = bubbles || !showHeader || showActions;
+  const mediaOnly =
+    !hasBody &&
+    message.attachments.some((a) => a.contentType.startsWith("image/"));
+  // Rows: the sender + time header opens each run. Bubbles: only the sender
+  // name above the crew's runs in a channel; the time lives in the tools.
+  const showHead = bubbles ? showHeader && showSenderName : showHeader;
+
+  const onRowClick = (event: MouseEvent<HTMLLIElement>) => {
+    if (!bubbles || !coarse) return;
+    const target = event.target as HTMLElement;
+    if (target.closest("a, button, textarea, input")) return;
+    setRevealed((value) => !value);
+  };
 
   return (
     <li
       className={`group chat-row flex gap-2 px-4 ${showHeader ? "pt-2.5 pb-1.5" : "py-1"} ${mine ? "bg-inset" : ""}`}
       data-message-id={message._id}
+      data-mine={mine ? "true" : "false"}
+      data-group={groupPosition}
+      data-media-only={mediaOnly ? "true" : "false"}
+      data-editing={mode === "edit" ? "true" : "false"}
+      data-revealed={revealed ? "true" : "false"}
+      onClick={onRowClick}
     >
-      <div className="min-w-0 flex-1">
-        {showHeader ? (
-          <div className="flex flex-wrap items-baseline gap-x-2">
+      <div className="chat-row-main min-w-0 flex-1">
+        {showHead ? (
+          <div className="chat-row-head flex flex-wrap items-baseline gap-x-2">
             <span className="text-base font-semibold text-ink">
               {senderName}
             </span>
@@ -216,22 +257,26 @@ export function ChatMessageItem({
           </div>
         ) : (
           <>
-            {hasBody ? (
-              <p className="text-base leading-relaxed break-words whitespace-pre-wrap text-ink">
-                <ChatBody body={message.body} />
-              </p>
-            ) : message.attachments.length === 0 ? (
-              // Its files never attached; shown so it can be read and removed.
-              <p className="text-base text-ink-3 italic">
-                Attachment unavailable
-              </p>
-            ) : null}
-            <ChatAttachmentList
-              attachments={message.attachments}
-              onImageLoad={onImageLoad}
-            />
+            <div className="chat-bubble">
+              {hasBody ? (
+                <p className="text-base leading-relaxed break-words whitespace-pre-wrap text-ink">
+                  <ChatBody body={message.body} />
+                </p>
+              ) : message.attachments.length === 0 ? (
+                // Its files never attached; shown so it can be read and removed.
+                <p className="text-base text-ink-3 italic">
+                  Attachment unavailable
+                </p>
+              ) : null}
+              <ChatAttachmentList
+                attachments={message.attachments}
+                onImageLoad={onImageLoad}
+              />
+            </div>
             {meta.length > 0 ? (
-              <p className="mt-0.5 text-xs text-ink-3">{meta.join(" · ")}</p>
+              <p className="chat-row-meta mt-0.5 text-xs text-ink-3">
+                {meta.join(" · ")}
+              </p>
             ) : null}
           </>
         )}
@@ -269,7 +314,7 @@ export function ChatMessageItem({
           cluster's width, and h-0 keeps the h-8 buttons from adding height. */}
       {showTools ? (
         <div className="chat-row-tools -mt-1 flex h-0 shrink-0 items-center gap-1.5 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100">
-          {!showHeader ? (
+          {bubbles || !showHeader ? (
             <time
               dateTime={new Date(message.createdAt).toISOString()}
               className="chat-row-time px-1 font-mono text-xs text-ink-3"

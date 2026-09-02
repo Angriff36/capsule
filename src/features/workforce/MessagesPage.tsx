@@ -3,8 +3,11 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { formatDate } from "../../lib/format";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
+import { ChatAppearanceMenu } from "../chat/ChatAppearanceMenu";
 import { ChatComposer, type ChatComposerSubmit } from "../chat/ChatComposer";
+import { ChatPushToggle } from "../chat/ChatPushToggle";
 import { ChatUnsentDrafts } from "../chat/ChatUnsentDrafts";
+import { useChatAppearance } from "../chat/useChatAppearance";
 import {
   ChatConversationRail,
   type ChatRailTeammate,
@@ -73,6 +76,7 @@ export function MessagesPage() {
   const [sending, setSending] = useState(false);
   const [pinSignal, setPinSignal] = useState(0);
   const [focusSignal, setFocusSignal] = useState(0);
+  const appearance = useChatAppearance();
 
   const select = useCallback(
     (next: ChatChannel | null) => {
@@ -186,13 +190,16 @@ export function MessagesPage() {
             days.
           </p>
         </div>
-        <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
-          <p className="text-3xl leading-none font-semibold text-brand">
-            {totalUnread}
-          </p>
-          <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
-            Unread
-          </p>
+        <div className="flex flex-col items-end gap-3">
+          <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
+            <p className="text-3xl leading-none font-semibold text-brand">
+              {totalUnread}
+            </p>
+            <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
+              Unread
+            </p>
+          </div>
+          <ChatPushToggle />
         </div>
       </header>
       <WorkforceWorkspaceNav />
@@ -233,7 +240,11 @@ export function MessagesPage() {
                 />
               </div>
             ) : (
-              <div className="chat-shell">
+              <div
+                className="chat-shell"
+                data-chat-layout={appearance.layout}
+                data-chat-accent={appearance.accent}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line-2 px-4 py-3">
                   <div className="min-w-0">
                     {mobile ? (
@@ -254,14 +265,17 @@ export function MessagesPage() {
                       </p>
                     ) : null}
                   </div>
-                  {channel.kind === "event" ? (
-                    <Link
-                      className="text-link inline-flex"
-                      to={`/events/${channel.eventId}?tab=chat`}
-                    >
-                      Open event
-                    </Link>
-                  ) : null}
+                  <div className="flex items-center gap-3">
+                    {channel.kind === "event" ? (
+                      <Link
+                        className="text-link inline-flex"
+                        to={`/events/${channel.eventId}?tab=chat`}
+                      >
+                        Open event
+                      </Link>
+                    ) : null}
+                    <ChatAppearanceMenu />
+                  </div>
                 </div>
                 <ChatThread
                   messages={messages}
@@ -269,6 +283,7 @@ export function MessagesPage() {
                   personNames={identity.names}
                   channelKey={channelKey}
                   canManage={identity.canManage}
+                  showSenderNames={channel.kind === "event"}
                   pinSignal={pinSignal}
                   onEdit={actions.edit}
                   onRemove={actions.remove}

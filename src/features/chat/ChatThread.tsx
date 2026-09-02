@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -7,12 +8,15 @@ import {
   useState,
 } from "react";
 import { EmptyState, Skeleton } from "../../ui/primitives";
-import { ChatMessageItem } from "./ChatMessageItem";
+import { ChatMessageItem, formatChatTime } from "./ChatMessageItem";
 import type { ChatMessageView } from "./chatTypes";
+import { useChatAppearance } from "./useChatAppearance";
 import "./chat.css";
 
 /** Consecutive messages from one sender inside this window share a header. */
 const HEADER_GAP_MS = 5 * 60_000;
+/** Bubbles: a centered time stamp separates runs this far apart. */
+const STAMP_GAP_MS = 60 * 60_000;
 /** This close to the bottom counts as "at the bottom". */
 const PIN_THRESHOLD_PX = 80;
 const REACH_BOTTOM_DEBOUNCE_MS = 2_000;
@@ -27,6 +31,8 @@ export type ChatThreadProps = {
   readonly channelKey: string;
   /** manageAccess: may remove anyone's message. */
   readonly canManage: boolean;
+  /** Event channels name the sender; a direct message needs no names. */
+  readonly showSenderNames: boolean;
   /** Increment after the caller's own send to force a pin-to-bottom. */
   readonly pinSignal: number;
   readonly onEdit: (message: ChatMessageView, body: string) => Promise<void>;
@@ -77,6 +83,7 @@ export function ChatThread({
   personNames,
   channelKey,
   canManage,
+  showSenderNames,
   pinSignal,
   onEdit,
   onRemove,
@@ -84,6 +91,7 @@ export function ChatThread({
   emptyTitle,
   emptyHint,
 }: ChatThreadProps) {
+  const { layout } = useChatAppearance();
   const listRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const pinnedRef = useRef(true);
@@ -228,33 +236,67 @@ export function ChatThread({
           ) : sorted.length === 0 ? (
             <EmptyState title={emptyTitle} hint={emptyHint} />
           ) : (
-            <ul className="divide-y divide-line-2">
+            <ul className="chat-list">
               {sorted.map((message, index) => {
                 const previous = index > 0 ? sorted[index - 1] : undefined;
-                const showHeader =
+                const next = sorted[index + 1];
+                const startsGroup =
                   previous === undefined ||
                   previous.senderPersonId !== message.senderPersonId ||
                   message.createdAt - previous.createdAt > HEADER_GAP_MS;
+                const endsGroup =
+                  next === undefined ||
+                  next.senderPersonId !== message.senderPersonId ||
+                  next.createdAt - message.createdAt > HEADER_GAP_MS;
+                const groupPosition =
+                  startsGroup && endsGroup
+                    ? "only"
+                    : startsGroup
+                      ? "first"
+                      : endsGroup
+                        ? "last"
+                        : "middle";
                 const mine =
                   myPersonId !== null && message.senderPersonId === myPersonId;
+                // Bubbles carry no time on every row; a centered stamp marks a
+                // new hour-long gap or a new day instead.
+                const stamp =
+                  layout === "bubbles" &&
+                  (previous === undefined ||
+                    message.createdAt - previous.createdAt > STAMP_GAP_MS ||
+                    new Date(message.createdAt).toDateString() !==
+                      new Date(previous.createdAt).toDateString());
                 return (
-                  <ChatMessageItem
-                    key={message._id}
-                    message={message}
-                    senderName={
-                      mine
-                        ? "You"
-                        : (personNames.get(message.senderPersonId) ??
-                          "Former teammate")
-                    }
-                    mine={mine}
-                    showHeader={showHeader}
-                    canEdit={mine}
-                    canRemove={mine || canManage}
-                    onEdit={(body) => onEdit(message, body)}
-                    onRemove={() => onRemove(message)}
-                    onImageLoad={onImageLoad}
-                  />
+                  <Fragment key={message._id}>
+                    {stamp ? (
+                      <li className="chat-stamp" aria-hidden="true">
+                        <time
+                          dateTime={new Date(message.createdAt).toISOString()}
+                        >
+                          {formatChatTime(message.createdAt)}
+                        </time>
+                      </li>
+                    ) : null}
+                    <ChatMessageItem
+                      message={message}
+                      senderName={
+                        mine
+                          ? "You"
+                          : (personNames.get(message.senderPersonId) ??
+                            "Former teammate")
+                      }
+                      mine={mine}
+                      showHeader={startsGroup}
+                      layout={layout}
+                      groupPosition={groupPosition}
+                      showSenderName={showSenderNames && !mine}
+                      canEdit={mine}
+                      canRemove={mine || canManage}
+                      onEdit={(body) => onEdit(message, body)}
+                      onRemove={() => onRemove(message)}
+                      onImageLoad={onImageLoad}
+                    />
+                  </Fragment>
                 );
               })}
             </ul>

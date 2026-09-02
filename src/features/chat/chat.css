@@ -101,21 +101,277 @@
   flex-shrink: 0;
 }
 
+/* Rows: one hairline between rows (the list carries it, so Bubbles can drop
+   it without touching the markup). */
+[data-chat-layout="rows"] .chat-list > li + li {
+  border-top: 1px solid var(--color-line-2);
+}
+
 /* The collapsed-row time and the Edit/Remove cluster sit beside the body and
    reveal on hover or focus (group-hover in the markup). Touch screens have no
-   hover, so there they stay visible and drop under the message body. */
+   hover, so in Rows they stay visible and drop under the message body. */
 @media (pointer: coarse) {
-  .chat-row {
+  [data-chat-layout="rows"] .chat-row {
     flex-direction: column;
   }
-  .chat-row-time,
-  .chat-row-tools {
+  [data-chat-layout="rows"] .chat-row-time,
+  [data-chat-layout="rows"] .chat-row-tools {
     opacity: 1;
   }
-  .chat-row-tools {
+  [data-chat-layout="rows"] .chat-row-tools {
     height: auto;
     margin-top: 0.375rem;
   }
+}
+
+/* ---------------------------------------------------------------- Bubbles
+   Own messages right-aligned in one accent fill, the crew's left-aligned in a
+   quiet neutral bubble. Every color is a token: the accent resolves through a
+   local custom property so dark mode needs no extra rules. Scoped on the
+   shell's data attributes; the conversation rail never matches. */
+[data-chat-accent="blue"] {
+  --chat-accent: var(--color-info);
+}
+[data-chat-accent="graphite"] {
+  --chat-accent: var(--color-ink-2);
+}
+[data-chat-accent="orange"] {
+  --chat-accent: var(--color-accent);
+}
+[data-chat-accent="green"] {
+  --chat-accent: var(--color-ok);
+}
+[data-chat-accent="plum"] {
+  --chat-accent: var(--color-chat-plum);
+}
+[data-chat-accent="teal"] {
+  --chat-accent: var(--color-chat-teal);
+}
+
+[data-chat-layout="bubbles"] .chat-row {
+  padding: 0.125rem 1rem;
+  background: transparent;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+[data-chat-layout="bubbles"] .chat-row[data-group="first"],
+[data-chat-layout="bubbles"] .chat-row[data-group="only"] {
+  padding-top: 0.5rem;
+}
+
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] {
+  flex-direction: row-reverse;
+}
+
+[data-chat-layout="bubbles"] .chat-row-main {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 78%;
+}
+
+[data-chat-layout="bubbles"] .chat-row[data-editing="true"] .chat-row-main {
+  flex: 1 1 auto;
+  max-width: 34rem;
+}
+
+[data-chat-layout="bubbles"] .chat-row-head {
+  margin: 0 0.75rem 0.125rem;
+}
+
+[data-chat-layout="bubbles"] .chat-row-head span {
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--color-ink-3);
+}
+
+[data-chat-layout="bubbles"] .chat-row-head time {
+  display: none;
+}
+
+[data-chat-layout="bubbles"] .chat-bubble {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sheet);
+  background: var(--color-chat-other);
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-row-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-bubble {
+  background: var(--chat-accent);
+  color: var(--color-chat-on-accent);
+}
+
+/* Inside an own bubble there is exactly one text color. */
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-bubble p,
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-bubble a,
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-bubble span,
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-bubble svg {
+  color: var(--color-chat-on-accent);
+}
+
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-bubble a {
+  text-decoration: underline;
+}
+
+/* The tail: only the last bubble of a run drops its corner on the sender's
+   side, so a run reads as one voice. */
+[data-chat-layout="bubbles"] .chat-row[data-group="last"] .chat-bubble,
+[data-chat-layout="bubbles"] .chat-row[data-group="only"] .chat-bubble {
+  border-bottom-left-radius: var(--radius-xs);
+}
+
+[data-chat-layout="bubbles"]
+  .chat-row[data-mine="true"][data-group="last"]
+  .chat-bubble,
+[data-chat-layout="bubbles"]
+  .chat-row[data-mine="true"][data-group="only"]
+  .chat-bubble {
+  border-bottom-left-radius: var(--radius-sheet);
+  border-bottom-right-radius: var(--radius-xs);
+}
+
+/* A photo-only message IS the bubble. */
+[data-chat-layout="bubbles"] .chat-row[data-media-only="true"] .chat-bubble {
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+}
+
+[data-chat-layout="bubbles"]
+  .chat-row[data-media-only="true"]
+  .chat-photos[data-count="one"]
+  .chat-photo {
+  border: 0;
+  border-radius: var(--radius-sheet);
+}
+
+[data-chat-layout="bubbles"] .chat-bubble .chat-photos {
+  margin-top: 0.25rem;
+}
+
+[data-chat-layout="bubbles"] .chat-row[data-mine="true"] .chat-row-meta {
+  text-align: right;
+}
+
+[data-chat-layout="bubbles"] .chat-row-tools {
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+}
+
+/* Centered stamp between runs an hour or a day apart. */
+.chat-stamp {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 1rem 0.25rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+}
+
+@media (pointer: coarse) {
+  /* No hover on a phone: a tap on the bubble reveals the time and tools. */
+  [data-chat-layout="bubbles"] .chat-row-tools {
+    height: 0;
+    opacity: 0;
+  }
+  [data-chat-layout="bubbles"] .chat-row[data-revealed="true"] .chat-row-tools,
+  [data-chat-layout="bubbles"] .chat-row:focus-within .chat-row-tools {
+    height: auto;
+    opacity: 1;
+  }
+}
+
+@media (max-width: 767px) {
+  [data-chat-layout="bubbles"] .chat-row {
+    padding-inline: 0.75rem;
+  }
+  [data-chat-layout="bubbles"] .chat-row-main {
+    max-width: 86%;
+  }
+}
+
+/* ------------------------------------------------- Appearance popover */
+.chat-appearance-panel {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  gap: 0.75rem;
+  min-width: 260px;
+  max-width: calc(100vw - 2rem);
+  padding: 0.75rem;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+  box-shadow: 0 12px 32px -12px
+    color-mix(in srgb, var(--color-ink) 35%, transparent);
+  cursor: default;
+}
+
+.chat-appearance > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+}
+
+.chat-seg {
+  display: flex;
+  gap: 0.375rem;
+  margin-top: 0.375rem;
+}
+
+.chat-seg [aria-checked="true"] {
+  border-color: var(--color-ink);
+  background: var(--color-inset);
+}
+
+.chat-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.375rem;
+}
+
+.chat-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  background: var(--chat-accent);
+  cursor: pointer;
+}
+
+.chat-swatch[aria-checked="true"] {
+  border-color: var(--color-ink);
+  box-shadow: inset 0 0 0 2px var(--color-panel);
+}
+
+.chat-swatch:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.chat-swatch-dot {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  cursor: inherit;
+}
+
+.chat-push {
+  max-width: 18rem;
+  text-align: right;
 }
 
 /* Messages that did not send sit between the thread and the composer, each
