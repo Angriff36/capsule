@@ -186,3 +186,82 @@ self.addEventListener("fetch", (event) => {
     );
   }
 });
+
+/*
+ * Web push for team chat. The payload is built by convex/teamChatPush.ts:
+ * { title, body, url, tag }. Every push shows a notification (a silent push
+ * would cost the site its permission on Safari); a click focuses an open
+ * Capsule window and moves it to the thread, or opens one.
+ */
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { title: "Capsule", body: event.data ? event.data.text() : "" };
+  }
+  const url = typeof data.url === "string" ? data.url : "/staff/messages";
+  event.waitUntil(
+    self.registration.showNotification(data.title || "Capsule", {
+      body: data.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      tag: data.tag || "capsule-chat",
+      renotify: true,
+      data: { url },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = new URL(
+    (event.notification.data && event.notification.data.url) ||
+      "/staff/messages",
+    self.location.origin,
+  ).href;
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+      });
+      for (const client of windows) {
+        if (new URL(client.url).origin !== self.location.origin) continue;
+        await client.focus();
+        if ("navigate" in client) {
+          try {
+            await client.navigate(target);
+            return;
+          } catch {
+            // Fall through: the page moves itself.
+          }
+        }
+        client.postMessage({ type: "capsule:navigate", url: target });
+        return;
+      }
+      await self.clients.openWindow(target);
+    })(),
+  );
+});
+
+// The push service rotated the subscription: subscribe again with the same
+// server key and let an open page re-register the new endpoint (the worker
+// itself has no sign-in to talk to Convex with).
+self.addEventListener("pushsubscriptionchange", (event) => {
+  event.waitUntil(
+    (async () => {
+      const old = event.oldSubscription;
+      const key = old && old.options ? old.options.applicationServerKey : null;
+      if (!key) return;
+      await self.registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: key,
+      });
+      const windows = await self.clients.matchAll({ type: "window" });
+      for (const client of windows) {
+        client.postMessage({ type: "capsule:push-changed" });
+      }
+    })(),
+  );
+});

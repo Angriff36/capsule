@@ -20,7 +20,7 @@
  * Attachment anywhere references them.
  */
 import { v } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 import { deleteBlobIfOrphan } from "./lib/blobs";
@@ -218,6 +218,13 @@ export const sendWithFiles = mutation({
     }
     if (Object.keys(patch).length > 0) {
       await ctx.db.patch(message._id, patch);
+    }
+    // Web push for the recipient / the people mentioned — after this
+    // transaction commits, never on a replay (the first attempt already did).
+    if (!replay) {
+      await ctx.scheduler.runAfter(0, internal.teamChatPushSend.deliver, {
+        messageId: message._id,
+      });
     }
     return { docId };
   },
