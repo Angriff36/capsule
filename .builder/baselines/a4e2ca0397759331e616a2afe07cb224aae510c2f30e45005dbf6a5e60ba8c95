@@ -852,15 +852,11 @@ export const listChatNotifyPreference = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__row.ownerId == null) || (__row.ownerId === user.id)))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("chatNotifyPreferences").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     const __plainRows = rows;
-    const __visibleRows: any[] = [];
-    for (const __row of __plainRows) {
-      if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__row.ownerId == null) || (__row.ownerId === user.id)))) continue;
-      __visibleRows.push(__row);
-    }
-    return __visibleRows;
+    return __plainRows;
   },
 });
 
@@ -869,13 +865,13 @@ export const getChatNotifyPreference = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__row.ownerId == null) || (__row.ownerId === user.id)))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = __rawDoc;
-    if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__doc.ownerId == null) || (__doc.ownerId === user.id)))) return null;
     return __doc;
   },
 });
@@ -885,16 +881,12 @@ export const listChatNotifyPreferenceByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__row.ownerId == null) || (__row.ownerId === user.id)))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("chatNotifyPreferences").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     const __plainRows = rows;
-    const __visibleRows: any[] = [];
-    for (const __row of __plainRows) {
-      if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__row.ownerId == null) || (__row.ownerId === user.id)))) continue;
-      __visibleRows.push(__row);
-    }
-    return __visibleRows;
+    return __plainRows;
   },
 });
 
@@ -903,17 +895,13 @@ export const listChatNotifyPreferenceByOwnerId = query({
   handler: async (ctx, { ownerId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
+    if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__row.ownerId == null) || (__row.ownerId === user.id)))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("chatNotifyPreferences").withIndex("by_ownerId", (q) => q.eq("ownerId", ownerId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     const __plainRows = rows;
-    const __visibleRows: any[] = [];
-    for (const __row of __plainRows) {
-      if (!__allowsRead("chatNotifyPreferenceRead", "ChatNotifyPreference", () => ((__row.ownerId == null) || (__row.ownerId === user.id)))) continue;
-      __visibleRows.push(__row);
-    }
-    return __visibleRows;
+    return __plainRows;
   },
 });
 

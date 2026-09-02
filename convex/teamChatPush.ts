@@ -10,7 +10,11 @@
  */
 import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
-import { internalMutation, internalQuery } from "./_generated/server";
+import {
+  internalMutation,
+  internalQuery,
+  type QueryCtx,
+} from "./_generated/server";
 import { live, tenantEvent, tenantPerson } from "./lib/teamChatRead";
 
 /** A push older than this when the action finally runs is not worth sending. */
@@ -44,6 +48,20 @@ export type PushJob = {
   readonly targets: readonly PushTarget[];
   readonly payload: PushPayload;
 };
+
+/** The recipient's account-level opt-in (ChatNotifyPreference); default off. */
+async function wantsPush(
+  ctx: QueryCtx,
+  tenantId: string,
+  authSubjectId: string,
+): Promise<boolean> {
+  const rows = await ctx.db
+    .query("chatNotifyPreferences")
+    .withIndex("by_ownerId", (q) => q.eq("ownerId", authSubjectId))
+    .take(10);
+  const row = rows.find((r) => r.tenantId === tenantId);
+  return row?.enabled === true;
+}
 
 function displayName(person: Doc<"people"> | null): string {
   if (!person) return "A teammate";
@@ -111,6 +129,10 @@ export const buildPushJob = internalQuery({
       if (!person || !person.authSubjectId || person.status !== "active") {
         continue;
       }
+      // Their ACCOUNT preference gates delivery, so turning notifications off
+      // stops every device at once — even ones that have not reopened the app
+      // to drop their subscription yet.
+      if (!(await wantsPush(ctx, tenantId, person.authSubjectId))) continue;
       // Newest first, LIVE rows only, bounded by the walk cap: soft-deleted
       // rows from resets or disables must not push a live device off a take().
       let picked = 0;
