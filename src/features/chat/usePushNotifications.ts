@@ -314,6 +314,8 @@ export function usePushNotifications(): PushState {
       await setPreference({ enabled: true });
       await subscribeThisDevice(true);
     } catch (cause) {
+      // Failed: fall back to the real server value so the UI cannot stick "on".
+      setOptimistic(null);
       setError(
         cause instanceof Error && cause.message
           ? cause.message
@@ -350,6 +352,8 @@ export function usePushNotifications(): PushState {
       await setPreference({ enabled: false });
       await unsubscribeThisDevice();
     } catch (cause) {
+      // Failed: fall back to the real server value so the UI cannot stick "off".
+      setOptimistic(null);
       setError(
         cause instanceof Error && cause.message
           ? cause.message
