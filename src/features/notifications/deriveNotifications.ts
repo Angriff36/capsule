@@ -242,23 +242,28 @@ export function deriveNotifications(
   }
 
   // Only the rows the thread can show and mark read: the newest
-  // DM_THREAD_LIMIT per sender. An older unread row would notify forever.
-  const bySender = new Map<string, Doc<"staffMessages">[]>();
+  // DM_THREAD_LIMIT of the PAIR — sent and received together, exactly the
+  // window listChannel renders. A received row older than that window would
+  // notify forever, because opening the thread can never reach it.
+  const byPartner = new Map<string, Doc<"staffMessages">[]>();
   for (const message of src.staffMessages ?? []) {
-    if (
-      src.currentAuthSubjectId == null ||
-      message.recipientAuthSubjectId !== src.currentAuthSubjectId ||
-      message.deletedAt != null
-    ) {
+    if (src.currentAuthSubjectId == null || message.deletedAt != null) {
       continue;
     }
-    const key = message.senderPersonId as string;
-    const list = bySender.get(key);
+    const partner =
+      message.recipientAuthSubjectId === src.currentAuthSubjectId
+        ? (message.senderPersonId as string)
+        : message.senderAuthSubjectId === src.currentAuthSubjectId &&
+            message.recipientPersonId != null
+          ? (message.recipientPersonId as string)
+          : null;
+    if (partner == null) continue;
+    const list = byPartner.get(partner);
     if (list) list.push(message);
-    else bySender.set(key, [message]);
+    else byPartner.set(partner, [message]);
   }
   const visibleDm = new Set<string>();
-  for (const list of bySender.values()) {
+  for (const list of byPartner.values()) {
     list.sort((a, b) => b._creationTime - a._creationTime);
     for (const message of list.slice(0, DM_THREAD_LIMIT)) {
       visibleDm.add(message._id as string);

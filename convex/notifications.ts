@@ -18,7 +18,7 @@
 // generated as non-exported locals, so the role → capability map is mirrored
 // here (same pattern as sourceProvenance.ts / hiringPipeline.ts). Keep in
 // sync with src/foundation/base.manifest if a role grant moves.
-import type { Id } from "./_generated/dataModel";
+import type { Doc, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
@@ -168,30 +168,50 @@ export const listNotifications = query({
           .collect(),
       ),
       // Team chat made staffMessages a high-volume table, so this is no
-      // longer a tenant-wide collect: unread DMs come from the caller's own
-      // recipient index walked back through the 90-day retention window,
-      // @mentions from the newest channel traffic (the mention window is
-      // seven days). Merged and de-duplicated below.
+      // longer a tenant-wide collect: the caller's direct messages — received
+      // AND sent, so the tray sees the same newest-400-per-pair window the
+      // thread shows — come from the caller's own person indexes walked back
+      // through the 90-day retention window; @mentions from the newest
+      // channel traffic (the mention window is seven days). Merged and
+      // de-duplicated below.
       when(can(auth, "staffAccess"), async () => {
-        const receivedInWindow = async () => {
-          if (!auth.personId) return [];
-          const since = Date.now() - MESSAGE_RETENTION_MS;
-          const out = [];
-          const range = ctx.db
-            .query("staffMessages")
-            .withIndex("by_recipientPersonId", (q) =>
-              q.eq("recipientPersonId", auth.personId as Id<"people">),
-            )
-            .order("desc");
+        const since = Date.now() - MESSAGE_RETENTION_MS;
+        const walk = async (
+          range: AsyncIterable<Doc<"staffMessages">>,
+          keep: (row: Doc<"staffMessages">) => boolean,
+        ) => {
+          const out: Doc<"staffMessages">[] = [];
           for await (const row of range) {
             if ((row.createdAt ?? row._creationTime) < since) break;
-            out.push(row);
+            if (keep(row)) out.push(row);
             if (out.length >= RECEIVED_CAP) break;
           }
           return out;
         };
-        const [received, recent] = await Promise.all([
-          receivedInWindow(),
+        const me = auth.personId as Id<"people"> | null;
+        const [received, sent, recent] = await Promise.all([
+          me
+            ? walk(
+                ctx.db
+                  .query("staffMessages")
+                  .withIndex("by_recipientPersonId", (q) =>
+                    q.eq("recipientPersonId", me),
+                  )
+                  .order("desc"),
+                () => true,
+              )
+            : [],
+          me
+            ? walk(
+                ctx.db
+                  .query("staffMessages")
+                  .withIndex("by_senderPersonId", (q) =>
+                    q.eq("senderPersonId", me),
+                  )
+                  .order("desc"),
+                (row) => row.recipientPersonId != null,
+              )
+            : [],
           ctx.db
             .query("staffMessages")
             .withIndex("by_tenantId", byTenant)
@@ -199,7 +219,7 @@ export const listNotifications = query({
             .take(MESSAGE_TAKE),
         ]);
         const seen = new Set<string>();
-        return [...received, ...recent].filter((row) => {
+        return [...received, ...sent, ...recent].filter((row) => {
           if (row.tenantId !== tenantId || seen.has(String(row._id))) {
             return false;
           }

@@ -61,6 +61,18 @@ export const sendWithFiles = mutation({
     if (text.length === 0 && args.files.length === 0) {
       throw new Error("Message text or a file is required");
     }
+    // Every file must be a real, uploaded blob before anything is written:
+    // a message must never claim a file that does not exist, and a wrong-table
+    // id must never reach the channel query's URL hydration.
+    for (const file of args.files) {
+      const storageId = ctx.db.system.normalizeId("_storage", file.storageId);
+      const blob = storageId ? await ctx.db.system.get(storageId) : null;
+      if (!blob) {
+        throw new Error(
+          `The upload for ${file.fileName} is missing. Attach it again.`,
+        );
+      }
+    }
 
     // Scoped: another caller's (or tenant's) identical draft key can never
     // resolve to this message, and vice versa.

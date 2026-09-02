@@ -7,7 +7,6 @@
  * in use — an event document, another message's photo, a dish image — by
  * naming its storage id.
  */
-import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 
 export async function blobReferenced(
@@ -40,9 +39,11 @@ export async function deleteBlobIfOrphan(
   ctx: MutationCtx,
   storageId: string,
 ): Promise<boolean> {
+  const id = ctx.db.system.normalizeId("_storage", storageId);
+  if (!id) return false;
   if (await blobReferenced(ctx, storageId)) return false;
-  const blob = await ctx.db.system.get(storageId as Id<"_storage">);
+  const blob = await ctx.db.system.get(id);
   if (!blob) return false;
-  await ctx.storage.delete(storageId as Id<"_storage">);
+  await ctx.storage.delete(id);
   return true;
 }
