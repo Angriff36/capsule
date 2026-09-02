@@ -168,21 +168,24 @@ export async function attachmentsFor(
   message: Doc<"staffMessages">,
 ): Promise<ChatAttachmentView[]> {
   if ((message.attachmentCount ?? 0) <= 0) return [];
-  // Ascending and bounded: the sender attaches right after sending, so its
-  // rows are the earliest; a later row someone else parks on this message id
-  // can neither hide them nor grow this read.
+  if (!message.senderAuthSubjectId) return [];
+  // Parent AND uploader through the composite index: a row someone else
+  // parks on this message id is never read. Bounded (a message carries at
+  // most 20 files); ascending so the send order is kept.
   const rows = await ctx.db
     .query("attachments")
-    .withIndex("by_parentId", (q) => q.eq("parentId", String(message._id)))
+    .withIndex("by_parentId_and_uploadedById", (q) =>
+      q
+        .eq("parentId", String(message._id))
+        .eq("uploadedById", message.senderAuthSubjectId),
+    )
     .order("asc")
     .take(ATTACHMENT_SCAN);
   const mine = rows.filter(
     (row) =>
       row.parentType === "staffMessage" &&
       row.tenantId === tenantId &&
-      live(row) &&
-      row.uploadedById != null &&
-      row.uploadedById === message.senderAuthSubjectId,
+      live(row),
   );
   return Promise.all(
     mine.map(async (row) => ({

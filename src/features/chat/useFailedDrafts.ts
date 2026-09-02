@@ -23,6 +23,10 @@ const store = new Map<string, ChatComposerDraft[]>();
 const listeners = new Set<(channelKey: string) => void>();
 
 function mergeAll(items: readonly ChatComposerDraft[]): ChatComposerDraft {
+  // Two merged attempts are a new operation: no key carries over, so the
+  // retry cannot be de-duplicated against either original. A single item
+  // keeps its key.
+  if (items.length === 1) return items[0]!;
   return items.reduce((older, newer) => ({
     text: restoreDraftText(older.text, newer.text),
     files: restoreDraftFiles(older.files, newer.files),

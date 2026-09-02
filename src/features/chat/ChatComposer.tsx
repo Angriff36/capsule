@@ -67,6 +67,10 @@ export function ChatComposer({
   const pendingCaretRef = useRef<number | null>(null);
   const submittingRef = useRef(false);
   const nextFileKeyRef = useRef(0);
+  /** Idempotency key of a restored draft, reused by its next send attempt. */
+  const draftKeyRef = useRef<string | null>(
+    initialDraft?.idempotencyKey ?? null,
+  );
 
   // Files from another composer instance are re-keyed against this
   // instance's counter so a newly attached file can never share a key.
@@ -173,6 +177,7 @@ export function ChatComposer({
     }
     consumedRestoreRef.current = restoreDraft.token;
     const failed = restoreDraft.draft;
+    if (failed.idempotencyKey) draftKeyRef.current = failed.idempotencyKey;
     setText((current) => restoreDraftText(failed.text, current));
     setFiles((current) => restoreDraftFiles(rekey(failed.files), current));
     setLinks((current) => restoreDraftLinks(failed.links, current));
@@ -199,7 +204,17 @@ export function ChatComposer({
   const submit = async () => {
     if (!canSend || submittingRef.current) return;
     submittingRef.current = true;
-    const draft: ChatComposerDraft = { text, files, links, mentions };
+    // The same draft retried after a failure reuses its key, so a first
+    // attempt that committed but lost its response is not sent twice.
+    const idempotencyKey = draftKeyRef.current ?? crypto.randomUUID();
+    draftKeyRef.current = null;
+    const draft: ChatComposerDraft = {
+      text,
+      files,
+      links,
+      mentions,
+      idempotencyKey,
+    };
     const body = [
       trimmed,
       ...links.map((link) => chatLinkToken(link.kind, link.id, link.label)),
@@ -221,6 +236,7 @@ export function ChatComposer({
         files: draft.files.map((pending) => pending.file),
         mentionedPersonIds: draft.mentions.map((mention) => mention.personId),
         draft,
+        idempotencyKey,
       });
     } catch {
       // The caller renders `error`. If this composer is already gone (the
@@ -230,6 +246,7 @@ export function ChatComposer({
         onDraftOrphaned?.(draft);
         return;
       }
+      draftKeyRef.current = draft.idempotencyKey ?? null;
       setText((current) => restoreDraftText(draft.text, current));
       setFiles((current) => restoreDraftFiles(draft.files, current));
       setLinks((current) => restoreDraftLinks(draft.links, current));

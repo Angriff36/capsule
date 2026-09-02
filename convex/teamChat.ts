@@ -47,8 +47,8 @@ const EVENT_SCAN = 400;
 const EVENT_CANDIDATES = 80;
 /** Messages hydrated concurrently (each up to 20 attachment URL lookups). */
 const HYDRATE_BATCH = 16;
-/** Rows one rail channel may walk (own/removed rows past this read as "50+"). */
-const RAIL_WALK_CAP = 150;
+/** LIVE rows one rail channel examines (own rows past this read as "50+"). */
+const RAIL_LIVE_CAP = 150;
 /**
  * Rows the whole rail may walk across its channels; with the DM walks (2 ×
  * 4000), the events page and the cursor reads it stays well under Convex's
@@ -270,16 +270,16 @@ export const listConversations = query({
         }
         continue;
       }
-      // Newest first, live rows only, stopping at the cursor: unread rows
-      // behind own or removed rows are still counted (up to the walk cap),
-      // and a removed burst cannot hide a live channel.
+      // Newest first, live rows only, stopping at the cursor. Removed rows
+      // spend only the shared physical budget, never the live cap, so a
+      // removed burst cannot hide a live channel or its unread rows.
       const scan = await scanChannel(ctx, tenantId, event._id, {
         since: args.since,
         readUpTo,
         me,
         stopAtCursor: true,
-        countLimit: MAX_THREAD_MESSAGES,
-        walkCap: Math.min(RAIL_WALK_CAP, budget),
+        countLimit: RAIL_LIVE_CAP,
+        walkCap: budget,
       });
       budget -= scan.walked;
       const newest = scan.newest;

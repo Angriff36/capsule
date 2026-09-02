@@ -20,6 +20,8 @@ export type ChatComposerSubmit = {
   readonly mentionedPersonIds: readonly string[];
   /** The raw draft, so a caller can keep it if the composer unmounts before a failure. */
   readonly draft: ChatComposerDraft;
+  /** Stable for this draft across retries; the server de-duplicates on it. */
+  readonly idempotencyKey: string;
 };
 
 export type ChatComposerProps = {

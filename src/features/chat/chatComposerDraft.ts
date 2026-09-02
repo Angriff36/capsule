@@ -7,6 +7,12 @@ export type ChatComposerDraft = {
   readonly files: readonly ChatPendingFile[];
   readonly links: readonly ChatComposerLink[];
   readonly mentions: readonly ChatComposerPerson[];
+  /**
+   * Set on the first send attempt and kept through a failure, so a retry of
+   * the same draft is the same server operation (no duplicate message when
+   * the first attempt committed but its response was lost).
+   */
+  readonly idempotencyKey?: string;
 };
 
 /**

@@ -67,8 +67,13 @@ export async function scanChannel(
     readUpTo: number;
     me: Id<"people"> | null;
     stopAtCursor: boolean;
+    /** Live rows examined before the count reads as capped. */
     countLimit: number;
-    /** Rows walked before giving up; defaults to CHANNEL_WALK_CAP. */
+    /**
+     * Rows walked, live or not, before giving up — the caller's physical
+     * budget for Convex's document limits; defaults to CHANNEL_WALK_CAP.
+     * Removed rows spend only this, never the live-row limits.
+     */
     walkCap?: number;
   },
 ): Promise<ChannelScan> {

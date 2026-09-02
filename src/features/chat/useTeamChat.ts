@@ -2,9 +2,6 @@ import { useConvex, useMutation, useQuery } from "convex/react";
 import { useCallback, useMemo } from "react";
 import { api } from "../../lib/api";
 import {
-  useAttachmentRemove,
-  useCreateAttachment,
-  useCreateStaffMessage,
   useListPerson,
   useStaffMessageEdit,
   useStaffMessageMarkRead,
@@ -122,35 +119,26 @@ export function useChatRecordSearch(): (
 type UploadedFile = { file: File; storageId: string };
 
 /**
- * Upload every file, create the message, then attach the files to it.
- * Uploads run first so a failed upload never leaves a half message behind.
- * If any attach fails, the rows that did attach and the message are taken
- * back and the send rejects, so the composer restores the draft for a clean
- * retry. Only when that rollback itself fails does the call resolve — with a
- * warning naming the files the sent message is missing — because the
- * message is then really there and a restored draft would duplicate it.
+ * Upload every file, then commit the message AND its attachment rows in one
+ * server transaction (convex/teamChatSend.ts), keyed by the draft's
+ * idempotency key so a retry after a lost response is the same message.
+ * Blobs uploaded for a send that does not commit are discarded again.
  */
 export function useSendChatMessage() {
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
   const discardUploads = useMutation(api.fileStorage.discardOrphanUploads);
-  const send = useCreateStaffMessage();
-  const attach = useCreateAttachment();
-  const removeAttachment = useAttachmentRemove();
-  const remove = useStaffMessageRemove();
+  const sendWithFiles = useMutation(api.teamChatSend.sendWithFiles);
 
   return useCallback(
-    async (
-      channel: ChatChannel,
-      submit: ChatComposerSubmit,
-    ): Promise<string | null> => {
+    async (channel: ChatChannel, submit: ChatComposerSubmit): Promise<void> => {
       if (submit.files.length > CHAT_MAX_FILES) {
         throw new Error(
           `A message can carry up to ${CHAT_MAX_FILES} files. Send this one with fewer, then attach the rest.`,
         );
       }
       const uploaded: UploadedFile[] = [];
-      // Blobs uploaded for a send that does not complete are deleted again
-      // (best effort) so nothing unreferenced is left in storage.
+      // Blobs uploaded for a send that does not commit are deleted again
+      // (best effort); the discard keeps any blob a live row references.
       const discard = () =>
         uploaded.length === 0
           ? Promise.resolve()
@@ -192,73 +180,29 @@ export function useSendChatMessage() {
         channel.kind === "event"
           ? { eventId: channel.eventId }
           : { recipientPersonId: channel.personId };
-      let result: { docId?: string } | null;
       try {
-        result = (await send({
+        await sendWithFiles({
           ...target,
           body: submit.body,
-          attachmentCount: uploaded.length,
           ...(submit.mentionedPersonIds.length > 0
             ? { mentionedPersonIds: submit.mentionedPersonIds.join(",") }
             : {}),
-        })) as { docId?: string } | null;
-      } catch (cause) {
-        await discard();
-        throw cause;
-      }
-      const docId = result?.docId;
-      if (!docId) {
-        await discard();
-        throw new Error("The message was not created.");
-      }
-
-      const failed: string[] = [];
-      const attached: string[] = [];
-      for (const { file, storageId } of uploaded) {
-        try {
-          const row = (await attach({
-            parentType: "staffMessage",
-            parentId: docId,
+          files: uploaded.map(({ file, storageId }) => ({
+            storageId,
             fileName: file.name,
             contentType: file.type || "application/octet-stream",
             fileSize: file.size,
-            storageId,
-            idempotencyKey: `${docId}:${storageId}`,
-          })) as { docId?: string } | null;
-          if (row?.docId) attached.push(row.docId);
-        } catch {
-          failed.push(file.name);
-        }
-      }
-      if (failed.length === 0) return null;
-
-      // Roll back the message FIRST. If that fails the message stays, so its
-      // successful files must stay with it; only after the message is gone
-      // are its orphaned attachment rows tidied (best effort).
-      const files = `${failed.length === 1 ? "a file" : `${failed.length} files`} (${failed.join(", ")})`;
-      try {
-        await remove({ docId });
-      } catch {
-        // The message stays with the files that did attach; the blobs of the
-        // files that did not are unreferenced — drop them (the discard keeps
-        // every blob a live row still points at).
+          })),
+          idempotencyKey: submit.idempotencyKey,
+        });
+      } catch (cause) {
+        // Nothing committed (or the commit is unknown: a retry with the same
+        // key resolves it). Blobs a committed row references are kept.
         await discard();
-        return `The message was sent without ${files}. Attach ${
-          failed.length === 1 ? "it" : "them"
-        } again in a new message.`;
+        throw cause;
       }
-      await Promise.all(
-        attached.map((attachmentId) =>
-          removeAttachment({ docId: attachmentId }).catch(() => undefined),
-        ),
-      );
-      // The message is gone and its rows are removed: the blobs are orphans.
-      await discard();
-      throw new Error(
-        `Could not attach ${files}, so nothing was sent. Try again.`,
-      );
     },
-    [attach, discardUploads, generateUploadUrl, remove, removeAttachment, send],
+    [discardUploads, generateUploadUrl, sendWithFiles],
   );
 }
 

@@ -79,13 +79,8 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
     setError(null);
     setSending(true);
     try {
-      const warning = await sendMessage(channel, submit);
-      if (channelRef.current === sentFrom) {
-        setPinSignal((n) => n + 1);
-        if (warning) setError(warning);
-      } else if (warning) {
-        pendingNotices.current.set(sentFrom, warning);
-      }
+      await sendMessage(channel, submit);
+      if (channelRef.current === sentFrom) setPinSignal((n) => n + 1);
     } catch (cause) {
       const reason =
         cause instanceof Error ? cause.message : "The message was not sent.";

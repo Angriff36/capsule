@@ -33,3 +33,8 @@ projections:
         StaffChatReadCursor:
           - fields: [channelKey, authSubjectId]
             name: by_channelKey_and_authSubjectId
+        # Team-chat files: the seam reads a message's attachments by parent AND
+        # uploader, so a row someone else parks on the message id is never read.
+        Attachment:
+          - fields: [parentId, uploadedById]
+            name: by_parentId_and_uploadedById

@@ -94,6 +94,7 @@ import type * as staffSelfReviews from "../staffSelfReviews.js";
 import type * as stripeConnect from "../stripeConnect.js";
 import type * as teamChat from "../teamChat.js";
 import type * as teamChatCursor from "../teamChatCursor.js";
+import type * as teamChatSend from "../teamChatSend.js";
 import type * as tppParser from "../tppParser.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
@@ -192,6 +193,7 @@ declare const fullApi: ApiFromModules<{
   stripeConnect: typeof stripeConnect;
   teamChat: typeof teamChat;
   teamChatCursor: typeof teamChatCursor;
+  teamChatSend: typeof teamChatSend;
   tppParser: typeof tppParser;
   vehicleAssignment: typeof vehicleAssignment;
   webhookIntegrations: typeof webhookIntegrations;
