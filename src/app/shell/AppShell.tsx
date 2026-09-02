@@ -5,7 +5,6 @@ import { WifiOffIcon } from "../../ui/icons";
 import { AnnouncementBanner } from "../../features/announcements/AnnouncementBanner";
 import { ActionResultHost } from "../../ui/action-result";
 import { CommandPalette } from "./CommandPalette";
-import { MobileTabBar } from "./MobileTabBar";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
 import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
@@ -82,7 +81,6 @@ export function AppShell() {
               </RouteErrorBoundary>
             </div>
           </main>
-          <MobileTabBar />
         </div>
       </div>
       <CommandPalette

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { MobileTabBar } from "../../app/shell/MobileTabBar";
 import { formatDate } from "../../lib/format";
 import { CheckIcon, WifiOffIcon } from "../../ui/icons";
 import { PageHeader } from "../../ui/primitives";
@@ -61,8 +60,6 @@ export function MyDayFrame({
         <PageHeader title="My Day" lead={identityLead} />
         {children}
       </main>
-      {/* Same phone navigation as AppShell; this route lives outside it. */}
-      <MobileTabBar />
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
 import { ChevronDownIcon } from "../../ui/icons";
+import { useDismissibleMenu } from "../../ui/useDismissibleMenu";
 import {
   CHAT_ACCENTS,
   CHAT_APPEARANCE_DEFAULT,
@@ -14,31 +14,7 @@ import "./chat.css";
  */
 export function ChatAppearanceMenu() {
   const { layout, accent, set, reset } = useChatAppearance();
-  const detailsRef = useRef<HTMLDetailsElement>(null);
-
-  // <details> never closes itself: outside pointer or Esc closes it.
-  useEffect(() => {
-    const details = detailsRef.current;
-    if (!details) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!details.open) return;
-      if (event.target instanceof Node && details.contains(event.target))
-        return;
-      details.open = false;
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && details.open) {
-        details.open = false;
-        (details.querySelector("summary") as HTMLElement | null)?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, []);
+  const detailsRef = useDismissibleMenu();
 
   const isDefault =
     layout === CHAT_APPEARANCE_DEFAULT.layout &&
