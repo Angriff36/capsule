@@ -176,15 +176,18 @@ export const listNotifications = query({
       // de-duplicated below.
       when(can(auth, "staffAccess"), async () => {
         const since = Date.now() - MESSAGE_RETENTION_MS;
+        // Bounded by rows VISITED, not rows kept: a sender's index range also
+        // holds their channel messages, and this runs on every page.
         const walk = async (
           range: AsyncIterable<Doc<"staffMessages">>,
           keep: (row: Doc<"staffMessages">) => boolean,
         ) => {
           const out: Doc<"staffMessages">[] = [];
+          let visited = 0;
           for await (const row of range) {
+            if (++visited > RECEIVED_CAP) break;
             if ((row.createdAt ?? row._creationTime) < since) break;
             if (keep(row)) out.push(row);
-            if (out.length >= RECEIVED_CAP) break;
           }
           return out;
         };

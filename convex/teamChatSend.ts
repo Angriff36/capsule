@@ -75,12 +75,16 @@ export const sendWithFiles = mutation({
     }
 
     // Scoped: another caller's (or tenant's) identical draft key can never
-    // resolve to this message, and vice versa.
-    const scope = `${auth.tenantId}:${auth.id}:teamChat:${draftKey}`;
+    // resolve to this message, and vice versa. The fixed kind segment comes
+    // BEFORE the caller's key and the key is last, so a draft key that happens
+    // to end in ":file:0" can never collide with another message's file key.
+    const prefix = `${auth.tenantId}:${auth.id}:teamChat`;
+    const messageKey = `${prefix}:message:${draftKey}`;
+    const fileKey = (index: number) => `${prefix}:file:${index}:${draftKey}`;
     const replay =
       (await ctx.db
         .query("commandIdempotencyKeys")
-        .withIndex("by_key", (q) => q.eq("key", scope))
+        .withIndex("by_key", (q) => q.eq("key", messageKey))
         .first()) !== null;
 
     const created = (await ctx.runMutation(
@@ -94,7 +98,7 @@ export const sendWithFiles = mutation({
         ...(args.mentionedPersonIds
           ? { mentionedPersonIds: args.mentionedPersonIds }
           : {}),
-        idempotencyKey: scope,
+        idempotencyKey: messageKey,
       },
     )) as { docId?: string } | null;
     const docId = created?.docId;
@@ -131,7 +135,7 @@ export const sendWithFiles = mutation({
         contentType: file.contentType || "application/octet-stream",
         fileSize: file.fileSize,
         storageId: file.storageId,
-        idempotencyKey: `${scope}:file:${index}`,
+        idempotencyKey: fileKey(index),
       });
     }
 

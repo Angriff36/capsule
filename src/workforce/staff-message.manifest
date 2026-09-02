@@ -59,13 +59,15 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
   constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
 
-  // A DM party is identified by Person (the same rule the chat seam uses), so a
-  // teammate who links a sign-in after the message was sent still owns it.
+  // A DM party is identified ONLY by Person — the caller's current linked
+  // profile (the same rule the chat seam uses). The copied auth subjects are
+  // never an authorization: a sign-in that was moved to another Person would
+  // otherwise keep reading the old Person's messages.
   // `senderAuthSubjectId == null and senderPersonId == null` is the creation
   // draft only (createVia checks this policy against the draft before the
   // sender is stamped); a stored row always has both, so no persisted DM is
   // ever readable through this branch.
-  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or (self.senderAuthSubjectId == null and self.senderPersonId == null) or (user.id != null and (self.senderAuthSubjectId == user.id or self.recipientAuthSubjectId == user.id)) or (user.personId != null and (self.senderPersonId == user.personId or self.recipientPersonId == user.personId))) "Staff may read channel messages and their own direct messages"
+  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or (self.senderAuthSubjectId == null and self.senderPersonId == null) or (user.personId != null and (self.senderPersonId == user.personId or self.recipientPersonId == user.personId))) "Staff may read channel messages and their own direct messages"
   default policy staffMessageWrite write: roleAllows(user.role, "staffAccess") "Staff may write staff messages through commands"
   default policy staffMessageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute staff message commands"
 
@@ -135,7 +137,8 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   command edit(body: string, optional mentionedPersonIds: string) {
     guard self.deletedAt == null
     guard user.id != null
-    guard self.senderAuthSubjectId != null and self.senderAuthSubjectId == user.id
+    // The author is the current linked Person, never the copied sign-in.
+    guard user.personId != null and self.senderPersonId == user.personId
     constraint editBodyOrFiles: length(trim(body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
     mutate body = body
     // Omitting the mention list keeps the existing one (and its notifications).
@@ -152,7 +155,7 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   command remove() {
     guard self.deletedAt == null
     guard user.id != null
-    guard (self.senderAuthSubjectId != null and self.senderAuthSubjectId == user.id) or roleAllows(user.role, "manageAccess")
+    guard (user.personId != null and self.senderPersonId == user.personId) or roleAllows(user.role, "manageAccess")
     mutate deletedAt = now()
     emit StaffMessageRemoved {
       staffMessageId: self.id
