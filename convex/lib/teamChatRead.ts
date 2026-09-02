@@ -161,7 +161,10 @@ export async function tenantEvent(
   tenantId: string,
   id: string,
 ): Promise<Doc<"events"> | null> {
-  const doc = await ctx.db.get(id as Id<"events">);
+  // Ids arrive from URL query parameters: a malformed one or another table's
+  // id must read as "not available", never throw or fetch the wrong row.
+  const eventId = ctx.db.normalizeId("events", id);
+  const doc = eventId ? await ctx.db.get(eventId) : null;
   if (!doc || doc.tenantId !== tenantId || !live(doc)) return null;
   return doc;
 }
@@ -171,7 +174,8 @@ export async function tenantPerson(
   tenantId: string,
   id: string,
 ): Promise<Doc<"people"> | null> {
-  const doc = await ctx.db.get(id as Id<"people">);
+  const personId = ctx.db.normalizeId("people", id);
+  const doc = personId ? await ctx.db.get(personId) : null;
   if (!doc || doc.tenantId !== tenantId || !live(doc)) return null;
   return doc;
 }

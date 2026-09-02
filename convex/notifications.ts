@@ -222,7 +222,11 @@ export const listNotifications = query({
             .take(MESSAGE_TAKE),
         ]);
         const seen = new Set<string>();
-        return [...received, ...sent, ...recent].filter((row) => {
+        // The tenant-wide sample serves @mentions only, so it carries channel
+        // rows alone: the caller's direct messages come from their own person
+        // walks, never from a sample that could hold someone else's DM.
+        const channelRecent = recent.filter((row) => row.eventId != null);
+        return [...received, ...sent, ...channelRecent].filter((row) => {
           if (row.tenantId !== tenantId || seen.has(String(row._id))) {
             return false;
           }
@@ -296,7 +300,8 @@ export const listNotifications = query({
       }
       await Promise.all(
         [...ids].map(async (id) => {
-          const event = await ctx.db.get(id as Id<"events">);
+          const eventId = ctx.db.normalizeId("events", id);
+          const event = eventId ? await ctx.db.get(eventId) : null;
           if (event && event.tenantId === tenantId && event.deletedAt == null) {
             mentionEventTitles[id] = String(event.title ?? "Untitled event");
           }

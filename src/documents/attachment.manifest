@@ -89,6 +89,11 @@ entity Attachment mixin TenantScoped, SoftDeletable {
     storageId: string,
     optional evidenceType: AttachmentEvidenceType
   ) {
+    // Creation only: the generator also emits an instance form of every
+    // command, and re-running attach on a stored row would re-parent someone's
+    // file (for example into the chat-only parent type, which the generated
+    // API never shows). A stored row always has its uploader.
+    guard self.uploadedById == null "Files are attached once; remove the attachment and add the file again to change it"
     constraint attachParent: length(trim(parentId)) > 0 "Parent record is required"
     constraint attachFileName: length(trim(fileName)) > 0 "File name is required"
     constraint attachStorage: length(trim(storageId)) > 0 "Stored file reference is required"

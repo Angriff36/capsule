@@ -241,19 +241,29 @@ export function deriveNotifications(
     });
   }
 
+  // The caller's identity for chat is their CURRENT linked Person — the
+  // same rule as the StaffMessage read policy. The auth subjects copied onto
+  // rows are routing data, never a party test: a sign-in moved to another
+  // Person must not see the old Person's conversations.
+  const myPersonId =
+    src.currentAuthSubjectId == null
+      ? null
+      : (((src.people ?? []).find(
+          (p) =>
+            p.authSubjectId === src.currentAuthSubjectId && p.deletedAt == null,
+        )?._id as string | undefined) ?? null);
+
   // Only the rows the thread can show and mark read: the newest
   // DM_THREAD_LIMIT of the PAIR — sent and received together, exactly the
   // window listChannel renders. A received row older than that window would
   // notify forever, because opening the thread can never reach it.
   const byPartner = new Map<string, Doc<"staffMessages">[]>();
   for (const message of src.staffMessages ?? []) {
-    if (src.currentAuthSubjectId == null || message.deletedAt != null) {
-      continue;
-    }
+    if (myPersonId == null || message.deletedAt != null) continue;
     const partner =
-      message.recipientAuthSubjectId === src.currentAuthSubjectId
+      (message.recipientPersonId as string | null | undefined) === myPersonId
         ? (message.senderPersonId as string)
-        : message.senderAuthSubjectId === src.currentAuthSubjectId &&
+        : (message.senderPersonId as string) === myPersonId &&
             message.recipientPersonId != null
           ? (message.recipientPersonId as string)
           : null;
@@ -271,8 +281,8 @@ export function deriveNotifications(
   }
   for (const message of src.staffMessages ?? []) {
     if (
-      src.currentAuthSubjectId == null ||
-      message.recipientAuthSubjectId !== src.currentAuthSubjectId ||
+      myPersonId == null ||
+      (message.recipientPersonId as string | null | undefined) !== myPersonId ||
       !visibleDm.has(message._id as string) ||
       message.deletedAt != null ||
       message.readAt != null ||
@@ -294,13 +304,6 @@ export function deriveNotifications(
 
   // @mentions in event channels. The body is encrypted and never read here;
   // the sender stamps the mentioned Person ids alongside the message.
-  const myPersonId =
-    src.currentAuthSubjectId == null
-      ? null
-      : (((src.people ?? []).find(
-          (p) =>
-            p.authSubjectId === src.currentAuthSubjectId && p.deletedAt == null,
-        )?._id as string | undefined) ?? null);
   if (myPersonId != null) {
     const readUpTo = new Map<string, number>();
     for (const cursor of src.staffChatReadCursors ?? []) {
