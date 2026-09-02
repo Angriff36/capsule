@@ -15,6 +15,8 @@ import {
   type ChatChannel,
   type ChatLinkTarget,
   type ChatMessageView,
+  type ChatSender,
+  chatSenderKey,
 } from "./chatTypes";
 
 /**
@@ -59,11 +61,14 @@ export function useChatIdentity() {
       names.set(String(person._id), personDisplayName(person) || "Teammate");
     }
     const tenantId = status?.tenantId ?? null;
+    const sender: ChatSender | null =
+      tenantId && personId ? { tenantId, personId } : null;
     return {
       loading: status === undefined || people === undefined,
       personId,
-      /** Tenant + current Person: what an unsent draft belongs to. Null until both are known. */
-      identityKey: tenantId && personId ? `${tenantId}:${personId}` : null,
+      /** Tenant + current Person; every send and unsent draft is bound to it. Null until both are known. */
+      sender,
+      identityKey: sender ? chatSenderKey(sender) : null,
       me,
       canManage: MANAGE_ROLES.has(role) || role.endsWith("_manager"),
       roster,
@@ -133,7 +138,11 @@ export function useSendChatMessage() {
   const sendWithFiles = useMutation(api.teamChatSend.sendWithFiles);
 
   return useCallback(
-    async (channel: ChatChannel, submit: ChatComposerSubmit): Promise<void> => {
+    async (
+      channel: ChatChannel,
+      submit: ChatComposerSubmit,
+      sender: ChatSender,
+    ): Promise<void> => {
       if (submit.files.length > CHAT_MAX_FILES) {
         throw new Error(
           `A message can carry up to ${CHAT_MAX_FILES} files. Send this one with fewer, then attach the rest.`,
@@ -197,6 +206,10 @@ export function useSendChatMessage() {
             fileSize: file.size,
           })),
           idempotencyKey: submit.idempotencyKey,
+          // The server commits only if this is still the signed-in identity:
+          // a sign-in or profile change during the uploads must not send the
+          // previous person's message as the next one.
+          sender,
         });
       } catch (cause) {
         // Nothing committed (or the commit is unknown: a retry with the same

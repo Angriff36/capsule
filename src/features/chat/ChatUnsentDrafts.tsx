@@ -43,7 +43,7 @@ export function ChatUnsentDrafts({ channel, identity, onSent }: Props) {
   const retry = async (item: UnsentDraft) => {
     if (!unsentDrafts.begin(item.id)) return;
     try {
-      await sendMessage(item.channel, item.submit);
+      await sendMessage(item.channel, item.submit, item.sender);
       unsentDrafts.remove(item.id);
       if (onScreenRef.current === chatChannelKey(item.channel)) onSent?.();
     } catch (cause) {

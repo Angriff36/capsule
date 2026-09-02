@@ -68,11 +68,13 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
 
   const onSubmit = async (submit: ChatComposerSubmit) => {
     const sentFrom = channel;
-    // The draft belongs to whoever is signed in NOW; a later sign-in never sees it.
-    const sentBy = identity.identityKey ?? "anonymous";
+    // Bound to whoever is signed in NOW: the server commits only for this
+    // identity, and a failed draft belongs to it alone.
+    const sentBy = identity.sender;
+    if (!sentBy) return;
     setSending(true);
     try {
-      await sendMessage(sentFrom, submit);
+      await sendMessage(sentFrom, submit, sentBy);
       if (channelRef.current === chatChannelKey(sentFrom)) {
         setPinSignal((n) => n + 1);
       }

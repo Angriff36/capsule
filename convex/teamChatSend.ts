@@ -47,10 +47,23 @@ export const sendWithFiles = mutation({
     ),
     /** Stable per draft; a retry with the same key returns the same message. */
     idempotencyKey: v.string(),
+    /** The identity that pressed Send; the call commits only if it is still signed in. */
+    sender: v.object({ tenantId: v.string(), personId: v.string() }),
   },
   handler: async (ctx, args) => {
     const auth = await chatAuth(ctx);
     if (!auth) throw new Error("Sign in to use team chat");
+    // The uploads take time; if the account or the linked Person changed in
+    // between, this is no longer the message's author. Nothing is written.
+    if (
+      auth.tenantId !== args.sender.tenantId ||
+      !auth.personId ||
+      auth.personId !== args.sender.personId
+    ) {
+      throw new Error(
+        "Your sign-in changed while the message was being sent. Nothing was sent.",
+      );
+    }
     if (args.files.length > MAX_FILES) {
       throw new Error(`A message can carry up to ${MAX_FILES} files.`);
     }
@@ -64,6 +77,13 @@ export const sendWithFiles = mutation({
     // a message must never claim a file that does not exist, and a wrong-table
     // id must never reach the channel query's URL hydration.
     for (const file of args.files) {
+      // The same invariants Attachment.attach enforces for every other file.
+      if (file.fileName.trim().length === 0) {
+        throw new Error("File name is required");
+      }
+      if (!(file.fileSize >= 0)) {
+        throw new Error("File size cannot be negative");
+      }
       const storageId = ctx.db.system.normalizeId("_storage", file.storageId);
       const blob = storageId ? await ctx.db.system.get(storageId) : null;
       if (!blob) {

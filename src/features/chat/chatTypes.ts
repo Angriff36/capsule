@@ -96,3 +96,16 @@ export const CHAT_MAX_FILES = 20;
 /** The guard message the send command raises for an unlinked sign-in. */
 export const CHAT_UNLINKED_REASON =
   "Link your account to a staff profile before sending messages";
+
+/**
+ * Who is sending: the tenant and current linked Person at the moment Send
+ * was pressed. Travels with the send (and with an unsent draft) so the
+ * server commits only if the signed-in identity is still this one.
+ */
+export type ChatSender = {
+  readonly tenantId: string;
+  readonly personId: string;
+};
+
+export const chatSenderKey = (sender: ChatSender): string =>
+  `${sender.tenantId}:${sender.personId}`;
