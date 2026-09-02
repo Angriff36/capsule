@@ -4,6 +4,7 @@ import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { formatDate } from "../../lib/format";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
 import { ChatComposer, type ChatComposerSubmit } from "../chat/ChatComposer";
+import { ChatUnsentDrafts } from "../chat/ChatUnsentDrafts";
 import {
   ChatConversationRail,
   type ChatRailTeammate,
@@ -16,7 +17,7 @@ import {
   chatChannelKey,
 } from "../chat/chatTypes";
 import { useChannelReadMarker } from "../chat/useChannelReadMarker";
-import { useChatDraftRecovery } from "../chat/useChatDraftRecovery";
+import { sendFailureReason, unsentDrafts } from "../chat/useUnsentDrafts";
 import {
   useChatChannel,
   useChatChannelSummary,
@@ -69,10 +70,7 @@ export function MessagesPage() {
     channel?.kind === "event" ? channelKey : null,
     summary,
   );
-  const drafts = useChatDraftRecovery(channelKey);
-
   const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [pinSignal, setPinSignal] = useState(0);
   const [focusSignal, setFocusSignal] = useState(0);
 
@@ -84,7 +82,6 @@ export function MessagesPage() {
       if (next?.kind === "event") params.set("event", next.eventId);
       if (next?.kind === "direct") params.set("dm", next.personId);
       setSearchParams(params);
-      setError(null);
       if (next && !mobile) setFocusSignal((n) => n + 1);
     },
     [mobile, searchParams, setSearchParams],
@@ -134,33 +131,22 @@ export function MessagesPage() {
   }, [channel, identity.personId, markDirectRead, messages]);
 
   // A send finishes on the channel it left from. If the user has moved on,
-  // its pin and any notice must not land on the channel now on screen; the
-  // notice waits until they come back.
+  // its pin must not land on the channel now on screen; a failure becomes
+  // that channel's "Not sent" row, shown when they come back.
   const channelRef = useRef(channelKey);
   channelRef.current = channelKey;
-  const pendingNotices = useRef(new Map<string, string>());
-  useEffect(() => {
-    const notice = pendingNotices.current.get(channelKey);
-    if (notice !== undefined) {
-      pendingNotices.current.delete(channelKey);
-      setError(notice);
-    }
-  }, [channelKey]);
 
   const onSubmit = async (submit: ChatComposerSubmit) => {
     if (!channel) return;
-    const sentFrom = channelKey;
-    setError(null);
+    const sentFrom = channel;
     setSending(true);
     try {
-      await sendMessage(channel, submit);
-      if (channelRef.current === sentFrom) setPinSignal((n) => n + 1);
+      await sendMessage(sentFrom, submit);
+      if (channelRef.current === chatChannelKey(sentFrom)) {
+        setPinSignal((n) => n + 1);
+      }
     } catch (cause) {
-      const reason =
-        cause instanceof Error ? cause.message : "The message was not sent.";
-      if (channelRef.current === sentFrom) setError(reason);
-      else pendingNotices.current.set(sentFrom, reason);
-      throw cause;
+      unsentDrafts.keep(sentFrom, submit, sendFailureReason(cause));
     } finally {
       setSending(false);
     }
@@ -294,15 +280,12 @@ export function MessagesPage() {
                       : "Say hello."
                   }
                 />
+                <ChatUnsentDrafts
+                  channel={channel}
+                  onSent={() => setPinSignal((n) => n + 1)}
+                />
                 <ChatComposer
                   key={channelKey}
-                  initialDraft={drafts.initialDraft}
-                  onInitialDraftConsumed={drafts.onInitialDraftConsumed}
-                  restoreDraft={drafts.restoreDraft}
-                  onRestoreConsumed={drafts.onRestoreConsumed}
-                  onDraftOrphaned={(draft) =>
-                    drafts.orphanedFrom(channelKey, draft)
-                  }
                   placeholder={
                     channel.kind === "event"
                       ? `Message the “${headerTitle}” crew…`
@@ -315,7 +298,6 @@ export function MessagesPage() {
                   searchRecords={searchRecords}
                   onSubmit={onSubmit}
                   sending={sending}
-                  error={error}
                   focusSignal={focusSignal}
                 />
               </div>

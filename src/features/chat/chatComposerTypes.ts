@@ -1,4 +1,4 @@
-import type { ChatComposerDraft } from "./chatComposerDraft";
+import type { ChatPendingFile } from "./ChatComposerChips";
 import type { ChatLinkKind } from "./chatLinkTokens";
 import type { ChatLinkTarget } from "./chatTypes";
 
@@ -13,14 +13,30 @@ export type ChatComposerPerson = {
   readonly name: string;
 };
 
+/**
+ * What the composer held when Send was pressed. Kept with a message that did
+ * not send so it can be shown and retried as-is; never merged back into the
+ * composer.
+ */
+export type ChatComposerDraft = {
+  readonly text: string;
+  readonly files: readonly ChatPendingFile[];
+  readonly links: readonly ChatComposerLink[];
+  readonly mentions: readonly ChatComposerPerson[];
+};
+
 export type ChatComposerSubmit = {
   /** Trimmed text followed by one `[[kind:id|Label]]` token per linked record (space separated). Empty string allowed when files exist. */
   readonly body: string;
   readonly files: readonly File[];
   readonly mentionedPersonIds: readonly string[];
-  /** The raw draft, so a caller can keep it if the composer unmounts before a failure. */
+  /** The raw draft, for the "Not sent" row's preview. */
   readonly draft: ChatComposerDraft;
-  /** Stable for this draft across retries; the server de-duplicates on it. */
+  /**
+   * Minted once per draft. A retry of the same unsent message sends the same
+   * key, and the server de-duplicates on it — a first attempt that committed
+   * but lost its response is never sent twice.
+   */
   readonly idempotencyKey: string;
 };
 
@@ -32,22 +48,14 @@ export type ChatComposerProps = {
   readonly people: readonly ChatComposerPerson[];
   /** Record search for the # picker; resolves to [] on error. Called only with terms of ≥ 2 chars, debounced 180ms by the composer. */
   readonly searchRecords: (term: string) => Promise<readonly ChatLinkTarget[]>;
+  /**
+   * Settles when the send is over either way. The composer clears before it
+   * awaits and never restores: a failure is the caller's to keep as an unsent
+   * message (see ChatUnsentDrafts), so text typed meanwhile stays the next
+   * message and the failed one stays its own operation.
+   */
   readonly onSubmit: (submit: ChatComposerSubmit) => Promise<void>;
   readonly sending: boolean;
-  /** Upload/send error from the caller; render as `role="alert"` text-sm text-danger above the toolbar. */
-  readonly error: string | null;
   /** Optional: increments when the caller wants the textarea focused (e.g. after channel switch on desktop). */
   readonly focusSignal?: number;
-  /** A draft to start from — a send that failed after this channel was left. Read once, on mount. */
-  readonly initialDraft?: ChatComposerDraft | null;
-  /** Called once on mount when `initialDraft` was taken in, so the caller can drop its copy. */
-  readonly onInitialDraftConsumed?: () => void;
-  /** A failed draft to merge into the live composer (same channel re-opened before the failure). */
-  readonly restoreDraft?: {
-    readonly draft: ChatComposerDraft;
-    readonly token: number;
-  } | null;
-  readonly onRestoreConsumed?: (token: number) => void;
-  /** A send failed after this composer unmounted; the caller keeps the draft. */
-  readonly onDraftOrphaned?: (draft: ChatComposerDraft) => void;
 };

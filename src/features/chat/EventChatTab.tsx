@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { EmptyState } from "../../ui/primitives";
 import { EventTabPanel } from "../events/EventTabPanel";
 import { ChatComposer, type ChatComposerSubmit } from "./ChatComposer";
 import { ChatThread } from "./ChatThread";
+import { ChatUnsentDrafts } from "./ChatUnsentDrafts";
 import {
   CHAT_UNLINKED_REASON,
   type ChatChannel,
   chatChannelKey,
 } from "./chatTypes";
 import { useChannelReadMarker } from "./useChannelReadMarker";
-import { useChatDraftRecovery } from "./useChatDraftRecovery";
 import {
   useChatChannel,
   useChatChannelSummary,
@@ -19,6 +19,7 @@ import {
   useChatRecordSearch,
   useSendChatMessage,
 } from "./useTeamChat";
+import { sendFailureReason, unsentDrafts } from "./useUnsentDrafts";
 import "./chat.css";
 
 type Props = {
@@ -45,9 +46,7 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
   const sendMessage = useSendChatMessage();
   const searchRecords = useChatRecordSearch();
   const onReachBottom = useChannelReadMarker(channelKey, summary);
-  const drafts = useChatDraftRecovery(channelKey);
   const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [pinSignal, setPinSignal] = useState(0);
 
   const people = useMemo(
@@ -62,31 +61,21 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
   );
 
   // A send finishes on the channel it left from (the tab is reused when the
-  // route moves to another event); its pin and notice never land elsewhere.
+  // route moves to another event): its pin never lands elsewhere, and a
+  // failure becomes that channel's "Not sent" row, wherever the user is now.
   const channelRef = useRef(channelKey);
   channelRef.current = channelKey;
-  const pendingNotices = useRef(new Map<string, string>());
-  useEffect(() => {
-    const notice = pendingNotices.current.get(channelKey);
-    if (notice !== undefined) {
-      pendingNotices.current.delete(channelKey);
-      setError(notice);
-    }
-  }, [channelKey]);
 
   const onSubmit = async (submit: ChatComposerSubmit) => {
-    const sentFrom = channelKey;
-    setError(null);
+    const sentFrom = channel;
     setSending(true);
     try {
-      await sendMessage(channel, submit);
-      if (channelRef.current === sentFrom) setPinSignal((n) => n + 1);
+      await sendMessage(sentFrom, submit);
+      if (channelRef.current === chatChannelKey(sentFrom)) {
+        setPinSignal((n) => n + 1);
+      }
     } catch (cause) {
-      const reason =
-        cause instanceof Error ? cause.message : "The message was not sent.";
-      if (channelRef.current === sentFrom) setError(reason);
-      else pendingNotices.current.set(sentFrom, reason);
-      throw cause;
+      unsentDrafts.keep(sentFrom, submit, sendFailureReason(cause));
     } finally {
       setSending(false);
     }
@@ -139,13 +128,12 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
             emptyTitle="No messages yet"
             emptyHint="Start the crew conversation for this event."
           />
+          <ChatUnsentDrafts
+            channel={channel}
+            onSent={() => setPinSignal((n) => n + 1)}
+          />
           <ChatComposer
             key={channelKey}
-            initialDraft={drafts.initialDraft}
-            onInitialDraftConsumed={drafts.onInitialDraftConsumed}
-            restoreDraft={drafts.restoreDraft}
-            onRestoreConsumed={drafts.onRestoreConsumed}
-            onDraftOrphaned={(draft) => drafts.orphanedFrom(channelKey, draft)}
             placeholder={`Message the “${eventTitle}” crew…`}
             disabledReason={
               identity.loading || identity.personId
@@ -156,7 +144,6 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
             searchRecords={searchRecords}
             onSubmit={onSubmit}
             sending={sending}
-            error={error}
           />
         </div>
       )}

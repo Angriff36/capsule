@@ -38,7 +38,10 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   property recipientAuthSubjectId: string?
   // May be empty when the message carries files (attachmentCount > 0).
   property required encrypted body: string
-  // Number of files the sender attached; lets a photo-only message have no text.
+  // Number of Attachment rows on this message. Written ONLY by the authored
+  // seam convex/teamChatSend.ts after those rows exist in the same
+  // transaction — never accepted from a caller, so no command can claim files
+  // a message does not have.
   property attachmentCount: int = 0
   // Comma-separated Person ids mentioned with @ — notification routing only.
   property mentionedPersonIds: string?
@@ -50,7 +53,8 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
   // Intent only — entity-level constraints do not project to Convex; the
-  // commands below carry the enforced copies.
+  // commands below carry the enforced copies. Text-or-files is enforced by
+  // the send seam, the only place that can see the files.
   constraint staffMessageTarget: (self.recipientPersonId != null or self.eventId != null) and (self.recipientPersonId == null or self.eventId == null) "A message goes to exactly one place: a teammate or an event channel"
   constraint staffMessageBodyOrFiles: length(trim(self.body)) > 0 or self.attachmentCount > 0 "Message text or a file is required"
   constraint staffMessageDistinctParties: self.recipientPersonId == null or self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
@@ -64,11 +68,14 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   // Governed creation — one row per message. The sender is always the
   // caller's linked staff profile; the recipient's sign-in is copied from
   // the tenant-checked recipient Person row, never accepted from the browser.
+  // Files ride along only through convex/teamChatSend.ts, which runs this
+  // command and every Attachment.attach in one transaction and then sets
+  // attachmentCount from the rows it made; the command alone carries no file
+  // count, so a direct caller can only post text.
   command send(
     optional recipientPersonId: uuid,
     optional eventId: uuid,
     body: string,
-    attachmentCount: int,
     optional mentionedPersonIds: string
   ) {
     guard self.deletedAt == null
@@ -82,16 +89,13 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
     guard self.eventId == null or self.event != null
     guard self.recipientPersonId == null or self.recipient != null
     constraint sendTarget: (recipientPersonId != null or eventId != null) and (recipientPersonId == null or eventId == null) "Pick a teammate or an event channel, not both"
-    constraint sendBodyOrFiles: length(trim(body)) > 0 or attachmentCount > 0 "Message text or a file is required"
     constraint sendDistinctParties: recipientPersonId == null or recipientPersonId != user.personId "You cannot message yourself"
-    constraint sendAttachmentCount: attachmentCount >= 0 "Attachment count cannot be negative"
     mutate senderPersonId = user.personId
     mutate senderAuthSubjectId = user.id
     mutate recipientPersonId = recipientPersonId
     mutate recipientAuthSubjectId = self.recipient != null ? self.recipient.authSubjectId : null
     mutate eventId = eventId
     mutate body = body
-    mutate attachmentCount = attachmentCount
     mutate mentionedPersonIds = mentionedPersonIds
     emit StaffMessageSent {
       staffMessageId: self.id

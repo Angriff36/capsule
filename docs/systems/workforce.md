@@ -55,6 +55,12 @@ clients. Every event carries the same channel as its **Team Chat** tab.
 - Files are `Attachment` rows with `parentType: staffMessage` and
   `parentId` = the message id; record links travel inside the encrypted body
   as `[[kind:id|Label]]` tokens (`src/features/chat/chatLinkTokens.ts`).
+  A message and its files commit together through the authored seam
+  `convex/teamChatSend.ts` (nested `StaffMessage.send` + `Attachment.attach`
+  under one per-draft idempotency key), which then sets `attachmentCount`
+  from the rows it made — the bare command carries no file count. A send
+  that fails becomes a "Not sent" row above the composer with Retry (same
+  message, same key) and Discard; it is never merged back into the composer.
 - Reads go through the authored seam `convex/teamChat.ts` (index-bounded,
   decrypts bodies, hydrates download URLs). Channel read state is a
   per-account `StaffChatReadCursor`; direct messages keep per-message
