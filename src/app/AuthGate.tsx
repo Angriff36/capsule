@@ -17,7 +17,7 @@ import {
 } from "convex/react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api";
-import { PushRevokeOnSignout } from "./PushRevokeOnSignout";
+import { PushRevokeGuard, PushRevokeOnSignout } from "./PushRevokeOnSignout";
 import {
   type AuthStatusSnapshot,
   workspaceMembershipPolicy,
@@ -44,6 +44,7 @@ export function AuthGate({ children }: { children?: ReactNode }) {
         <SignInScreen />
       </Unauthenticated>
       <Authenticated>
+        <PushRevokeGuard />
         <ClaimGate>{children}</ClaimGate>
       </Authenticated>
       <AuthRefreshing>

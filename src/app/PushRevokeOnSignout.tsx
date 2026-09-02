@@ -1,25 +1,67 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useMutation } from "convex/react";
+import { api } from "../lib/api";
+
+/** Best-effort: drop this browser's push subscription, retrying a few times. */
+async function dropBrowserSubscription(): Promise<string | null> {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window))
+    return null;
+  const registration = await navigator.serviceWorker.getRegistration();
+  const subscription = await registration?.pushManager.getSubscription();
+  if (!subscription) return null;
+  const endpoint = subscription.endpoint;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      if (await subscription.unsubscribe()) return endpoint;
+    } catch {
+      // keep trying
+    }
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  }
+  return endpoint;
+}
 
 /**
- * Mounted only while the app is unauthenticated (see AuthGate). Whenever there
- * is no session — an explicit sign-out or a silently expired one — it drops
- * this browser's push subscription, so a signed-out shared device stops
- * receiving direct-message and mention notifications. Client-only: killing the
- * endpoint is enough (the server row is pruned on its next failed delivery),
- * and it needs no auth, so it also covers a lost session.
+ * Mounted inside <Authenticated> (AuthGate): its unmount is the sign-out /
+ * session-loss moment while the Convex client still has a token, so it
+ * retires the server row (unregister) AND drops the browser subscription.
+ * PushRevokeOnSignout on the <Unauthenticated> side is the fallback when this
+ * cleanup cannot finish.
+ */
+export function PushRevokeGuard() {
+  const unregister = useMutation(api.pushSubscriptions.unregister);
+  const unregisterRef = useRef(unregister);
+  unregisterRef.current = unregister;
+  useEffect(() => {
+    return () => {
+      void (async () => {
+        const endpoint = await dropBrowserSubscription().catch(() => null);
+        if (endpoint) {
+          await unregisterRef.current({ endpoint }).catch(() => undefined);
+        }
+      })();
+    };
+  }, []);
+  return null;
+}
+
+/**
+ * Mounted while the app is unauthenticated. A signed-out or expired session
+ * must not keep this browser subscribed: it retries the browser unsubscribe
+ * so a signed-out shared device stops receiving notifications even if the
+ * authenticated cleanup above did not complete. Client-only (no auth needed);
+ * the server row is pruned on its next failed delivery.
  */
 export function PushRevokeOnSignout() {
   useEffect(() => {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
     let cancelled = false;
     void (async () => {
       try {
-        const registration = await navigator.serviceWorker.getRegistration();
-        const subscription = await registration?.pushManager.getSubscription();
-        if (!cancelled && subscription) await subscription.unsubscribe();
+        await dropBrowserSubscription();
       } catch {
-        // Best effort: a dead endpoint is pruned server-side on next send.
+        // Best effort.
       }
+      if (cancelled) return;
     })();
     return () => {
       cancelled = true;

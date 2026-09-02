@@ -467,7 +467,9 @@
   align-items: center;
   justify-content: center;
   padding: 4.5rem 1rem 1.5rem;
-  background: color-mix(in srgb, var(--color-ink) 90%, transparent);
+  /* A photo viewer reads on a dark ground in either theme, so the scrim and
+     its controls are fixed dark/light — not the ink token, which inverts. */
+  background: rgb(12 14 16 / 0.92);
   cursor: zoom-out;
 }
 
@@ -483,16 +485,20 @@
   cursor: default;
 }
 
+.chat-lightbox-bar p {
+  color: #ffffff;
+}
+
 .chat-lightbox-btn {
   flex: none;
-  color: var(--color-on-brand);
+  color: #ffffff;
   background: transparent;
-  border-color: color-mix(in srgb, var(--color-on-brand) 45%, transparent);
+  border-color: rgb(255 255 255 / 0.45);
 }
 
 .chat-lightbox-btn:hover {
-  background: color-mix(in srgb, var(--color-on-brand) 12%, transparent);
-  border-color: var(--color-on-brand);
+  background: rgb(255 255 255 / 0.12);
+  border-color: #ffffff;
 }
 
 .chat-lightbox-img {
@@ -510,11 +516,11 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: var(--radius-pill);
-  border: 1px solid color-mix(in srgb, var(--color-on-brand) 45%, transparent);
-  color: var(--color-on-brand);
+  border: 1px solid rgb(255 255 255 / 0.45);
+  color: #ffffff;
   font-size: var(--text-xl);
   line-height: 1;
-  background: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  background: rgb(12 14 16 / 0.6);
   cursor: pointer;
 }
 
