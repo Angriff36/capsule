@@ -105,7 +105,12 @@ export const buildPushJob = internalQuery({
     for (const personId of new Set(recipientIds)) {
       if (personId === String(message.senderPersonId)) continue;
       const person = await tenantPerson(ctx, tenantId, personId);
-      if (!person || !person.authSubjectId) continue;
+      // Only an ACTIVE person is a valid recipient: a deactivated or
+      // terminated staff member keeps their authSubjectId and devices but is
+      // locked out of the app, so they must not keep getting notifications.
+      if (!person || !person.authSubjectId || person.status !== "active") {
+        continue;
+      }
       // Newest first, LIVE rows only, bounded by the walk cap: soft-deleted
       // rows from resets or disables must not push a live device off a take().
       let picked = 0;

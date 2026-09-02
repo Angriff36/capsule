@@ -3,23 +3,22 @@ import { useAuth } from "@clerk/react";
 import { useMutation } from "convex/react";
 import { api } from "../lib/api";
 
-/** Drop this browser's push subscription, retrying a few times. */
-async function dropBrowserSubscription(): Promise<string | null> {
+type DropResult = { endpoint: string; dropped: boolean } | null;
+
+/** Try once to drop this browser's push subscription. */
+async function dropBrowserSubscription(): Promise<DropResult> {
   if (!("serviceWorker" in navigator) || !("PushManager" in window))
     return null;
   const registration = await navigator.serviceWorker.getRegistration();
   const subscription = await registration?.pushManager.getSubscription();
   if (!subscription) return null;
-  const endpoint = subscription.endpoint;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      if (await subscription.unsubscribe()) return endpoint;
-    } catch {
-      // keep trying
-    }
-    await new Promise((resolve) => setTimeout(resolve, 400));
+  let dropped = false;
+  try {
+    dropped = await subscription.unsubscribe();
+  } catch {
+    dropped = false;
   }
-  return endpoint;
+  return { endpoint: subscription.endpoint, dropped };
 }
 
 /**
@@ -27,10 +26,13 @@ async function dropBrowserSubscription(): Promise<string | null> {
  * is signed out. It watches Clerk's own `isSignedIn` (the source of truth),
  * not Convex's auth state, so an org switch or a token refresh (which briefly
  * drop Convex auth while the user stays signed in) never disable notifications.
- * On a real sign-out or an expired session it unsubscribes the browser and
- * retires the server row by its endpoint (a no-auth mutation, since the token
- * is already gone), so a signed-out shared device receives nothing further.
- * Mounted once, above the auth-state branches.
+ *
+ * Revocation is not treated as done until it actually succeeds: both the
+ * browser unsubscribe and the server-row release (a no-auth mutation, since
+ * the token is gone) must complete. If either fails — e.g. the device is
+ * offline at sign-out — it retries on the next `online` event and on a short
+ * timer, so a signed-out shared device cannot start receiving pushes again
+ * when it reconnects. Mounted once, above the auth-state branches.
  */
 export function PushRevokeOnSignout() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -39,27 +41,52 @@ export function PushRevokeOnSignout() {
   );
   const releaseRef = useRef(releaseByEndpoint);
   releaseRef.current = releaseByEndpoint;
-  // Revoke once per signed-out transition (reset when the user signs back in).
-  // A first load while already signed out also clears any subscription a
-  // prior session left on this browser.
-  const revokedRef = useRef(false);
 
   useEffect(() => {
-    if (!isLoaded) return;
-    if (isSignedIn) {
-      revokedRef.current = false;
-      return;
-    }
-    if (revokedRef.current) return;
-    revokedRef.current = true;
+    if (!isLoaded || isSignedIn) return;
+
     let cancelled = false;
-    void (async () => {
-      const endpoint = await dropBrowserSubscription().catch(() => null);
-      if (cancelled || !endpoint) return;
-      await releaseRef.current({ endpoint }).catch(() => undefined);
-    })();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    // One attempt; resolves true only when the device is fully clean.
+    const attempt = async (): Promise<boolean> => {
+      let result: DropResult = null;
+      try {
+        result = await dropBrowserSubscription();
+      } catch {
+        return false;
+      }
+      if (result === null) return true; // nothing subscribed on this browser
+      if (!result.dropped) return false; // unsubscribe failed; retry later
+      try {
+        await releaseRef.current({ endpoint: result.endpoint });
+        return true;
+      } catch {
+        return false; // server unreachable; retry later
+      }
+    };
+
+    const onOnline = () => void run();
+    const cleanupListeners = () => {
+      window.removeEventListener("online", onOnline);
+      if (timer) clearTimeout(timer);
+    };
+
+    const run = async () => {
+      if (cancelled) return;
+      if (await attempt()) {
+        cleanupListeners();
+        return;
+      }
+      if (cancelled) return;
+      timer = setTimeout(() => void run(), 15000);
+    };
+
+    window.addEventListener("online", onOnline);
+    void run();
     return () => {
       cancelled = true;
+      cleanupListeners();
     };
   }, [isLoaded, isSignedIn]);
 

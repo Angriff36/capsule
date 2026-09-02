@@ -24,7 +24,7 @@ export function ChatPushToggle() {
           push.enabled ? "btn btn-secondary btn-sm" : "btn btn-ghost btn-sm"
         }
         aria-pressed={push.enabled}
-        disabled={push.busy || push.keyMissing}
+        disabled={push.busy || (push.keyMissing && !push.enabled)}
         onClick={() => void (push.enabled ? push.disable() : push.enable())}
       >
         {push.busy
@@ -37,7 +37,7 @@ export function ChatPushToggle() {
         className={`mt-1 text-xs ${push.error ? "text-danger" : "text-ink-3"}`}
         role={push.error ? "alert" : undefined}
       >
-        {push.keyMissing
+        {push.keyMissing && !push.enabled
           ? "Notifications are not set up on this deployment yet."
           : hint}
       </p>

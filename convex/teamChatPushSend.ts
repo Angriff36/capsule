@@ -22,8 +22,10 @@ export const deliver = internalAction({
   handler: async (ctx, args): Promise<void> => {
     const publicKey = process.env.VAPID_PUBLIC_KEY;
     const privateKey = process.env.VAPID_PRIVATE_KEY;
-    const subject = process.env.VAPID_SUBJECT ?? "mailto:ops@capsule.app";
-    if (!publicKey || !privateKey) return;
+    const subject = process.env.VAPID_SUBJECT;
+    // The same full config the vapidPublicKey query requires; without it a
+    // client can never enable, so nothing should be delivered either.
+    if (!publicKey || !privateKey || !subject) return;
 
     const now = Date.now();
     const job = await ctx.runQuery(internal.teamChatPush.buildPushJob, {
