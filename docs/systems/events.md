@@ -74,6 +74,15 @@ All writes include the current generated version when available. A stale version
 
 Material revisions do not automatically return an approved Event to planning or require renewed approval. Title, Event type, Client, and owner reassignment are not editable in the current dossier. `Event.assignOwner` exists in generated capability metadata but is not yet exposed by this UI.
 
+## Team chat
+
+The **Team Chat** tab (`?tab=chat`) is the event's channel: every staff role
+reads and posts, with photos, files, `@` mentions, and `#` links to dishes,
+menus, clients, and other events. It is the same channel listed under Event
+channels on `/staff/messages`, and the phone overview shows it as a card. The
+Overview's "Planning notes" panel stays a flat note list and links to the
+channel. Domain and seam: `docs/systems/workforce.md` § Team chat.
+
 ## Recurring events
 
 The Event dossier can turn a planned Event into a recurring source. Operators choose weekly, monthly, or annual cadence and one of two explicit end conditions:

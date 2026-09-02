@@ -134,6 +134,13 @@ export const CloudSunIcon = icon(
 
 export const MinusIcon = icon(<path d="M4 8h8" />);
 
+export const MessageIcon = icon(
+  <>
+    <path d="M2.6 3.2h10.8v7.4H6.4l-3 2.6v-2.6h-.8z" />
+    <path d="M5.4 6.1h5.2M5.4 8.3h3.4" />
+  </>,
+);
+
 export const WindIcon = icon(
   <path d="M2.4 5.6h6.4a1.8 1.8 0 1 0-1.8-1.8M2.4 10.4h8.2a1.8 1.8 0 1 1-1.8 1.8M2.4 8h10.4" />,
 );

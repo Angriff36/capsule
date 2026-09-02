@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { type Id } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import {
@@ -11,6 +12,7 @@ import { useAuthStatus } from "../../lib/useAuthStatus";
 import { Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventTabPanel } from "./EventTabPanel";
+import { eventDetailPath } from "./eventRoutes";
 import { FailureBanner } from "./FailureBanner";
 
 // Roles carrying adminAccess (base.manifest: admin → owner → system).
@@ -20,7 +22,10 @@ type Props = {
   readonly eventId: Id<"events">;
 };
 
-/** Event-wide staff discussion (Overview). Block questions live on Timeline. */
+/**
+ * Planning notes (Overview): a flat note list that stays with the plan.
+ * Live crew conversation is the Team Chat tab; block questions live on Timeline.
+ */
 export function EventTimelineCommentsPanel({ eventId }: Props) {
   const authStatus = useAuthStatus();
   const comments = useListEventTimelineComment();
@@ -68,10 +73,18 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
 
   return (
     <EventTabPanel
-      eyebrow="Staff discussion"
-      title="Comments"
-      description="Day-level notes from the crew. Questions about a specific run-sheet block live on the Timeline tab."
+      eyebrow="Planning notes"
+      title="Planning notes"
+      description="Day-level notes that stay with the plan. Live crew conversation happens in Team Chat; questions about a run-sheet block live on the Timeline tab."
       testId="event-overview-comments"
+      actions={
+        <Link
+          className="text-link inline-flex"
+          to={eventDetailPath(eventId, "chat")}
+        >
+          Open team chat
+        </Link>
+      }
     >
       {failure ? <FailureBanner failure={failure} /> : null}
       {me == null ? (

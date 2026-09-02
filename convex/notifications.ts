@@ -18,10 +18,12 @@
 // generated as non-exported locals, so the role → capability map is mirrored
 // here (same pattern as sourceProvenance.ts / hiringPipeline.ts). Keep in
 // sync with src/foundation/base.manifest if a role grant moves.
+import type { Doc, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
 import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
+import { CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
 
 const ALL_ACCESS = [
   "eventAccess",
@@ -71,6 +73,15 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
   ],
   workforce_staff: ["staffAccess", "workforceAccess"],
 };
+
+/** Newest channel rows read for @mentions (the mention window is 7 days). */
+const MESSAGE_TAKE = 400;
+/** Same window deriveNotifications uses for mentions (RECENT_WINDOW_MS). */
+const MENTION_WINDOW_MS = 7 * 86_400_000;
+/** Same retention window deriveNotifications uses for unread DMs. */
+const MESSAGE_RETENTION_MS = 90 * 86_400_000;
+/** Hard ceiling on the caller's received-DM walk (it stops at retention first). */
+const RECEIVED_CAP = 4000;
 
 function can(auth: AppAuthContext, ...capabilities: string[]): boolean {
   const granted = ROLE_CAPABILITIES[auth.role] ?? [];
@@ -156,12 +167,73 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect(),
       ),
-      when(can(auth, "staffAccess"), () =>
-        ctx.db
-          .query("staffMessages")
-          .withIndex("by_tenantId", byTenant)
-          .collect(),
-      ),
+      // Team chat made staffMessages a high-volume table, so this is no
+      // longer a tenant-wide collect: the caller's direct messages — received
+      // AND sent, so the tray sees the same newest-400-per-pair window the
+      // thread shows — come from the caller's own person indexes walked back
+      // through the 90-day retention window; @mentions from the newest
+      // channel traffic (the mention window is seven days). Merged and
+      // de-duplicated below.
+      when(can(auth, "staffAccess"), async () => {
+        const since = Date.now() - MESSAGE_RETENTION_MS;
+        // Bounded by rows VISITED, not rows kept: a sender's index range also
+        // holds their channel messages, and this runs on every page.
+        const walk = async (
+          range: AsyncIterable<Doc<"staffMessages">>,
+          keep: (row: Doc<"staffMessages">) => boolean,
+        ) => {
+          const out: Doc<"staffMessages">[] = [];
+          let visited = 0;
+          for await (const row of range) {
+            if (++visited > RECEIVED_CAP) break;
+            if ((row.createdAt ?? row._creationTime) < since) break;
+            if (keep(row)) out.push(row);
+          }
+          return out;
+        };
+        const me = auth.personId as Id<"people"> | null;
+        const [received, sent, recent] = await Promise.all([
+          me
+            ? walk(
+                ctx.db
+                  .query("staffMessages")
+                  .withIndex("by_recipientPersonId", (q) =>
+                    q.eq("recipientPersonId", me),
+                  )
+                  .order("desc"),
+                () => true,
+              )
+            : [],
+          me
+            ? walk(
+                ctx.db
+                  .query("staffMessages")
+                  .withIndex("by_senderPersonId", (q) =>
+                    q.eq("senderPersonId", me),
+                  )
+                  .order("desc"),
+                (row) => row.recipientPersonId != null,
+              )
+            : [],
+          ctx.db
+            .query("staffMessages")
+            .withIndex("by_tenantId", byTenant)
+            .order("desc")
+            .take(MESSAGE_TAKE),
+        ]);
+        const seen = new Set<string>();
+        // The tenant-wide sample serves @mentions only, so it carries channel
+        // rows alone: the caller's direct messages come from their own person
+        // walks, never from a sample that could hold someone else's DM.
+        const channelRecent = recent.filter((row) => row.eventId != null);
+        return [...received, ...sent, ...channelRecent].filter((row) => {
+          if (row.tenantId !== tenantId || seen.has(String(row._id))) {
+            return false;
+          }
+          seen.add(String(row._id));
+          return true;
+        });
+      }),
       when(can(auth, "kitchenAccess", "manageAccess"), () =>
         ctx.db
           .query("prepTaskComments")
@@ -170,9 +242,77 @@ export const listNotifications = query({
       ),
     ]);
 
+    // A mention hides once its channel has been read. The caller's cursor is
+    // read per mention channel through the (channel, account) index, never
+    // the account's whole cursor history.
+    const mentionChannelKeys = new Set<string>();
+    if (staffMessages && auth.personId) {
+      const now = Date.now();
+      for (const message of staffMessages) {
+        if (
+          message.eventId &&
+          message.deletedAt == null &&
+          message.createdAt != null &&
+          now - message.createdAt <= MENTION_WINDOW_MS &&
+          (message.mentionedPersonIds ?? "")
+            .split(",")
+            .some((id) => id.trim() === auth.personId)
+        ) {
+          mentionChannelKeys.add(`event:${String(message.eventId)}`);
+        }
+      }
+    }
+    const staffChatReadCursors = (
+      await Promise.all(
+        [...mentionChannelKeys].map((channelKey) =>
+          ctx.db
+            .query("staffChatReadCursors")
+            .withIndex("by_channelKey_and_authSubjectId", (q) =>
+              q.eq("channelKey", channelKey).eq("authSubjectId", auth.id),
+            )
+            .take(CURSOR_DUPLICATES_CAP),
+        ),
+      )
+    )
+      .flat()
+      .filter((row) => row.tenantId === tenantId);
+
+    // Roles without eventAccess cannot list events, but a mention still
+    // needs its channel's title: hydrate only the events of the caller's own
+    // mentions inside the mention window, tenant-checked, title only (same
+    // narrow projection as eventDayBriefing).
+    const mentionEventTitles: Record<string, string> = {};
+    if (!events && staffMessages && auth.personId) {
+      const now = Date.now();
+      const ids = new Set<string>();
+      for (const message of staffMessages) {
+        if (
+          message.eventId &&
+          message.deletedAt == null &&
+          message.createdAt != null &&
+          now - message.createdAt <= MENTION_WINDOW_MS &&
+          (message.mentionedPersonIds ?? "")
+            .split(",")
+            .some((id) => id.trim() === auth.personId)
+        ) {
+          ids.add(String(message.eventId));
+        }
+      }
+      await Promise.all(
+        [...ids].map(async (id) => {
+          const eventId = ctx.db.normalizeId("events", id);
+          const event = eventId ? await ctx.db.get(eventId) : null;
+          if (event && event.tenantId === tenantId && event.deletedAt == null) {
+            mentionEventTitles[id] = String(event.title ?? "Untitled event");
+          }
+        }),
+      );
+    }
+
     return deriveNotifications({
       now: Date.now(),
       currentAuthSubjectId: auth.id || undefined,
+      currentPersonId: auth.personId ?? null,
       events,
       incidents,
       invoices,
@@ -185,6 +325,8 @@ export const listNotifications = query({
       vendorOrders,
       staffMessages,
       prepTaskComments,
+      staffChatReadCursors,
+      mentionEventTitles,
     });
   },
 });

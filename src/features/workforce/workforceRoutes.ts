@@ -3,7 +3,7 @@ export const WORKFORCE_SECTIONS = [
   { key: "swaps", label: "Shift swaps", path: "/staff/swaps" },
   { key: "time", label: "Time & availability", path: "/staff/time" },
   { key: "time-off", label: "Time off", path: "/staff/time-off" },
-  { key: "messages", label: "Messages", path: "/staff/messages" },
+  { key: "messages", label: "Team chat", path: "/staff/messages" },
   { key: "utilization", label: "Utilization", path: "/staff/utilization" },
   {
     key: "qualifications",

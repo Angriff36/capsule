@@ -1,7 +1,11 @@
 // Capsule documents — file attachments on Event, Client, Contract, Vendor,
-// Delivery, and Closeout records. Binary content lives in Convex file storage (authored seam
+// Delivery, Closeout, Dish, Ingredient, and StaffMessage (team chat) records.
+// Binary content lives in Convex file storage (authored seam
 // convex/fileStorage.ts issues upload URLs and resolves download URLs);
 // this entity records the metadata, uploader identity, and timestamp.
+// The parentType union is also hand-mirrored in convex/fileStorage.ts
+// (listForParent) and src/features/attachments/AttachmentsSection.tsx —
+// minus staffMessage, whose files are read only through convex/teamChat.ts.
 
 use "../foundation/base.manifest"
 
@@ -17,6 +21,8 @@ enum AttachmentParentType {
   dish
   // Culinary ingredient catalog image (Ingredient.setPrimaryImage).
   ingredient
+  // Team chat photo or file; parentId is the StaffMessage id.
+  staffMessage
 }
 
 enum AttachmentEvidenceType {
@@ -55,14 +61,22 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   property required fileName: string
   property required contentType: string
   property required fileSize: int = 0
-  property required storageId: string
+  // Indexed so an orphaned upload (a blob no live row references) can be
+  // recognised and discarded (convex/fileStorage.ts discardOrphanUploads).
+  property required indexed storageId: string
   property evidenceType: AttachmentEvidenceType?
   property uploadedById: string?
   property uploadedAt: datetime?
   // Operator-selected photos to include in the post-event client feedback survey.
   property inFeedbackSurvey: boolean?
 
-  default policy attachmentRead read: roleAllows(user.role, "staffAccess") "Staff may read attachments"
+  // Team-chat files (parentType staffMessage) follow their message and are
+  // readable ONLY through the chat seam (convex/teamChat.ts), which authorizes
+  // the parent message by the caller's current Person. The generated queries
+  // never return a persisted chat file: `uploadedById == null` is the
+  // create-time draft escape alone (the read policy runs before mutates), and
+  // a copied sign-in id is never an authorization.
+  default policy attachmentRead read: roleAllows(user.role, "staffAccess") and (self.parentType != "staffMessage" or self.uploadedById == null) "Staff may read attachments; chat files are read through their message"
   default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may write attachments through commands"
   default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute attachment commands"
 
@@ -75,6 +89,15 @@ entity Attachment mixin TenantScoped, SoftDeletable {
     storageId: string,
     optional evidenceType: AttachmentEvidenceType
   ) {
+    // Creation only: the generator also emits an instance form of every
+    // command, and re-running attach on a stored row would re-parent someone's
+    // file (for example into the chat-only parent type, which the generated
+    // API never shows). A stored row always has its uploader.
+    guard self.uploadedById == null "Files are attached once; remove the attachment and add the file again to change it"
+    // Chat files are written only by convex/teamChatSend.ts, in the same
+    // transaction as their message, after the blob and the parent message are
+    // verified; the public command never creates one.
+    constraint attachNotChat: parentType != "staffMessage" "Chat files are attached through their message"
     constraint attachParent: length(trim(parentId)) > 0 "Parent record is required"
     constraint attachFileName: length(trim(fileName)) > 0 "File name is required"
     constraint attachStorage: length(trim(storageId)) > 0 "Stored file reference is required"

@@ -25,3 +25,25 @@ projections:
       # Manifest still lists mermaid as a compatible companion; Capsule does not
       # want those files rebuilt (low product value / ownership noise).
       skipDocsDiagrams: true
+      # Composite indexes the domain needs but the grammar cannot declare.
+      # StaffChatReadCursor: one row per (channel, account) — the upsert seam
+      # convex/teamChatCursor.ts and every cursor read look the caller's row up
+      # directly instead of filtering a channel-wide page.
+      indexes:
+        StaffChatReadCursor:
+          - fields: [channelKey, authSubjectId]
+            name: by_channelKey_and_authSubjectId
+        # Team-chat files: the seam reads a message's attachments by parent AND
+        # uploader, so a row someone else parks on the message id is never read.
+        Attachment:
+          - fields: [parentId, uploadedById]
+            name: by_parentId_and_uploadedById
+        # Catalog rows hold their primary image's storage id directly. The
+        # orphan-blob check (convex/lib/blobs.ts) must find them by that id
+        # before it deletes an unreferenced upload.
+        Dish:
+          - fields: [primaryImageStorageId]
+            name: by_primaryImageStorageId
+        Ingredient:
+          - fields: [primaryImageStorageId]
+            name: by_primaryImageStorageId

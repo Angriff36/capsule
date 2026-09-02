@@ -5,6 +5,7 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { deleteBlobIfOrphan } from "./lib/blobs";
 
 /** Short-lived URL the browser POSTs the file bytes to. Staff only. */
 export const generateUploadUrl = mutation({
@@ -15,6 +16,33 @@ export const generateUploadUrl = mutation({
       throw new Error("Sign in to upload files");
     }
     return await ctx.storage.generateUploadUrl();
+  },
+});
+
+/** Uploads a client may discard in one call (a chat message holds at most 20). */
+const DISCARD_CAP = 25;
+
+/**
+ * Delete uploaded blobs that no live Attachment row references — the files a
+ * client uploaded for a send that then failed or was rolled back. A blob some
+ * live row still references is left alone, so this can never remove a file
+ * that is in use. Staff only; ids are only known to the uploader.
+ */
+export const discardOrphanUploads = mutation({
+  args: { storageIds: v.array(v.string()) },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || auth.role === "anonymous") {
+      throw new Error("Sign in to manage uploads");
+    }
+    let discarded = 0;
+    for (const storageId of [...new Set(args.storageIds)].slice(
+      0,
+      DISCARD_CAP,
+    )) {
+      if (await deleteBlobIfOrphan(ctx, storageId)) discarded += 1;
+    }
+    return { discarded };
   },
 });
 
@@ -30,6 +58,8 @@ export const listForParent = query({
       v.literal("closeout"),
       v.literal("dish"),
       v.literal("ingredient"),
+      // No "staffMessage": chat files are private to the message's readers
+      // and are hydrated only by convex/teamChat.ts.
     ),
     parentId: v.string(),
   },

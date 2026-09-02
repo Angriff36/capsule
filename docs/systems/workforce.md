@@ -41,6 +41,35 @@ Use a **roster and time sheet**, not a generic employee dashboard:
 - Select a Person credential as a Shift prerequisite; scheduling is denied when it belongs to another Person, is inactive, or expires before the shift ends.
 - Define reusable TrainingModules and ShiftTypes, record dated passing scores per Person, and schedule gated ShiftTypes only when the Person has completed the required module.
 
+## Team chat
+
+`/staff/messages` is the crew's chat: a rail of event channels and
+direct-message partners, one thread pane, and a composer that sends text,
+photos, files, `@` mentions, and `#` links to events, dishes, menus, and
+clients. Every event carries the same channel as its **Team Chat** tab.
+
+- Messages are `StaffMessage` rows (`src/workforce/staff-message.manifest`):
+  a direct message has `recipientPersonId`, a channel message has `eventId`.
+  The sender is always the caller's linked Person (`user.personId`); the
+  row-level read policy shows a direct message only to its two parties.
+- Files are `Attachment` rows with `parentType: staffMessage` and
+  `parentId` = the message id; record links travel inside the encrypted body
+  as `[[kind:id|Label]]` tokens (`src/features/chat/chatLinkTokens.ts`).
+  A message and its files commit together through the authored seam
+  `convex/teamChatSend.ts` (nested `StaffMessage.send` + `Attachment.attach`
+  under one per-draft idempotency key, scoped to tenant and caller), which
+  then sets `attachmentCount` from the rows it made and clears the body of a
+  file-only message — the bare command requires text and carries no file
+  count. A send that fails becomes a "Not sent" row above the composer with
+  Retry (same message, same key) and Discard; it is never merged back into
+  the composer.
+- Reads go through the authored seam `convex/teamChat.ts` (index-bounded,
+  decrypts bodies, hydrates download URLs). Channel read state is a
+  per-account `StaffChatReadCursor`; direct messages keep per-message
+  `readAt`. The UI shows the last 90 days.
+- UI lives in `src/features/chat/**` (unguarded seam-hook directory, like
+  `src/features/attachments`); `MessagesPage` and the event tab import it.
+
 ## Cross-system handoffs
 
 Events own service context; Person owns operator identity; staffing records feed readiness explanations and PayrollInput. Incidents may link to a Shift. Logistics Delivery may reference a Person as driver, but Vehicle is not currently modeled.

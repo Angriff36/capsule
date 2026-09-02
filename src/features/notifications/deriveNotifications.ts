@@ -21,6 +21,7 @@ export interface AppNotification {
     | "certification_expiry"
     | "allergen_incident"
     | "staff_message"
+    | "mention"
     | "prep_task_comment";
   message: string;
   /** Route to the relevant record. */
@@ -40,6 +41,7 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     certification_expiry: "Certification",
     allergen_incident: "Allergen",
     staff_message: "Message",
+    mention: "Mention",
     prep_task_comment: "Prep note",
   };
 
@@ -68,6 +70,8 @@ const OVERDUE_ELIGIBLE_STATUSES = new Set(["sent", "viewed", "partial"]);
 export interface NotificationSources {
   now: number;
   currentAuthSubjectId: string | undefined;
+  /** The caller's current linked Person — the server's resolution (getAuthContext), never re-derived here. */
+  currentPersonId?: string | null;
   events: Doc<"events">[] | undefined;
   incidents: Doc<"incidents">[] | undefined;
   invoices: Doc<"invoices">[] | undefined;
@@ -80,10 +84,16 @@ export interface NotificationSources {
   vendorOrders: Doc<"vendorOrders">[] | undefined;
   staffMessages: Doc<"staffMessages">[] | undefined;
   prepTaskComments: Doc<"prepTaskComments">[] | undefined;
+  /** The caller's own chat read cursors — a mention hides once its channel is read. */
+  staffChatReadCursors?: Doc<"staffChatReadCursors">[] | undefined;
+  /** Titles for mention channels whose events the caller's role cannot list. */
+  mentionEventTitles?: Record<string, string>;
 }
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
 const MESSAGE_RETENTION_MS = 90 * 86_400_000;
+/** Newest DM rows per pair the thread shows (convex/lib/teamChatRead.ts MAX_THREAD_MESSAGES). */
+const DM_THREAD_LIMIT = 400;
 
 export function deriveNotifications(
   src: NotificationSources,
@@ -233,10 +243,44 @@ export function deriveNotifications(
     });
   }
 
+  // The caller's identity for chat is their CURRENT linked Person as the
+  // server resolved it (the same Person the DM and cursor reads were fetched
+  // for) — never re-derived from the people list, which may hold an older
+  // or second row for the same sign-in. The auth subjects copied onto rows
+  // are routing data, never a party test.
+  const myPersonId = src.currentPersonId ?? null;
+
+  // Only the rows the thread can show and mark read: the newest
+  // DM_THREAD_LIMIT of the PAIR — sent and received together, exactly the
+  // window listChannel renders. A received row older than that window would
+  // notify forever, because opening the thread can never reach it.
+  const byPartner = new Map<string, Doc<"staffMessages">[]>();
+  for (const message of src.staffMessages ?? []) {
+    if (myPersonId == null || message.deletedAt != null) continue;
+    const partner =
+      (message.recipientPersonId as string | null | undefined) === myPersonId
+        ? (message.senderPersonId as string)
+        : (message.senderPersonId as string) === myPersonId &&
+            message.recipientPersonId != null
+          ? (message.recipientPersonId as string)
+          : null;
+    if (partner == null) continue;
+    const list = byPartner.get(partner);
+    if (list) list.push(message);
+    else byPartner.set(partner, [message]);
+  }
+  const visibleDm = new Set<string>();
+  for (const list of byPartner.values()) {
+    list.sort((a, b) => b._creationTime - a._creationTime);
+    for (const message of list.slice(0, DM_THREAD_LIMIT)) {
+      visibleDm.add(message._id as string);
+    }
+  }
   for (const message of src.staffMessages ?? []) {
     if (
-      src.currentAuthSubjectId == null ||
-      message.recipientAuthSubjectId !== src.currentAuthSubjectId ||
+      myPersonId == null ||
+      (message.recipientPersonId as string | null | undefined) !== myPersonId ||
+      !visibleDm.has(message._id as string) ||
       message.deletedAt != null ||
       message.readAt != null ||
       message.createdAt == null ||
@@ -250,9 +294,58 @@ export function deriveNotifications(
       id: `staff-message:${message._id}`,
       kind: "staff_message",
       message: `New message from ${who}`,
-      link: "/staff/messages",
+      link: `/staff/messages?dm=${message.senderPersonId}`,
       at: message.createdAt,
     });
+  }
+
+  // @mentions in event channels. The body is encrypted and never read here;
+  // the sender stamps the mentioned Person ids alongside the message.
+  if (myPersonId != null) {
+    const readUpTo = new Map<string, number>();
+    for (const cursor of src.staffChatReadCursors ?? []) {
+      if (cursor.authSubjectId !== src.currentAuthSubjectId) continue;
+      readUpTo.set(
+        cursor.channelKey,
+        Math.max(readUpTo.get(cursor.channelKey) ?? 0, cursor.lastReadAt),
+      );
+    }
+    for (const message of src.staffMessages ?? []) {
+      if (
+        message.deletedAt != null ||
+        message.eventId == null ||
+        message.createdAt == null ||
+        (message.senderPersonId as string) === myPersonId ||
+        now - message.createdAt > RECENT_WINDOW_MS
+      ) {
+        continue;
+      }
+      const mentioned = (message.mentionedPersonIds ?? "")
+        .split(",")
+        .map((id) => id.trim());
+      if (!mentioned.includes(myPersonId)) continue;
+      const eventId = message.eventId as string;
+      // Cursors hold the commit-time position (a total order), so compare it.
+      if ((readUpTo.get(`event:${eventId}`) ?? 0) >= message._creationTime) {
+        continue;
+      }
+      const who =
+        personNames.get(message.senderPersonId as string) ?? "A teammate";
+      const title =
+        eventTitles.get(eventId) ??
+        src.mentionEventTitles?.[eventId] ??
+        "an event";
+      out.push({
+        id: `mention:${message._id}`,
+        kind: "mention",
+        message: `${who} mentioned you in "${title}" chat`,
+        // Team chat, not the event page: every chat reader can open this,
+        // while /events/:id needs eventAccess that kitchen or logistics
+        // roles do not carry.
+        link: `/staff/messages?event=${eventId}`,
+        at: message.createdAt,
+      });
+    }
   }
 
   for (const comment of src.prepTaskComments ?? []) {
