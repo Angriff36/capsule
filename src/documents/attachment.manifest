@@ -94,6 +94,10 @@ entity Attachment mixin TenantScoped, SoftDeletable {
     // file (for example into the chat-only parent type, which the generated
     // API never shows). A stored row always has its uploader.
     guard self.uploadedById == null "Files are attached once; remove the attachment and add the file again to change it"
+    // Chat files are written only by convex/teamChatSend.ts, in the same
+    // transaction as their message, after the blob and the parent message are
+    // verified; the public command never creates one.
+    constraint attachNotChat: parentType != "staffMessage" "Chat files are attached through their message"
     constraint attachParent: length(trim(parentId)) > 0 "Parent record is required"
     constraint attachFileName: length(trim(fileName)) > 0 "File name is required"
     constraint attachStorage: length(trim(storageId)) > 0 "Stored file reference is required"

@@ -70,6 +70,8 @@ const OVERDUE_ELIGIBLE_STATUSES = new Set(["sent", "viewed", "partial"]);
 export interface NotificationSources {
   now: number;
   currentAuthSubjectId: string | undefined;
+  /** The caller's current linked Person — the server's resolution (getAuthContext), never re-derived here. */
+  currentPersonId?: string | null;
   events: Doc<"events">[] | undefined;
   incidents: Doc<"incidents">[] | undefined;
   invoices: Doc<"invoices">[] | undefined;
@@ -241,17 +243,12 @@ export function deriveNotifications(
     });
   }
 
-  // The caller's identity for chat is their CURRENT linked Person — the
-  // same rule as the StaffMessage read policy. The auth subjects copied onto
-  // rows are routing data, never a party test: a sign-in moved to another
-  // Person must not see the old Person's conversations.
-  const myPersonId =
-    src.currentAuthSubjectId == null
-      ? null
-      : (((src.people ?? []).find(
-          (p) =>
-            p.authSubjectId === src.currentAuthSubjectId && p.deletedAt == null,
-        )?._id as string | undefined) ?? null);
+  // The caller's identity for chat is their CURRENT linked Person as the
+  // server resolved it (the same Person the DM and cursor reads were fetched
+  // for) — never re-derived from the people list, which may hold an older
+  // or second row for the same sign-in. The auth subjects copied onto rows
+  // are routing data, never a party test.
+  const myPersonId = src.currentPersonId ?? null;
 
   // Only the rows the thread can show and mark read: the newest
   // DM_THREAD_LIMIT of the PAIR — sent and received together, exactly the

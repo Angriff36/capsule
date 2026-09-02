@@ -312,6 +312,7 @@ export const listNotifications = query({
     return deriveNotifications({
       now: Date.now(),
       currentAuthSubjectId: auth.id || undefined,
+      currentPersonId: auth.personId ?? null,
       events,
       incidents,
       invoices,

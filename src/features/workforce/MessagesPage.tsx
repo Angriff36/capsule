@@ -139,6 +139,8 @@ export function MessagesPage() {
   const onSubmit = async (submit: ChatComposerSubmit) => {
     if (!channel) return;
     const sentFrom = channel;
+    // The draft belongs to whoever is signed in NOW; a later sign-in never sees it.
+    const sentBy = identity.identityKey ?? "anonymous";
     setSending(true);
     try {
       await sendMessage(sentFrom, submit);
@@ -146,7 +148,7 @@ export function MessagesPage() {
         setPinSignal((n) => n + 1);
       }
     } catch (cause) {
-      unsentDrafts.keep(sentFrom, submit, sendFailureReason(cause));
+      unsentDrafts.keep(sentBy, sentFrom, submit, sendFailureReason(cause));
     } finally {
       setSending(false);
     }
@@ -282,6 +284,7 @@ export function MessagesPage() {
                 />
                 <ChatUnsentDrafts
                   channel={channel}
+                  identity={identity.identityKey}
                   onSent={() => setPinSignal((n) => n + 1)}
                 />
                 <ChatComposer

@@ -15,10 +15,9 @@
  * same message instead of a duplicate. The nested keys are scoped to the
  * tenant and the caller (the generated key table is global), and the message
  * a key resolves to is verified against the call before anything else
- * happens. Files are keyed by position, never by blob id: a retry that
- * uploaded its files again is handed the first attempt's rows, and its
- * second blobs are deleted only when no live Attachment anywhere references
- * them.
+ * happens. A replay never inserts files — the first attempt's rows are the
+ * message's files — and its re-uploaded blobs are deleted only when no live
+ * Attachment anywhere references them.
  */
 import { v } from "convex/values";
 import { api } from "./_generated/api";
@@ -78,9 +77,7 @@ export const sendWithFiles = mutation({
     // resolve to this message, and vice versa. The fixed kind segment comes
     // BEFORE the caller's key and the key is last, so a draft key that happens
     // to end in ":file:0" can never collide with another message's file key.
-    const prefix = `${auth.tenantId}:${auth.id}:teamChat`;
-    const messageKey = `${prefix}:message:${draftKey}`;
-    const fileKey = (index: number) => `${prefix}:file:${index}:${draftKey}`;
+    const messageKey = `${auth.tenantId}:${auth.id}:teamChat:message:${draftKey}`;
     const replay =
       (await ctx.db
         .query("commandIdempotencyKeys")
@@ -128,19 +125,43 @@ export const sendWithFiles = mutation({
       return { docId };
     }
 
-    // Keyed by the draft and the file's position, never by the blob: a retry
-    // that re-uploaded its files (new blob ids) is handed the first attempt's
-    // rows instead of adding a second set.
-    for (const [index, file] of args.files.entries()) {
-      await ctx.runMutation(api.mutations.Attachment_createViaAttach, {
-        parentType: "staffMessage",
-        parentId: docId,
-        fileName: file.fileName,
-        contentType: file.contentType || "application/octet-stream",
-        fileSize: file.fileSize,
-        storageId: file.storageId,
-        idempotencyKey: fileKey(index),
-      });
+    // Chat files are written here and nowhere else: the public
+    // Attachment.attach command rejects the chat parent type, so a row can
+    // exist only after the blob and the parent message were verified above.
+    // Same shape and audit event as the generated command. A replay never
+    // inserts — the first attempt's rows are the message's files.
+    if (!replay) {
+      const now = Date.now();
+      for (const file of args.files) {
+        const attachmentId = await ctx.db.insert("attachments", {
+          tenantId: auth.tenantId,
+          createdAt: now,
+          updatedAt: now,
+          parentType: "staffMessage",
+          parentId: docId,
+          fileName: file.fileName,
+          contentType: file.contentType || "application/octet-stream",
+          fileSize: file.fileSize,
+          storageId: file.storageId,
+          uploadedById: auth.id,
+          uploadedAt: now,
+          version: 1,
+        });
+        await ctx.db.insert("manifestEvents", {
+          type: "AttachmentAdded",
+          entity: "Attachment",
+          entityId: attachmentId,
+          payload: {
+            attachmentId,
+            tenantId: auth.tenantId,
+            parentType: "staffMessage",
+            parentId: docId,
+            fileName: file.fileName,
+            storageId: file.storageId,
+          },
+          createdAt: now,
+        });
+      }
     }
 
     // The rows are the truth: they set the message's count, and a blob this

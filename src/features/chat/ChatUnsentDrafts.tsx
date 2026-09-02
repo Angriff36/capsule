@@ -11,6 +11,8 @@ import "./chat.css";
 
 type Props = {
   readonly channel: ChatChannel;
+  /** Tenant + current Person of the signed-in user (useChatIdentity().identityKey); null while unknown. */
+  readonly identity: string | null;
   /** A retry succeeded while this channel is still on screen — pin the thread. */
   readonly onSent?: () => void;
 };
@@ -29,9 +31,9 @@ function previewOf(item: UnsentDraft): string {
  * composer. Retry sends the very same message again (same files, same
  * idempotency key); Discard drops it.
  */
-export function ChatUnsentDrafts({ channel, onSent }: Props) {
+export function ChatUnsentDrafts({ channel, identity, onSent }: Props) {
   const channelKey = chatChannelKey(channel);
-  const items = useUnsentDrafts(channelKey);
+  const items = useUnsentDrafts(identity, channelKey);
   const sendMessage = useSendChatMessage();
   const onScreenRef = useRef(channelKey);
   onScreenRef.current = channelKey;

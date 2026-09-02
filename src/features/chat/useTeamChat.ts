@@ -58,9 +58,12 @@ export function useChatIdentity() {
     for (const person of people ?? []) {
       names.set(String(person._id), personDisplayName(person) || "Teammate");
     }
+    const tenantId = status?.tenantId ?? null;
     return {
       loading: status === undefined || people === undefined,
       personId,
+      /** Tenant + current Person: what an unsent draft belongs to. Null until both are known. */
+      identityKey: tenantId && personId ? `${tenantId}:${personId}` : null,
       me,
       canManage: MANAGE_ROLES.has(role) || role.endsWith("_manager"),
       roster,

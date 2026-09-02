@@ -213,7 +213,13 @@ export async function attachmentsFor(
       fileName: row.fileName,
       contentType: row.contentType,
       fileSize: row.fileSize,
-      url: await ctx.storage.getUrl(row.storageId as Id<"_storage">),
+      url: await (async () => {
+        // A row can only come from the send seam, but a URL must never be
+        // minted from an id that does not parse: the whole channel query
+        // would fail for every reader.
+        const storageId = ctx.db.system.normalizeId("_storage", row.storageId);
+        return storageId ? await ctx.storage.getUrl(storageId) : null;
+      })(),
     })),
   );
 }

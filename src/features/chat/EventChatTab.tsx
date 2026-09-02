@@ -68,6 +68,8 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
 
   const onSubmit = async (submit: ChatComposerSubmit) => {
     const sentFrom = channel;
+    // The draft belongs to whoever is signed in NOW; a later sign-in never sees it.
+    const sentBy = identity.identityKey ?? "anonymous";
     setSending(true);
     try {
       await sendMessage(sentFrom, submit);
@@ -75,7 +77,7 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
         setPinSignal((n) => n + 1);
       }
     } catch (cause) {
-      unsentDrafts.keep(sentFrom, submit, sendFailureReason(cause));
+      unsentDrafts.keep(sentBy, sentFrom, submit, sendFailureReason(cause));
     } finally {
       setSending(false);
     }
@@ -130,6 +132,7 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
           />
           <ChatUnsentDrafts
             channel={channel}
+            identity={identity.identityKey}
             onSent={() => setPinSignal((n) => n + 1)}
           />
           <ChatComposer
