@@ -83,7 +83,7 @@ export function QuickFileImport() {
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-3 p-4">
+      <div className="flex flex-wrap items-center gap-3 p-4">
         <input
           ref={fileInput}
           type="file"
@@ -92,9 +92,15 @@ export function QuickFileImport() {
           disabled={busy}
           className="text-xs"
         />
-        {busy ? <span className="text-xs text-ink-2">{progress}</span> : null}
+        {progress ? (
+          <span className="text-xs text-ink-2">{progress}</span>
+        ) : null}
       </div>
-      {error ? <p className="px-4 pb-3 text-xs text-danger">{error}</p> : null}
+      {error ? (
+        <p className="px-4 pb-3 text-xs text-danger" role="alert">
+          {error}
+        </p>
+      ) : null}
       {results.length > 0 ? (
         <div className="px-4 pb-4">
           <p className="text-xs">

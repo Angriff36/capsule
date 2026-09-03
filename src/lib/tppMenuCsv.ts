@@ -11,6 +11,7 @@ export interface TppMenuFeedRow {
   name: string;
   description?: string;
   category?: string;
+  service_style?: string;
   portion_size_description?: string;
   dietary_tags?: string;
   allergens?: string;
@@ -102,6 +103,7 @@ export function tppMenuCsvToRows(text: string): {
   const cCat = col("category");
   const cSize = col("portion_size", "portion_size_description");
   const cUnit = col("portion_unit");
+  const cStyle = col("service_style", "servicestyle");
   const cPrice = col("portion_price", "price_per_person");
   const cTags = col("tags", "dietary_tags");
   const cAllergens = col("allergens");
@@ -118,7 +120,10 @@ export function tppMenuCsvToRows(text: string): {
     const category = cCat >= 0 ? (cells[cCat] ?? "").trim() : "";
     const size = cSize >= 0 ? (cells[cSize] ?? "").trim() : "";
     const unit = cUnit >= 0 ? (cells[cUnit] ?? "").trim() : "";
-    const priceRaw = cPrice >= 0 ? parseFloat(cells[cPrice] ?? "") : NaN;
+    const priceRaw =
+      cPrice >= 0
+        ? parseFloat((cells[cPrice] ?? "").replace(/[$,\s]/g, ""))
+        : NaN;
     const tags = (cTags >= 0 ? (cells[cTags] ?? "") : "")
       .split(/[\n;,]/)
       .map((t) => t.trim())
@@ -128,6 +133,8 @@ export function tppMenuCsvToRows(text: string): {
       name,
       description: cDesc >= 0 ? (cells[cDesc] ?? "").trim() : "",
       category: category || undefined,
+      service_style:
+        cStyle >= 0 ? (cells[cStyle] ?? "").trim() || undefined : undefined,
       portion_size_description:
         [size, unit].filter(Boolean).join(" ") || undefined,
       dietary_tags: tags.length ? [...new Set(tags)].join("; ") : undefined,

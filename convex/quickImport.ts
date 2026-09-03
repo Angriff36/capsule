@@ -57,25 +57,43 @@ export const importFile = action({
     const runId = started.importRunId;
 
     const counts = JSON.stringify({ [args.datasetType]: args.rows.length });
-    await ctx.runMutation(api.mutations.ImportRun_recordParse, {
-      docId: runId,
-      recordCounts: counts,
-    });
-    await ctx.runMutation(api.mutations.ImportRun_validate, { docId: runId });
-    await ctx.runMutation(api.mutations.ImportRun_beginReview, {
-      docId: runId,
-    });
-    await ctx.runMutation(api.mutations.ImportRun_approveReview, {
-      docId: runId,
-      finalRecordCounts: counts,
-    });
+    try {
+      await ctx.runMutation(api.mutations.ImportRun_recordParse, {
+        docId: runId,
+        recordCounts: counts,
+      });
+      await ctx.runMutation(api.mutations.ImportRun_validate, { docId: runId });
+      await ctx.runMutation(api.mutations.ImportRun_beginReview, {
+        docId: runId,
+      });
+      await ctx.runMutation(api.mutations.ImportRun_approveReview, {
+        docId: runId,
+        finalRecordCounts: counts,
+      });
 
-    // Materialize. commitImportRun re-checks auth + the committing status we
-    // just set, and flips the run to completed itself.
-    const result = await ctx.runAction(api.importCommit.commitImportRun, {
-      importRunId: runId,
-      rawRows: args.rows,
-    });
-    return { importRunId: runId, ...result };
+      // Materialize. commitImportRun re-checks auth + the committing status we
+      // just set, and flips the run to completed itself.
+      const result = await ctx.runAction(api.importCommit.commitImportRun, {
+        importRunId: runId,
+        rawRows: args.rows,
+      });
+      return { importRunId: runId, ...result };
+    } catch (cause) {
+      // Never leave an allocated run stuck mid-pipeline: mark it failed (the
+      // generated transition allows failed from any pre-completion state) so
+      // Revert/audit stay truthful, then surface the error.
+      const detail =
+        cause instanceof Error ? cause.message : "Quick import failed";
+      try {
+        await ctx.runMutation(api.mutations.ImportRun_markFailed, {
+          docId: runId,
+          failureDetails: detail,
+        });
+      } catch {
+        // The run may already be terminal (completed/reverted) — surface the
+        // original failure either way.
+      }
+      throw cause;
+    }
   },
 });
