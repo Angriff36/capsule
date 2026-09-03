@@ -8,10 +8,12 @@ The goal text (≤4000 chars) points here. Both bind.
   https://capsule-tau-eight.vercel.app/events/nn7ez3fz56ya246m6p17az2ad58crnwg
   ("Mendenhall / Jarvis Wedding", invoice 6153). Inspect it to learn the real
   data shape and before-state. Never write to it.
-- Vercel Preview deployments use their own Convex deployment (vercel.json
-  points previews at tangible-skunk-448) and their own Clerk environment.
-  Jarvis will not exist there. Never point a Preview at production Convex or
-  change environment configuration to obtain fixture data.
+- Vercel Preview deployments use their own non-production Convex deployment
+  (tangible-skunk-448, set in the Vercel project's Preview environment — not in
+  vercel.json) and their own Clerk environment. Production Convex is
+  impartial-mule-193; tangible-skunk-448 is never production. Jarvis will not
+  exist on a preview. Never point a Preview at production Convex or change
+  environment configuration to obtain fixture data.
 - For Preview/dev acceptance use existing preview/dev fixture data if it
   covers all nine sections; otherwise create the smallest disposable fixture
   that does (UI or governed commands). No fixture framework. No production

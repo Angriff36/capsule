@@ -64,6 +64,8 @@ export interface SavedReportRow {
   _id: string;
   version: number;
   status: unknown;
+  /** Person id that owns the definition; only the owner may updateDefinition. */
+  ownerId?: string | null;
   name?: string | null;
   subjectArea?: string | null;
   chartType?: string | null;
@@ -172,7 +174,10 @@ export function downloadLiveReportCsv(
 }
 
 function csvCell(value: ReportCellValue | undefined): string {
-  const raw = value == null ? "" : String(value);
+  if (typeof value === "number") {
+    return String(value);
+  }
+  const raw = value ?? "";
   const safe = /^[=+\-@]/u.test(raw) ? `'${raw}` : raw;
   return `"${safe.replaceAll('"', '""')}"`;
 }
