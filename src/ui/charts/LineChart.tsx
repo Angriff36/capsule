@@ -27,6 +27,7 @@ export interface LineChartSeries {
   dataKey: string;
   name: string;
   color: string;
+  yAxisId?: "left" | "right";
 }
 
 export interface LineChartProps {
@@ -38,6 +39,7 @@ export interface LineChartProps {
   showGrid?: boolean;
   showLegend?: boolean;
   formatYAxis?: (value: number) => string;
+  formatRightYAxis?: (value: number) => string;
   className?: string;
 }
 
@@ -50,8 +52,10 @@ export function LineChart({
   showGrid = true,
   showLegend = true,
   formatYAxis = formatCount,
+  formatRightYAxis = formatCount,
   className,
 }: LineChartProps) {
+  const hasRightAxis = series.some((item) => item.yAxisId === "right");
   return (
     <div className={className}>
       <ResponsiveContainer width={width} height={height}>
@@ -68,10 +72,20 @@ export function LineChart({
             tick={{ fill: "currentColor" }}
           />
           <YAxis
+            yAxisId="left"
             className="text-2xs text-ink-2"
             tick={{ fill: "currentColor" }}
             tickFormatter={formatYAxis}
           />
+          {hasRightAxis ? (
+            <YAxis
+              yAxisId="right"
+              orientation="right"
+              className="text-2xs text-ink-2"
+              tick={{ fill: "currentColor" }}
+              tickFormatter={formatRightYAxis}
+            />
+          ) : null}
           <Tooltip
             contentStyle={{
               backgroundColor: "var(--color-panel)",
@@ -87,6 +101,7 @@ export function LineChart({
               dataKey={s.dataKey}
               stroke={s.color}
               name={s.name}
+              yAxisId={s.yAxisId ?? "left"}
             />
           ))}
         </RechartsLineChart>

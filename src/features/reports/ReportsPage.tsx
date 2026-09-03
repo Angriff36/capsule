@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   useCreateSavedReportDefinition,
   useListSavedReportDefinition,
@@ -6,43 +6,87 @@ import {
   useSavedReportDefinitionChangeSharing,
   useSavedReportDefinitionRename,
   useSavedReportDefinitionRestore,
+  useSavedReportDefinitionUpdateDefinition,
 } from "../../lib/manifest-convex-react";
+import { formatStatusLabel } from "../../lib/statusLabels";
+import { useActionNotice } from "../../ui/action-result";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   ReportCreateForm,
   ReportCreatePayloadBuilder,
   REPORT_SHARING_SCOPES,
   SHARING_SCOPE_LABELS,
+  type ReportChartType,
   type ReportSharingScope,
 } from "./ReportCreateForm";
+import { LiveReportData } from "./LiveReportData";
+import { LiveReportWorkspace } from "./LiveReportWorkspace";
+import {
+  normalizeReportChart,
+  normalizeReportSubject,
+  parseLiveReportDefinition,
+  type ReportDateWindow,
+  type SavedReportRow,
+} from "./liveReportModel";
 import { ReportLifecyclePolicy } from "./ReportLifecyclePolicy";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
-import { useActionNotice } from "../../ui/action-result";
 
 const policy = new ReportLifecyclePolicy();
 const payloadBuilder = new ReportCreatePayloadBuilder();
 
 export function ReportsPage() {
-  const reports = useListSavedReportDefinition();
+  const reportQuery = useListSavedReportDefinition();
+  const reports = reportQuery as SavedReportRow[] | undefined;
   const createReport = useCreateSavedReportDefinition();
   const rename = useSavedReportDefinitionRename();
   const changeSharing = useSavedReportDefinitionChangeSharing();
   const archive = useSavedReportDefinitionArchive();
   const restore = useSavedReportDefinitionRestore();
+  const updateDefinition = useSavedReportDefinitionUpdateDefinition();
   const [showCreate, setShowCreate] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
-  const activeRows = (reports ?? []).filter((row) => row.deletedAt == null);
-  const definedRows = activeRows.filter((row) => row.definedAt != null);
-  const visibleRows = showArchived
-    ? definedRows
-    : definedRows.filter((row) => String(row.status) !== "archived");
+  const { currentRows, definedRows } = useMemo(() => {
+    const activeRows = (reports ?? []).filter((row) => row.deletedAt == null);
+    const defined = activeRows.filter((row) => row.definedAt != null);
+    return {
+      currentRows: defined.filter((row) => String(row.status) !== "archived"),
+      definedRows: defined,
+    };
+  }, [reports]);
+  const visibleRows = showArchived ? definedRows : currentRows;
+  const selectedReport =
+    currentRows.find((row) => row._id === selectedId) ?? null;
+
+  const selectReport = (reportId: string) => {
+    setSelectedId(reportId);
+  };
+
+  useEffect(() => {
+    if (selectedId && currentRows.some((row) => row._id === selectedId)) {
+      return;
+    }
+    setSelectedId(currentRows[0]?._id ?? null);
+  }, [currentRows, selectedId]);
+
+  useEffect(() => {
+    if (!selectedId || !window.matchMedia("(max-width: 1080px)").matches) {
+      return;
+    }
+    const frame = window.requestAnimationFrame(() => {
+      document
+        .getElementById("live-report-title")
+        ?.closest(".live-report")
+        ?.scrollIntoView({ block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [selectedId]);
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -63,20 +107,18 @@ export function ReportsPage() {
     try {
       const payload = payloadBuilder.fromForm(new FormData(form));
       void run("create-report", async () => {
-        await createReport(payload);
+        const created = (await createReport(payload)) as { docId?: string };
+        if (created.docId) selectReport(String(created.docId));
         form.reset();
         setShowCreate(false);
-        setNotice("Report saved.");
+        setNotice("Live report created.");
       });
     } catch (error) {
       setFailure(error);
     }
   };
 
-  const invokeLifecycle = (
-    row: { _id: string; version: number; status: unknown },
-    key: string,
-  ) => {
+  const invokeLifecycle = (row: SavedReportRow, key: string) => {
     void run(`${row._id}:${key}`, async () => {
       if (key === "archive") {
         await archive({ docId: row._id, version: row.version });
@@ -84,19 +126,16 @@ export function ReportsPage() {
         return;
       }
       await restore({ docId: row._id, version: row.version });
+      selectReport(row._id);
       setNotice("Report restored.");
     });
   };
 
-  const invokeRename = (row: {
-    _id: string;
-    version: number;
-    name?: string | null;
-  }) => {
+  const invokeRename = (row: SavedReportRow) => {
     void (async () => {
       const values = await prompt.askFields({
         title: "Rename report",
-        description: "Update the display name for this saved definition.",
+        description: "Update the display name for this live report.",
         fields: [
           {
             name: "name",
@@ -120,15 +159,12 @@ export function ReportsPage() {
     })();
   };
 
-  const invokeShare = (row: {
-    _id: string;
-    version: number;
-    sharingScope?: string | null;
-  }) => {
+  const invokeShare = (row: SavedReportRow) => {
     void (async () => {
       const values = await prompt.askFields({
         title: "Change sharing",
-        description: "Choose who can see this saved report.",
+        description:
+          "Choose who can discover this report. Source permissions still apply.",
         fields: [
           {
             name: "sharingScope",
@@ -160,16 +196,37 @@ export function ReportsPage() {
     })();
   };
 
+  const applyReportSettings = (
+    row: SavedReportRow,
+    dateWindow: ReportDateWindow,
+    chartType: ReportChartType,
+  ) => {
+    const definition = parseLiveReportDefinition(row.definition);
+    void run(`${row._id}:apply`, async () => {
+      await updateDefinition({
+        docId: row._id,
+        version: row.version,
+        chartType,
+        definition: {
+          version: 2,
+          dateWindow,
+          notes: definition.notes,
+        },
+      });
+      setNotice("Live report settings applied.");
+    });
+  };
+
   const loading = reports === undefined;
 
   return (
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div>
-          <h1 className="display-title">Saved reports</h1>
+          <h1 className="display-title">Live reports</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Report setups you can save, rename, share, archive, and restore. A
-            saved report keeps your settings — it doesn't draw the chart yet.
+            Saved views of current Capsule operations. Open a report to see live
+            KPIs, a chart, and the source records behind every number.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -205,109 +262,180 @@ export function ReportsPage() {
         />
       ) : null}
 
-      <section className="working-ledger">
-        <div className="ledger-heading">
-          <div>
-            <h2>Saved reports</h2>
-          </div>
-          <span>{visibleRows.length} saved</span>
-        </div>
-        {loading ? (
-          <TableSkeleton rows={5} />
-        ) : visibleRows.length === 0 ? (
-          <div className="document-empty">
-            <p>No saved reports yet.</p>
-            <span>
-              Save a report to keep its name, chart type, and sharing settings
-              here for later.
-            </span>
-            <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowCreate(true)}
-              >
-                New report
-              </button>
-            </div>
-          </div>
+      <div className="reports-workspace-grid">
+        {selectedReport ? (
+          <SelectedReport
+            report={selectedReport}
+            busy={busy === `${selectedReport._id}:apply`}
+            onApply={(dateWindow, chartType) =>
+              applyReportSettings(selectedReport, dateWindow, chartType)
+            }
+          />
         ) : (
-          <div className="supply-table-wrap">
-            <table className="supply-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Subject</th>
-                  <th>Chart</th>
-                  <th>Sharing</th>
-                  <th>State</th>
-                  <th aria-label="Actions" />
-                </tr>
-              </thead>
-              <tbody>
-                {visibleRows.map((row) => {
-                  const status = String(row.status);
-                  const editable = policy.canEditDefinition(
-                    status,
-                    row.definedAt,
-                  );
-                  return (
-                    <tr key={row._id}>
-                      <td>
-                        <strong>{String(row.name || "Untitled")}</strong>
-                      </td>
-                      <td>{formatStatusLabel(String(row.subjectArea))}</td>
-                      <td>{formatStatusLabel(String(row.chartType))}</td>
-                      <td>
-                        {(SHARING_SCOPE_LABELS as Record<string, string>)[
-                          String(row.sharingScope ?? "owner_only")
-                        ] ?? formatStatusLabel(String(row.sharingScope))}
-                      </td>
-                      <td>
-                        <StatusChip status={status} />
-                      </td>
-                      <td>
-                        <div className="supply-row-actions">
-                          {editable ? (
-                            <>
-                              <button
-                                className="btn btn-ghost btn-sm"
-                                disabled={busy != null}
-                                onClick={() => invokeRename(row)}
-                              >
-                                Rename
-                              </button>
-                              <button
-                                className="btn btn-ghost btn-sm"
-                                disabled={busy != null}
-                                onClick={() => invokeShare(row)}
-                              >
-                                Share
-                              </button>
-                            </>
-                          ) : null}
-                          {policy.reportActions(status).map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => invokeLifecycle(row, action.key)}
-                            >
-                              {busy === `${row._id}:${action.key}`
-                                ? "Working…"
-                                : action.label}
-                            </button>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <section className="live-report live-report-placeholder">
+            <div className="document-empty">
+              <p>No live report is open.</p>
+              <span>Create or open a saved report to query current data.</span>
+            </div>
+          </section>
         )}
-      </section>
+
+        <section
+          className="saved-report-index"
+          aria-labelledby="saved-reports-heading"
+        >
+          <div className="ledger-heading">
+            <h2 id="saved-reports-heading">Saved reports</h2>
+            <span>{visibleRows.length} saved</span>
+          </div>
+          {loading ? (
+            <TableSkeleton rows={5} />
+          ) : visibleRows.length === 0 ? (
+            <div className="document-empty">
+              <p>No saved reports yet.</p>
+              <span>
+                Create one to open live operational results immediately.
+              </span>
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowCreate(true)}
+                >
+                  New report
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="saved-report-list">
+              {visibleRows.map((row) => {
+                const status = String(row.status);
+                const editable = policy.canEditDefinition(
+                  status,
+                  row.definedAt,
+                );
+                const isSelected = selectedReport?._id === row._id;
+                return (
+                  <article
+                    className={`saved-report-item${isSelected ? " is-selected" : ""}`}
+                    key={row._id}
+                  >
+                    <div className="saved-report-item-heading">
+                      <div>
+                        <strong>{String(row.name || "Untitled")}</strong>
+                        <span>
+                          {formatStatusLabel(String(row.subjectArea))} ·{" "}
+                          {formatStatusLabel(String(row.chartType))}
+                        </span>
+                      </div>
+                      <StatusChip status={status} />
+                    </div>
+                    <span className="saved-report-sharing">
+                      {(SHARING_SCOPE_LABELS as Record<string, string>)[
+                        String(row.sharingScope ?? "owner_only")
+                      ] ?? formatStatusLabel(String(row.sharingScope))}
+                    </span>
+                    <div className="saved-report-actions">
+                      {status !== "archived" ? (
+                        <button
+                          className={
+                            isSelected
+                              ? "btn btn-primary btn-sm"
+                              : "btn btn-ghost btn-sm"
+                          }
+                          type="button"
+                          disabled={busy != null}
+                          onClick={() => selectReport(row._id)}
+                        >
+                          {isSelected ? "Open" : "View report"}
+                        </button>
+                      ) : null}
+                      {editable ? (
+                        <>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            type="button"
+                            disabled={busy != null}
+                            onClick={() => invokeRename(row)}
+                          >
+                            Rename
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            type="button"
+                            disabled={busy != null}
+                            onClick={() => invokeShare(row)}
+                          >
+                            Share
+                          </button>
+                        </>
+                      ) : null}
+                      {policy.reportActions(status).map((action) => (
+                        <button
+                          key={action.key}
+                          className="btn btn-ghost btn-sm"
+                          type="button"
+                          disabled={busy != null}
+                          onClick={() => invokeLifecycle(row, action.key)}
+                        >
+                          {busy === `${row._id}:${action.key}`
+                            ? "Working…"
+                            : action.label}
+                        </button>
+                      ))}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      </div>
     </div>
+  );
+}
+
+function SelectedReport({
+  report,
+  busy,
+  onApply,
+}: {
+  report: SavedReportRow;
+  busy: boolean;
+  onApply: (dateWindow: ReportDateWindow, chartType: ReportChartType) => void;
+}) {
+  const subject = normalizeReportSubject(report.subjectArea);
+  if (!subject) {
+    return (
+      <section className="live-report">
+        <div className="document-empty live-report-unavailable">
+          <p>This report uses an unsupported subject area.</p>
+          <span>
+            Create a new report with one of the available live subjects.
+          </span>
+        </div>
+      </section>
+    );
+  }
+
+  const definition = parseLiveReportDefinition(report.definition);
+  const chart = normalizeReportChart(report.chartType);
+  return (
+    <LiveReportData subject={subject} dateWindow={definition.dateWindow}>
+      {({ model, loading, sourceAvailable }) => (
+        <LiveReportWorkspace
+          report={report}
+          subject={subject}
+          savedDateWindow={definition.dateWindow}
+          savedChartType={chart.chartType}
+          usedChartFallback={chart.usedFallback}
+          model={model}
+          loading={loading}
+          sourceAvailable={sourceAvailable}
+          busy={busy}
+          onApply={onApply}
+        />
+      )}
+    </LiveReportData>
   );
 }

@@ -52,7 +52,7 @@ describe("Reports routes and lifecycle bindings", () => {
       subjectArea: "logistics",
       chartType: "bar",
       sharingScope: "team",
-      definition: { version: 1, notes: "proof" },
+      definition: { version: 2, dateWindow: "90_days", notes: "proof" },
     });
   });
 });
