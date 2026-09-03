@@ -220,7 +220,7 @@ export function ReportsPage() {
   const loading = reports === undefined;
 
   return (
-    <div className="operations-stage supply-stage reports-stage">
+    <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div>
           <h1 className="display-title">Live reports</h1>

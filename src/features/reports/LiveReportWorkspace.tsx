@@ -65,7 +65,7 @@ export function LiveReportWorkspace({
       <div className="live-report-heading">
         <div>
           <div className="live-report-eyebrow">
-            <span className="live-report-chip">Live</span>
+            <span>Current data</span>
             <span>{formatStatusLabel(subject)}</span>
             <span>{REPORT_DATE_WINDOW_LABELS[savedDateWindow]}</span>
           </div>

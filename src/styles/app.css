@@ -2754,7 +2754,7 @@
 .saved-report-sharing {
   margin-top: 0.2rem;
   color: var(--color-ink-3);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .saved-report-actions {
@@ -2777,6 +2777,8 @@
   margin-top: 0.45rem;
   font-family: var(--font-display);
   font-size: clamp(1.6rem, 3vw, 2.35rem);
+  font-weight: 700;
+  line-height: 0.98;
   letter-spacing: -0.035em;
 }
 
@@ -2794,25 +2796,18 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   color: var(--color-ink-3);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.live-report-chip {
-  border: 1px solid var(--color-ok);
-  border-radius: var(--radius-pill);
-  background: var(--color-ok-soft);
-  padding: 0.2rem 0.55rem;
-  color: var(--color-ok);
+  font-family: var(--font-display);
+  font-size: 14px;
   font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
 }
 
 .live-report-sharing {
   flex: none;
   color: var(--color-ink-3);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .live-report-controls {
@@ -2835,9 +2830,11 @@
 .report-kpi span,
 .live-report-table-lead span {
   color: var(--color-ink-3);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -2846,7 +2843,7 @@
   background: var(--color-warn-soft);
   padding: 0.75rem;
   color: var(--color-ink-2);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .report-kpi-grid {
