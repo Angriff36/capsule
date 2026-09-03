@@ -186,16 +186,23 @@ export function CandidatesPage() {
     _id: string;
     fullName: string;
     version: number | undefined;
+    hiredPersonId?: string | null;
   }) => {
     setFailure(null);
     setNotice(null);
     setBusy(true);
+    const linkedPerson =
+      candidate.hiredPersonId != null
+        ? people?.find((row) => row._id === candidate.hiredPersonId)
+        : undefined;
     try {
       const result = await hireIntoTeam({
         candidateId: candidate._id as never,
         ...(candidate.version !== undefined
           ? { expectedVersion: candidate.version }
           : {}),
+        // Reactivation intent: only the "Restore and resend" state sends it.
+        ...(linkedPerson?.status === "inactive" ? { restore: true } : {}),
       });
       if (result.kind === "hired_no_email") {
         setNotice({

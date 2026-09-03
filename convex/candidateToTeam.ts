@@ -45,9 +45,11 @@ const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 // Roles that carry decision authority over other people or domains. Hiring a
 // candidate INTO one of these is a role assignment, and role assignment is
 // admin-only in Capsule (Person.assignRole). A workforce manager can hire the
-// line, not grant a manager tier — mirrors the assignRole/linkAccount
-// escalation guards. Keep in sync with base.manifest.
+// line, not grant a manager/lead tier — kitchen_lead is included because it
+// carries kitchenLeadAccess (cancel batches, block prep tasks). Mirrors the
+// assignRole/linkAccount escalation guards. Keep in sync with base.manifest.
 const PRIVILEGED_HIRE_ROLES = new Set([
+  "kitchen_lead",
   "manager",
   "kitchen_manager",
   "sales_manager",
@@ -75,10 +77,14 @@ export const hireIntoTeam = mutation({
     // Optimistic concurrency, same as the generated commands: refuse to hire
     // over a row another manager (or a KM re-import) changed since render.
     expectedVersion: v.optional(v.number()),
+    // Explicit reactivation intent. The UI sends true only from the
+    // "Restore and resend" state — a plain resend click never reactivates,
+    // even if the profile went inactive after the page rendered.
+    restore: v.optional(v.boolean()),
   },
   handler: async (
     ctx,
-    { candidateId, expectedVersion },
+    { candidateId, expectedVersion, restore },
   ): Promise<HireIntoTeamResult> => {
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || !WORKFORCE_MANAGE_ROLES.has(auth.role)) {
@@ -139,6 +145,14 @@ export const hireIntoTeam = mutation({
           );
         }
         if (String(linked.status) === "inactive") {
+          // Reactivation requires the caller to have SEEN the inactive state
+          // (the "Restore and resend" button sets restore). A stale page that
+          // still says "Resend sign-in" must not flip access back on.
+          if (restore !== true) {
+            throw new ConvexError(
+              "This hire's team profile is inactive. Reload the page and use Restore and resend.",
+            );
+          }
           if (
             PRIVILEGED_HIRE_ROLES.has(String(linked.role)) &&
             !ADMIN_ROLES.has(auth.role)
@@ -317,18 +331,19 @@ async function findPersonByEmail(
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .collect();
   let unlinked: Doc<"people"> | null = null;
-  let terminated: Doc<"people"> | null = null;
+  let dormant: Doc<"people"> | null = null;
   for (const person of people) {
     if ((await readStoredEmail(ctx, person.email)) !== email) continue;
-    if (person.deletedAt != null || String(person.status) === "terminated") {
-      terminated ??= person;
-    } else if (person.authSubjectId) {
-      return person;
-    } else {
+    // A LIVE profile always beats a dormant one, whatever the link state —
+    // reactivating a stale duplicate would resurrect old permissions.
+    if (person.deletedAt == null && String(person.status) === "active") {
+      if (person.authSubjectId) return person;
       unlinked ??= person;
+    } else {
+      dormant ??= person;
     }
   }
-  return unlinked ?? terminated;
+  return unlinked ?? dormant;
 }
 
 /** Person.email is an encrypted field; decode the envelope, else take it raw. */
