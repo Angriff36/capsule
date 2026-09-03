@@ -181,10 +181,12 @@ function normalized(raw: string | null | undefined): string {
 /**
  * The tenant's Person carrying this email, ANY row — including terminated
  * ones, because terminate() sets deletedAt and a soft-deleted mailbox must
- * still block a duplicate. Person.email is encrypted, so the only honest
- * match is a decrypt-and-compare over the tenant's roster — single-tenant
- * scale, the same shape as the roster scan the generated list query and
- * authLink already do.
+ * still block a duplicate. A live (non-terminated) row always wins over an
+ * older terminated one — duplicate rows exist historically because the
+ * create command never enforced uniqueness. Person.email is encrypted, so
+ * the only honest match is a decrypt-and-compare over the tenant's roster —
+ * single-tenant scale, the same shape as the roster scan the generated list
+ * query and authLink already do.
  */
 async function findLivePersonByEmail(
   ctx: MutationCtx,
@@ -195,10 +197,15 @@ async function findLivePersonByEmail(
     .query("people")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .collect();
+  let terminated: Doc<"people"> | null = null;
   for (const person of people) {
-    if ((await readStoredEmail(ctx, person.email)) === email) return person;
+    if ((await readStoredEmail(ctx, person.email)) !== email) continue;
+    if (person.deletedAt == null && String(person.status) !== "terminated") {
+      return person;
+    }
+    terminated ??= person;
   }
-  return null;
+  return terminated;
 }
 
 /** Person.email is an encrypted field; decode the envelope, else take it raw. */
