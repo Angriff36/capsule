@@ -143,12 +143,50 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
     );
     expect(builder).toContain("MONTHS_IN_YEAR - 1");
     expect(builder).toContain("return Date.UTC(");
-    expect(builder).toContain("timestamp < threshold");
     const workspace = readFileSync(
       "src/features/reports/LiveReportWorkspace.tsx",
       "utf8",
     );
     expect(workspace).toContain("data={model.trend}");
+  });
+
+  it("drops a future-dated record instead of fabricating a 13th trend bucket", () => {
+    // filterRows only enforces dateOf(row) >= windowStart (see
+    // liveReportBuilders.ts filterRows): there is no upper bound, so a row
+    // dated after "now" — a scheduled event, exactly the kind of record a
+    // forward-scheduling app like this one keeps — still reaches
+    // monthlyTrend. Reproduces the real prod defect (not the grep-only one
+    // the guard covered): with monthlyTrend's earliestBucket/latestBucket
+    // check removed, this "future" row lands in `buckets.get(key) ??
+    // emptyBucket(...)` and adds a 13th point past the seeded 12-month
+    // range, through the real buildLiveReportModel -> monthlyTrend path,
+    // not a source grep.
+    const now = new Date();
+    const currentMonth = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 15);
+    const future = Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 3, 10);
+    const model = buildLiveReportModel(
+      "events",
+      [
+        { _id: "current", startsAt: currentMonth },
+        { _id: "future", startsAt: future },
+      ],
+      "12_months",
+    );
+    expect(model.trend).toHaveLength(12);
+    expect(model.trend.at(-1)?.label).toBe(
+      new Intl.DateTimeFormat("en-US", {
+        month: "short",
+        year: "2-digit",
+        timeZone: "UTC",
+      }).format(new Date(currentMonth)),
+    );
+    // The scheduled-ahead event is still a real row: filterRows keeps it
+    // (KPIs/table/CSV should show upcoming events), only the trend chart's
+    // fixed 12-bucket range excludes it.
+    expect(model.rows.map((row) => row.id).sort()).toEqual([
+      "current",
+      "future",
+    ]);
   });
 
   it("maps Production to kitchen and fails closed when kitchen is disabled", () => {

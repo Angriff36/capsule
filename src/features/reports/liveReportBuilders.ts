@@ -535,9 +535,31 @@ function monthlyTrend(
   const buckets = new Map<string, ReportChartPoint>();
   const now = Date.now();
   const threshold = windowStart(dateWindow, now);
+  // A bounded window (30 days, 90 days, 12 months) pre-seeds exactly the
+  // month buckets from windowStart's month through the current month —
+  // earliestBucket/latestBucket below, computed once from that same
+  // threshold/now pair. filterRows only enforces the lower bound
+  // (dateOf(row) >= threshold): it has no upper bound, so a row dated after
+  // "now" (a scheduled event, a not-yet-issued invoice line, a future
+  // shift or delivery window — all ordinary for a forward-scheduling app)
+  // still reaches this function. Without a matching check here, such a row
+  // falls through to `buckets.get(key) ?? emptyBucket(...)` and fabricates
+  // a bucket beyond latestBucket, so a "last 12 months" trend can render
+  // 13+ points. Comparing at month granularity (not the raw timestamp,
+  // which would need a second now-dependent threshold recompute prone to a
+  // straddled-instant race) keeps both edges — old and future-dated rows —
+  // aligned with the exact range the seeding loop promised the chart.
+  // Timestamps, not Date references: `cursor` below is mutated in place
+  // by the seeding loop, so capturing its .getTime() up front (rather than
+  // the Date object itself) keeps earliestBucket fixed at the window's
+  // first month instead of drifting to the loop's final value.
+  let earliestBucket: number | null = null;
+  let latestBucket: number | null = null;
   if (threshold != null) {
     const cursor = startOfMonth(threshold);
     const end = startOfMonth(now);
+    earliestBucket = cursor.getTime();
+    latestBucket = end.getTime();
     while (cursor <= end) {
       const key = monthKey(cursor);
       buckets.set(key, emptyBucket(cursor, metrics));
@@ -547,8 +569,9 @@ function monthlyTrend(
   for (const row of rows) {
     const timestamp = dateOf(row);
     if (timestamp == null) continue;
-    if (threshold != null && timestamp < threshold) continue;
     const date = startOfMonth(timestamp);
+    if (earliestBucket != null && date.getTime() < earliestBucket) continue;
+    if (latestBucket != null && date.getTime() > latestBucket) continue;
     const key = monthKey(date);
     const bucket = buckets.get(key) ?? emptyBucket(date, metrics);
     for (const metric of metrics) {
