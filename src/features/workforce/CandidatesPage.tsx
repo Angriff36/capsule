@@ -179,9 +179,13 @@ export function CandidatesPage() {
   }) => {
     setFailure(null);
     setNotice(null);
+    setBusy(true);
     try {
       const result = await hireIntoTeam({
         candidateId: candidate._id as never,
+        ...(candidate.version !== undefined
+          ? { expectedVersion: candidate.version }
+          : {}),
       });
       if (result.kind === "hired_no_email") {
         setNotice(
@@ -203,6 +207,8 @@ export function CandidatesPage() {
       }
     } catch (error) {
       setFailure(error);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -480,7 +486,7 @@ export function CandidatesPage() {
                       <button
                         type="button"
                         className="btn btn-primary"
-                        disabled={candidate.stage === "hired"}
+                        disabled={busy || candidate.stage === "hired"}
                         onClick={() => void hireCandidate(candidate)}
                       >
                         Hire into team
