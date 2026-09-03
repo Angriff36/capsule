@@ -119,6 +119,17 @@ export const hireIntoTeam = mutation({
     if (alreadyHired && candidate.hiredPersonId) {
       const linked = await ctx.db.get(candidate.hiredPersonId as Id<"people">);
       if (linked && linked.deletedAt == null) {
+        // Credentials go to the LINKED PROFILE's address — it owns the Clerk
+        // account. A KM re-import can patch a different email onto the
+        // candidate row even after hire; refuse to silently mail the old
+        // mailbox while the card shows a new one.
+        const personEmail = await readStoredEmail(ctx, linked.email);
+        const candidateEmail = normalized(candidate.email);
+        if (candidateEmail && candidateEmail !== personEmail) {
+          throw new ConvexError(
+            `The candidate row says ${candidateEmail} but their sign-in profile uses ${personEmail}. Fix the profile under Team roles, then resend.`,
+          );
+        }
         // A linked profile that was later deactivated cannot receive a
         // sign-in (provisionStaffSignIn requires an active row) — bring it
         // back first, under the same privileged-role gate as the reuse path.
@@ -136,10 +147,14 @@ export const hireIntoTeam = mutation({
             version: linked.version,
           });
         }
+        // NOTE: an ACTIVE privileged profile is NOT gated here on purpose.
+        // The link already exists — resending grants nothing new, and
+        // provisionStaffSignIn already lets a workforce manager provision any
+        // non-admin Person (the same rule as "Email sign-in" in Team roles).
         return {
           kind: "hired",
           personId: String(linked._id),
-          email: normalized(candidate.email),
+          email: personEmail || candidateEmail,
         };
       }
     }

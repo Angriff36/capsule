@@ -440,6 +440,12 @@ export function CandidatesPage() {
                     <button
                       type="button"
                       className="btn btn-secondary"
+                      disabled={busy || candidate.hiredPersonId != null}
+                      title={
+                        candidate.hiredPersonId != null
+                          ? "This hire has a live team profile. Deactivate or terminate them under Administration → Permissions → Team roles instead of reopening."
+                          : undefined
+                      }
                       onClick={(e) => {
                         const select = e.currentTarget
                           .closest(".supply-form-grid")
