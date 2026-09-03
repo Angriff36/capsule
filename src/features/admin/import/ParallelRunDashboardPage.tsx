@@ -679,19 +679,19 @@ export function ParallelRunDashboardPage() {
                       <td>{menuCatalogComparison.tppTotal.toLocaleString()}</td>
                       <td
                         className={
-                          menuCatalogComparison.pendingLinks === 0
+                          menuCatalogComparison.unresolvedLinks === 0
                             ? "text-ok"
                             : "text-warn"
                         }
                       >
-                        {menuCatalogComparison.pendingLinks > 0
-                          ? `${menuCatalogComparison.pendingLinks.toLocaleString()} to resolve`
+                        {menuCatalogComparison.unresolvedLinks > 0
+                          ? `${menuCatalogComparison.unresolvedLinks.toLocaleString()} to resolve`
                           : "0"}
                       </td>
                       <td>
                         <StatusChip
                           status={
-                            menuCatalogComparison.pendingLinks === 0
+                            menuCatalogComparison.unresolvedLinks === 0
                               ? "match"
                               : "warning"
                           }
