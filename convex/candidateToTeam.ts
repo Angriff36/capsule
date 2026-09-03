@@ -119,6 +119,23 @@ export const hireIntoTeam = mutation({
     if (alreadyHired && candidate.hiredPersonId) {
       const linked = await ctx.db.get(candidate.hiredPersonId as Id<"people">);
       if (linked && linked.deletedAt == null) {
+        // A linked profile that was later deactivated cannot receive a
+        // sign-in (provisionStaffSignIn requires an active row) — bring it
+        // back first, under the same privileged-role gate as the reuse path.
+        if (String(linked.status) === "inactive") {
+          if (
+            PRIVILEGED_HIRE_ROLES.has(String(linked.role)) &&
+            !ADMIN_ROLES.has(auth.role)
+          ) {
+            throw new ConvexError(
+              "This hire's profile is an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles.",
+            );
+          }
+          await ctx.runMutation(api.mutations.Person_reactivate, {
+            docId: linked._id,
+            version: linked.version,
+          });
+        }
         return {
           kind: "hired",
           personId: String(linked._id),
