@@ -1,6 +1,6 @@
 /**
  * Runtime proof: SavedReportDefinition.createDefinition → archive → restore.
- * ownerId is v.id("people"), so the JWT subject must be an opaque Person id.
+ * ownerId is v.id("people"), resolved from the JWT subject's linked Person.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -35,6 +35,7 @@ async function hireStaff(
   tenantId: string,
   label: string,
 ) {
+  const authSubjectId = `user_${tenantId}_${label}`;
   const manager = proof.asRole({
     subject: `workforce-${tenantId}-${label}`,
     role: "workforce_manager",
@@ -51,15 +52,23 @@ async function hireStaff(
       employmentType: "full_time",
     },
   )) as { docId: string };
-  return person.docId;
+  await proof.executeCommand(manager, api.mutations.Person_linkAccount, {
+    docId: person.docId,
+    authSubjectId,
+  });
+  return { personId: person.docId, authSubjectId };
 }
 
 describe("runtime proof: SavedReportDefinition create → archive → restore", () => {
   it("creates, archives, and restores a governed report definition", async () => {
     const proof = harness();
-    const personId = await hireStaff(proof, S.tenantA, "owner");
+    const { personId, authSubjectId } = await hireStaff(
+      proof,
+      S.tenantA,
+      "owner",
+    );
     const staff = proof.asRole({
-      subject: personId,
+      subject: authSubjectId,
       role: "event_manager",
       tenantId: S.tenantA,
     });
@@ -127,14 +136,15 @@ describe("runtime proof: SavedReportDefinition create → archive → restore", 
 
   it("keeps owner_only reports out of another tenant", async () => {
     const proof = harness();
-    const personId = await hireStaff(proof, S.tenantA, "private");
+    const { authSubjectId } = await hireStaff(proof, S.tenantA, "private");
     const owner = proof.asRole({
-      subject: personId,
+      subject: authSubjectId,
       role: "manager",
       tenantId: S.tenantA,
     });
+    const outsider = await hireStaff(proof, S.tenantB, "outsider");
     const otherTenant = proof.asRole({
-      subject: await hireStaff(proof, S.tenantB, "outsider"),
+      subject: outsider.authSubjectId,
       role: "manager",
       tenantId: S.tenantB,
     });

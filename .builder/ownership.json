@@ -18,10 +18,10 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "faebcb9297cd6e09fe58a0e1ac58b9a498e52f5bdc342590631acf55a3161474"
+      "sha256": "c090ebf00f1e393045d39dcedc230769c7cfa7fea7d735fe86ba88a15b7b4092"
     },
     "convex/queries.ts": {
-      "sha256": "188d9f42acf3becab840ef0c7e33cbe6e0d65beafa32a95bb48c5dff386aa098"
+      "sha256": "c58d1f6d62cf190e04fe821f1105b038eb88e50fe1b76a9e27ed6b9753954b47"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -30,7 +30,7 @@
       "sha256": "623691544bf261a6136914913592199240207e6b65f3abea6d8c33f9666474b1"
     },
     "manifest-context-summary.json": {
-      "sha256": "9f23d66d087e9c40080a18d4ceaae36bce94733159ff3fbe6e263f08680f2d2e"
+      "sha256": "9ee523dbf4fddc5004435589f0bdf85bc2c51432ee067f057d7c082389e372a1"
     },
     "package.json": {
       "sha256": "e5826d3732b8193a02c702442e6559fb8e2c1efb0b1911bcb0f3b0afdeb466b0"
@@ -45,10 +45,10 @@
       "sha256": "fa158809496ca8bda4fb589c4370863f25a73e7070d4d0d63e00d401c57b01cc"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "88a950a3878848b2be6048927772a6a633899c1ab63441e1199c4d155913e08a"
+      "sha256": "798a46ac1b879f9b8b49813e0d40cb06a6527e9cbbc3c52afcf1d73b9417a358"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "0d10f53d892a622c3490e68a326a4f26252117fa93a0a2c31886a6e92284cb43"
+      "sha256": "5c2f2c6b8d1810f817b3d23cba4b626e000b2c7b9f9233b61c328d1daef64b5e"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "9c121e32c667f0d180d20be2881587cd26a96cfeda0ffb8bc27dc676e1ec15bd"
@@ -60,7 +60,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "0d6736d9366538509daf411e223078436417c13d819f7ac39bfb3c482a968b37"
+      "sha256": "7f6f32a7ef6871231418b2f57cfd8cd990b9dbcf17fed704525c33547a628eaa"
     }
   },
   "package": {
