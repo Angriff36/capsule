@@ -7,7 +7,11 @@ export function clientDisplayName(
   if (!clientId) return "—";
   const c = clients?.find((x) => x._id === clientId);
   if (!c) return "—";
-  if (c.clientType === "company" && c.companyName) return c.companyName;
-  const name = [c.givenName, c.familyName].filter(Boolean).join(" ");
-  return name || c.companyName || "—";
+  const companyName = c.companyName?.trim();
+  if (c.clientType === "company" && companyName) return companyName;
+  const name = [c.givenName, c.familyName]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(" ");
+  return name || companyName || "—";
 }

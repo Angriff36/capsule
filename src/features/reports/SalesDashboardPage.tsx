@@ -13,6 +13,7 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
+import { clientDisplayName } from "../events/clientName";
 
 /**
  * Sales Dashboard (Priority 36)
@@ -176,9 +177,7 @@ export function SalesDashboardPage() {
       const client = clients.find((c) => c._id === event.clientId);
       if (!client) return;
 
-      const name =
-        client.companyName ||
-        `${client.contactGivenName} ${client.contactFamilyName}`.trim();
+      const name = clientDisplayName(event.clientId, clients);
 
       if (!clientMap.has(event.clientId)) {
         clientMap.set(event.clientId, { name, revenue: 0, eventCount: 0 });
