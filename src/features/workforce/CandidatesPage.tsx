@@ -443,7 +443,7 @@ export function CandidatesPage() {
                       disabled={busy || candidate.hiredPersonId != null}
                       title={
                         candidate.hiredPersonId != null
-                          ? "This hire has a live team profile. Deactivate or terminate them under Administration → Permissions → Team roles instead of reopening."
+                          ? "Reopening is disabled while a team profile is linked (issue #269). Change their status under Administration → Permissions → Team roles."
                           : undefined
                       }
                       onClick={(e) => {
@@ -498,7 +498,19 @@ export function CandidatesPage() {
                       <button
                         type="button"
                         className="btn btn-primary"
-                        disabled={busy}
+                        disabled={
+                          busy ||
+                          (candidate.stage === "hired" &&
+                            candidate.hiredPersonId == null &&
+                            !candidate.email)
+                        }
+                        title={
+                          candidate.stage === "hired" &&
+                          candidate.hiredPersonId == null &&
+                          !candidate.email
+                            ? "This hire has no email, so no sign-in can be set up. Re-import the candidate with an email, or add them under Administration → Permissions → Team roles."
+                            : undefined
+                        }
                         onClick={() => void hireCandidate(candidate)}
                       >
                         {candidate.stage !== "hired"

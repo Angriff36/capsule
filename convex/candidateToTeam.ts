@@ -118,7 +118,22 @@ export const hireIntoTeam = mutation({
     // behavior — the same as re-pressing "Email sign-in" in Team roles).
     if (alreadyHired && candidate.hiredPersonId) {
       const linked = await ctx.db.get(candidate.hiredPersonId as Id<"people">);
-      if (linked && linked.deletedAt == null) {
+      if (linked) {
+        // hiredPersonId is settable through the public Candidate_hire with no
+        // tenant validation, so never decrypt or trust a foreign row.
+        if (linked.tenantId !== auth.tenantId) {
+          throw new ConvexError(
+            "This hire's profile link is invalid. Clear it under Team roles.",
+          );
+        }
+        // Resending must never silently restore access: an inactive or
+        // removed profile comes back only as an explicit action under Team
+        // roles (which owns reactivation), never as a side effect here.
+        if (linked.deletedAt != null || String(linked.status) !== "active") {
+          throw new ConvexError(
+            "This hire's team profile is inactive or removed. Restore or replace it under Team roles, then resend.",
+          );
+        }
         // Credentials go to the LINKED PROFILE's address — it owns the Clerk
         // account. A KM re-import can patch a different email onto the
         // candidate row even after hire; refuse to silently mail the old
@@ -129,23 +144,6 @@ export const hireIntoTeam = mutation({
           throw new ConvexError(
             `The candidate row says ${candidateEmail} but their sign-in profile uses ${personEmail}. Fix the profile under Team roles, then resend.`,
           );
-        }
-        // A linked profile that was later deactivated cannot receive a
-        // sign-in (provisionStaffSignIn requires an active row) — bring it
-        // back first, under the same privileged-role gate as the reuse path.
-        if (String(linked.status) === "inactive") {
-          if (
-            PRIVILEGED_HIRE_ROLES.has(String(linked.role)) &&
-            !ADMIN_ROLES.has(auth.role)
-          ) {
-            throw new ConvexError(
-              "This hire's profile is an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles.",
-            );
-          }
-          await ctx.runMutation(api.mutations.Person_reactivate, {
-            docId: linked._id,
-            version: linked.version,
-          });
         }
         // NOTE: an ACTIVE privileged profile is NOT gated here on purpose.
         // The link already exists — resending grants nothing new, and
