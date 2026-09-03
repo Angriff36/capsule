@@ -29,9 +29,10 @@ enum ReportSharingScope {
   tenant_wide
 }
 
-// User-owned saved chart/report configuration. Owner is stamped from trusted
-// user.id (never client-supplied). definition is intentionally schemaless UI
-// configuration (PROMPT.md catch-all exception; type json per semantics.md).
+// User-owned saved chart/report configuration. Owner is stamped from the
+// trusted linked user.personId (never client-supplied). definition is
+// intentionally schemaless UI configuration (PROMPT.md catch-all exception;
+// type json per semantics.md).
 // chartType remains an open string — vega-lite catalog is UI-owned (OD045).
 entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
@@ -59,7 +60,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
   // Per-row read gate: owner_only rows visible to owner (or managers); team /
   // tenant_wide readable by any staffAccess principal (semantics.md read gate).
   // Undefined drafts (ownerId == null) are readable by staff for create flow.
-  default policy savedReportRead read: self.ownerId == null or self.ownerId == user.id or self.sharingScope != "owner_only" or roleAllows(user.role, "manageAccess") "Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess"
+  default policy savedReportRead read: self.ownerId == null or self.ownerId == user.personId or self.sharingScope != "owner_only" or roleAllows(user.role, "manageAccess") "Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess"
   default policy savedReportWrite write: roleAllows(user.role, "staffAccess") "Staff may write saved reports through commands"
   default policy savedReportExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute saved report commands"
 
@@ -75,10 +76,10 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.definedAt == null
     guard self.status == "active"
     guard self.deletedAt == null
-    guard user.id != null
+    guard user.personId != null
     constraint createName: length(trim(name)) > 0 "Report name is required"
     constraint createChartType: length(trim(chartType)) > 0 "Chart type is required"
-    mutate ownerId = user.id
+    mutate ownerId = user.personId
     mutate name = name
     mutate subjectArea = subjectArea
     mutate chartType = chartType
@@ -88,7 +89,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     emit SavedReportDefinitionCreated {
       savedReportDefinitionId: self.id
       tenantId: self.tenantId
-      ownerId: user.id
+      ownerId: user.personId
       name: name
       subjectArea: subjectArea
       chartType: chartType
@@ -102,7 +103,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    guard self.ownerId == user.personId or roleAllows(user.role, "manageAccess")
     constraint renameName: length(trim(name)) > 0 "Report name is required"
     mutate name = name
     emit SavedReportRenamed {
@@ -123,7 +124,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    guard self.ownerId == user.personId or roleAllows(user.role, "manageAccess")
     constraint updateChartType: chartType == null or length(trim(chartType)) > 0 "Chart type cannot be blank"
     mutate chartType = chartType != null ? chartType : self.chartType
     mutate definition = definition != null ? definition : self.definition
@@ -143,7 +144,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    guard self.ownerId == user.personId or roleAllows(user.role, "manageAccess")
     mutate sharingScope = sharingScope
     emit SavedReportSharingChanged {
       savedReportDefinitionId: self.id
@@ -159,7 +160,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    guard self.ownerId == user.personId or roleAllows(user.role, "manageAccess")
     compute previousStatus = self.status
     mutate status = "archived"
     mutate archivedAt = now()
@@ -177,7 +178,7 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
     guard self.definedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    guard self.ownerId == user.personId or roleAllows(user.role, "manageAccess")
     compute previousStatus = self.status
     mutate status = "active"
     mutate restoredAt = now()
