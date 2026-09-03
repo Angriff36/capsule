@@ -547,6 +547,7 @@ function monthlyTrend(
   for (const row of rows) {
     const timestamp = dateOf(row);
     if (timestamp == null) continue;
+    if (threshold != null && timestamp < threshold) continue;
     const date = startOfMonth(timestamp);
     const key = monthKey(date);
     const bucket = buckets.get(key) ?? emptyBucket(date, metrics);

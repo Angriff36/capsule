@@ -143,6 +143,12 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
     );
     expect(builder).toContain("MONTHS_IN_YEAR - 1");
     expect(builder).toContain("return Date.UTC(");
+    expect(builder).toContain("timestamp < threshold");
+    const workspace = readFileSync(
+      "src/features/reports/LiveReportWorkspace.tsx",
+      "utf8",
+    );
+    expect(workspace).toContain("data={model.trend}");
   });
 
   it("maps Production to kitchen and fails closed when kitchen is disabled", () => {
@@ -163,6 +169,12 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
       "utf8",
     );
     expect(policy).toContain('production: "kitchen"');
+    const workspace = readFileSync(
+      "src/features/reports/LiveReportWorkspace.tsx",
+      "utf8",
+    );
+    expect(workspace).toContain("!sourceAvailable");
+    expect(workspace).toContain("Source data isn’t available");
   });
 
   it("keeps Apply read-only for a shared-report viewer", () => {
