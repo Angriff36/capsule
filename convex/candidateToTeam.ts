@@ -71,7 +71,13 @@ export const hireIntoTeam = mutation({
     // committed (e.g. the caller lost the response before provisioning),
     // Candidate_hire has bumped the version, so a stale expectedVersion must
     // not block the recovery. Return the linked Person and let the client
-    // finish the sign-in email.
+    // finish the sign-in email. A stale CONCURRENT hire (two managers, same
+    // candidate) is indistinguishable from a lost-response retry by payload,
+    // and both end in the same place: provisionStaffSignIn re-issues the
+    // password until the person first signs in (its own documented recovery
+    // behavior — the same as re-pressing "Email sign-in" in Team roles), and
+    // the busy-disable on the button stops accidental double-clicks. The
+    // newest email simply wins; no operation-key machinery needed.
     if (candidate.stage === "hired") {
       if (candidate.hiredPersonId) {
         const linked = await ctx.db.get(
@@ -111,15 +117,15 @@ export const hireIntoTeam = mutation({
       return { kind: "hired_no_email" };
     }
 
-    // Same email already on a live profile? Link to it — never a duplicate.
+    // Same email already on ANY profile? Link to it — never a duplicate.
     // Person_createViaHire is a plain insert and does not enforce the
     // manifest's unique [tenantId, email]; a duplicate row would also make
-    // the hire's self-link ambiguous (two unset rows, one verified email).
+    // the hire's self-link ambiguous (two rows, one verified email).
     const existing = await findLivePersonByEmail(ctx, auth.tenantId, email);
     if (existing) {
-      // A terminated row is terminal in the manifest (status transition
-      // terminated → []) and cannot be reused — blocking beats minting a
-      // second identity on the same mailbox.
+      // Terminated is terminal (status transition terminated → []) and
+      // terminate() soft-deletes the row, so it cannot be reused — blocking
+      // beats minting a second identity on the same mailbox.
       if (String(existing.status) === "terminated") {
         throw new ConvexError(
           "This email belongs to a terminated team member. Sort out their profile under Team roles before hiring this candidate.",
@@ -173,11 +179,12 @@ function normalized(raw: string | null | undefined): string {
 }
 
 /**
- * The tenant's live (non-deleted) Person carrying this email, any status.
- * Person.email is encrypted, so the only honest match is a
- * decrypt-and-compare over the tenant's roster — single-tenant scale, the
- * same shape as the roster scan the generated list query and authLink
- * already do.
+ * The tenant's Person carrying this email, ANY row — including terminated
+ * ones, because terminate() sets deletedAt and a soft-deleted mailbox must
+ * still block a duplicate. Person.email is encrypted, so the only honest
+ * match is a decrypt-and-compare over the tenant's roster — single-tenant
+ * scale, the same shape as the roster scan the generated list query and
+ * authLink already do.
  */
 async function findLivePersonByEmail(
   ctx: MutationCtx,
@@ -189,7 +196,6 @@ async function findLivePersonByEmail(
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .collect();
   for (const person of people) {
-    if (person.deletedAt != null) continue;
     if ((await readStoredEmail(ctx, person.email)) === email) return person;
   }
   return null;
