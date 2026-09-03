@@ -12,6 +12,7 @@ import { StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
+import { QuickFileImport } from "./QuickFileImport";
 
 type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
 type DatasetType =
@@ -280,6 +281,8 @@ export function ImportRunsListPage() {
           </form>
         </div>
       ) : null}
+
+      <QuickFileImport />
 
       {error ? (
         <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-base text-danger mt-4">
