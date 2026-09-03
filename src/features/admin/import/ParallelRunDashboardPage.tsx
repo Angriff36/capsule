@@ -124,36 +124,47 @@ export function ParallelRunDashboardPage() {
     );
     // Active TPP→Capsule links are the imported catalog. Counting links (not
     // run recordCounts) stays correct across chunked and re-run imports.
+    // Restricted to tpp_legacy so a future non-TPP menu source cannot skew it.
     const menuLinks = (externalLinks ?? []).filter(
       (link) =>
         link.recordType === "menu" &&
+        link.sourceSystem === "tpp_legacy" &&
         link.deletedAt == null &&
         link.conflictStatus !== "superseded",
     );
-    const tppTotal = menuLinks.length;
-    const pendingLinks = menuLinks.filter((link) => !link.capsuleId).length;
+    // capsuleDishes === null means the read was denied, NOT an empty catalog.
+    const dishesKnown = capsuleDishes !== null;
+    const dishIds = new Set((capsuleDishes ?? []).map((dish) => dish._id));
     const linkedDishIds = new Set(
       menuLinks.filter((link) => link.capsuleId).map((link) => link.capsuleId),
     );
+    const tppTotal = menuLinks.length;
+    // A link is resolved only when its Capsule dish still exists.
+    const unresolvedLinks = menuLinks.filter(
+      (link) => !link.capsuleId || !dishIds.has(link.capsuleId),
+    ).length;
     const capsuleTotal = capsuleDishes?.length ?? 0;
     const dishesWithoutLink = capsuleDishes
       ? capsuleDishes.filter((dish) => !linkedDishIds.has(dish._id)).length
       : 0;
-    const matched = tppTotal - pendingLinks;
-    const diff = matched - tppTotal;
+    const matched = tppTotal - unresolvedLinks;
+    const diff = capsuleTotal - tppTotal;
     const diffPercent = tppTotal > 0 ? (diff / tppTotal) * 100 : 0;
     return {
+      dishesKnown,
       capsuleTotal,
       tppTotal,
-      pendingLinks,
+      unresolvedLinks,
       dishesWithoutLink,
       matched,
       diff,
       diffPercent,
       status:
-        diff === 0 && pendingLinks === 0
+        diff === 0 && unresolvedLinks === 0 && dishesWithoutLink === 0
           ? ("match" as const)
-          : Math.abs(diffPercent) > 5
+          : Math.abs(diffPercent) > 5 ||
+              unresolvedLinks > 0 ||
+              dishesWithoutLink > 0
             ? ("error" as const)
             : ("warning" as const),
       runCount: menuRuns.length,
@@ -615,6 +626,10 @@ export function ParallelRunDashboardPage() {
             menuCatalogComparison.capsuleTotal === 0 ? (
               <p className="p-4 text-center text-ink-3 text-sm">
                 No menu catalog imported yet.
+              </p>
+            ) : !menuCatalogComparison.dishesKnown ? (
+              <p className="p-4 text-center text-ink-3 text-sm">
+                Dish counts unavailable for your role — link totals shown only.
               </p>
             ) : (
               <div className="supply-table-wrap">
