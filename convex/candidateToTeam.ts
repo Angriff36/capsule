@@ -66,17 +66,12 @@ export const hireIntoTeam = mutation({
     ) {
       throw new ConvexError("Candidate not found.");
     }
-    if (
-      expectedVersion !== undefined &&
-      candidate.version !== expectedVersion
-    ) {
-      throw new ConvexError(
-        "This candidate changed since you loaded the page. Refresh and try again.",
-      );
-    }
 
-    // Idempotent: a re-run after a partial success returns the linked Person
-    // instead of tripping the create a second time.
+    // Idempotent resume BEFORE the version check: if the hire already
+    // committed (e.g. the caller lost the response before provisioning),
+    // Candidate_hire has bumped the version, so a stale expectedVersion must
+    // not block the recovery. Return the linked Person and let the client
+    // finish the sign-in email.
     if (candidate.stage === "hired") {
       if (candidate.hiredPersonId) {
         const linked = await ctx.db.get(
@@ -95,6 +90,15 @@ export const hireIntoTeam = mutation({
       );
     }
 
+    if (
+      expectedVersion !== undefined &&
+      candidate.version !== expectedVersion
+    ) {
+      throw new ConvexError(
+        "This candidate changed since you loaded the page. Refresh and try again.",
+      );
+    }
+
     // Person.email is required and Clerk needs a deliverable address — a
     // sign-in cannot exist without one. Record the recruiting decision and
     // hand the fix to the Team roles form instead of blocking the hire.
@@ -107,9 +111,28 @@ export const hireIntoTeam = mutation({
       return { kind: "hired_no_email" };
     }
 
-    // Same email already on an active profile? Link to it — never a duplicate.
+    // Same email already on a live profile? Link to it — never a duplicate.
+    // Person_createViaHire is a plain insert and does not enforce the
+    // manifest's unique [tenantId, email]; a duplicate row would also make
+    // the hire's self-link ambiguous (two unset rows, one verified email).
     const existing = await findLivePersonByEmail(ctx, auth.tenantId, email);
     if (existing) {
+      // A terminated row is terminal in the manifest (status transition
+      // terminated → []) and cannot be reused — blocking beats minting a
+      // second identity on the same mailbox.
+      if (String(existing.status) === "terminated") {
+        throw new ConvexError(
+          "This email belongs to a terminated team member. Sort out their profile under Team roles before hiring this candidate.",
+        );
+      }
+      // Returning seasonal/inactive staff: reactivate their row instead of
+      // splitting employment history across two profiles.
+      if (String(existing.status) === "inactive") {
+        await ctx.runMutation(api.mutations.Person_reactivate, {
+          docId: existing._id,
+          version: existing.version,
+        });
+      }
       await ctx.runMutation(api.mutations.Candidate_hire, {
         docId: candidateId,
         version: expectedVersion ?? candidate.version,
@@ -150,10 +173,11 @@ function normalized(raw: string | null | undefined): string {
 }
 
 /**
- * The tenant's live active Person carrying this email, if any. Person.email
- * is encrypted, so the only honest match is a decrypt-and-compare over the
- * tenant's roster — single-tenant scale, the same shape as the roster scan
- * the generated list query and authLink already do.
+ * The tenant's live (non-deleted) Person carrying this email, any status.
+ * Person.email is encrypted, so the only honest match is a
+ * decrypt-and-compare over the tenant's roster — single-tenant scale, the
+ * same shape as the roster scan the generated list query and authLink
+ * already do.
  */
 async function findLivePersonByEmail(
   ctx: MutationCtx,
@@ -165,9 +189,7 @@ async function findLivePersonByEmail(
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .collect();
   for (const person of people) {
-    if (person.deletedAt != null || String(person.status) !== "active") {
-      continue;
-    }
+    if (person.deletedAt != null) continue;
     if ((await readStoredEmail(ctx, person.email)) === email) return person;
   }
   return null;
