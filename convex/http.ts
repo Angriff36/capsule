@@ -511,8 +511,8 @@ const COMMAND_DISPATCH = {
   },
   "DishComponent.attach": {
     ref: api.mutations.DishComponent_createViaAttach,
-    params: ["dishId","componentId","yieldQuantity","batchMultiplier","sortOrder","idempotencyKey"] as const,
-    paramMeta: [{"name":"dishId","type":"uuid","required":true},{"name":"componentId","type":"uuid","required":true},{"name":"yieldQuantity","type":"decimal","required":true},{"name":"batchMultiplier","type":"decimal","required":false},{"name":"sortOrder","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["dishId","componentId","yieldQuantity","batchMultiplier","sortOrder","role","idempotencyKey"] as const,
+    paramMeta: [{"name":"dishId","type":"uuid","required":true},{"name":"componentId","type":"uuid","required":true},{"name":"yieldQuantity","type":"decimal","required":true},{"name":"batchMultiplier","type":"decimal","required":false},{"name":"sortOrder","type":"number","required":false},{"name":"role","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "DishComponent.detach": {
     ref: api.mutations.DishComponent_detach,
@@ -761,8 +761,8 @@ const COMMAND_DISPATCH = {
   },
   "EventAssignment.assign": {
     ref: api.mutations.EventAssignment_createViaAssign,
-    params: ["eventId","personId","startsAt","endsAt","notes","idempotencyKey"] as const,
-    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"personId","type":"uuid","required":true},{"name":"startsAt","type":"datetime","required":false},{"name":"endsAt","type":"datetime","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["eventId","personId","role","startsAt","endsAt","notes","idempotencyKey"] as const,
+    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"personId","type":"uuid","required":true},{"name":"role","type":"string","required":true},{"name":"startsAt","type":"datetime","required":false},{"name":"endsAt","type":"datetime","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "EventAssignment.checkIn": {
     ref: api.mutations.EventAssignment_checkIn,
@@ -921,8 +921,8 @@ const COMMAND_DISPATCH = {
   },
   "EventStaffNeed.postOpen": {
     ref: api.mutations.EventStaffNeed_createViaPostOpen,
-    params: ["eventId","description","startsAt","endsAt","notes","idempotencyKey"] as const,
-    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"description","type":"string","required":false},{"name":"startsAt","type":"datetime","required":false},{"name":"endsAt","type":"datetime","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["eventId","role","description","startsAt","endsAt","notes","idempotencyKey"] as const,
+    paramMeta: [{"name":"eventId","type":"uuid","required":true},{"name":"role","type":"string","required":true},{"name":"description","type":"string","required":false},{"name":"startsAt","type":"datetime","required":false},{"name":"endsAt","type":"datetime","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "EventStaffNeed.releaseClaim": {
     ref: api.mutations.EventStaffNeed_releaseClaim,
@@ -1791,8 +1791,8 @@ const COMMAND_DISPATCH = {
   },
   "Person.assignRole": {
     ref: api.mutations.Person_assignRole,
-    params: ["docId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","role","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"role","type":"CapsuleRole","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Person.correctIdentity": {
     ref: api.mutations.Person_correctIdentity,
@@ -1806,8 +1806,8 @@ const COMMAND_DISPATCH = {
   },
   "Person.hire": {
     ref: api.mutations.Person_createViaHire,
-    params: ["givenName","familyName","email","phone","employmentType","employeeNumber","authSubjectId","idempotencyKey"] as const,
-    paramMeta: [{"name":"givenName","type":"string","required":true},{"name":"familyName","type":"string","required":true},{"name":"email","type":"string","required":true},{"name":"phone","type":"string","required":false},{"name":"employmentType","type":"EmploymentType","required":false},{"name":"employeeNumber","type":"string","required":false},{"name":"authSubjectId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["givenName","familyName","email","phone","role","employmentType","employeeNumber","authSubjectId","idempotencyKey"] as const,
+    paramMeta: [{"name":"givenName","type":"string","required":true},{"name":"familyName","type":"string","required":true},{"name":"email","type":"string","required":true},{"name":"phone","type":"string","required":false},{"name":"role","type":"CapsuleRole","required":false},{"name":"employmentType","type":"EmploymentType","required":false},{"name":"employeeNumber","type":"string","required":false},{"name":"authSubjectId","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Person.linkAccount": {
     ref: api.mutations.Person_linkAccount,
@@ -2236,8 +2236,8 @@ const COMMAND_DISPATCH = {
   },
   "RoleScorecard.define": {
     ref: api.mutations.RoleScorecard_createViaDefine,
-    params: ["title","expectations","effectiveFrom","idempotencyKey"] as const,
-    paramMeta: [{"name":"title","type":"string","required":true},{"name":"expectations","type":"string","required":false},{"name":"effectiveFrom","type":"datetime","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["role","title","expectations","effectiveFrom","idempotencyKey"] as const,
+    paramMeta: [{"name":"role","type":"CapsuleRole","required":true},{"name":"title","type":"string","required":true},{"name":"expectations","type":"string","required":false},{"name":"effectiveFrom","type":"datetime","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "RoleScorecard.reactivate": {
     ref: api.mutations.RoleScorecard_reactivate,
@@ -2326,8 +2326,8 @@ const COMMAND_DISPATCH = {
   },
   "Shift.schedule": {
     ref: api.mutations.Shift_createViaSchedule,
-    params: ["personId","startsAt","endsAt","eventId","shiftTypeId","requiredQualificationId","requiredTrainingCompletionId","notes","idempotencyKey"] as const,
-    paramMeta: [{"name":"personId","type":"uuid","required":true},{"name":"startsAt","type":"datetime","required":true},{"name":"endsAt","type":"datetime","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"shiftTypeId","type":"uuid","required":false},{"name":"requiredQualificationId","type":"uuid","required":false},{"name":"requiredTrainingCompletionId","type":"uuid","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["personId","startsAt","endsAt","eventId","role","shiftTypeId","requiredQualificationId","requiredTrainingCompletionId","notes","idempotencyKey"] as const,
+    paramMeta: [{"name":"personId","type":"uuid","required":true},{"name":"startsAt","type":"datetime","required":true},{"name":"endsAt","type":"datetime","required":true},{"name":"eventId","type":"uuid","required":false},{"name":"role","type":"string","required":false},{"name":"shiftTypeId","type":"uuid","required":false},{"name":"requiredQualificationId","type":"uuid","required":false},{"name":"requiredTrainingCompletionId","type":"uuid","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Shift.stageApprovedSwap": {
     ref: api.mutations.Shift_stageApprovedSwap,
@@ -2636,8 +2636,8 @@ const COMMAND_DISPATCH = {
   },
   "VendorContact.add": {
     ref: api.mutations.VendorContact_createViaAdd,
-    params: ["vendorId","name","email","phone","notes","idempotencyKey"] as const,
-    paramMeta: [{"name":"vendorId","type":"uuid","required":true},{"name":"name","type":"string","required":true},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["vendorId","name","role","email","phone","notes","idempotencyKey"] as const,
+    paramMeta: [{"name":"vendorId","type":"uuid","required":true},{"name":"name","type":"string","required":true},{"name":"role","type":"VendorContactRole","required":false},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"notes","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VendorContact.remove": {
     ref: api.mutations.VendorContact_remove,
@@ -2646,8 +2646,8 @@ const COMMAND_DISPATCH = {
   },
   "VendorContact.update": {
     ref: api.mutations.VendorContact_update,
-    params: ["docId","name","email","phone","notes","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"name","type":"string","required":true},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"notes","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","name","role","email","phone","notes","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"name","type":"string","required":true},{"name":"role","type":"VendorContactRole","required":false},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"notes","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "VendorContract.activate": {
     ref: api.mutations.VendorContract_activate,
@@ -2951,7 +2951,7 @@ const COMMAND_DISPATCH = {
   },
 } as const;
 
-const DISPATCHER_FORBIDDEN_BODY_KEYS = new Set(["__auth","user","role","tenantId","orgId","userId","actorId","identity"]);
+const DISPATCHER_FORBIDDEN_BODY_KEYS = new Set(["__auth","user","tenantId","orgId","userId","actorId","identity"]);
 
 http.route({
   pathPrefix: "/api/manifest/",
@@ -3000,7 +3000,7 @@ http.route({
 /** Wire-format notes returned by the GET discovery routes. */
 const DISPATCHER_WIRE_NOTES = {
   execute: "POST /api/manifest/{entity}/commands/{command} with a JSON object body of the listed params",
-  auth: "Authorization: Bearer <JWT accepted by Convex auth>; identity/tenant/role fields are server-derived and ignored in the body",
+  auth: "Authorization: Bearer <JWT accepted by Convex auth>; identity/tenant fields are server-derived and ignored in the body; declared command params (including role) are accepted",
   datetime: "datetime/date params are epoch milliseconds numbers",
   lists: "list params are JSON arrays",
   idempotencyKey: "optional string; retries with the same key do not repeat the command",

@@ -66,6 +66,7 @@ const DATASET_TYPES = [
   "menus",
   "venues",
   "payments",
+  "pack_list",
 ] as const;
 type DatasetType = (typeof DATASET_TYPES)[number];
 
@@ -165,7 +166,13 @@ export const startImport = mutation({
       sourceSystem: args.sourceSystem as
         "tpp_legacy" | "csv_export" | "api_sync",
       datasetType: args.datasetType as
-        "events" | "contacts" | "leads" | "menus" | "venues" | "payments",
+        | "events"
+        | "contacts"
+        | "leads"
+        | "menus"
+        | "venues"
+        | "payments"
+        | "pack_list",
       status: "started" as const,
       startTime: Date.now(),
       recordCounts: "{}",
