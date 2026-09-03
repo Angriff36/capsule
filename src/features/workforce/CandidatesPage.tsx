@@ -55,6 +55,13 @@ const STAGE_LABEL: Record<string, string> = {
   rejected: "Rejected",
 };
 
+// Mirrors the seam's usability test: a sign-in needs a deliverable address,
+// not just a nonempty field.
+function hasUsableEmail(email: string | null | undefined): boolean {
+  const value = (email ?? "").trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(value);
+}
+
 function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
   const text = String(value ?? "");
   if (!text) return undefined;
@@ -463,6 +470,13 @@ export function CandidatesPage() {
                     >
                       Move
                     </button>
+                    {candidate.hiredPersonId != null ? (
+                      <p className="text-sm text-ink-2 mt-2">
+                        Reopening is disabled while a team profile is linked
+                        (issue #269). Change their status under Administration →
+                        Permissions → Team roles.
+                      </p>
+                    ) : null}
                   </label>
                   <label className="field-label">
                     Rejection note (optional)
@@ -502,14 +516,7 @@ export function CandidatesPage() {
                           busy ||
                           (candidate.stage === "hired" &&
                             candidate.hiredPersonId == null &&
-                            !candidate.email)
-                        }
-                        title={
-                          candidate.stage === "hired" &&
-                          candidate.hiredPersonId == null &&
-                          !candidate.email
-                            ? "This hire has no email, so no sign-in can be set up. Re-import the candidate with an email, or add them under Administration → Permissions → Team roles."
-                            : undefined
+                            !hasUsableEmail(candidate.email))
                         }
                         onClick={() => void hireCandidate(candidate)}
                       >
@@ -519,6 +526,15 @@ export function CandidatesPage() {
                             ? "Resend sign-in"
                             : "Finish team setup"}
                       </button>
+                      {candidate.stage === "hired" &&
+                      candidate.hiredPersonId == null &&
+                      !hasUsableEmail(candidate.email) ? (
+                        <p className="text-sm text-ink-2 mt-2">
+                          This hire has no usable email, so no sign-in can be
+                          set up. Re-import the candidate with an email, or add
+                          them under Administration → Permissions → Team roles.
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 </div>

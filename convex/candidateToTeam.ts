@@ -219,6 +219,12 @@ export const hireIntoTeam = mutation({
         });
       }
       personId = existing._id;
+      // NOTE (declined review finding): an existing profile KEEPS its role —
+      // a returning hire whose applied role differs from their old one (a
+      // kitchen veteran applying to sales) reuses their profile unchanged.
+      // Changing a role is admin-only, and blocking the mismatch would send
+      // every returning seasonal hire to an admin. The Person row remains
+      // the truth for what the account can do.
     } else {
       const fullName = candidate.fullName.trim();
       const parts = fullName.split(/\s+/u);
