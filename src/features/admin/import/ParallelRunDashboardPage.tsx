@@ -4,6 +4,7 @@
 import { useMemo } from "react";
 import {
   useListEvent,
+  useListDish,
   useListImportRun,
   useListExternalRecordLink,
   useListServiceStyle,
@@ -67,6 +68,7 @@ interface ComparisonMetric {
 
 export function ParallelRunDashboardPage() {
   const capsuleEvents = useListEvent();
+  const capsuleDishes = useListDish();
   const importRuns = useListImportRun();
   const externalLinks = useListExternalRecordLink();
   const serviceStyles = useListServiceStyle();
@@ -94,28 +96,69 @@ export function ParallelRunDashboardPage() {
     });
   }, [capsuleEvents, selectedDateRange]);
 
-  // Get completed import runs for TPP data
+  // Get completed import runs for TPP data. The events comparison uses the
+  // events subset; the Recent Import Runs table shows every completed dataset.
   const completedImportRuns = useMemo(() => {
     if (!importRuns) return [];
     return importRuns.filter(
       (run) =>
         run.status === "completed" &&
-        run.datasetType === COMPARISON_DATASET &&
         run.startTime &&
         new Date(run.startTime) >= selectedDateRange.start &&
         new Date(run.startTime) <= selectedDateRange.end,
     );
   }, [importRuns, selectedDateRange]);
 
-  // Get latest completed import run for TPP comparison
+  // Latest completed EVENTS run drives the events comparison; the latest
+  // completed MENUS run drives the dish-catalog comparison.
   const latestTppImport = useMemo(() => {
-    if (completedImportRuns.length === 0) return null;
-    return completedImportRuns.sort((a, b) => {
-      const timeA = a.startTime ?? 0;
-      const timeB = b.startTime ?? 0;
-      return timeB - timeA;
-    })[0];
+    const eventsRuns = completedImportRuns
+      .filter((run) => run.datasetType === COMPARISON_DATASET)
+      .sort((a, b) => (b.startTime ?? 0) - (a.startTime ?? 0));
+    return eventsRuns[0] ?? null;
   }, [completedImportRuns]);
+
+  const menuCatalogComparison = useMemo(() => {
+    const menuRuns = completedImportRuns.filter(
+      (run) => run.datasetType === "menus",
+    );
+    // Active TPP→Capsule links are the imported catalog. Counting links (not
+    // run recordCounts) stays correct across chunked and re-run imports.
+    const menuLinks = (externalLinks ?? []).filter(
+      (link) =>
+        link.recordType === "menu" &&
+        link.deletedAt == null &&
+        link.conflictStatus !== "superseded",
+    );
+    const tppTotal = menuLinks.length;
+    const pendingLinks = menuLinks.filter((link) => !link.capsuleId).length;
+    const linkedDishIds = new Set(
+      menuLinks.filter((link) => link.capsuleId).map((link) => link.capsuleId),
+    );
+    const capsuleTotal = capsuleDishes?.length ?? 0;
+    const dishesWithoutLink = capsuleDishes
+      ? capsuleDishes.filter((dish) => !linkedDishIds.has(dish._id)).length
+      : 0;
+    const matched = tppTotal - pendingLinks;
+    const diff = matched - tppTotal;
+    const diffPercent = tppTotal > 0 ? (diff / tppTotal) * 100 : 0;
+    return {
+      capsuleTotal,
+      tppTotal,
+      pendingLinks,
+      dishesWithoutLink,
+      matched,
+      diff,
+      diffPercent,
+      status:
+        diff === 0 && pendingLinks === 0
+          ? ("match" as const)
+          : Math.abs(diffPercent) > 5
+            ? ("error" as const)
+            : ("warning" as const),
+      runCount: menuRuns.length,
+    };
+  }, [completedImportRuns, capsuleDishes, externalLinks]);
 
   // Parse TPP record counts from JSON string
   const tppRecordCounts = useMemo(() => {
@@ -397,6 +440,7 @@ export function ParallelRunDashboardPage() {
 
   const loading =
     capsuleEvents === undefined ||
+    capsuleDishes === undefined ||
     importRuns === undefined ||
     externalLinks === undefined ||
     serviceStyles === undefined ||
@@ -550,6 +594,126 @@ export function ParallelRunDashboardPage() {
                 </tbody>
               </table>
             </div>
+          </section>
+
+          {/* Menu catalog comparison */}
+          <section className="working-ledger mt-6">
+            <div className="ledger-heading">
+              <div>
+                <h2>Menu Catalog Comparison</h2>
+                <p className="text-xs text-ink-2">
+                  Dishes imported from the TPP menu catalog vs the dish list in
+                  Capsule.
+                </p>
+              </div>
+              <span>
+                {menuCatalogComparison.runCount} menu import{" "}
+                {menuCatalogComparison.runCount === 1 ? "run" : "runs"}
+              </span>
+            </div>
+            {menuCatalogComparison.tppTotal === 0 &&
+            menuCatalogComparison.capsuleTotal === 0 ? (
+              <p className="p-4 text-center text-ink-3 text-sm">
+                No menu catalog imported yet.
+              </p>
+            ) : (
+              <div className="supply-table-wrap">
+                <table className="supply-table">
+                  <thead>
+                    <tr>
+                      <th>Metric</th>
+                      <th>Capsule</th>
+                      <th>TPP imported</th>
+                      <th>Difference</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Total dishes</td>
+                      <td>
+                        {menuCatalogComparison.capsuleTotal.toLocaleString()}
+                      </td>
+                      <td>{menuCatalogComparison.tppTotal.toLocaleString()}</td>
+                      <td
+                        className={
+                          menuCatalogComparison.capsuleTotal -
+                            menuCatalogComparison.tppTotal ===
+                          0
+                            ? "text-ok"
+                            : "text-warn"
+                        }
+                      >
+                        {menuCatalogComparison.capsuleTotal -
+                          menuCatalogComparison.tppTotal >=
+                        0
+                          ? "+"
+                          : ""}
+                        {(
+                          menuCatalogComparison.capsuleTotal -
+                          menuCatalogComparison.tppTotal
+                        ).toLocaleString()}
+                      </td>
+                      <td>
+                        <StatusChip status={menuCatalogComparison.status} />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>TPP items linked to a Capsule dish</td>
+                      <td>{menuCatalogComparison.matched.toLocaleString()}</td>
+                      <td>{menuCatalogComparison.tppTotal.toLocaleString()}</td>
+                      <td
+                        className={
+                          menuCatalogComparison.pendingLinks === 0
+                            ? "text-ok"
+                            : "text-warn"
+                        }
+                      >
+                        {menuCatalogComparison.pendingLinks > 0
+                          ? `${menuCatalogComparison.pendingLinks.toLocaleString()} to resolve`
+                          : "0"}
+                      </td>
+                      <td>
+                        <StatusChip
+                          status={
+                            menuCatalogComparison.pendingLinks === 0
+                              ? "match"
+                              : "warning"
+                          }
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Capsule dishes without a TPP link</td>
+                      <td>
+                        {menuCatalogComparison.dishesWithoutLink.toLocaleString()}
+                      </td>
+                      <td>—</td>
+                      <td
+                        className={
+                          menuCatalogComparison.dishesWithoutLink === 0
+                            ? "text-ok"
+                            : "text-warn"
+                        }
+                      >
+                        {menuCatalogComparison.dishesWithoutLink > 0
+                          ? `+${menuCatalogComparison.dishesWithoutLink.toLocaleString()}`
+                          : "0"}
+                      </td>
+                      <td>
+                        <StatusChip
+                          status={
+                            menuCatalogComparison.dishesWithoutLink === 0
+                              ? "match"
+                              : "warning"
+                          }
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            )}
           </section>
 
           {/* Breakdown Tables */}
