@@ -205,10 +205,19 @@ export const hireIntoTeam = mutation({
     // assignment, which Capsule makes admin-only (Person.assignRole). The
     // candidate keeps a privileged roleAppliedFor on their row; an admin can
     // set it under Team roles after the hire.
+    // EXCEPTION: linking an already-ACTIVE, already-AUTH-LINKED profile
+    // grants nothing new — the account exists and already holds the role —
+    // so legacy reconciliation (hired without a link) is bookkeeping, not
+    // elevation, and stays a workforce-manager action.
+    const alreadyAccountable =
+      existing != null &&
+      existing.status === "active" &&
+      Boolean(existing.authSubjectId);
     const effectiveRole = existing
       ? String(existing.role)
       : candidate.roleAppliedFor;
     if (
+      !alreadyAccountable &&
       PRIVILEGED_HIRE_ROLES.has(effectiveRole) &&
       !ADMIN_ROLES.has(auth.role)
     ) {
