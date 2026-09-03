@@ -152,6 +152,24 @@ export const hireIntoTeam = mutation({
 
     // Same email already on a profile? Link to it — never a duplicate.
     const existing = await findPersonByEmail(ctx, auth.tenantId, email);
+    // Hiring into a privileged role — by creating a profile with one, OR by
+    // reusing/reactivating an existing profile that HOLDS one — is a role
+    // assignment, which Capsule makes admin-only (Person.assignRole). The
+    // candidate keeps a privileged roleAppliedFor on their row; an admin can
+    // set it under Team roles after the hire.
+    const effectiveRole = existing
+      ? String(existing.role)
+      : candidate.roleAppliedFor;
+    if (
+      PRIVILEGED_HIRE_ROLES.has(effectiveRole) &&
+      !ADMIN_ROLES.has(auth.role)
+    ) {
+      throw new ConvexError(
+        existing
+          ? "This email belongs to an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles."
+          : "Hiring into a manager or admin role needs an admin. Hire them into their staff role, or have an admin change the role under Team roles.",
+      );
+    }
     let personId: Id<"people">;
     if (existing) {
       // Terminated is terminal (status transition terminated → []) and
@@ -172,17 +190,6 @@ export const hireIntoTeam = mutation({
       }
       personId = existing._id;
     } else {
-      // Hiring INTO a privileged role is a role assignment — admin-only,
-      // same line as Person.assignRole. The candidate keeps the role on
-      // their row; an admin can set it under Team roles after the hire.
-      if (
-        PRIVILEGED_HIRE_ROLES.has(candidate.roleAppliedFor) &&
-        !ADMIN_ROLES.has(auth.role)
-      ) {
-        throw new ConvexError(
-          "Hiring into a manager or admin role needs an admin. Hire them into their staff role, or have an admin change the role under Team roles.",
-        );
-      }
       const fullName = candidate.fullName.trim();
       const parts = fullName.split(/\s+/u);
       const givenName = parts[0] ?? "";
