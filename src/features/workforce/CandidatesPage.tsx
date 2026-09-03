@@ -194,9 +194,15 @@ export function CandidatesPage() {
         return;
       }
       try {
-        await provisionSignIn({ personId: result.personId as never });
+        const provisioned = await provisionSignIn({
+          personId: result.personId as never,
+        });
         setNotice(
-          `Hired ${candidate.fullName}. Emailed a sign-in link and password to ${result.email}.`,
+          `Hired ${candidate.fullName}. Emailed ${
+            provisioned.passwordIssued
+              ? "a sign-in link and password"
+              : "a sign-in link"
+          } to ${provisioned.email}.`,
         );
       } catch (provisionError) {
         setNotice(
@@ -486,10 +492,16 @@ export function CandidatesPage() {
                       <button
                         type="button"
                         className="btn btn-primary"
-                        disabled={busy || candidate.stage === "hired"}
+                        disabled={
+                          busy ||
+                          (candidate.stage === "hired" &&
+                            candidate.hiredPersonId != null)
+                        }
                         onClick={() => void hireCandidate(candidate)}
                       >
-                        Hire into team
+                        {candidate.stage === "hired"
+                          ? "Finish team setup"
+                          : "Hire into team"}
                       </button>
                     </div>
                   </div>

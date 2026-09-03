@@ -5,16 +5,22 @@
 // event has no consumer, so the accepted offer dead-ended at a label. This
 // seam is the missing wire: it creates the Person through the SAME generated
 // command the Team roles hire form uses (Person_createViaHire — encrypted at
-// rest, hireDate stamped) and links it on the candidate row via Candidate_hire.
-// The CLIENT then calls authProvision.provisionStaffSignIn with the returned
-// personId to create the Clerk account and email the password — that step
-// stays client-orchestrated because it is an action (Clerk REST + mail) and
-// actions cannot run inside a mutation.
+// rest, hireDate stamped) and links it on the candidate row. The CLIENT then
+// calls authProvision.provisionStaffSignIn with the returned personId to
+// create the Clerk account and email the password — that step stays
+// client-orchestrated because it is an action (Clerk REST + mail) and actions
+// cannot run inside a mutation.
+//
+// Candidates already marked hired WITHOUT a linked profile — the old button's
+// output and KM imports with a hired stage — are converted here too:
+// Candidate_hire refuses stage "hired", so the link is a direct patch, the
+// same direct-write shape hiringPipeline.ts uses for its upserts, behind the
+// same role gate.
 //
 // The generated create command does a plain insert: the manifest's
 // `unique [tenantId, email]` is NOT enforced at the DB, so this seam resolves
-// an existing live Person by decrypted email BEFORE creating and links to it
-// instead of minting a duplicate profile.
+// an existing Person by decrypted email BEFORE creating and links to it
+// instead of minting a duplicate.
 //
 // Gated at the workforceManageAccess tier, the EXACT roles base.manifest
 // grants it (workforce_manager/admin/owner/system via `extends`), the same
@@ -66,34 +72,25 @@ export const hireIntoTeam = mutation({
     ) {
       throw new ConvexError("Candidate not found.");
     }
+    const alreadyHired = candidate.stage === "hired";
 
     // Idempotent resume BEFORE the version check: if the hire already
-    // committed (e.g. the caller lost the response before provisioning),
-    // Candidate_hire has bumped the version, so a stale expectedVersion must
-    // not block the recovery. Return the linked Person and let the client
-    // finish the sign-in email. A stale CONCURRENT hire (two managers, same
-    // candidate) is indistinguishable from a lost-response retry by payload,
-    // and both end in the same place: provisionStaffSignIn re-issues the
+    // committed and the profile is linked, a re-run (e.g. the caller lost
+    // the response before provisioning) must not be blocked by the stale
+    // version — return the personId and let the client finish the email. A
+    // stale CONCURRENT hire is payload-indistinguishable from that retry;
+    // both end in the same place, and provisionStaffSignIn re-issues the
     // password until the person first signs in (its own documented recovery
-    // behavior — the same as re-pressing "Email sign-in" in Team roles), and
-    // the busy-disable on the button stops accidental double-clicks. The
-    // newest email simply wins; no operation-key machinery needed.
-    if (candidate.stage === "hired") {
-      if (candidate.hiredPersonId) {
-        const linked = await ctx.db.get(
-          candidate.hiredPersonId as Id<"people">,
-        );
-        if (linked && linked.deletedAt == null) {
-          return {
-            kind: "hired",
-            personId: String(linked._id),
-            email: normalized(candidate.email),
-          };
-        }
+    // behavior — the same as re-pressing "Email sign-in" in Team roles).
+    if (alreadyHired && candidate.hiredPersonId) {
+      const linked = await ctx.db.get(candidate.hiredPersonId as Id<"people">);
+      if (linked && linked.deletedAt == null) {
+        return {
+          kind: "hired",
+          personId: String(linked._id),
+          email: normalized(candidate.email),
+        };
       }
-      throw new ConvexError(
-        "This candidate is already hired but their team profile is gone. Hire them again under Team roles.",
-      );
     }
 
     if (
@@ -110,18 +107,18 @@ export const hireIntoTeam = mutation({
     // hand the fix to the Team roles form instead of blocking the hire.
     const email = normalized(candidate.email);
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(email)) {
-      await ctx.runMutation(api.mutations.Candidate_hire, {
-        docId: candidateId,
-        version: expectedVersion ?? candidate.version,
-      });
+      if (!alreadyHired) {
+        await ctx.runMutation(api.mutations.Candidate_hire, {
+          docId: candidateId,
+          version: expectedVersion ?? candidate.version,
+        });
+      }
       return { kind: "hired_no_email" };
     }
 
-    // Same email already on ANY profile? Link to it — never a duplicate.
-    // Person_createViaHire is a plain insert and does not enforce the
-    // manifest's unique [tenantId, email]; a duplicate row would also make
-    // the hire's self-link ambiguous (two rows, one verified email).
-    const existing = await findLivePersonByEmail(ctx, auth.tenantId, email);
+    // Same email already on a profile? Link to it — never a duplicate.
+    const existing = await findPersonByEmail(ctx, auth.tenantId, email);
+    let personId: Id<"people">;
     if (existing) {
       // Terminated is terminal (status transition terminated → []) and
       // terminate() soft-deletes the row, so it cannot be reused — blocking
@@ -139,36 +136,43 @@ export const hireIntoTeam = mutation({
           version: existing.version,
         });
       }
+      personId = existing._id;
+    } else {
+      const fullName = candidate.fullName.trim();
+      const parts = fullName.split(/\s+/u);
+      const givenName = parts[0] ?? "";
+      const familyName =
+        parts.length > 1 ? parts.slice(1).join(" ") : givenName;
+      if (!givenName) {
+        throw new ConvexError("Candidate has no name to hire with.");
+      }
+      const result = await ctx.runMutation(api.mutations.Person_createViaHire, {
+        givenName,
+        familyName,
+        email,
+        phone: candidate.phone ?? undefined,
+        role: candidate.roleAppliedFor,
+        idempotencyKey: `candidateHire:${auth.tenantId}:${candidateId}`,
+      });
+      personId = result.docId as Id<"people">;
+    }
+
+    if (alreadyHired) {
+      // Old-path hires (pre-feature button, KM imports) reached stage hired
+      // with no Person and Candidate_hire refuses stage "hired" — link the
+      // profile directly, the same direct patch hiringPipeline's upserts use.
+      await ctx.db.patch(candidateId, {
+        hiredPersonId: personId,
+        updatedAt: Date.now(),
+        version: (candidate.version ?? 0) + 1,
+      });
+    } else {
       await ctx.runMutation(api.mutations.Candidate_hire, {
         docId: candidateId,
         version: expectedVersion ?? candidate.version,
-        hiredPersonId: existing._id,
+        hiredPersonId: personId,
       });
-      return { kind: "hired", personId: String(existing._id), email };
     }
-
-    const fullName = candidate.fullName.trim();
-    const parts = fullName.split(/\s+/u);
-    const givenName = parts[0] ?? "";
-    const familyName = parts.length > 1 ? parts.slice(1).join(" ") : givenName;
-    if (!givenName) {
-      throw new ConvexError("Candidate has no name to hire with.");
-    }
-
-    const result = await ctx.runMutation(api.mutations.Person_createViaHire, {
-      givenName,
-      familyName,
-      email,
-      role: candidate.roleAppliedFor,
-      idempotencyKey: `candidateHire:${auth.tenantId}:${candidateId}`,
-    });
-    const personId = result.docId as Id<"people">;
-
-    await ctx.runMutation(api.mutations.Candidate_hire, {
-      docId: candidateId,
-      version: expectedVersion ?? candidate.version,
-      hiredPersonId: personId,
-    });
 
     return { kind: "hired", personId: String(personId), email };
   },
@@ -179,16 +183,16 @@ function normalized(raw: string | null | undefined): string {
 }
 
 /**
- * The tenant's Person carrying this email, ANY row — including terminated
+ * The tenant's Person carrying this email — ANY row, including terminated
  * ones, because terminate() sets deletedAt and a soft-deleted mailbox must
- * still block a duplicate. A live (non-terminated) row always wins over an
- * older terminated one — duplicate rows exist historically because the
- * create command never enforced uniqueness. Person.email is encrypted, so
- * the only honest match is a decrypt-and-compare over the tenant's roster —
- * single-tenant scale, the same shape as the roster scan the generated list
- * query and authLink already do.
+ * still block a duplicate. Precedence among matches: a live linked profile
+ * first (its Clerk account already exists), then any other live row, then a
+ * terminated one. Person.email is encrypted, so the only honest match is a
+ * decrypt-and-compare over the tenant's roster — single-tenant scale, the
+ * same shape as the roster scan the generated list query and authLink
+ * already do.
  */
-async function findLivePersonByEmail(
+async function findPersonByEmail(
   ctx: MutationCtx,
   tenantId: string,
   email: string,
@@ -197,15 +201,19 @@ async function findLivePersonByEmail(
     .query("people")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .collect();
+  let unlinked: Doc<"people"> | null = null;
   let terminated: Doc<"people"> | null = null;
   for (const person of people) {
     if ((await readStoredEmail(ctx, person.email)) !== email) continue;
-    if (person.deletedAt == null && String(person.status) !== "terminated") {
+    if (person.deletedAt != null || String(person.status) === "terminated") {
+      terminated ??= person;
+    } else if (person.authSubjectId) {
       return person;
+    } else {
+      unlinked ??= person;
     }
-    terminated ??= person;
   }
-  return terminated;
+  return unlinked ?? terminated;
 }
 
 /** Person.email is an encrypted field; decode the envelope, else take it raw. */
