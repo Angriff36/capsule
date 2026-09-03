@@ -492,16 +492,14 @@ export function CandidatesPage() {
                       <button
                         type="button"
                         className="btn btn-primary"
-                        disabled={
-                          busy ||
-                          (candidate.stage === "hired" &&
-                            candidate.hiredPersonId != null)
-                        }
+                        disabled={busy}
                         onClick={() => void hireCandidate(candidate)}
                       >
-                        {candidate.stage === "hired"
-                          ? "Finish team setup"
-                          : "Hire into team"}
+                        {candidate.stage !== "hired"
+                          ? "Hire into team"
+                          : candidate.hiredPersonId != null
+                            ? "Resend sign-in"
+                            : "Finish team setup"}
                       </button>
                     </div>
                   </div>

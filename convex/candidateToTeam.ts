@@ -29,11 +29,33 @@ import { ConvexError, v } from "convex/values";
 import { mutation, type MutationCtx } from "./_generated/server";
 import { api } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
+import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
 import { decrypt } from "./lib/encryption";
 import type { Doc, Id } from "./_generated/dataModel";
 
 const WORKFORCE_MANAGE_ROLES = new Set([
   "workforce_manager",
+  "admin",
+  "owner",
+  "system",
+]);
+
+const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
+
+// Roles that carry decision authority over other people or domains. Hiring a
+// candidate INTO one of these is a role assignment, and role assignment is
+// admin-only in Capsule (Person.assignRole). A workforce manager can hire the
+// line, not grant a manager tier — mirrors the assignRole/linkAccount
+// escalation guards. Keep in sync with base.manifest.
+const PRIVILEGED_HIRE_ROLES = new Set([
+  "manager",
+  "kitchen_manager",
+  "sales_manager",
+  "event_manager",
+  "inventory_manager",
+  "logistics_manager",
+  "workforce_manager",
+  "finance_manager",
   "admin",
   "owner",
   "system",
@@ -62,6 +84,18 @@ export const hireIntoTeam = mutation({
     if (!auth.tenantId || !WORKFORCE_MANAGE_ROLES.has(auth.role)) {
       throw new ConvexError(
         "Only a workforce manager can hire a candidate into the team.",
+      );
+    }
+    // The manual role mirror above bypasses the generated checkRole, so it
+    // must also fail closed on the org-wide Workforce kill-switch.
+    if (
+      orgCapabilityDeniesAction(
+        "workforceManageAccess",
+        auth.disabledCapabilities,
+      )
+    ) {
+      throw new ConvexError(
+        "Workforce is switched off for this organization. Turn it back on under Administration → Permissions.",
       );
     }
     const candidate = await ctx.db.get(candidateId);
@@ -138,6 +172,17 @@ export const hireIntoTeam = mutation({
       }
       personId = existing._id;
     } else {
+      // Hiring INTO a privileged role is a role assignment — admin-only,
+      // same line as Person.assignRole. The candidate keeps the role on
+      // their row; an admin can set it under Team roles after the hire.
+      if (
+        PRIVILEGED_HIRE_ROLES.has(candidate.roleAppliedFor) &&
+        !ADMIN_ROLES.has(auth.role)
+      ) {
+        throw new ConvexError(
+          "Hiring into a manager or admin role needs an admin. Hire them into their staff role, or have an admin change the role under Team roles.",
+        );
+      }
       const fullName = candidate.fullName.trim();
       const parts = fullName.split(/\s+/u);
       const givenName = parts[0] ?? "";
