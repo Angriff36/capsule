@@ -126,13 +126,31 @@ export const hireIntoTeam = mutation({
             "This hire's profile link is invalid. Clear it under Team roles.",
           );
         }
-        // Resending must never silently restore access: an inactive or
-        // removed profile comes back only as an explicit action under Team
-        // roles (which owns reactivation), never as a side effect here.
-        if (linked.deletedAt != null || String(linked.status) !== "active") {
+        // Resending must never SILENTLY restore access: for an inactive
+        // profile the UI labels this action "Restore and resend", so the
+        // click itself is the explicit reactivation decision. A removed
+        // (terminated/deleted) profile cannot come back at all.
+        if (
+          linked.deletedAt != null ||
+          String(linked.status) === "terminated"
+        ) {
           throw new ConvexError(
-            "This hire's team profile is inactive or removed. Restore or replace it under Team roles, then resend.",
+            "This hire's team profile was removed. Hire them again under Team roles.",
           );
+        }
+        if (String(linked.status) === "inactive") {
+          if (
+            PRIVILEGED_HIRE_ROLES.has(String(linked.role)) &&
+            !ADMIN_ROLES.has(auth.role)
+          ) {
+            throw new ConvexError(
+              "This hire's profile is an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles.",
+            );
+          }
+          await ctx.runMutation(api.mutations.Person_reactivate, {
+            docId: linked._id,
+            version: linked.version,
+          });
         }
         // Credentials go to the LINKED PROFILE's address — it owns the Clerk
         // account. A KM re-import can patch a different email onto the

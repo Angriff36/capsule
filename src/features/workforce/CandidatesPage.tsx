@@ -86,7 +86,10 @@ export function CandidatesPage() {
   const [busy, setBusy] = useState(false);
   const [kmJson, setKmJson] = useState("");
   const [ingestReport, setIngestReport] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{
+    text: string;
+    tone: "ok" | "warn";
+  } | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
   const activePeople = (people ?? []).filter(
@@ -195,28 +198,31 @@ export function CandidatesPage() {
           : {}),
       });
       if (result.kind === "hired_no_email") {
-        setNotice(
-          `Hired ${candidate.fullName}. The candidate has no email, so no sign-in could be created — add them under Administration → Permissions → Team roles.`,
-        );
+        setNotice({
+          text: `Hired ${candidate.fullName}. The candidate has no usable email, so no sign-in could be created — add them under Administration → Permissions → Team roles.`,
+          tone: "warn",
+        });
         return;
       }
       try {
         const provisioned = await provisionSignIn({
           personId: result.personId as never,
         });
-        setNotice(
-          `Hired ${candidate.fullName}. Emailed ${
+        setNotice({
+          text: `Hired ${candidate.fullName}. Emailed ${
             provisioned.passwordIssued
               ? "a sign-in link and password"
               : "a sign-in link"
           } to ${provisioned.email}.`,
-        );
+          tone: "ok",
+        });
       } catch (provisionError) {
-        setNotice(
-          `Hired ${candidate.fullName}, but the sign-in email failed${
+        setNotice({
+          text: `Hired ${candidate.fullName}, but the sign-in email failed${
             provisionError instanceof Error ? `: ${provisionError.message}` : ""
           }. Use Email sign-in under Administration → Permissions → Team roles.`,
-        );
+          tone: "warn",
+        });
       }
     } catch (error) {
       setFailure(error);
@@ -294,7 +300,13 @@ export function CandidatesPage() {
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {notice ? (
-        <output className="banner banner-ok block mt-4">{notice}</output>
+        <output
+          className={`banner ${
+            notice.tone === "warn" ? "banner-warn" : "banner-ok"
+          } block mt-4`}
+        >
+          {notice.text}
+        </output>
       ) : null}
 
       {/* KM interview-tool import (spec §9.3 "map the KM JSON into the model"). */}
@@ -522,9 +534,13 @@ export function CandidatesPage() {
                       >
                         {candidate.stage !== "hired"
                           ? "Hire into team"
-                          : candidate.hiredPersonId != null
-                            ? "Resend sign-in"
-                            : "Finish team setup"}
+                          : candidate.hiredPersonId == null
+                            ? "Finish team setup"
+                            : (people?.find(
+                                  (row) => row._id === candidate.hiredPersonId,
+                                )?.status ?? "active") === "inactive"
+                              ? "Restore and resend"
+                              : "Resend sign-in"}
                       </button>
                       {candidate.stage === "hired" &&
                       candidate.hiredPersonId == null &&
@@ -533,6 +549,14 @@ export function CandidatesPage() {
                           This hire has no usable email, so no sign-in can be
                           set up. Re-import the candidate with an email, or add
                           them under Administration → Permissions → Team roles.
+                        </p>
+                      ) : null}
+                      {candidate.hiredPersonId != null &&
+                      people?.find((row) => row._id === candidate.hiredPersonId)
+                        ?.status === "inactive" ? (
+                        <p className="text-sm text-ink-2 mt-2">
+                          Their team profile is inactive. This restores it, then
+                          emails the sign-in again.
                         </p>
                       ) : null}
                     </div>
