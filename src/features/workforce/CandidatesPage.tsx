@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import {
   useCandidateAdvance,
-  useCandidateHire,
   useCandidateReject,
   useCreateCandidate,
   useCreateInterview,
@@ -10,7 +9,11 @@ import {
   useListInterview,
   useListPerson,
 } from "../../lib/manifest-convex-react";
-import { useIngestKmCandidates } from "../../lib/hiringPipeline";
+import {
+  useHireCandidateIntoTeam,
+  useIngestKmCandidates,
+  useProvisionStaffSignIn,
+} from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
@@ -66,15 +69,17 @@ export function CandidatesPage() {
   const createCandidate = useCreateCandidate();
   const advance = useCandidateAdvance();
   const reject = useCandidateReject();
-  const hire = useCandidateHire();
   const scheduleInterview = useCreateInterview();
   const recordOutcome = useInterviewRecordOutcome();
   const ingestKm = useIngestKmCandidates();
+  const hireIntoTeam = useHireCandidateIntoTeam();
+  const provisionSignIn = useProvisionStaffSignIn();
 
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const [kmJson, setKmJson] = useState("");
   const [ingestReport, setIngestReport] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
   const activePeople = (people ?? []).filter(
@@ -164,13 +169,38 @@ export function CandidatesPage() {
     }
   };
 
-  const hireCandidate = async (
-    candidateId: string,
-    version: number | undefined,
-  ) => {
+  // Hire for real: team profile from the candidate row, then the sign-in
+  // email (Clerk account + password). No email on the candidate still records
+  // the hire — the profile has to be made under Team roles by hand.
+  const hireCandidate = async (candidate: {
+    _id: string;
+    fullName: string;
+    version: number | undefined;
+  }) => {
     setFailure(null);
+    setNotice(null);
     try {
-      await hire({ docId: candidateId, version });
+      const result = await hireIntoTeam({
+        candidateId: candidate._id as never,
+      });
+      if (result.kind === "hired_no_email") {
+        setNotice(
+          `Hired ${candidate.fullName}. The candidate has no email, so no sign-in could be created — add them under Administration → Permissions → Team roles.`,
+        );
+        return;
+      }
+      try {
+        await provisionSignIn({ personId: result.personId as never });
+        setNotice(
+          `Hired ${candidate.fullName}. Emailed a sign-in link and password to ${result.email}.`,
+        );
+      } catch (provisionError) {
+        setNotice(
+          `Hired ${candidate.fullName}, but the sign-in email failed${
+            provisionError instanceof Error ? `: ${provisionError.message}` : ""
+          }. Use Email sign-in under Administration → Permissions → Team roles.`,
+        );
+      }
     } catch (error) {
       setFailure(error);
     }
@@ -244,6 +274,9 @@ export function CandidatesPage() {
 
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
+      {notice ? (
+        <output className="banner banner-ok block mt-4">{notice}</output>
+      ) : null}
 
       {/* KM interview-tool import (spec §9.3 "map the KM JSON into the model"). */}
       <section className="working-ledger mt-4">
@@ -448,11 +481,9 @@ export function CandidatesPage() {
                         type="button"
                         className="btn btn-primary"
                         disabled={candidate.stage === "hired"}
-                        onClick={() =>
-                          void hireCandidate(candidate._id, candidate.version)
-                        }
+                        onClick={() => void hireCandidate(candidate)}
                       >
-                        Hire
+                        Hire into team
                       </button>
                     </div>
                   </div>
