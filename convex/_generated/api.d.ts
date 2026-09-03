@@ -85,6 +85,7 @@ import type * as personalDataExport from "../personalDataExport.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
 import type * as qboSync from "../qboSync.js";
 import type * as queries from "../queries.js";
+import type * as quickImport from "../quickImport.js";
 import type * as quoteBuilder from "../quoteBuilder.js";
 import type * as recurringEvents from "../recurringEvents.js";
 import type * as sagas from "../sagas.js";
@@ -189,6 +190,7 @@ declare const fullApi: ApiFromModules<{
   pushSubscriptions: typeof pushSubscriptions;
   qboSync: typeof qboSync;
   queries: typeof queries;
+  quickImport: typeof quickImport;
   quoteBuilder: typeof quoteBuilder;
   recurringEvents: typeof recurringEvents;
   sagas: typeof sagas;
