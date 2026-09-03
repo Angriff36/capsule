@@ -1,11 +1,12 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { useMutation } from "convex/react";
 import {
   useListImportRun,
-  useImportRunStart,
   useImportRunMarkFailed,
   useImportRunRevert,
 } from "../../../lib/manifest-convex-react";
+import { api } from "../../../lib/api";
 import { importRunDetailPath } from "./importRoutes";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
@@ -54,7 +55,10 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function ImportRunsListPage() {
   const allRuns = useListImportRun();
-  const startImport = useImportRunStart();
+  // Allocation goes through the authored importCoordinator seam: the generated
+  // ImportRun_start is a transition command on an EXISTING run (requires docId),
+  // so the "Start Import" form could never allocate a row with it.
+  const startImport = useMutation(api.importCoordinator.startImport);
   const markFailed = useImportRunMarkFailed();
   const revertImport = useImportRunRevert();
   const { prompt, host } = useActionPrompt();
@@ -108,7 +112,6 @@ export function ImportRunsListPage() {
           data.get("sourceSystem") ?? "tpp_legacy",
         ) as SourceSystem,
         datasetType: String(data.get("datasetType") ?? "events") as DatasetType,
-        actorId: data.get("actorId")?.toString().trim() || undefined,
         checksum: data.get("checksum")?.toString().trim() || undefined,
       });
       setShowForm(false);
