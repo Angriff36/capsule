@@ -56,7 +56,8 @@ export class ReportCreatePayloadBuilder {
       chartType,
       sharingScope: sharingScope as ReportSharingScope,
       definition: {
-        version: 1,
+        version: 2,
+        dateWindow: "90_days",
         notes: notes || undefined,
       },
     };
@@ -76,8 +77,9 @@ export function ReportCreateForm({
       onSubmit={onSubmit}
     >
       <p className="text-base text-ink-2">
-        Save a report setup you can rename, share, archive, and restore later.
-        This library stores your settings — it doesn't draw the chart yet.
+        Choose a subject and Capsule will open a live report from its current
+        operational records. You can rename, share, archive, and restore it
+        later.
       </p>
       <label className="block space-y-1">
         <span className="text-sm text-ink-3">Name</span>
@@ -146,7 +148,7 @@ export function ReportCreateForm({
         />
       </label>
       <button className="btn btn-primary" type="submit" disabled={busy}>
-        {busy ? "Saving…" : "Save definition"}
+        {busy ? "Opening…" : "Create live report"}
       </button>
     </form>
   );
