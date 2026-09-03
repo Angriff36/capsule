@@ -45,7 +45,9 @@ Live app: **https://capsule-tau-eight.vercel.app** (Vercel project `capsule`,
 team `ryans-projects-471134dd`, GitHub-linked, production branch `main`).
 Backend: Convex prod deployment **impartial-mule-193**
 (https://impartial-mule-193.convex.cloud — dashboard:
-https://dashboard.convex.dev/d/impartial-mule-193). Auth: Clerk dev instance
+https://dashboard.convex.dev/d/impartial-mule-193). It is the only production
+Convex deployment; tangible-skunk-448 is a non-production (Vercel Preview)
+deployment and must never be read or written as prod. Auth: Clerk dev instance
 `golden-koi-11` (test keys — swap for a Clerk production instance before real
 customers).
 

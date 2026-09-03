@@ -9,6 +9,7 @@ import {
   useSavedReportDefinitionUpdateDefinition,
 } from "../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -29,6 +30,7 @@ import {
   type ReportDateWindow,
   type SavedReportRow,
 } from "./liveReportModel";
+import { canEditSavedReportDefinition } from "./reportEditAccess";
 import { ReportLifecyclePolicy } from "./ReportLifecyclePolicy";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
 
@@ -404,6 +406,14 @@ function SelectedReport({
   busy: boolean;
   onApply: (dateWindow: ReportDateWindow, chartType: ReportChartType) => void;
 }) {
+  const authStatus = useAuthStatus();
+  // Same rule as the updateDefinition command: the owner, or manageAccess.
+  // A team- / company-shared report opens for every reader who can see the
+  // subject, and Apply used to stay live for them until the guard rejected it.
+  const canEditSettings = canEditSavedReportDefinition(report, {
+    personId: authStatus?.personId,
+    role: authStatus?.role,
+  });
   const subject = normalizeReportSubject(report.subjectArea);
   if (!subject) {
     return (
@@ -433,6 +443,7 @@ function SelectedReport({
           loading={loading}
           sourceAvailable={sourceAvailable}
           busy={busy}
+          canEditSettings={canEditSettings}
           onApply={onApply}
         />
       )}

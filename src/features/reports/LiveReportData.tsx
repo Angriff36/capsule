@@ -4,14 +4,15 @@ import {
   useListEvent,
   useListIngredientDemand,
   useListInvoice,
+  useListPayment,
   useListPrepTask,
   useListProposal,
   useListShift,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
-import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import type { ReportSubjectArea } from "./ReportCreateForm";
 import { buildLiveReportModel } from "./liveReportBuilders";
+import { canReadReportSubject } from "./liveReportSubjectAccess";
 import type { LiveReportModel, ReportDateWindow } from "./liveReportModel";
 
 interface LiveReportDataState {
@@ -70,20 +71,79 @@ function LogisticsData(props: LiveReportDataProps) {
 }
 
 function FinanceData(props: LiveReportDataProps) {
-  return <ResolvedData {...props} rows={useListInvoice()} />;
+  return (
+    <ResolvedData
+      {...props}
+      rows={useListInvoice()}
+      paymentRows={useListPayment()}
+    />
+  );
+}
+
+/**
+ * Project the Payment ledger onto invoices before the generic builder runs.
+ * PaymentSettled is the only cash event: pending/processing/failed payments
+ * have not been received, while refunded payments no longer count. The
+ * invoice.amountPaid field is a command-maintained balance, useful as
+ * evidence, but the live finance report's Collected KPI is sourced from these
+ * payment rows rather than inferred from Invoice.total - Invoice.amountDue.
+ */
+function rowsWithActualPayments(
+  invoiceRows: readonly unknown[],
+  paymentRows: readonly unknown[],
+): readonly unknown[] {
+  const paidByInvoice = new Map<string, number>();
+  for (const payment of paymentRows) {
+    if (!isRecord(payment) || payment.deletedAt != null) continue;
+    if (payment.status !== "completed") continue;
+    const invoiceId = String(payment.invoiceId ?? "");
+    if (!invoiceId) continue;
+    paidByInvoice.set(
+      invoiceId,
+      (paidByInvoice.get(invoiceId) ?? 0) + numberValue(payment.amount),
+    );
+  }
+  return invoiceRows.map((invoice) => {
+    if (!isRecord(invoice)) return invoice;
+    const invoiceId = String(invoice._id ?? invoice.id ?? "");
+    return {
+      ...invoice,
+      amountPaid: paidByInvoice.get(invoiceId) ?? 0,
+    };
+  });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+function numberValue(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
 }
 
 function ResolvedData({
   rows,
+  paymentRows,
   subject,
   dateWindow,
   children,
-}: LiveReportDataProps & { rows: readonly unknown[] | undefined }) {
+}: LiveReportDataProps & {
+  rows: readonly unknown[] | undefined;
+  paymentRows?: readonly unknown[] | undefined;
+}) {
   const authStatus = useAuthStatus();
-  const loading = rows === undefined || authStatus === undefined;
+  const loading =
+    rows === undefined ||
+    authStatus === undefined ||
+    (subject === "finance" && paymentRows === undefined);
   const sourceAvailable = loading
     ? false
-    : canReadSubject(
+    : canReadReportSubject(
         subject,
         String(authStatus?.role ?? ""),
         authStatus?.disabledCapabilities,
@@ -91,41 +151,19 @@ function ResolvedData({
   const model = useMemo(
     () =>
       !loading && sourceAvailable
-        ? buildLiveReportModel(subject, rows ?? [], dateWindow)
+        ? buildLiveReportModel(
+            subject,
+            subject === "finance"
+              ? rowsWithActualPayments(rows ?? [], paymentRows ?? [])
+              : (rows ?? []),
+            dateWindow,
+          )
         : null,
-    [dateWindow, loading, rows, sourceAvailable, subject],
+    [dateWindow, loading, paymentRows, rows, sourceAvailable, subject],
   );
   return children({
     loading,
     sourceAvailable,
     model,
   });
-}
-
-function canReadSubject(
-  subject: ReportSubjectArea,
-  role: string,
-  disabledCapabilities: readonly string[] | undefined,
-): boolean {
-  if (disabledCapabilities?.includes(subject)) return false;
-  const permissions = new Set(resolveManifestPolicies(role));
-  if (subject === "events") {
-    return permissions.has("eventAccess") || permissions.has("salesAccess");
-  }
-  if (subject === "sales") return permissions.has("salesAccess");
-  if (subject === "inventory") {
-    return (
-      permissions.has("inventoryAccess") || permissions.has("manageAccess")
-    );
-  }
-  if (subject === "production") {
-    return permissions.has("kitchenAccess") || permissions.has("manageAccess");
-  }
-  if (subject === "workforce") return permissions.has("workforceAccess");
-  if (subject === "logistics") {
-    return (
-      permissions.has("logisticsAccess") || permissions.has("manageAccess")
-    );
-  }
-  return permissions.has("financeAccess") || permissions.has("manageAccess");
 }

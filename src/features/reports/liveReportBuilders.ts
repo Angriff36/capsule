@@ -20,6 +20,9 @@ const MONTH_FORMAT = new Intl.DateTimeFormat("en-US", {
   timeZone: "UTC",
 });
 
+/** "Last 12 months" covers this month and the eleven before it. */
+const MONTHS_IN_YEAR = 12;
+
 const COUNT_SERIES: ReportTrendSeries = {
   dataKey: "value",
   name: "Records",
@@ -440,7 +443,7 @@ function buildFinanceReport(
     subject: "finance",
     sourceLabel: "Invoice records",
     sourceDescription:
-      "Current invoices supply issued value, collected value, outstanding balances, and payment status in functional-currency amounts. Voided invoices stay visible as evidence but contribute $0 to the KPIs.",
+      "Current invoices supply issued value, payments received, outstanding balances, and payment status in functional-currency amounts. Collected is the invoice payment total (Invoice.amountPaid), so applied credit memos and written-off balances lower Outstanding without counting as cash and Collected plus Outstanding can be less than Invoiced. Voided invoices stay visible as evidence but contribute $0 to the KPIs.",
     sourcePath: "/finance/invoices",
     effectiveWindow: dateWindow,
     kpis: [
@@ -512,8 +515,15 @@ function windowStart(dateWindow: ReportDateWindow, now: number): number | null {
   if (dateWindow === "all_time") return null;
   if (dateWindow === "30_days") return now - 30 * 86_400_000;
   if (dateWindow === "90_days") return now - 90 * 86_400_000;
+  // Twelve months = the current month plus the eleven before it. Anchoring at
+  // (year - 1, same month) spanned thirteen month starts, so the trend drew 13
+  // buckets and kept records from the same month one year ago.
   const date = new Date(now);
-  return Date.UTC(date.getUTCFullYear() - 1, date.getUTCMonth(), 1);
+  return Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth() - (MONTHS_IN_YEAR - 1),
+    1,
+  );
 }
 
 function monthlyTrend(
@@ -632,13 +642,36 @@ function invoiceDue(row: SourceRow): number {
   return number(row.functionalCurrencyAmountDue ?? row.amountDue);
 }
 
+/**
+ * Invoice.safeExchangeRate (computed by the Invoice query hydration) folds an
+ * invoice-currency amount into the tenant's functional currency. Null / <= 0
+ * rates mean "already functional currency", matching the computed field.
+ */
+function invoiceExchangeRate(row: SourceRow): number {
+  const rate = number(row.safeExchangeRate ?? row.exchangeRate);
+  return rate > 0 ? rate : 1;
+}
+
+/**
+ * Cash actually received, in functional currency. Invoice.amountPaid is the
+ * command-maintained payment total: Invoice.applyPayment (run by the
+ * PaymentSettled reaction) and markDepositPaid raise it, recordRefund lowers
+ * it. applyCredit and writeOff lower amountDue and never touch amountPaid, so
+ * `total - amountDue` reports account credit and written-off balance as money
+ * received. Round like the functionalCurrency* computed fields so Invoiced,
+ * Collected, and Outstanding stay on one scale.
+ */
+function invoicePaid(row: SourceRow): number {
+  return Math.round(number(row.amountPaid) * invoiceExchangeRate(row));
+}
+
 function recognizedInvoiceTotal(row: SourceRow): number {
   return row.status === "voided" ? 0 : invoiceTotal(row);
 }
 
 function collectedInvoiceTotal(row: SourceRow): number {
   if (row.status === "voided") return 0;
-  return Math.max(0, invoiceTotal(row) - invoiceDue(row));
+  return Math.max(0, invoicePaid(row));
 }
 
 function collectibleInvoiceDue(row: SourceRow): number {

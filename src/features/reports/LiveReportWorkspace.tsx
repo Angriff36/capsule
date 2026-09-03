@@ -21,6 +21,7 @@ import {
   type ReportDateWindow,
   type SavedReportRow,
 } from "./liveReportModel";
+import { SAVED_REPORT_READ_ONLY_NOTICE } from "./reportEditAccess";
 
 interface LiveReportWorkspaceProps {
   report: SavedReportRow;
@@ -32,6 +33,12 @@ interface LiveReportWorkspaceProps {
   loading: boolean;
   sourceAvailable: boolean;
   busy: boolean;
+  /**
+   * False for a viewer who does not own this shared report: the
+   * updateDefinition command would reject the save, so the controls stay
+   * read-only instead of sending the viewer into that guard failure.
+   */
+  canEditSettings: boolean;
   onApply: (dateWindow: ReportDateWindow, chartType: ReportChartType) => void;
 }
 
@@ -45,10 +52,12 @@ export function LiveReportWorkspace({
   loading,
   sourceAvailable,
   busy,
+  canEditSettings,
   onApply,
 }: LiveReportWorkspaceProps) {
   const [dateWindow, setDateWindow] = useState(savedDateWindow);
   const [chartType, setChartType] = useState(savedChartType);
+  const controlsLocked = busy || !canEditSettings;
 
   useEffect(() => {
     setDateWindow(savedDateWindow);
@@ -57,6 +66,7 @@ export function LiveReportWorkspace({
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!canEditSettings) return;
     onApply(dateWindow, chartType);
   };
 
@@ -89,7 +99,7 @@ export function LiveReportWorkspace({
             onChange={(event) =>
               setDateWindow(event.target.value as ReportDateWindow)
             }
-            disabled={busy}
+            disabled={controlsLocked}
           >
             {REPORT_DATE_WINDOWS.map((window) => (
               <option key={window} value={window}>
@@ -106,7 +116,7 @@ export function LiveReportWorkspace({
             onChange={(event) =>
               setChartType(event.target.value as ReportChartType)
             }
-            disabled={busy}
+            disabled={controlsLocked}
           >
             {REPORT_CHART_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -118,11 +128,17 @@ export function LiveReportWorkspace({
         <button
           className="btn btn-primary btn-sm"
           type="submit"
-          disabled={busy}
+          disabled={controlsLocked}
         >
           {busy ? "Applying…" : "Apply"}
         </button>
       </form>
+
+      {canEditSettings ? null : (
+        <p className="live-report-notice" role="status">
+          {SAVED_REPORT_READ_ONLY_NOTICE}
+        </p>
+      )}
 
       {usedChartFallback ? (
         <p className="live-report-notice" role="status">

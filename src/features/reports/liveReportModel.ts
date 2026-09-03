@@ -64,6 +64,8 @@ export interface SavedReportRow {
   _id: string;
   version: number;
   status: unknown;
+  /** Person id that owns the definition; only the owner may updateDefinition. */
+  ownerId?: string | null;
   name?: string | null;
   subjectArea?: string | null;
   chartType?: string | null;
