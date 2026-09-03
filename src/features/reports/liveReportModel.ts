@@ -174,7 +174,10 @@ export function downloadLiveReportCsv(
 }
 
 function csvCell(value: ReportCellValue | undefined): string {
-  const raw = value == null ? "" : String(value);
+  if (typeof value === "number") {
+    return String(value);
+  }
+  const raw = value ?? "";
   const safe = /^[=+\-@]/u.test(raw) ? `'${raw}` : raw;
   return `"${safe.replaceAll('"', '""')}"`;
 }

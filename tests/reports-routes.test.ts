@@ -204,8 +204,8 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
           startsAt: Date.UTC(2026, 0, 2, 3, 4, 5),
           venueName: "+venue",
           stage: "-draft",
-          expectedHeadcount: 4,
-          budgetAmount: 5,
+          expectedHeadcount: -4,
+          budgetAmount: -5,
           quotedPrice: "@price",
         },
       ],
@@ -220,6 +220,11 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
     expect(csv.contents).toContain("'+venue");
     expect(csv.contents).toContain("'-draft");
     expect(csv.contents).toContain("'@price");
+    expect(csv.contents.split("\r\n")[1]).toBe(
+      '"\'=SUM(A1)","2026-01-02T03:04:05.000Z","\'+venue","\'-draft",-4,-5,"\'@price"',
+    );
+    expect(csv.contents).not.toContain("'-4");
+    expect(csv.contents).not.toContain("'-5");
     expect(csv.filename).toMatch(/^quarterly-ops-\d{4}-\d{2}-\d{2}\.csv$/);
   });
 });
