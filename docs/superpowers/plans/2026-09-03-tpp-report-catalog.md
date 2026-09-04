@@ -240,19 +240,19 @@ git push
 - Produces real results for all 36 Financial report IDs.
 - Consumes: Invoice, Payment, Proposal, Event, EventCloseout, RevenueAttribution, ingredient pricing, event menu/dish quantities, rentals/equipment, shifts/time/pay-rate seams, referral sources, venues, and functional-currency fields.
 
-- [ ] **Step 1: Implement A/R Aging Detail, Accounts Receivable, Accounts Receivable - New, Contact Statement/Receivables, and Outstanding Deposits**
-- [ ] **Step 2: Implement Contact Payments, Credit Card Transactions, Event Scheduled Payments, and Payment Totals from settled/reversed payment truth**
-- [ ] **Step 3: Implement Average Event Spending per Guest, Event Revenue by Client, Event Sales by Referral, Sales Forecasting, Snapshot Revenue, and Venue Sales**
-- [ ] **Step 4: Implement Beverage Costs/Totals, Event Food Costing Summary, Inventory Cost Changes, Menu Item Cost per Event/Costing/Itemized Sales/Sales by Category**
-- [ ] **Step 5: Implement Event Discount Summary, Event Other Fee(s), Miscellaneous Totals, Rental Charges, Staffing Charges, Staff Earnings, and Platform Fee + Gratuity Summary**
-- [ ] **Step 6: Implement Ledger / Food and Beverage Sales, Lost Revenue by Cancellation Reason, Outstanding Proposals, Profit Summary, Tax Exempt - New, and Taxable Sales**
-- [ ] **Step 7: Keep drafts out of billed revenue, voided/reversed rows out of collected totals, currency conversion at issued snapshots, and missing-cost/rate coverage visible**
-- [ ] **Step 8: Wire every Financial loader ID to a concrete resolver; do not share raw pay rates outside management-authorized staff-earnings calculations**
-- [ ] **Step 9: Run codegen, typecheck, finance money truth, payment, margin, food-cost, revenue, and reports tests**
+- [x] **Step 1: Implement A/R Aging Detail, Accounts Receivable, Accounts Receivable - New, Contact Statement/Receivables, and Outstanding Deposits**
+- [x] **Step 2: Implement Contact Payments, Credit Card Transactions, Event Scheduled Payments, and Payment Totals from settled/reversed payment truth**
+- [x] **Step 3: Implement Average Event Spending per Guest, Event Revenue by Client, Event Sales by Referral, Sales Forecasting, Snapshot Revenue, and Venue Sales**
+- [x] **Step 4: Implement Beverage Costs/Totals, Event Food Costing Summary, Inventory Cost Changes, Menu Item Cost per Event/Costing/Itemized Sales/Sales by Category**
+- [x] **Step 5: Implement Event Discount Summary, Event Other Fee(s), Miscellaneous Totals, Rental Charges, Staffing Charges, Staff Earnings, and Platform Fee + Gratuity Summary**
+- [x] **Step 6: Implement Ledger / Food and Beverage Sales, Lost Revenue by Cancellation Reason, Outstanding Proposals, Profit Summary, Tax Exempt - New, and Taxable Sales**
+- [x] **Step 7: Keep drafts out of billed revenue, voided/reversed rows out of collected totals, currency conversion at issued snapshots, and missing-cost/rate coverage visible**
+- [x] **Step 8: Wire every Financial loader ID to a concrete resolver; do not share raw pay rates outside management-authorized staff-earnings calculations**
+- [x] **Step 9: Run codegen, typecheck, finance money truth, payment, margin, food-cost, revenue, and reports tests**
 
 Run: `bun run codegen && bun run typecheck && bun run test -- tests/reports-routes.test.ts tests/finance-money-truth.test.ts tests/food-cost-ratio-copy.test.ts tests/proofs/event-estimated-food-cost.runtime.test.ts tests/proofs/invoice-payment-lifecycle.runtime.test.ts tests/proofs/event-closeout-lifecycle.runtime.test.ts`
 
-- [ ] **Step 10: Commit and push**
+- [x] **Step 10: Commit and push**
 
 ```bash
 git add convex/tppReports src/features/reports/tpp
