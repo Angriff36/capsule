@@ -245,7 +245,7 @@ export function CandidatesPage() {
         setNotice({
           text: `Hired ${candidate.fullName}, but the sign-in email failed${
             provisionError instanceof Error ? `: ${provisionError.message}` : ""
-          }. Use Email sign-in under Administration → Permissions → Team roles.`,
+          }. Press Resend sign-in on their card to try again.`,
           tone: "warn",
         });
       }

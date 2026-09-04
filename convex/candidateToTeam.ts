@@ -152,18 +152,13 @@ export const hireIntoTeam = mutation({
         if (String(linked.status) === "inactive") {
           // Reactivation requires the caller to have SEEN the inactive state
           // (the "Restore and resend" button sets restore). A stale page that
-          // still says "Resend sign-in" must not flip access back on.
+          // still says "Resend sign-in" must not flip access back on. No
+          // extra role gate here: the canonical Person_reactivate already
+          // authorizes workforce managers, and reactivation restores a
+          // pre-existing state rather than granting anything new.
           if (restore !== true) {
             throw new ConvexError(
               "This hire's team profile is inactive. Reload the page and use Restore and resend.",
-            );
-          }
-          if (
-            PRIVILEGED_HIRE_ROLES.has(String(linked.role)) &&
-            !ADMIN_ROLES.has(auth.role)
-          ) {
-            throw new ConvexError(
-              "This hire's profile is an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles.",
             );
           }
           await ctx.runMutation(api.mutations.Person_reactivate, {
@@ -252,7 +247,7 @@ export const hireIntoTeam = mutation({
           : "This email belongs to an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles.",
       );
     }
-    const roleDowngraded = needsAdmin && existing == null;
+    const roleDowngraded = needsAdmin && !reusingLiveProfile;
     let personId: Id<"people">;
     if (reusingLiveProfile) {
       // Returning seasonal/inactive staff: reactivate their row instead of
@@ -367,14 +362,15 @@ async function findPersonByEmail(
     if ((await readStoredEmail(ctx, person.email)) !== email) continue;
     // A LIVE profile always beats a dormant one, whatever the link state —
     // reactivating a stale duplicate would resurrect old permissions.
-    // Within dormant, an inactive row (recoverable) beats a terminated one.
+    // Dormant buckets keep the NEWEST row (ascending creation scan, last
+    // wins) so a third-episode rehire keys off the most recent history.
     if (person.deletedAt == null && String(person.status) === "active") {
       if (person.authSubjectId) return person;
-      unlinked ??= person;
+      unlinked = person;
     } else if (person.deletedAt == null) {
-      inactive ??= person;
+      inactive = person;
     } else {
-      terminated ??= person;
+      terminated = person;
     }
   }
   return unlinked ?? inactive ?? terminated;
