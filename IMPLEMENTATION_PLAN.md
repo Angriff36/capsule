@@ -97,8 +97,14 @@ re-run the subagent audits, the plan is converged.
 Iteration 16 (HEAD `c3e8f3b`, 2026-09-03): drift check only. Same state:
 no code change since `1b3abd9`, `origin/main` = `609023d` is an ancestor,
 newest issue #271, `lint_specs.sh specs/ralph` OK, AC-001…AC-019 PENDING,
-23 open tasks. No subagent audit. Operator: stop the plan loop and start
-BUILD at A1.
+21 open tasks (A1–A9, B1–B4, C1–C6, D1–D2). No subagent audit. Operator:
+stop the plan loop and start BUILD at A1.
+Iteration 17 (HEAD `2d0cb7c`, 2026-09-03): drift check only. Same state:
+no code change since `1b3abd9` (only the 7 spec-bullet lines, AC-018/019),
+`origin/main` = `609023d` is an ancestor, newest issue #271, specs gate OK
+(4 specs), AC-001…AC-019 PENDING, 21 open tasks. Fixed the iteration-16
+task count (said 23; the plan has 21 `- [ ]` items). No subagent audit.
+Operator: stop the plan loop and start BUILD at A1.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
