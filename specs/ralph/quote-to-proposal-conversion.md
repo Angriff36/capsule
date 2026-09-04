@@ -22,6 +22,13 @@ proposal without re-keying the client, date, headcount, or menu choices.
       raw submission
 - [ ] Conversion works when reference catalogs (service style / occasion)
       contain no matching row — the value surfaces as text, never a crash
+- [ ] After conversion the salesperson reaches the created proposal in one
+      click from the quote queue and from the lead pipeline, and the quote
+      queue is reachable from the lead pipeline (the "next action" half of
+      the Sales JTBD)
+- [ ] A conversion that fails part-way shows which records were already
+      created (client, lead, event, proposal), can be retried, and can be
+      dismissed — no partial record is unreachable from the queue
 
 ## Out of Scope
 

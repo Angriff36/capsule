@@ -18,7 +18,9 @@ judgment — run the llm-review gate (src/lib/llm-review.ts, criteria table
 src/lib/review-criteria.md, UX-01 / TONE-01) on the rendered copy or screenshot
 in addition to the programmatic test. `createReview()` THROWS when
 ANTHROPIC_API_KEY is unset (llm-review.ts:134,137) and is not wired into
-`bun run check`. J reviews run manually with the key present; output is saved
+`bun run check` (vitest `include` is tests/**/*.test.ts only, vite.config.ts:103,
+so src/lib/llm-review.test.ts never runs in the gate; run it by path:
+`bunx vitest run src/lib/llm-review.test.ts`). J reviews run manually with the key present; output is saved
 under .artifacts/llm-review/<AC-id>.md; they are never added to `bun run
 check`. The P test is the gate the loop halts on; the J review is recorded
 evidence.
@@ -58,4 +60,4 @@ is installed (only jsdom), so do not plan render tests.
 | AC-016 | specs/ralph/reference-catalogs-self-serve.md | A runtime proof creates an event with empty catalogs (null ids accepted) and with populated catalogs (ids persist and resolve). | `tests/proofs/event-create-catalogs.runtime.test.ts` › "create with empty and populated catalogs" | P | PENDING |
 | AC-017 | specs/capsule-complete-feature-spec.md §4.3 | End to end: a client submits once, sales sees the lead with all selections, converts without re-entry, the proposal is sent and accepted, and the created event carries date, times, headcount, venue, menu servings and enhancements, with the proposal pointing at the event. | `tests/proofs/quote-to-booked-event.runtime.test.ts` › "quote to booked event journey" | P | PENDING |
 | AC-018 | specs/ralph/quote-to-proposal-conversion.md | After conversion, sales reaches the created proposal in one click from the quote queue and from the lead pipeline (deep link `/clients/proposals?proposal=<id>`), and the queue is reachable from the pipeline. | `tests/features/sales/quote-submissions-review.test.ts` › "queue and pipeline deep-link to the converted proposal" | P | PENDING |
-| AC-019 | specs/ralph/quote-to-proposal-conversion.md | A conversion that failed part-way shows which records were already created (client, lead, event, proposal links from the checkpointed ids), can be retried, and can be dismissed; no partial record is unreachable from the queue. | `tests/features/sales/quote-submissions-review.test.ts` › "failed row shows checkpointed records" | P | PENDING |
+| AC-019 | specs/ralph/quote-to-proposal-conversion.md | A conversion that failed part-way shows which records were already created (client, lead, event, proposal links from the checkpointed ids), can be retried without duplicating those records, and can be dismissed; no partial record is unreachable from the queue. | `tests/features/sales/quote-submissions-review.test.ts` › "failed row shows checkpointed records"; `tests/proofs/quote-conversion.runtime.test.ts` › "retry after partial failure reuses checkpointed records" | P | PENDING |

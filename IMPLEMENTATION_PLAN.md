@@ -5,11 +5,15 @@
 
 # Implementation plan — capsule
 
-Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 2: 6 audit
-passes; runtime proof `tests/proposal-event-booking.runtime.test.ts` 7/7
-green). Branch: `ralph/wiggum-loop`. Audits: 10 read-only subagent passes over
-`specs/**`, `src/**`, `convex/**`, `tests/**`, plus GitHub issues #113, #119,
-#136, #141–#151. Evidence is `file:line` as of commit `1b3abd9`.
+Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 3: 5 more
+read-only passes; every `file:line` below re-checked at HEAD `e722ab0`, no
+code change since `1b3abd9`; runtime proof
+`tests/proposal-event-booking.runtime.test.ts` 7/7 green). Branch:
+`ralph/wiggum-loop`. Audits: 15 read-only subagent passes over `specs/**`,
+`src/**`, `convex/**`, `tests/**`, plus GitHub issues #113, #119, #136,
+#141–#151. Iteration 3 changes: A7 path fix, A8 split into A8 + A9 (failed
+rows have no retry today — manifest marks `failed` terminal), exact test file
+named on every task, AC-018/AC-019 anchored in the spec.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
@@ -59,8 +63,9 @@ JTBD.
 
 **Manifest changes in this release** (each needs `bun run manifest:regen`;
 the sibling `../builder` checkout exists on this machine): `QuoteSubmission`
-dismiss command + status, `QuoteSubmission` free-text style/occasion fields,
-`Proposal` end-time field. Follow the `manifest` skill before editing
+dismiss command + status (A4), `QuoteSubmission` retry command (A9),
+`QuoteSubmission` free-text style/occasion fields (A5), `Proposal` end-time
+field (C2). Batch A4 + A5 + A9 into one regen. Follow the `manifest` skill before editing
 `src/**/*.manifest`. Never hand-edit generated trees. Gates: `src/sales/*.manifest`
 changes are guarded by `bun run check:commercial-manifest`
 (`scripts/check-commercial-manifest-integration.ts`); `src/operations/*.manifest`
@@ -87,9 +92,11 @@ Order = build order. Earlier tasks unblock later ones.
       already accepts `optional eventId` (`src/sales/proposal.manifest:106`;
       generated at `convex/mutations.ts:29145`, args `:29162`). Delete the
       stale "createViaDraft has no eventId arg" comment (`quoteBuilder.ts:517-519`).
-      Add a runtime proof under
-      `tests/proofs/` that conversion yields client + lead + event + proposal
-      with `proposal.eventId == event._id`. → AC-008
+      Add the runtime proof `tests/proofs/quote-conversion.runtime.test.ts`
+      › "convert builds client, lead, event and linked proposal": conversion
+      yields client + lead + event + proposal with
+      `proposal.eventId == event._id`. This file is the home for A3/A4/A5/A9
+      proofs too. → AC-008
 - [ ] **A2. Show service style and occasion in the review queue.**
       `src/features/sales/QuoteSubmissionsReviewPage.tsx:183-245` (queue
       route `/clients/quote-requests`, `src/app/App.tsx:1213-1219`) renders
@@ -97,11 +104,16 @@ Order = build order. Earlier tasks unblock later ones.
       Resolve names via `useListServiceStyle`/`useListOccasion` (retired rows
       still resolve — same `nameOf` pattern as
       `src/features/events/EventDetailsCard.tsx:28-34`); show "Not specified"
-      when null. Test: queue renders all seven fields exactly as submitted.
+      when null. Test: new file
+      `tests/features/sales/quote-submissions-review.test.ts` › "queue shows
+      all seven submitted fields" (source-text style, like
+      `tests/quote-start-time.test.ts`; no render tests — no
+      @testing-library). This file is also the home for A6/A7/A8 tests.
       → AC-007
 - [ ] **A3. Dedup regression proof.** `generateDedupKey` +
       short-circuit at `convex/quoteBuilder.ts:29-37,158-176` is built but
-      untested. Runtime proof: same email + event date submitted twice →
+      untested. Runtime proof `quote-conversion.runtime.test.ts` › "dedup by
+      contact and event date": same email + event date submitted twice →
       one `QuoteSubmission`, one `Lead`; different date → two. → AC-009
 - [ ] **A4. Dismiss a junk/duplicate submission without deleting it.**
       Manifest: add `dismissed` to `QuoteSubmissionStatus` and a
@@ -110,8 +122,10 @@ Order = build order. Earlier tasks unblock later ones.
       raw row and `dedupKey` stay). Regen. UI: "Dismiss" action in the
       review page via `useActionPrompt` `askReason` (repo pattern, see
       `src/ui/action-prompt`), dismissed rows hidden by default with a
-      "Show dismissed" toggle. Proof: dismiss keeps the row readable and a
-      re-submit of the same key still dedups. → AC-010
+      "Show dismissed" toggle. Proof `quote-conversion.runtime.test.ts` ›
+      "dismiss keeps the raw submission": dismiss keeps the row readable and a
+      re-submit of the same key still dedups (extend the dedup filter at
+      `quoteBuilder.ts:166-168` to include `dismissed`). → AC-010
 - [ ] **A5. Free-text service style / occasion when catalogs are empty.**
       Manifest: add `serviceStyleText: string?` and `occasionText: string?`
       to `QuoteSubmission` and its `create` command; regen. Public form
@@ -119,9 +133,11 @@ Order = build order. Earlier tasks unblock later ones.
       in place of each empty `<select>`. `convex/quoteBuilder.ts`
       `ingressQuoteSubmission` stores the text; `processQuoteSubmission`
       carries it into the proposal `notes` when no catalog row matches.
-      Review queue (A2) shows the text. Proof: submit + convert with zero
-      `serviceStyles`/`occasions` rows → no throw, text visible on submission
-      and proposal. → AC-011, AC-014
+      Review queue (A2) shows the text. Proofs in
+      `quote-conversion.runtime.test.ts`: "public submit with empty catalogs
+      captures free text" (AC-014) and "empty catalogs convert as text"
+      (AC-011): submit + convert with zero `serviceStyles`/`occasions` rows →
+      no throw, text visible on submission and proposal. → AC-011, AC-014
 - [ ] **A6. Admin notice when the public form is offline.** `ingressQuoteSubmission`
       throws a plain `ConvexError("Unable to process quote. Please contact us
       directly.")` when no active `organizations` row exists
@@ -133,32 +149,62 @@ Order = build order. Earlier tasks unblock later ones.
       `/admin/branding` where `useCreateOrganization` lives
       (`src/features/admin/BrandingPage.tsx:35`). `BrandingPage.tsx:178`
       already has an inline "Save branding first so the organization record
-      exists" hint but no page-level banner. No new guard. → AC-014
+      exists" hint but no page-level banner. No new guard. Test:
+      `quote-submissions-review.test.ts` › "offline notice when no
+      organization". → AC-014
 - [ ] **A7. One-click path from the queue and the pipeline to the created
       proposal.** Depends on A1 (proposal exists and is linked).
-      `QuoteSubmissionsReviewPage.tsx` (~L136-149, ~L262) links "Open event →"
-      / "See in pipeline →" / "Open converted event →" but never to the
-      proposal, although the completed submission stores `proposalId`.
-      `LeadPipelinePage.tsx:645-647` "Open proposal" goes to the generic
-      `/clients/proposals` list. `ProposalsPage.tsx:146-159` already
+      `QuoteSubmissionsReviewPage.tsx` (`:150-161`, `:261-262`) links "Open
+      event →" / "See in pipeline →" / "Open converted event →" but never to
+      the proposal, although the completed submission stores `proposalId`.
+      `src/features/clients/LeadPipelinePage.tsx:645-647` (note: `clients/`,
+      not `sales/`) "Open proposal" goes to the generic `/clients/proposals`
+      list via `CLIENTS_ROUTES.proposals`. `ProposalsPage.tsx:146-159` already
       implements the deep link `/clients/proposals?proposal=<id>` (scrolls +
       opens panels). Wire both callers to it. Also add a "Quote requests"
       link to `/clients/quote-requests` from `LeadPipelinePage.tsx` (today
       zero references; the queue is reachable only via
-      `ClientsWorkspaceNav`). No manifest change. Test: source-text test
-      asserts both links target `?proposal=` and the pipeline links to the
-      queue route. → AC-018
-- [ ] **A8. Failed conversion shows what was created and can be retried or
-      dismissed.** Depends on A4 (dismiss). `checkpointQuoteSubmissionIds`
-      (`convex/quoteBuilder.ts:551-563`) persists the client/lead/event/
-      proposal ids created before a failure, but the review page shows links
-      only when `status === "completed"`
-      (`QuoteSubmissionsReviewPage.tsx:262`); failed rows show the error text
-      only, so partial records are unreachable from the queue. Render
-      whichever checkpointed ids exist on failed rows (same link components
-      as completed rows), keep the existing Convert (retry) action for failed
-      rows, and let A4's Dismiss apply to them. Test: a failed submission
-      with a checkpointed `clientId` renders the client link. → AC-019
+      `ClientsWorkspaceNav`). No manifest change. Test:
+      `quote-submissions-review.test.ts` › "queue and pipeline deep-link to
+      the converted proposal" — source-text assertions that both links target
+      `?proposal=` and the pipeline links to the queue route (same style as
+      `tests/clients-routes.test.ts` › "deep-links accepted Proposal into
+      Event create with client prefill"). → AC-018
+- [ ] **A8. Failed conversion shows what was created and can be dismissed.**
+      Depends on A4 (dismiss). `checkpointQuoteSubmissionIds` (call at
+      `convex/quoteBuilder.ts:551-563`, mutation at `:581`) persists the
+      client/lead/event/proposal ids created before a failure, but the review
+      page shows links only when `status === "completed"`
+      (`QuoteSubmissionsReviewPage.tsx:259-262`); failed rows (`:247-257`)
+      show the error text only, so partial records are unreachable from the
+      queue. Render whichever checkpointed ids exist on failed rows (same
+      link components as completed rows, plus the A7 proposal link) and let
+      A4's Dismiss apply to failed rows (A4's guard: pending or failed). No
+      manifest change beyond A4. Test: `quote-submissions-review.test.ts` ›
+      "failed row shows checkpointed records" — a failed submission with a
+      checkpointed `clientId` renders the client link. → AC-019
+- [ ] **A9. Retry a failed conversion without duplicating records.** Depends
+      on A8. There is NO retry today: `isActionable`
+      (`QuoteSubmissionsReviewPage.tsx:24-27`) returns false for `failed`,
+      `processQuoteSubmission` rejects non-pending rows
+      (`convex/quoteBuilder.ts:374-382`), and the manifest has no
+      `failed → pending` transition (`quote-submission.manifest:133-171`:
+      `startProcessing` guards `status == "pending"`). Manifest: add
+      `command retry()` on `src/sales/quote-submission.manifest` — guard
+      `status == "failed"` and `deletedAt == null`; mutate `status =
+      "pending"`, clear `errorMessage`/`processingErrors`; keep the
+      checkpointed ids. Regen with A4/A5. Backend: `processQuoteSubmission`
+      reuses `submission.clientId/leadId/eventId/proposalId` when already set
+      (skip that create step) so a retry never duplicates a client, lead,
+      event or proposal; delete the two stale "failed is terminal" comments
+      (`quoteBuilder.ts:374-377`, `QuoteSubmissionsReviewPage.tsx:22-24`).
+      UI: "Retry" on failed rows calls retry then the existing convert
+      action. Proof `quote-conversion.runtime.test.ts` › "retry after partial
+      failure reuses checkpointed records": force the proposal step to fail
+      (e.g. no `organizations` row after client/lead/event exist is not
+      reachable — instead checkpoint a row by hand with `clientId`+`leadId`
+      set and `status: "failed"`, call retry + convert, assert the client and
+      lead counts did not grow and `status === "completed"`). → AC-019
 
 ### B. Reference catalogs (spec `specs/ralph/reference-catalogs-self-serve.md`)
 
@@ -187,10 +233,13 @@ Order = build order. Earlier tasks unblock later ones.
       `src/features/kitchen/KitchenCatalog{Page,CreateForm,LifecycleButtons,Cards}.tsx`.
       No manifest change. `scripts/seed-catalogs.ts` has no package.json
       script entry (run with `bun scripts/seed-catalogs.ts`); this page
-      supersedes it for daily use. Test (new dir `tests/features/admin/`): page wires
-      the four commands per catalog; a new row appears in
-      `serviceStyleSelectOptions` without reload (Convex query reactivity).
-      → AC-012
+      supersedes it for daily use. Test: new file
+      `tests/features/admin/catalogs-page.test.ts` (new dir) › "wires
+      register, revise, deactivate, activate per catalog" — source-text
+      assertions that the page wires the four hooks per catalog and the route
+      + nav entry exist; reactivity is by Convex subscription
+      (`useListServiceStyle`), so assert the selector reads the live list,
+      not a snapshot. → AC-012
 - [ ] **B2. Explicit empty state on event create.** Occasion select in
       `src/features/events/EventCreatePage.tsx:430-443` shows only a
       placeholder when the catalog is empty. Render "No occasions yet — add
@@ -216,7 +265,9 @@ Order = build order. Earlier tasks unblock later ones.
 - [ ] **B4. Retired rows: hidden on create, kept on existing records.**
       Behavior exists (`EventCreatePage.tsx:212-213`,
       `serviceStyleCatalog.ts:57-59`, `EventDetailsCard.tsx:28-34,93-94`) but
-      has no test. Unit test: a deactivated style is absent from
+      has no test. Unit test
+      `tests/features/events/service-style-retired.test.ts` › "retired hidden
+      on create, resolved on detail": a deactivated style is absent from
       `serviceStyleSelectOptions` and still resolves by id in the detail
       `nameOf` lookup. → AC-015
 
@@ -249,7 +300,8 @@ Order = build order. Earlier tasks unblock later ones.
       seeds `startsAt` from prefill at `:466-475`; the "Ends" field
       (`:476-483`) has no prefill default today — seed `endsAt` the same way.
       When the proposal has no end time the preview panel says so in one
-      line. Extend the C1 proof. → AC-004
+      line. Extend the C1 proof file with › "typed date, times and headcount
+      carry over". → AC-004
 - [ ] **C3. Accepted enhancements visible on the event.** `ProposalEnhancement`
       exists (`src/sales/proposal-enhancement.manifest:14-27`: proposalId,
       name, description, price, sortOrder, addedAt, removedAt; `withdraw` at
@@ -263,8 +315,9 @@ Order = build order. Earlier tasks unblock later ones.
       `useQuery(api.queries.listProposalEnhancementByProposalId, …)`
       (`convex/queries.ts:8632`; no generated hook). Create-page preview
       (`EventCreatePage.tsx:658-707`) states the count that will show on the
-      event. Runtime proof asserts the rows are reachable from the event id.
-      → AC-005, AC-006
+      event. Extend the C1 proof file with › "accepted enhancements reachable
+      from the event" (rows reachable from the event id); the preview count
+      is asserted by C6's "preview lists carried values". → AC-005, AC-006
 - [ ] **C4. Event links back to the proposal and its accepted revision.**
       Link is one-way today (`Proposal.eventId`; Event has no `proposalId`).
       Add a "Booked from proposal" line on
@@ -278,7 +331,8 @@ Order = build order. Earlier tasks unblock later ones.
       `revisionNumber` from `listProposalRevisionByProposalId`
       (`convex/queries.ts:8756`) or `SignatureRequest.proposalRevisionId`
       (`signature-request.manifest:39`) for digital accepts. No manifest
-      change. → AC-002
+      change. Extend the C1 proof file with › "event resolves its proposal
+      and accepted revision". → AC-002
 - [ ] **C5. Consolidate date formatting.** `ProposalEventPrefill.toDatetimeLocal`
       (`ProposalEventPrefill.ts:55-65`) duplicates `toDatetimeLocalValue` in
       `src/lib/format.ts:79`. Use the library helper; delete the private copy.
@@ -361,4 +415,17 @@ Order = build order. Earlier tasks unblock later ones.
 - **`scripts/seed-catalogs.ts`** is not wired to a package.json script (B1
   admin UI supersedes it for daily use).
 - **`src/lib/llm-review.test.ts`** throws (does not skip) when
-  `ANTHROPIC_API_KEY` is unset — a `bun run test` gap outside this release.
+  `ANTHROPIC_API_KEY` is unset. It is NOT run by `bun run test` or `bun run
+  check`: vitest `include` is `tests/**/*.test.ts` only (`vite.config.ts:103`).
+  Run it by path (`bunx vitest run src/lib/llm-review.test.ts`) with the key
+  present for the J-kind reviews in `ACCEPTANCE_TESTS.md`.
+- **src/lib consolidation candidates near this release** (standard-library
+  rule; not in scope because the lines are unrelated to the tasks above):
+  `src/features/clients/LeadPipelinePage.tsx:65-69` private
+  `Intl.NumberFormat` duplicates `formatMoney` (`src/lib/format.ts:14-18`);
+  `ProposalCreateForm.tsx:499,545,598,631` `.toFixed(2)` instead of
+  `formatMoneyExact`; `BrandingPage.tsx:143-200` inline error unwrapping vs
+  `src/lib/convexActionErrorMessage.ts:8`;
+  `src/features/events/CommandFailure.ts:57-96` overlaps the same helper.
+  `LeadPipelinePage.tsx:89` and `ProposalCreateForm.tsx:39,57` carry two
+  near-duplicate date-only parsers with no `src/lib/format.ts` counterpart.
