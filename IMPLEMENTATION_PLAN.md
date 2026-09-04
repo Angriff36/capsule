@@ -53,6 +53,21 @@ above), #171 (cloud agents cannot regen — this loop runs locally with
 `../builder`, so A4/A5/A9/C2 are only buildable here), #241 (agent bundle
 path sends without a revision snapshot — C4 must tolerate a proposal with no
 revision), #165 (invoice number cascade, future work with #136).
+Iteration 8 (HEAD `6819379`, no code change since `1b3abd9`; `origin/main`
+has not moved past this branch, so no merge drift). No subagent re-audit was
+run: every `file:line` below is pinned to an unchanged tree. Delta is issue
+triage only. #233 confirms `package.json` is Builder-owned
+(`.builder/ownership.json:35`): NO task may add a `scripts` entry — new proof
+files are picked up by the `tests/proofs` directory in `test:proofs`
+(`package.json:49`) and by vitest `include` (`vite.config.ts:103`), so B3/C1/D1
+need no wiring; `scripts/seed-catalogs.ts` stays script-less by design.
+#237 (branding logo lost for no-org admins) touches `BrandingPage.tsx` but not
+the `useCreateOrganization` path A6 links to — out of scope. #265 (production
+runs on Clerk development keys) is a Vercel env fix, not code; it does not
+block this branch but must be settled before the one `[release]` merge, since
+that merge is the production deploy. #164/#161 (`proof:emit` irHash drift on
+Linux) do not apply: this loop runs on Windows and adds no `CATALOG_ENTITIES`
+proofs. Plan is stable; the build loop can start at A1.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
@@ -290,7 +305,8 @@ Order = build order. Earlier tasks unblock later ones.
       commands. Follow the create-form / lifecycle-buttons split in
       `src/features/kitchen/KitchenCatalog{Page,CreateForm,LifecycleButtons,Cards}.tsx`.
       No manifest change. `scripts/seed-catalogs.ts` has no package.json
-      script entry (run with `bun scripts/seed-catalogs.ts`); this page
+      script entry (run with `bun scripts/seed-catalogs.ts`) and must not
+      get one — `package.json` is Builder-owned (issue #233); this page
       supersedes it for daily use. Test: new file
       `tests/features/admin/catalogs-page.test.ts` (new dir) › "wires
       register, revise, deactivate, activate per catalog" — source-text
@@ -520,8 +536,15 @@ Order = build order. Earlier tasks unblock later ones.
   nor `event.manifest` stores `quoteSubmissionId`; the submission stores
   `clientId/leadId/eventId/proposalId`, so a by-proposalId lookup would need
   an index or a manifest ref. Low value now; note only.
-- **`scripts/seed-catalogs.ts`** is not wired to a package.json script (B1
-  admin UI supersedes it for daily use).
+- **`scripts/seed-catalogs.ts`** is not wired to a package.json script and
+  cannot be: `package.json` is Builder-owned (#233). B1 admin UI supersedes
+  it for daily use.
+- **Release-day config, not code** (#265): production Vercel runs Clerk
+  development keys. Fix the env in Vercel before the single `[release]`
+  merge of this branch; nothing in this plan touches it.
+- **Branding logo for no-org admins** (#237): `BrandingPage.tsx` saves the
+  logo only on the Clerk organization. A6 links to that page for the
+  organization row, not the logo; unaffected.
 - **`src/lib/llm-review.test.ts`** throws (does not skip) when
   `ANTHROPIC_API_KEY` is unset. It is NOT run by `bun run test` or `bun run
   check`: vitest `include` is `tests/**/*.test.ts` only (`vite.config.ts:103`).
