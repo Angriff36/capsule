@@ -15,6 +15,14 @@ green on iteration 3, not re-run since no code changed). Branch:
 `src/**`, `convex/**`, `tests/**`, plus GitHub issues #113, #119, #136,
 #141–#151 (states re-checked with `gh` on iteration 4: #115/#141/#149/#150
 closed; #124/#136/#142–#146 open).
+Iteration 6 (4 read-only passes at HEAD `d32f598`, still no code change):
+fixed line drifts A9 (`:133-181`), digital-accept (`:194`),
+`CommandFailure.ts:58-100`, the import manifest path (`src/import/`), and
+made the C4/manifest-paragraph `EventGuestPanel.tsx:82` citation exact (it
+reads guests; it is the pattern, not a proposal reader). All 9 "Already
+complete" rows and the D2 §0 rows re-confirmed. Loop hygiene:
+`.ralph-checkpoint` and `.ralph-telemetry.jsonl` are untracked and NOT
+gitignored — build iterations must stage explicit paths, never `git add -A`.
 Iteration 5 changes: A4 names the inline `showArchived` toggle pattern and
 notes `TONE_BY_STATUS` is module-private; A6 records that no shared banner
 primitive exists (write inline); B2 says not to use the centered `EmptyState`
@@ -86,7 +94,8 @@ bypasses, and `check:event-manifest` scans `src/features/events/**` +
 them, but C2–C4 edits under `src/features/events/**` must keep
 `check:event-manifest` green (no direct `useMutation`/`useQuery` on owned
 tables; `useQuery(api.queries.listProposalByEventId, …)` is a read of Proposal,
-not an event-owned table — same as `EventGuestPanel.tsx:82`). If regen emits any new
+not an event-owned table — same direct-`useQuery` shape as
+`EventGuestPanel.tsx:82`, which reads `listEventGuestByEventId`). If regen emits any new
 `<Entity>_createVia<Verb>` export, `tests/governed-creation-mappings.test.ts`
 (authored, sorted list) must be edited by hand — A4/A5/C2 add fields/commands
 only, so no new createVia is expected. Entity-level `constraint` lines do not
@@ -215,8 +224,8 @@ Order = build order. Earlier tasks unblock later ones.
       (`QuoteSubmissionsReviewPage.tsx:24-27`) returns false for `failed`,
       `processQuoteSubmission` rejects non-pending rows
       (`convex/quoteBuilder.ts:374-382`), and the manifest has no
-      `failed → pending` transition (`quote-submission.manifest:133-171`:
-      `startProcessing` guards `status == "pending"`). Manifest: add
+      `failed → pending` transition (`quote-submission.manifest:133-181`: startProcessing/complete/fail;
+      `startProcessing` guards `status == "pending"` at `:135`). Manifest: add
       `command retry()` on `src/sales/quote-submission.manifest` — guard
       `status == "failed"` and `deletedAt == null`; mutate `status =
       "pending"`, clear `errorMessage`/`processingErrors`; keep the
@@ -360,8 +369,10 @@ Order = build order. Earlier tasks unblock later ones.
       `listProposalByEventId` (`convex/queries.ts:8428`, `by_eventId` index,
       tenant + `deletedAt` filtered, `salesAccess` read). It has no generated
       hook (`manifest-convex-react.ts` has no `useList*By*Id`) — call
-      `useQuery(api.queries.listProposalByEventId, { eventId })` as
-      `EventGuestPanel.tsx:82` does. Show proposal number and the accepted
+      `useQuery(api.queries.listProposalByEventId, { eventId })` directly,
+      the same shape as `EventGuestPanel.tsx:82` (which reads
+      `listEventGuestByEventId`; nothing under `src/features/events`
+      reads `listProposalByEventId` yet). Show proposal number and the accepted
       revision: Proposal stores no accepted-revision id, so use the highest
       `revisionNumber` from `listProposalRevisionByProposalId`
       (`convex/queries.ts:8756`) or `SignatureRequest.proposalRevisionId`
@@ -440,13 +451,14 @@ Order = build order. Earlier tasks unblock later ones.
 - **Invoice numbers** (#136): `src/sales/invoice.manifest:19` still seeds
   `invoiceNumber` with the raw event id; `invoiceNumberDisplay.ts` is cosmetic.
 - **Service-style import reconciliation queue** (feature §3.2):
-  `import-dataset.manifest:269` names `mapServiceStyle` with no implementation.
+  `src/import/import-dataset.manifest:269` names `mapServiceStyle` with no
+  implementation (grep of `src/` + `convex/` is empty).
 - **Event lifecycle** (feature §3.3/§4.1): `quote` stage unreachable,
   Confirmed conflated with Executing, no duplicate/archive/reopen, reporting
   freeze at finalize is a comment only.
 - **Digital accept** (`on SignatureCompleted run Proposal.accept`,
   `signature-request.manifest:299`) reaches the dish-selection cascade only
-  when the proposal already has an `eventId` (`proposal.manifest:189`);
+  when the proposal already has an `eventId` (`proposal.manifest:194`);
   link-time copy covers booking.
 - **Reporting parity** (#124), **org seed** (#113 generator, ships in Manifest
   3.6.46+), Nowsta (#122), social DMs (#123), email inbox.
@@ -489,6 +501,6 @@ Order = build order. Earlier tasks unblock later ones.
   `ProposalCreateForm.tsx:499,545,598,631` `.toFixed(2)` instead of
   `formatMoneyExact`; `BrandingPage.tsx:143-200` inline error unwrapping vs
   `src/lib/convexActionErrorMessage.ts:8`;
-  `src/features/events/CommandFailure.ts:57-96` overlaps the same helper.
+  `src/features/events/CommandFailure.ts:58-100` overlaps the same helper.
   `LeadPipelinePage.tsx:89` and `ProposalCreateForm.tsx:39,57` carry two
   near-duplicate date-only parsers with no `src/lib/format.ts` counterpart.
