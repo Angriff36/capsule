@@ -47,6 +47,9 @@ export function RecordPreviewSheet({
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        // A nested lifecycle prompt owns the first Escape press. Its own
+        // keyboard handler dismisses it without also losing this record.
+        if (panelRef.current?.querySelector("[data-action-prompt]")) return;
         event.preventDefault();
         onClose();
         return;

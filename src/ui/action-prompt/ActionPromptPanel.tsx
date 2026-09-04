@@ -101,6 +101,7 @@ export function ActionPromptPanel({
 
   return (
     <form
+      data-action-prompt
       className={`mt-3 rounded-sm border p-4 ${
         tone === "danger"
           ? "border-danger/40 bg-danger-soft/40"

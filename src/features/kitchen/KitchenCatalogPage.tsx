@@ -618,6 +618,7 @@ function KitchenCatalogPageContent({
           <KitchenCatalogCards
             section={section}
             rows={displayRows as never}
+            viewKey={`${section}:${category}:${deferredSearch}:${sort}:${showHidden}`}
             categories={categories}
             activeCategory={category}
             onCategoryChange={setCategory}

@@ -68,6 +68,7 @@ type CategoryOption = {
 type Props = Readonly<{
   section: KitchenSection;
   rows: CatalogItem[];
+  viewKey: string;
   categories: CategoryOption[];
   activeCategory: string;
   onCategoryChange: (category: string) => void;
@@ -86,6 +87,7 @@ const ROW_HEIGHT = 68;
 export function KitchenCatalogCards({
   section,
   rows,
+  viewKey,
   categories,
   activeCategory,
   onCategoryChange,
@@ -99,6 +101,14 @@ export function KitchenCatalogCards({
     () => rows.find((row) => row._id === selectedId) ?? null,
     [rows, selectedId],
   );
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [pendingFocusIndex, setPendingFocusIndex] = useState<number | null>(
+    null,
+  );
+  const activeIndex = useMemo(
+    () => rows.findIndex((row) => row._id === activeId),
+    [activeId, rows],
+  );
   const closePreview = useCallback(() => setSelectedId(null), []);
   const { scrollRef, virtualRows, totalHeight, onScroll } = useVirtualWindow({
     count: rows.length,
@@ -107,8 +117,37 @@ export function KitchenCatalogCards({
 
   useEffect(() => {
     setSelectedId(null);
+    setActiveId(null);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
-  }, [activeCategory, rows, scrollRef, section]);
+  }, [scrollRef, viewKey]);
+
+  useEffect(() => {
+    if (pendingFocusIndex == null) return;
+    const row = scrollRef.current?.querySelector<HTMLElement>(
+      `[data-row-index="${pendingFocusIndex}"]`,
+    );
+    if (!row) return;
+    row.focus();
+    setPendingFocusIndex(null);
+  }, [pendingFocusIndex, scrollRef, virtualRows]);
+
+  const focusRow = useCallback(
+    (index: number) => {
+      const item = rows[index];
+      const scroller = scrollRef.current;
+      if (!item || !scroller) return;
+      setActiveId(item._id);
+      setPendingFocusIndex(index);
+
+      const top = index * ROW_HEIGHT;
+      const bottom = top + ROW_HEIGHT;
+      if (top < scroller.scrollTop) scroller.scrollTop = top;
+      if (bottom > scroller.scrollTop + scroller.clientHeight) {
+        scroller.scrollTop = bottom - scroller.clientHeight;
+      }
+    },
+    [rows, scrollRef],
+  );
 
   return (
     <>
@@ -132,8 +171,9 @@ export function KitchenCatalogCards({
 
         <div className="culinary-catalog-ledger">
           <div
-            role="table"
+            role="grid"
             aria-label={`${section} catalog`}
+            aria-colcount={6}
             aria-rowcount={rows.length + 1}
           >
             <div className="culinary-ledger-header" role="row">
@@ -166,41 +206,74 @@ export function KitchenCatalogCards({
                       className="culinary-ledger-row"
                       role="row"
                       aria-rowindex={index + 2}
-                      aria-selected={item._id === selectedId || undefined}
-                      tabIndex={0}
+                      aria-selected={item._id === selectedId}
+                      data-row-index={index}
+                      tabIndex={
+                        activeIndex < 0
+                          ? index === 0
+                            ? 0
+                            : -1
+                          : item._id === activeId
+                            ? 0
+                            : -1
+                      }
                       style={{
                         height: `${ROW_HEIGHT}px`,
                         transform: `translateY(${offset}px)`,
                       }}
-                      onClick={() => setSelectedId(item._id)}
+                      onClick={() => {
+                        setActiveId(item._id);
+                        setSelectedId(item._id);
+                      }}
+                      onFocus={() => setActiveId(item._id)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
                           event.preventDefault();
                           setSelectedId(item._id);
+                          return;
+                        }
+                        if (event.key === "ArrowDown") {
+                          event.preventDefault();
+                          focusRow(Math.min(rows.length - 1, index + 1));
+                        }
+                        if (event.key === "ArrowUp") {
+                          event.preventDefault();
+                          focusRow(Math.max(0, index - 1));
+                        }
+                        if (event.key === "Home") {
+                          event.preventDefault();
+                          focusRow(0);
+                        }
+                        if (event.key === "End") {
+                          event.preventDefault();
+                          focusRow(rows.length - 1);
                         }
                       }}
                     >
-                      <span className="culinary-ledger-name" role="cell">
+                      <span className="culinary-ledger-name" role="gridcell">
                         <strong>{item.name}</strong>
                         <small>{ledgerDescription(section, item)}</small>
                       </span>
-                      <span className="culinary-ledger-category" role="cell">
+                      <span
+                        className="culinary-ledger-category"
+                        role="gridcell"
+                      >
                         {item.category || "Uncategorized"}
                       </span>
-                      <span className="culinary-ledger-detail" role="cell">
+                      <span className="culinary-ledger-detail" role="gridcell">
                         {ledgerDetail(section, item)}
                       </span>
-                      <span role="cell">
+                      <span role="gridcell">
                         <span
-                          className={`culinary-ledger-status ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
+                          className={`culinary-ledger-status chip-state ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
                         >
                           {formatStatusLabel(String(item.status))}
                         </span>
                       </span>
-                      <span className="culinary-ledger-version" role="cell">
-                        v{item.version}
+                      <span className="culinary-ledger-version" role="gridcell">
+                        {editionLabel(item)}
                       </span>
-                      <span className="culinary-ledger-open" role="cell">
+                      <span className="culinary-ledger-open" role="gridcell">
                         <ChevronRightIcon />
                       </span>
                     </div>
@@ -270,7 +343,7 @@ function CatalogPreview({
 
       <div className="culinary-preview-state">
         <span
-          className={`culinary-ledger-status ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
+          className={`culinary-ledger-status chip-state ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
         >
           {formatStatusLabel(String(item.status))}
         </span>
@@ -309,7 +382,7 @@ function CatalogPreview({
 function previewFacts(section: KitchenSection, item: CatalogItem) {
   const facts: { label: string; value: string }[] = [
     { label: "Category", value: item.category || "Uncategorized" },
-    { label: "Edition", value: `v${item.version}` },
+    { label: "Edition", value: editionLabel(item) },
   ];
   if (section === "dishes" && item.course) {
     facts.push({ label: "Course", value: item.course });
@@ -330,6 +403,10 @@ function previewFacts(section: KitchenSection, item: CatalogItem) {
     facts.push({ label: "Menu type", value: "Template" });
   }
   return facts;
+}
+
+function editionLabel(item: CatalogItem) {
+  return item.editionNumber == null ? "—" : `Ed. ${item.editionNumber}`;
 }
 
 function ledgerDescription(section: KitchenSection, item: CatalogItem) {

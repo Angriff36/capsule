@@ -35,7 +35,7 @@
 .record-preview-heading > p:first-child {
   margin: 0 0 0.35rem;
   color: var(--color-brand);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -51,7 +51,7 @@
 .record-preview-heading > p:last-child:not(:first-child) {
   margin: 0.55rem 0 0;
   color: var(--color-ink-2);
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   line-height: 1.5;
 }
 

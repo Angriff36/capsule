@@ -17,7 +17,7 @@
   margin: 0;
   padding: 0.65rem 0.7rem 0.5rem;
   color: var(--color-ink-3);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -61,7 +61,7 @@
 .culinary-category-index button span:last-child {
   color: var(--color-ink-3);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
 }
 
 .culinary-catalog-ledger {
@@ -88,7 +88,7 @@
   border-bottom: 1px solid var(--color-line-2);
   background: var(--color-inset);
   color: var(--color-ink-3);
-  font-size: 0.68rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -111,7 +111,7 @@
   border-bottom: 1px solid var(--color-line);
   background: var(--color-panel);
   color: var(--color-ink-2);
-  font-size: 0.84rem;
+  font-size: 0.9375rem;
   text-align: left;
   cursor: pointer;
 }
@@ -146,7 +146,7 @@
 
 .culinary-ledger-name small {
   color: var(--color-ink-3);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .culinary-ledger-category,
@@ -156,49 +156,14 @@
   white-space: nowrap;
 }
 
-.culinary-ledger-status {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-pill);
-  padding: 0.15rem 0.55rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.culinary-ledger-status.is-live {
-  border-color: color-mix(in srgb, var(--color-ok) 30%, transparent);
-  background: var(--color-ok-soft);
-  color: var(--color-ok);
-}
-
-.culinary-ledger-status.is-draft {
-  border-color: color-mix(in srgb, var(--color-info) 30%, transparent);
-  background: var(--color-info-soft);
-  color: var(--color-info);
-}
-
-.culinary-ledger-status.is-quiet {
-  border-color: var(--color-line-2);
-  background: var(--color-inset);
-  color: var(--color-ink-2);
-}
-
-.culinary-ledger-status.is-warn {
-  border-color: color-mix(in srgb, var(--color-warn) 30%, transparent);
-  background: var(--color-warn-soft);
-  color: var(--color-warn);
+.culinary-status-quiet {
+  background: var(--color-ink-2);
 }
 
 .culinary-ledger-version {
   color: var(--color-ink-3);
   font-family: var(--font-mono);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
 }
 
 .culinary-ledger-open {
@@ -221,7 +186,7 @@
   background: var(--color-inset);
   padding: 0.45rem 0.85rem;
   color: var(--color-ink-3);
-  font-size: 0.72rem;
+  font-size: 0.8125rem;
 }
 
 .culinary-ledger-footer span:last-child {
@@ -233,7 +198,7 @@
   align-items: center;
   gap: 0.45rem;
   color: var(--color-ink-3);
-  font-size: 0.74rem;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -278,7 +243,7 @@
   align-items: center;
   gap: 0.6rem;
   color: var(--color-ink-3);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
 }
 
 .culinary-preview-section {
@@ -289,7 +254,7 @@
 .culinary-preview-section h3 {
   margin: 0 0 0.7rem;
   color: var(--color-ink);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -298,7 +263,7 @@
 .culinary-preview-section p {
   margin: 0;
   color: var(--color-ink-2);
-  font-size: 0.92rem;
+  font-size: 0.9375rem;
   line-height: 1.65;
 }
 
@@ -316,13 +281,13 @@
 
 .culinary-preview-section dt {
   color: var(--color-ink-3);
-  font-size: 0.78rem;
+  font-size: 0.8125rem;
 }
 
 .culinary-preview-section dd {
   margin: 0;
   color: var(--color-ink);
-  font-size: 0.85rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   text-align: right;
 }
