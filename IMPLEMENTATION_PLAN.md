@@ -92,6 +92,12 @@ audit. Same result as iteration 10: `src`/`convex`/`tests` unchanged since
 #270, `lint_specs.sh specs/ralph` OK, AC-001…AC-019 all PENDING. Seven
 plan iterations with no task change. Plan passes are now waste: run
 `./loop.sh --branch ralph/wiggum-loop --allow-dirty` in BUILD mode at A1.
+Iteration 12 (HEAD `3493bc6`, 2026-09-03): drift check only, no subagent
+audit. `src`/`convex`/`tests` unchanged since `1b3abd9` (only the 7
+spec-bullet lines, AC-018/019); `origin/main` = `609023d` still an
+ancestor; newest open issue #270; `lint_specs.sh specs/ralph` OK (4
+specs); AC-001…AC-019 all PENDING. Eight plan iterations with no task
+change. Do not run PLAN mode again until a build commit lands.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
