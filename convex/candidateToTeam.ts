@@ -233,12 +233,18 @@ export const hireIntoTeam = mutation({
       existing != null &&
       existing.status === "active" &&
       Boolean(existing.authSubjectId);
-    const effectiveRole = existing
-      ? String(existing.role)
+    // A terminated match is non-reusable history: the gate evaluates the
+    // REQUESTED role (a terminated "staff" row must not green-light a KM
+    // "admin", and a terminated "admin" row must not block a staff rehire).
+    const reusingLiveProfile =
+      existing != null && String(existing.status) !== "terminated";
+    const effectiveRole = reusingLiveProfile
+      ? String(existing!.role)
       : candidate.roleAppliedFor;
     const needsAdmin =
       PRIVILEGED_HIRE_ROLES.has(effectiveRole) && !ADMIN_ROLES.has(auth.role);
-    const reuseBlocked = needsAdmin && existing != null && !alreadyAccountable;
+    const reuseBlocked =
+      needsAdmin && reusingLiveProfile && !alreadyAccountable;
     if (reuseBlocked) {
       throw new ConvexError(
         String(existing!.status) === "active"
@@ -248,7 +254,7 @@ export const hireIntoTeam = mutation({
     }
     const roleDowngraded = needsAdmin && existing == null;
     let personId: Id<"people">;
-    if (existing && String(existing.status) !== "terminated") {
+    if (reusingLiveProfile) {
       // Returning seasonal/inactive staff: reactivate their row instead of
       // splitting employment history across two profiles — but only with
       // explicit restore intent (same rule as the resume branch). The first
@@ -295,10 +301,12 @@ export const hireIntoTeam = mutation({
         email,
         phone: candidate.phone ?? undefined,
         role: roleDowngraded ? "staff" : candidate.roleAppliedFor,
-        // Email-scoped: a rehire after reopening + an email change must
-        // create a FRESH profile, not replay the original hire's cached
-        // create (which would re-link the old mailbox).
-        idempotencyKey: `candidateHire:${auth.tenantId}:${candidateId}:${email}`,
+        // Email-scoped plus episode-scoped: a rehire after reopening + an
+        // email change (or after the previous profile was terminated) must
+        // create a FRESH profile, not replay an earlier cached create.
+        idempotencyKey: `candidateHire:${auth.tenantId}:${candidateId}:${email}:${
+          existing ? existing._id : "new"
+        }`,
       });
       personId = result.docId as Id<"people">;
     }
@@ -335,13 +343,13 @@ function normalized(raw: string | null | undefined): string {
 
 /**
  * The tenant's Person carrying this email — ANY row, including terminated
- * ones, because terminate() sets deletedAt and a soft-deleted mailbox must
- * still block a duplicate. Precedence among matches: a live linked profile
- * first (its Clerk account already exists), then any other live row, then a
- * terminated one. Person.email is encrypted, so the only honest match is a
- * decrypt-and-compare over the tenant's roster — single-tenant scale, the
- * same shape as the roster scan the generated list query and authLink
- * already do.
+ * ones, because a terminated mailbox must be distinguished from a free one.
+ * Precedence among matches: live rows first (linked, then unlinked), then
+ * inactive, then terminated. Person.email is encrypted, so the only honest
+ * match is a decrypt-and-compare over the tenant's roster — single-tenant
+ * scale, the same shape as the roster scan the generated list query and
+ * authLink already do. (A bounded fingerprint index would be a schema
+ * change + backfill; revisit if roster history ever gets large.)
  */
 async function findPersonByEmail(
   ctx: MutationCtx,
