@@ -31,6 +31,28 @@ names the fix link; §4.3 attribution / "estimate" labelling recorded as
 future work (consent is already stored). All 19 AC rows cover every
 acceptance bullet in the three in-scope specs; no overlap with
 `field-flow-defect-burndown.md`. Plan is stable — the build loop can start.
+Iteration 7 (HEAD `86f3ca3`, still no code change since `1b3abd9`; the only
+non-plan diff is the iteration-3 spec bullets already covered by AC-018/019):
+gate baselines proven in THIS worktree — `bun scripts/manifest-regen-check.ts`
+→ "generated output is current" (all 93 `.manifest` sources are LF, so issue
+#261's CRLF hash drift does not apply here; run regen from `capsule-ralph`,
+not from the primary `C:/Projects/capsule` checkout, which carries CRLF);
+`bun run test:proofs` → 35 files / 104 tests green; spec gate is
+`./lint_specs.sh specs/ralph` (OK, 4 specs) — the no-arg form fails on
+`specs/capsule-complete-feature-spec.md` by design (AGENTS.md:17 calls it
+reference context, not a ralph spec; do not add template sections to it).
+`.artifacts/` is gitignored and absent in a fresh worktree — `mkdir -p` it
+before redirecting logs. Loop hygiene fix: `.ralph-checkpoint`,
+`.ralph-telemetry.jsonl`, `.ralph-failures.md` are now in `.gitignore`, so
+the loop's own state no longer trips the clean-tree guard (`loop.sh:43`) or
+rides along on `git add -A`. `CLAUDE.md` is rewritten by the CogniLayer
+session hook every session, so it stays dirty: start the loop with
+`--allow-dirty` or commit the bridge line first. New gh issues since
+iteration 4 that touch this release: #261 (regen line endings, handled
+above), #171 (cloud agents cannot regen — this loop runs locally with
+`../builder`, so A4/A5/A9/C2 are only buildable here), #241 (agent bundle
+path sends without a revision snapshot — C4 must tolerate a proposal with no
+revision), #165 (invoice number cascade, future work with #136).
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
@@ -376,9 +398,14 @@ Order = build order. Earlier tasks unblock later ones.
       revision: Proposal stores no accepted-revision id, so use the highest
       `revisionNumber` from `listProposalRevisionByProposalId`
       (`convex/queries.ts:8756`) or `SignatureRequest.proposalRevisionId`
-      (`signature-request.manifest:39`) for digital accepts. No manifest
-      change. Extend the C1 proof file with › "event resolves its proposal
-      and accepted revision". → AC-002
+      (`signature-request.manifest:39`) for digital accepts. A proposal can
+      have zero revisions: the UI send paths (`ProposalsPage.tsx:82`,
+      `LeadPipelinePage.tsx:109`) go through
+      `api.lib.proposalRevision.sendProposalWithRevisionCapture`, but the
+      agent bundle path calls raw `Proposal.send` (issue #241) — show the
+      proposal number alone and "no revision captured" in that case; never
+      throw. No manifest change. Extend the C1 proof file with › "event
+      resolves its proposal and accepted revision". → AC-002
 - [ ] **C5. Consolidate date formatting.** `ProposalEventPrefill.toDatetimeLocal`
       (`ProposalEventPrefill.ts:55-65`) duplicates `toDatetimeLocalValue` in
       `src/lib/format.ts:79`. Use the library helper; delete the private copy.
@@ -448,8 +475,15 @@ Order = build order. Earlier tasks unblock later ones.
   an interaction-level test. Recommended next release.
 - **Mobile stage actions** (feature §4.5): `EventStageActionsCard` is skipped
   on the phone overview (`EventDetailPage.tsx:627`); no next-action summary.
-- **Invoice numbers** (#136): `src/sales/invoice.manifest:19` still seeds
+- **Invoice numbers** (#136, #165): `src/sales/invoice.manifest:19` still seeds
   `invoiceNumber` with the raw event id; `invoiceNumberDisplay.ts` is cosmetic.
+  #165 names the fix (cascade param + regen + backfill of rows matching
+  `^[a-z0-9]{24,}$`) and needs a Builder-capable session like this one.
+- **Agent event-bundle resume** (#241): a bundle `enter` that fails after
+  `Proposal.draft` / `Invoice.issue` / `VendorOrder.open` never plans the
+  missing children on retry, and the signed path sends without a revision
+  snapshot. Agent API path, not on the re-keying journey; C4 only tolerates
+  the no-revision case.
 - **Service-style import reconciliation queue** (feature §3.2):
   `src/import/import-dataset.manifest:269` names `mapServiceStyle` with no
   implementation (grep of `src/` + `convex/` is empty).
