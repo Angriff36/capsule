@@ -68,6 +68,17 @@ block this branch but must be settled before the one `[release]` merge, since
 that merge is the production deploy. #164/#161 (`proof:emit` irHash drift on
 Linux) do not apply: this loop runs on Windows and adds no `CATALOG_ENTITIES`
 proofs. Plan is stable; the build loop can start at A1.
+Iteration 9 (HEAD `7f9512a`, no code change since `1b3abd9`, `origin/main`
+still unmoved, `lint_specs.sh specs/ralph` OK). No re-audit: nothing the
+plan cites has changed. New issues since iteration 8: #269 (hire revocation)
+and #270 (Person email correction) come from
+`feat/candidate-hire-into-team` and touch Candidate/Person only — the
+conversion path matches *clients* by email (`quoteBuilder.ts:395-417`), not
+Person, so neither affects A1–D2. When that branch merges to `main`, rebase
+this branch once before the `[release]` merge; expect no conflict in
+`src/features/sales/**`, `src/features/events/**` or `convex/quoteBuilder.ts`.
+Five consecutive plan iterations have produced no task change: the plan is
+converged. Do not spend another plan iteration; run the build loop.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
