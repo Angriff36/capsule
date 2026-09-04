@@ -11,6 +11,7 @@ import { query } from "../_generated/server";
 import { getAuthContext } from "../lib/authContext";
 import {
   REPORT_ROW_LIMIT,
+  decryptReportFields,
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
@@ -133,7 +134,7 @@ export const run = query({
     if (!REPORT_IDS.has(args.reportId))
       throw new Error("Unknown Financial report");
     const parameters = (args.parameters ?? {}) as Parameters;
-    const [events, invoices, clients] = await Promise.all([
+    const [rawEvents, invoices, clients] = await Promise.all([
       ctx.db
         .query("events")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -147,6 +148,16 @@ export const run = query({
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT),
     ]);
+    const events = await Promise.all(
+      rawEvents.map((event) =>
+        decryptReportFields(
+          ctx,
+          "Event",
+          ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+          event,
+        ),
+      ),
+    );
     const eventById = new Map(
       events
         .filter((row) => isLiveTenantRow(row, tenantId))

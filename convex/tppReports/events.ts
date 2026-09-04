@@ -9,6 +9,7 @@ import { query, type QueryCtx } from "../_generated/server";
 import type { Doc, Id } from "../_generated/dataModel";
 import {
   REPORT_ROW_LIMIT,
+  decryptReportFields,
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
@@ -52,7 +53,7 @@ async function eventsInRange(
   parameters: Parameters,
 ) {
   const [start, end] = range(parameters);
-  return (
+  const events = (
     await ctx.db
       .query("events")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -61,6 +62,16 @@ async function eventsInRange(
     (event) =>
       isLiveTenantRow(event, tenantId) &&
       inDateRange(event.startsAt, start, end),
+  );
+  return await Promise.all(
+    events.map((event) =>
+      decryptReportFields(
+        ctx,
+        "Event",
+        ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+        event,
+      ),
+    ),
   );
 }
 
@@ -73,10 +84,15 @@ async function selectedEvent(
     typeof parameters.eventId === "string"
       ? ctx.db.normalizeId("events", parameters.eventId)
       : null;
-  const event = eventId ? await ctx.db.get(eventId) : null;
-  if (!event || !isLiveTenantRow(event, tenantId))
+  const eventRaw = eventId ? await ctx.db.get(eventId) : null;
+  if (!eventRaw || !isLiveTenantRow(eventRaw, tenantId))
     throw new Error("Choose an event");
-  return event;
+  return await decryptReportFields(
+    ctx,
+    "Event",
+    ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+    eventRaw,
+  );
 }
 
 async function eventMenu(

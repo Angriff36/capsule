@@ -8,6 +8,7 @@ import type {
 import { query } from "../_generated/server";
 import {
   REPORT_ROW_LIMIT,
+  decryptReportFields,
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
@@ -247,10 +248,27 @@ export const run = query({
     }
 
     if (args.reportId === "mailing-labels") {
-      const clients = await ctx.db
+      const rawClients = await ctx.db
         .query("clients")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT);
+      const clients = await Promise.all(
+        rawClients.map((client) =>
+          decryptReportFields(
+            ctx,
+            "Client",
+            [
+              "addressLine1",
+              "addressLine2",
+              "city",
+              "region",
+              "postalCode",
+              "countryCode",
+            ],
+            client,
+          ),
+        ),
+      );
       return {
         kind: "labels",
         title: title(args.reportId),
@@ -441,10 +459,15 @@ export const run = query({
     }
 
     if (args.reportId === "staff-address-phone-list") {
-      const people = await ctx.db
+      const rawPeople = await ctx.db
         .query("people")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT);
+      const people = await Promise.all(
+        rawPeople.map((person) =>
+          decryptReportFields(ctx, "Person", ["email", "phone"], person),
+        ),
+      );
       return table(
         args.reportId,
         [
@@ -470,10 +493,28 @@ export const run = query({
     }
 
     if (args.reportId === "vendor-phone-list") {
-      const vendors = await ctx.db
+      const rawVendors = await ctx.db
         .query("vendors")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT);
+      const vendors = await Promise.all(
+        rawVendors.map((vendor) =>
+          decryptReportFields(
+            ctx,
+            "Vendor",
+            [
+              "email",
+              "phone",
+              "addressLine1",
+              "city",
+              "region",
+              "postalCode",
+              "countryCode",
+            ],
+            vendor,
+          ),
+        ),
+      );
       return table(
         args.reportId,
         [
@@ -497,10 +538,30 @@ export const run = query({
     }
 
     if (args.reportId === "venue-detail" || args.reportId === "venue-listing") {
-      const venues = await ctx.db
+      const rawVenues = await ctx.db
         .query("venues")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT);
+      const venues = await Promise.all(
+        rawVenues.map((venue) =>
+          decryptReportFields(
+            ctx,
+            "Venue",
+            [
+              "addressLine1",
+              "addressLine2",
+              "city",
+              "region",
+              "postalCode",
+              "countryCode",
+              "contactName",
+              "contactEmail",
+              "contactPhone",
+            ],
+            venue,
+          ),
+        ),
+      );
       const active = venues.filter(
         (row) => isLiveTenantRow(row, tenantId) && row.status === "active",
       );

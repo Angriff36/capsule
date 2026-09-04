@@ -7,6 +7,7 @@ import type {
 import { query, type QueryCtx } from "../_generated/server";
 import {
   REPORT_ROW_LIMIT,
+  decryptReportFields,
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
@@ -76,9 +77,15 @@ async function eventBundle(
       ? ctx.db.normalizeId("events", rawEventId)
       : null;
   if (!eventId) throw new Error("Choose an event");
-  const event = await ctx.db.get(eventId);
-  if (!event || !isLiveTenantRow(event, tenantId))
+  const eventRaw = await ctx.db.get(eventId);
+  if (!eventRaw || !isLiveTenantRow(eventRaw, tenantId))
     throw new Error("Event not found");
+  const event = await decryptReportFields(
+    ctx,
+    "Event",
+    ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+    eventRaw,
+  );
   const [client, invoices, proposals, contracts, eventDishes] =
     await Promise.all([
       ctx.db.get(event.clientId),
@@ -102,9 +109,27 @@ async function eventBundle(
   const dishes = await Promise.all(
     eventDishes.map((item) => ctx.db.get(item.dishId)),
   );
+  const plainClient =
+    client && isLiveTenantRow(client, tenantId)
+      ? await decryptReportFields(
+          ctx,
+          "Client",
+          [
+            "email",
+            "phone",
+            "addressLine1",
+            "addressLine2",
+            "city",
+            "region",
+            "postalCode",
+            "countryCode",
+          ],
+          client,
+        )
+      : null;
   return {
     event,
-    client: client && isLiveTenantRow(client, tenantId) ? client : null,
+    client: plainClient,
     invoices: invoices.filter((row) => isLiveTenantRow(row, tenantId)),
     proposals: proposals.filter((row) => isLiveTenantRow(row, tenantId)),
     contracts: contracts.filter((row) => isLiveTenantRow(row, tenantId)),
@@ -137,13 +162,32 @@ export const run = query({
         args.reportId,
       )
     ) {
-      const clients = (
+      const rawClients = (
         await ctx.db
           .query("clients")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
           .take(REPORT_ROW_LIMIT)
       ).filter(
         (row) => isLiveTenantRow(row, tenantId) && row.status === "active",
+      );
+      const clients = await Promise.all(
+        rawClients.map((client) =>
+          decryptReportFields(
+            ctx,
+            "Client",
+            [
+              "email",
+              "phone",
+              "addressLine1",
+              "addressLine2",
+              "city",
+              "region",
+              "postalCode",
+              "countryCode",
+            ],
+            client,
+          ),
+        ),
       );
       const filtered =
         args.reportId === "contact-activity"
@@ -204,9 +248,24 @@ export const run = query({
         typeof parameters.clientId === "string"
           ? ctx.db.normalizeId("clients", parameters.clientId)
           : null;
-      const client = clientId ? await ctx.db.get(clientId) : null;
-      if (!client || !isLiveTenantRow(client, tenantId))
+      const clientRaw = clientId ? await ctx.db.get(clientId) : null;
+      if (!clientRaw || !isLiveTenantRow(clientRaw, tenantId))
         throw new Error("Contact not found");
+      const client = await decryptReportFields(
+        ctx,
+        "Client",
+        [
+          "email",
+          "phone",
+          "addressLine1",
+          "addressLine2",
+          "city",
+          "region",
+          "postalCode",
+          "countryCode",
+        ],
+        clientRaw,
+      );
       return document(args.reportId, "contact_letter", [
         { id: "date", rows: [{ value: dateText(Date.now()) }] },
         {
@@ -240,6 +299,20 @@ export const run = query({
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
           .take(REPORT_ROW_LIMIT),
       ]);
+      const plainEvents = await Promise.all(
+        events.map((event) =>
+          decryptReportFields(
+            ctx,
+            "Event",
+            [
+              "primaryContactName",
+              "primaryContactEmail",
+              "primaryContactPhone",
+            ],
+            event,
+          ),
+        ),
+      );
       const clientsById = new Map(
         clients.map((client) => [String(client._id), clientName(client)]),
       );
@@ -254,7 +327,7 @@ export const run = query({
           { key: "status", label: "Event status", kind: "text" },
           { key: "type", label: "Event type", kind: "text" },
         ],
-        events
+        plainEvents
           .filter(
             (row) =>
               isLiveTenantRow(row, tenantId) &&
