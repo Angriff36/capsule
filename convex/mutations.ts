@@ -27047,7 +27047,7 @@ async function __runPersonLinkAccount(ctx: MutationCtx, { docId, authSubjectId, 
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
-    if (!((checkRole(user, "adminAccess") || (!checkRole(doc, "adminAccess"))))) throw new Error("Guard 3 failed");
+    if (!((checkRole(user, "adminAccess") || (!checkRole(doc.role, "adminAccess"))))) throw new Error("Guard 3 failed");
     if (!((((authSubjectId).trim()).length > 0))) throw new Error("Choose an account to link");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -27367,7 +27367,7 @@ async function __runPersonUnlinkAccount(ctx: MutationCtx, { docId, version }: an
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 1 failed");
-    if (!((checkRole(user, "adminAccess") || (!checkRole(doc, "adminAccess"))))) throw new Error("Guard 2 failed");
+    if (!((checkRole(user, "adminAccess") || (!checkRole(doc.role, "adminAccess"))))) throw new Error("Guard 2 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

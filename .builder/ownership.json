@@ -18,7 +18,7 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "504c8a486a6695f6a4674a50ffd9f7a9727a53efb25e070b425f568cdd3df623"
+      "sha256": "c090ebf00f1e393045d39dcedc230769c7cfa7fea7d735fe86ba88a15b7b4092"
     },
     "convex/queries.ts": {
       "sha256": "c58d1f6d62cf190e04fe821f1105b038eb88e50fe1b76a9e27ed6b9753954b47"
@@ -65,7 +65,7 @@
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "3.6.48",
+      "@angriff36/manifest": "^3.6.48",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },
