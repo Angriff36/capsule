@@ -1,0 +1,25 @@
+// Per-person favorites for the Total Party Planner compatibility catalog.
+//
+// One row per canonical report id and linked Person. The authored seam
+// convex/tppReportFavorites.ts is the only write path: it validates the id
+// against the code-owned catalog boundary and upserts/deletes raw rows using
+// trusted auth context. Favorite state has no business consequence and never
+// grants access to the report's source records.
+
+use "../foundation/base.manifest"
+
+entity TppReportFavorite mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, personId, reportId]
+  timestamps
+  versionProperty version: number
+
+  property indexed personId: uuid?
+  property indexed reportId: string?
+
+  default policy tppReportFavoriteRead read: self.personId == null or self.personId == user.personId "Staff may read their own report favorites"
+  default policy tppReportFavoriteWrite write: roleAllows(user.role, "reportFavoriteSeamOnly") "Report favorites are managed only through the app"
+  default policy tppReportFavoriteExecute execute: roleAllows(user.role, "reportFavoriteSeamOnly") "Report favorites are managed only through the app"
+
+  store TppReportFavorite in durable
+}

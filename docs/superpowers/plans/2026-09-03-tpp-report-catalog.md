@@ -93,7 +93,7 @@ git push
 - Consumes: canonical `reportId: string` from Task 1.
 - Produces: `api.tppReportFavorites.listMine()` and `api.tppReportFavorites.setFavorite({ reportId, favorite })`.
 
-- [ ] **Step 1: Add the `TppReportFavorite` authored Manifest entity**
+- [x] **Step 1: Add the `TppReportFavorite` authored Manifest entity**
 
 ```manifest
 entity TppReportFavorite mixin TenantScoped {
@@ -110,17 +110,17 @@ entity TppReportFavorite mixin TenantScoped {
 }
 ```
 
-- [ ] **Step 2: Register the new root module in `src/app.manifest`**
-- [ ] **Step 3: Run ownership-aware regeneration**
+- [x] **Step 2: Register the new root module in `src/app.manifest`**
+- [x] **Step 3: Run ownership-aware regeneration**
 
 Run: `bun run manifest:regen`
 
-- [ ] **Step 4: Implement the authored upsert/delete seam using trusted auth tenant/person and the `(tenantId, personId, reportId)` key**
-- [ ] **Step 5: Run Convex codegen and focused gates**
+- [x] **Step 4: Implement the authored upsert/delete seam using trusted auth tenant/person and the `(tenantId, personId, reportId)` key**
+- [x] **Step 5: Run Convex codegen and focused gates**
 
 Run: `bun run codegen && bun run typecheck && bun run check:manifest-registry`
 
-- [ ] **Step 6: Commit and push**
+- [x] **Step 6: Commit and push**
 
 ```bash
 git add src/app.manifest src/insights/tpp-report-favorite.manifest convex/tppReportFavorites.ts convex src/generated src/lib/manifest-convex-react.ts schemas wiring .builder/ownership.json
