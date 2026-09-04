@@ -2684,6 +2684,349 @@
 }
 
 /* Reports — a narrow saved index beside one dominant, ruled live result. */
+.report-view-switch {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+}
+
+.report-view-switch button {
+  border: 0;
+  border-right: 1px solid var(--color-line);
+  background: transparent;
+  padding: 0.75rem 1rem;
+  color: var(--color-ink-3);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.report-view-switch button.is-active {
+  box-shadow: inset 0 -3px 0 var(--color-brand);
+  color: var(--color-ink);
+}
+
+.tpp-report-page {
+  gap: 2rem;
+}
+
+.tpp-report-count {
+  flex: none;
+  border-left: 3px solid var(--color-accent);
+  padding: 0.7rem 1rem;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.tpp-catalog-section {
+  min-width: 0;
+  border-top: 1px solid var(--color-ink);
+}
+
+.tpp-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  border-bottom: 1px solid var(--color-line-2);
+}
+
+.tpp-section-heading h2 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+}
+
+.tpp-section-heading span {
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.tpp-card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tpp-report-card {
+  position: relative;
+  min-width: 0;
+  min-height: 6.5rem;
+  border-right: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.tpp-report-card:nth-child(4n + 1) {
+  border-left: 1px solid var(--color-line);
+}
+
+.tpp-report-open {
+  display: grid;
+  width: 100%;
+  min-height: 100%;
+  gap: 0.3rem;
+  border: 0;
+  background: transparent;
+  padding: 0.9rem 2.4rem 0.9rem 0.9rem;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tpp-report-open:hover,
+.tpp-report-open:focus-visible {
+  background: var(--color-brand-soft);
+}
+
+.tpp-report-open strong {
+  align-self: end;
+  font-family: var(--font-display);
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.tpp-report-open span {
+  align-self: start;
+  color: var(--color-ink-3);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.tpp-favorite {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tpp-runner {
+  border-top: 3px solid var(--color-brand);
+  border-bottom: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+}
+
+.tpp-runner-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.tpp-runner-heading h2 {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+}
+
+.tpp-runner-heading p:last-child {
+  max-width: 52rem;
+  margin-top: 0.4rem;
+  color: var(--color-ink-2);
+  font-size: 13px;
+}
+
+.tpp-parameter-form {
+  display: flex;
+  align-items: end;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.tpp-parameter-grid {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tpp-parameter-grid label,
+.tpp-date-range label {
+  display: grid;
+  gap: 0.3rem;
+  color: var(--color-ink-3);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.tpp-date-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  border: 0;
+  padding: 0;
+}
+
+.tpp-date-range legend {
+  grid-column: 1 / -1;
+  color: var(--color-ink-3);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.tpp-parameter-wide {
+  grid-column: 1 / -1;
+}
+
+.tpp-checkbox {
+  display: flex !important;
+  align-items: center;
+  align-self: end;
+  min-height: 2.5rem;
+}
+
+.tpp-parameter-hint,
+.tpp-result-status {
+  flex: 1;
+  color: var(--color-ink-3);
+  font-size: 13px;
+}
+
+.tpp-output-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-line-2);
+}
+
+.tpp-output-bar strong {
+  font-family: var(--font-display);
+}
+
+.tpp-output-bar > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tpp-print-area {
+  border: 0;
+  padding: 1rem 0;
+  box-shadow: none;
+}
+
+.tpp-result-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tpp-result-table {
+  min-width: 720px;
+}
+
+.tpp-result-table td[data-kind="money"],
+.tpp-result-table td[data-kind="number"],
+.tpp-result-table td[data-kind="quantity"] {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.tpp-total-strip,
+.tpp-measures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  border-top: 1px solid var(--color-line-2);
+}
+
+.tpp-total-strip > div,
+.tpp-measures > div {
+  border-right: 1px solid var(--color-line);
+  padding: 0.75rem;
+}
+
+.tpp-total-strip dt,
+.tpp-measures dt {
+  color: var(--color-ink-3);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tpp-total-strip dd,
+.tpp-measures dd {
+  margin-top: 0.25rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.tpp-measures [data-emphasis="primary"] {
+  background: var(--color-brand-soft);
+}
+
+.tpp-document {
+  display: grid;
+  gap: 1.5rem;
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.tpp-document section {
+  border-top: 1px solid var(--color-ink);
+}
+
+.tpp-document h3 {
+  padding: 0.65rem 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.tpp-document dl > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.3fr) minmax(0, 1fr);
+  gap: 1rem;
+  border-top: 1px solid var(--color-line);
+  padding: 0.55rem 0;
+}
+
+.tpp-document dt {
+  color: var(--color-ink-3);
+  font-size: 12px;
+}
+
+.tpp-label-sheet {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, var(--label-width));
+  gap: 0.125in;
+  justify-content: center;
+}
+
+.tpp-label-sheet article {
+  display: grid;
+  align-content: center;
+  width: var(--label-width);
+  height: var(--label-height);
+  border: 1px dashed var(--color-line-2);
+  padding: 0.12in;
+  overflow: hidden;
+  font-size: 10px;
+}
+
+.tpp-label-table_tent article {
+  place-content: center;
+  text-align: center;
+}
+
+.tpp-result-empty {
+  min-height: 12rem;
+}
+
 .reports-workspace-grid {
   display: grid;
   grid-template-columns: minmax(16rem, 0.34fr) minmax(0, 1fr);
@@ -2942,6 +3285,18 @@
 }
 
 @media (max-width: 1080px) {
+  .tpp-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tpp-report-card:nth-child(4n + 1) {
+    border-left: 0;
+  }
+
+  .tpp-report-card:nth-child(2n + 1) {
+    border-left: 1px solid var(--color-line);
+  }
+
   .reports-workspace-grid {
     grid-template-columns: 1fr;
     grid-template-areas:
@@ -2956,6 +3311,27 @@
 }
 
 @media (max-width: 700px) {
+  .tpp-card-grid,
+  .tpp-parameter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tpp-report-card,
+  .tpp-report-card:nth-child(2n + 1) {
+    border-left: 1px solid var(--color-line);
+  }
+
+  .tpp-parameter-form,
+  .tpp-output-bar,
+  .tpp-runner-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tpp-parameter-form > .btn {
+    width: 100%;
+  }
+
   .saved-report-list,
   .live-report-controls {
     grid-template-columns: 1fr;

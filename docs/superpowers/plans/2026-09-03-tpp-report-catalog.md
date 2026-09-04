@@ -277,18 +277,18 @@ git push
 - Consumes: catalog, favorites APIs, request parser, loaders, result families, and export helpers.
 - Produces: exact 96-card catalog, personal stars, report parameter forms, previews, print/PDF/CSV/Excel/label actions, and secondary Saved reports view.
 
-- [ ] **Step 1: Add Catalog and Saved reports route-local views without removing existing saved-definition lifecycle behavior**
-- [ ] **Step 2: Render Favorites, Contacts, Event, Financial, and TPP General in exact order with names, descriptions, and accessible star toggles**
-- [ ] **Step 3: Render declared parameter controls, current-event defaults, validation summary, and retained values after failure**
-- [ ] **Step 4: Mount only the selected report loader and render distinct loading, unavailable, empty, truncated, and complete states**
-- [ ] **Step 5: Render shared table, ledger, document, worksheet, label, and financial result families with semantic headers and group totals**
-- [ ] **Step 6: Add report-specific Print, PDF, CSV, Excel, and labels actions from the catalog outputs**
-- [ ] **Step 7: Add `DESIGN.md`-compliant ruled catalog/workspace styling, responsive stacking, horizontal evidence scrolling, and physical print rules**
-- [ ] **Step 8: Run formatting, design-vocabulary, typecheck, existing reports tests, and build**
+- [x] **Step 1: Add Catalog and Saved reports route-local views without removing existing saved-definition lifecycle behavior**
+- [x] **Step 2: Render Favorites, Contacts, Event, Financial, and TPP General in exact order with names, descriptions, and accessible star toggles**
+- [x] **Step 3: Render declared parameter controls, current-event defaults, validation summary, and retained values after failure**
+- [x] **Step 4: Mount only the selected report loader and render distinct loading, unavailable, empty, truncated, and complete states**
+- [x] **Step 5: Render shared table, ledger, document, worksheet, label, and financial result families with semantic headers and group totals**
+- [x] **Step 6: Add report-specific Print, PDF, CSV, Excel, and labels actions from the catalog outputs**
+- [x] **Step 7: Add `DESIGN.md`-compliant ruled catalog/workspace styling, responsive stacking, horizontal evidence scrolling, and physical print rules**
+- [x] **Step 8: Run formatting, design-vocabulary, typecheck, existing reports tests, and build**
 
 Run: `bunx prettier --write src/features/reports src/styles/app.css && bun run check:design-vocab && bun run typecheck && bun run test -- tests/reports-routes.test.ts && bun run build`
 
-- [ ] **Step 9: Commit and push**
+- [x] **Step 9: Commit and push**
 
 ```bash
 git add src/features/reports src/styles/app.css

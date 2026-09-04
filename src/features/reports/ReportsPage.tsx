@@ -33,11 +33,37 @@ import {
 import { canEditSavedReportDefinition } from "./reportEditAccess";
 import { ReportLifecyclePolicy } from "./ReportLifecyclePolicy";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
+import { TppReportCatalog } from "./tpp/TppReportCatalog";
 
 const policy = new ReportLifecyclePolicy();
 const payloadBuilder = new ReportCreatePayloadBuilder();
 
 export function ReportsPage() {
+  const [view, setView] = useState<"catalog" | "saved">("catalog");
+  return (
+    <>
+      <nav className="report-view-switch" aria-label="Report views">
+        <button
+          className={view === "catalog" ? "is-active" : ""}
+          type="button"
+          onClick={() => setView("catalog")}
+        >
+          TPP report catalog
+        </button>
+        <button
+          className={view === "saved" ? "is-active" : ""}
+          type="button"
+          onClick={() => setView("saved")}
+        >
+          Saved reports
+        </button>
+      </nav>
+      {view === "catalog" ? <TppReportCatalog /> : <SavedReportsPage />}
+    </>
+  );
+}
+
+function SavedReportsPage() {
   const reportQuery = useListSavedReportDefinition();
   const reports = reportQuery as SavedReportRow[] | undefined;
   const createReport = useCreateSavedReportDefinition();
