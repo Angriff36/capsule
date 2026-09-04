@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import { BoundedDateInput } from "../../../ui/BoundedDateInputs";
 import type { TppReportDefinition, TppReportOption } from "./types";
 
 export interface TppReportOptions {
@@ -52,9 +53,8 @@ export function TppReportParameters({
                   <legend>{parameter.label}</legend>
                   <label>
                     <span>From</span>
-                    <input
+                    <BoundedDateInput
                       className="input"
-                      type="date"
                       name={`${parameter.key}Start`}
                       defaultValue={dateValue(
                         parameter.default === "today" ? now : monthStart,
@@ -63,9 +63,8 @@ export function TppReportParameters({
                   </label>
                   <label>
                     <span>Through</span>
-                    <input
+                    <BoundedDateInput
                       className="input"
-                      type="date"
                       name={`${parameter.key}End`}
                       defaultValue={dateValue(
                         parameter.default === "today" ? now : monthEnd,
@@ -90,9 +89,8 @@ export function TppReportParameters({
               return (
                 <label key={parameter.key}>
                   <span>{parameter.label}</span>
-                  <input
+                  <BoundedDateInput
                     className="input"
-                    type="date"
                     name={parameter.key}
                     defaultValue={dateValue(defaultDate)}
                   />
