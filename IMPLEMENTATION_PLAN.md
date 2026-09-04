@@ -94,6 +94,11 @@ stop the running plan loop and start
 `./loop.sh --branch ralph/wiggum-loop --allow-dirty` (build mode) at A1.
 Until then, each plan iteration must record one line here and stop; do not
 re-run the subagent audits, the plan is converged.
+Iteration 16 (HEAD `c3e8f3b`, 2026-09-03): drift check only. Same state:
+no code change since `1b3abd9`, `origin/main` = `609023d` is an ancestor,
+newest issue #271, `lint_specs.sh specs/ralph` OK, AC-001…AC-019 PENDING,
+23 open tasks. No subagent audit. Operator: stop the plan loop and start
+BUILD at A1.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
