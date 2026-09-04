@@ -79,13 +79,14 @@ this branch once before the `[release]` merge; expect no conflict in
 `src/features/sales/**`, `src/features/events/**` or `convex/quoteBuilder.ts`.
 Five consecutive plan iterations have produced no task change: the plan is
 converged. Do not spend another plan iteration; run the build loop.
-Iterations 10–13 (HEADs `7e291d7`, `b4b15b8`, `3493bc6`, `729f329`;
-2026-09-03): drift checks only, no subagent audit. Every run found the same
+Iterations 10–14 (HEADs `7e291d7`, `b4b15b8`, `3493bc6`, `729f329`,
+`9e4c590`; 2026-09-03): drift checks only, no subagent audit. Every run found the same
 state: `git diff 1b3abd9 HEAD -- src convex tests specs` touches only the 7
 iteration-3 spec-bullet lines (covered by AC-018/019); `origin/main` =
 `609023d` is still an ancestor; newest product issue #270;
-`lint_specs.sh specs/ralph` OK (4 specs); AC-001…AC-019 all PENDING. Nine
-plan iterations with no task change. Root cause, found on iteration 13: the
+`lint_specs.sh specs/ralph` OK (4 specs); AC-001…AC-019 all PENDING. Ten
+plan iterations with no task change (iteration 14 confirmed #271 is the
+newest issue and nothing else moved). Root cause, found on iteration 13: the
 loop runs as `./loop.sh plan` with no iteration cap, and `loop.sh` halts on
 `check_done.sh` in build mode only, so plan mode never stops by itself.
 Filed as issue #271 (loop tooling, not product code). Operator action:
