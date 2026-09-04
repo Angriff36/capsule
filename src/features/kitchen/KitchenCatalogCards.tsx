@@ -114,6 +114,13 @@ export function KitchenCatalogCards({
     count: rows.length,
     rowHeight: ROW_HEIGHT,
   });
+  const tabStopIndex = useMemo(
+    () =>
+      virtualRows.some((row) => row.index === activeIndex)
+        ? activeIndex
+        : (virtualRows[0]?.index ?? -1),
+    [activeIndex, virtualRows],
+  );
 
   useEffect(() => {
     setSelectedId(null);
@@ -176,13 +183,31 @@ export function KitchenCatalogCards({
             aria-colcount={6}
             aria-rowcount={rows.length + 1}
           >
-            <div className="culinary-ledger-header" role="row">
-              <span role="columnheader">Name</span>
-              <span role="columnheader">Category</span>
-              <span role="columnheader">Details</span>
-              <span role="columnheader">Status</span>
-              <span role="columnheader">Edition</span>
-              <span role="columnheader" aria-label="Preview" />
+            <div
+              className="culinary-ledger-header"
+              role="row"
+              aria-rowindex={1}
+            >
+              <span role="columnheader" aria-colindex={1}>
+                Name
+              </span>
+              <span role="columnheader" aria-colindex={2}>
+                Category
+              </span>
+              <span role="columnheader" aria-colindex={3}>
+                Details
+              </span>
+              <span role="columnheader" aria-colindex={4}>
+                Status
+              </span>
+              <span role="columnheader" aria-colindex={5}>
+                Edition
+              </span>
+              <span
+                role="columnheader"
+                aria-colindex={6}
+                aria-label="Preview"
+              />
             </div>
             <div
               ref={scrollRef}
@@ -208,15 +233,7 @@ export function KitchenCatalogCards({
                       aria-rowindex={index + 2}
                       aria-selected={item._id === selectedId}
                       data-row-index={index}
-                      tabIndex={
-                        activeIndex < 0
-                          ? index === 0
-                            ? 0
-                            : -1
-                          : item._id === activeId
-                            ? 0
-                            : -1
-                      }
+                      tabIndex={index === tabStopIndex ? 0 : -1}
                       style={{
                         height: `${ROW_HEIGHT}px`,
                         transform: `translateY(${offset}px)`,
@@ -240,6 +257,28 @@ export function KitchenCatalogCards({
                           event.preventDefault();
                           focusRow(Math.max(0, index - 1));
                         }
+                        if (event.key === "PageDown") {
+                          event.preventDefault();
+                          const pageSize = Math.max(
+                            1,
+                            Math.floor(
+                              (scrollRef.current?.clientHeight ?? ROW_HEIGHT) /
+                                ROW_HEIGHT,
+                            ),
+                          );
+                          focusRow(Math.min(rows.length - 1, index + pageSize));
+                        }
+                        if (event.key === "PageUp") {
+                          event.preventDefault();
+                          const pageSize = Math.max(
+                            1,
+                            Math.floor(
+                              (scrollRef.current?.clientHeight ?? ROW_HEIGHT) /
+                                ROW_HEIGHT,
+                            ),
+                          );
+                          focusRow(Math.max(0, index - pageSize));
+                        }
                         if (event.key === "Home") {
                           event.preventDefault();
                           focusRow(0);
@@ -250,30 +289,47 @@ export function KitchenCatalogCards({
                         }
                       }}
                     >
-                      <span className="culinary-ledger-name" role="gridcell">
+                      <span
+                        className="culinary-ledger-name"
+                        role="gridcell"
+                        aria-colindex={1}
+                      >
                         <strong>{item.name}</strong>
                         <small>{ledgerDescription(section, item)}</small>
                       </span>
                       <span
                         className="culinary-ledger-category"
                         role="gridcell"
+                        aria-colindex={2}
                       >
                         {item.category || "Uncategorized"}
                       </span>
-                      <span className="culinary-ledger-detail" role="gridcell">
+                      <span
+                        className="culinary-ledger-detail"
+                        role="gridcell"
+                        aria-colindex={3}
+                      >
                         {ledgerDetail(section, item)}
                       </span>
-                      <span role="gridcell">
+                      <span role="gridcell" aria-colindex={4}>
                         <span
                           className={`culinary-ledger-status chip-state ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
                         >
                           {formatStatusLabel(String(item.status))}
                         </span>
                       </span>
-                      <span className="culinary-ledger-version" role="gridcell">
+                      <span
+                        className="culinary-ledger-version"
+                        role="gridcell"
+                        aria-colindex={5}
+                      >
                         {editionLabel(item)}
                       </span>
-                      <span className="culinary-ledger-open" role="gridcell">
+                      <span
+                        className="culinary-ledger-open"
+                        role="gridcell"
+                        aria-colindex={6}
+                      >
                         <ChevronRightIcon />
                       </span>
                     </div>

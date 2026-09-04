@@ -72,7 +72,12 @@ export function RecordPreviewSheet({
     <div
       className="record-preview-backdrop"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (
+          event.target === event.currentTarget &&
+          !panelRef.current?.querySelector("[data-action-prompt]")
+        ) {
+          onClose();
+        }
       }}
     >
       <section
