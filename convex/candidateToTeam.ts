@@ -65,8 +65,10 @@ const PRIVILEGED_HIRE_ROLES = new Set([
 
 export type HireIntoTeamResult =
   // Person created (or already linked) and the candidate row now points at
-  // it — the client sends the sign-in email to personId next.
-  | { kind: "hired"; personId: string; email: string }
+  // it — the client sends the sign-in email to personId next. roleDowngraded
+  // means a non-admin hired into a privileged applied role, so the profile
+  // got the base staff role; an admin can set the real role under Team roles.
+  | { kind: "hired"; personId: string; email: string; roleDowngraded: boolean }
   // Candidate had no usable email, so no Person could be made. The stage mark
   // still commits — the UI says to add them under Team roles with an email.
   | { kind: "hired_no_email" }
@@ -188,6 +190,7 @@ export const hireIntoTeam = mutation({
           kind: "hired",
           personId: String(linked._id),
           email: personEmail || candidateEmail,
+          roleDowngraded: false,
         };
       }
     }
@@ -217,15 +220,15 @@ export const hireIntoTeam = mutation({
 
     // Same email already on a profile? Link to it — never a duplicate.
     const existing = await findPersonByEmail(ctx, auth.tenantId, email);
-    // Hiring into a privileged role — by creating a profile with one, OR by
-    // reusing/reactivating an existing profile that HOLDS one — is a role
-    // assignment, which Capsule makes admin-only (Person.assignRole). The
-    // candidate keeps a privileged roleAppliedFor on their row; an admin can
-    // set it under Team roles after the hire.
-    // EXCEPTION: linking an already-ACTIVE, already-AUTH-LINKED profile
-    // grants nothing new — the account exists and already holds the role —
-    // so legacy reconciliation (hired without a link) is bookkeeping, not
-    // elevation, and stays a workforce-manager action.
+    // Hiring INTO a privileged role is a role assignment, which Capsule makes
+    // admin-only (Person.assignRole). A workforce manager's hire still goes
+    // through: the profile is created with the base staff role and the
+    // candidate row keeps the applied role for an admin to set afterwards.
+    // Guard tied to the actual harm (domain-gating-restraint): no manager-tier
+    // grant without an admin — but no blocked hire either.
+    // EXCEPTION: linking an already-ACTIVE, already-AUTH-LINKED profile grants
+    // nothing new — bookkeeping, not elevation — so it stays a
+    // workforce-manager action.
     const alreadyAccountable =
       existing != null &&
       existing.status === "active" &&
@@ -233,29 +236,19 @@ export const hireIntoTeam = mutation({
     const effectiveRole = existing
       ? String(existing.role)
       : candidate.roleAppliedFor;
-    if (
-      !alreadyAccountable &&
-      PRIVILEGED_HIRE_ROLES.has(effectiveRole) &&
-      !ADMIN_ROLES.has(auth.role)
-    ) {
+    const needsAdmin =
+      PRIVILEGED_HIRE_ROLES.has(effectiveRole) && !ADMIN_ROLES.has(auth.role);
+    const reuseBlocked = needsAdmin && existing != null && !alreadyAccountable;
+    if (reuseBlocked) {
       throw new ConvexError(
-        existing
-          ? String(existing.status) === "active"
-            ? "This email already belongs to a manager or admin profile. Only an admin can link or provision it — sort it out under Team roles."
-            : "This email belongs to an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles."
-          : "Hiring into a manager or admin role needs an admin. Hire them into their staff role, or have an admin change the role under Team roles.",
+        String(existing!.status) === "active"
+          ? "This email already belongs to a manager or admin profile. Only an admin can link or provision it — sort it out under Team roles."
+          : "This email belongs to an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles.",
       );
     }
+    const roleDowngraded = needsAdmin && existing == null;
     let personId: Id<"people">;
-    if (existing) {
-      // Terminated is terminal (status transition terminated → []) and
-      // terminate() soft-deletes the row, so it cannot be reused — blocking
-      // beats minting a second identity on the same mailbox.
-      if (String(existing.status) === "terminated") {
-        throw new ConvexError(
-          "This email belongs to a terminated team member. Sort out their profile under Team roles before hiring this candidate.",
-        );
-      }
+    if (existing && String(existing.status) !== "terminated") {
       // Returning seasonal/inactive staff: reactivate their row instead of
       // splitting employment history across two profiles — but only with
       // explicit restore intent (same rule as the resume branch). The first
@@ -282,6 +275,9 @@ export const hireIntoTeam = mutation({
       // every returning seasonal hire to an admin. The Person row remains
       // the truth for what the account can do.
     } else {
+      // No live profile — including the terminated case: a rehire under the
+      // same email is a normal event, so create a fresh profile instead of
+      // resurrecting a soft-deleted row.
       const fullName = candidate.fullName.trim();
       const parts = fullName.split(/\s+/u);
       const givenName = parts[0] ?? "";
@@ -298,7 +294,7 @@ export const hireIntoTeam = mutation({
         familyName,
         email,
         phone: candidate.phone ?? undefined,
-        role: candidate.roleAppliedFor,
+        role: roleDowngraded ? "staff" : candidate.roleAppliedFor,
         // Email-scoped: a rehire after reopening + an email change must
         // create a FRESH profile, not replay the original hire's cached
         // create (which would re-link the old mailbox).
@@ -324,7 +320,12 @@ export const hireIntoTeam = mutation({
       });
     }
 
-    return { kind: "hired", personId: String(personId), email };
+    return {
+      kind: "hired",
+      personId: String(personId),
+      email,
+      roleDowngraded,
+    };
   },
 });
 

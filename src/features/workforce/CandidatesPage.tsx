@@ -234,7 +234,11 @@ export function CandidatesPage() {
             provisioned.passwordIssued
               ? "a sign-in link and password"
               : "a sign-in link"
-          } to ${provisioned.email}.`,
+          } to ${provisioned.email}.${
+            result.roleDowngraded
+              ? " They joined with the base staff role — an admin can set their manager role under Administration → Permissions → Team roles."
+              : ""
+          }`,
           tone: "ok",
         });
       } catch (provisionError) {
