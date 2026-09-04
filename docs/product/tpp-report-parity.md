@@ -4,6 +4,12 @@
 **Contract:** 96 visible cards, 89 canonical reports, 7 Favorites aliases  
 **Status vocabulary:** `sample` means a Mangia output exists under `work/`; `published` means a public report definition exists; `inferred` means the accepted first implementation follows the TPP catalog description until a stronger comparison is available.
 
+**Implementation status (2026-09-04):** all 89 canonical report IDs resolve through concrete Contacts, Event, Financial, or TPP General loaders. The `/reports` catalog renders the seven screenshot Favorites aliases plus the 89 canonical cards (96 visible cards total), with persistent per-person stars, declared parameter controls, and report-specific print/PDF/CSV/Excel/label actions. Local authenticated browser proof confirmed all 96 cards, five sections, a populated Address & Phone List result, and a 390 px layout with no horizontal overflow.
+
+Protected Manifest fields are decrypted only inside the authenticated, tenant-scoped authored report queries. The browser never receives encryption envelopes. Staff Earnings reads finalized payroll inputs and remains limited to the existing management tiers; report favorites grant no source-data access.
+
+Two fields present in the TPP catalog have no Capsule source property yet: contact birthdays and staff postal addresses. Their reports remain in the catalog without fabricated values; the domain gap is tracked in [issue #272](https://github.com/Angriff36/capsule/issues/272).
+
 The implementation source of truth is `src/features/reports/tpp/catalog.ts`. This matrix records parity evidence; it is not an allowlist and does not remove any report from the delivery.
 
 ## Contacts

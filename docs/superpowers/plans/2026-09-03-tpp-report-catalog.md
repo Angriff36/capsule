@@ -307,17 +307,17 @@ git push
 **Interfaces:**
 - Produces: checked parity matrix, current system documentation, complete gate evidence, browser/print evidence, independent approval, and production release proof.
 
-- [ ] **Step 1: Confirm all 89 catalog definitions have concrete loader and renderer coverage and all seven Favorites references resolve**
-- [ ] **Step 2: Update the closeout/reporting system document with TPP compatibility behavior, data boundaries, and output families**
+- [x] **Step 1: Confirm all 89 catalog definitions have concrete loader and renderer coverage and all seven Favorites references resolve**
+- [x] **Step 2: Update the closeout/reporting system document with TPP compatibility behavior, data boundaries, and output families**
 - [ ] **Step 3: Run the full repository gate**
 
 Run: `bun run check`
 
-- [ ] **Step 4: Start local Convex and Vite, then browser-check all 96 cards, category ordering, personal favorites, keyboard behavior, and Saved reports preservation**
+- [x] **Step 4: Start local Convex and Vite, then browser-check all 96 cards, category ordering, personal favorites, keyboard behavior, and Saved reports preservation**
 - [ ] **Step 5: Run one populated and one empty report from each of the six report families and inspect every distinct parameter control**
 - [ ] **Step 6: Print-inspect every distinct event-document, worksheet, ledger, label, envelope, table-tent, and multipage financial layout at letter size**
 - [ ] **Step 7: Cross-check published/local-evidence reports numerically and update the parity matrix with the exact evidence and comparison status**
-- [ ] **Step 8: Commit documentation/evidence metadata and push the clean branch**
+- [x] **Step 8: Commit documentation/evidence metadata and push the clean branch**
 
 ```bash
 git add docs/product/tpp-report-parity.md docs/systems/closeout-reporting.md docs/superpowers/plans/2026-09-03-tpp-report-catalog.md
