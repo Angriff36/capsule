@@ -39,7 +39,7 @@
 - Produces: `TppReportId`, `TppReportCategory`, `TppReportParameter`, `TppReportDefinition`, `TPP_REPORT_CATALOG`, `TPP_REPORT_BY_ID`, `TPP_DEFAULT_FAVORITES`.
 - Consumes: exact screenshot text and accepted evidence paths/URLs from the spec.
 
-- [ ] **Step 1: Define discriminated parameter, output, evidence, request, and result contracts**
+- [x] **Step 1: Define discriminated parameter, output, evidence, request, and result contracts**
 
 ```ts
 export type TppReportParameter =
@@ -63,17 +63,17 @@ export interface TppReportDefinition {
 }
 ```
 
-- [ ] **Step 2: Enter all 11 Contacts definitions with exact names and screenshot descriptions**
-- [ ] **Step 3: Enter all 29 Event definitions with exact names and screenshot descriptions**
-- [ ] **Step 4: Enter all 36 Financial definitions with exact names and screenshot descriptions**
-- [ ] **Step 5: Enter all 13 TPP General definitions and the seven default favorite IDs**
-- [ ] **Step 6: Add import-time catalog invariants for 89 unique IDs, expected category counts, valid loader/renderer pairs, and seven favorite references**
-- [ ] **Step 7: Write the parity matrix with one row per canonical report, its family, source records, parameters, outputs, and evidence state**
-- [ ] **Step 8: Format and typecheck**
+- [x] **Step 2: Enter all 11 Contacts definitions with exact names and screenshot descriptions**
+- [x] **Step 3: Enter all 29 Event definitions with exact names and screenshot descriptions**
+- [x] **Step 4: Enter all 36 Financial definitions with exact names and screenshot descriptions**
+- [x] **Step 5: Enter all 13 TPP General definitions and the seven default favorite IDs**
+- [x] **Step 6: Add import-time catalog invariants for 89 unique IDs, expected category counts, valid loader/renderer pairs, and seven favorite references**
+- [x] **Step 7: Write the parity matrix with one row per canonical report, its family, source records, parameters, outputs, and evidence state**
+- [x] **Step 8: Format and typecheck**
 
 Run: `bunx prettier --write src/features/reports/tpp docs/product/tpp-report-parity.md && bun run typecheck`
 
-- [ ] **Step 9: Commit and push**
+- [x] **Step 9: Commit and push**
 
 ```bash
 git add src/features/reports/tpp docs/product/tpp-report-parity.md
