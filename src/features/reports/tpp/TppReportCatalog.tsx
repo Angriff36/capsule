@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { Component, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../lib/api";
+import { ReportsFailureBanner } from "../ReportsFailureBanner";
 import {
   TPP_CATEGORY_LABELS,
   TPP_DEFAULT_FAVORITES,
@@ -16,6 +17,48 @@ const CATEGORIES: readonly TppReportCategory[] = [
   "financial",
   "tpp_general",
 ];
+
+class TppReportRunnerBoundary extends Component<
+  { resetKey: string; onClose: () => void; children: ReactNode },
+  { error: Error | null }
+> {
+  state = { error: null as Error | null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidUpdate(previous: Readonly<{ resetKey: string }>) {
+    if (previous.resetKey !== this.props.resetKey && this.state.error) {
+      this.setState({ error: null });
+    }
+  }
+
+  render() {
+    if (!this.state.error) return this.props.children;
+    return (
+      <section className="tpp-runner tpp-runner-failure">
+        <ReportsFailureBanner error={this.state.error} />
+        <div className="tpp-runner-recovery">
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => this.setState({ error: null })}
+          >
+            Adjust parameters
+          </button>
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={this.props.onClose}
+          >
+            Close report
+          </button>
+        </div>
+      </section>
+    );
+  }
+}
 
 export function TppReportCatalog() {
   const stored = useQuery(api.tppReportFavorites.listMine, {});
@@ -76,11 +119,16 @@ export function TppReportCatalog() {
         <span className="tpp-report-count">89 reports</span>
       </header>
       {selected ? (
-        <TppReportRunner
-          definition={selected}
-          options={usableOptions}
+        <TppReportRunnerBoundary
+          resetKey={selected.id}
           onClose={() => setSelected(null)}
-        />
+        >
+          <TppReportRunner
+            definition={selected}
+            options={usableOptions}
+            onClose={() => setSelected(null)}
+          />
+        </TppReportRunnerBoundary>
       ) : null}
       {favoriteReports.length ? (
         <CatalogSection

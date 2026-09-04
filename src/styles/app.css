@@ -2742,7 +2742,7 @@
 .tpp-section-heading span {
   color: var(--color-ink-3);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .tpp-card-grid {
@@ -2769,7 +2769,7 @@
   gap: 0.3rem;
   border: 0;
   background: transparent;
-  padding: 0.9rem 2.4rem 0.9rem 0.9rem;
+  padding: 0.9rem 3.2rem 0.9rem 0.9rem;
   color: inherit;
   text-align: left;
   cursor: pointer;
@@ -2790,7 +2790,7 @@
 .tpp-report-open span {
   align-self: start;
   color: var(--color-ink-3);
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.35;
 }
 
@@ -2798,8 +2798,8 @@
   position: absolute;
   top: 0.55rem;
   right: 0.55rem;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border: 0;
   background: transparent;
   color: var(--color-accent);
@@ -2812,6 +2812,17 @@
   border-top: 3px solid var(--color-brand);
   border-bottom: 1px solid var(--color-line-2);
   background: var(--color-panel);
+}
+
+.tpp-runner-failure {
+  padding: 1rem 0;
+}
+
+.tpp-runner-recovery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
 }
 
 .tpp-runner-heading {
@@ -2857,7 +2868,7 @@
   gap: 0.3rem;
   color: var(--color-ink-3);
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
 }
 
@@ -2873,7 +2884,7 @@
   grid-column: 1 / -1;
   color: var(--color-ink-3);
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
 }
 
@@ -2952,7 +2963,7 @@
 .tpp-total-strip dt,
 .tpp-measures dt {
   color: var(--color-ink-3);
-  font-size: 11px;
+  font-size: 13px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -2997,7 +3008,7 @@
 
 .tpp-document dt {
   color: var(--color-ink-3);
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .tpp-label-sheet {
@@ -3015,7 +3026,7 @@
   border: 1px dashed var(--color-line-2);
   padding: 0.12in;
   overflow: hidden;
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .tpp-label-table_tent article {
