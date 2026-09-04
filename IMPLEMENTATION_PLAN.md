@@ -140,6 +140,11 @@ no code change since `1b3abd9` (only the 7 spec-bullet lines, AC-018/019),
 `origin/main` = `609023d` is an ancestor, newest issue #271, specs gate OK
 (4 specs), AC-001…AC-019 PENDING, 0 PASS, 21 open tasks. No subagent audit.
 Operator: stop the plan loop and start BUILD at A1.
+Iteration 25 (HEAD `71d929f`, 2026-09-03): drift check only. Same state:
+no code change since `1b3abd9` (only the 7 spec-bullet lines, AC-018/019),
+`origin/main` = `609023d` is an ancestor, newest issue #271, specs gate OK
+(4 specs), AC-001…AC-019 PENDING, 0 PASS, 21 open tasks. No subagent audit.
+Operator: stop the plan loop and start BUILD at A1.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
