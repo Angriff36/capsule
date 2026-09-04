@@ -104,6 +104,8 @@ import type * as teamChatPushSend from "../teamChatPushSend.js";
 import type * as teamChatSend from "../teamChatSend.js";
 import type * as tppParser from "../tppParser.js";
 import type * as tppReportFavorites from "../tppReportFavorites.js";
+import type * as tppReports_options from "../tppReports/options.js";
+import type * as tppReports_shared from "../tppReports/shared.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
 import type * as workforceScheduling from "../workforceScheduling.js";
@@ -211,6 +213,8 @@ declare const fullApi: ApiFromModules<{
   teamChatSend: typeof teamChatSend;
   tppParser: typeof tppParser;
   tppReportFavorites: typeof tppReportFavorites;
+  "tppReports/options": typeof tppReports_options;
+  "tppReports/shared": typeof tppReports_shared;
   vehicleAssignment: typeof vehicleAssignment;
   webhookIntegrations: typeof webhookIntegrations;
   workforceScheduling: typeof workforceScheduling;

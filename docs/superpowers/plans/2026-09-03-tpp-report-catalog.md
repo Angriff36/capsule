@@ -143,9 +143,9 @@ git push
 - Produces: `parseTppReportRequest(definition, FormData, now, currentEventId)`, `TppReportResult`, `TppTabularResult`, `TppDocumentResult`, `TppLabelResult`, `TppFinancialResult`, `escapeCsvCell`, `downloadTppCsv`, `downloadTppExcel`, and bounded option queries.
 - Consumes: `TppReportDefinition` from Task 1 and `api` from `src/lib/api.ts`.
 
-- [ ] **Step 1: Parse declared controls into a typed request and return field-addressable validation errors**
-- [ ] **Step 2: Implement shared dates, quantities, functional-currency money, aging buckets, group totals, percentages, and safe-label helpers**
-- [ ] **Step 3: Implement exact result-family contracts**
+- [x] **Step 1: Parse declared controls into a typed request and return field-addressable validation errors**
+- [x] **Step 2: Implement shared dates, quantities, functional-currency money, aging buckets, group totals, percentages, and safe-label helpers**
+- [x] **Step 3: Implement exact result-family contracts**
 
 ```ts
 export type TppReportResult =
@@ -155,13 +155,13 @@ export type TppReportResult =
   | { kind: "financial"; title: string; columns: readonly TppColumn[]; rows: readonly TppRow[]; groups: readonly TppGroup[]; totals: readonly TppTotal[]; measures: readonly TppMeasure[] };
 ```
 
-- [ ] **Step 4: Add bounded event/client/person/vendor/venue/category/status option queries**
-- [ ] **Step 5: Implement CSV and spreadsheet-safe export values, including formula-prefix escaping and typed numeric/date cells**
-- [ ] **Step 6: Run codegen, typecheck, and existing reports tests**
+- [x] **Step 4: Add bounded event/client/person/vendor/venue/category/status option queries**
+- [x] **Step 5: Implement CSV and spreadsheet-safe export values, including formula-prefix escaping and typed numeric/date cells**
+- [x] **Step 6: Run codegen, typecheck, and existing reports tests**
 
 Run: `bun run codegen && bun run typecheck && bun run test -- tests/reports-routes.test.ts`
 
-- [ ] **Step 7: Commit and push**
+- [x] **Step 7: Commit and push**
 
 ```bash
 git add src/features/reports/tpp convex/tppReports
