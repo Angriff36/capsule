@@ -79,6 +79,13 @@ this branch once before the `[release]` merge; expect no conflict in
 `src/features/sales/**`, `src/features/events/**` or `convex/quoteBuilder.ts`.
 Five consecutive plan iterations have produced no task change: the plan is
 converged. Do not spend another plan iteration; run the build loop.
+Iteration 10 (HEAD `7e291d7`, 2026-09-03): drift check only, no
+subagent audit. `git diff 1b3abd9 HEAD -- src convex tests specs` touches
+only the iteration-3 spec bullets (7 lines, covered by AC-018/019);
+`origin/main` = `609023d` is still an ancestor of this branch; newest open
+issue is still #270; `lint_specs.sh specs/ralph` OK. ACCEPTANCE_TESTS.md
+unchanged (AC-001…AC-019 all PENDING). Six iterations with no task change.
+Next iteration MUST be a build iteration starting at A1, not a plan pass.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
