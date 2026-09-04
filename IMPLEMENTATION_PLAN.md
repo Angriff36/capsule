@@ -5,10 +5,11 @@
 
 # Implementation plan — capsule
 
-Plan date: 2026-09-03. Branch: `ralph/wiggum-loop`. Audits: 10 read-only
-subagent passes over `specs/**`, `src/**`, `convex/**`, `tests/**`, plus GitHub
-issues #113, #119, #136, #141–#151. Evidence is `file:line` as of commit
-`1b3abd9`.
+Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 2: 6 audit
+passes; runtime proof `tests/proposal-event-booking.runtime.test.ts` 7/7
+green). Branch: `ralph/wiggum-loop`. Audits: 10 read-only subagent passes over
+`specs/**`, `src/**`, `convex/**`, `tests/**`, plus GitHub issues #113, #119,
+#136, #141–#151. Evidence is `file:line` as of commit `1b3abd9`.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
@@ -37,7 +38,9 @@ class of failure named in Josh's first JTBD.
 **Scope.** Finish activities 1, 2, 3 and 5 so that a prospect's phone quote
 becomes a sent proposal and then a fully populated, linked event with nothing
 retyped, and so that an empty reference catalog is a fixable condition rather
-than a dead dropdown.
+than a dead dropdown. After conversion, sales reaches the proposal and any
+partial records in one click (A7/A8) — the "next action" half of the Sales
+JTBD.
 
 **Why this slice.**
 
@@ -58,9 +61,18 @@ than a dead dropdown.
 the sibling `../builder` checkout exists on this machine): `QuoteSubmission`
 dismiss command + status, `QuoteSubmission` free-text style/occasion fields,
 `Proposal` end-time field. Follow the `manifest` skill before editing
-`src/**/*.manifest`. Never hand-edit generated trees.
+`src/**/*.manifest`. Never hand-edit generated trees. Gates: `src/sales/*.manifest`
+changes are guarded by `bun run check:commercial-manifest`
+(`scripts/check-commercial-manifest-integration.ts`); `src/operations/*.manifest`
+and `src/features/events/**` by `check:event-manifest`. If regen emits any new
+`<Entity>_createVia<Verb>` export, `tests/governed-creation-mappings.test.ts`
+(authored, sorted list) must be edited by hand — A4/A5/C2 add fields/commands
+only, so no new createVia is expected. Entity-level `constraint` lines do not
+compile to Convex; put guards on the command. `.builder/ownership.json`
+sha-locks generated files incl. `src/lib/manifest-convex-react.ts` (9187 lines,
+header "do not edit by hand").
 
-**Acceptance contract.** `ACCEPTANCE_TESTS.md` AC-001 … AC-017. Each task
+**Acceptance contract.** `ACCEPTANCE_TESTS.md` AC-001 … AC-019. Each task
 below names the ids it must turn to `PASS`.
 
 ## Prioritized tasks (release scope)
@@ -70,16 +82,17 @@ Order = build order. Earlier tasks unblock later ones.
 ### A. Quote → lead → proposal (spec `specs/ralph/quote-to-proposal-conversion.md`)
 
 - [ ] **A1. Link the converted proposal to the event it creates.** In
-      `convex/quoteBuilder.ts` `processQuoteSubmission` (~L497–519) pass
-      `eventId` into `Proposal_createViaDraft`; the manifest command already
-      accepts `optional eventId` (`src/sales/proposal.manifest:106`,
-      generated at `convex/mutations.ts:29162`). Delete the stale
-      "createViaDraft has no eventId arg" comment (`quoteBuilder.ts:517-519`).
+      `convex/quoteBuilder.ts` `processQuoteSubmission` call site (`:497-515`)
+      pass `eventId` into `Proposal_createViaDraft`; the manifest command
+      already accepts `optional eventId` (`src/sales/proposal.manifest:106`;
+      generated at `convex/mutations.ts:29145`, args `:29162`). Delete the
+      stale "createViaDraft has no eventId arg" comment (`quoteBuilder.ts:517-519`).
       Add a runtime proof under
       `tests/proofs/` that conversion yields client + lead + event + proposal
       with `proposal.eventId == event._id`. → AC-008
 - [ ] **A2. Show service style and occasion in the review queue.**
-      `src/features/sales/QuoteSubmissionsReviewPage.tsx:183-245` renders
+      `src/features/sales/QuoteSubmissionsReviewPage.tsx:183-245` (queue
+      route `/clients/quote-requests`, `src/app/App.tsx:1213-1219`) renders
       contact/date/guests/venue/menu but not `serviceStyleId`/`occasionId`.
       Resolve names via `useListServiceStyle`/`useListOccasion` (retired rows
       still resolve — same `nameOf` pattern as
@@ -110,12 +123,42 @@ Order = build order. Earlier tasks unblock later ones.
       `serviceStyles`/`occasions` rows → no throw, text visible on submission
       and proposal. → AC-011, AC-014
 - [ ] **A6. Admin notice when the public form is offline.** `ingressQuoteSubmission`
-      throws when no active `organizations` row exists
-      (`convex/quoteBuilder.ts:111-115`); the public copy is already safe
-      (`publicErrorMessage`). Add a one-line notice on
-      `QuoteSubmissionsReviewPage` when `useListOrganization()` has no active
-      row, linking to `/admin/branding` where `useCreateOrganization` lives
-      (`src/features/admin/BrandingPage.tsx:35`). No new guard. → AC-014
+      throws a plain `ConvexError("Unable to process quote. Please contact us
+      directly.")` when no active `organizations` row exists
+      (`convex/quoteBuilder.ts:111-115`); the public copy is already safe —
+      thrown server-side, unwrapped client-side by the helper
+      `src/lib/publicErrorMessage.ts:17` in `QuoteSubmissionPage.tsx`. Staff
+      never see it. Add a one-line notice on `QuoteSubmissionsReviewPage`
+      when `useListOrganization()` has no active row, linking to
+      `/admin/branding` where `useCreateOrganization` lives
+      (`src/features/admin/BrandingPage.tsx:35`). `BrandingPage.tsx:178`
+      already has an inline "Save branding first so the organization record
+      exists" hint but no page-level banner. No new guard. → AC-014
+- [ ] **A7. One-click path from the queue and the pipeline to the created
+      proposal.** Depends on A1 (proposal exists and is linked).
+      `QuoteSubmissionsReviewPage.tsx` (~L136-149, ~L262) links "Open event →"
+      / "See in pipeline →" / "Open converted event →" but never to the
+      proposal, although the completed submission stores `proposalId`.
+      `LeadPipelinePage.tsx:645-647` "Open proposal" goes to the generic
+      `/clients/proposals` list. `ProposalsPage.tsx:146-159` already
+      implements the deep link `/clients/proposals?proposal=<id>` (scrolls +
+      opens panels). Wire both callers to it. Also add a "Quote requests"
+      link to `/clients/quote-requests` from `LeadPipelinePage.tsx` (today
+      zero references; the queue is reachable only via
+      `ClientsWorkspaceNav`). No manifest change. Test: source-text test
+      asserts both links target `?proposal=` and the pipeline links to the
+      queue route. → AC-018
+- [ ] **A8. Failed conversion shows what was created and can be retried or
+      dismissed.** Depends on A4 (dismiss). `checkpointQuoteSubmissionIds`
+      (`convex/quoteBuilder.ts:551-563`) persists the client/lead/event/
+      proposal ids created before a failure, but the review page shows links
+      only when `status === "completed"`
+      (`QuoteSubmissionsReviewPage.tsx:262`); failed rows show the error text
+      only, so partial records are unreachable from the queue. Render
+      whichever checkpointed ids exist on failed rows (same link components
+      as completed rows), keep the existing Convert (retry) action for failed
+      rows, and let A4's Dismiss apply to them. Test: a failed submission
+      with a checkpointed `clientId` renders the client link. → AC-019
 
 ### B. Reference catalogs (spec `specs/ralph/reference-catalogs-self-serve.md`)
 
@@ -123,35 +166,43 @@ Order = build order. Earlier tasks unblock later ones.
       at `/admin/catalogs`, added to `AdminWorkspaceNav.tsx:3-14`, wrapped in
       the same admin route guard as its siblings in `src/app/App.tsx`. Three
       sections: Service styles, Occasions, Referral sources. Per row: name,
-      client-facing label, sort order, status; actions add (`useCreate*`
-      governed create), relabel (`use*ReviseDetails`), retire
-      (`use*Deactivate`), reactivate (`use*Activate`). Commands already exist:
+      code, sort order, description, status (`name` is the client-facing
+      label per the manifest comment; there is no separate label field);
+      actions add (`useCreate*` governed create), relabel
+      (`use*ReviseDetails`), retire (`use*Deactivate`), reactivate
+      (`use*Activate`). Commands already exist:
       `src/operations/service-style.manifest:53-126`,
       `src/operations/occasion.manifest:53-126`,
       `src/sales/referral-source.manifest:54-127` (verified: all three have
-      register/reviseDetails/deactivate/activate). Hooks exist in
+      register/reviseDetails/deactivate/activate). Write guards:
+      ServiceStyle/Occasion = `eventManageAccess`, ReferralSource =
+      `salesManageAccess`; reads = `eventAccess` or `salesAccess`. Hooks exist in
       `src/lib/manifest-convex-react.ts`: `useCreateServiceStyle`,
       `useServiceStyleReviseDetails`, `useServiceStyleDeactivate`,
       `useServiceStyleActivate` (:7051-7101) and the `Occasion` (:4881-4931) /
       `ReferralSource` (:6788-6838) equivalents. Route: App.tsx has no
       per-route role guard — admin siblings are wrapped in `SupplyRoute`
       (`src/app/App.tsx:495`, a Suspense wrapper); role checks live in the
-      commands (`eventManageAccess`). Follow the create-form /
-      lifecycle-buttons split in
-      `src/features/kitchen/KitchenCatalog{Page,CreateForm,LifecycleButtons}.tsx`.
-      No manifest change. Test (new dir `tests/features/admin/`): page wires
+      commands. Follow the create-form / lifecycle-buttons split in
+      `src/features/kitchen/KitchenCatalog{Page,CreateForm,LifecycleButtons,Cards}.tsx`.
+      No manifest change. `scripts/seed-catalogs.ts` has no package.json
+      script entry (run with `bun scripts/seed-catalogs.ts`); this page
+      supersedes it for daily use. Test (new dir `tests/features/admin/`): page wires
       the four commands per catalog; a new row appears in
       `serviceStyleSelectOptions` without reload (Convex query reactivity).
       → AC-012
 - [ ] **B2. Explicit empty state on event create.** Occasion select in
-      `src/features/events/EventCreatePage.tsx:437` shows only a placeholder
-      when the catalog is empty. Render "No occasions yet — add them in
-      Admin › Catalogs" with a link, keep the field optional so create still
-      succeeds. Service style already falls back to the four TPP defaults
-      (`src/features/events/serviceStyleCatalog.ts:53-75`); show the same
-      one-line note when the fallback is active. Test extends
-      `tests/features/events/create-event-blockers.test.ts` (source-text +
-      pure-helper style, no render). → AC-013
+      `src/features/events/EventCreatePage.tsx:430-443` shows only a
+      placeholder when the catalog is empty. Render "No occasions yet — add
+      them in Admin › Catalogs" with a link, keep the field optional so create
+      still succeeds. Service style already falls back to the four TPP
+      defaults (`src/features/events/serviceStyleCatalog.ts:53-75`); show the
+      same one-line note when the fallback is active. Test extends
+      `tests/features/events/create-event-blockers.test.ts`, which mixes
+      pure-helper calls (`SERVICE_STYLE_CATALOG`, `persistableServiceStyleId`,
+      `serviceStyleSelectOptions`) with `readFileSync` source-text assertions
+      on `EventCreatePage.tsx`; no render. `serviceStyleCatalog.ts` is also
+      exercised by `tests/event-menu-cost-prep-po-chain.test.ts`. → AC-013
 - [ ] **B3. Runtime proof: create event with empty and populated catalogs.**
       `tests/proofs/event-create-catalogs.runtime.test.ts`: (a) zero
       ServiceStyle/Occasion rows → `Event_createViaPlanEngagement` succeeds
@@ -186,19 +237,26 @@ Order = build order. Earlier tasks unblock later ones.
       markViewed, accept, stageEventLink, linkEvent, decline, expire,
       supersede, stageClientMerge, reassignClient; `proposal.manifest:90-300`);
       regen. Pass it through the draft seam
-      `convex/lib/proposalDraft.ts` `draftProposalWithLines` (:25). Draft form
+      `convex/lib/proposalDraft.ts` `draftProposalWithLines` (:25; args today:
+      clientId, title, guestCount?, subtotal, taxAmount, discountAmount,
+      total, eventDate?, eventType?, venueName?, venueAddress?, expiresAt?,
+      notes?, terms?, eventId?, lines[]). Draft form
       `src/features/clients/ProposalCreateForm.tsx:395-398` gets an end-time
-      input using `BoundedDateInput` from `src/ui/BoundedDateInputs.tsx`;
-      quote conversion (A1) passes `submission.eventEndTime`
-      (`quote-submission.manifest:31`) through. `ProposalEventPrefill.values` adds
-      `endsAtLocal`; `EventCreatePage.tsx:476-483` seeds `endsAt` from it. When
-      the proposal has no end time the preview panel says so in one line.
-      Extend the C1 proof. → AC-004
+      input using `BoundedDateTimeLocalInput` (`src/ui/BoundedDateInputs.tsx:35`;
+      `BoundedDateInput` at `:29` is date-only); quote conversion (A1) passes
+      `submission.eventEndTime` (`quote-submission.manifest:31`) through.
+      `ProposalEventPrefill.values` adds `endsAtLocal`. `EventCreatePage.tsx`
+      seeds `startsAt` from prefill at `:466-475`; the "Ends" field
+      (`:476-483`) has no prefill default today — seed `endsAt` the same way.
+      When the proposal has no end time the preview panel says so in one
+      line. Extend the C1 proof. → AC-004
 - [ ] **C3. Accepted enhancements visible on the event.** `ProposalEnhancement`
       exists (`src/sales/proposal-enhancement.manifest:14-27`: proposalId,
-      name, description, price, sortOrder, addedAt, removedAt; `withdraw`
-      also sets `deletedAt`) with no event-side surface (only
-      `src/features/clients/ProposalEnhancementsPanel.tsx`). Thinnest slice,
+      name, description, price, sortOrder, addedAt, removedAt; `withdraw` at
+      `:93` also sets `deletedAt` at `:99`) with no event-side surface. The
+      only readers are proposal-side:
+      `src/features/clients/ProposalEnhancementsPanel.tsx` and
+      `ProposalsPage.tsx` via `useListProposalEnhancement` (list-all). Thinnest slice,
       no schema change: event detail overview gets an "Enhancements" card
       that lists live rows (`removedAt == null`) of the proposal whose
       `eventId` equals the event, read via
@@ -229,9 +287,11 @@ Order = build order. Earlier tasks unblock later ones.
       `ProposalEventPrefill` today (`grep -rl ProposalEventPrefill tests` is
       empty). Add `tests/features/events/proposal-event-prefill.test.ts`
       (kebab-case, pure-helper style like its siblings): `matchVenue`
-      case/whitespace-insensitive hit and miss, mismatch notice text in
-      `EventCreatePage.tsx:701-706`, and `values()` including the C2
-      `endsAtLocal`. → AC-003, AC-006
+      (`ProposalEventPrefill.ts:33-40`) case/whitespace-insensitive hit and
+      miss, mismatch notice text in `EventCreatePage.tsx:701-706`, and
+      `values()` (`:19-30`; returns title, eventType, startsAtLocal,
+      expectedHeadcount, quotedPrice) including the C2 `endsAtLocal`.
+      → AC-003, AC-006
 
 ### D. Release proof
 
@@ -253,12 +313,16 @@ Order = build order. Earlier tasks unblock later ones.
       8.4/9.2/9.3/9.5 ❌→✅ (`VenueVendorRelationship`, `RoleScorecard`,
       `Candidate`/`Interview`, `OneOnOne`). There is no 8.5 row. Keep the
       legend; do not rewrite the spec body.
+      `specs/capsule-complete-feature-spec.json` mirrors the same stale table
+      but no script or test consumes it (grep of `scripts/` and `tests/` is
+      empty) — leave the `.json` untouched.
 
 ## Already complete (verified 2026-09-03, no task needed)
 
 - [x] Quote dedup key and short-circuit (`convex/quoteBuilder.ts:29-37,158-176`) — needs the A3 proof only.
 - [x] Client find-or-create on conversion (`convex/quoteBuilder.ts:395-417`).
-- [x] Proposal `linkEvent`/`stageEventLink` + `ProposalEventLinked` menu-copy cascade (`src/sales/proposal.manifest:208-244`, `src/sales/proposal-dish-selection.manifest:155-166`; accept-time cascade at `:138-149`; `convex/lib/proposalEventCreation.ts`).
+- [x] Proposal `linkEvent`/`stageEventLink` + `ProposalEventLinked` menu-copy cascade (`src/sales/proposal.manifest:208-244`; `src/sales/proposal-dish-selection.manifest:155` `on ProposalEventLinked fanOut …` and `:138` `on ProposalAccepted fanOut …`, both run `EventDish.confirmFromProposal`; `convex/lib/proposalEventCreation.ts`).
+- [x] Accepting a proposal that already has an `eventId` (the quote-conversion case) fires the same `ProposalAccepted` dish cascade against that event (`proposal.manifest` accept ~`:172-195` sets `dishSelectionProposalId` when `self.eventId != null`); `ProposalsPage.tsx:706-730` shows "View event" instead of "Create event" — no duplicate-event risk.
 - [x] Venue match by name + visible mismatch banner (`src/features/events/ProposalEventPrefill.ts:32-40`, `EventCreatePage.tsx:237-243,701-706`) — behavior only; test in C6.
 - [x] Create-page preview of carried values (`EventCreatePage.tsx:658-707`).
 - [x] ServiceStyle/Occasion/ReferralSource entities with register/reviseDetails/activate/deactivate + idempotent seed (`scripts/seed-catalogs.ts`).
@@ -290,3 +354,11 @@ Order = build order. Earlier tasks unblock later ones.
   link-time copy covers booking.
 - **Reporting parity** (#124), **org seed** (#113 generator, ships in Manifest
   3.6.46+), Nowsta (#122), social DMs (#123), email inbox.
+- **Reverse link to the raw `QuoteSubmission`**: neither `proposal.manifest`
+  nor `event.manifest` stores `quoteSubmissionId`; the submission stores
+  `clientId/leadId/eventId/proposalId`, so a by-proposalId lookup would need
+  an index or a manifest ref. Low value now; note only.
+- **`scripts/seed-catalogs.ts`** is not wired to a package.json script (B1
+  admin UI supersedes it for daily use).
+- **`src/lib/llm-review.test.ts`** throws (does not skip) when
+  `ANTHROPIC_API_KEY` is unset — a `bun run test` gap outside this release.

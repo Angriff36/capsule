@@ -7,7 +7,7 @@ One row per acceptance criterion. Ids are stable: assign AC-001, AC-002, ... onc
 never renumber. Status: PENDING (no passing test yet) | PASS (real test exists + passes)
 | RETIRED (criterion dropped from specs — keep the row, add a one-line reason).
 
-Release: "Booked without re-keying" (plan date 2026-09-03). Scope = specs/ralph/
+Release: "Booked without re-keying" (plan date 2026-09-03; AC-001 … AC-019). Scope = specs/ralph/
 proposal-to-event-handoff.md, quote-to-proposal-conversion.md,
 reference-catalogs-self-serve.md, plus the feature-spec §4.3 done-when.
 field-flow-defect-burndown.md is out of this release; its criteria get ids when
@@ -16,11 +16,26 @@ it is scheduled.
 Verification kind: P = programmatic (runtime proof / unit test). J = human-like
 judgment — run the llm-review gate (src/lib/llm-review.ts, criteria table
 src/lib/review-criteria.md, UX-01 / TONE-01) on the rendered copy or screenshot
-in addition to the programmatic test. Runtime proofs live in tests/proofs/
-*.runtime.test.ts (convex-test); unit tests in tests/**/*.test.ts. A new file
-under tests/proofs/ needs no registration: vitest includes tests/**/*.test.ts
-(vite.config.ts:103) and `bun run test:proofs` runs the whole directory;
-scripts/emit-proof-kit.ts binds only CATALOG_ENTITIES proof ids.
+in addition to the programmatic test. `createReview()` THROWS when
+ANTHROPIC_API_KEY is unset (llm-review.ts:134,137) and is not wired into
+`bun run check`. J reviews run manually with the key present; output is saved
+under .artifacts/llm-review/<AC-id>.md; they are never added to `bun run
+check`. The P test is the gate the loop halts on; the J review is recorded
+evidence.
+
+Runtime proofs live in tests/proofs/*.runtime.test.ts. They run in the
+`edge-runtime` environment (vite.config.ts:104 `environmentMatchGlobs`), boot
+via `createManifestTestContext({ convexTest, schema, modules })` from
+`@angriff36/manifest/proof-kit/convex-test` with `modules` from
+tests/proofs/convex-test-modules.ts, and need the CONVEX_FIELD_ENCRYPTION_KEY
+`beforeAll` fallback (pattern: tests/proofs/event-approve-opens-packlist
+.runtime.test.ts:1-30). New proof files for Event/Proposal/QuoteSubmission
+need no registry entry: scripts/emit-proof-kit.ts binds `runtimeTest` paths
+only for CATALOG_ENTITIES capabilities (:43-52, :232-266) and `check:proof`
+validates only those generated artifacts — the existing root-level booking
+proof already runs unregistered. Unit tests under tests/features/** are
+pure-helper or `readFileSync` source-text assertions; no @testing-library/react
+is installed (only jsdom), so do not plan render tests.
 -->
 
 | Id | Spec | Outcome to verify (WHAT, not HOW) | Required test | Kind | Status |
@@ -42,3 +57,5 @@ scripts/emit-proof-kit.ts binds only CATALOG_ENTITIES proof ids.
 | AC-015 | specs/ralph/reference-catalogs-self-serve.md | A retired service style is absent from new-event selectors but still resolves by id on existing events and imported records. | `tests/features/events/service-style-retired.test.ts` › "retired hidden on create, resolved on detail" | P | PENDING |
 | AC-016 | specs/ralph/reference-catalogs-self-serve.md | A runtime proof creates an event with empty catalogs (null ids accepted) and with populated catalogs (ids persist and resolve). | `tests/proofs/event-create-catalogs.runtime.test.ts` › "create with empty and populated catalogs" | P | PENDING |
 | AC-017 | specs/capsule-complete-feature-spec.md §4.3 | End to end: a client submits once, sales sees the lead with all selections, converts without re-entry, the proposal is sent and accepted, and the created event carries date, times, headcount, venue, menu servings and enhancements, with the proposal pointing at the event. | `tests/proofs/quote-to-booked-event.runtime.test.ts` › "quote to booked event journey" | P | PENDING |
+| AC-018 | specs/ralph/quote-to-proposal-conversion.md | After conversion, sales reaches the created proposal in one click from the quote queue and from the lead pipeline (deep link `/clients/proposals?proposal=<id>`), and the queue is reachable from the pipeline. | `tests/features/sales/quote-submissions-review.test.ts` › "queue and pipeline deep-link to the converted proposal" | P | PENDING |
+| AC-019 | specs/ralph/quote-to-proposal-conversion.md | A conversion that failed part-way shows which records were already created (client, lead, event, proposal links from the checkpointed ids), can be retried, and can be dismissed; no partial record is unreachable from the queue. | `tests/features/sales/quote-submissions-review.test.ts` › "failed row shows checkpointed records" | P | PENDING |
