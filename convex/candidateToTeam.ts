@@ -272,6 +272,9 @@ export const hireIntoTeam = mutation({
       const givenName = parts[0] ?? "";
       const familyName =
         parts.length > 1 ? parts.slice(1).join(" ") : givenName;
+      // NOTE (declined): mononyms repeat the word as the family name
+      // ("Prince Prince") — Person requires both fields and inventing a
+      // placeholder is worse. Correct the roster entry after hire if needed.
       if (!givenName) {
         throw new ConvexError("Candidate has no name to hire with.");
       }
@@ -281,7 +284,10 @@ export const hireIntoTeam = mutation({
         email,
         phone: candidate.phone ?? undefined,
         role: candidate.roleAppliedFor,
-        idempotencyKey: `candidateHire:${auth.tenantId}:${candidateId}`,
+        // Email-scoped: a rehire after reopening + an email change must
+        // create a FRESH profile, not replay the original hire's cached
+        // create (which would re-link the old mailbox).
+        idempotencyKey: `candidateHire:${auth.tenantId}:${candidateId}:${email}`,
       });
       personId = result.docId as Id<"people">;
     }
@@ -331,19 +337,23 @@ async function findPersonByEmail(
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .collect();
   let unlinked: Doc<"people"> | null = null;
-  let dormant: Doc<"people"> | null = null;
+  let inactive: Doc<"people"> | null = null;
+  let terminated: Doc<"people"> | null = null;
   for (const person of people) {
     if ((await readStoredEmail(ctx, person.email)) !== email) continue;
     // A LIVE profile always beats a dormant one, whatever the link state —
     // reactivating a stale duplicate would resurrect old permissions.
+    // Within dormant, an inactive row (recoverable) beats a terminated one.
     if (person.deletedAt == null && String(person.status) === "active") {
       if (person.authSubjectId) return person;
       unlinked ??= person;
+    } else if (person.deletedAt == null) {
+      inactive ??= person;
     } else {
-      dormant ??= person;
+      terminated ??= person;
     }
   }
-  return unlinked ?? dormant;
+  return unlinked ?? inactive ?? terminated;
 }
 
 /** Person.email is an encrypted field; decode the envelope, else take it raw. */
