@@ -181,16 +181,16 @@ git push
 - Produces real results for all Contacts and TPP General report IDs.
 - Consumes: bounded report request and shared result helpers from Task 3.
 
-- [ ] **Step 1: Implement contact directory, birthday, activity, task/note, opportunity, and order-activity projections**
-- [ ] **Step 2: Implement event-linked contact envelopes, letters, contracts, menus, invoices, packing slips, and proposals by composing current document records**
-- [ ] **Step 3: Implement inventory in-stock, menu listing/packages/popularity, pending-final events, and post-event notes**
-- [ ] **Step 4: Implement staff/vendor phone and venue detail/list projections while keeping private wage and unrelated encrypted fields out of the payload**
-- [ ] **Step 5: Wire every Contacts and General catalog loader ID to a concrete resolver; unknown IDs throw instead of returning an empty report**
-- [ ] **Step 6: Run codegen, typecheck, existing contact/client/event tests, and reports tests**
+- [x] **Step 1: Implement contact directory, birthday, activity, task/note, opportunity, and order-activity projections**
+- [x] **Step 2: Implement event-linked contact envelopes, letters, contracts, menus, invoices, packing slips, and proposals by composing current document records**
+- [x] **Step 3: Implement inventory in-stock, menu listing/packages/popularity, pending-final events, and post-event notes**
+- [x] **Step 4: Implement staff/vendor phone and venue detail/list projections while keeping private wage and unrelated encrypted fields out of the payload**
+- [x] **Step 5: Wire every Contacts and General catalog loader ID to a concrete resolver; unknown IDs throw instead of returning an empty report**
+- [x] **Step 6: Run codegen, typecheck, existing contact/client/event tests, and reports tests**
 
 Run: `bun run codegen && bun run typecheck && bun run test -- tests/reports-routes.test.ts tests/sales-report-client-label.test.ts tests/vendor-order-title.test.ts tests/event-planning-foundation.test.ts`
 
-- [ ] **Step 7: Commit and push**
+- [x] **Step 7: Commit and push**
 
 ```bash
 git add convex/tppReports src/features/reports/tpp
