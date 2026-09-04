@@ -5,15 +5,19 @@
 
 # Implementation plan — capsule
 
-Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 3: 5 more
-read-only passes; every `file:line` below re-checked at HEAD `e722ab0`, no
+Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 4: 6 more
+read-only passes; every `file:line` below re-checked at HEAD `73803b7`, no
 code change since `1b3abd9`; runtime proof
-`tests/proposal-event-booking.runtime.test.ts` 7/7 green). Branch:
-`ralph/wiggum-loop`. Audits: 15 read-only subagent passes over `specs/**`,
-`src/**`, `convex/**`, `tests/**`, plus GitHub issues #113, #119, #136,
-#141–#151. Iteration 3 changes: A7 path fix, A8 split into A8 + A9 (failed
-rows have no retry today — manifest marks `failed` terminal), exact test file
-named on every task, AC-018/AC-019 anchored in the spec.
+`tests/proposal-event-booking.runtime.test.ts` 7/7 green on iteration 3, not
+re-run since no code changed). Branch: `ralph/wiggum-loop`. Audits: 21
+read-only subagent passes over `specs/**`, `src/**`, `convex/**`, `tests/**`,
+plus GitHub issues #113, #119, #136, #141–#151 (states re-checked with `gh`
+on iteration 4: #115/#141/#149/#150 closed; #124/#136/#142–#146 open).
+Iteration 4 changes: manifest-gate sentence corrected (the `check:*-manifest`
+scripts scan feature code, not `.manifest` files), edge-runtime is selected by
+directory (`tests/proofs/**`) not by file suffix, A4 reuses the shared status
+chip tones, three line drifts fixed (A6/A7/A9), D2 row ambiguity noted,
+client portal + pay-from-phone recorded as built-but-unspecified future work.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
@@ -66,10 +70,18 @@ the sibling `../builder` checkout exists on this machine): `QuoteSubmission`
 dismiss command + status (A4), `QuoteSubmission` retry command (A9),
 `QuoteSubmission` free-text style/occasion fields (A5), `Proposal` end-time
 field (C2). Batch A4 + A5 + A9 into one regen. Follow the `manifest` skill before editing
-`src/**/*.manifest`. Never hand-edit generated trees. Gates: `src/sales/*.manifest`
-changes are guarded by `bun run check:commercial-manifest`
-(`scripts/check-commercial-manifest-integration.ts`); `src/operations/*.manifest`
-and `src/features/events/**` by `check:event-manifest`. If regen emits any new
+`src/**/*.manifest`. Never hand-edit generated trees. Gates: `.manifest` edits
+are caught by `builder-regen-guard --check-ownership` (sha in
+`.builder/ownership.json`) and `check:manifest-registry`, both inside `bun run
+check` — regen and commit the generated output in the same commit.
+`check:commercial-manifest` (`scripts/check-commercial-manifest-integration.ts`)
+scans only `src/features/finance/**` + `convex/lib/**` for Invoice/Payment
+bypasses, and `check:event-manifest` scans `src/features/events/**` +
+`convex/lib/**`; neither reads `.manifest` files, so A4/A5/A9/C2 do not touch
+them, but C2–C4 edits under `src/features/events/**` must keep
+`check:event-manifest` green (no direct `useMutation`/`useQuery` on owned
+tables; `useQuery(api.queries.listProposalByEventId, …)` is a read of Proposal,
+not an event-owned table — same as `EventGuestPanel.tsx:82`). If regen emits any new
 `<Entity>_createVia<Verb>` export, `tests/governed-creation-mappings.test.ts`
 (authored, sorted list) must be edited by hand — A4/A5/C2 add fields/commands
 only, so no new createVia is expected. Entity-level `constraint` lines do not
@@ -122,7 +134,11 @@ Order = build order. Earlier tasks unblock later ones.
       raw row and `dedupKey` stay). Regen. UI: "Dismiss" action in the
       review page via `useActionPrompt` `askReason` (repo pattern, see
       `src/ui/action-prompt`), dismissed rows hidden by default with a
-      "Show dismissed" toggle. Proof `quote-conversion.runtime.test.ts` ›
+      "Show dismissed" toggle. Chip tone: add `dismissed: "mute"` to
+      `TONE_BY_STATUS` in `src/lib/statusLabels.ts` and delete the private
+      `STATUS_TONE` map + `color=` prop in `QuoteSubmissionsReviewPage.tsx:29-34,191`
+      — `StatusChip` (`src/ui/primitives.tsx:31-36`) already falls back to
+      `statusChipClass(status)` (standard-library rule). Proof `quote-conversion.runtime.test.ts` ›
       "dismiss keeps the raw submission": dismiss keeps the row readable and a
       re-submit of the same key still dedups (extend the dedup filter at
       `quoteBuilder.ts:166-168` to include `dismissed`). → AC-010
@@ -147,14 +163,14 @@ Order = build order. Earlier tasks unblock later ones.
       never see it. Add a one-line notice on `QuoteSubmissionsReviewPage`
       when `useListOrganization()` has no active row, linking to
       `/admin/branding` where `useCreateOrganization` lives
-      (`src/features/admin/BrandingPage.tsx:35`). `BrandingPage.tsx:178`
+      (`src/features/admin/BrandingPage.tsx:35`). `BrandingPage.tsx:178-181`
       already has an inline "Save branding first so the organization record
       exists" hint but no page-level banner. No new guard. Test:
       `quote-submissions-review.test.ts` › "offline notice when no
       organization". → AC-014
 - [ ] **A7. One-click path from the queue and the pipeline to the created
       proposal.** Depends on A1 (proposal exists and is linked).
-      `QuoteSubmissionsReviewPage.tsx` (`:150-161`, `:261-262`) links "Open
+      `QuoteSubmissionsReviewPage.tsx` (`:150-161`, `:259-268`) links "Open
       event →" / "See in pipeline →" / "Open converted event →" but never to
       the proposal, although the completed submission stores `proposalId`.
       `src/features/clients/LeadPipelinePage.tsx:645-647` (note: `clients/`,
@@ -197,7 +213,7 @@ Order = build order. Earlier tasks unblock later ones.
       reuses `submission.clientId/leadId/eventId/proposalId` when already set
       (skip that create step) so a retry never duplicates a client, lead,
       event or proposal; delete the two stale "failed is terminal" comments
-      (`quoteBuilder.ts:374-377`, `QuoteSubmissionsReviewPage.tsx:22-24`).
+      (`quoteBuilder.ts:374-377`, `QuoteSubmissionsReviewPage.tsx:21-23`).
       UI: "Retry" on failed rows calls retry then the existing convert
       action. Proof `quote-conversion.runtime.test.ts` › "retry after partial
       failure reuses checkpointed records": force the proposal step to fail
@@ -280,7 +296,12 @@ Order = build order. Earlier tasks unblock later ones.
       imports (`../convex/…` → `../../convex/…`,
       `./proofs/convex-test-modules` → `./convex-test-modules`). It is not
       bound in `scripts/emit-proof-kit.ts`, so no registry edit; keep
-      `bun run test:proofs` green. → AC-001
+      `bun run test:proofs` green. Note the move changes the vitest
+      environment: `environmentMatchGlobs` is `[["tests/proofs/**",
+      "edge-runtime"]]` (`vite.config.ts:104`), so today the root-level file
+      runs under the default `node` environment; under `tests/proofs/` it runs
+      in `edge-runtime` like every other proof. Run it once after the move
+      and fix any environment-only failure before marking C1 done. → AC-001
 - [ ] **C2. End time carries over.** Proposal stores only `eventDate`
       (`src/sales/proposal.manifest:41`). Manifest: add
       `eventEndDate: datetime?` to `Proposal` and to `draft(...)` only —
@@ -336,7 +357,10 @@ Order = build order. Earlier tasks unblock later ones.
 - [ ] **C5. Consolidate date formatting.** `ProposalEventPrefill.toDatetimeLocal`
       (`ProposalEventPrefill.ts:55-65`) duplicates `toDatetimeLocalValue` in
       `src/lib/format.ts:79`. Use the library helper; delete the private copy.
-      (Standard-library rule.)
+      Both format local time as `YYYY-MM-DDTHH:MM`; the only difference is
+      that the private copy accepts `null`/non-finite and returns
+      `undefined`, while the library helper takes a required `number` — keep
+      that guard at the call site in `values()`. (Standard-library rule.)
 - [ ] **C6. Unit test for the prefill seam.** No test covers
       `ProposalEventPrefill` today (`grep -rl ProposalEventPrefill tests` is
       empty). Add `tests/features/events/proposal-event-prefill.test.ts`
@@ -365,7 +389,11 @@ Order = build order. Earlier tasks unblock later ones.
       6 ❌→🟡 (import runs, external links, parallel-run dashboard, cutover),
       7.4 ❌→🟡 (7 live dashboards, bugs in #124), 8.3 🟡→✅ (`VenueNote`),
       8.4/9.2/9.3/9.5 ❌→✅ (`VenueVendorRelationship`, `RoleScorecard`,
-      `Candidate`/`Interview`, `OneOnOne`). There is no 8.5 row. Keep the
+      `Candidate`/`Interview`, `OneOnOne`). "5.2" appears twice: the merged
+      row "5.1–5.2 Proposal builder + templates" (🟡, leave it) and the
+      standalone row "5.2 Timeline / venue-logistics / enhancements sections"
+      (❌ → ✅, this is the one). 8.5 has no standalone row; it is bundled as
+      "7.3 / 8.5 Revenue attribution + splits" (❌, leave it). Keep the
       legend; do not rewrite the spec body.
       `specs/capsule-complete-feature-spec.json` mirrors the same stale table
       but no script or test consumes it (grep of `scripts/` and `tests/` is
@@ -408,6 +436,20 @@ Order = build order. Earlier tasks unblock later ones.
   link-time copy covers booking.
 - **Reporting parity** (#124), **org seed** (#113 generator, ships in Manifest
   3.6.46+), Nowsta (#122), social DMs (#123), email inbox.
+- **Client portal + pay from a phone (Clients JTBD, no spec text).** Both are
+  built: `src/features/clientPortal/{ClientPortalPage,EventClientPortalShare}.tsx`,
+  `convex/clientPortal.ts`, `convex/lib/clientPortalToken.ts`,
+  `src/sales/share-link.manifest`; Stripe payment links via
+  `convex/invoicePayments.ts` `createPaymentLink` + `src/lib/invoicePaymentActions.ts`,
+  `convex/stripeConnect.ts`. No file under `specs/` describes the portal's
+  content (event details, documents, invoices) or the client pay flow; the
+  feature spec's §6.4 covers only imported-payment reconciliation. When that
+  release is scheduled, author `specs/ralph/client-portal-pay.md` in the
+  ralph template and assign its criteria the next free AC ids. Not in this
+  release: it is a different actor's job and is not on the re-keying path.
+- **Money truth framing** (Josh JTBD "billed vs collected vs dead, margin per
+  event"): covered only generically by feature §7.1/§7.3/§7.4; no spec uses
+  that framing. Note only.
 - **Reverse link to the raw `QuoteSubmission`**: neither `proposal.manifest`
   nor `event.manifest` stores `quoteSubmissionId`; the submission stores
   `clientId/leadId/eventId/proposalId`, so a by-proposalId lookup would need
@@ -422,7 +464,8 @@ Order = build order. Earlier tasks unblock later ones.
 - **src/lib consolidation candidates near this release** (standard-library
   rule; not in scope because the lines are unrelated to the tasks above):
   `src/features/clients/LeadPipelinePage.tsx:65-69` private
-  `Intl.NumberFormat` duplicates `formatMoney` (`src/lib/format.ts:14-18`);
+  `Intl.NumberFormat` duplicates `formatMoney` (`src/lib/format.ts:32`, built
+  on the `defaultMoneyFmt` formatter at `:14-18`);
   `ProposalCreateForm.tsx:499,545,598,631` `.toFixed(2)` instead of
   `formatMoneyExact`; `BrandingPage.tsx:143-200` inline error unwrapping vs
   `src/lib/convexActionErrorMessage.ts:8`;

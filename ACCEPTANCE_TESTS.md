@@ -11,7 +11,9 @@ Release: "Booked without re-keying" (plan date 2026-09-03; AC-001 … AC-019). S
 proposal-to-event-handoff.md, quote-to-proposal-conversion.md,
 reference-catalogs-self-serve.md, plus the feature-spec §4.3 done-when.
 field-flow-defect-burndown.md is out of this release; its criteria get ids when
-it is scheduled.
+it is scheduled. The client portal / pay-from-phone job has code but no spec
+yet (see IMPLEMENTATION_PLAN.md future work); it gets a spec and ids when
+scheduled.
 
 Verification kind: P = programmatic (runtime proof / unit test). J = human-like
 judgment — run the llm-review gate (src/lib/llm-review.ts, criteria table
@@ -25,8 +27,11 @@ under .artifacts/llm-review/<AC-id>.md; they are never added to `bun run
 check`. The P test is the gate the loop halts on; the J review is recorded
 evidence.
 
-Runtime proofs live in tests/proofs/*.runtime.test.ts. They run in the
-`edge-runtime` environment (vite.config.ts:104 `environmentMatchGlobs`), boot
+Runtime proofs live in tests/proofs/*.runtime.test.ts. Everything under
+tests/proofs/** runs in the `edge-runtime` environment (vite.config.ts:104
+`environmentMatchGlobs` is `[["tests/proofs/**", "edge-runtime"]]`; the
+default is `node`, so the root-level booking proof runs in node until C1
+moves it). Proofs boot
 via `createManifestTestContext({ convexTest, schema, modules })` from
 `@angriff36/manifest/proof-kit/convex-test` with `modules` from
 tests/proofs/convex-test-modules.ts, and need the CONVEX_FIELD_ENCRYPTION_KEY
@@ -58,6 +63,6 @@ is installed (only jsdom), so do not plan render tests.
 | AC-014 | specs/ralph/reference-catalogs-self-serve.md | The public quote form submits when catalogs are empty; the free-text style/occasion fallback is captured on the submission; a missing organization row is reported to staff, not hidden. | `tests/proofs/quote-conversion.runtime.test.ts` › "public submit with empty catalogs captures free text"; `tests/features/sales/quote-submissions-review.test.ts` › "offline notice when no organization" | P | PENDING |
 | AC-015 | specs/ralph/reference-catalogs-self-serve.md | A retired service style is absent from new-event selectors but still resolves by id on existing events and imported records. | `tests/features/events/service-style-retired.test.ts` › "retired hidden on create, resolved on detail" | P | PENDING |
 | AC-016 | specs/ralph/reference-catalogs-self-serve.md | A runtime proof creates an event with empty catalogs (null ids accepted) and with populated catalogs (ids persist and resolve). | `tests/proofs/event-create-catalogs.runtime.test.ts` › "create with empty and populated catalogs" | P | PENDING |
-| AC-017 | specs/capsule-complete-feature-spec.md §4.3 | End to end: a client submits once, sales sees the lead with all selections, converts without re-entry, the proposal is sent and accepted, and the created event carries date, times, headcount, venue, menu servings and enhancements, with the proposal pointing at the event. | `tests/proofs/quote-to-booked-event.runtime.test.ts` › "quote to booked event journey" | P | PENDING |
+| AC-017 | specs/capsule-complete-feature-spec.md §4.3 done-when + specs/ralph/proposal-to-event-handoff.md (composite journey; §4.3 alone ends at the draft proposal) | End to end: a client submits once, sales sees the lead with all selections, converts without re-entry, the proposal is sent and accepted, and the created event carries date, times, headcount, venue, menu servings and enhancements, with the proposal pointing at the event. | `tests/proofs/quote-to-booked-event.runtime.test.ts` › "quote to booked event journey" | P | PENDING |
 | AC-018 | specs/ralph/quote-to-proposal-conversion.md | After conversion, sales reaches the created proposal in one click from the quote queue and from the lead pipeline (deep link `/clients/proposals?proposal=<id>`), and the queue is reachable from the pipeline. | `tests/features/sales/quote-submissions-review.test.ts` › "queue and pipeline deep-link to the converted proposal" | P | PENDING |
 | AC-019 | specs/ralph/quote-to-proposal-conversion.md | A conversion that failed part-way shows which records were already created (client, lead, event, proposal links from the checkpointed ids), can be retried without duplicating those records, and can be dismissed; no partial record is unreachable from the queue. | `tests/features/sales/quote-submissions-review.test.ts` › "failed row shows checkpointed records"; `tests/proofs/quote-conversion.runtime.test.ts` › "retry after partial failure reuses checkpointed records" | P | PENDING |
