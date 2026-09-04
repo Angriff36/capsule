@@ -86,6 +86,12 @@ only the iteration-3 spec bullets (7 lines, covered by AC-018/019);
 issue is still #270; `lint_specs.sh specs/ralph` OK. ACCEPTANCE_TESTS.md
 unchanged (AC-001…AC-019 all PENDING). Six iterations with no task change.
 Next iteration MUST be a build iteration starting at A1, not a plan pass.
+Iteration 11 (HEAD `b4b15b8`, 2026-09-03): drift check only, no subagent
+audit. Same result as iteration 10: `src`/`convex`/`tests` unchanged since
+`1b3abd9`, `origin/main` = `609023d` still an ancestor, newest open issue
+#270, `lint_specs.sh specs/ralph` OK, AC-001…AC-019 all PENDING. Seven
+plan iterations with no task change. Plan passes are now waste: run
+`./loop.sh --branch ralph/wiggum-loop --allow-dirty` in BUILD mode at A1.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
