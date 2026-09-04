@@ -30,7 +30,7 @@ block inside a form field; B3 `test:proofs` wording; AC-014 outcome now
 names the fix link; §4.3 attribution / "estimate" labelling recorded as
 future work (consent is already stored). All 19 AC rows cover every
 acceptance bullet in the three in-scope specs; no overlap with
-`field-flow-defect-burndown.md`. Plan is stable — the build loop can start.
+`known-bugs-142-to-151.md`. Plan is stable — the build loop can start.
 Iteration 7 (HEAD `86f3ca3`, still no code change since `1b3abd9`; the only
 non-plan diff is the iteration-3 spec bullets already covered by AC-018/019):
 gate baselines proven in THIS worktree — `bun scripts/manifest-regen-check.ts`
@@ -239,7 +239,7 @@ below names the ids it must turn to `PASS`.
 
 Order = build order. Earlier tasks unblock later ones.
 
-### A. Quote → lead → proposal (spec `specs/ralph/quote-to-proposal-conversion.md`)
+### A. Quote → lead → proposal (spec `specs/ralph/public-quote-form.md`)
 
 - [ ] **A1. Link the converted proposal to the event it creates.** In
       `convex/quoteBuilder.ts` `processQuoteSubmission` call site (`:497-515`)
@@ -371,7 +371,7 @@ Order = build order. Earlier tasks unblock later ones.
       set and `status: "failed"`, call retry + convert, assert the client and
       lead counts did not grow and `status === "completed"`). → AC-019
 
-### B. Reference catalogs (spec `specs/ralph/reference-catalogs-self-serve.md`)
+### B. Reference catalogs (spec `specs/ralph/dropdown-lists-and-their-admin-screen.md`)
 
 - [ ] **B1. Admin catalogs page.** New `src/features/admin/CatalogsPage.tsx`
       at `/admin/catalogs`, added to `AdminWorkspaceNav.tsx:3-14`, wrapped in
@@ -440,7 +440,7 @@ Order = build order. Earlier tasks unblock later ones.
       `serviceStyleSelectOptions` and still resolves by id in the detail
       `nameOf` lookup. → AC-015
 
-### C. Proposal → event handoff residuals (spec `specs/ralph/proposal-to-event-handoff.md`)
+### C. Proposal → event handoff residuals (spec `specs/ralph/signed-proposal-becomes-the-event.md`)
 
 - [ ] **C1. Move the booking proof under `tests/proofs/`.**
       `tests/proposal-event-booking.runtime.test.ts` (7 tests, 7/7 green on
@@ -574,7 +574,7 @@ Order = build order. Earlier tasks unblock later ones.
 
 ## Future work (outside this release)
 
-- **Field-flow burndown** (`specs/ralph/field-flow-defect-burndown.md`): #149
+- **Field-flow burndown** (`specs/ralph/known-bugs-142-to-151.md`): #149
   and #150 are fixed with tests; still open: #142 disable "Mark packed" while
   the list is draft + negative proof (`PackListItemTable.tsx:132-152`), #143
   create-location path from receiving (`VendorOrderPage.tsx:607-627`), #144
