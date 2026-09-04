@@ -69,7 +69,10 @@ export type HireIntoTeamResult =
   | { kind: "hired"; personId: string; email: string }
   // Candidate had no usable email, so no Person could be made. The stage mark
   // still commits — the UI says to add them under Team roles with an email.
-  | { kind: "hired_no_email" };
+  | { kind: "hired_no_email" }
+  // The matching profile is INACTIVE. Nothing was mutated; the UI must
+  // re-present the action as an explicit restore before this proceeds.
+  | { kind: "needs_restore"; personId: string; email: string };
 
 export const hireIntoTeam = mutation({
   args: {
@@ -254,8 +257,18 @@ export const hireIntoTeam = mutation({
         );
       }
       // Returning seasonal/inactive staff: reactivate their row instead of
-      // splitting employment history across two profiles.
+      // splitting employment history across two profiles — but only with
+      // explicit restore intent (same rule as the resume branch). The first
+      // click returns needs_restore; the UI re-confirms with "Restore and
+      // resend" and sends restore:true.
       if (String(existing.status) === "inactive") {
+        if (restore !== true) {
+          return {
+            kind: "needs_restore",
+            personId: String(existing._id),
+            email,
+          };
+        }
         await ctx.runMutation(api.mutations.Person_reactivate, {
           docId: existing._id,
           version: existing.version,

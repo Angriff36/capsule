@@ -90,6 +90,9 @@ export function CandidatesPage() {
     text: string;
     tone: "ok" | "warn";
   } | null>(null);
+  // Candidates whose matched profile is INACTIVE: the next Hire click carries
+  // explicit restore intent ("Restore and resend").
+  const [restoreReady, setRestoreReady] = useState<Set<string>>(new Set());
   const [failure, setFailure] = useState<unknown>(null);
 
   const activePeople = (people ?? []).filter(
@@ -202,8 +205,19 @@ export function CandidatesPage() {
           ? { expectedVersion: candidate.version }
           : {}),
         // Reactivation intent: only the "Restore and resend" state sends it.
-        ...(linkedPerson?.status === "inactive" ? { restore: true } : {}),
+        ...(linkedPerson?.status === "inactive" ||
+        restoreReady.has(candidate._id)
+          ? { restore: true }
+          : {}),
       });
+      if (result.kind === "needs_restore") {
+        setRestoreReady((prev) => new Set(prev).add(candidate._id));
+        setNotice({
+          text: `${candidate.fullName}'s team profile is inactive. Press Restore and resend to bring it back, then the sign-in goes out.`,
+          tone: "warn",
+        });
+        return;
+      }
       if (result.kind === "hired_no_email") {
         setNotice({
           text: `Hired ${candidate.fullName}. The candidate has no usable email, so no sign-in could be created — add them under Administration → Permissions → Team roles.`,
@@ -550,11 +564,15 @@ export function CandidatesPage() {
                         onClick={() => void hireCandidate(candidate)}
                       >
                         {candidate.stage !== "hired"
-                          ? "Hire into team"
+                          ? restoreReady.has(candidate._id)
+                            ? "Restore and resend"
+                            : "Hire into team"
                           : removedProfile
                             ? "Profile removed"
                             : candidate.hiredPersonId == null
-                              ? "Finish team setup"
+                              ? restoreReady.has(candidate._id)
+                                ? "Restore and resend"
+                                : "Finish team setup"
                               : inactiveProfile
                                 ? "Restore and resend"
                                 : "Resend sign-in"}
