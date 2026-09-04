@@ -18,7 +18,7 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "504c8a486a6695f6a4674a50ffd9f7a9727a53efb25e070b425f568cdd3df623"
+      "sha256": "c090ebf00f1e393045d39dcedc230769c7cfa7fea7d735fe86ba88a15b7b4092"
     },
     "convex/queries.ts": {
       "sha256": "c58d1f6d62cf190e04fe821f1105b038eb88e50fe1b76a9e27ed6b9753954b47"
@@ -30,7 +30,7 @@
       "sha256": "623691544bf261a6136914913592199240207e6b65f3abea6d8c33f9666474b1"
     },
     "manifest-context-summary.json": {
-      "sha256": "ada134588f135a1f1c31c69439442cde8caccb51f02586120eab4e352068d5ae"
+      "sha256": "e213645875861ff03ca2a1fd992460504a246fd642ff5ea88963f85972f9df1f"
     },
     "package.json": {
       "sha256": "112f8a17d1c49e8b3e7868b15627a56001354977dc634ed844dad9f27fbe68d7"
@@ -45,10 +45,10 @@
       "sha256": "fa158809496ca8bda4fb589c4370863f25a73e7070d4d0d63e00d401c57b01cc"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "91a336c2ebbbf8b50addc27e781e45fa8849e4b9bbee72ff20f124d5a5992a4c"
+      "sha256": "798a46ac1b879f9b8b49813e0d40cb06a6527e9cbbc3c52afcf1d73b9417a358"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "c07497db8b6bc2c92b4d5aab6b383c2b00a2ddaef4ef1c8fc98af462b02b0c37"
+      "sha256": "dd6d0f6f11b2500d44167e845fde99e72fc5f97ee8829e09292eeae043a98c3e"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "9c121e32c667f0d180d20be2881587cd26a96cfeda0ffb8bc27dc676e1ec15bd"
@@ -60,12 +60,12 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "204d55ce933607201132f98dfe432790bf6fcba3783746e7bf9fae150eccfbad"
+      "sha256": "565c173f2886b16deed4cb99023f651b4e352c164e939bab04034c1a33ca2fee"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "3.6.48",
+      "@angriff36/manifest": "^3.6.48",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },
