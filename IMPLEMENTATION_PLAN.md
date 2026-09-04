@@ -5,19 +5,24 @@
 
 # Implementation plan — capsule
 
-Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 4: 6 more
-read-only passes; every `file:line` below re-checked at HEAD `73803b7`, no
-code change since `1b3abd9`; runtime proof
-`tests/proposal-event-booking.runtime.test.ts` 7/7 green on iteration 3, not
-re-run since no code changed). Branch: `ralph/wiggum-loop`. Audits: 21
-read-only subagent passes over `specs/**`, `src/**`, `convex/**`, `tests/**`,
-plus GitHub issues #113, #119, #136, #141–#151 (states re-checked with `gh`
-on iteration 4: #115/#141/#149/#150 closed; #124/#136/#142–#146 open).
-Iteration 4 changes: manifest-gate sentence corrected (the `check:*-manifest`
-scripts scan feature code, not `.manifest` files), edge-runtime is selected by
-directory (`tests/proofs/**`) not by file suffix, A4 reuses the shared status
-chip tones, three line drifts fixed (A6/A7/A9), D2 row ambiguity noted,
-client portal + pay-from-phone recorded as built-but-unspecified future work.
+Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 5: 3 more
+read-only passes — AC coverage of every spec bullet, `src/lib`/`src/ui`
+primitive inventory for tasks A2–C4, and the 12 test-infra/gate claims —
+every `file:line` below re-checked at HEAD `2b11d51`, no code change since
+`1b3abd9`; runtime proof `tests/proposal-event-booking.runtime.test.ts` 7/7
+green on iteration 3, not re-run since no code changed). Branch:
+`ralph/wiggum-loop`. Audits: 24 read-only subagent passes over `specs/**`,
+`src/**`, `convex/**`, `tests/**`, plus GitHub issues #113, #119, #136,
+#141–#151 (states re-checked with `gh` on iteration 4: #115/#141/#149/#150
+closed; #124/#136/#142–#146 open).
+Iteration 5 changes: A4 names the inline `showArchived` toggle pattern and
+notes `TONE_BY_STATUS` is module-private; A6 records that no shared banner
+primitive exists (write inline); B2 says not to use the centered `EmptyState`
+block inside a form field; B3 `test:proofs` wording; AC-014 outcome now
+names the fix link; §4.3 attribution / "estimate" labelling recorded as
+future work (consent is already stored). All 19 AC rows cover every
+acceptance bullet in the three in-scope specs; no overlap with
+`field-flow-defect-burndown.md`. Plan is stable — the build loop can start.
 
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
@@ -134,8 +139,11 @@ Order = build order. Earlier tasks unblock later ones.
       raw row and `dedupKey` stay). Regen. UI: "Dismiss" action in the
       review page via `useActionPrompt` `askReason` (repo pattern, see
       `src/ui/action-prompt`), dismissed rows hidden by default with a
-      "Show dismissed" toggle. Chip tone: add `dismissed: "mute"` to
-      `TONE_BY_STATUS` in `src/lib/statusLabels.ts` and delete the private
+      "Show dismissed" toggle — plain `useState` + button, the same inline
+      pattern as `showArchived` in `src/features/clients/ClientsPage.tsx:58,250-254`
+      (no shared toggle primitive exists). Chip tone: add `dismissed: "mute"` to
+      `TONE_BY_STATUS` in `src/lib/statusLabels.ts:42` (module-private const;
+      edit in place, it is not exported) and delete the private
       `STATUS_TONE` map + `color=` prop in `QuoteSubmissionsReviewPage.tsx:29-34,191`
       — `StatusChip` (`src/ui/primitives.tsx:31-36`) already falls back to
       `statusChipClass(status)` (standard-library rule). Proof `quote-conversion.runtime.test.ts` ›
@@ -165,7 +173,10 @@ Order = build order. Earlier tasks unblock later ones.
       `/admin/branding` where `useCreateOrganization` lives
       (`src/features/admin/BrandingPage.tsx:35`). `BrandingPage.tsx:178-181`
       already has an inline "Save branding first so the organization record
-      exists" hint but no page-level banner. No new guard. Test:
+      exists" hint but no page-level banner. No shared banner/notice/alert
+      primitive exists in `src/ui` or `src/lib` (only the draft-specific
+      `DraftRestoreBanner`, `src/ui/formDraft.tsx:121`), so write the notice
+      inline; do not add a primitive for a second copy. No new guard. Test:
       `quote-submissions-review.test.ts` › "offline notice when no
       organization". → AC-014
 - [ ] **A7. One-click path from the queue and the pipeline to the created
@@ -259,8 +270,10 @@ Order = build order. Earlier tasks unblock later ones.
 - [ ] **B2. Explicit empty state on event create.** Occasion select in
       `src/features/events/EventCreatePage.tsx:430-443` shows only a
       placeholder when the catalog is empty. Render "No occasions yet — add
-      them in Admin › Catalogs" with a link, keep the field optional so create
-      still succeeds. Service style already falls back to the four TPP
+      them in Admin › Catalogs" with a link as a one-line hint under the
+      field (not `EmptyState`, `src/ui/primitives.tsx:127` — that is a
+      centered list-empty block, wrong inside a form), keep the field
+      optional so create still succeeds. Service style already falls back to the four TPP
       defaults (`src/features/events/serviceStyleCatalog.ts:53-75`); show the
       same one-line note when the fallback is active. Test extends
       `tests/features/events/create-event-blockers.test.ts`, which mixes
@@ -275,7 +288,8 @@ Order = build order. Earlier tasks unblock later ones.
       `occasionId`, `src/operations/event.manifest:673`); (b) populated → ids
       persist and resolve. No registry step: vitest includes
       `tests/**/*.test.ts` (`vite.config.ts:103`) and `bun run test:proofs`
-      runs `tests/proofs`; `scripts/emit-proof-kit.ts` binds only
+      runs `tests/proofs` plus nine named guard/route files
+      (`package.json:49`); `scripts/emit-proof-kit.ts` binds only
       `CATALOG_ENTITIES` proof ids (Event/Proposal/QuoteSubmission are not in
       it) and `check:proof` only checks registered paths exist. → AC-016
 - [ ] **B4. Retired rows: hidden on create, kept on existing records.**
@@ -447,6 +461,12 @@ Order = build order. Earlier tasks unblock later ones.
   release is scheduled, author `specs/ralph/client-portal-pay.md` in the
   ralph template and assign its criteria the next free AC ids. Not in this
   release: it is a different actor's job and is not on the re-keying path.
+- **Quote form attribution + "estimate" labelling** (feature §4.3 body,
+  not its done-when): `src/sales/quote-submission.manifest` stores consent
+  (`consentGrantedAt` `:46`, `consentRequired` `:72`) but no referral /
+  attribution field, and `QuoteSubmissionPage.tsx` never labels the price as
+  an estimate. Neither is an acceptance bullet in any spec; not in this
+  release.
 - **Money truth framing** (Josh JTBD "billed vs collected vs dead, margin per
   event"): covered only generically by feature §7.1/§7.3/§7.4; no spec uses
   that framing. Note only.
