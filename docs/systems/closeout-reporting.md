@@ -13,6 +13,7 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 | `finance/event-closeout.manifest`, `finance/closeout.manifest` | EventCloseout         |
 | `finance/payroll-input.manifest`                               | PayrollInput          |
 | `insights/report.manifest`                                     | SavedReportDefinition |
+| `insights/tpp-report-favorite.manifest`                        | TppReportFavorite     |
 
 ## Primary workspace (Slice 8 + 8b + reports)
 
@@ -20,7 +21,7 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 | ------------------- | -------------------------------------------------------------------- |
 | `/finance/closeout` | Capture reconciled numbers for a closed-out event; finalize folio    |
 | `/finance/payroll`  | Prepare/finalize rollups; compile and export a selected payroll period |
-| `/reports`          | Open saved, reactive reports over current operational records       |
+| `/reports`          | Run the TPP-compatible catalog or open saved reactive reports        |
 
 **User outcomes proven**
 
@@ -51,6 +52,22 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
   type persist through `SavedReportDefinition.updateDefinition`.
 - CSV export uses exactly the visible evidence columns and rows, emits ISO
   dates and numeric amounts, and escapes spreadsheet-formula prefixes.
+- Complete TPP-compatible catalog: 89 canonical reports across Contacts,
+  Event, Financial, and TPP General, plus the seven Favorites aliases from the
+  Mangia reference screen. Names, descriptions, category order, and default
+  favorites remain TPP-compatible while Capsule owns the visual shell.
+- TPP report parameters are declared in the catalog and parsed into bounded,
+  typed requests. Results use four shared families: tables/ledgers, event
+  documents/worksheets, physical labels, and financial results.
+- Personal stars persist through the authored `tppReportFavorites` seam. They
+  change catalog organization only and never grant access to source records.
+- Print and browser print-to-PDF share the visible result. Tabular reports add
+  formula-safe UTF-8 CSV and typed Excel XML; label reports preserve Avery
+  5160, Avery 5163, medium table-tent, and #10 envelope dimensions.
+- Authored report queries apply tenant scope and bounded reads, exclude draft
+  or void invoices from billed revenue, count only completed payments as
+  collected, use finalized closeouts for profit, and decrypt protected fields
+  at the server boundary before projection.
 
 **Known boundary**
 
@@ -60,6 +77,10 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 - PayrollInput `hourlyRate` / `overtimeRate` / `grossAmount` entry — Manifest encrypts
   private money to ciphertext while Convex schema still declares `number` (proven insert
   failure); minutes + optional notes ship without those fields
+- Capsule does not yet store contact birthdays or staff postal addresses.
+  Birthday List therefore has its TPP shape without fabricated rows, and Staff
+  Address & Phone List currently projects name, role, phone, and email. The
+  additive domain work is tracked in GitHub issue #272.
 
 Payroll compilation is read-only: it does not materialize a second stored
 summary or submit payroll. ADP and Paychex companies may still need to map the
