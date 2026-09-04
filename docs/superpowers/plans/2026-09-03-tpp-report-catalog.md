@@ -210,18 +210,18 @@ git push
 - Produces real results for all 29 Event report IDs plus the event documents referenced from Contacts.
 - Consumes: current event/menu/dish/recipe/prep/equipment/purchasing/vendor/order/pack/delivery/workforce records and existing proposal, contract, invoice, and BEO builders.
 
-- [ ] **Step 1: Implement event booking/change/delivery/list/schedule/task/timeline/worksheet/BEO projections**
-- [ ] **Step 2: Implement Event Menu, Heating and Serving Event Menu, Event Menu Item Production, Production Summary, and Master Food Production Worksheet**
-- [ ] **Step 3: Implement Equipment Summary, Pack List, Shopping List, and Staff Schedules**
-- [ ] **Step 4: Implement beverage, miscellaneous, other-inventory, rental, and general vendor order lists with vendor grouping and report-specific quantities**
-- [ ] **Step 5: Implement Kitchen Labor, Menu Item Recipes, Invoice Number History, and the blank Contact Worksheet**
-- [ ] **Step 6: Implement Event Menu Item Labels, Heating & Serving labels, and Menu Item Table Tents with exact physical print dimensions**
-- [ ] **Step 7: Wire every Event loader ID to a concrete resolver and reuse accepted local TPP fixtures for field order and headings**
-- [ ] **Step 8: Run codegen, typecheck, existing event/procurement/production/logistics/workforce tests, and PDF tests**
+- [x] **Step 1: Implement event booking/change/delivery/list/schedule/task/timeline/worksheet/BEO projections**
+- [x] **Step 2: Implement Event Menu, Heating and Serving Event Menu, Event Menu Item Production, Production Summary, and Master Food Production Worksheet**
+- [x] **Step 3: Implement Equipment Summary, Pack List, Shopping List, and Staff Schedules**
+- [x] **Step 4: Implement beverage, miscellaneous, other-inventory, rental, and general vendor order lists with vendor grouping and report-specific quantities**
+- [x] **Step 5: Implement Kitchen Labor, Menu Item Recipes, Invoice Number History, and the blank Contact Worksheet**
+- [x] **Step 6: Implement Event Menu Item Labels, Heating & Serving labels, and Menu Item Table Tents with exact physical print dimensions**
+- [x] **Step 7: Wire every Event loader ID to a concrete resolver and reuse accepted local TPP fixtures for field order and headings**
+- [x] **Step 8: Run codegen, typecheck, existing event/procurement/production/logistics/workforce tests, and PDF tests**
 
 Run: `bun run codegen && bun run typecheck && bun run test -- tests/reports-routes.test.ts tests/features/events/eventRoutes.test.ts tests/event-manifest-integration-guard.test.ts tests/production-manifest-integration-guard.test.ts tests/logistics-routes.test.ts tests/workforce-manifest-integration-guard.test.ts`
 
-- [ ] **Step 9: Commit and push**
+- [x] **Step 9: Commit and push**
 
 ```bash
 git add convex/tppReports src/features/reports/tpp
