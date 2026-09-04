@@ -237,7 +237,9 @@ export const hireIntoTeam = mutation({
     ) {
       throw new ConvexError(
         existing
-          ? "This email belongs to an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles."
+          ? String(existing.status) === "active"
+            ? "This email already belongs to a manager or admin profile. Only an admin can link or provision it — sort it out under Team roles."
+            : "This email belongs to an inactive manager or admin. Only an admin can bring that profile back — sort it out under Team roles."
           : "Hiring into a manager or admin role needs an admin. Hire them into their staff role, or have an admin change the role under Team roles.",
       );
     }

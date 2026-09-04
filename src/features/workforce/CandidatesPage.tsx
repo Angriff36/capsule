@@ -414,6 +414,15 @@ export function CandidatesPage() {
               (row) => row.candidateId === candidate._id,
             );
             const terminal = ["hired", "rejected"].includes(candidate.stage);
+            const linkedPerson =
+              candidate.hiredPersonId != null
+                ? people?.find((row) => row._id === candidate.hiredPersonId)
+                : undefined;
+            // listPerson filters removed rows out entirely: a missing row for
+            // a linked hire means the profile was terminated/deleted.
+            const removedProfile =
+              candidate.hiredPersonId != null && linkedPerson == null;
+            const inactiveProfile = linkedPerson?.status === "inactive";
             return (
               <div key={candidate._id} className="supply-form mt-4">
                 <div className="supply-form-heading">
@@ -534,20 +543,21 @@ export function CandidatesPage() {
                         disabled={
                           busy ||
                           (candidate.stage === "hired" &&
-                            candidate.hiredPersonId == null &&
-                            !hasUsableEmail(candidate.email))
+                            ((candidate.hiredPersonId == null &&
+                              !hasUsableEmail(candidate.email)) ||
+                              removedProfile))
                         }
                         onClick={() => void hireCandidate(candidate)}
                       >
                         {candidate.stage !== "hired"
                           ? "Hire into team"
-                          : candidate.hiredPersonId == null
-                            ? "Finish team setup"
-                            : (people?.find(
-                                  (row) => row._id === candidate.hiredPersonId,
-                                )?.status ?? "active") === "inactive"
-                              ? "Restore and resend"
-                              : "Resend sign-in"}
+                          : removedProfile
+                            ? "Profile removed"
+                            : candidate.hiredPersonId == null
+                              ? "Finish team setup"
+                              : inactiveProfile
+                                ? "Restore and resend"
+                                : "Resend sign-in"}
                       </button>
                       {candidate.stage === "hired" &&
                       candidate.hiredPersonId == null &&
@@ -558,9 +568,13 @@ export function CandidatesPage() {
                           them under Administration → Permissions → Team roles.
                         </p>
                       ) : null}
-                      {candidate.hiredPersonId != null &&
-                      people?.find((row) => row._id === candidate.hiredPersonId)
-                        ?.status === "inactive" ? (
+                      {removedProfile ? (
+                        <p className="text-sm text-ink-2 mt-2">
+                          Their team profile was removed. Hire them again under
+                          Administration → Permissions → Team roles.
+                        </p>
+                      ) : null}
+                      {inactiveProfile ? (
                         <p className="text-sm text-ink-2 mt-2">
                           Their team profile is inactive. This restores it, then
                           emails the sign-in again.
