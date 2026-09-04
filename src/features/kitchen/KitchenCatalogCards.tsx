@@ -1,23 +1,31 @@
-import type { ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { Link } from "react-router-dom";
+import { formatMoneyExact } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
+import { ChevronRightIcon } from "../../ui/icons";
+import { RecordPreviewSheet } from "../../ui/RecordPreviewSheet";
+import { useVirtualWindow } from "../../ui/useVirtualWindow";
+import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
+import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons";
 import { CulinaryCatalogCardCopy } from "./culinary-studio/CulinaryCatalogCardCopy";
 import { CulinaryCatalogCardTone } from "./culinary-studio/CulinaryCatalogCardTone";
 import "./culinary-studio/CulinaryCatalogCards.css";
-import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
-import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons";
-import { formatMoneyExact } from "../../lib/format";
-import { formatStatusLabel } from "../../lib/statusLabels";
-import { ActionMenu } from "../../ui/primitives";
 import {
+  componentPath,
   dishPath,
   menuPath,
-  componentPath,
   type KitchenSection,
 } from "./kitchenRoutes";
 
-type CatalogItem = {
+export type CatalogItem = {
   _id: string;
   name: string;
   status: string;
@@ -32,6 +40,11 @@ type CatalogItem = {
   primaryImageStorageId?: string | null;
   allergenSummary?: string[] | null;
   deletedAt?: number | null;
+  editionNumber?: number | null;
+  canonicalDishId?: string | null;
+  canonicalIngredientId?: string | null;
+  mergedIntoDishId?: string | null;
+  mergedIntoIngredientId?: string | null;
 };
 
 type LifecycleCommands = {
@@ -46,154 +59,434 @@ type LifecycleCommands = {
   restoreMenu: (args: Record<string, unknown>) => Promise<unknown>;
 };
 
+type CategoryOption = {
+  value: string;
+  label: string;
+  count: number;
+};
+
 type Props = Readonly<{
   section: KitchenSection;
   rows: CatalogItem[];
+  viewKey: string;
+  categories: CategoryOption[];
+  activeCategory: string;
+  onCategoryChange: (category: string) => void;
   busy: string | null;
   showHidden: boolean;
   run: (key: string, work: () => Promise<void>) => Promise<void>;
   commands: LifecycleCommands;
 }>;
 
+const ROW_HEIGHT = 68;
+
 /**
- * Catalog grid: substantial white cards (1 / 2 / 3 / 4 per row), a real
- * image area on top, name + chips + cost, then one primary "Open" and an
- * overflow menu holding lifecycle actions (Delete last, in red).
+ * Virtualized culinary index. Only the visible ledger rows mount; the one
+ * selected record gets the richer image and lifecycle surface in its preview.
  */
 export function KitchenCatalogCards({
   section,
   rows,
+  viewKey,
+  categories,
+  activeCategory,
+  onCategoryChange,
   busy,
   showHidden,
   run,
   commands,
 }: Props) {
-  return (
-    <ul className="culinary-card-grid">
-      {rows.map((item, index) => (
-        <li key={item._id} className="culinary-card card">
-          <CardMedia section={section} item={item} index={index} />
-          <div className="culinary-card-body">
-            <div className="flex items-start justify-between gap-2">
-              <h3 className="culinary-card-title">
-                {wrapCardLink(section, item._id, item.name)}
-              </h3>
-              <span
-                className={`chip ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
-              >
-                {formatStatusLabel(String(item.status))}
-              </span>
-            </div>
-            <CardMetaChips section={section} item={item} />
-            <p className="culinary-card-desc">
-              {CulinaryCatalogCardCopy.description(item) ||
-                CulinaryCatalogCardCopy.fallbackHint(section, item)}
-            </p>
-            {section === "dishes" ? (
-              <AllergenIconRow codes={item.allergenSummary} className="mt-1" />
-            ) : null}
-            <CardCost section={section} item={item} />
-          </div>
-          <div className="culinary-card-actions">
-            {wrapCardLink(section, item._id, "Open", "btn btn-primary btn-sm")}
-            <span className="text-xs text-ink-2">v{item.version}</span>
-            <KitchenCatalogLifecycleButtons
-              section={section}
-              item={item}
-              busy={busy}
-              run={run}
-              showHidden={showHidden}
-              commands={commands}
-              render={(buttons) =>
-                buttons ? <ActionMenu>{buttons}</ActionMenu> : null
-              }
-            />
-          </div>
-        </li>
-      ))}
-    </ul>
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = useMemo(
+    () => rows.find((row) => row._id === selectedId) ?? null,
+    [rows, selectedId],
   );
-}
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [pendingFocusIndex, setPendingFocusIndex] = useState<number | null>(
+    null,
+  );
+  const activeIndex = useMemo(
+    () => rows.findIndex((row) => row._id === activeId),
+    [activeId, rows],
+  );
+  const closePreview = useCallback(() => setSelectedId(null), []);
+  const { scrollRef, virtualRows, totalHeight, onScroll } = useVirtualWindow({
+    count: rows.length,
+    rowHeight: ROW_HEIGHT,
+  });
+  const tabStopIndex = useMemo(
+    () =>
+      virtualRows.some((row) => row.index === activeIndex)
+        ? activeIndex
+        : (virtualRows[0]?.index ?? -1),
+    [activeIndex, virtualRows],
+  );
 
-function CardMedia({
-  section,
-  item,
-  index,
-}: Readonly<{
-  section: KitchenSection;
-  item: CatalogItem;
-  index: number;
-}>) {
-  if (section === "dishes" || section === "ingredients") {
-    return (
-      <div className="culinary-card-media">
-        <DishPrimaryImage
-          storageId={item.primaryImageStorageId}
-          alt={item.name}
-          size="card"
-        />
-      </div>
+  useEffect(() => {
+    setSelectedId(null);
+    setActiveId(null);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [scrollRef, viewKey]);
+
+  useEffect(() => {
+    if (pendingFocusIndex == null) return;
+    const row = scrollRef.current?.querySelector<HTMLElement>(
+      `[data-row-index="${pendingFocusIndex}"]`,
     );
-  }
+    if (!row) return;
+    row.focus();
+    setPendingFocusIndex(null);
+  }, [pendingFocusIndex, scrollRef, virtualRows]);
+
+  const focusRow = useCallback(
+    (index: number) => {
+      const item = rows[index];
+      const scroller = scrollRef.current;
+      if (!item || !scroller) return;
+      setActiveId(item._id);
+      setPendingFocusIndex(index);
+
+      const top = index * ROW_HEIGHT;
+      const bottom = top + ROW_HEIGHT;
+      if (top < scroller.scrollTop) scroller.scrollTop = top;
+      if (bottom > scroller.scrollTop + scroller.clientHeight) {
+        scroller.scrollTop = bottom - scroller.clientHeight;
+      }
+    },
+    [rows, scrollRef],
+  );
+
   return (
-    <div className="culinary-card-media culinary-card-media-glyph">
-      <span aria-hidden="true">
-        {CulinaryCatalogCardCopy.glyph(section, index)}
-      </span>
-      <span className="text-xs font-medium text-ink-2">
-        {CulinaryCatalogCardTone.kindLabel(section)}
-      </span>
-    </div>
+    <>
+      <div className="culinary-index-layout">
+        <nav className="culinary-category-index" aria-label="Categories">
+          <p>Category</p>
+          {categories.map((category) => (
+            <button
+              key={category.value}
+              type="button"
+              aria-current={
+                category.value === activeCategory ? "page" : undefined
+              }
+              onClick={() => onCategoryChange(category.value)}
+            >
+              <span>{category.label}</span>
+              <span>{category.count.toLocaleString()}</span>
+            </button>
+          ))}
+        </nav>
+
+        <div className="culinary-catalog-ledger">
+          <div
+            role="grid"
+            aria-label={`${section} catalog`}
+            aria-colcount={6}
+            aria-rowcount={rows.length + 1}
+          >
+            <div
+              className="culinary-ledger-header"
+              role="row"
+              aria-rowindex={1}
+            >
+              <span role="columnheader" aria-colindex={1}>
+                Name
+              </span>
+              <span role="columnheader" aria-colindex={2}>
+                Category
+              </span>
+              <span role="columnheader" aria-colindex={3}>
+                Details
+              </span>
+              <span role="columnheader" aria-colindex={4}>
+                Status
+              </span>
+              <span role="columnheader" aria-colindex={5}>
+                Edition
+              </span>
+              <span
+                role="columnheader"
+                aria-colindex={6}
+                aria-label="Preview"
+              />
+            </div>
+            <div
+              ref={scrollRef}
+              className="culinary-ledger-scroll"
+              role="rowgroup"
+              style={{
+                height: `${Math.min(584, Math.max(ROW_HEIGHT, totalHeight))}px`,
+              }}
+              onScroll={onScroll}
+            >
+              <div
+                className="culinary-ledger-window"
+                role="presentation"
+                style={{ height: `${totalHeight}px` }}
+              >
+                {virtualRows.map(({ index, offset }) => {
+                  const item = rows[index];
+                  return (
+                    <div
+                      key={item._id}
+                      className="culinary-ledger-row"
+                      role="row"
+                      aria-rowindex={index + 2}
+                      aria-selected={item._id === selectedId}
+                      data-row-index={index}
+                      tabIndex={index === tabStopIndex ? 0 : -1}
+                      style={{
+                        height: `${ROW_HEIGHT}px`,
+                        transform: `translateY(${offset}px)`,
+                      }}
+                      onClick={() => {
+                        setActiveId(item._id);
+                        setSelectedId(item._id);
+                      }}
+                      onFocus={() => setActiveId(item._id)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          setSelectedId(item._id);
+                          return;
+                        }
+                        if (event.key === "ArrowDown") {
+                          event.preventDefault();
+                          focusRow(Math.min(rows.length - 1, index + 1));
+                        }
+                        if (event.key === "ArrowUp") {
+                          event.preventDefault();
+                          focusRow(Math.max(0, index - 1));
+                        }
+                        if (event.key === "PageDown") {
+                          event.preventDefault();
+                          const pageSize = Math.max(
+                            1,
+                            Math.floor(
+                              (scrollRef.current?.clientHeight ?? ROW_HEIGHT) /
+                                ROW_HEIGHT,
+                            ),
+                          );
+                          focusRow(Math.min(rows.length - 1, index + pageSize));
+                        }
+                        if (event.key === "PageUp") {
+                          event.preventDefault();
+                          const pageSize = Math.max(
+                            1,
+                            Math.floor(
+                              (scrollRef.current?.clientHeight ?? ROW_HEIGHT) /
+                                ROW_HEIGHT,
+                            ),
+                          );
+                          focusRow(Math.max(0, index - pageSize));
+                        }
+                        if (event.key === "Home") {
+                          event.preventDefault();
+                          focusRow(0);
+                        }
+                        if (event.key === "End") {
+                          event.preventDefault();
+                          focusRow(rows.length - 1);
+                        }
+                      }}
+                    >
+                      <span
+                        className="culinary-ledger-name"
+                        role="gridcell"
+                        aria-colindex={1}
+                      >
+                        <strong>{item.name}</strong>
+                        <small>{ledgerDescription(section, item)}</small>
+                      </span>
+                      <span
+                        className="culinary-ledger-category"
+                        role="gridcell"
+                        aria-colindex={2}
+                      >
+                        {item.category || "Uncategorized"}
+                      </span>
+                      <span
+                        className="culinary-ledger-detail"
+                        role="gridcell"
+                        aria-colindex={3}
+                      >
+                        {ledgerDetail(section, item)}
+                      </span>
+                      <span role="gridcell" aria-colindex={4}>
+                        <span
+                          className={`culinary-ledger-status chip-state ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
+                        >
+                          {formatStatusLabel(String(item.status))}
+                        </span>
+                      </span>
+                      <span
+                        className="culinary-ledger-version"
+                        role="gridcell"
+                        aria-colindex={5}
+                      >
+                        {editionLabel(item)}
+                      </span>
+                      <span
+                        className="culinary-ledger-open"
+                        role="gridcell"
+                        aria-colindex={6}
+                      >
+                        <ChevronRightIcon />
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <footer className="culinary-ledger-footer">
+            <span>{rows.length.toLocaleString()} matching records</span>
+            <span>Select a row to preview</span>
+          </footer>
+        </div>
+      </div>
+
+      <RecordPreviewSheet
+        open={selected != null}
+        title={selected?.name ?? "Record"}
+        description={
+          selected ? ledgerDescription(section, selected) : undefined
+        }
+        label={`${CulinaryCatalogCardTone.kindLabel(section)} preview`}
+        onClose={closePreview}
+        footer={
+          selected ? (
+            <>
+              {recordLink(
+                section,
+                selected._id,
+                "Open full record",
+                "btn btn-primary",
+              )}
+              <KitchenCatalogLifecycleButtons
+                section={section}
+                item={selected}
+                busy={busy}
+                run={run}
+                showHidden={showHidden}
+                commands={commands}
+              />
+            </>
+          ) : null
+        }
+      >
+        {selected ? <CatalogPreview section={section} item={selected} /> : null}
+      </RecordPreviewSheet>
+    </>
   );
 }
 
-function CardMetaChips({
-  section,
-  item,
-}: Readonly<{
-  section: KitchenSection;
-  item: CatalogItem;
-}>) {
-  const chips: string[] = [];
-  if (item.category) chips.push(item.category);
-  if (section === "dishes" && item.course) chips.push(item.course);
-  if (section === "components" && item.cuisine) chips.push(item.cuisine);
-  if (section === "menus" && item.isTemplate) chips.push("Template");
-  if (chips.length === 0) return null;
-  return (
-    <div className="flex flex-wrap gap-1">
-      {chips.map((chip) => (
-        <span
-          key={chip}
-          className="chip border-line-2 bg-inset text-ink-2 capitalize"
-        >
-          {chip}
-        </span>
-      ))}
-    </div>
-  );
-}
-
-function CardCost({
+function CatalogPreview({
   section,
   item,
 }: Readonly<{ section: KitchenSection; item: CatalogItem }>) {
-  if (section !== "ingredients" || item.costPerUnit == null) return null;
+  const facts = previewFacts(section, item);
   return (
-    <p className="mt-auto pt-1 text-sm text-ink-2">
-      <span className="text-base font-semibold text-ink">
-        {formatMoneyExact(Number(item.costPerUnit))}
-      </span>{" "}
-      per {item.unit ?? "unit"}
-    </p>
+    <div className="culinary-preview">
+      {section === "dishes" || section === "ingredients" ? (
+        <div className="culinary-preview-image">
+          <DishPrimaryImage
+            storageId={item.primaryImageStorageId}
+            alt={item.name}
+            size="hero"
+          />
+        </div>
+      ) : null}
+
+      <div className="culinary-preview-state">
+        <span
+          className={`culinary-ledger-status chip-state ${CulinaryCatalogCardTone.statusClass(String(item.status))}`}
+        >
+          {formatStatusLabel(String(item.status))}
+        </span>
+        <span>{CulinaryCatalogCardTone.kindLabel(section)}</span>
+      </div>
+
+      <section className="culinary-preview-section">
+        <h3>Record details</h3>
+        <dl>
+          {facts.map((fact) => (
+            <div key={fact.label}>
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      {item.description?.trim() ? (
+        <section className="culinary-preview-section">
+          <h3>Description</h3>
+          <p>{item.description.trim()}</p>
+        </section>
+      ) : null}
+
+      {item.allergenSummary ? (
+        <section className="culinary-preview-section">
+          <h3>Allergens</h3>
+          <AllergenIconRow codes={item.allergenSummary} />
+        </section>
+      ) : null}
+    </div>
   );
 }
 
-function wrapCardLink(
+function previewFacts(section: KitchenSection, item: CatalogItem) {
+  const facts: { label: string; value: string }[] = [
+    { label: "Category", value: item.category || "Uncategorized" },
+    { label: "Edition", value: editionLabel(item) },
+  ];
+  if (section === "dishes" && item.course) {
+    facts.push({ label: "Course", value: item.course });
+  }
+  if (section === "components" && item.cuisine) {
+    facts.push({ label: "Cuisine", value: item.cuisine });
+  }
+  if (section === "ingredients") {
+    facts.push({ label: "Unit", value: item.unit || "Unit" });
+    if (item.costPerUnit != null) {
+      facts.push({
+        label: "Cost",
+        value: `${formatMoneyExact(Number(item.costPerUnit))} per ${item.unit || "unit"}`,
+      });
+    }
+  }
+  if (section === "menus" && item.isTemplate) {
+    facts.push({ label: "Menu type", value: "Template" });
+  }
+  return facts;
+}
+
+function editionLabel(item: CatalogItem) {
+  return item.editionNumber == null ? "—" : `Ed. ${item.editionNumber}`;
+}
+
+function ledgerDescription(section: KitchenSection, item: CatalogItem) {
+  return (
+    CulinaryCatalogCardCopy.description(item) ||
+    CulinaryCatalogCardCopy.fallbackHint(section, item)
+  );
+}
+
+function ledgerDetail(section: KitchenSection, item: CatalogItem) {
+  if (section === "ingredients" && item.costPerUnit != null) {
+    return `${formatMoneyExact(Number(item.costPerUnit))} / ${item.unit || "unit"}`;
+  }
+  if (section === "dishes") return item.course || "—";
+  if (section === "components") return item.cuisine || "—";
+  if (section === "menus") return item.isTemplate ? "Template" : "Menu";
+  return "—";
+}
+
+function recordLink(
   section: KitchenSection,
   id: string,
   body: ReactNode,
-  className = "culinary-card-link",
+  className?: string,
 ): ReactNode {
   if (section === "ingredients") {
     return (

@@ -1,4 +1,4 @@
-import { useEffect, useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import type { ActionPromptRequest } from "./ActionPromptTypes";
 import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
 import {
@@ -24,6 +24,11 @@ export function ActionPromptPanel({
 }: ActionPromptPanelProps) {
   const headingId = useId();
   const helperId = useId();
+  const returnFocusRef = useRef<HTMLElement | null>(
+    typeof document === "undefined"
+      ? null
+      : (document.activeElement as HTMLElement | null),
+  );
   const [reason, setReason] = useState("");
   const [values, setValues] = useState<Record<string, string>>(() =>
     initialValues(request),
@@ -56,6 +61,14 @@ export function ActionPromptPanel({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onDismiss]);
+
+  useEffect(
+    () => () => {
+      const returnTarget = returnFocusRef.current;
+      if (returnTarget?.isConnected) returnTarget.focus();
+    },
+    [],
+  );
 
   const rejectUnarmedConfirm = (event: {
     preventDefault: () => void;
@@ -101,6 +114,7 @@ export function ActionPromptPanel({
 
   return (
     <form
+      data-action-prompt
       className={`mt-3 rounded-sm border p-4 ${
         tone === "danger"
           ? "border-danger/40 bg-danger-soft/40"

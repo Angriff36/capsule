@@ -1,26 +1,360 @@
-/* Catalog cards: status chip colors only. Kind tints, spines, gradients and
-   tracked micro text are gone — the card is a plain white surface. */
+/* Culinary catalog index: dense ruled records with a single lazy preview. */
 
-.culinary-card-status.is-live {
-  color: var(--color-ok);
-  background: var(--color-ok-soft);
-  border-color: color-mix(in srgb, var(--color-ok) 30%, transparent);
+.culinary-index-layout {
+  display: grid;
+  grid-template-columns: 178px minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem;
 }
 
-.culinary-card-status.is-draft {
-  color: var(--color-info);
-  background: var(--color-info-soft);
-  border-color: color-mix(in srgb, var(--color-info) 30%, transparent);
+.culinary-category-index {
+  position: sticky;
+  top: 1rem;
+  border-top: 1px solid var(--color-ink);
 }
 
-.culinary-card-status.is-quiet {
+.culinary-category-index > p {
+  margin: 0;
+  padding: 0.65rem 0.7rem 0.5rem;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.culinary-category-index button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: 100%;
+  min-height: 36px;
+  align-items: center;
+  gap: 0.75rem;
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  border-left: 3px solid transparent;
+  background: transparent;
+  padding: 0.45rem 0.7rem;
   color: var(--color-ink-2);
-  background: var(--color-inset);
-  border-color: var(--color-line-2);
+  text-align: left;
+  cursor: pointer;
 }
 
-.culinary-card-status.is-warn {
-  color: var(--color-warn);
-  background: var(--color-warn-soft);
-  border-color: color-mix(in srgb, var(--color-warn) 30%, transparent);
+.culinary-category-index button:hover {
+  background: var(--color-inset);
+  color: var(--color-ink);
+}
+
+.culinary-category-index button[aria-current="page"] {
+  border-left-color: var(--color-brand);
+  background: var(--color-accent-soft);
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.culinary-category-index button span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culinary-category-index button span:last-child {
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.culinary-catalog-ledger {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-ledger);
+  background: var(--color-panel);
+}
+
+.culinary-ledger-header,
+.culinary-ledger-row {
+  display: grid;
+  grid-template-columns:
+    minmax(210px, 1.7fr) minmax(110px, 0.75fr) minmax(120px, 0.8fr)
+    minmax(90px, 0.55fr) 64px 32px;
+  align-items: center;
+  column-gap: 0.8rem;
+  padding: 0 0.85rem;
+}
+
+.culinary-ledger-header {
+  min-height: 34px;
+  border-bottom: 1px solid var(--color-line-2);
+  background: var(--color-inset);
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.culinary-ledger-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.culinary-ledger-window {
+  position: relative;
+  min-width: 0;
+}
+
+.culinary-ledger-row {
+  position: absolute;
+  inset: 0 0 auto;
+  width: 100%;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-panel);
+  color: var(--color-ink-2);
+  font-size: 0.9375rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.culinary-ledger-row:hover,
+.culinary-ledger-row[aria-selected="true"] {
+  background: var(--color-inset);
+}
+
+.culinary-ledger-row:focus-visible {
+  z-index: 1;
+}
+
+.culinary-ledger-name {
+  display: grid;
+  min-width: 0;
+  gap: 0.14rem;
+}
+
+.culinary-ledger-name strong,
+.culinary-ledger-name small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culinary-ledger-name strong {
+  color: var(--color-ink);
+  font-size: 0.94rem;
+  font-weight: 650;
+}
+
+.culinary-ledger-name small {
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+.culinary-ledger-category,
+.culinary-ledger-detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.culinary-status-quiet {
+  background: var(--color-ink-2);
+}
+
+.culinary-ledger-version {
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.culinary-ledger-open {
+  display: grid;
+  place-items: center;
+  color: var(--color-ink-3);
+}
+
+.culinary-ledger-row:hover .culinary-ledger-open {
+  color: var(--color-brand);
+}
+
+.culinary-ledger-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 34px;
+  align-items: center;
+  border-top: 1px solid var(--color-line-2);
+  background: var(--color-inset);
+  padding: 0.45rem 0.85rem;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+.culinary-ledger-footer span:last-child {
+  font-family: var(--font-mono);
+}
+
+.culinary-toolbar-field {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.culinary-toolbar-field select {
+  min-width: 130px;
+  height: 32px;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-xs);
+  background: var(--color-panel);
+  padding: 0 1.8rem 0 0.55rem;
+  color: var(--color-ink);
+  font: inherit;
+  font-weight: 500;
+}
+
+.culinary-category-select {
+  display: none;
+}
+
+.culinary-preview {
+  display: grid;
+  gap: 1.2rem;
+}
+
+.culinary-preview-image {
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-inset);
+}
+
+.culinary-preview-image > *,
+.culinary-preview-image img {
+  width: 100%;
+  max-width: none;
+  height: 230px;
+  object-fit: cover;
+}
+
+.culinary-preview-state {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+.culinary-preview-section {
+  border-top: 1px solid var(--color-ink);
+  padding-top: 0.75rem;
+}
+
+.culinary-preview-section h3 {
+  margin: 0 0 0.7rem;
+  color: var(--color-ink);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.culinary-preview-section p {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: 0.9375rem;
+  line-height: 1.65;
+}
+
+.culinary-preview-section dl {
+  margin: 0;
+}
+
+.culinary-preview-section dl > div {
+  display: grid;
+  grid-template-columns: minmax(100px, 0.75fr) minmax(0, 1.25fr);
+  gap: 1rem;
+  padding: 0.58rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.culinary-preview-section dt {
+  color: var(--color-ink-3);
+  font-size: 0.8125rem;
+}
+
+.culinary-preview-section dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+@media (max-width: 959px) {
+  .culinary-ledger-header,
+  .culinary-ledger-row {
+    grid-template-columns: minmax(190px, 1.6fr) minmax(100px, 0.75fr) 100px 32px;
+  }
+
+  .culinary-ledger-detail,
+  .culinary-ledger-version,
+  .culinary-ledger-header > :nth-child(3),
+  .culinary-ledger-header > :nth-child(5) {
+    display: none;
+  }
+}
+
+@media (max-width: 719px) {
+  .culinary-index-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .culinary-category-index {
+    display: none;
+  }
+
+  .culinary-category-select {
+    display: flex;
+  }
+
+  .culinary-ledger-header,
+  .culinary-ledger-row {
+    grid-template-columns: minmax(0, 1fr) 88px 26px;
+    column-gap: 0.55rem;
+    padding: 0 0.7rem;
+  }
+
+  .culinary-ledger-category,
+  .culinary-ledger-header > :nth-child(2) {
+    display: none;
+  }
+
+  .culinary-ledger-header > :nth-child(4) {
+    grid-column: 2;
+  }
+
+  .culinary-ledger-header > :nth-child(6) {
+    grid-column: 3;
+  }
+
+  .culinary-ledger-footer span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 519px) {
+  .culinary-studio .component-toolbar {
+    align-items: stretch;
+  }
+
+  .culinary-toolbar-field {
+    justify-content: space-between;
+  }
+
+  .culinary-toolbar-field select {
+    flex: 1;
+    min-width: 0;
+  }
 }
