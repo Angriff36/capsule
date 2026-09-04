@@ -1,4 +1,10 @@
-import { useMemo, useState, type FormEvent } from "react";
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
@@ -33,7 +39,7 @@ import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
 import { KitchenBookNav } from "./KitchenBookNav";
-import { KitchenCatalogCards } from "./KitchenCatalogCards";
+import { KitchenCatalogCards, type CatalogItem } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
 import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -70,12 +76,61 @@ function csv(value: FormDataEntryValue | null) {
 }
 
 export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
+  if (section === "ingredients") return <IngredientCatalogPage />;
+  if (section === "components") return <ComponentCatalogPage />;
+  if (section === "dishes") return <DishCatalogPage />;
+  return <MenuCatalogPage />;
+}
+
+function IngredientCatalogPage() {
+  const data = useListIngredient();
+  return (
+    <KitchenCatalogPageContent
+      section="ingredients"
+      data={data as CatalogItem[] | undefined}
+    />
+  );
+}
+
+function ComponentCatalogPage() {
+  const data = useListComponent();
+  return (
+    <KitchenCatalogPageContent
+      section="components"
+      data={data as CatalogItem[] | undefined}
+    />
+  );
+}
+
+function DishCatalogPage() {
+  const data = useListDish();
+  return (
+    <KitchenCatalogPageContent
+      section="dishes"
+      data={data as CatalogItem[] | undefined}
+    />
+  );
+}
+
+function MenuCatalogPage() {
+  const data = useListMenu();
+  return (
+    <KitchenCatalogPageContent
+      section="menus"
+      data={data as CatalogItem[] | undefined}
+    />
+  );
+}
+
+function KitchenCatalogPageContent({
+  section,
+  data,
+}: {
+  section: KitchenSection;
+  data: CatalogItem[] | undefined;
+}) {
   const tenantId = useAuthStatus()?.tenantId ?? null;
   const navigate = useNavigate();
-  const ingredients = useListIngredient();
-  const components = useListComponent();
-  const dishes = useListDish();
-  const menus = useListMenu();
   const createIngredient = useCreateIngredient();
   const createComponent = useCreateComponent();
   const createDish = useCreateDish();
@@ -96,29 +151,93 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const archiveMenu = useMenuArchive();
   const restoreMenu = useMenuRestore();
   const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [sort, setSort] = useState<"name-asc" | "name-desc" | "category">(
+    "name-asc",
+  );
   const [showHidden, setShowHidden] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
   const { notifySuccess, host: successToastHost } = useSuccessToast();
+  const deferredSearch = useDeferredValue(search);
 
-  const data = { components, ingredients, dishes, menus }[section];
+  const visibleRows = useMemo(
+    () =>
+      (showHidden
+        ? (data ?? [])
+        : culinaryCatalogVisibility.filterLive(data ?? [])) as CatalogItem[],
+    [data, showHidden],
+  );
+  const categories = useMemo(() => {
+    const counts = new Map<string, { label: string; count: number }>();
+    for (const item of visibleRows) {
+      const label = item.category?.trim() || "Uncategorized";
+      const value = label.toLocaleLowerCase();
+      const current = counts.get(value);
+      counts.set(value, {
+        label: current?.label ?? label,
+        count: (current?.count ?? 0) + 1,
+      });
+    }
+    return [
+      { value: "all", label: "All records", count: visibleRows.length },
+      ...Array.from(counts, ([value, entry]) => ({
+        value,
+        label: entry.label,
+        count: entry.count,
+      })).sort((a, b) => a.label.localeCompare(b.label)),
+    ];
+  }, [visibleRows]);
+
+  useEffect(() => {
+    setCategory("all");
+    setSearch("");
+    setSort("name-asc");
+  }, [section]);
+
+  useEffect(() => {
+    if (!categories.some((option) => option.value === category)) {
+      setCategory("all");
+    }
+  }, [categories, category]);
+
   const rows = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    const base = showHidden
-      ? (data ?? [])
-      : culinaryCatalogVisibility.filterLive(data ?? []);
-    return base
-      .filter((item) =>
-        query
-          ? [item.name, "category" in item ? item.category : undefined]
-              .filter(Boolean)
-              .some((value) => String(value).toLowerCase().includes(query))
-          : true,
-      )
-      .sort((a, b) => String(a.name).localeCompare(String(b.name)));
-  }, [data, search, showHidden]);
+    const query = deferredSearch.trim().toLowerCase();
+    return visibleRows
+      .filter((item) => {
+        const itemCategory = item.category?.trim() || "Uncategorized";
+        if (
+          category !== "all" &&
+          itemCategory.toLocaleLowerCase() !== category
+        ) {
+          return false;
+        }
+        if (!query) return true;
+        return [
+          item.name,
+          item.category,
+          item.description,
+          item.cuisine,
+          item.course,
+        ].some((value) =>
+          String(value ?? "")
+            .toLowerCase()
+            .includes(query),
+        );
+      })
+      .sort((a, b) => {
+        if (sort === "category") {
+          const categoryOrder = String(a.category ?? "").localeCompare(
+            String(b.category ?? ""),
+          );
+          if (categoryOrder !== 0) return categoryOrder;
+        }
+        const nameOrder = String(a.name).localeCompare(String(b.name));
+        return sort === "name-desc" ? -nameOrder : nameOrder;
+      });
+  }, [category, deferredSearch, sort, visibleRows]);
   if (data !== undefined) {
     KitchenCatalogDisplayCache.write(tenantId, section, rows);
   }
@@ -148,7 +267,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
       if (section === "ingredients") {
         const name = String(data.get("name") ?? "").trim();
         const duplicate = culinaryCanonicalMatcher.likelyDuplicate(
-          ingredients ?? [],
+          visibleRows,
           name,
         );
         if (
@@ -294,7 +413,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
       } else if (section === "dishes") {
         const name = String(data.get("name") ?? "").trim();
         const duplicate = culinaryCanonicalMatcher.likelyDuplicate(
-          dishes ?? [],
+          visibleRows,
           name,
         );
         if (
@@ -428,6 +547,34 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               aria-label={`Search ${section}`}
             />
           </label>
+          <label className="culinary-toolbar-field culinary-category-select">
+            <span>Category</span>
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
+              {categories.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label} ({option.count})
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="culinary-toolbar-field">
+            <span>Sort</span>
+            <select
+              value={sort}
+              onChange={(event) =>
+                setSort(
+                  event.target.value as "name-asc" | "name-desc" | "category",
+                )
+              }
+            >
+              <option value="name-asc">Name A–Z</option>
+              <option value="name-desc">Name Z–A</option>
+              <option value="category">Category</option>
+            </select>
+          </label>
           {section === "dishes" ||
           section === "ingredients" ||
           section === "components" ? (
@@ -471,6 +618,9 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           <KitchenCatalogCards
             section={section}
             rows={displayRows as never}
+            categories={categories}
+            activeCategory={category}
+            onCategoryChange={setCategory}
             busy={busy}
             showHidden={showHidden}
             run={run}
