@@ -152,7 +152,7 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-Progress: Ralph loop BUILD iteration 1 on ralph/wiggum-loop (2026-09-04): task A1 complete — convex/quoteBuilder.ts passes eventId into Proposal_createViaDraft; new proof tests/proofs/quote-conversion.runtime.test.ts green; AC-008 = PASS (first PASS in ACCEPTANCE_TESTS.md). Fixed pre-existing tsc break in src/lib/llm-review.test.ts (loop-template fiction). Gates all green (1188 tests, typecheck, format, vite build). Commit a5f7628, tag v0.0.36, pushed to origin. Open: next iteration is task A2 (QuoteSubmissionsReviewPage shows serviceStyleId/occasionId, AC-007), then A3; build order A2→D2 per IMPLEMENTATION_PLAN.md (20 open tasks).
+Capsule ralph/wiggum-loop BUILD iteration 2 complete (2026-09-04): A2 done — quote review queue shows service style + occasion (nameOf over useListServiceStyle/useListOccasion, "Not specified" fallback), AC-007 = PASS. Commit 8419d57, tag v0.0.37, branch pushed. Gates green: 120 files/1189 tests, typecheck, format:check, vite build. Open: next iteration = A3 (dedup regression proof → AC-009) in tests/proofs/quote-conversion.runtime.test.ts; then A4-A9, B1-B4, C1-C6, D1-D2 per IMPLEMENTATION_PLAN.md. 17 ACs still PENDING.
 
 # === END COGNILAYER ===
 

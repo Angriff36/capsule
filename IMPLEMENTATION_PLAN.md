@@ -192,6 +192,22 @@ seven submitted fields" (source-text style) green — AC-007 = PASS. Gates:
 `bunx vite build` green. Tag `v0.0.37` created. Next: A3 (dedup regression
 proof) → AC-009.
 
+Iteration 31 (BUILD iteration 3, 2026-09-04): A3 DONE. Runtime proof
+`tests/proofs/quote-conversion.runtime.test.ts` › "dedup by contact and event
+date" is green — AC-009 = PASS. Covered: a resubmit of the same email + event
+date (case/whitespace variant) returns the SAME submissionId with
+`isDuplicate: true` and leaves one live row; after conversion the completed row
+still dedups and a second `processQuoteSubmission` on it is refused ("Only
+pending submissions can be converted"), so a repeat submit can never mint a
+second lead; a different event date for the same contact creates a second
+submission + second lead while the email match reuses the ONE client —
+`listClient` decrypts email (queries.ts:929), so the find-or-create match path
+is real in the harness (A1 had exercised only the create half). Implementation
+needed NO change; the built dedup was already correct. Gates: `bun run test`
+120 files / 1190 tests green; typecheck, `format:check`, `bunx vite build`
+green. Tag `v0.0.38` created. Next: A4 (dismiss a junk/duplicate submission)
+→ AC-010.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -296,7 +312,7 @@ Order = build order. Earlier tasks unblock later ones.
       `tests/quote-start-time.test.ts`; no render tests — no
       @testing-library). This file is also the home for A6/A7/A8 tests.
       → AC-007
-- [ ] **A3. Dedup regression proof.** `generateDedupKey` +
+- [x] **A3. Dedup regression proof.** `generateDedupKey` +
       short-circuit at `convex/quoteBuilder.ts:29-37,158-176` is built but
       untested. Runtime proof `quote-conversion.runtime.test.ts` › "dedup by
       contact and event date": same email + event date submitted twice →
@@ -592,7 +608,7 @@ Order = build order. Earlier tasks unblock later ones.
 
 ## Already complete (verified 2026-09-03, no task needed)
 
-- [x] Quote dedup key and short-circuit (`convex/quoteBuilder.ts:29-37,158-176`) — needs the A3 proof only.
+- [x] Quote dedup key and short-circuit (`convex/quoteBuilder.ts:29-37,158-176`) — proven by `tests/proofs/quote-conversion.runtime.test.ts` › "dedup by contact and event date" (A3 / AC-009).
 - [x] Client find-or-create on conversion (`convex/quoteBuilder.ts:395-417`).
 - [x] Proposal `linkEvent`/`stageEventLink` + `ProposalEventLinked` menu-copy cascade (`src/sales/proposal.manifest:208-244`; `src/sales/proposal-dish-selection.manifest:155` `on ProposalEventLinked fanOut …` and `:138` `on ProposalAccepted fanOut …`, both run `EventDish.confirmFromProposal`; `convex/lib/proposalEventCreation.ts`).
 - [x] Accepting a proposal that already has an `eventId` (the quote-conversion case) fires the same `ProposalAccepted` dish cascade against that event (`proposal.manifest` accept ~`:172-195` sets `dishSelectionProposalId` when `self.eventId != null`); `ProposalsPage.tsx:706-730` shows "View event" instead of "Create event" — no duplicate-event risk.

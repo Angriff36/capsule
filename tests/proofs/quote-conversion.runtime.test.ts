@@ -10,8 +10,14 @@
  *     linked to the event the same conversion created — no separate linkEvent
  *     step, and accepting the proposal later books no second event.
  *
- * Later proofs (dedup AC-009, dismiss AC-010, free-text AC-011/AC-014, retry
- * AC-019) extend this file.
+ * Dedup proof (plan A3 / AC-009): same contact + event date submitted twice
+ * resolves to ONE submission and never a second lead — the completed row still
+ * dedups, and only pending rows convert, so a repeat cannot re-run conversion.
+ * A different event date for the same contact is a new request: second
+ * submission, second lead, same client (email match reuses it).
+ *
+ * Later proofs (dismiss AC-010, free-text AC-011/AC-014, retry AC-019) extend
+ * this file.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -149,5 +155,101 @@ describe("runtime proof: quote submission → conversion (AC-008)", () => {
     expect((proposals[0] as { _id?: string })._id).toBe(converted.proposalId);
     // AC-008: the converted proposal is linked to the event it created.
     expect((proposals[0] as { eventId?: string }).eventId).toBe(eventId);
+  });
+});
+
+describe("runtime proof: quote dedup (AC-009)", () => {
+  it("dedup by contact and event date", async () => {
+    const tenantId = "tenant-quote-dedup-a3";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-dedup-a3",
+      role: "owner",
+      tenantId,
+    });
+
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      { name: "Dedup proof kitchen" },
+    );
+
+    const submit = (email: string, eventDate: number) =>
+      asActions(owner).action(api.quoteBuilder.submitQuote, {
+        clientName: "Dana Prospect",
+        email,
+        phone: "555-0100",
+        eventDate,
+        eventEndTime: eventDate + 5 * 60 * 60 * 1000,
+        guestCount: 75,
+        consent: true,
+        venueName: "Orchard Barn",
+        menuPreferences: "BBQ buffet",
+        dietaryRestrictions: "",
+        notes: "",
+      }) as Promise<{
+        submissionId: string;
+        isDuplicate: boolean;
+        status: string;
+      }>;
+
+    const convert = (submissionId: string) =>
+      asActions(owner).action(api.quoteBuilder.processQuoteSubmission, {
+        submissionId,
+      }) as Promise<{
+        clientId: string | null;
+        leadId: string | null;
+        errors: string[];
+      }>;
+
+    const firstDate = Date.UTC(2026, 9, 15, 17, 0);
+    const otherDate = Date.UTC(2026, 10, 20, 17, 0);
+
+    // Same contact + event date, submitted twice (the repeat in different
+    // case/whitespace — the dedup key lowercases and trims the email).
+    const first = await submit("dana@example.com", firstDate);
+    expect(first.isDuplicate).toBe(false);
+    expect(first.status).toBe("pending");
+
+    const repeat = await submit("  Dana@Example.com ", firstDate);
+    expect(repeat.isDuplicate).toBe(true);
+    expect(repeat.submissionId).toBe(first.submissionId);
+    expect(await liveRows(owner, "quoteSubmissions")).toHaveLength(1);
+
+    // Convert once. The completed row still dedups the key, and converting the
+    // same row again is refused (only pending rows convert) — so a repeat
+    // submit can never run conversion a second time and mint a second lead.
+    const converted = await convert(first.submissionId);
+    expect(converted.errors).toEqual([]);
+    expect(converted.leadId).toBeTruthy();
+
+    const afterConvert = await submit("dana@example.com", firstDate);
+    expect(afterConvert.isDuplicate).toBe(true);
+    expect(afterConvert.submissionId).toBe(first.submissionId);
+    expect(afterConvert.status).toBe("completed");
+
+    await expect(convert(first.submissionId)).rejects.toThrow(
+      /Only pending submissions can be converted/,
+    );
+
+    expect(await liveRows(owner, "quoteSubmissions")).toHaveLength(1);
+    expect(await liveRows(owner, "leads")).toHaveLength(1);
+
+    // Different event date for the same contact = a new request: a second
+    // submission, a second lead — and the client is NOT duplicated (the
+    // conversion's email match finds the client the first conversion made).
+    const second = await submit("dana@example.com", otherDate);
+    expect(second.isDuplicate).toBe(false);
+    expect(second.submissionId).not.toBe(first.submissionId);
+    expect(await liveRows(owner, "quoteSubmissions")).toHaveLength(2);
+
+    const secondConverted = await convert(second.submissionId);
+    expect(secondConverted.errors).toEqual([]);
+    expect(secondConverted.leadId).toBeTruthy();
+    expect(secondConverted.leadId).not.toBe(converted.leadId);
+    expect(secondConverted.clientId).toBe(converted.clientId);
+
+    expect(await liveRows(owner, "leads")).toHaveLength(2);
+    expect(await liveRows(owner, "clients")).toHaveLength(1);
   });
 });
