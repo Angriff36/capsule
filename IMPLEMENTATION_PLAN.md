@@ -254,8 +254,9 @@ notes when no catalog id was linked. Review queue resolves
 `nameOf(...) ?? sub.serviceStyleText ?? "Not specified"`. A6: `publicFormOffline`
 inline warn banner (same styling as the partialErrors banner) when
 `useListOrganization()` has no row with `status === "active"` and the list is
-loaded, linking to `/admin/branding`. AC-011 = PASS, AC-014 = PASS (7 of 19
-now PASS). Gates: `bun run test` 120 files / 1197 tests green; typecheck,
+loaded, linking to `/admin/branding`. AC-011 = PASS, AC-014 = PASS (6 of 19
+now PASS: AC-007…AC-011 + AC-014). Gates: `bun run test` 120 files / 1197
+tests green; typecheck,
 `format:check` (one prettier fix on QuoteSubmissionPage), `bunx vite build`
 green. Tag `v0.0.40` created. Next: A7 (one-click proposal links from queue +
 pipeline) → AC-018.
