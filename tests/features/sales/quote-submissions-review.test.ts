@@ -83,4 +83,40 @@ describe("quote submissions review queue", () => {
     expect(page).toContain("quote form is offline");
     expect(page).toContain('"/admin/branding"');
   });
+
+  // AC-018: after conversion, sales reaches the created proposal in ONE
+  // click from the quote queue and from the lead pipeline. Both deep-link
+  // into the proposals page's focused row (?proposal=<id> opens its panels
+  // and scrolls it into view) instead of the generic list, and the quote
+  // queue itself is reachable from the pipeline page.
+  it("queue and pipeline deep-link to the converted proposal", () => {
+    const pipeline = readFileSync(
+      "src/features/clients/LeadPipelinePage.tsx",
+      "utf8",
+    );
+    const routes = readFileSync(
+      "src/features/clients/clientsRoutes.ts",
+      "utf8",
+    );
+    const proposals = readFileSync(
+      "src/features/clients/ProposalsPage.tsx",
+      "utf8",
+    );
+    // shared route builder targets the focused-proposal URL param
+    expect(routes).toContain("?proposal=${id}");
+    // the queue links the created proposal: on the completed row and in the
+    // just-converted banner (the action result carries proposalId)
+    expect(page).toContain("sub.proposalId");
+    expect(page).toContain("CLIENTS_ROUTES.proposal(");
+    expect(page).toContain("result.proposalId");
+    // the pipeline card's "Open proposal" uses the same deep link, not the
+    // generic proposals list
+    expect(pipeline).toContain("CLIENTS_ROUTES.proposal(lead.proposalId)");
+    expect(pipeline).not.toContain("CLIENTS_ROUTES.proposals");
+    // the proposals page consumes the param, so the link lands on the real
+    // proposal (no dead link)
+    expect(proposals).toContain('searchParams.get("proposal")');
+    // the quote queue is reachable from the pipeline page
+    expect(pipeline).toContain("CLIENTS_ROUTES.quoteRequests");
+  });
 });

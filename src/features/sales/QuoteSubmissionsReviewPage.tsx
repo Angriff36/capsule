@@ -20,6 +20,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
+import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import type { Doc } from "../../lib/api";
 
 type QuoteSubmission = Doc<"quoteSubmissions">;
@@ -76,6 +77,7 @@ export function QuoteSubmissionsReviewPage() {
     clientName: string;
     eventId: string | null;
     leadId: string | null;
+    proposalId: string | null;
   } | null>(null);
 
   const convert = async (id: string, clientName: string) => {
@@ -101,6 +103,7 @@ export function QuoteSubmissionsReviewPage() {
           clientName,
           eventId: result.eventId,
           leadId: result.leadId,
+          proposalId: result.proposalId,
         });
       }
     } catch (err) {
@@ -233,6 +236,14 @@ export function QuoteSubmissionsReviewPage() {
             proposal.
           </p>
           <p className="mt-1">
+            {lastConverted.proposalId && (
+              <Link
+                to={CLIENTS_ROUTES.proposal(lastConverted.proposalId)}
+                className="underline mr-3"
+              >
+                Open proposal →
+              </Link>
+            )}
             {lastConverted.eventId && (
               <Link
                 to={`/events/${lastConverted.eventId}`}
@@ -360,16 +371,27 @@ export function QuoteSubmissionsReviewPage() {
                 </div>
               )}
 
-              {sub.status === "completed" && sub.eventId && (
-                <p className="mt-3 text-xs">
-                  <Link
-                    to={`/events/${sub.eventId}`}
-                    className="text-ink-2 underline"
-                  >
-                    Open converted event →
-                  </Link>
-                </p>
-              )}
+              {sub.status === "completed" &&
+                (sub.eventId || sub.proposalId) && (
+                  <p className="mt-3 text-xs">
+                    {sub.proposalId && (
+                      <Link
+                        to={CLIENTS_ROUTES.proposal(sub.proposalId)}
+                        className="text-ink-2 underline mr-3"
+                      >
+                        Open proposal →
+                      </Link>
+                    )}
+                    {sub.eventId && (
+                      <Link
+                        to={`/events/${sub.eventId}`}
+                        className="text-ink-2 underline"
+                      >
+                        Open converted event →
+                      </Link>
+                    )}
+                  </p>
+                )}
 
               {(isActionable(sub) || canDismiss(sub)) && (
                 <div className="mt-3 flex flex-wrap items-center gap-2">

@@ -261,6 +261,30 @@ tests green; typecheck,
 green. Tag `v0.0.40` created. Next: A7 (one-click proposal links from queue +
 pipeline) → AC-018.
 
+Iteration 34 (BUILD iteration 6, 2026-09-04): A7 DONE. One-click proposal
+reach from queue and pipeline — AC-018 = PASS. `CLIENTS_ROUTES.proposal(id)`
+added to `src/features/clients/clientsRoutes.ts` (builds
+`/clients/proposals?proposal=<id>`; ProposalsPage already consumes the param
+at `:149` — opens detail panels + scrolls the row into view, so the link is
+real, not dead). Queue (`QuoteSubmissionsReviewPage.tsx`): completed rows
+render "Open proposal →" from `sub.proposalId` beside "Open converted event
+→", and the just-converted banner now stores `result.proposalId` and links
+"Open proposal →" first. Pipeline (`LeadPipelinePage.tsx`): card "Open
+proposal" deep-links `CLIENTS_ROUTES.proposal(lead.proposalId)` instead of
+the generic `CLIENTS_ROUTES.proposals` list, and the masthead gains a "Quote
+requests" `text-link` to `CLIENTS_ROUTES.quoteRequests` beside the
+Capture-lead button (wrapped in a flex div; `.supply-masthead` layout
+unchanged). No manifest change, no regen. Test
+`tests/features/sales/quote-submissions-review.test.ts` › "queue and pipeline
+deep-link to the converted proposal": source-text asserts the shared builder
+targets `?proposal=`, both callers use `CLIENTS_ROUTES.proposal(`, the
+pipeline no longer references the generic `CLIENTS_ROUTES.proposals`,
+ProposalsPage consumes the param, and the pipeline links `quoteRequests`.
+Gates: `bun run test` 120 files / 1198 tests green; typecheck, `format:check`
+(one prettier rewrap on the review page), `bunx vite build` green. Tag
+`v0.0.41` created. 7 of 19 ACs PASS (AC-007…AC-011, AC-014, AC-018). Next:
+A8 (failed conversion shows checkpointed records) → AC-019.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -417,7 +441,7 @@ Order = build order. Earlier tasks unblock later ones.
       inline; do not add a primitive for a second copy. No new guard. Test:
       `quote-submissions-review.test.ts` › "offline notice when no
       organization". → AC-014
-- [ ] **A7. One-click path from the queue and the pipeline to the created
+- [x] **A7. One-click path from the queue and the pipeline to the created
       proposal.** Depends on A1 (proposal exists and is linked).
       `QuoteSubmissionsReviewPage.tsx` (`:150-161`, `:259-268`) links "Open
       event →" / "See in pipeline →" / "Open converted event →" but never to

@@ -330,13 +330,18 @@ export function LeadPipelinePage() {
             conversation progresses.
           </p>
         </div>
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={() => setShowCapture((value) => !value)}
-        >
-          {showCapture ? "Close form" : "Capture lead"}
-        </button>
+        <div className="flex items-center gap-3">
+          <Link className="text-link" to={CLIENTS_ROUTES.quoteRequests}>
+            Quote requests
+          </Link>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => setShowCapture((value) => !value)}
+          >
+            {showCapture ? "Close form" : "Capture lead"}
+          </button>
+        </div>
       </header>
 
       <ClientsWorkspaceNav />
@@ -642,7 +647,7 @@ export function LeadPipelinePage() {
                           ) : (
                             <Link
                               className="text-link"
-                              to={CLIENTS_ROUTES.proposals}
+                              to={CLIENTS_ROUTES.proposal(lead.proposalId)}
                             >
                               Open proposal
                             </Link>
