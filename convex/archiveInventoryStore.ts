@@ -73,3 +73,71 @@ export const listArtifacts = internalQuery({
     return rows.filter((row) => row.deletedAt == null);
   },
 });
+
+/**
+ * The most recent prior run in this tenant that inventoried an archive
+ * (R2-9 / PR01-04 — the identical-bytes short-circuit and the revision-delta
+ * baseline). Excludes the given run, deleted runs, and REVERTED runs: a
+ * revert supersedes the run's links and rolls its records back, so bytes
+ * identical to a reverted import must re-inventory instead of no-op —
+ * re-materializing after a revert is not a duplicate.
+ *
+ * Tie-break when createdAt collides (same millisecond): greater _id string —
+ * arbitrary but deterministic; the delta is an advisory operator listing,
+ * never a gate. `archiveChecksum` narrows the match to a specific archive.
+ */
+export const findPriorArchivedRun = internalQuery({
+  args: {
+    tenantId: v.string(),
+    excludeImportRunId: v.id("importRuns"),
+    archiveChecksum: v.optional(v.string()),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ importRunId: string; archiveChecksum: string } | null> => {
+    const runs = await ctx.db
+      .query("importRuns")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .collect();
+    const candidates = runs
+      .filter(
+        (run) =>
+          run._id !== args.excludeImportRunId &&
+          run.deletedAt == null &&
+          run.status !== "reverted" &&
+          run.archiveChecksum != null &&
+          (args.archiveChecksum === undefined ||
+            run.archiveChecksum === args.archiveChecksum),
+      )
+      .sort(
+        (a, b) =>
+          (b.createdAt ?? 0) - (a.createdAt ?? 0) ||
+          (b._id > a._id ? 1 : b._id < a._id ? -1 : 0),
+      );
+    const winner = candidates[0];
+    return winner
+      ? {
+          importRunId: winner._id,
+          archiveChecksum: winner.archiveChecksum as string,
+        }
+      : null;
+  },
+});
+
+/** Live name → checksum pairs for a run's artifacts — the delta input. */
+export const listArtifactChecksums = internalQuery({
+  args: { importRunId: v.id("importRuns") },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<Array<{ name: string; checksum: string | null }>> => {
+    const rows = await ctx.db
+      .query("importArtifacts")
+      .withIndex("by_importRunId", (q) => q.eq("importRunId", args.importRunId))
+      .collect();
+    return rows
+      .filter((row) => row.deletedAt == null)
+      .map((row) => ({ name: row.name, checksum: row.checksum ?? null }));
+  },
+});

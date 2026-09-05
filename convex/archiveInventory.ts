@@ -31,6 +31,10 @@ import {
   readZipEntries,
   ZipArchiveError,
 } from "../src/lib/tppReports/zipReader";
+import {
+  computeArchiveDelta,
+  type ArchiveWorkbookDelta,
+} from "../src/lib/tppReports/archiveDelta";
 
 /** Mirrors the coordinator's import gate (convex/importCoordinator.ts). */
 function canImport(role: string): boolean {
@@ -59,7 +63,8 @@ function archiveFailure(error: unknown): never {
     : new ConvexError("Archive inventory failed");
 }
 
-export interface ArchiveInventoryResult {
+export interface RegisteredInventoryResult {
+  status: "registered";
   registered: number;
   skipped: number;
   workbooks: Array<{
@@ -75,7 +80,27 @@ export interface ArchiveInventoryResult {
     archiveOnly: string[];
     indexOnly: string[];
   };
+  /**
+   * R2-9 / PR01-04: explicit per-workbook delta against the prior archived
+   * import in this tenant (unchanged/changed/added/removed by content
+   * checksum). Absent when there is no prior import to diff against.
+   */
+  delta?: ArchiveWorkbookDelta;
 }
+
+/**
+ * R2-9 identical-bytes short-circuit: a DIFFERENT live, non-reverted prior
+ * run already inventoried an archive with this exact checksum. Nothing is
+ * registered and the run keeps no archive linkage — re-uploading the same
+ * bytes is a no-op that names the run that already holds them.
+ */
+export interface DuplicateInventoryResult {
+  status: "duplicate";
+  priorImportRunId: string;
+}
+
+export type ArchiveInventoryResult =
+  RegisteredInventoryResult | DuplicateInventoryResult;
 
 export const inventoryArchive = action({
   args: {
@@ -109,6 +134,26 @@ export const inventoryArchive = action({
     const blob = await ctx.storage.get(args.storageId as Id<"_storage">);
     if (!blob) throw new ConvexError("Archive not found in file storage.");
     const archive = Buffer.from(await blob.arrayBuffer());
+    const wholeChecksum = sha256Hex(archive);
+
+    // R2-9 / PR01-04 identical-bytes short-circuit — BEFORE any inflate or
+    // registration: a different live prior run already inventoried these
+    // exact bytes, so this upload is a no-op that names that run. The new
+    // run keeps no archive linkage (0/0 defaults stay commit-safe) and no
+    // second artifact copy exists at any level. Same-run re-inventory does
+    // NOT hit this path (the run is excluded) and keeps the name-skip
+    // idempotency of the original inventory.
+    const duplicate = (await ctx.runQuery(
+      internal.archiveInventoryStore.findPriorArchivedRun,
+      {
+        tenantId: auth.tenantId,
+        excludeImportRunId: args.importRunId,
+        archiveChecksum: wholeChecksum,
+      },
+    )) as { importRunId: string } | null;
+    if (duplicate) {
+      return { status: "duplicate", priorImportRunId: duplicate.importRunId };
+    }
 
     // Safe-list pass first: structure, names and declared sizes are checked
     // with zero decompression, so hostile inputs fail before any inflate.
@@ -149,7 +194,8 @@ export const inventoryArchive = action({
 
     let registered = 0;
     let skipped = 0;
-    const workbooks: ArchiveInventoryResult["workbooks"] = [];
+    const workbooks: RegisteredInventoryResult["workbooks"] = [];
+    const currentChecksums = new Map<string, string>();
     for (const name of workbookNames) {
       const content = contents.get(name);
       if (!content) {
@@ -171,6 +217,7 @@ export const inventoryArchive = action({
 
       if (existing.has(name)) {
         skipped += 1;
+        currentChecksums.set(name, checksum);
         workbooks.push({
           name,
           checksum,
@@ -208,6 +255,7 @@ export const inventoryArchive = action({
         },
       );
       registered += 1;
+      currentChecksums.set(name, checksum);
       workbooks.push({ name, checksum, byteSize: content.length, entryCount });
     }
 
@@ -215,11 +263,38 @@ export const inventoryArchive = action({
       docId: args.importRunId,
       archiveWorkbookCount: workbookNames.length,
       archiveStorageId: args.storageId,
-      archiveChecksum: sha256Hex(archive),
+      archiveChecksum: wholeChecksum,
       indexWorkbookCount: indexNames.length,
     });
 
+    // R2-9 / PR01-04: an archive that is NOT byte-identical to the prior
+    // import still gets a full inventory, plus an EXPLICIT delta naming
+    // which workbooks are unchanged, revised, added, or gone — the operator
+    // sees what changed instead of a blind second copy. Unchanged workbooks
+    // stay single-copy at the record level through the cross-run
+    // ExternalRecordLink dedup (importCommit.findLink).
+    let delta: ArchiveWorkbookDelta | undefined;
+    const prior = (await ctx.runQuery(
+      internal.archiveInventoryStore.findPriorArchivedRun,
+      {
+        tenantId: auth.tenantId,
+        excludeImportRunId: args.importRunId,
+      },
+    )) as { importRunId: string } | null;
+    if (prior) {
+      const priorArtifacts = (await ctx.runQuery(
+        internal.archiveInventoryStore.listArtifactChecksums,
+        { importRunId: prior.importRunId as Id<"importRuns"> },
+      )) as Array<{ name: string; checksum: string | null }>;
+      delta = computeArchiveDelta(
+        prior.importRunId,
+        new Map(priorArtifacts.map((row) => [row.name, row.checksum])),
+        currentChecksums,
+      );
+    }
+
     return {
+      status: "registered",
       registered,
       skipped,
       workbooks,
@@ -230,6 +305,7 @@ export const inventoryArchive = action({
         archiveOnly,
         indexOnly,
       },
+      delta,
     };
   },
 });
