@@ -5,6 +5,14 @@
 
 # Implementation plan — capsule
 
+Scope notice (2026-09-05, release 2 planned): release 2, "Every source
+record accounted for", is planned below — tasks R2-1 … R2-14, acceptance
+contract AC-020 … AC-030 in `ACCEPTANCE_TESTS.md`. Everything from "Plan
+date: 2026-09-03" down through the release 1 sections is COMPLETED
+HISTORY (released 2026-09-05 via `release/ralph-20260905`). Keep it as
+evidence; do not reuse its completion state for PR01–PR14, the
+[production-readiness requirements](docs/product/production-readiness.md).
+
 Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 5: 3 more
 read-only passes — AC coverage of every spec bullet, `src/lib`/`src/ui`
 primitive inventory for tasks A2–C4, and the 12 test-infra/gate claims —
@@ -612,6 +620,262 @@ The J halves of AC-006/AC-013 (llm-review UX-01 evidence) still need a
 session with ANTHROPIC_API_KEY (unset again this session; no
 .env.local); they are recorded evidence, not loop gates.
 
+Iteration 46 (PLAN, 2026-09-05, HEAD `279f6a3`): release 2 planning.
+The branch fast-forwarded to `origin/main` `279f6a3`, no conflicts — the
+branch's own release had landed on `main` via `release/ralph-20260905`;
+main brought in the workforce hire lifecycle, the TPP report catalog
+workspace and the culinary catalog inspector. Validation green on the
+merged tree: `bun run test` 127 files / 1217 tests, typecheck,
+`format:check`, `bunx vite build`; `bun install` not needed. Local
+preview verified via `ralph-preview.ps1` on port 7812
+(`RALPH_PREVIEW_CHECK_CMD` already configured). The local Convex backend
+on 3210 is owned by the PRIMARY checkout's dev session, so this
+plan-only iteration did not push a second watcher — in-memory
+convex-test proofs are the backend evidence. A fresh gap analysis (17
+parallel spec readers + one opus synthesis pass) selected release 2,
+"Every source record accounted for". `ACCEPTANCE_TESTS.md` gained
+AC-020 … AC-030 (fixed mapping, updated in parallel with this plan).
+Plan tasks R2-1 … R2-14 are written below; 5 honesty issues were filed
+(see Escalations under "Prioritized tasks — release 2"). The build loop
+can start at R2-1.
+
+## Recommended SLC release 2: Every source record accounted for
+
+**Scope.** Finish the import lifecycle's accountability spine end to end.
+A tenant-scoped ImportArtifact archive manifest inventories every workbook
+in an uploaded zip (hardened against traversal, absolute-path,
+nested-archive, expanded-bytes and encryption abuse), reconciles archive
+inventory against the supplied index — the 90-vs-70 discrepancy must be
+explained before commit proceeds — classifies every workbook and every
+row/section into a disposition taxonomy with reconciled counts, persists
+full provenance (coordinates, raw-vs-interpreted values, date system,
+parser version) inspectable by an operator, survives worker restart via
+persisted checkpoints with fault-injection proofs, and interprets Excel
+dates/formats correctly (1900/1904, leap-day, fractional-day, numFmt —
+closes issue #274). Two boundary slices ride along because PR01's spec
+names them as dependencies: PR12-05 file-access ownership
+(`convex/fileStorage.ts:89-105` — `urlsForStorageIds` resolves URLs for
+arbitrary caller-supplied storage ids after only a tenant check) and
+PR12-01 deployment-config detection (issue #265: production runs Clerk
+dev keys), plus PR13-06 — a release receipt tying integrated SHA →
+Vercel READY → matching Convex code/schema → config checks →
+authenticated workflow, wired into `scripts/release.sh`. One
+released-surface defect is folded in:
+`convex/lib/proposalRevision.ts:228-230` stamps `tenantName = "Tenant"`
+onto branded proposal revisions/PDFs (no AC; regression test only, see
+R2-13).
+
+**Why this slice.**
+
+- Simple: one pipeline plus two small boundary fixes; no providers, no
+  OAuth, no financial semantics; additive over preserved data (648
+  clients / 953 venues / 455 attachments untouched; re-runs ride the
+  existing idempotency keys `import:<runId>:<type>:<externalId>` at
+  `convex/importCommit.ts:19,357,362`).
+- Lovable: Josh's JTBD is "replace TPP completely, with imports that
+  reconcile". Every workbook gets a disposition, the 90-vs-70 mystery is
+  answered by an artifact, dates stop being silently wrong, re-runs
+  resume instead of duplicating.
+- Complete: the job "upload once, account for every source record"
+  finishes end to end; PR02–PR05 and PR11 consume this inventory next.
+
+**Out of this release** (each item names its owning later release — this
+is sequencing, NOT owner deferral): PR01-08 cancel/compensation
+(import-operations slice, built with the PR13-08 durable
+retry/lease/dead-letter framework); PR02 matching rules / 3-way
+ambiguity chooser / bulk resolution (identity-resolution release — its
+needs-mapping queue is PRODUCED by this release's disposition taxonomy);
+recipe normalization of 143 source-rich drafts + 74 empty recipes (PR03 —
+never fabricate BOMs); opening-stock classification (PR04, business
+choice pending); ledger reconstruction / chargebacks / numbering guards
+(PR05; payments stay reference-mode); imported-acceptance labeling +
+confirmed-vs-executing lifecycle + ProposalTemplatesPage docId dead
+buttons (PR06 booking qualification); PR07 inbox cannot-send states;
+PR08 Nowsta; PR09 payroll provider ack; PR10 template-apply atomicity +
+returns; PR11 90-workbook→report mapping artifact (consumes this
+release's inventory); PR12-07/08/09/10 (later access release);
+PR13-08/09/10 (recovery release); PR14-01 coverage ledger (the cutover
+release may start it alongside).
+
+**Risks and dependencies.** Manifest changes regen via `bun run
+manifest:regen` — the sibling `../builder` checkout is present locally;
+regen and commit the generated output in the same commit;
+`.builder/ownership.json` sha-locks generated trees; any new
+`<Entity>_createVia<Verb>` export requires hand-editing
+`tests/governed-creation-mappings.test.ts`. `zipReader` uses `node:zlib`,
+so archive ingest follows the governed action pattern
+(`convex/quickImport.ts`) — materialization stays exclusively through
+`convex/importCommit.ts` (spec: "no second write API"). New proof files
+need no registry entry (`scripts/emit-proof-kit.ts` binds only
+CATALOG_ENTITIES paths) BUT check `tests/proof-registry-gate.test.ts`
+expectations. Proofs run edge-runtime under `tests/proofs/` with the
+CONVEX_FIELD_ENCRYPTION_KEY beforeAll fallback pattern. Fixtures are
+sanitized synthetic only — never the private 90-workbook archive or
+receipts. No @testing-library render tests. Issue #265 stays open — the
+PR13-06 receipt will legitimately report partial until the owner rotates
+the production Clerk keys (the detector working as designed; do not
+soften it). The timezone convention is explicit naive-local with a
+recorded assumption, not invented truth. ANTHROPIC_API_KEY is unset, so
+any llm-review J-halves are recorded evidence, never gates.
+
+**Acceptance contract.** `ACCEPTANCE_TESTS.md` AC-020 … AC-030 (fixed
+mapping, maintained in parallel): AC-020=PR01-01, AC-021=PR01-02,
+AC-022=PR01-03, AC-023=PR01-04, AC-024=PR01-05, AC-025=PR01-06,
+AC-026=PR01-07, AC-027=PR01-09, AC-028=PR12-01, AC-029=PR12-05,
+AC-030=PR13-06. Each task below names the ids it must turn to `PASS`.
+
+## Prioritized tasks — release 2
+
+Order = build order. Earlier tasks unblock later ones. Each task is one
+build iteration.
+
+- [ ] **R2-1. ImportArtifact manifest + ImportRun archive linkage.**
+      Author `src/import/import-artifact.manifest` (tenant-scoped: name,
+      checksum, byte size, entry count, disposition, parse status,
+      provenance JSON) and additive archive linkage on
+      `src/import/import-run.manifest` — add archive-side fields only,
+      never reshape the existing run fields. Run `bun run manifest:regen`
+      from this checkout (not the primary); commit the generated output
+      in the same commit. If regen emits a new
+      `<Entity>_createVia<Verb>` export, hand-edit
+      `tests/governed-creation-mappings.test.ts` (authored, sorted
+      list). Foundations only — no proof of its own; the AC proofs land
+      with R2-3 (`tests/proofs/import-archive-inventory.runtime.test.ts`),
+      R2-5 (`tests/proofs/import-archive-disposition.runtime.test.ts`)
+      and R2-8 (`tests/proofs/import-provenance.runtime.test.ts`).
+      → AC-020, AC-021, AC-022
+- [ ] **R2-2. Harden the zip reader.**
+      `src/lib/tppReports/zipReader.ts:39-71` reads entries with zero
+      bounds today. Add traversal, absolute-path, nested-archive,
+      expanded-bytes cap, duplicate-filename, encrypted-workbook and
+      corrupt-entry detection → bounded named failures, no writes outside
+      source storage. Unit tests with crafted synthetic malformed buffers
+      in `tests/zip-archive-abuse.test.ts` (pure parser; sits outside
+      `tests/proofs/`, so it runs under the default node environment).
+      → AC-026
+- [ ] **R2-3. Archive inventory ingest.** Governed action (pattern:
+      `convex/quickImport.ts`) that safe-lists an uploaded zip into
+      per-workbook ImportArtifact rows with checksums — R2-1's manifest
+      plus R2-2's hardened reader. Limits and progress are visible
+      before expensive parsing begins. Source storage belongs to the
+      tenant/import, never an arbitrary event. Runtime proof
+      `tests/proofs/import-archive-inventory.runtime.test.ts`: a
+      synthetic multi-workbook zip yields one ImportArtifact row per
+      workbook, each with checksum, byte size and entry count.
+      → AC-020
+- [ ] **R2-4. Index-vs-inventory reconciliation gate.** Parse the
+      supplied index, diff it against the archive inventory (in-both /
+      archive-only / index-only), and block commit until the discrepancy
+      is explained. Runtime proof with a synthetic archive whose index
+      describes fewer workbooks than it contains (the 90-vs-70 shape) —
+      commit refused while unexplained, proceeds once reconciled; lives
+      in `tests/proofs/import-archive-inventory.runtime.test.ts`
+      (AC-020) and feeds the completion counts asserted by
+      `tests/proofs/import-archive-completion.runtime.test.ts` (AC-027).
+      → AC-020, AC-027
+- [ ] **R2-5. Disposition taxonomy + counted outcomes.** Workbook-level
+      disposition on ImportArtifact (normalized, linked reference,
+      duplicate view, needs mapping, unsupported, invalid) plus counted
+      per-row/section outcomes; headers and summaries classified
+      separately; counts reconcile without silent drops; surfaced in the
+      review stage (`beginReview` at `convex/importCoordinator.ts:621`).
+      Runtime proof `tests/proofs/import-archive-disposition.runtime.test.ts`
+      (AC-021) and the reconciled-counts half of
+      `tests/proofs/import-archive-completion.runtime.test.ts` (AC-027 —
+      goes PASS when the R2-4 reconciliation half is also in).
+      → AC-021, AC-027
+- [ ] **R2-6. Checkpoints + resume with fault injection.** Persist stage
+      cursor + processed counts on the run; resume completes missing
+      children/deposits/lines/attachments WITHOUT replacing newer user
+      edits — build on the per-record idempotency keys already at
+      `convex/importCommit.ts:19,357`
+      (`import:<runId>:<type>:<externalId>`). Fault-injection proof at
+      each checkpoint: `tests/proofs/import-resume-fault-injection.runtime.test.ts`
+      — fail mid-stage, resume, assert no duplicates and no clobbered
+      edits. Feeds issue #241's shared mechanics; keep #241 open until
+      the event-bundle surface carries its own proof. → AC-024
+- [ ] **R2-7. xlsxReader date/format correctness.**
+      `src/lib/tppReports/xlsxReader.ts` ignores formatting/formulas/
+      styles today (issue #274). Handle 1900/1904 epochs, the 1900
+      leap-day quirk, fractional-day times, numFmt-driven
+      interpretation, accounting parentheses, fractions, sparse/merged
+      cells, and cached formula values (formulas/macros never executed).
+      Record raw + interpreted values; missing units never inferred from
+      unrelated cells. Timezone convention: explicit naive-local with a
+      recorded assumption. Pure-parser unit tests in
+      `tests/xlsx-date-formats.test.ts`. → AC-025
+- [ ] **R2-8. Provenance persistence + operator inspectability.**
+      Persist coordinates, raw text/value, date system, parser version
+      and normalized-result linkage (rides R2-1's provenance JSON).
+      Render it on `src/features/admin/import/ImportRunDetailPage.tsx`
+      for the authorized operator. Runtime proof
+      `tests/proofs/import-provenance.runtime.test.ts` plus a
+      source-text test for the rendering (no render tests). → AC-022
+- [ ] **R2-9. Reupload / revision delta / cross-device reopen.**
+      Identical bytes → no-op (checksum short-circuit); changed checksum
+      → explicit delta listing, never a second copy; reopening the run
+      from another device creates no duplicate business records. Runtime
+      proof `tests/proofs/import-reupload-delta.runtime.test.ts`.
+      → AC-023
+- [ ] **R2-10. File-access ownership fix.** `convex/fileStorage.ts:89-105`
+      `urlsForStorageIds` checks only `auth.tenantId` — join through
+      tenant-owned attachment/entity rows before resolving URLs. Trace
+      consumers first (`src/features/attachments/DishPrimaryImage.tsx:27`,
+      `src/lib/fileStorageClient.ts:12`, `listForParent` at
+      `fileStorage.ts:50-86`). Negative runtime proof
+      `tests/proofs/file-storage-ownership.runtime.test.ts`: a storage
+      id outside authorized parent records yields no URL. → AC-029
+- [ ] **R2-11. Deployment config checks.** Redacted, actionable errors
+      for mismatched Clerk issuer/application keys, Convex audience,
+      callback URLs and environment; dev-credential detection in
+      production (issue #265). Wire the checker into the build/release
+      path. Unit tests on the checker:
+      `tests/deployment-config-check.test.ts`. → AC-028
+- [ ] **R2-12. Release receipt.** Tie integrated SHA → canonical Vercel
+      URL + READY deployment → matching Convex code/schema → config
+      checks → authenticated production workflow. Partial stays partial —
+      no softening. Wire into `scripts/release.sh`; produce the receipt
+      for THIS release's `[release]` merge. Unit test on the receipt
+      builder: `tests/release-receipt.test.ts`. → AC-030
+- [ ] **R2-13. Tenant branding defect.** Resolve `tenantName` from the
+      tenant record at `convex/lib/proposalRevision.ts:228-230`; delete
+      the `"Tenant"` placeholder. Regression test only (no AC — honesty
+      fold-in; PR06-03's remainder stays with the booking-qualification
+      release): extend `tests/proofs/proposal-event-booking.runtime.test.ts`
+      or add a focused runtime test asserting the branded revision/PDF
+      carries the tenant's real name.
+- [ ] **R2-14. Release proof bundle + ship.** All new proofs green under
+      `tests/proofs/`; full gates (`bun run test`, typecheck,
+      `format:check`, `bunx vite build`, manifest-regen-check);
+      cross-model review; `bash scripts/release.sh --reviewer <model>`
+      with the R2-12 receipt attached.
+
+### Escalations
+
+Filed in `Angriff36/capsule` this session (2026-09-05), each labeled
+with its owning later release (per
+`docs/architecture/escalate-blockers-to-github.md` — workarounds are not
+escalation):
+
+- #275 — ProposalTemplatesPage docId dead buttons
+  (`src/features/clients/ProposalTemplatesPage.tsx:128-129,167,180`) —
+  PR06 booking qualification.
+- #276 — `src/features/production/KitchenDisplayPage.tsx:200` fabricates
+  `actualYield` — PR03 recipe truth.
+- #277 — MessageInbox replies stuck queued, no cannot-send state
+  (`src/features/sales/MessageInboxPage.tsx`) — PR07 communication
+  delivery.
+- #278 — `src/features/logistics/PackListDetailPage.tsx:232-244`
+  non-atomic client-side template apply — PR10 equipment logistics.
+- #279 — `src/features/logistics/routePlanner.ts:13` hardcodes 40 km/h —
+  PR11 reporting (estimate labelling).
+
+Keep open with these roles: #265 (R2-11 detects, R2-12 reports partial
+until the owner rotates the production Clerk keys — detector working as
+designed, do not soften); #274 (closed by R2-7 / AC-025); #241 (R2-6
+feeds its shared mechanics; stays open until the event-bundle surface
+carries its own proof).
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -633,6 +897,32 @@ Activities in `specs/` in the order a real event moves through the business.
 Dependency spine: 2 → 1 → 3 → 4 → 5 → 6 → 7 → 8 → 10. Activities 1, 3 and
 5 are the three hand-offs where data is re-keyed today. That is the #141
 class of failure named in Josh's first JTBD.
+
+### Production-readiness journey (PR01–PR14, planned 2026-09-05)
+
+Compact per-release view of `docs/product/production-readiness.md` and the
+`specs/ralph/production-01…14` specs. `✅` = built per evidence, `🟡` = built
+with gaps, `❌` = not built.
+
+| PR | Activity | Actor | Status |
+| -- | -------- | ----- | ------ |
+| PR01 | Import archive: every workbook inventoried, classified, reconciled, resumable | Josh | 🟡 runs + dashboard built; no artifact manifest, no disposition, no resume — THIS release (R2-1…R2-9) |
+| PR02 | Source identity: match rules, ambiguity chooser, bulk resolution | Josh | 🟡 needs-mapping queue not built; produced by this release's taxonomy |
+| PR03 | Recipe truth: normalize imported recipes; never fabricate BOMs | Josh, Kitchen | 🟡 143 source-rich drafts + 74 empty recipes |
+| PR04 | Stock flow: opening-stock classification | Josh | 🟡 business choice pending |
+| PR05 | Financial truth: ledger, chargebacks, numbering | Josh | 🟡 reference-mode payments only |
+| PR06 | Booking qualification: imported-acceptance labeling, lifecycle | Sales | 🟡 qualification gaps |
+| PR07 | Communication delivery: inbox send states | Sales | 🟡 manual ingress only |
+| PR08 | Provider sync: Nowsta | Josh | 🟡 Nowsta ❌ |
+| PR09 | Workforce: payroll provider ack | Josh | 🟡 ack missing |
+| PR10 | Equipment logistics: template-apply atomicity, returns | Josh | 🟡 rentals/returns ❌ |
+| PR11 | Reporting: 90-workbook → report mapping | Tim | 🟡 mapping artifact missing; consumes this release's inventory |
+| PR12 | Access/privacy: file ownership, config detection | Josh | 🟡 file-ownership gap; R2-10/R2-11 close two named slices |
+| PR13 | Release/recovery: receipt, backups | Josh | 🟡 receipt/backups ❌; R2-12 adds the receipt |
+| PR14 | Qualification cutover: coverage ledger | Josh, Tim | ❌ depends on all |
+
+Dependency spine per `docs/product/production-readiness.md` ordering:
+PR01 → PR02 → {PR03, PR04, PR05} → …
 
 ## Recommended SLC release: "Booked without re-keying"
 
@@ -1104,3 +1394,30 @@ Order = build order. Earlier tasks unblock later ones.
   `src/features/events/CommandFailure.ts:58-100` overlaps the same helper.
   `LeadPipelinePage.tsx:89` and `ProposalCreateForm.tsx:39,57` carry two
   near-duplicate date-only parsers with no `src/lib/format.ts` counterpart.
+- **Import cancel/compensation** (PR01-08, production-01 import-archive):
+  lands with the import-operations slice, built on the PR13-08 durable
+  retry/lease/dead-letter framework.
+- **Source-identity matching rules, 3-way ambiguity chooser, bulk
+  resolution** (PR02 identity resolution): the needs-mapping queue it
+  consumes is PRODUCED by release 2's disposition taxonomy.
+- **Recipe normalization of 143 source-rich drafts + 74 empty recipes**
+  (PR03 recipe truth): never fabricate BOMs.
+- **Opening-stock classification** (PR04 stock flow): business choice
+  pending.
+- **Ledger reconstruction, chargebacks, numbering guards** (PR05 financial
+  truth): payments stay reference-mode.
+- **Imported-acceptance labeling, confirmed-vs-executing lifecycle,
+  ProposalTemplatesPage docId dead buttons** (PR06 booking
+  qualification).
+- **Inbox cannot-send states** (PR07 communication delivery): replies can
+  stick queued with no operator-visible reason
+  (`src/features/sales/MessageInboxPage.tsx`).
+- **Payroll provider ack** (PR09 workforce).
+- **Template-apply atomicity + returns** (PR10 equipment logistics):
+  `src/features/logistics/PackListDetailPage.tsx:232-244` applies
+  templates client-side, non-atomically.
+- **90-workbook → report mapping artifact** (PR11 reporting): consumes
+  release 2's inventory.
+- **PR12-07/08/09/10** (later access release); **PR13-08/09/10**
+  (recovery release); **PR14-01 coverage ledger** (cutover release; the
+  cutover release may start it alongside).
