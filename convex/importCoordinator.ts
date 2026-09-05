@@ -181,6 +181,11 @@ export const startImport = mutation({
       indexWorkbookCount: 0,
       discrepancyExplained: false,
       checksum: args.checksum ?? undefined,
+      // Timestamps-mixin fields: commands (recordArchiveInventory,
+      // explainArchiveDiscrepancy, …) guard on createdAt being present, so
+      // the authored insert stamps them exactly like a command-created row.
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       version: 0,
     });
 
@@ -284,7 +289,7 @@ export const loadImportContext = internalQuery({
   args: { importRunId: v.id("importRuns") },
   handler: async (ctx, args): Promise<ImportContext | null> => {
     const importRun = await ctx.db.get(args.importRunId);
-    if (!importRun || importRun.deletedAt !== null) {
+    if (!importRun || importRun.deletedAt != null) {
       return null;
     }
 
@@ -308,7 +313,7 @@ export const progressImportStage = internalMutation({
   },
   handler: async (ctx, args) => {
     const importRun = await ctx.db.get(args.importRunId);
-    if (!importRun || importRun.deletedAt !== null) {
+    if (!importRun || importRun.deletedAt != null) {
       throw new ConvexError("Import run not found");
     }
 

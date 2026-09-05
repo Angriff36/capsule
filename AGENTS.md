@@ -80,7 +80,7 @@ bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is e
 # but are not package.json scripts in this checkout — use the MCP host + mint-jwt path above.
 ```
 
-**New `convex/*.ts` authored seam?** Run `bun run codegen` before `bun run typecheck` — `convex/_generated/api.d.ts` is a strict static module list (runtime `api = anyApi` is dynamic, but the types are not); the dev server does NOT auto-regenerate it, so a fresh authored query/mutation won't typecheck until codegen registers it.
+**New `convex/*.ts` authored seam?** Run `bun run codegen` before `bun run typecheck` — `convex/_generated/api.d.ts` is a strict static module list (runtime `api = anyApi` is dynamic, but the types are not); the dev server does NOT auto-regenerate it, so a fresh authored query/mutation won't typecheck until codegen registers it. In a worktree without `.env.local` (no `CONVEX_DEPLOYMENT`), run `CONVEX_DEPLOYMENT=befitting-armadillo-283 bunx convex codegen --typecheck disable` — codegen validates modules through a dry push and never modifies the deployment (`convex codegen --help`). Node-runtime rule: only actions may live in a `"use node"` file; put helper mutations/queries in a sibling non-node file.
 
 Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).  
 Manifest CLI safe vs unsafe in Capsule: [docs/generation/manifest-cli-safety.md](docs/generation/manifest-cli-safety.md).

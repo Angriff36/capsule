@@ -685,6 +685,63 @@ rewrapped the two new files), `bunx vite build`,
 Tag `v0.0.53` created. Next: R2-3 (archive inventory ingest action +
 `tests/proofs/import-archive-inventory.runtime.test.ts`) → AC-020.
 
+Iteration 48 (BUILD, release 2, 2026-09-05): R2-3 + R2-4 DONE. AC-020 =
+PASS (2 of 11 release-2 ACs, with AC-026). New authored seam
+convex/archiveInventory.ts ("use node" action; the zip reader inflates via
+node:zlib) + convex/archiveInventoryStore.ts (internal draft-allocate /
+list-names helpers — Convex allows only actions in the Node runtime, so the
+mutation/query helpers must live in a separate non-node file).
+inventoryArchive reads the uploaded zip from ctx.storage, safe-lists it
+with the R2-2 reader (listZipEntries first — zero inflate — then
+readZipEntries with allowArchiveEntries because .xlsx workbooks are zip
+containers), registers one ImportArtifact per .xlsx through the generated
+ImportArtifact_register command (draft row + governed command, per the
+register docId contract; checksum = sha256 of the workbook's decompressed
+bytes, byteSize = workbook file size, entryCount = inner central-directory
+count, provenance JSON records in_both/archive_only + containerError),
+skips names already registered (re-run is a no-op), and records counts via
+ImportRun_recordArchiveInventory (archiveChecksum = sha256 of the whole
+archive — the R2-9 reupload short-circuit input). The index is
+caller-supplied report names (indexReportNames arg — the quickImport
+client-side mapping precedent); reconciliation is three-way
+in-both/archive-only/index-only, returned to the caller and persisted as
+counts. R2-4 gate: ImportRun.commit gained the guard
+`self.archiveWorkbookCount == self.indexWorkbookCount or
+self.discrepancyExplained == true` (import-run.manifest; one regen; no new
+createVia, governed-creation mappings untouched). Runs without an archive
+keep 0==0 and are unaffected. Proof
+tests/proofs/import-archive-inventory.runtime.test.ts › "upload inventories
+every workbook and reconciles the supplied index before commit": synthetic
+stored-only zip, 90 distinct 3-part workbook zips, index = first 70 names;
+asserts 90 artifact rows with distinct 64-hex checksums, byteSize and
+entryCount 3, run counts 90/70, storage + checksum linkage, re-run
+registers 0/skips 90, the generated stage walk to "committing",
+ImportRun_commit refusal (Guard 2) while unexplained,
+explainArchiveDiscrepancy, then commit → completed. Two pre-existing
+defects found and FIXED in authored seams (no GitHub issue — fixed this
+session, no open blocker): (1) convex/importCoordinator.ts
+loadImportContext + progressImportStage compared `deletedAt !== null`, but
+startImport's insert leaves deletedAt UNDEFINED — both internals
+returned/threw "not found" for EVERY production-created run (the
+coordinator per-stage actions were dead paths); now `!= null`, matching
+importCommit.ts:133's own idiom. (2) startImport's direct insert lacked
+createdAt/updatedAt, so every ImportRun command guarding
+`createdAt != null` (recordArchiveInventory, explainArchiveDiscrepancy)
+failed for production runs; the insert now stamps them like a
+command-created row. Environment facts proven by a temporary probe
+(deleted after): node:zlib + zipReader load and run under the edge-runtime
+proof env; ctx.storage round-trips through the manifest proof actor (type
+cast needed — the harness run-ctx type declares only {db, auth});
+crypto.subtle works. `bun run codegen` needs CONVEX_DEPLOYMENT set (no
+.env.local here): `CONVEX_DEPLOYMENT=befitting-armadillo-283 bunx convex
+codegen --typecheck disable` worked (codegen validates modules via a dry
+push and never modifies the deployment, per `convex codegen --help`;
+api.d.ts was the only _generated change). Gates: `bun run test` 129 files
+/ 1248 tests green; typecheck, format:check (prettier rewrapped the three
+new files), `bunx vite build`, manifest-regen-check green. Tag v0.0.54
+created. Next: R2-5 (disposition taxonomy + counted outcomes) → AC-021,
+AC-027.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
@@ -799,7 +856,7 @@ build iteration.
       in `tests/zip-archive-abuse.test.ts` (pure parser; sits outside
       `tests/proofs/`, so it runs under the default node environment).
       → AC-026
-- [ ] **R2-3. Archive inventory ingest.** Governed action (pattern:
+- [x] **R2-3. Archive inventory ingest.** Governed action (pattern:
       `convex/quickImport.ts`) that safe-lists an uploaded zip into
       per-workbook ImportArtifact rows with checksums — R2-1's manifest
       plus R2-2's hardened reader. Limits and progress are visible
@@ -809,7 +866,7 @@ build iteration.
       synthetic multi-workbook zip yields one ImportArtifact row per
       workbook, each with checksum, byte size and entry count.
       → AC-020
-- [ ] **R2-4. Index-vs-inventory reconciliation gate.** Parse the
+- [x] **R2-4. Index-vs-inventory reconciliation gate.** Parse the
       supplied index, diff it against the archive inventory (in-both /
       archive-only / index-only), and block commit until the discrepancy
       is explained. Runtime proof with a synthetic archive whose index

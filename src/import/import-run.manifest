@@ -168,9 +168,15 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // R2-4 / AC-020: an archive run whose supplied index describes a different
+  // number of workbooks than the archive actually contains (the 90-vs-70
+  // shape) cannot complete until an operator explains the gap via
+  // explainArchiveDiscrepancy. Runs without an archive keep 0 == 0 and are
+  // unaffected — existing row-based imports behave exactly as before.
   command commit(optional actorId: string) {
     guard self.status == "committing"
     guard self.reviewApprovedAt != null
+    guard self.archiveWorkbookCount == self.indexWorkbookCount or self.discrepancyExplained == true
     guard self.deletedAt == null
     constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
     mutate actorId = actorId != null ? actorId : self.actorId
