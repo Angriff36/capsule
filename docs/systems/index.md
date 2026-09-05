@@ -2,7 +2,7 @@
 
 This is the authoritative inventory of CapsuleX operator systems, entity ownership, and UI status. Domain meaning remains in the canonical Manifest source; experience details live in the linked owner document.
 
-Current generated boundary: **43 governed business entities**, **219 command capabilities**, and **99 relationships** from the 36 canonical proofs in `C:/projects/Manifest-source/src`.
+Historical generated inventory: **43 governed business entities**, **219 command capabilities**, and **99 relationships** from 36 canonical proofs. These counts and the shipping labels below are not a current full-product qualification. Recount from the active generated registry when needed; the [2026-09-05 production-readiness requirements](../product/production-readiness.md) distinguish current evidence from remaining gaps.
 
 ## Operator systems
 
@@ -16,8 +16,8 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 | Production & quality          | PrepTask, ProductionBatch, QualityCheck, Incident, EventAllergenCheck                                                | `/kitchen/prep`                                     | Shipping prep board + quality fail→block proof                     |
 | Workforce                     | EventAssignment, Shift, ShiftType, AvailabilityWindow, TimeRecord, Qualification, TrainingModule, TrainingCompletion | `/staff`, `/staff/training`                         | Shipping roster, time, qualifications, training + shift gates      |
 | [Logistics](logistics.md)     | PackList, PackListItem, Delivery                                                                                     | `/logistics`                                        | Shipping pack lists, load sheet, deliveries + lifecycle proof      |
-| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                                                   | `/clients`, `/finance`                              | Slice 7 shipped; OD035/OD038 automation deferred                   |
-| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                                                   | `/finance/closeout`, `/finance/payroll`, `/reports` | Closeout + payroll + report library shipped; chart render deferred |
+| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                                                   | `/clients`, `/finance`                              | Existing UI and booking handoff; full money/lifecycle qualification in PR05/PR06 |
+| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                                                   | `/finance/closeout`, `/finance/payroll`, `/reports` | Existing closeout, payroll, and report renderers; qualification in PR09/PR11 |
 
 `TenantScoped` and `SoftDeletable` are source mixins, not operator systems or standalone workspaces.
 

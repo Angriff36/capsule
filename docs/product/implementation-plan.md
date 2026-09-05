@@ -31,7 +31,11 @@ Every slice must:
 | 8. Closeout and reporting         | Capture/finalize event closeout, prepare payroll inputs, save governed report definitions        | Closeout & reporting, all systems          | Stable upstream facts; aggregate capture behavior defined                     |
 | 9. Service desk integration       | Replace placeholder Home with role-shaped attention, upcoming services, and verified readiness   | All shipping systems                       | Only queryable/verified facts may appear; no fake KPIs                        |
 
-Current delivery status: Slices 1–9 plus SavedReportDefinition `/reports` (create→archive→restore library) and Slice 7 PaymentMethod UI (`/finance/payment-methods`, linked from payment record) are shipped. Slice 8 EventCloseout (`/finance/closeout`) and Slice 8b PayrollInput (`/finance/payroll` prepare→finalize runtime proof) remain documented in the owning system pages. Slice 7 still defers OD035/OD038 automation. Report chart/result rendering remains deferred. Slice 3 keeps blocked automation and projected-number precision explicit; Slice 0 projection-safety backlog items beyond the proven reactions remain open. Slice 5's runtime proof doubles as the regression proof for the manifest 3.6.18–3.6.20 relation-resolution fixes. Slice 6 also regresses opaque FK Zod acceptance for Convex document ids (Manifest 3.6.29+).
+Historical delivery inventory: Slices 1–9, the saved-report library, payment-method UI, closeout, and payroll have implementation/proof recorded in their owning system pages. This is not a full production-readiness claim. Report renderers and proposal-to-event handoffs now exist; earlier blanket rendering/automation deferrals are not owner-authorized exclusions. Verify their current behavior and remaining gaps through the requirements below. Preserve existing projection, relation-resolution, and opaque-ID regression proof.
+
+## Production completion requirements — 2026-09-05
+
+The [production-readiness requirements index](production-readiness.md) links fourteen additional Ralph specs covering source migration, operational handoffs, financial accuracy, providers, security, and release/recovery qualification. It records current evidence and unresolved business choices; this document remains the sole product roadmap. Build dependency-ordered vertical outcomes from those requirements when planning is requested. The prior completed Ralph task plan does not satisfy the new criteria, and adding these specs does not start a run or authorize deployment.
 
 ## Slice composition rule
 

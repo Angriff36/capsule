@@ -5,6 +5,12 @@
 
 # Implementation plan — capsule
 
+Scope notice (2026-09-05): this completed plan covers its original specs only.
+The new [production-readiness requirements](docs/product/production-readiness.md)
+add PR01–PR14 and require a fresh gap plan when planning is requested. No new
+run has been started. Preserve historical acceptance IDs and evidence; do not
+interpret the completed checkboxes below as completion of the new requirements.
+
 Plan date: 2026-09-03 (re-verified 2026-09-03, plan iteration 5: 3 more
 read-only passes — AC coverage of every spec bullet, `src/lib`/`src/ui`
 primitive inventory for tasks A2–C4, and the 12 test-infra/gate claims —
