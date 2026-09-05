@@ -66,6 +66,14 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   property required dispositionCounts: string = "{}"
   property required unaccountedRecordCount: int = 0
 
+  // Commit checkpoint (PR01-05, R2-6, additive): the resume cursor INSIDE the
+  // committing stage — cumulative processed/committed/skipped/pending counts.
+  // The run's status is the stage cursor; this JSON is the per-record cursor.
+  // The durable resume truth stays the per-record ExternalRecordLink + create
+  // idempotency keys (importCommit.ts) — the checkpoint is operator
+  // visibility and batch bookkeeping, never a second source of record state.
+  property required commitCheckpoint: string = "{}"
+
   constraint recordCountsPresent: self.recordCounts != null "Record counts must be present"
 
   transition status from "started" to ["parsing", "failed"]
@@ -327,6 +335,31 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // recordCommitCheckpoint - Persist the commit-stage resume checkpoint
+  // (PR01-05 / R2-6). commitImportRun writes it at every batch boundary and
+  // before completion. A worker fault leaves the run in "committing" with
+  // this checkpoint (failed is TERMINAL — marking a mid-commit fault failed
+  // would orphan crash-window records), so re-invoking the commit action is
+  // the resume.
+  command recordCommitCheckpoint(
+    commitCheckpoint: string,
+    optional actorId: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    guard self.status == "committing"
+    constraint commitCheckpointPresent: length(trim(commitCheckpoint)) > 0 "Commit checkpoint is required"
+    constraint commitCheckpointActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate commitCheckpoint = commitCheckpoint
+    mutate actorId = actorId != null ? actorId : self.actorId
+    emit ImportRunCommitCheckpointRecorded {
+      importRunId: self.id
+      tenantId: self.tenantId
+      commitCheckpoint: commitCheckpoint
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
   store ImportRun in durable
 }
 
@@ -406,5 +439,12 @@ event ImportRunDispositionSummaryRecorded: "import_run.disposition_summary_recor
   tenantId: string
   dispositionCounts: string
   unaccountedRecordCount: int
+  actorId: string
+}
+
+event ImportRunCommitCheckpointRecorded: "import_run.commit_checkpoint_recorded" {
+  importRunId: string
+  tenantId: string
+  commitCheckpoint: string
   actorId: string
 }

@@ -18,6 +18,16 @@
  * salesAccess guard), or `Lead_createViaCapture` (the create verb; salesAccess
  * guard), and linked idempotently through ExternalRecordLink. Re-run is safe
  * (per-record idempotencyKey + link dedup).
+ * R2-6 resume (PR01-05): every dataset branch is a resumable loop — the
+ * optional maxRecords arg stops after N terminal outcomes (persisting the
+ * ImportRun commit checkpoint), a crashed invocation leaves exactly that
+ * durable state, and re-invoking creates ONLY the missing records: own-run
+ * links skip silently, foreign-run links count as skipped, and a record
+ * whose create committed but whose link did not (the crash window) is
+ * re-created under the same idempotencyKey — the generated create returns
+ * the ORIGINAL docId with zero writes, so a newer user edit is never
+ * replaced. "failed" is terminal, so a commit fault must never markFailed;
+ * the resumable state is "committing" + checkpoint (see quickImport).
  * Revert supersedes the run's links (dataset-agnostic).
  *
  * Events resolve cross-dataset: a TPP Event's external `ClientID`/`VenueID` are
@@ -261,6 +271,11 @@ export const upsertLink = internalMutation({
       rawSourceData: args.rawSourceData,
       conflictStatus: args.conflictStatus,
       resolutionNote: args.resolutionNote,
+      // SoftDeletable shape: generated creates stamp deletedAt: null, and
+      // findLink/linksForRun filter q.eq(deletedAt, null) — an insert without
+      // the key leaves it undefined and every cross-dataset findLink
+      // (events→contact, payments→event, pack_list→event) silently misses.
+      deletedAt: null,
       createdAt: now,
       updatedAt: now,
       version: 0,
@@ -289,7 +304,87 @@ export type CommitResult = {
   skipped: number;
   pending: number;
   parseErrors: number;
+  /**
+   * R2-6 batch stop: true when maxRecords stopped this invocation with
+   * unhandled records left — the run stays "committing"; re-invoke the
+   * action with the same rows to resume (per-record link + idempotencyKey
+   * dedup makes the resume create only the missing records).
+   */
+  stoppedEarly?: boolean;
+  /** Cumulative records handled across this run's commit invocations. */
+  processedCount?: number;
 };
+
+/**
+ * Commit-stage resume checkpoint (PR01-05 / R2-6) — persisted on the run via
+ * ImportRun_recordCommitCheckpoint. The run's status is the stage cursor;
+ * these cumulative counts are the per-record cursor inside "committing".
+ * Durable resume truth stays the per-record ExternalRecordLink + create
+ * idempotency keys — the checkpoint is bookkeeping and operator visibility.
+ */
+type CommitCheckpoint = {
+  processedCount: number;
+  committedCount: number;
+  skippedCount: number;
+  pendingCount: number;
+  updatedAt?: number;
+};
+
+/** Seed the checkpoint from the run's stored JSON (malformed ⇒ zeroed). */
+function seedCheckpoint(raw: string): CommitCheckpoint {
+  try {
+    const parsed = JSON.parse(raw) as Partial<CommitCheckpoint>;
+    return {
+      processedCount: Math.max(0, parsed.processedCount ?? 0),
+      committedCount: Math.max(0, parsed.committedCount ?? 0),
+      skippedCount: Math.max(0, parsed.skippedCount ?? 0),
+      pendingCount: Math.max(0, parsed.pendingCount ?? 0),
+    };
+  } catch {
+    return {
+      processedCount: 0,
+      committedCount: 0,
+      skippedCount: 0,
+      pendingCount: 0,
+    };
+  }
+}
+
+/**
+ * Fold one invocation's outcomes into the seeded checkpoint. A record this
+ * run already handled (own-run link) is skipped silently by the callers, so
+ * each terminal outcome is counted exactly once across invocations.
+ */
+function mergeCheckpoint(
+  seed: CommitCheckpoint,
+  invocation: { committed: number; skipped: number; pending: number },
+): CommitCheckpoint {
+  return {
+    processedCount:
+      seed.processedCount +
+      invocation.committed +
+      invocation.skipped +
+      invocation.pending,
+    committedCount: seed.committedCount + invocation.committed,
+    skippedCount: seed.skippedCount + invocation.skipped,
+    pendingCount: seed.pendingCount + invocation.pending,
+    updatedAt: Date.now(),
+  };
+}
+
+/**
+ * True when the R2-6 batch limit is reached and unhandled records remain.
+ * Called at the TOP of a loop iteration: `handled` records already reached a
+ * terminal outcome this invocation, `remaining` records (this one included)
+ * are still unhandled.
+ */
+function batchLimitReached(
+  maxRecords: number | undefined,
+  handled: number,
+  remaining: number,
+): boolean {
+  return maxRecords !== undefined && handled >= maxRecords && remaining > 0;
+}
 
 /**
  * Commit a venues ImportRun: parse caller-supplied TPP rows → materialize Venue
@@ -301,6 +396,17 @@ export const commitImportRun = action({
   args: {
     importRunId: v.id("importRuns"),
     rawRows: v.array(v.any()),
+    /**
+     * R2-6 batch limit: process at most this many records to a terminal
+     * outcome per invocation, persist the checkpoint, and return
+     * stoppedEarly without completing the run. Chunked commits stay inside
+     * action limits, and a worker that dies mid-loop leaves exactly this
+     * durable state — re-invoking resumes by creating only the missing
+     * records (own-run links skip; crash-window creates dedup through the
+     * create command's idempotencyKey, which returns the original docId
+     * with zero writes, so newer user edits are never replaced).
+     */
+    maxRecords: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<CommitResult> => {
     const runCtx = await ctx.runQuery(internal.importCommit.loadCommitContext, {
@@ -321,6 +427,55 @@ export const commitImportRun = action({
         `Import run must be in 'committing' status to commit, current: ${importRun.status}`,
       );
     }
+    if (args.maxRecords !== undefined && args.maxRecords < 1) {
+      throw new ConvexError("maxRecords must be at least 1 when provided.");
+    }
+
+    // R2-6 resume state, shared by every dataset branch below. Counting
+    // rule: a link THIS run wrote was counted by the invocation that handled
+    // it (the loop skip is silent for own-run links); foreign-run links,
+    // fresh creates, and caught failures count in this invocation.
+    const checkpoint = seedCheckpoint(importRun.commitCheckpoint);
+    const stopEarly = async (
+      parseErrors: number,
+      invocation: { committed: number; skipped: number; pending: number },
+    ): Promise<CommitResult> => {
+      const merged = mergeCheckpoint(checkpoint, invocation);
+      await ctx.runMutation(api.mutations.ImportRun_recordCommitCheckpoint, {
+        docId: args.importRunId,
+        commitCheckpoint: JSON.stringify(merged),
+      });
+      return {
+        committed: invocation.committed,
+        skipped: invocation.skipped,
+        pending: invocation.pending,
+        parseErrors,
+        stoppedEarly: true,
+        processedCount: merged.processedCount,
+      };
+    };
+    const completeRun = async (invocation: {
+      committed: number;
+      skipped: number;
+      pending: number;
+    }): Promise<void> => {
+      await ctx.runMutation(api.mutations.ImportRun_recordCommitCheckpoint, {
+        docId: args.importRunId,
+        commitCheckpoint: JSON.stringify(
+          mergeCheckpoint(checkpoint, invocation),
+        ),
+      });
+      // recordCommitCheckpoint bumps the run's version — re-read so the
+      // terminal flip passes OCC (the entry snapshot is now stale).
+      const freshRun = await ctx.runQuery(
+        internal.importCommit.loadCommitContext,
+        { importRunId: args.importRunId },
+      );
+      await ctx.runMutation(api.mutations.ImportRun_commit, {
+        docId: args.importRunId,
+        version: freshRun ? freshRun.importRun.version : importRun.version,
+      });
+    };
 
     // ponytail: a TPP contact (a person we cater for) → a person-type Client
     // account. We deliberately do NOT create a ClientContact here: that entity
@@ -346,7 +501,22 @@ export const commitImportRun = action({
       let committed = 0;
       let skipped = 0;
       let pending = 0;
-      for (const contact of parsed.records) {
+      for (const [index, contact] of parsed.records.entries()) {
+        // R2-6 batch stop: halt before the next record once maxRecords
+        // records reached a terminal outcome this invocation.
+        if (
+          batchLimitReached(
+            args.maxRecords,
+            committed + skipped + pending,
+            parsed.records.length - index,
+          )
+        ) {
+          return await stopEarly(parsed.errors.length, {
+            committed,
+            skipped,
+            pending,
+          });
+        }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -354,7 +524,12 @@ export const commitImportRun = action({
           externalId: contact.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized in a prior run — idempotent skip.
+          // Already materialized — idempotent skip. A link THIS run wrote
+          // was counted by the invocation that handled it, so a resume
+          // skips it silently (R2-6) and checkpoint counts stay exact.
+          if (existing.sourceImportRunId === args.importRunId) {
+            continue;
+          }
           skipped += 1;
           continue;
         }
@@ -417,16 +592,20 @@ export const commitImportRun = action({
         );
       }
 
-      await ctx.runMutation(api.mutations.ImportRun_commit, {
-        docId: args.importRunId,
-        version: importRun.version,
-      });
+      // R2-6: persist the final checkpoint totals, then flip to completed
+      // with a fresh version (recordCommitCheckpoint bumps it).
+      await completeRun({ committed, skipped, pending });
 
       return {
         committed,
         skipped,
         pending,
         parseErrors: parsed.errors.length,
+        processedCount: mergeCheckpoint(checkpoint, {
+          committed,
+          skipped,
+          pending,
+        }).processedCount,
       };
     }
 
@@ -445,7 +624,23 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
 
-      for (const event of parsed.records as ParsedCapsuleEvent[]) {
+      for (const [index, event] of (
+        parsed.records as ParsedCapsuleEvent[]
+      ).entries()) {
+        // R2-6 batch stop (see the contacts branch).
+        if (
+          batchLimitReached(
+            args.maxRecords,
+            committed + skipped + pending,
+            parsed.records.length - index,
+          )
+        ) {
+          return await stopEarly(parsed.errors.length, {
+            committed,
+            skipped,
+            pending,
+          });
+        }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -453,7 +648,11 @@ export const commitImportRun = action({
           externalId: event.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized in a prior run — idempotent skip.
+          // Already materialized — idempotent skip (own-run links skip
+          // silently so resume counts stay exact, R2-6).
+          if (existing.sourceImportRunId === args.importRunId) {
+            continue;
+          }
           skipped += 1;
           continue;
         }
@@ -615,16 +814,20 @@ export const commitImportRun = action({
         );
       }
 
-      await ctx.runMutation(api.mutations.ImportRun_commit, {
-        docId: args.importRunId,
-        version: importRun.version,
-      });
+      // R2-6: persist the final checkpoint totals, then flip to completed
+      // with a fresh version (recordCommitCheckpoint bumps it).
+      await completeRun({ committed, skipped, pending });
 
       return {
         committed,
         skipped,
         pending,
         parseErrors: parsed.errors.length,
+        processedCount: mergeCheckpoint(checkpoint, {
+          committed,
+          skipped,
+          pending,
+        }).processedCount,
       };
     }
 
@@ -643,7 +846,23 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
 
-      for (const lead of parsed.records as ParsedCapsuleLead[]) {
+      for (const [index, lead] of (
+        parsed.records as ParsedCapsuleLead[]
+      ).entries()) {
+        // R2-6 batch stop (see the contacts branch).
+        if (
+          batchLimitReached(
+            args.maxRecords,
+            committed + skipped + pending,
+            parsed.records.length - index,
+          )
+        ) {
+          return await stopEarly(parsed.errors.length, {
+            committed,
+            skipped,
+            pending,
+          });
+        }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -651,7 +870,11 @@ export const commitImportRun = action({
           externalId: lead.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized in a prior run — idempotent skip.
+          // Already materialized — idempotent skip (own-run links skip
+          // silently so resume counts stay exact, R2-6).
+          if (existing.sourceImportRunId === args.importRunId) {
+            continue;
+          }
           skipped += 1;
           continue;
         }
@@ -726,16 +949,20 @@ export const commitImportRun = action({
         );
       }
 
-      await ctx.runMutation(api.mutations.ImportRun_commit, {
-        docId: args.importRunId,
-        version: importRun.version,
-      });
+      // R2-6: persist the final checkpoint totals, then flip to completed
+      // with a fresh version (recordCommitCheckpoint bumps it).
+      await completeRun({ committed, skipped, pending });
 
       return {
         committed,
         skipped,
         pending,
         parseErrors: parsed.errors.length,
+        processedCount: mergeCheckpoint(checkpoint, {
+          committed,
+          skipped,
+          pending,
+        }).processedCount,
       };
     }
 
@@ -764,7 +991,23 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
 
-      for (const payment of parsed.records as ParsedCapsulePayment[]) {
+      for (const [index, payment] of (
+        parsed.records as ParsedCapsulePayment[]
+      ).entries()) {
+        // R2-6 batch stop (see the contacts branch).
+        if (
+          batchLimitReached(
+            args.maxRecords,
+            committed + skipped + pending,
+            parsed.records.length - index,
+          )
+        ) {
+          return await stopEarly(parsed.errors.length, {
+            committed,
+            skipped,
+            pending,
+          });
+        }
         // Idempotent skip: an existing ACTIVE link means this payment reference
         // is already staged (or already matched). The link IS the artifact, so
         // ANY active link — matched or not — is a no-op skip (re-runs don't
@@ -777,6 +1020,11 @@ export const commitImportRun = action({
           externalId: payment.externalId,
         });
         if (existing) {
+          // Already staged — no-op skip. A link THIS run wrote was counted
+          // by the invocation that staged it (R2-6 resume).
+          if (existing.sourceImportRunId === args.importRunId) {
+            continue;
+          }
           skipped += 1;
           continue;
         }
@@ -835,16 +1083,20 @@ export const commitImportRun = action({
         throw new ConvexError("No payment references staged.");
       }
 
-      await ctx.runMutation(api.mutations.ImportRun_commit, {
-        docId: args.importRunId,
-        version: importRun.version,
-      });
+      // R2-6: persist the final checkpoint totals, then flip to completed
+      // with a fresh version (recordCommitCheckpoint bumps it).
+      await completeRun({ committed, skipped, pending });
 
       return {
         committed,
         skipped,
         pending,
         parseErrors: parsed.errors.length,
+        processedCount: mergeCheckpoint(checkpoint, {
+          committed,
+          skipped,
+          pending,
+        }).processedCount,
       };
     }
 
@@ -877,7 +1129,23 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
 
-      for (const menu of parsed.records as ParsedCapsuleMenu[]) {
+      for (const [index, menu] of (
+        parsed.records as ParsedCapsuleMenu[]
+      ).entries()) {
+        // R2-6 batch stop (see the contacts branch).
+        if (
+          batchLimitReached(
+            args.maxRecords,
+            committed + skipped + pending,
+            parsed.records.length - index,
+          )
+        ) {
+          return await stopEarly(parsed.errors.length, {
+            committed,
+            skipped,
+            pending,
+          });
+        }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -885,7 +1153,11 @@ export const commitImportRun = action({
           externalId: menu.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized in a prior run — idempotent skip.
+          // Already materialized — idempotent skip (own-run links skip
+          // silently so resume counts stay exact, R2-6).
+          if (existing.sourceImportRunId === args.importRunId) {
+            continue;
+          }
           skipped += 1;
           continue;
         }
@@ -947,16 +1219,20 @@ export const commitImportRun = action({
         );
       }
 
-      await ctx.runMutation(api.mutations.ImportRun_commit, {
-        docId: args.importRunId,
-        version: importRun.version,
-      });
+      // R2-6: persist the final checkpoint totals, then flip to completed
+      // with a fresh version (recordCommitCheckpoint bumps it).
+      await completeRun({ committed, skipped, pending });
 
       return {
         committed,
         skipped,
         pending,
         parseErrors: parsed.errors.length,
+        processedCount: mergeCheckpoint(checkpoint, {
+          committed,
+          skipped,
+          pending,
+        }).processedCount,
       };
     }
 
@@ -987,7 +1263,23 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
 
-      for (const packList of parsed.records as ParsedCapsulePackList[]) {
+      for (const [index, packList] of (
+        parsed.records as ParsedCapsulePackList[]
+      ).entries()) {
+        // R2-6 batch stop (see the contacts branch).
+        if (
+          batchLimitReached(
+            args.maxRecords,
+            committed + skipped + pending,
+            parsed.records.length - index,
+          )
+        ) {
+          return await stopEarly(parsed.errors.length, {
+            committed,
+            skipped,
+            pending,
+          });
+        }
         const existing = await ctx.runQuery(internal.importCommit.findLink, {
           tenantId,
           sourceSystem,
@@ -995,7 +1287,11 @@ export const commitImportRun = action({
           externalId: packList.externalId,
         });
         if (existing && existing.capsuleId) {
-          // Already materialized in a prior run — idempotent skip.
+          // Already materialized — idempotent skip (own-run links skip
+          // silently so resume counts stay exact, R2-6).
+          if (existing.sourceImportRunId === args.importRunId) {
+            continue;
+          }
           skipped += 1;
           continue;
         }
@@ -1117,16 +1413,20 @@ export const commitImportRun = action({
         );
       }
 
-      await ctx.runMutation(api.mutations.ImportRun_commit, {
-        docId: args.importRunId,
-        version: importRun.version,
-      });
+      // R2-6: persist the final checkpoint totals, then flip to completed
+      // with a fresh version (recordCommitCheckpoint bumps it).
+      await completeRun({ committed, skipped, pending });
 
       return {
         committed,
         skipped,
         pending,
         parseErrors: parsed.errors.length,
+        processedCount: mergeCheckpoint(checkpoint, {
+          committed,
+          skipped,
+          pending,
+        }).processedCount,
       };
     }
 
@@ -1152,7 +1452,21 @@ export const commitImportRun = action({
     let skipped = 0;
     let pending = 0;
 
-    for (const venue of parsed.records) {
+    for (const [index, venue] of parsed.records.entries()) {
+      // R2-6 batch stop (see the contacts branch).
+      if (
+        batchLimitReached(
+          args.maxRecords,
+          committed + skipped + pending,
+          parsed.records.length - index,
+        )
+      ) {
+        return await stopEarly(parsed.errors.length, {
+          committed,
+          skipped,
+          pending,
+        });
+      }
       const existing = await ctx.runQuery(internal.importCommit.findLink, {
         tenantId,
         sourceSystem,
@@ -1160,7 +1474,11 @@ export const commitImportRun = action({
         externalId: venue.externalId,
       });
       if (existing && existing.capsuleId) {
-        // Already materialized in a prior run — idempotent skip.
+        // Already materialized — idempotent skip (own-run links skip
+        // silently so resume counts stay exact, R2-6).
+        if (existing.sourceImportRunId === args.importRunId) {
+          continue;
+        }
         skipped += 1;
         continue;
       }
@@ -1227,18 +1545,21 @@ export const commitImportRun = action({
     }
 
     // Flip the run to completed via the generated command (transition guard +
-    // ImportRunCommitted event + OCC). Version is unchanged since the run was
-    // last read (venue/link writes do not touch importRuns).
-    await ctx.runMutation(api.mutations.ImportRun_commit, {
-      docId: args.importRunId,
-      version: importRun.version,
-    });
+    // ImportRunCommitted event + OCC). R2-6: persist the final checkpoint
+    // totals first, then flip with a fresh version (recordCommitCheckpoint
+    // bumps it, so the entry snapshot would fail OCC).
+    await completeRun({ committed, skipped, pending });
 
     return {
       committed,
       skipped,
       pending,
       parseErrors: parsed.errors.length,
+      processedCount: mergeCheckpoint(checkpoint, {
+        committed,
+        skipped,
+        pending,
+      }).processedCount,
     };
   },
 });

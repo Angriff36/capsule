@@ -182,6 +182,7 @@ export const startImport = mutation({
       discrepancyExplained: false,
       dispositionCounts: "{}",
       unaccountedRecordCount: 0,
+      commitCheckpoint: "{}",
       checksum: args.checksum ?? undefined,
       // Timestamps-mixin fields: commands (recordArchiveInventory,
       // explainArchiveDiscrepancy, …) guard on createdAt being present, so
@@ -220,6 +221,17 @@ export const getImportRunStatus = query({
       // Invalid JSON, leave as null
     }
 
+    // Commit-stage resume checkpoint (R2-6) — processed counts + cursor.
+    let parsedCheckpoint: Record<string, unknown> | null = null;
+    try {
+      parsedCheckpoint = JSON.parse(importRun.commitCheckpoint) as Record<
+        string,
+        unknown
+      >;
+    } catch {
+      // Invalid JSON, leave as null
+    }
+
     return {
       id: importRun._id,
       status: importRun.status,
@@ -234,6 +246,7 @@ export const getImportRunStatus = query({
       reviewApprovedAt: importRun.reviewApprovedAt,
       commitStartedAt: importRun.commitStartedAt,
       recordCounts: parsedCounts,
+      commitCheckpoint: parsedCheckpoint,
       checksum: importRun.checksum,
       actorId: importRun.actorId,
       failureDetails: importRun.failureDetails,

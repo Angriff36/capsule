@@ -21,7 +21,7 @@
  */
 import { ConvexError, v } from "convex/values";
 import { action } from "./_generated/server";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
 import type { Id } from "./_generated/dataModel";
 import type { CommitResult } from "./importCommit";
@@ -81,17 +81,30 @@ export const importFile = action({
     } catch (cause) {
       // Never leave an allocated run stuck mid-pipeline: mark it failed (the
       // generated transition allows failed from any pre-completion state) so
-      // Revert/audit stay truthful, then surface the error.
-      const detail =
-        cause instanceof Error ? cause.message : "Quick import failed";
-      try {
-        await ctx.runMutation(api.mutations.ImportRun_markFailed, {
-          docId: runId,
-          failureDetails: detail,
-        });
-      } catch {
-        // The run may already be terminal (completed/reverted) — surface the
-        // original failure either way.
+      // Revert/audit stay truthful, then surface the error. EXCEPT mid-commit
+      // (R2-6 / PR01-05): "failed" is TERMINAL (no transition out), while a
+      // commit fault leaves durable per-record links + the commit checkpoint
+      // whose resume is re-invoking commitImportRun — marking such a run
+      // failed would orphan crash-window records (entity created, link not
+      // yet) beyond recovery, because a replacement run's idempotency keys
+      // are run-scoped.
+      const runCtx = await ctx
+        .runQuery(internal.importCoordinator.loadImportContext, {
+          importRunId: runId,
+        })
+        .catch(() => null);
+      if (runCtx?.importRun.status !== "committing") {
+        const detail =
+          cause instanceof Error ? cause.message : "Quick import failed";
+        try {
+          await ctx.runMutation(api.mutations.ImportRun_markFailed, {
+            docId: runId,
+            failureDetails: detail,
+          });
+        } catch {
+          // The run may already be terminal (completed/reverted) — surface
+          // the original failure either way.
+        }
       }
       throw cause;
     }
