@@ -15,10 +15,10 @@
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
-import { api } from "../convex/_generated/api";
-import schema from "../convex/schema";
+import { api } from "../../convex/_generated/api";
+import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
-import { modules } from "./proofs/convex-test-modules";
+import { modules } from "./convex-test-modules";
 
 function harness() {
   return createManifestTestContext({

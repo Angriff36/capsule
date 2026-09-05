@@ -411,6 +411,22 @@ not testable. No manifest change, no regen. Gates: `bun run test` 123 files
 (AC-007…AC-016, AC-018, AC-019). Next: C1 (move the booking proof under
 `tests/proofs/`) → AC-001.
 
+Iteration 40 (BUILD iteration 12, 2026-09-04): C1 DONE. `git mv
+tests/proposal-event-booking.runtime.test.ts
+tests/proofs/proposal-event-booking.runtime.test.ts`; three imports fixed
+(`../../convex/_generated/api`, `../../convex/schema`,
+`./convex-test-modules` — same shape as every sibling proof). The move
+puts the file under `environmentMatchGlobs` edge-runtime (vite.config.ts:104):
+7/7 green there, NO environment-only fix needed (the proof uses only
+`Date.parse` + the proof-kit pattern, no node APIs). `package.json:49`
+`test:proofs` runs the `tests/proofs` directory plus named guard files, and
+the root-level path was never named, so the gate needed no edit;
+emit-proof-kit.ts still does not bind it (unregistered by design).
+AC-001 = PASS (13 of 19: AC-001, AC-007…AC-016, AC-018, AC-019). C2–C4
+extend this proof file. Gates: `bun run test` 123 files / 1209 tests
+green; typecheck, `format:check`, `bunx vite build` green. Tag `v0.0.47`
+created. Next: C2 (end time carries over) → AC-004.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -422,7 +438,7 @@ Activities in `specs/` in the order a real event moves through the business.
 | 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | ✅ entities + commands + seed script; admin UI `/admin/catalogs` (B1); create-time empty states (B2); runtime proof (B3); retired rows hidden on create, kept on detail (B4) | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
-| 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event; proof sits outside `tests/proofs/` | 4, 2 (service style/occasion on create) |
+| 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event | 4, 2 (service style/occasion on create) |
 | 6 | Event is planned: staffing, prep, equipment, purchasing | Josh, Sales, Kitchen | feature §9–§11 | ✅ (My Day, prep board, pack lists, equipment, receiving) | 5 |
 | 7 | Field staff execute from a phone; no dead ends | Kayden | `ralph/field-flow-defect-burndown` | 🟡 #149/#150 fixed and tested; #142–#146 open (empty states, dish cost, dietary tags, draft-list packing) | 6 |
 | 8 | Closeout, invoice, money truth | Josh | feature §7, issue #136 | 🟡 dashboards live; invoice numbers still raw doc ids at the source | 7 |
@@ -692,7 +708,7 @@ Order = build order. Earlier tasks unblock later ones.
 
 ### C. Proposal → event handoff residuals (spec `specs/ralph/signed-proposal-becomes-the-event.md`)
 
-- [ ] **C1. Move the booking proof under `tests/proofs/`.**
+- [x] **C1. Move the booking proof under `tests/proofs/`.**
       `tests/proposal-event-booking.runtime.test.ts` (7 tests, 7/7 green on
       2026-09-03) satisfies the behavior but not the spec's location. Move it
       to `tests/proofs/proposal-event-booking.runtime.test.ts`; fix its

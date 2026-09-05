@@ -30,8 +30,7 @@ evidence.
 Runtime proofs live in tests/proofs/*.runtime.test.ts. Everything under
 tests/proofs/** runs in the `edge-runtime` environment (vite.config.ts:104
 `environmentMatchGlobs` is `[["tests/proofs/**", "edge-runtime"]]`; the
-default is `node`, so the root-level booking proof runs in node until C1
-moves it). Proofs boot
+default is `node` for every other test file). Proofs boot
 via `createManifestTestContext({ convexTest, schema, modules })` from
 `@angriff36/manifest/proof-kit/convex-test` with `modules` from
 tests/proofs/convex-test-modules.ts, and need the CONVEX_FIELD_ENCRYPTION_KEY
@@ -39,15 +38,15 @@ tests/proofs/convex-test-modules.ts, and need the CONVEX_FIELD_ENCRYPTION_KEY
 .runtime.test.ts:1-30). New proof files for Event/Proposal/QuoteSubmission
 need no registry entry: scripts/emit-proof-kit.ts binds `runtimeTest` paths
 only for CATALOG_ENTITIES capabilities (:43-52, :232-266) and `check:proof`
-validates only those generated artifacts — the existing root-level booking
-proof already runs unregistered. Unit tests under tests/features/** are
+validates only those generated artifacts — the booking
+proof runs unregistered. Unit tests under tests/features/** are
 pure-helper or `readFileSync` source-text assertions; no @testing-library/react
 is installed (only jsdom), so do not plan render tests.
 -->
 
 | Id | Spec | Outcome to verify (WHAT, not HOW) | Required test | Kind | Status |
 | ------ | ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ---- | ------- |
-| AC-001 | specs/ralph/signed-proposal-becomes-the-event.md | Creating an event from an accepted proposal copies every live menu selection onto the event with `quantityServings` unchanged; removed selections are not copied. Proof lives under `tests/proofs/`. | `tests/proofs/proposal-event-booking.runtime.test.ts` › "books the event, links the proposal, and copies live menu selections" (exists today at `tests/proposal-event-booking.runtime.test.ts`, 7/7 green 2026-09-03; PENDING only until moved under `tests/proofs/`) | P | PENDING |
+| AC-001 | specs/ralph/signed-proposal-becomes-the-event.md | Creating an event from an accepted proposal copies every live menu selection onto the event with `quantityServings` unchanged; removed selections are not copied. Proof lives under `tests/proofs/`. | `tests/proofs/proposal-event-booking.runtime.test.ts` › "books the event, links the proposal, and copies live menu selections" (moved under `tests/proofs/` 2026-09-04; 7/7 green under edge-runtime) | P | PASS |
 | AC-002 | specs/ralph/signed-proposal-becomes-the-event.md | From the created event a user can reach the source proposal (reverse lookup `listProposalByEventId`) and see which revision was accepted (highest `revisionNumber`, or `SignatureRequest.proposalRevisionId` for digital accepts); a proposal with no revision (agent bundle path, issue #241) shows the proposal number and "no revision captured" without throwing; the event does not rely on free-text copies for that link. | `tests/proofs/proposal-event-booking.runtime.test.ts` › "event resolves its proposal and accepted revision" | P | PENDING |
 | AC-003 | specs/ralph/signed-proposal-becomes-the-event.md | When the proposal venue name matches a saved Venue (case/whitespace-insensitive) the event gets that `venueId`; when it does not, the create screen shows a visible mismatch notice and the operator can pick or create a venue. | `tests/features/events/proposal-event-prefill.test.ts` › "venue match and mismatch notice" | P | PENDING |
 | AC-004 | specs/ralph/signed-proposal-becomes-the-event.md | Date, start time, end time and headcount from the proposal arrive on the event as typed fields (`startsAt`, `endsAt`, `expectedHeadcount`) without re-entry; a proposal with no end time says so on the create screen instead of silently leaving the field blank. | `tests/proofs/proposal-event-booking.runtime.test.ts` › "typed date, times and headcount carry over" | P | PENDING |
