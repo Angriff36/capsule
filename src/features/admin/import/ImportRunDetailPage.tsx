@@ -13,6 +13,7 @@ import { api } from "../../../lib/api";
 import { formatDate, formatTime } from "../../../lib/format";
 import { useRouteRecord } from "../../../lib/routeRecord";
 import { importRunsListPath } from "./importRoutes";
+import { ImportProvenancePanel } from "./ImportProvenancePanel";
 import { StatusChip } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
@@ -856,6 +857,9 @@ export function ImportRunDetailPage() {
           </div>
         </div>
       ) : null}
+
+      {/* Source Provenance Section (artifact-side evidence, PR01-03) */}
+      <ImportProvenancePanel importRunId={importRun._id} />
 
       {/* Failure Details Section */}
       {importRun.status === "failed" && importRun.failureDetails ? (
