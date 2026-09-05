@@ -75,8 +75,17 @@ async function acceptedProposalWithMenu(
   proof: ReturnType<typeof harness>,
   actor: Actor,
   seed: Awaited<ReturnType<typeof seedCatalog>>,
-  /** Draft-window hook (C3): offer/withdraw enhancements before send. */
-  beforeSend?: (proposalId: string) => Promise<void>,
+  opts?: {
+    /** Draft-window hook (C3): offer/withdraw enhancements before send. */
+    beforeSend?: (proposalId: string) => Promise<void>;
+    /**
+     * C4: send through the UI send path
+     * (sendProposalWithRevisionCapture), which captures an immutable
+     * revision in the same transaction, instead of the raw Proposal_send
+     * the agent bundle path uses (issue #241).
+     */
+    captureRevision?: boolean;
+  },
 ) {
   const proposal = (await proof.executeCommand(
     actor,
@@ -122,10 +131,18 @@ async function acceptedProposalWithMenu(
     api.mutations.ProposalDishSelection_remove,
     { docId: removed.docId },
   );
-  if (beforeSend) await beforeSend(proposal.docId);
-  await proof.executeCommand(actor, api.mutations.Proposal_send, {
-    docId: proposal.docId,
-  });
+  if (opts?.beforeSend) await opts.beforeSend(proposal.docId);
+  if (opts?.captureRevision) {
+    await proof.executeCommand(
+      actor,
+      api.lib.proposalRevision.sendProposalWithRevisionCapture,
+      { docId: proposal.docId },
+    );
+  } else {
+    await proof.executeCommand(actor, api.mutations.Proposal_send, {
+      docId: proposal.docId,
+    });
+  }
   await proof.executeCommand(actor, api.mutations.Proposal_markViewed, {
     docId: proposal.docId,
   });
@@ -281,11 +298,8 @@ describe("accepted proposal → create event (issue #141)", () => {
     let withdrawnId = "";
     // offer/withdraw guard proposal.status == "draft", so both run in the
     // draft window: two live enhancements plus one withdrawn before send.
-    const proposalId = await acceptedProposalWithMenu(
-      proof,
-      owner,
-      seed,
-      async (id) => {
+    const proposalId = await acceptedProposalWithMenu(proof, owner, seed, {
+      beforeSend: async (id) => {
         await proof.executeCommand(
           owner,
           api.mutations.ProposalEnhancement_createViaOffer,
@@ -313,7 +327,7 @@ describe("accepted proposal → create event (issue #141)", () => {
           { docId: withdrawn.docId },
         );
       },
-    );
+    });
 
     const booked = (await proof.executeCommand(
       owner,
@@ -348,6 +362,176 @@ describe("accepted proposal → create event (issue #141)", () => {
     // Withdraw soft-deletes (removedAt AND deletedAt), so the generated read
     // already drops the row — the withdrawn offer never reaches the event.
     expect(enhancements.map((row) => row._id)).not.toContain(withdrawnId);
+  });
+
+  it("event resolves its proposal and accepted revision", async () => {
+    const tenantId = "tenant-booking-rev";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-rev",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedCatalog(proof, owner, tenantId);
+
+    // UI send path: send and revision capture commit in one transaction
+    // (convex/lib/proposalRevision.sendProposalWithRevisionCapture).
+    const capturedId = await acceptedProposalWithMenu(proof, owner, seed, {
+      captureRevision: true,
+    });
+    const booked = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId: capturedId,
+        event: { clientId: seed.clientId, ...EVENT_ARGS },
+      },
+    )) as { docId: string };
+
+    // The exact read path EventProposalSourceCard walks: the reverse lookup
+    // resolves the proposal from the event — never a free-text copy.
+    const proposals = (await owner.query(api.queries.listProposalByEventId, {
+      eventId: booked.docId,
+    })) as Array<{ _id: string }>;
+    expect(proposals.map((row) => row._id)).toEqual([capturedId]);
+
+    const revisions = (await owner.query(
+      api.queries.listProposalRevisionByProposalId,
+      { proposalId: capturedId },
+    )) as Array<{ _id: string; revisionNumber: number }>;
+    expect(revisions).toHaveLength(1);
+    expect(revisions[0].revisionNumber).toBe(1);
+
+    // No signature request exists for it yet: the card's digital branch is
+    // empty and the highest revisionNumber (1) is the accepted revision.
+    const signaturesBefore = (await owner.query(
+      api.queries.listSignatureRequest,
+      {},
+    )) as Array<{ proposalId: string | null }>;
+    expect(
+      signaturesBefore.filter((row) => row.proposalId === capturedId),
+    ).toEqual([]);
+
+    // Digital accept: sign the captured revision, then the generated
+    // SignatureCompleted reaction accepts the proposal (complete →
+    // __runProposalAccept), and booking walks the same reverse lookup with
+    // the signature naming WHICH revision was accepted.
+    const digitalProposal = (await proof.executeCommand(
+      owner,
+      api.mutations.Proposal_createViaDraft,
+      {
+        clientId: seed.clientId,
+        title: "Signed gala proposal",
+        subtotal: 900,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 900,
+      },
+    )) as { docId: string };
+    await proof.executeCommand(
+      owner,
+      api.lib.proposalRevision.sendProposalWithRevisionCapture,
+      { docId: digitalProposal.docId },
+    );
+    await proof.executeCommand(owner, api.mutations.Proposal_markViewed, {
+      docId: digitalProposal.docId,
+    });
+    const digitalRevisions = (await owner.query(
+      api.queries.listProposalRevisionByProposalId,
+      { proposalId: digitalProposal.docId },
+    )) as Array<{ _id: string; revisionNumber: number }>;
+    expect(digitalRevisions).toHaveLength(1);
+
+    // The signature commands guard on user.personId, which only a linked
+    // Person row provides (person-first auth, convex/lib/authContext.ts):
+    // seed one for this subject the way Team roles links a real sign-in.
+    await proof.seedEntity(owner, "people", {
+      tenantId,
+      givenName: "Rev",
+      familyName: "Owner",
+      email: "rev-owner@example.com",
+      role: "owner",
+      employmentType: "full_time",
+      status: "active",
+      authSubjectId: "owner-rev",
+      version: 1,
+    });
+
+    const signature = (await proof.executeCommand(
+      owner,
+      api.mutations.SignatureRequest_createViaRequestSignature,
+      {
+        proposalRevisionId: digitalRevisions[0]._id,
+        proposalId: digitalProposal.docId,
+        recipientEmail: "signer@example.com",
+        recipientName: "Casey Contact",
+      },
+    )) as { docId: string };
+    // No generated command sets callbackToken (the authored acceptance seam
+    // owns it); seed it the way that seam does so complete's guard passes.
+    await owner.run(async (ctx) =>
+      ctx.db.patch(signature.docId as never, { callbackToken: "proof-token" }),
+    );
+    await proof.executeCommand(owner, api.mutations.SignatureRequest_complete, {
+      docId: signature.docId,
+      callbackToken: "proof-token",
+      signedArtifactReference: "proof://signed",
+    });
+    const digitalRow = (await owner.run(async (ctx) =>
+      ctx.db.get(digitalProposal.docId as never),
+    )) as { status?: string };
+    expect(digitalRow.status).toBe("accepted");
+
+    const bookedDigital = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId: digitalProposal.docId,
+        event: { clientId: seed.clientId, ...EVENT_ARGS },
+      },
+    )) as { docId: string };
+    const digitalProposals = (await owner.query(
+      api.queries.listProposalByEventId,
+      { eventId: bookedDigital.docId },
+    )) as Array<{ _id: string }>;
+    expect(digitalProposals.map((row) => row._id)).toEqual([
+      digitalProposal.docId,
+    ]);
+    const signaturesAfter = (await owner.query(
+      api.queries.listSignatureRequest,
+      {},
+    )) as Array<{
+      proposalId: string | null;
+      proposalRevisionId: string;
+      status: string;
+    }>;
+    const completed = signaturesAfter.find(
+      (row) => row.proposalId === digitalProposal.docId,
+    );
+    expect(completed?.status).toBe("completed");
+    expect(completed?.proposalRevisionId).toBe(digitalRevisions[0]._id);
+
+    // Agent bundle path (issue #241): raw Proposal.send captures no revision.
+    // Zero revisions is a resolvable state — the card says "no revision
+    // captured" — and the reverse lookup still resolves. Nothing throws.
+    const rawId = await acceptedProposalWithMenu(proof, owner, seed);
+    const bookedRaw = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId: rawId,
+        event: { clientId: seed.clientId, ...EVENT_ARGS },
+      },
+    )) as { docId: string };
+    const rawProposals = (await owner.query(api.queries.listProposalByEventId, {
+      eventId: bookedRaw.docId,
+    })) as Array<{ _id: string }>;
+    expect(rawProposals.map((row) => row._id)).toEqual([rawId]);
+    const rawRevisions = (await owner.query(
+      api.queries.listProposalRevisionByProposalId,
+      { proposalId: rawId },
+    )) as Array<{ revisionNumber: number }>;
+    expect(rawRevisions).toEqual([]);
   });
 
   it("sales_staff can complete the whole flow, menu copy included", async () => {

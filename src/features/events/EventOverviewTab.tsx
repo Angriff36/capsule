@@ -5,6 +5,7 @@ import {
   type EventDetailRevisePanelsProps,
 } from "./EventDetailRevisePanels";
 import { EventProposalEnhancementsCard } from "../clients/EventProposalEnhancementsCard";
+import { EventProposalSourceCard } from "../clients/EventProposalSourceCard";
 import { EventDetailsCard } from "./EventDetailsCard";
 import type {
   EventLifecycleAction,
@@ -116,6 +117,7 @@ export function EventOverviewTab({
             accessibilityNeeds={reviseProps.accessibilityNeeds}
             editHref={editHref}
           />
+          <EventProposalSourceCard eventId={eventId} />
           <EventProposalEnhancementsCard eventId={eventId} />
           <EventBudgetCard
             budgetAmount={budgetAmount}

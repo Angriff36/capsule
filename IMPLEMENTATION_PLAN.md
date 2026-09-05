@@ -507,6 +507,43 @@ typecheck, format:check (one prettier rewrap on EventCreatePage + the
 proof), bunx vite build green. Tag v0.0.49 created. Next: C4 (event links
 back to the proposal and its accepted revision) → AC-002.
 
+Iteration 43 (BUILD iteration 15, 2026-09-05): C4 DONE. AC-002 = PASS (18
+of 19; left: AC-017 = D1). New card
+`src/features/clients/EventProposalSourceCard.tsx` ("Booked from proposal",
+testId `event-proposal-source-card`), mounted by `EventOverviewTab` between
+`EventDetailsCard` and the C3 enhancements card — same clients/ seam (the
+event-manifest guard permits direct useQuery only in EventGuestPanel).
+Read path: `useQuery(api.queries.listProposalByEventId, { eventId })` →
+first live proposal → revisions via `listProposalRevisionByProposalId`
+(generated query is UNORDERED — the caller sorts revisionNumber desc) +
+signature requests via `listSignatureRequest` (no by-proposalId query
+exists; the denormalized `proposalId` is filtered client-side, the C3
+list-all shape). Revision label precedence: completed signature's
+`proposalRevisionId` → "Revision n — signed digitally"; else highest
+revisionNumber → "Revision n"; else "no revision captured" (agent bundle
+path, #241). Label = `proposalNumber || title || "Proposal"`; deep-links
+`CLIENTS_ROUTES.proposal(id)`. Booking proof now 10 tests: "event resolves
+its proposal and accepted revision" walks (a) the UI send path
+(`sendProposalWithRevisionCapture` → revision 1 resolves), (b) a REAL
+digital accept — the signature commands guard `user.personId`, which only a
+linked `people` row grants (person-first auth, `convex/lib/authContext.ts`),
+so the proof seeds one via `proof.seedEntity` the way Team roles links a
+sign-in; no generated command sets `callbackToken` (the authored acceptance
+seam owns it), so the proof patches it before `SignatureRequest_complete`,
+whose generated SignatureCompleted reaction runs `Proposal_accept` — so the
+signature IS the accept (sign after markViewed, never after a manual
+accept, or the reaction's accept guard fails); (c) raw `Proposal_send` →
+zero revisions, the reverse lookup still resolves, nothing throws. New
+wiring test `tests/features/events/event-proposal-source-card.test.ts`
+(read calls, precedence order, "no revision captured" copy, deep link, and
+the EventOverviewTab mount). Helper `acceptedProposalWithMenu`'s 4th param
+is now an opts object `{ beforeSend?, captureRevision? }` (one call site
+updated). No manifest change, no regen. Gates: `bun run test` 126 files /
+1216 tests green; typecheck, `format:check`, `bunx vite build` green. Tag
+`v0.0.50` created. Next: C5 (consolidate date formatting — no AC), then
+D1 (end-to-end journey proof `quote-to-booked-event.runtime.test.ts`) →
+AC-017.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -518,7 +555,7 @@ Activities in `specs/` in the order a real event moves through the business.
 | 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | ✅ entities + commands + seed script; admin UI `/admin/catalogs` (B1); create-time empty states (B2); runtime proof (B3); retired rows hidden on create, kept on detail (B4) | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
-| 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview + end time (C2) + enhancements visible on the event (C3) built; no reverse link on the event (C4) | 4, 2 (service style/occasion on create) |
+| 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | ✅ link + menu copy + venue match + preview + end time (C2) + enhancements (C3) + reverse link to the proposal and its accepted revision (C4) built | 4, 2 (service style/occasion on create) |
 | 6 | Event is planned: staffing, prep, equipment, purchasing | Josh, Sales, Kitchen | feature §9–§11 | ✅ (My Day, prep board, pack lists, equipment, receiving) | 5 |
 | 7 | Field staff execute from a phone; no dead ends | Kayden | `ralph/field-flow-defect-burndown` | 🟡 #149/#150 fixed and tested; #142–#146 open (empty states, dish cost, dietary tags, draft-list packing) | 6 |
 | 8 | Closeout, invoice, money truth | Josh | feature §7, issue #136 | 🟡 dashboards live; invoice numbers still raw doc ids at the source | 7 |
@@ -838,7 +875,7 @@ Order = build order. Earlier tasks unblock later ones.
       event. Extend the C1 proof file with › "accepted enhancements reachable
       from the event" (rows reachable from the event id); the preview count
       is asserted by C6's "preview lists carried values". → AC-005, AC-006
-- [ ] **C4. Event links back to the proposal and its accepted revision.**
+- [x] **C4. Event links back to the proposal and its accepted revision.**
       Link is one-way today (`Proposal.eventId`; Event has no `proposalId`).
       Add a "Booked from proposal" line on
       `EventOverviewCard`/`EventDetailsCard` via the generated reverse lookup
