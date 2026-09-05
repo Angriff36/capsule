@@ -8,6 +8,99 @@ import {
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 
+// Event-authorized, deliberately narrow view of the booking details operations
+// needs. Generated reads remain the authority for event and sales permissions.
+export const getEventBookingDetails = query({
+  args: { eventId: v.id("events") },
+  handler: async (
+    ctx,
+    { eventId },
+  ): Promise<{
+    proposalId: Id<"proposals">;
+    label: string;
+    canOpenProposal: boolean;
+    revisionLabel: string;
+    enhancements: Array<{
+      _id: Id<"proposalEnhancements">;
+      name: string;
+      description: string | null;
+      price: number | null;
+    }>;
+  } | null> => {
+    const event: Doc<"events"> | null = await ctx.runQuery(
+      api.queries.getEvent,
+      { id: eventId },
+    );
+    if (!event) return null;
+    const proposals = await ctx.db
+      .query("proposals")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect();
+    const proposal = proposals.find(
+      (p) =>
+        p.tenantId === event.tenantId &&
+        p.deletedAt == null &&
+        p.status === "accepted",
+    );
+    if (!proposal) return null;
+    const salesProposal: Doc<"proposals"> | null = await ctx.runQuery(
+      api.queries.getProposal,
+      { id: proposal._id },
+    );
+    const revisions = (
+      await ctx.db
+        .query("proposalRevisions")
+        .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+        .collect()
+    ).filter((r) => r.tenantId === event.tenantId && r.deletedAt == null);
+    const signatures = await ctx.db
+      .query("signatureRequests")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
+      .filter((q) => q.eq(q.field("proposalId"), proposal._id))
+      .collect();
+    const signed = signatures.find(
+      (s) => s.status === "completed" && s.deletedAt == null,
+    );
+    const signedRevision = revisions.find(
+      (r) => r._id === signed?.proposalRevisionId,
+    );
+    const latest = revisions.sort(
+      (a, b) => b.revisionNumber - a.revisionNumber,
+    )[0];
+    const enhancements = (
+      await ctx.db
+        .query("proposalEnhancements")
+        .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+        .collect()
+    )
+      .filter(
+        (r) =>
+          r.tenantId === event.tenantId &&
+          r.deletedAt == null &&
+          r.addedAt != null &&
+          r.removedAt == null,
+      )
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((r) => ({
+        _id: r._id,
+        name: r.name,
+        description: r.description ?? null,
+        price: salesProposal ? r.price : null,
+      }));
+    return {
+      proposalId: proposal._id,
+      label: proposal.proposalNumber || proposal.title || "Proposal",
+      canOpenProposal: salesProposal !== null,
+      revisionLabel: signedRevision
+        ? `Revision ${signedRevision.revisionNumber} — signed digitally`
+        : latest
+          ? `Revision ${latest.revisionNumber}`
+          : "no revision captured",
+      enhancements,
+    };
+  },
+});
+
 // Public status payload for getQuoteSubmissionStatus — derived from the Doc so
 // field types stay in sync with the schema (single source of truth).
 type QuoteSubmissionStatusResult = {
@@ -87,6 +180,8 @@ export const ingressQuoteSubmission = internalMutation({
     guestCount: v.number(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    serviceStyleText: v.string(),
+    occasionText: v.string(),
     venueName: v.string(),
     venueAddress: v.string(),
     menuPreferences: v.string(),
@@ -115,24 +210,6 @@ export const ingressQuoteSubmission = internalMutation({
     }
     const tenantId = org.tenantId;
 
-    // Per-tenant rate cap on the anonymous public write. Dedup only blocks
-    // exact (email+date) repeats, so a caller varying those fields could flood
-    // the review queue and inflate cost; cap submissions per tenant per hour
-    // (table-less: a bounded take over the tenant index). A true per-caller
-    // (per-IP) limit needs a counter table and remains a follow-up.
-    const HOUR_MS = 60 * 60 * 1000;
-    const MAX_PER_HOUR = 30;
-    const recent = await ctx.db
-      .query("quoteSubmissions")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .filter((q) => q.gte(q.field("submittedAt"), Date.now() - HOUR_MS))
-      .take(MAX_PER_HOUR + 1);
-    if (recent.length >= MAX_PER_HOUR) {
-      throw new ConvexError(
-        "We've received a lot of quote requests recently. Please try again shortly.",
-      );
-    }
-
     const email = args.email.trim().toLowerCase();
     const clientName = args.clientName.trim();
     const dedupKey = generateDedupKey(email, args.eventDate, tenantId);
@@ -154,7 +231,9 @@ export const ingressQuoteSubmission = internalMutation({
     }
 
     // Dedup: a prior active submission for the same key is returned as-is so a
-    // repeat submit is a no-op (submit-once). Failed submissions can be retried.
+    // repeat submit is a no-op (submit-once). Dismissed rows still count — the
+    // raw capture is retained, and a repeat submit of a dismissed key must not
+    // mint a second row. Failed rows retain their IDs for staff to retry.
     const candidates = await ctx.db
       .query("quoteSubmissions")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -165,7 +244,9 @@ export const ingressQuoteSubmission = internalMutation({
         sub.deletedAt == null &&
         (sub.status === "pending" ||
           sub.status === "processing" ||
-          sub.status === "completed"),
+          sub.status === "completed" ||
+          sub.status === "dismissed" ||
+          sub.status === "failed"),
     );
     if (existing) {
       return {
@@ -189,6 +270,10 @@ export const ingressQuoteSubmission = internalMutation({
       guestCount: args.guestCount,
       serviceStyleId: args.serviceStyleId ?? null,
       occasionId: args.occasionId ?? null,
+      // Free-text answers from the empty-catalog fallback inputs (A5): stored
+      // as text because no catalog row exists to reference.
+      serviceStyleText: args.serviceStyleText.trim() || null,
+      occasionText: args.occasionText.trim() || null,
       venueName: args.venueName.trim() || null,
       venueAddress: args.venueAddress.trim() || null,
       menuPreferences: args.menuPreferences.trim() || null,
@@ -268,6 +353,8 @@ export const submitQuote = action({
     consent: v.boolean(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    serviceStyleText: v.optional(v.string()),
+    occasionText: v.optional(v.string()),
     venueName: v.optional(v.string()),
     venueAddress: v.optional(v.string()),
     menuPreferences: v.optional(v.string()),
@@ -324,6 +411,8 @@ export const submitQuote = action({
         guestCount: args.guestCount,
         serviceStyleId: args.serviceStyleId,
         occasionId: args.occasionId,
+        serviceStyleText: bounded(args.serviceStyleText),
+        occasionText: bounded(args.occasionText),
         venueName: bounded(args.venueName),
         venueAddress: bounded(args.venueAddress),
         menuPreferences: bounded(args.menuPreferences, MAX_LONG),
@@ -372,9 +461,9 @@ export const processQuoteSubmission = action({
       throw new ConvexError("Quote submission not found");
     }
     // Only pending submissions can be converted: the manifest transitions are
-    // pending → processing → completed|failed, and failed is terminal (there is
-    // no failed → processing reopen command). A failed conversion is surfaced
-    // to the operator for manual handling rather than offered a broken retry.
+    // pending → processing → completed|failed. A failed conversion reopens via
+    // QuoteSubmission_retry (failed → pending, checkpointed ids kept) before
+    // this action runs again — the steps below then reuse those records.
     if (submission.status !== "pending") {
       throw new ConvexError(
         `Only pending submissions can be converted (this one is ${submission.status}).`,
@@ -391,155 +480,204 @@ export const processQuoteSubmission = action({
       docId: submissionId,
     });
 
-    // Client — match by email, else create.
-    let clientId: Id<"clients"> | null = null;
-    try {
-      const existingClients = await ctx.runQuery(api.queries.listClient);
-      const existingClient = existingClients.find(
-        (c) =>
-          c.email?.toLowerCase() === email.toLowerCase() &&
-          !c.deletedAt &&
-          c.status === "active",
-      );
-      if (existingClient) {
-        clientId = existingClient._id;
-      } else {
-        const created = await ctx.runMutation(
-          api.mutations.Client_createViaRegister,
-          { clientType: "company", companyName: clientName, email, phone },
+    // Client — match by email, else create. A retry (failed → pending) reuses
+    // the checkpointed id from the failed attempt, so the retry never
+    // duplicates the client.
+    let clientId: Id<"clients"> | null = submission.clientId ?? null;
+    if (!clientId) {
+      try {
+        const existingClients = await ctx.runQuery(api.queries.listClient);
+        const existingClient = existingClients.find(
+          (c) =>
+            c.email?.toLowerCase() === email.toLowerCase() &&
+            !c.deletedAt &&
+            c.status === "active",
         );
-        clientId = created.docId;
+        if (existingClient) {
+          clientId = existingClient._id;
+        } else {
+          const created = await ctx.runMutation(
+            api.mutations.Client_createViaRegister,
+            { clientType: "company", companyName: clientName, email, phone },
+          );
+          clientId = created.docId;
+        }
+      } catch (error) {
+        errors.push(
+          `client: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
-    } catch (error) {
-      errors.push(
-        `client: ${error instanceof Error ? error.message : String(error)}`,
-      );
     }
 
-    // Lead.
-    let leadId: Id<"leads"> | null = null;
-    try {
-      if (clientId) {
-        const leadResult = await ctx.runMutation(
-          api.mutations.Lead_createViaCapture,
-          {
-            leadType: "company",
-            source: "quote-builder",
-            estimatedValue: 0,
-            companyName: clientName,
-            email,
-            phone,
-          },
+    // Lead — reused from the checkpoint on retry, else created fresh.
+    let leadId: Id<"leads"> | null = submission.leadId ?? null;
+    if (!leadId) {
+      try {
+        if (clientId) {
+          const leadResult = await ctx.runMutation(
+            api.mutations.Lead_createViaCapture,
+            {
+              leadType: "company",
+              source: "quote-builder",
+              estimatedValue: 0,
+              companyName: clientName,
+              email,
+              phone,
+            },
+          );
+          const createdLeadId = leadResult.docId;
+          leadId = createdLeadId;
+        }
+      } catch (error) {
+        errors.push(
+          `lead: ${error instanceof Error ? error.message : String(error)}`,
         );
-        const createdLeadId = leadResult.docId;
-        leadId = createdLeadId;
-        await ctx.runMutation(api.mutations.Lead_stageConversion, {
-          docId: createdLeadId,
-          clientId,
-          clientContactId: undefined,
-        });
-        await ctx.runMutation(api.mutations.Lead_confirmConversion, {
-          docId: createdLeadId,
-        });
       }
-    } catch (error) {
-      errors.push(
-        `lead: ${error instanceof Error ? error.message : String(error)}`,
-      );
     }
 
-    // Event.
-    let eventId: Id<"events"> | null = null;
-    try {
-      if (clientId) {
-        const eventStart = submission.eventDate ?? Date.now();
-        // Default to a 4-hour event when no end time is supplied OR the supplied
-        // end is invalid / non-positive-duration (e.g. an "00:00" end equals the
-        // midnight start) — otherwise Event creation fails terminally.
-        const rawEnd = submission.eventEndTime ?? 0;
-        const eventEnd =
-          Number.isFinite(rawEnd) && rawEnd > eventStart
-            ? rawEnd
-            : eventStart + 4 * 60 * 60 * 1000;
-        const eventResult = await ctx.runMutation(
-          api.mutations.Event_createViaPlanEngagement,
-          {
+    // Retry must resume the conversion substeps too: a lead may have been
+    // captured before the prior attempt failed to link/confirm its client.
+    if (leadId && clientId) {
+      try {
+        const lead: Doc<"leads"> | null = await ctx.runQuery(
+          api.queries.getLead,
+          { id: leadId },
+        );
+        if (!lead?.convertedAt) {
+          await ctx.runMutation(api.mutations.Lead_stageConversion, {
+            docId: leadId,
             clientId,
-            title: `Quote Request: ${clientName}`,
-            eventType: "Catering Inquiry",
-            startsAt: eventStart,
-            endsAt: eventEnd,
-            expectedHeadcount: submission.guestCount ?? 0,
-            primaryContactName: clientName,
-            budgetAmount: 0,
-            quotedPrice: 0,
-            serviceStyleId: submission.serviceStyleId ?? undefined,
-            occasionId: submission.occasionId ?? undefined,
-            venueName: submission.venueName ?? undefined,
-            venueAddress: submission.venueAddress ?? undefined,
-            serviceRequirements: submission.menuPreferences ?? undefined,
-            operationalRequirements:
-              submission.dietaryRestrictions ?? undefined,
-          },
+          });
+          await ctx.runMutation(api.mutations.Lead_confirmConversion, {
+            docId: leadId,
+          });
+        }
+      } catch (error) {
+        errors.push(
+          `lead conversion: ${error instanceof Error ? error.message : String(error)}`,
         );
-        eventId = eventResult.docId;
       }
-    } catch (error) {
-      errors.push(
-        `event: ${error instanceof Error ? error.message : String(error)}`,
-      );
+    }
+
+    // Event — reused from the checkpoint on retry, else created fresh.
+    let eventId: Id<"events"> | null = submission.eventId ?? null;
+    if (!eventId) {
+      try {
+        if (clientId) {
+          const eventStart = submission.eventDate ?? Date.now();
+          // Default to a 4-hour event when no end time is supplied OR the
+          // supplied end is invalid / non-positive-duration (e.g. an
+          // "00:00" end equals the midnight start) — otherwise Event
+          // creation fails terminally.
+          const rawEnd = submission.eventEndTime ?? 0;
+          const eventEnd =
+            Number.isFinite(rawEnd) && rawEnd > eventStart
+              ? rawEnd
+              : eventStart + 4 * 60 * 60 * 1000;
+          const eventResult = await ctx.runMutation(
+            api.mutations.Event_createViaPlanEngagement,
+            {
+              clientId,
+              title: `Quote Request: ${clientName}`,
+              eventType: "Catering Inquiry",
+              startsAt: eventStart,
+              endsAt: eventEnd,
+              expectedHeadcount: submission.guestCount ?? 0,
+              primaryContactName: clientName,
+              budgetAmount: 0,
+              quotedPrice: 0,
+              serviceStyleId: submission.serviceStyleId ?? undefined,
+              occasionId: submission.occasionId ?? undefined,
+              venueName: submission.venueName ?? undefined,
+              venueAddress: submission.venueAddress ?? undefined,
+              serviceRequirements: submission.menuPreferences ?? undefined,
+              operationalRequirements:
+                submission.dietaryRestrictions ?? undefined,
+            },
+          );
+          eventId = eventResult.docId;
+        }
+      } catch (error) {
+        errors.push(
+          `event: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
     }
 
     // Draft proposal.
-    let proposalId: Id<"proposals"> | null = null;
-    try {
-      if (clientId) {
-        const proposalResult = await ctx.runMutation(
-          api.mutations.Proposal_createViaDraft,
-          {
-            clientId,
-            title: `Proposal for ${clientName}`,
-            eventDate: submission.eventDate ?? Date.now(),
-            eventType: "Catering Inquiry",
-            venueName: submission.venueName ?? undefined,
-            venueAddress: submission.venueAddress ?? undefined,
-            guestCount: submission.guestCount ?? 0,
-            subtotal: 0,
-            taxAmount: 0,
-            discountAmount: 0,
-            total: 0,
-            notes:
-              submission.notes ??
-              "Draft proposal created from quote request. Menu selection and pricing to follow.",
-          },
+    // Free-text style/occasion (A5): when the catalogs were empty the
+    // prospect answered as text and there is no catalog row to link, so the
+    // draft proposal's notes carry the answer — sales reads it without
+    // re-opening the raw submission.
+    const freeTextNotes: string[] = [];
+    if (!submission.serviceStyleId && submission.serviceStyleText) {
+      freeTextNotes.push(`Service style: ${submission.serviceStyleText}`);
+    }
+    if (!submission.occasionId && submission.occasionText) {
+      freeTextNotes.push(`Occasion: ${submission.occasionText}`);
+    }
+    const proposalNotes = [
+      submission.notes ??
+        "Draft proposal created from quote request. Menu selection and pricing to follow.",
+      ...freeTextNotes,
+    ].join(" ");
+    // Draft proposal — reused from the checkpoint on retry, else created
+    // fresh.
+    let proposalId: Id<"proposals"> | null = submission.proposalId ?? null;
+    if (!proposalId) {
+      try {
+        if (clientId) {
+          const proposalResult = await ctx.runMutation(
+            api.mutations.Proposal_createViaDraft,
+            {
+              clientId,
+              title: `Proposal for ${clientName}`,
+              eventDate: submission.eventDate ?? Date.now(),
+              // The submission's end time carries onto the draft proposal
+              // (C2) so the create-event prefill can seed the event's endsAt.
+              eventEndDate: submission.eventEndTime ?? undefined,
+              eventType: "Catering Inquiry",
+              venueName: submission.venueName ?? undefined,
+              venueAddress: submission.venueAddress ?? undefined,
+              guestCount: submission.guestCount ?? 0,
+              subtotal: 0,
+              taxAmount: 0,
+              discountAmount: 0,
+              total: 0,
+              eventId: eventId ?? undefined,
+              notes: proposalNotes,
+            },
+          );
+          proposalId = proposalResult.docId;
+          // Linked at creation: draft accepts an optional eventId, so the
+          // proposal points at the event this conversion just created (the
+          // accept path then reuses it instead of booking a second event).
+        }
+      } catch (error) {
+        errors.push(
+          `proposal: ${error instanceof Error ? error.message : String(error)}`,
         );
-        proposalId = proposalResult.docId;
-        // ponytail: no Proposal command links an event after creation
-        // (createViaDraft has no eventId arg), so the draft stays unlinked;
-        // both IDs are still recorded on the QuoteSubmission below.
       }
-    } catch (error) {
-      errors.push(
-        `proposal: ${error instanceof Error ? error.message : String(error)}`,
-      );
     }
 
     // Only mark complete when every entity was created: complete's id fields
     // are schema-typed ids, so passing ""/null for a missing one throws AFTER
     // startProcessing committed — which would strand the submission in
-    // "processing". A partial conversion is marked failed (terminal) with the
-    // per-step errors so the operator can reconcile manually.
-    if (errors.length === 0 && clientId && leadId && eventId && proposalId) {
-      // Best-effort: link the draft proposal back onto the lead so the pipeline
-      // shows it (and avoids a duplicate-proposal prompt). Non-fatal.
+    // "processing". A partial conversion is marked failed (retriable via
+    // QuoteSubmission_retry) with the per-step errors.
+    if (errors.length === 0 && leadId && proposalId) {
       try {
         await ctx.runMutation(api.mutations.Lead_stageProposal, {
           docId: leadId,
           proposalId,
         });
-      } catch {
-        // swallow — the proposal still exists and is recorded on the submission
+      } catch (error) {
+        errors.push(
+          `lead proposal link: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
+    }
+    if (errors.length === 0 && clientId && leadId && eventId && proposalId) {
       await ctx.runMutation(api.mutations.QuoteSubmission_complete, {
         docId: submissionId,
         clientId,
@@ -549,8 +687,9 @@ export const processQuoteSubmission = action({
       });
     } else {
       // Persist whatever IDs WERE created onto the submission before marking it
-      // failed, so the terminal failed row keeps durable links to the partial
-      // records (and reconciliation doesn't lose them or create duplicates).
+      // failed, so the failed row keeps durable links to the partial records —
+      // the review queue links them, and a retry reuses them instead of
+      // creating duplicates.
       await ctx.runMutation(
         internal.quoteBuilder.checkpointQuoteSubmissionIds,
         {
@@ -575,8 +714,9 @@ export const processQuoteSubmission = action({
 
 /**
  * Persists whichever sales-record IDs a partial conversion created onto the
- * QuoteSubmission (used before marking a conversion failed, so the terminal
- * row retains its links for reconciliation). Internal — only processQuoteSubmission calls it.
+ * QuoteSubmission (used before marking a conversion failed, so the failed
+ * row retains its links for the queue and for retry). Internal — only
+ * processQuoteSubmission calls it.
  */
 export const checkpointQuoteSubmissionIds = internalMutation({
   args: {

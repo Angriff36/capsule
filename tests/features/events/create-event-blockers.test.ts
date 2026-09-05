@@ -5,6 +5,7 @@ import {
   SERVICE_STYLE_CATALOG,
   persistableServiceStyleId,
   serviceStyleSelectOptions,
+  usingBuiltInServiceStyles,
 } from "../../../src/features/events/serviceStyleCatalog";
 
 const TEST_EVENT_ID = "nn7ez3fz56ya246m6p17az2ad58crnwg";
@@ -103,5 +104,58 @@ describe("events index is not a Test Event deep-link", () => {
     const list = readFileSync("src/features/events/EventsListPage.tsx", "utf8");
     expect(list).not.toContain(TEST_EVENT_ID);
     expect(list).not.toMatch(/useEffect\([\s\S]{0,200}navigate\(/);
+  });
+});
+
+describe("empty catalogs show an explicit state and do not block create", () => {
+  it("flags the built-in service-style fallback only once the list has loaded", () => {
+    expect(usingBuiltInServiceStyles(undefined)).toBe(false);
+    expect(usingBuiltInServiceStyles([])).toBe(true);
+    expect(
+      usingBuiltInServiceStyles([
+        { _id: "ss1", name: "Full Service", status: "retired" },
+      ]),
+    ).toBe(true);
+    expect(
+      usingBuiltInServiceStyles([
+        { _id: "ss1", name: "Full Service", status: "active" },
+      ]),
+    ).toBe(false);
+  });
+
+  it("both empty selectors show a one-line hint linking to Admin → Catalogs", () => {
+    const page = readFileSync(
+      "src/features/events/EventCreatePage.tsx",
+      "utf8",
+    );
+    expect(page).toContain("No occasions yet");
+    expect(page).toContain("built-in service styles");
+    expect(page).toContain(
+      "occasions !== undefined && activeOccasions.length === 0",
+    );
+    expect(page.match(/to="\/admin\/catalogs"/g)?.length).toBe(2);
+  });
+
+  it("empty catalogs do not block create — both selectors stay optional", () => {
+    const page = readFileSync(
+      "src/features/events/EventCreatePage.tsx",
+      "utf8",
+    );
+    const occasionSelect =
+      page.match(/Occasion\s*<select[\s\S]*?<\/select>/)?.[0] ?? "";
+    expect(occasionSelect).toContain(
+      '<option value="">Select an occasion</option>',
+    );
+    expect(occasionSelect).not.toContain("required");
+    const styleSelect =
+      page.match(/Service style\s*<select[\s\S]*?<\/select>/)?.[0] ?? "";
+    expect(styleSelect).toContain(
+      '<option value="">Select a service style</option>',
+    );
+    expect(styleSelect).not.toContain("required");
+    // Create stays gated on client and venue only, and a built-in catalog
+    // code never reaches the command as a serviceStyleId.
+    expect(page).toContain("disabled={busy !== null || !clientId || !venueId}");
+    expect(persistableServiceStyleId("full-service")).toBe("");
   });
 });

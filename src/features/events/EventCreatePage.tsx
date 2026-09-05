@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateClient,
@@ -14,6 +14,7 @@ import {
   useListOccasion,
   useListPerson,
   useListProposalDishSelection,
+  useListProposalEnhancement,
   useListReferralSource,
   useListServiceStyle,
   useListVenue,
@@ -31,6 +32,7 @@ import { eventCreateDisabledReason } from "./eventCreateGuards";
 import {
   persistableServiceStyleId,
   serviceStyleSelectOptions,
+  usingBuiltInServiceStyles,
 } from "./serviceStyleCatalog";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
@@ -154,6 +156,7 @@ export function EventCreatePage() {
   const proposalId = searchParams.get("proposalId")?.trim() || "";
   const proposal = useGetProposal(proposalId || "skip");
   const proposalDishSelections = useListProposalDishSelection();
+  const proposalEnhancements = useListProposalEnhancement();
   const createEventFromProposal = useCreateEventFromProposal();
   const template = useRouteRecord(useGetEventTemplate, templateId || undefined);
   const menus = useListMenu();
@@ -190,6 +193,16 @@ export function EventCreatePage() {
           selection.proposalId === proposalId && selection.deletedAt == null,
       ).length
     : 0;
+  // Live enhancements (withdraw sets removedAt + deletedAt) — the rows the
+  // event overview card will list once this event exists (C3).
+  const proposalEnhancementCount = proposalId
+    ? (proposalEnhancements ?? []).filter(
+        (row) =>
+          row.proposalId === proposalId &&
+          row.deletedAt == null &&
+          row.removedAt == null,
+      ).length
+    : 0;
   // Proposal deep links may arrive without ?clientId= — seed it once loaded.
   useEffect(() => {
     if (proposal?.clientId) {
@@ -213,6 +226,12 @@ export function EventCreatePage() {
     .filter((occasion) => occasion.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const serviceStyleOptions = serviceStyleSelectOptions(serviceStyles);
+  // Empty catalogs (B2): once the lists have loaded, an empty occasion list and
+  // the built-in service-style fallback each get a one-line fix-it hint under
+  // the select instead of a silent blank dropdown.
+  const occasionsEmpty =
+    occasions !== undefined && activeOccasions.length === 0;
+  const builtInServiceStyles = usingBuiltInServiceStyles(serviceStyles);
   const salespeople = (people ?? [])
     .filter(
       (person) =>
@@ -426,22 +445,36 @@ export function EventCreatePage() {
                   touched={touched}
                 />
               </label>
-              <label className="field-label">
-                Occasion
-                <select
-                  value={occasionId}
-                  onChange={(event) => setOccasionId(event.target.value)}
-                  className="input"
-                  form="event-create-form"
-                >
-                  <option value="">Select an occasion</option>
-                  {activeOccasions.map((occasion) => (
-                    <option key={occasion._id} value={occasion._id}>
-                      {occasion.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div>
+                <label className="field-label">
+                  Occasion
+                  <select
+                    value={occasionId}
+                    onChange={(event) => setOccasionId(event.target.value)}
+                    className="input"
+                    form="event-create-form"
+                  >
+                    <option value="">Select an occasion</option>
+                    {activeOccasions.map((occasion) => (
+                      <option key={occasion._id} value={occasion._id}>
+                        {occasion.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {occasionsEmpty ? (
+                  <p className="mt-1 text-xs leading-relaxed text-ink-3">
+                    No occasions yet — add them in{" "}
+                    <Link
+                      to="/admin/catalogs"
+                      className="underline font-medium"
+                    >
+                      Admin → Catalogs
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+              </div>
               <label className="field-label">
                 Expected headcount *
                 <input
@@ -477,6 +510,7 @@ export function EventCreatePage() {
                 Ends *
                 <BoundedDateTimeLocalInput
                   name="endsAt"
+                  defaultValue={proposalPrefill.endsAtLocal}
                   className="input"
                   required
                 />
@@ -526,22 +560,36 @@ export function EventCreatePage() {
             count={4}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
-              <label className="field-label">
-                Service style
-                <select
-                  value={serviceStyleId}
-                  onChange={(event) => setServiceStyleId(event.target.value)}
-                  className="input"
-                  form="event-create-form"
-                >
-                  <option value="">Select a service style</option>
-                  {serviceStyleOptions.map((serviceStyle) => (
-                    <option key={serviceStyle.id} value={serviceStyle.id}>
-                      {serviceStyle.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div>
+                <label className="field-label">
+                  Service style
+                  <select
+                    value={serviceStyleId}
+                    onChange={(event) => setServiceStyleId(event.target.value)}
+                    className="input"
+                    form="event-create-form"
+                  >
+                    <option value="">Select a service style</option>
+                    {serviceStyleOptions.map((serviceStyle) => (
+                      <option key={serviceStyle.id} value={serviceStyle.id}>
+                        {serviceStyle.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {builtInServiceStyles ? (
+                  <p className="mt-1 text-xs leading-relaxed text-ink-3">
+                    Showing the four built-in service styles — add your own in{" "}
+                    <Link
+                      to="/admin/catalogs"
+                      className="underline font-medium"
+                    >
+                      Admin → Catalogs
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+              </div>
               <label className="field-label sm:col-span-2">
                 Accessibility needs
                 <input
@@ -673,6 +721,22 @@ export function EventCreatePage() {
                     {Number(proposal.guestCount ?? 0)} guests ·{" "}
                     {formatMoneyExact(Number(proposal.total ?? 0))}
                   </p>
+                  <p>
+                    {proposal.eventDate != null
+                      ? `Starts: ${formatDate(proposal.eventDate)} · ${formatTime(proposal.eventDate)}`
+                      : "No start date on the proposal — set the start time on the event."}
+                  </p>
+                  <p>
+                    {proposal.eventEndDate != null
+                      ? `Ends: ${formatDate(proposal.eventEndDate)} · ${formatTime(proposal.eventEndDate)}`
+                      : "No end time on the proposal — set the end time on the event."}
+                  </p>
+                  {proposalEnhancementCount > 0 ? (
+                    <p>
+                      Enhancements: {proposalEnhancementCount} on the proposal —
+                      they will show on the event.
+                    </p>
+                  ) : null}
                   {proposal.venueName ? (
                     <p>
                       Venue: {proposal.venueName}

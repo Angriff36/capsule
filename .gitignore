@@ -59,3 +59,8 @@ output/
 
 # Storybook static output
 storybook-static/
+
+# Ralph loop state (loop.sh writes these every iteration; never commit them)
+.ralph-checkpoint
+.ralph-telemetry.jsonl
+.ralph-failures.md

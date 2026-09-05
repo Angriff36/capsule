@@ -94,6 +94,11 @@ export function QuoteSubmissionPage() {
   const activeServiceStyles = options?.serviceStyles ?? [];
   const activeOccasions = options?.occasions ?? [];
 
+  // Empty-catalog fallback (A5): once the options have loaded and a catalog
+  // has no rows, ask for the answer as free text instead of a dead dropdown.
+  const styleAsText = options !== undefined && activeServiceStyles.length === 0;
+  const occasionAsText = options !== undefined && activeOccasions.length === 0;
+
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -122,6 +127,8 @@ export function QuoteSubmissionPage() {
         consent: data.get("consent") === "on",
         serviceStyleId: formId<Id<"serviceStyles">>(data.get("serviceStyleId")),
         occasionId: formId<Id<"occasions">>(data.get("occasionId")),
+        serviceStyleText: optional(String(data.get("serviceStyleText") ?? "")),
+        occasionText: optional(String(data.get("occasionText") ?? "")),
         venueName: optional(String(data.get("venueName") ?? "")),
         venueAddress: optional(String(data.get("venueAddress") ?? "")),
         menuPreferences: optional(String(data.get("menuPreferences") ?? "")),
@@ -365,46 +372,72 @@ export function QuoteSubmissionPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label
-                      htmlFor="serviceStyleId"
+                      htmlFor={
+                        styleAsText ? "serviceStyleText" : "serviceStyleId"
+                      }
                       className="block text-xs font-medium text-ink-2 mb-1"
                     >
                       Service Style
                     </label>
-                    <select
-                      id="serviceStyleId"
-                      name="serviceStyleId"
-                      className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
-                      disabled={busy}
-                    >
-                      <option value="">Select service style...</option>
-                      {activeServiceStyles.map((style) => (
-                        <option key={style._id} value={style._id}>
-                          {style.name}
-                        </option>
-                      ))}
-                    </select>
+                    {/* Empty catalog (A5): no styles to pick from, so ask in
+                        free text — a missing catalog never blocks submission. */}
+                    {styleAsText ? (
+                      <input
+                        type="text"
+                        id="serviceStyleText"
+                        name="serviceStyleText"
+                        className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                        placeholder="Tell us the style (e.g., buffet, plated)"
+                        disabled={busy}
+                      />
+                    ) : (
+                      <select
+                        id="serviceStyleId"
+                        name="serviceStyleId"
+                        className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                        disabled={busy}
+                      >
+                        <option value="">Select service style...</option>
+                        {activeServiceStyles.map((style) => (
+                          <option key={style._id} value={style._id}>
+                            {style.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
 
                   <div>
                     <label
-                      htmlFor="occasionId"
+                      htmlFor={occasionAsText ? "occasionText" : "occasionId"}
                       className="block text-xs font-medium text-ink-2 mb-1"
                     >
                       Occasion
                     </label>
-                    <select
-                      id="occasionId"
-                      name="occasionId"
-                      className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
-                      disabled={busy}
-                    >
-                      <option value="">Select occasion...</option>
-                      {activeOccasions.map((occasion) => (
-                        <option key={occasion._id} value={occasion._id}>
-                          {occasion.name}
-                        </option>
-                      ))}
-                    </select>
+                    {occasionAsText ? (
+                      <input
+                        type="text"
+                        id="occasionText"
+                        name="occasionText"
+                        className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                        placeholder="Tell us the occasion (e.g., birthday)"
+                        disabled={busy}
+                      />
+                    ) : (
+                      <select
+                        id="occasionId"
+                        name="occasionId"
+                        className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                        disabled={busy}
+                      >
+                        <option value="">Select occasion...</option>
+                        {activeOccasions.map((occasion) => (
+                          <option key={occasion._id} value={occasion._id}>
+                            {occasion.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 </div>
               </div>

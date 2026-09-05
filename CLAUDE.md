@@ -152,8 +152,7 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[Emergency bridge — running bridge was not updated]
-Files: src/features/events/EventTimelineAssigneePicker.tsx (edit)
+Capsule ralph/wiggum-loop BUILD iteration 2 complete (2026-09-04): A2 done — quote review queue shows service style + occasion (nameOf over useListServiceStyle/useListOccasion, "Not specified" fallback), AC-007 = PASS. Commit 8419d57, tag v0.0.37, branch pushed. Gates green: 120 files/1189 tests, typecheck, format:check, vite build. Open: next iteration = A3 (dedup regression proof → AC-009) in tests/proofs/quote-conversion.runtime.test.ts; then A4-A9, B1-B4, C1-C6, D1-D2 per IMPLEMENTATION_PLAN.md. 17 ACs still PENDING.
 
 # === END COGNILAYER ===
 

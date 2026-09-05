@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 64; // Clean CI checkout; local-only dirs excluded below must stay out of the count.
+const ROOT_CAP = 68; // Includes the eight net Ralph workflow roots added to the 60-root production tree.
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {

@@ -29,6 +29,9 @@ export const CLIENTS_ROUTES = {
   pipeline: "/clients/pipeline",
   detail: (id: string) => `/clients/${id}`,
   proposals: "/clients/proposals",
+  // Deep link into the proposals page's focused row: ?proposal=<id> opens
+  // that proposal's detail panels and scrolls the row into view.
+  proposal: (id: string) => `/clients/proposals?proposal=${id}`,
   proposalTemplates: "/clients/proposals/templates",
   contracts: "/clients/contracts",
   retention: "/clients/retention",

@@ -50,6 +50,11 @@ stale at 41; CI never reached `baseline:decay` until `proof:emit` was fixed.~~
 presentation authority (`docs/product/authority.md`), plus `IMPLEMENTATION_PLAN.md`,
 `vision.md`, `.claude/`, `.builder/`, and various analysis files. Clean CI checkout
 is 64 committed roots. Cap in `scripts/check-baseline-decay.ts` must match.
+
+**Ralph workflow (2026-09-05):** The production tree had 60 tracked root
+entries. Ralph adds eight net workflow/configuration entries, bringing the
+combined tree to 68. The root budget is now 68 to accommodate those checked-in
+tools and contracts; local caches remain excluded and other checks are unchanged.
 Still excludes `node_modules` / `dist` / `graphify-out` / `test-results`, local editor
 dirs (`.cursor` / `.sonarlint` / `.vscode`), and other gitignored local tool state
 (`.scannerwork` / `.vercel` / `output` / `work` / `.aboardai` / `.local`).

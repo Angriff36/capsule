@@ -66,6 +66,15 @@ export function serviceStyleSelectOptions(
   }));
 }
 
+/** True once the rows have loaded and none are active — the picker is showing
+ * the built-in catalog, so the UI can say so instead of staying silent. */
+export function usingBuiltInServiceStyles(
+  rows: readonly ListedServiceStyle[] | undefined,
+): boolean {
+  if (rows === undefined) return false;
+  return rows.every((row) => row.status !== "active");
+}
+
 /** Event.serviceStyleId is an optional uuid — catalog codes must not be sent. */
 export function persistableServiceStyleId(value: string): string {
   const trimmed = value.trim();

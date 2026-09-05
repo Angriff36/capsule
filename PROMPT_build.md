@@ -1,11 +1,15 @@
-0a. Study `specs/*` with up to 500 parallel Sonnet subagents to learn the application specifications.
+0a. Study all files recursively under `specs/` with up to ${RALPH_MAX_READ_AGENTS} parallel ${MODEL_REVIEW} subagents to learn the application specifications.
 0b. Study @IMPLEMENTATION_PLAN.md.
-0c. For reference, the application source code is in `src/*`.
+0c. Study @ACCEPTANCE_TESTS.md — the completion contract mapping each acceptance criterion (`AC-###`) to the required test that must exist and pass.
+0d. For reference, the application source code is all files recursively under `src/`.
 
-1. Your task is to implement functionality per the specifications using parallel subagents. Follow @IMPLEMENTATION_PLAN.md and choose the most important item to address. Before making changes, search the codebase (don't assume not implemented) using Sonnet subagents. You may use up to 500 parallel Sonnet subagents for searches/reads and only 1 Sonnet subagent for build/tests. Use Opus subagents when complex reasoning is needed (debugging, architectural decisions).
-2. After implementing functionality or resolving problems, run the tests for that unit of code that was improved. If functionality is missing then it's your job to add it as per the application specifications. Ultrathink.
+1. Your task is to implement functionality for `${PROJECT_NAME}` per the specifications using parallel subagents. Follow @IMPLEMENTATION_PLAN.md and choose the most important item to address. The chosen task carries required acceptance tests — the `AC-###` ids it references in @ACCEPTANCE_TESTS.md — and implementing their real, executable tests is part of the task scope. Before making changes, search the codebase (don't assume not implemented) using ${MODEL_REVIEW} subagents. You may use up to ${RALPH_MAX_READ_AGENTS} parallel ${MODEL_REVIEW} subagents for searches/reads and only ${RALPH_MAX_BUILD_AGENTS} ${MODEL_BUILD} subagent for build/tests. Use ${MODEL_PLAN} subagents when complex reasoning is needed (debugging, architectural decisions).
+2. After implementing functionality or resolving problems, run the tests (`${TEST_CMD}`; lint with `${LINT_CMD}`, build with `${BUILD_CMD}`) for that unit of code that was improved, including every acceptance test in @ACCEPTANCE_TESTS.md that covers it. An acceptance criterion is complete only when a real test that exercises its outcome exists and passes; then update that criterion's status to `PASS` with the test's path using a subagent. If functionality is missing then it's your job to add it as per the application specifications. Ultrathink.
 3. When you discover issues, immediately update @IMPLEMENTATION_PLAN.md with your findings using a subagent. When resolved, update and remove the item.
 4. When the tests pass, update @IMPLEMENTATION_PLAN.md, then `git add -A` then `git commit` with a message describing the changes. After the commit, `git push`.
+
+999. @ACCEPTANCE_TESTS.md is the completion contract — no cheating. Every non-`RETIRED` criterion must have a real, executable test that asserts its outcome and passes before you commit. You may NOT make a criterion "pass" by deleting, skipping (`.skip`/`xfail`/commenting out), weakening its assertions, or stubbing the test — that is cheating and is forbidden. TDD is encouraged: the test may be written first or alongside the implementation. If a criterion genuinely cannot be tested yet, leave it failing, keep its status `PENDING`, and record the blocker in @IMPLEMENTATION_PLAN.md using a subagent — do not mark it done. Never delete or renumber `AC-###` entries; that responsibility belongs to plan mode.
+9999. Create tests to verify implementation meets acceptance criteria and include both conventional tests (behavior, performance, correctness) and perceptual quality tests (for subjective criteria, see `src/lib` patterns — e.g. `llm-review.ts` as a binary pass/fail gate, and `review-criteria.md` for the active criteria). Run the perceptual gate as the final check before committing subjective work.
 
 99999. Important: When authoring documentation, capture the why — tests and implementation importance.
 999999. Important: Single sources of truth, no migrations/adapters. If tests unrelated to your work fail, resolve them as part of the increment.
@@ -16,5 +20,5 @@
 99999999999. For any bugs you notice, resolve them or document them in @IMPLEMENTATION_PLAN.md using a subagent even if it is unrelated to the current piece of work.
 999999999999. Implement functionality completely. Placeholders and stubs waste efforts and time redoing the same work.
 9999999999999. When @IMPLEMENTATION_PLAN.md becomes large periodically clean out the items that are completed from the file using a subagent.
-99999999999999. If you find inconsistencies in the specs/* then use an Opus 4.5 subagent with 'ultrathink' requested to update the specs.
+99999999999999. If you find inconsistencies in all files recursively under `specs/` then use one ${MODEL_PLAN} subagent with 'ultrathink' requested to update the specs.
 999999999999999. IMPORTANT: Keep @AGENTS.md operational only — status updates and progress notes belong in `IMPLEMENTATION_PLAN.md`. A bloated AGENTS.md pollutes every future loop's context.
