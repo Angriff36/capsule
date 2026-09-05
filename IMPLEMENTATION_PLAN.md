@@ -920,6 +920,56 @@ proof bundle + cross-model review + `bash scripts/release.sh --reviewer
 <model>` with the R2-12 receipt attached) — the only remaining
 `- [ ]` item.
 
+Iteration 58 (BUILD, release 2, 2026-09-05): R2-14 SHIP PREP — the
+release is BLOCKED on issue #265 (owner action), everything else is done.
+Workspace: `origin/main` `279f6a3` already an ancestor; branch pushed at
+`f523d2f`. Full `bun run check` (the exact gate release.sh runs on the
+merge) run on the branch. FIRST RUN FAILED at the last step:
+`baseline:decay` root count 73 > cap 68. Root cause: release 1 merged at
+68 tracked roots, then the loop added `ralph-preview.ps1` +
+`ralph-sync.sh` (clean CI checkout = 70 tracked roots — over cap even on
+a fresh clone), and the gitignored per-machine `.ralph-checkpoint`/
+`.ralph-telemetry.jsonl`/`.ralph-failures.md` (absent from `localOnly`)
+inflated local runs to 73. Fix per the file's own documented maintenance
+pattern: `ROOT_CAP` 68 → 70 with a BASELINE.md Correction entry, and the
+three ralph state files joined `localOnly` (the script's comment demands
+clean-CI counting — "otherwise baseline:decay is machine-dependent").
+No test pins the cap (grep of tests/). `baseline:decay: ok` after the
+fix; full check re-run green. proof:emit during check rewrote the
+`irHash` lines of `generated/proof/{capability-catalog.json,md,
+proof-registry.json}` (stale since the R2 manifest changes — iterations
+ran manifest-regen-check, never proof:emit); committed per release.sh's
+own remedy ("run it on the branch, commit the result"). #265 PRECHECK
+(the release blocker): Vercel CLI is authenticated locally (angriff36,
+team ryans-projects-471134dd, project `capsule`, canonical URL
+`https://capsule-tau-eight.vercel.app`); linked the project locally
+(`.vercel/` is gitignored; `vercel link` also wrote a dev `.env.local`
+and touched `.gitignore` — both deleted/reverted), pulled the production
+env read-only and ran the SAME checker the Vercel production build runs:
+2 BLOCKERS — `clerk:dev_credential_in_production`
+(VITE_CLERK_PUBLISHABLE_KEY is pk_test_*) and
+`clerk:secret_key_unrecognized`. scripts/vercel-build.sh runs that gate
+before `convex deploy` on every production build, so merging now would
+push main and FAIL the production build (production stays stale; Vercel
+builds main only for a `[release]` subject, and release.sh never creates
+a second one for the same branch). Per plan ("#265 must be settled
+before the one [release] merge") and AGENTS.md (Vercel/Clerk settings
+are HUMAN-AUTHORIZED only), release.sh is NOT run until the owner
+rotates the keys. The pulled env file was deleted immediately; only the
+checker's redacted output was recorded. Preview verified on 7812
+(ralph-preview.ps1 -Ensure). CAPSULE_API_KEY: not in the shell env, not
+in the primary checkout's .env.local → the receipt's workflow leg will
+verify the anonymous-401 half only (honest partial, by design).
+Cross-model review (gpt-5.6-sol, merge-review framing) runs on the push
+of this commit; APPROVE is the final pre-release gate. OWNER UNBLOCK
+(the checker's own action text): set VITE_CLERK_PUBLISHABLE_KEY (pk_live_*)
+in the Vercel project env, set CLERK_SECRET_KEY (sk_live_*) where the
+gateway runs, set CLERK_JWT_ISSUER_DOMAIN via `npx convex env set --prod`,
+add the production domains to Clerk allowed origins, then re-run the
+precheck (vercel env pull + check-deployment-config --json must report
+zero blockers) and `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
+bash scripts/release.sh --reviewer gpt-5.6-sol`.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.

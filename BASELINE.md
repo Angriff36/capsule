@@ -59,3 +59,12 @@ Still excludes `node_modules` / `dist` / `graphify-out` / `test-results`, local 
 dirs (`.cursor` / `.sonarlint` / `.vscode`), and other gitignored local tool state
 (`.scannerwork` / `.vercel` / `output` / `work` / `.aboardai` / `.local`).
 Enforced by `bun run baseline:decay`.
+
+**Correction (2026-09-05, release 2 ship prep):** Aim ≤70 — after the
+release-1 merge the Ralph loop added two committed workflow roots,
+`ralph-preview.ps1` (verified local preview harness) and `ralph-sync.sh`
+(worktree sync), bringing the clean CI checkout to 70 tracked roots. The
+cap in `scripts/check-baseline-decay.ts` now matches. The gitignored
+per-machine Ralph state files (`.ralph-checkpoint`, `.ralph-telemetry.jsonl`,
+`.ralph-failures.md`) joined the local-only exclusion list so local runs
+count the same clean checkout CI sees.
