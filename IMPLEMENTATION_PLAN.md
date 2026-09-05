@@ -891,6 +891,35 @@ record, delete the "Tenant" placeholder; regression test only), then
 R2-14 (release proof bundle + cross-model review + `bash
 scripts/release.sh --reviewer <model>` with the receipt attached).
 
+Iteration 57 (BUILD, release 2, 2026-09-05): R2-13 DONE. `convex/lib/
+proposalRevision.ts` `buildProposalRevisionSnapshot` now resolves
+`tenantName` from the tenant's live organization record — the exact
+`convex/authProvision.ts` companyNameForProvision idiom (`by_tenantId`
+index, active row first, any live row second, `brandDisplayName?.trim()
+|| name?.trim()`); the literal "Tenant" survives only when the tenant
+has NO organization row at all. Scope honesty from the consumer trace
+(haiku fan-out): `snapshot.tenant.name` has ZERO consumers today —
+proposalPdf.ts renders the live `TenantBranding.displayName`
+(masthead/footer), and signatureAcceptance.ts + shareLinks.ts parse only
+proposal/client/venue/enhancements from the snapshot — so the
+placeholder sat dormant in the immutable audit JSON; the fix still
+matters because the revision freezes forever and any future snapshot
+consumer (server-rendered PDF, audit view) would surface the literal.
+Regression proof (booking proof file, now 11 tests): "revision snapshot
+carries the tenant's real name, not a placeholder" seeds
+`Organization_createViaRegister` with BOTH name ("Booking Proof
+Kitchen") and brandDisplayName ("Booking Proof Catering Co."), sends
+through `sendProposalWithRevisionCapture`, and asserts the captured
+snapshot's tenant.name === the brand display name and !== "Tenant" —
+the assertion fails on pre-fix code (it would read "Tenant"), so the
+test is a real regression pin. Gates: `bun run test` 140 files / 1287
+tests green; typecheck, format:check (prettier rewrapped the proof's
+register call), `bunx vite build` green; preview verified 7812. No
+manifest change, no regen. Tag `v0.0.63` created. NEXT: R2-14 (release
+proof bundle + cross-model review + `bash scripts/release.sh --reviewer
+<model>` with the R2-12 receipt attached) — the only remaining
+`- [ ]` item.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
@@ -1089,7 +1118,7 @@ build iteration.
       no softening. Wire into `scripts/release.sh`; produce the receipt
       for THIS release's `[release]` merge. Unit test on the receipt
       builder: `tests/release-receipt.test.ts`. → AC-030
-- [ ] **R2-13. Tenant branding defect.** Resolve `tenantName` from the
+- [x] **R2-13. Tenant branding defect.** Resolve `tenantName` from the
       tenant record at `convex/lib/proposalRevision.ts:228-230`; delete
       the `"Tenant"` placeholder. Regression test only (no AC — honesty
       fold-in; PR06-03's remainder stays with the booking-qualification
