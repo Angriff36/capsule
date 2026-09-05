@@ -100,6 +100,13 @@ abort_release() {
 }
 trap abort_release INT TERM
 
+# PR12-01 / AC-028 — deployment config pre-flight. Shell env only
+# (--no-env-files): a local development .env.local must never impersonate
+# production config. The hard gate for the real production env runs inside
+# scripts/vercel-build.sh (VERCEL_ENV=production). set -e aborts here,
+# before any merge, when the release shell carries conflicting values.
+bun scripts/check-deployment-config.ts --environment production --no-env-files
+
 git checkout -q main
 subject="[release] $branch (reviewed by $reviewer)"
 if git merge-base --is-ancestor "$branch" main; then

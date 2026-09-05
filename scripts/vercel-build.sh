@@ -14,6 +14,16 @@ if [ "${VERCEL_ENV:-}" = "production" ]; then
   # cannot ship UI-only (QA 191: frontend 3dd95bb1, mule search still
   # hyphen-split leftover).
   echo "capsule vercel-build: production convex deploy + vite build"
+  # PR12-01 / AC-028 — production config gate. The build env is the one
+  # place the real production frontend env is visible before deploy, so a
+  # development Clerk key (issue #265) or a frontend pointed at the wrong
+  # Convex deployment fails loudly here, before anything ships. Empty
+  # CONVEX_DEPLOYMENT just skips the deployment-target cross-check.
+  bun scripts/check-deployment-config.ts \
+    --environment production \
+    --expected-deployment "${CONVEX_DEPLOYMENT:-}" \
+    --require VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY \
+    --no-env-files
   convex deploy --cmd 'vite build'
 elif [ -n "${VERCEL:-}" ]; then
   echo "capsule vercel-build: refusing non-production Vercel build (VERCEL_ENV=${VERCEL_ENV:-unset}). Only main deploys."

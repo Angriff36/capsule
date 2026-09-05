@@ -329,6 +329,7 @@ When the human asks for a MANUAL deploy (no `main` push involved):
 Invariants agents must not break (each broke a real deploy once):
 
 - `vercel.json` SPA rewrites stay.
+- `scripts/vercel-build.sh` gates every production build on `bun scripts/check-deployment-config.ts` (PR12-01/AC-028): a development Clerk key, missing frontend env, or a frontend pointed at the wrong Convex deployment fails the build. Standalone: `bun scripts/check-deployment-config.ts --environment production`.
 - `.vercelignore` patterns stay ROOT-ANCHORED (`/generated`, never bare
   `generated` — it swallows `src/generated`).
 - `package.json` `prepare` keeps its `|| exit 0` guard (gitless build env).

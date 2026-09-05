@@ -798,6 +798,50 @@ Iteration 53 (BUILD, release 2, 2026-09-05): R2-9 DONE. AC-023 = PASS (8 of 11 r
 
 Iteration 54 (BUILD, release 2, 2026-09-05): R2-10 DONE. AC-029 = PASS (9 of 11 release-2 ACs: AC-020…AC-027, AC-029). `convex/fileStorage.ts` `urlsForStorageIds` (the seam DishPrimaryImage and useStorageUrls resolve image URLs through) resolved URLs for ARBITRARY caller-supplied storage ids after only a tenant check — knowing another tenant's id, or any stored blob id, minted a signed URL. Fix: new private `storageReferencedByTenant(ctx, tenantId, storageId)` — the same reference walk as `convex/lib/blobs.ts` (attachments.by_storageId, dishes/ingredients.by_primaryImageStorageId) but tenant-scoped and live-only (`deletedAt == null`, the undefined-safe idiom); `urlsForStorageIds` calls getUrl ONLY for referenced ids, everything else maps to null. Consumer trace first (haiku fan-out): every caller passes a dish/ingredient `primaryImageStorageId` entity field (10 DishPrimaryImage parents + useStorageUrls × 2), catalog uploads ALSO create an Attachment row — no upload-preview-before-row caller exists, so the join breaks no flow; chat files hydrate through teamChatRead, listForParent already walks its own tenant's Attachment rows, both untouched. Upload/metadata surfaces were already gated (generateUploadUrl staff-only, Attachment commands staffAccess policies, generated listAttachmentByStorageId tenant+deletedAt+policy filtered — pinned both ways in the proof). Proof `tests/proofs/file-storage-ownership.runtime.test.ts` › "a storage id outside authorized parent records yields no URL": convex-test implements storageGetUrl (deterministic URL from the blob sha256), so the POSITIVE legs are real — own-tenant dish image (entity field only, NO Attachment row) and event document (Attachment row only) both resolve, proving each reference surface separately; a stored-but-unreferenced id → null; a foreign tenant holding the exact same three ids → null ×3; Attachment_remove and Dish_purge each stop the URL (liveness). Generated-command fact: instance-command `version` is OPTIONAL (checked only when passed), so proofs may omit it; `Attachment_createViaAttach` is the createVia export (governed-creation list already tracks it). Observation recorded, not changed: `discardOrphanUploads` lets staff of ANY tenant delete a blob no row anywhere references — orphan-only, id-knowledge-gated; PR12-10's negative matrix owns it. No manifest change, no regen, no codegen (existing module). Gates: `bun run test` 138 files / 1278 tests green; typecheck, format:check, `bunx vite build` green; preview verified on 7812. Tag v0.0.60 created. NEXT: R2-11 (deployment config checks, tests/deployment-config-check.test.ts → AC-028).
 
+Iteration 55 (BUILD, release 2, 2026-09-05): R2-11 DONE. AC-028 = PASS (10
+of 11 release-2 ACs: AC-020…AC-027, AC-028; left AC-030 = R2-12). New pure
+checker `src/lib/deploymentConfigCheck.ts` (PR12-01): named blocker findings
+for mismatched Clerk issuer (dev *.clerk.accounts.dev domain behind a live
+key, or production domain behind a test key; issuer vs CLERK_FRONTEND_API_URL
+host), application keys (pk/sk environment-segment pair mismatch,
+gateway-vs-frontend publishable-key divergence, unrecognized shapes,
+.env.example placeholder values), Convex audience (Clerk JWT template aud vs
+the auth.config applicationID "convex" — EXPECTED_CONVEX_AUDIENCE cites
+convex/auth.config.ts), callback URLs (Clerk allowlist origin vs --site-url)
+and environment (localhost VITE_CONVEX_URL/CAPSULE_PUBLIC_APP_URL in
+production, VITE_CONVEX_URL host label vs --expected-deployment,
+GOOGLE_CALENDAR_REDIRECT_URI vs CAPSULE_PUBLIC_APP_URL origin,
+CAPSULE_PUBLIC_APP_URL vs site origin). `config:missing:<VAR>` findings (via
+--require) carry redacted messages (variable name + key class pk_test_*,
+never values — redactCredential) and actionable actions (Vercel project env
+for VITE_*, `npx convex env set --prod` for deployment env).
+`clerk:dev_credential_in_production` is the issue #265 detector (pk_test_/
+sk_test_/dev-domain issuer while environment=production → blocker). CLI
+`scripts/check-deployment-config.ts` (process.env then .env/.env.local
+unless --no-env-files; flags --environment, --site-url,
+--expected-deployment, --audience, --callback-urls, --require, --env-file,
+--json; exit 1 on blockers — the R2-12 receipt consumes the JSON). Wiring:
+scripts/vercel-build.sh production branch runs it BEFORE `convex deploy`
+with --require VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY and
+--expected-deployment "${CONVEX_DEPLOYMENT:-}" (the one place the real
+production frontend env is visible pre-deploy — a dev Clerk key now FAILS
+the production build instead of shipping silently; #265 must be rotated
+before the [release] merge or that build blocks, by design); release.sh
+pre-flight before the merge (--no-env-files — a local dev .env.local must
+never impersonate production config); src/main.tsx startup console.error
+loop over the same checker (import.meta.env.MODE) — the operator-visible
+startup half. GOTCHAs: URL.host carries the port — use .hostname for
+host-class checks (localhost:7811 evaded the first cut); a pk-vs-sk class
+comparison must compare only the live/test segment or every valid pair
+"mismatches"; tsconfig include covers tests/ but NOT scripts/ (the CLI is
+run-only, like every scripts/*.ts — only the module + test typecheck); test
+key literals stay <20 chars after sk_live_/sk_test_ or the secret-scan gate
+trips (scripts/SecretScan.ts), and pk_ literals are never scanned. Gates:
+`bun run test` 139 files / 1283 tests green; typecheck, format:check,
+secrets, `bunx vite build` green; preview verified 7812. No manifest change,
+no regen. Tag `v0.0.61` created. NEXT: R2-12 (release receipt,
+`tests/release-receipt.test.ts` → AC-030).
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
@@ -984,7 +1028,7 @@ build iteration.
       `fileStorage.ts:50-86`). Negative runtime proof
       `tests/proofs/file-storage-ownership.runtime.test.ts`: a storage
       id outside authorized parent records yields no URL. → AC-029
-- [ ] **R2-11. Deployment config checks.** Redacted, actionable errors
+- [x] **R2-11. Deployment config checks.** Redacted, actionable errors
       for mismatched Clerk issuer/application keys, Convex audience,
       callback URLs and environment; dev-credential detection in
       production (issue #265). Wire the checker into the build/release
