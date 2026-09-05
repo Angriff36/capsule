@@ -319,6 +319,31 @@ typecheck, `format:check` (one prettier rewrap on the review page),
 `bunx vite build` green. Tag `v0.0.42` created. Next: B1 (admin catalogs
 page) → AC-012.
 
+Iteration 36 (BUILD iteration 8, 2026-09-04): B1 DONE. Admin catalogs page
+at `/admin/catalogs` — AC-012 = PASS. `src/features/admin/CatalogsPage.tsx`
+wires all twelve generated command hooks (register/reviseDetails/deactivate/
+activate for ServiceStyle, Occasion, ReferralSource) plus the three live
+`useList*` queries; `src/features/admin/CatalogsSection.tsx` is ONE shared
+section component (the three manifests share the command shape): create
+form (name/code/sortOrder/description, plain FormData like
+AnnouncementsPage), rows sorted by sortOrder then name showing code chip,
+`#sort`, Active/Retired chip and the retire reason, Rename via
+`useActionPrompt.askFields` (prefilled name/sort/description — the
+generated `__runServiceStyleReviseDetails` keeps old values when an arg is
+undefined, so a prefilled dialog never loses data), Retire via `askReason`
+(the command requires it), one-click Reactivate. Role checks stay in the
+commands (eventManage/salesManage), no UI gate. Route via `SupplyRoute` in
+App.tsx after `/admin/branding`; nav entry after Branding. No manifest
+change, no regen. Test `tests/features/admin/catalogs-page.test.ts` (new
+dir) › "wires register, revise, deactivate, activate per catalog" plus
+route/nav and live-list assertions (EventCreatePage reads the same
+`useList*` lists — the "without redeploy or reload" half of the AC is
+structural: same reactive query on both sides). Gates: `bun run test` 121
+files / 1204 tests green; typecheck, `format:check` (one prettier rewrap on
+the two new files), `bunx vite build` green. 9 of 19 ACs PASS (AC-007…012,
+AC-014, AC-018, AC-019). Next: B2 (explicit empty state on event create)
+→ AC-013.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -327,7 +352,7 @@ Activities in `specs/` in the order a real event moves through the business.
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
 | 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ form + dedup + client match; queue shows style/occasion + free text; junk dismissable; offline notice; one-click proposal links (A7); failed rows link checkpointed records and retry (A8/A9) | 2 (catalog rows), active `organizations` row |
-| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; **no admin UI**; occasion has no empty state; no runtime proof | — |
+| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; admin UI at `/admin/catalogs` (B1); event-create empty state + runtime proof pending (B2/B3) | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
 | 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event; proof sits outside `tests/proofs/` | 4, 2 (service style/occasion on create) |
@@ -531,7 +556,7 @@ Order = build order. Earlier tasks unblock later ones.
 
 ### B. Reference catalogs (spec `specs/ralph/dropdown-lists-and-their-admin-screen.md`)
 
-- [ ] **B1. Admin catalogs page.** New `src/features/admin/CatalogsPage.tsx`
+- [x] **B1. Admin catalogs page.** New `src/features/admin/CatalogsPage.tsx`
       at `/admin/catalogs`, added to `AdminWorkspaceNav.tsx:3-14`, wrapped in
       the same admin route guard as its siblings in `src/app/App.tsx`. Three
       sections: Service styles, Occasions, Referral sources. Per row: name,
