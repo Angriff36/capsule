@@ -31,6 +31,7 @@ import { eventCreateDisabledReason } from "./eventCreateGuards";
 import {
   persistableServiceStyleId,
   serviceStyleSelectOptions,
+  usingBuiltInServiceStyles,
 } from "./serviceStyleCatalog";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
@@ -213,6 +214,12 @@ export function EventCreatePage() {
     .filter((occasion) => occasion.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const serviceStyleOptions = serviceStyleSelectOptions(serviceStyles);
+  // Empty catalogs (B2): once the lists have loaded, an empty occasion list and
+  // the built-in service-style fallback each get a one-line fix-it hint under
+  // the select instead of a silent blank dropdown.
+  const occasionsEmpty =
+    occasions !== undefined && activeOccasions.length === 0;
+  const builtInServiceStyles = usingBuiltInServiceStyles(serviceStyles);
   const salespeople = (people ?? [])
     .filter(
       (person) =>
@@ -426,22 +433,36 @@ export function EventCreatePage() {
                   touched={touched}
                 />
               </label>
-              <label className="field-label">
-                Occasion
-                <select
-                  value={occasionId}
-                  onChange={(event) => setOccasionId(event.target.value)}
-                  className="input"
-                  form="event-create-form"
-                >
-                  <option value="">Select an occasion</option>
-                  {activeOccasions.map((occasion) => (
-                    <option key={occasion._id} value={occasion._id}>
-                      {occasion.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div>
+                <label className="field-label">
+                  Occasion
+                  <select
+                    value={occasionId}
+                    onChange={(event) => setOccasionId(event.target.value)}
+                    className="input"
+                    form="event-create-form"
+                  >
+                    <option value="">Select an occasion</option>
+                    {activeOccasions.map((occasion) => (
+                      <option key={occasion._id} value={occasion._id}>
+                        {occasion.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {occasionsEmpty ? (
+                  <p className="mt-1 text-xs leading-relaxed text-ink-3">
+                    No occasions yet — add them in{" "}
+                    <Link
+                      to="/admin/catalogs"
+                      className="underline font-medium"
+                    >
+                      Admin → Catalogs
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+              </div>
               <label className="field-label">
                 Expected headcount *
                 <input
@@ -526,22 +547,36 @@ export function EventCreatePage() {
             count={4}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
-              <label className="field-label">
-                Service style
-                <select
-                  value={serviceStyleId}
-                  onChange={(event) => setServiceStyleId(event.target.value)}
-                  className="input"
-                  form="event-create-form"
-                >
-                  <option value="">Select a service style</option>
-                  {serviceStyleOptions.map((serviceStyle) => (
-                    <option key={serviceStyle.id} value={serviceStyle.id}>
-                      {serviceStyle.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <div>
+                <label className="field-label">
+                  Service style
+                  <select
+                    value={serviceStyleId}
+                    onChange={(event) => setServiceStyleId(event.target.value)}
+                    className="input"
+                    form="event-create-form"
+                  >
+                    <option value="">Select a service style</option>
+                    {serviceStyleOptions.map((serviceStyle) => (
+                      <option key={serviceStyle.id} value={serviceStyle.id}>
+                        {serviceStyle.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {builtInServiceStyles ? (
+                  <p className="mt-1 text-xs leading-relaxed text-ink-3">
+                    Showing the four built-in service styles — add your own in{" "}
+                    <Link
+                      to="/admin/catalogs"
+                      className="underline font-medium"
+                    >
+                      Admin → Catalogs
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+              </div>
               <label className="field-label sm:col-span-2">
                 Accessibility needs
                 <input

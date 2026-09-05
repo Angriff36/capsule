@@ -344,6 +344,34 @@ the two new files), `bunx vite build` green. 9 of 19 ACs PASS (AC-007…012,
 AC-014, AC-018, AC-019). Next: B2 (explicit empty state on event create)
 → AC-013.
 
+Iteration 37 (BUILD iteration 9, 2026-09-04): B2 DONE. Explicit empty
+states on the event-create selectors — AC-013 = PASS on the P test. The J
+half (llm-review UX-01 on the copy) could NOT run: ANTHROPIC_API_KEY is
+unset in this worktree and there is no .env.local — evidence pending;
+re-run in a session that has the key and save it under
+.artifacts/llm-review/AC-013.md. `serviceStyleCatalog.ts` gains exported
+`usingBuiltInServiceStyles(rows)` (false while loading — no flash, the A5
+lesson; true when loaded and no active row, exactly when the picker shows
+the four built-in TPP styles). EventCreatePage: the occasion cell now wraps
+label+note in a div and shows "No occasions yet — add them in
+Admin → Catalogs" when `occasions !== undefined && activeOccasions.length
+=== 0`; the service-style cell shows "Showing the four built-in service
+styles — add your own in Admin → Catalogs" when the fallback is active;
+both hints are one-line `text-xs text-ink-3` paragraphs (the page's own
+note idiom) with an `underline font-medium` Link to /admin/catalogs (the A6
+banner idiom); both selects stay optional and the create gate is still
+client+venue only, so an empty catalog never blocks create (catalog codes
+still never persist — persistableServiceStyleId). Tests:
+create-event-blockers.test.ts › "empty catalogs show an explicit state and
+do not block create" (3 new: pure fallback-flag cases incl. retired-only;
+both hints + two /admin/catalogs links + the loading guard; optional /
+not-blocking regex checks on both select blocks). No manifest change, no
+regen. Gates: bun run test 121 files / 1207 tests green; typecheck,
+format:check (one prettier rewrap on EventCreatePage), bunx vite build
+green. Tag v0.0.44 created. 10 of 19 ACs PASS (AC-007…013, AC-014,
+AC-018, AC-019). Next: B3 (runtime proof: create event with empty and
+populated catalogs) → AC-016.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -352,7 +380,7 @@ Activities in `specs/` in the order a real event moves through the business.
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
 | 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ form + dedup + client match; queue shows style/occasion + free text; junk dismissable; offline notice; one-click proposal links (A7); failed rows link checkpointed records and retry (A8/A9) | 2 (catalog rows), active `organizations` row |
-| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; admin UI at `/admin/catalogs` (B1); event-create empty state + runtime proof pending (B2/B3) | — |
+| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; admin UI at `/admin/catalogs` (B1); event-create empty state done (B2); runtime proof pending (B3) | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
 | 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event; proof sits outside `tests/proofs/` | 4, 2 (service style/occasion on create) |
@@ -589,7 +617,7 @@ Order = build order. Earlier tasks unblock later ones.
       + nav entry exist; reactivity is by Convex subscription
       (`useListServiceStyle`), so assert the selector reads the live list,
       not a snapshot. → AC-012
-- [ ] **B2. Explicit empty state on event create.** Occasion select in
+- [x] **B2. Explicit empty state on event create.** Occasion select in
       `src/features/events/EventCreatePage.tsx:430-443` shows only a
       placeholder when the catalog is empty. Render "No occasions yet — add
       them in Admin › Catalogs" with a link as a one-line hint under the
