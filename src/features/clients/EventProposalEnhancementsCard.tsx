@@ -3,30 +3,15 @@ import { api, type Id } from "../../lib/api";
 import { formatMoneyExact } from "../../lib/format";
 import { EventOverviewCard } from "../events/EventOverviewCard";
 
-/**
- * Enhancements the client saw on the proposal that booked this event (C3 /
- * AC-005), rendered by the event overview (EventOverviewTab). Lives beside
- * the other Proposal readers in clients/ — the event-feature guard forbids
- * direct useQuery outside EventGuestPanel — and reaches the rows through the
- * reverse lookup (Proposal.eventId), so nothing is re-keyed onto the event.
- * The generated reads degrade to an empty list for roles without
- * salesAccess, so the card simply hides.
- */
 export function EventProposalEnhancementsCard({
   eventId,
 }: {
   eventId: Id<"events">;
 }) {
-  const proposals = useQuery(api.queries.listProposalByEventId, { eventId });
-  const proposal = (proposals ?? []).find((row) => row.deletedAt == null);
-  const enhancements = useQuery(
-    api.queries.listProposalEnhancementByProposalId,
-    proposal ? { proposalId: proposal._id } : "skip",
-  );
-  if (enhancements === undefined) return null;
-  const rows = enhancements
-    .filter((row) => row.addedAt != null && row.removedAt == null)
-    .sort((left, right) => Number(left.sortOrder) - Number(right.sortOrder));
+  const booking = useQuery(api.quoteBuilder.getEventBookingDetails, {
+    eventId,
+  });
+  const rows = booking?.enhancements ?? [];
   if (rows.length === 0) return null;
   return (
     <EventOverviewCard title="Enhancements" testId="event-enhancements-card">
@@ -35,7 +20,7 @@ export function EventProposalEnhancementsCard({
           <li key={row._id}>
             <span className="font-medium text-ink">{row.name}</span>
             {row.description ? ` — ${row.description}` : ""}
-            {` · ${formatMoneyExact(Number(row.price) || 0)}`}
+            {row.price !== null ? ` · ${formatMoneyExact(row.price)}` : ""}
           </li>
         ))}
       </ul>

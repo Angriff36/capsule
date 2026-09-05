@@ -8,6 +8,99 @@ import {
 } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 
+// Event-authorized, deliberately narrow view of the booking details operations
+// needs. Generated reads remain the authority for event and sales permissions.
+export const getEventBookingDetails = query({
+  args: { eventId: v.id("events") },
+  handler: async (
+    ctx,
+    { eventId },
+  ): Promise<{
+    proposalId: Id<"proposals">;
+    label: string;
+    canOpenProposal: boolean;
+    revisionLabel: string;
+    enhancements: Array<{
+      _id: Id<"proposalEnhancements">;
+      name: string;
+      description: string | null;
+      price: number | null;
+    }>;
+  } | null> => {
+    const event: Doc<"events"> | null = await ctx.runQuery(
+      api.queries.getEvent,
+      { id: eventId },
+    );
+    if (!event) return null;
+    const proposals = await ctx.db
+      .query("proposals")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect();
+    const proposal = proposals.find(
+      (p) =>
+        p.tenantId === event.tenantId &&
+        p.deletedAt == null &&
+        p.status === "accepted",
+    );
+    if (!proposal) return null;
+    const salesProposal: Doc<"proposals"> | null = await ctx.runQuery(
+      api.queries.getProposal,
+      { id: proposal._id },
+    );
+    const revisions = (
+      await ctx.db
+        .query("proposalRevisions")
+        .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+        .collect()
+    ).filter((r) => r.tenantId === event.tenantId && r.deletedAt == null);
+    const signatures = await ctx.db
+      .query("signatureRequests")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
+      .filter((q) => q.eq(q.field("proposalId"), proposal._id))
+      .collect();
+    const signed = signatures.find(
+      (s) => s.status === "completed" && s.deletedAt == null,
+    );
+    const signedRevision = revisions.find(
+      (r) => r._id === signed?.proposalRevisionId,
+    );
+    const latest = revisions.sort(
+      (a, b) => b.revisionNumber - a.revisionNumber,
+    )[0];
+    const enhancements = (
+      await ctx.db
+        .query("proposalEnhancements")
+        .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+        .collect()
+    )
+      .filter(
+        (r) =>
+          r.tenantId === event.tenantId &&
+          r.deletedAt == null &&
+          r.addedAt != null &&
+          r.removedAt == null,
+      )
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((r) => ({
+        _id: r._id,
+        name: r.name,
+        description: r.description ?? null,
+        price: salesProposal ? r.price : null,
+      }));
+    return {
+      proposalId: proposal._id,
+      label: proposal.proposalNumber || proposal.title || "Proposal",
+      canOpenProposal: salesProposal !== null,
+      revisionLabel: signedRevision
+        ? `Revision ${signedRevision.revisionNumber} — signed digitally`
+        : latest
+          ? `Revision ${latest.revisionNumber}`
+          : "no revision captured",
+      enhancements,
+    };
+  },
+});
+
 // Public status payload for getQuoteSubmissionStatus — derived from the Doc so
 // field types stay in sync with the schema (single source of truth).
 type QuoteSubmissionStatusResult = {
@@ -117,24 +210,6 @@ export const ingressQuoteSubmission = internalMutation({
     }
     const tenantId = org.tenantId;
 
-    // Per-tenant rate cap on the anonymous public write. Dedup only blocks
-    // exact (email+date) repeats, so a caller varying those fields could flood
-    // the review queue and inflate cost; cap submissions per tenant per hour
-    // (table-less: a bounded take over the tenant index). A true per-caller
-    // (per-IP) limit needs a counter table and remains a follow-up.
-    const HOUR_MS = 60 * 60 * 1000;
-    const MAX_PER_HOUR = 30;
-    const recent = await ctx.db
-      .query("quoteSubmissions")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .filter((q) => q.gte(q.field("submittedAt"), Date.now() - HOUR_MS))
-      .take(MAX_PER_HOUR + 1);
-    if (recent.length >= MAX_PER_HOUR) {
-      throw new ConvexError(
-        "We've received a lot of quote requests recently. Please try again shortly.",
-      );
-    }
-
     const email = args.email.trim().toLowerCase();
     const clientName = args.clientName.trim();
     const dedupKey = generateDedupKey(email, args.eventDate, tenantId);
@@ -158,7 +233,7 @@ export const ingressQuoteSubmission = internalMutation({
     // Dedup: a prior active submission for the same key is returned as-is so a
     // repeat submit is a no-op (submit-once). Dismissed rows still count — the
     // raw capture is retained, and a repeat submit of a dismissed key must not
-    // mint a second row. Failed submissions can be retried via a resubmit.
+    // mint a second row. Failed rows retain their IDs for staff to retry.
     const candidates = await ctx.db
       .query("quoteSubmissions")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -170,7 +245,8 @@ export const ingressQuoteSubmission = internalMutation({
         (sub.status === "pending" ||
           sub.status === "processing" ||
           sub.status === "completed" ||
-          sub.status === "dismissed"),
+          sub.status === "dismissed" ||
+          sub.status === "failed"),
     );
     if (existing) {
       return {
@@ -451,18 +527,34 @@ export const processQuoteSubmission = action({
           );
           const createdLeadId = leadResult.docId;
           leadId = createdLeadId;
-          await ctx.runMutation(api.mutations.Lead_stageConversion, {
-            docId: createdLeadId,
-            clientId,
-            clientContactId: undefined,
-          });
-          await ctx.runMutation(api.mutations.Lead_confirmConversion, {
-            docId: createdLeadId,
-          });
         }
       } catch (error) {
         errors.push(
           `lead: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+
+    // Retry must resume the conversion substeps too: a lead may have been
+    // captured before the prior attempt failed to link/confirm its client.
+    if (leadId && clientId) {
+      try {
+        const lead: Doc<"leads"> | null = await ctx.runQuery(
+          api.queries.getLead,
+          { id: leadId },
+        );
+        if (!lead?.convertedAt) {
+          await ctx.runMutation(api.mutations.Lead_stageConversion, {
+            docId: leadId,
+            clientId,
+          });
+          await ctx.runMutation(api.mutations.Lead_confirmConversion, {
+            docId: leadId,
+          });
+        }
+      } catch (error) {
+        errors.push(
+          `lead conversion: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
@@ -573,17 +665,19 @@ export const processQuoteSubmission = action({
     // startProcessing committed — which would strand the submission in
     // "processing". A partial conversion is marked failed (retriable via
     // QuoteSubmission_retry) with the per-step errors.
-    if (errors.length === 0 && clientId && leadId && eventId && proposalId) {
-      // Best-effort: link the draft proposal back onto the lead so the pipeline
-      // shows it (and avoids a duplicate-proposal prompt). Non-fatal.
+    if (errors.length === 0 && leadId && proposalId) {
       try {
         await ctx.runMutation(api.mutations.Lead_stageProposal, {
           docId: leadId,
           proposalId,
         });
-      } catch {
-        // swallow — the proposal still exists and is recorded on the submission
+      } catch (error) {
+        errors.push(
+          `lead proposal link: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
+    }
+    if (errors.length === 0 && clientId && leadId && eventId && proposalId) {
       await ctx.runMutation(api.mutations.QuoteSubmission_complete, {
         docId: submissionId,
         clientId,

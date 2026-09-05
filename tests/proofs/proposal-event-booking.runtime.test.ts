@@ -362,6 +362,47 @@ describe("accepted proposal → create event (issue #141)", () => {
     // Withdraw soft-deletes (removedAt AND deletedAt), so the generated read
     // already drops the row — the withdrawn offer never reaches the event.
     expect(enhancements.map((row) => row._id)).not.toContain(withdrawnId);
+    type Booking = {
+      canOpenProposal: boolean;
+      enhancements: Array<{ name: string; price: number | null }>;
+    } | null;
+    const booking = await owner.query(api.quoteBuilder.getEventBookingDetails, {
+      eventId: booked.docId,
+    });
+    expect((booking as Booking)?.canOpenProposal).toBe(true);
+    expect(
+      (booking as Booking)?.enhancements.map((row) => row.name).sort(),
+    ).toEqual(live);
+    const operations = proof.asRole({
+      subject: "booking-operations",
+      role: "event_manager",
+      tenantId,
+    });
+    const operationalBooking = await operations.query(
+      api.quoteBuilder.getEventBookingDetails,
+      { eventId: booked.docId },
+    );
+    expect((operationalBooking as Booking)?.canOpenProposal).toBe(false);
+    expect(
+      (operationalBooking as Booking)?.enhancements
+        .map((row) => row.name)
+        .sort(),
+    ).toEqual(live);
+    expect(
+      (operationalBooking as Booking)?.enhancements.every(
+        (row) => row.price === null,
+      ),
+    ).toBe(true);
+    const outsider = proof.asRole({
+      subject: "booking-outsider",
+      role: "owner",
+      tenantId: "other-tenant",
+    });
+    expect(
+      await outsider.query(api.quoteBuilder.getEventBookingDetails, {
+        eventId: booked.docId,
+      }),
+    ).toBeNull();
   });
 
   it("event resolves its proposal and accepted revision", async () => {

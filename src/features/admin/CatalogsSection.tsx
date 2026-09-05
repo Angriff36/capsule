@@ -258,7 +258,7 @@ export function CatalogsSection({
                     <span className="text-base font-semibold text-ink">
                       {row.name}
                     </span>
-                    <span className="chip border-line-2 bg-inset font-mono text-2xs text-ink-2">
+                    <span className="font-mono text-2xs text-ink-2">
                       {row.code}
                     </span>
                     <span className="text-2xs text-ink-3">

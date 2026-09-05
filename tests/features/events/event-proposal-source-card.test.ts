@@ -16,15 +16,16 @@ describe("event overview proposal source card", () => {
       "utf8",
     );
     // Reverse lookup first — the link never rides on a free-text copy.
-    expect(card).toContain("api.queries.listProposalByEventId");
+    expect(card).toContain("api.quoteBuilder.getEventBookingDetails");
     // Revision sources: the signed revision wins over the highest number.
-    expect(card).toContain("api.queries.listSignatureRequest");
-    expect(card).toContain("api.queries.listProposalRevisionByProposalId");
-    expect(card.indexOf('status === "completed"')).toBeLessThan(
-      card.indexOf("revisionNumber - "),
+    const projection = readFileSync("convex/quoteBuilder.ts", "utf8");
+    expect(projection).toContain('query("signatureRequests")');
+    expect(projection).toContain('query("proposalRevisions")');
+    expect(projection.indexOf('status === "completed"')).toBeLessThan(
+      projection.indexOf("revisionNumber - "),
     );
     // The agent path (no revision) stays visible as words, never a crash.
-    expect(card).toContain("no revision captured");
+    expect(projection).toContain("no revision captured");
     expect(card).toContain("return null");
     // One click to the proposal: the deep link opens its focused row.
     expect(card).toContain("CLIENTS_ROUTES.proposal(");

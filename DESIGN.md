@@ -572,6 +572,19 @@ Each system's authoritative experience and implementation status lives in [`docs
 - Controls remain aligned to the content they mutate.
 - Mobile collapses to a deliberate source/result mode switch instead of squeezing both panes.
 
+## Anti-slop Review Lens
+
+Owner approval: 2026-09-04. The Capsule Unslop profile is an avoid-focused review lens for authored UI; it is not a second design system and never overrides this document's tokens, components, route archetypes, or stored references.
+
+- Review a complete route in its real shell and with realistic data before changing isolated components.
+- Classify the route first: overview, catalog, dossier, working ledger, execution board, workbench, or reconciliation folio. A pattern is only a defect when it works against that route's job.
+- Fix repeated causes in shared authored components and tokens before applying page-level exceptions.
+- Prefer a navigable index plus an on-demand inspector for large catalogs. Bound mounted rows and expensive media/data work; do not render a rich card and image query for every record.
+- Treat repeated rounded cards, pills used for ordinary metadata, narrow document columns, stacked hero scaffolding, and decorative entrance motion as review signals—not automatic violations.
+- Preserve purposeful specialist surfaces such as timelines, boards, print documents, and source/result workbenches when their structure matches the operator task.
+- Verify populated, long-list, empty, loading, mobile, keyboard, reduced-motion, and overlay-focus behavior before considering a visual cleanup complete.
+- Keep the audit advisory. It should help reviewers find shared problems without creating a blocking style bureaucracy.
+
 ## Do's and Don'ts
 
 ### Do

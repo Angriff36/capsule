@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from "react";
 import {
   useCandidateAdvance,
-  useCandidateHire,
   useCandidateReject,
   useCreateCandidate,
   useCreateInterview,
@@ -10,7 +9,11 @@ import {
   useListInterview,
   useListPerson,
 } from "../../lib/manifest-convex-react";
-import { useIngestKmCandidates } from "../../lib/hiringPipeline";
+import {
+  useHireCandidateIntoTeam,
+  useIngestKmCandidates,
+  useProvisionStaffSignIn,
+} from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
@@ -52,6 +55,13 @@ const STAGE_LABEL: Record<string, string> = {
   rejected: "Rejected",
 };
 
+// Mirrors the seam's usability test: a sign-in needs a deliverable address,
+// not just a nonempty field.
+function hasUsableEmail(email: string | null | undefined): boolean {
+  const value = (email ?? "").trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/u.test(value);
+}
+
 function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
   const text = String(value ?? "");
   if (!text) return undefined;
@@ -66,15 +76,23 @@ export function CandidatesPage() {
   const createCandidate = useCreateCandidate();
   const advance = useCandidateAdvance();
   const reject = useCandidateReject();
-  const hire = useCandidateHire();
   const scheduleInterview = useCreateInterview();
   const recordOutcome = useInterviewRecordOutcome();
   const ingestKm = useIngestKmCandidates();
+  const hireIntoTeam = useHireCandidateIntoTeam();
+  const provisionSignIn = useProvisionStaffSignIn();
 
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const [kmJson, setKmJson] = useState("");
   const [ingestReport, setIngestReport] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{
+    text: string;
+    tone: "ok" | "warn";
+  } | null>(null);
+  // Candidates whose matched profile is INACTIVE: the next Hire click carries
+  // explicit restore intent ("Restore and resend").
+  const [restoreReady, setRestoreReady] = useState<Set<string>>(new Set());
   const [failure, setFailure] = useState<unknown>(null);
 
   const activePeople = (people ?? []).filter(
@@ -164,15 +182,77 @@ export function CandidatesPage() {
     }
   };
 
-  const hireCandidate = async (
-    candidateId: string,
-    version: number | undefined,
-  ) => {
+  // Hire for real: team profile from the candidate row, then the sign-in
+  // email (Clerk account + password). No email on the candidate still records
+  // the hire — the profile has to be made under Team roles by hand.
+  const hireCandidate = async (candidate: {
+    _id: string;
+    fullName: string;
+    version: number | undefined;
+    hiredPersonId?: string | null;
+  }) => {
     setFailure(null);
+    setNotice(null);
+    setBusy(true);
+    const linkedPerson =
+      candidate.hiredPersonId != null
+        ? people?.find((row) => row._id === candidate.hiredPersonId)
+        : undefined;
     try {
-      await hire({ docId: candidateId, version });
+      const result = await hireIntoTeam({
+        candidateId: candidate._id as never,
+        ...(candidate.version !== undefined
+          ? { expectedVersion: candidate.version }
+          : {}),
+        // Reactivation intent: only the "Restore and resend" state sends it.
+        ...(linkedPerson?.status === "inactive" ||
+        restoreReady.has(candidate._id)
+          ? { restore: true }
+          : {}),
+      });
+      if (result.kind === "needs_restore") {
+        setRestoreReady((prev) => new Set(prev).add(candidate._id));
+        setNotice({
+          text: `${candidate.fullName}'s team profile is inactive. Press Restore and resend to bring it back, then the sign-in goes out.`,
+          tone: "warn",
+        });
+        return;
+      }
+      if (result.kind === "hired_no_email") {
+        setNotice({
+          text: `Hired ${candidate.fullName}. The candidate has no usable email, so no sign-in could be created — add them under Administration → Permissions → Team roles.`,
+          tone: "warn",
+        });
+        return;
+      }
+      try {
+        const provisioned = await provisionSignIn({
+          personId: result.personId as never,
+        });
+        setNotice({
+          text: `Hired ${candidate.fullName}. Emailed ${
+            provisioned.passwordIssued
+              ? "a sign-in link and password"
+              : "a sign-in link"
+          } to ${provisioned.email}.${
+            result.roleDowngraded
+              ? " They joined with the base staff role — an admin can set their manager role under Administration → Permissions → Team roles."
+              : ""
+          }`,
+          tone: "ok",
+        });
+      } catch (provisionError) {
+        setNotice({
+          text: `Hired ${candidate.fullName}, but the sign-in email failed${
+            provisionError instanceof Error ? `: ${provisionError.message}` : ""
+          }. Press Resend sign-in on their card to try again.`,
+          tone: "warn",
+        });
+      }
     } catch (error) {
       setFailure(error);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -244,6 +324,15 @@ export function CandidatesPage() {
 
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
+      {notice ? (
+        <output
+          className={`banner ${
+            notice.tone === "warn" ? "banner-warn" : "banner-ok"
+          } block mt-4`}
+        >
+          {notice.text}
+        </output>
+      ) : null}
 
       {/* KM interview-tool import (spec §9.3 "map the KM JSON into the model"). */}
       <section className="working-ledger mt-4">
@@ -343,6 +432,15 @@ export function CandidatesPage() {
               (row) => row.candidateId === candidate._id,
             );
             const terminal = ["hired", "rejected"].includes(candidate.stage);
+            const linkedPerson =
+              candidate.hiredPersonId != null
+                ? people?.find((row) => row._id === candidate.hiredPersonId)
+                : undefined;
+            // listPerson filters removed rows out entirely: a missing row for
+            // a linked hire means the profile was terminated/deleted.
+            const removedProfile =
+              candidate.hiredPersonId != null && linkedPerson == null;
+            const inactiveProfile = linkedPerson?.status === "inactive";
             return (
               <div key={candidate._id} className="supply-form mt-4">
                 <div className="supply-form-heading">
@@ -395,6 +493,12 @@ export function CandidatesPage() {
                     <button
                       type="button"
                       className="btn btn-secondary"
+                      disabled={busy || candidate.hiredPersonId != null}
+                      title={
+                        candidate.hiredPersonId != null
+                          ? "Reopening is disabled while a team profile is linked (issue #269). Change their status under Administration → Permissions → Team roles."
+                          : undefined
+                      }
                       onClick={(e) => {
                         const select = e.currentTarget
                           .closest(".supply-form-grid")
@@ -412,6 +516,13 @@ export function CandidatesPage() {
                     >
                       Move
                     </button>
+                    {candidate.hiredPersonId != null ? (
+                      <p className="text-sm text-ink-2 mt-2">
+                        Reopening is disabled while a team profile is linked
+                        (issue #269). Change their status under Administration →
+                        Permissions → Team roles.
+                      </p>
+                    ) : null}
                   </label>
                   <label className="field-label">
                     Rejection note (optional)
@@ -447,13 +558,50 @@ export function CandidatesPage() {
                       <button
                         type="button"
                         className="btn btn-primary"
-                        disabled={candidate.stage === "hired"}
-                        onClick={() =>
-                          void hireCandidate(candidate._id, candidate.version)
+                        disabled={
+                          busy ||
+                          (candidate.stage === "hired" &&
+                            ((candidate.hiredPersonId == null &&
+                              !hasUsableEmail(candidate.email)) ||
+                              removedProfile))
                         }
+                        onClick={() => void hireCandidate(candidate)}
                       >
-                        Hire
+                        {candidate.stage !== "hired"
+                          ? restoreReady.has(candidate._id)
+                            ? "Restore and resend"
+                            : "Hire into team"
+                          : removedProfile
+                            ? "Profile removed"
+                            : candidate.hiredPersonId == null
+                              ? restoreReady.has(candidate._id)
+                                ? "Restore and resend"
+                                : "Finish team setup"
+                              : inactiveProfile
+                                ? "Restore and resend"
+                                : "Resend sign-in"}
                       </button>
+                      {candidate.stage === "hired" &&
+                      candidate.hiredPersonId == null &&
+                      !hasUsableEmail(candidate.email) ? (
+                        <p className="text-sm text-ink-2 mt-2">
+                          This hire has no usable email, so no sign-in can be
+                          set up. Re-import the candidate with an email, or add
+                          them under Administration → Permissions → Team roles.
+                        </p>
+                      ) : null}
+                      {removedProfile ? (
+                        <p className="text-sm text-ink-2 mt-2">
+                          Their team profile was removed. Hire them again under
+                          Administration → Permissions → Team roles.
+                        </p>
+                      ) : null}
+                      {inactiveProfile ? (
+                        <p className="text-sm text-ink-2 mt-2">
+                          Their team profile is inactive. This restores it, then
+                          emails the sign-in again.
+                        </p>
+                      ) : null}
                     </div>
                   </div>
                 </div>

@@ -14,9 +14,10 @@ describe("event overview enhancements card", () => {
       "utf8",
     );
     // Reverse lookup first, then live rows on the resolved proposal.
-    expect(card).toContain("api.queries.listProposalByEventId");
-    expect(card).toContain("api.queries.listProposalEnhancementByProposalId");
-    expect(card).toContain("removedAt == null");
+    expect(card).toContain("api.quoteBuilder.getEventBookingDetails");
+    const projection = readFileSync("convex/quoteBuilder.ts", "utf8");
+    expect(projection).toContain("api.queries.getEvent");
+    expect(projection).toContain("r.removedAt == null");
     // No proposal linked or nothing live → no card, never a crash.
     expect(card).toContain("rows.length === 0");
     expect(card).toContain("return null");

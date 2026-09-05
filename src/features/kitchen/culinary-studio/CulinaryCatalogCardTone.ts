@@ -24,10 +24,10 @@ export class CulinaryCatalogCardTone {
   static statusClass(status: string): string {
     const normalized = status.toLowerCase();
     if (normalized === "active" || normalized === "published") {
-      return "culinary-card-status is-live";
+      return "chip-state-ok";
     }
     if (normalized === "draft" || normalized === "pending") {
-      return "culinary-card-status is-draft";
+      return "chip-state-warn";
     }
     if (
       normalized === "archived" ||
@@ -35,8 +35,8 @@ export class CulinaryCatalogCardTone {
       normalized === "inactive" ||
       normalized === "merged"
     ) {
-      return "culinary-card-status is-quiet";
+      return "culinary-status-quiet";
     }
-    return "culinary-card-status is-warn";
+    return "chip-state-warn";
   }
 }
