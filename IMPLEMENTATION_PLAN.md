@@ -372,6 +372,25 @@ green. Tag v0.0.44 created. 10 of 19 ACs PASS (AC-007…013, AC-014,
 AC-018, AC-019). Next: B3 (runtime proof: create event with empty and
 populated catalogs) → AC-016.
 
+Iteration 38 (BUILD iteration 10, 2026-09-04): B3 DONE. Runtime proof
+`tests/proofs/event-create-catalogs.runtime.test.ts` › "create with empty and
+populated catalogs" — AC-016 = PASS. One tenant walks both states in order:
+(a) zero ServiceStyle/Occasion rows → `Event_createViaPlanEngagement`
+succeeds with both ids omitted (null accepted; row live, plannedAt set);
+(b) `ServiceStyle_createViaRegister` + `Occasion_createViaRegister` (the
+same generated commands the B1 admin page wires) then a second
+`Event_createViaPlanEngagement` with `serviceStyleId`/`occasionId` → the
+typed ids persist on the event AND resolve back to the live registered
+rows (name/code/status assertions — the data EventDetailsCard's `nameOf`
+reads); the empty-catalog event keeps its null ids after the catalogs are
+populated (membership assertion — Convex `collect()` order is
+unspecified). Implementation needed NO change; `planEngagement` already
+took both ids optional. No manifest change, no regen. Gates: `bun run
+test` 122 files / 1208 tests green; typecheck, `format:check` (one
+prettier rewrap on the new file), `bunx vite build` green. Tag `v0.0.45`
+created. 11 of 19 ACs PASS (AC-007…014, AC-016, AC-018, AC-019). Next:
+B4 (retired rows hidden on create, kept on existing records) → AC-015.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -380,7 +399,7 @@ Activities in `specs/` in the order a real event moves through the business.
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
 | 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ form + dedup + client match; queue shows style/occasion + free text; junk dismissable; offline notice; one-click proposal links (A7); failed rows link checkpointed records and retry (A8/A9) | 2 (catalog rows), active `organizations` row |
-| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; admin UI at `/admin/catalogs` (B1); event-create empty state done (B2); runtime proof pending (B3) | — |
+| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; admin UI at `/admin/catalogs` (B1); event-create empty state done (B2); runtime proof done (B3); retired-rows unit test pending (B4) | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
 | 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event; proof sits outside `tests/proofs/` | 4, 2 (service style/occasion on create) |
@@ -631,7 +650,7 @@ Order = build order. Earlier tasks unblock later ones.
       `serviceStyleSelectOptions`) with `readFileSync` source-text assertions
       on `EventCreatePage.tsx`; no render. `serviceStyleCatalog.ts` is also
       exercised by `tests/event-menu-cost-prep-po-chain.test.ts`. → AC-013
-- [ ] **B3. Runtime proof: create event with empty and populated catalogs.**
+- [x] **B3. Runtime proof: create event with empty and populated catalogs.**
       `tests/proofs/event-create-catalogs.runtime.test.ts`: (a) zero
       ServiceStyle/Occasion rows → `Event_createViaPlanEngagement` succeeds
       with null ids (`planEngagement` takes `optional serviceStyleId`/
