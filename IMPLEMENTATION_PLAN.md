@@ -580,6 +580,38 @@ AC), then D2 (spec status table refresh, no AC). AC-006/AC-013 J halves
 (llm-review UX-01) still need a session with ANTHROPIC_API_KEY (unset
 again this session; no .env.local).
 
+Iteration 45 (BUILD iteration 17, 2026-09-05): C5 + D2 DONE — ALL 21
+tasks complete, 19 of 19 AC PASS, no `- [ ]` items remain, so
+check_done.sh halts the build loop after this iteration. C5:
+`ProposalEventPrefill.values` now calls lib `toDatetimeLocalValue`
+(`src/lib/format.ts:79`); the private `toDatetimeLocal` copy is deleted;
+the null/non-finite guard stays at the call site as a one-line local
+const inside `values()` (prettier rewraps the arrow signature). No
+behavior change — the C6 seam test passes unchanged. D2: §0 status
+table in `specs/capsule-complete-feature-spec.md` refreshed (heading
+date → 2026-09-05): the plan's row list (3.2 ✅, 3.3 🟡, 4.1 🟡 reworded,
+standalone 5.2 ✅, 5.5 ✅, 4.6 ✅ with decks noted, 6 🟡, 7.4 🟡, 8.3 ✅,
+8.4 ✅, 9.2 ✅, 9.3 ✅, 9.5 ✅; merged 5.1–5.2 and 7.3/8.5 rows left as
+planned) PLUS two additions beyond the plan list, both verified against
+the tree: row 4.3 ❌→🟡 (stale since D1 — AC-017's journey proves §4.3's
+done-when; gaps named: text-only menu/enhancement capture, no estimate
+labelling, no attribution) and the slice roll-up paragraph (Slice 0
+3-of-4, Slice 1, Slice 2, Slice 3 clauses). Every evidence citation
+checked: manifests (`service-style`, `venue-note`,
+`venue-vendor-relationship`, `role-scorecard`, `hiring` Candidate +
+Interview, `one-on-one`, `signature-request`), `proposalPdf.ts`
+timeline/logistics/enhancements sections, `src/import/` +
+ParallelRunDashboardPage/CutoverPage, `sales_lock`/`lockForSales` in the
+wiring contract. `specs/capsule-complete-feature-spec.json` untouched
+per plan. Gates: `bun run test` 127 files / 1217 tests green; typecheck,
+`bunx vite build` green. Tag v0.0.52 created. THE BRANCH IS
+BUILD-COMPLETE: next step is the release review (cross-model merge
+gate; settle #265 — Clerk production keys in the Vercel env — BEFORE the
+`[release]` merge) then `bash scripts/release.sh --reviewer <model>`.
+The J halves of AC-006/AC-013 (llm-review UX-01 evidence) still need a
+session with ANTHROPIC_API_KEY (unset again this session; no
+.env.local); they are recorded evidence, not loop gates.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -933,7 +965,7 @@ Order = build order. Earlier tasks unblock later ones.
       proposal number alone and "no revision captured" in that case; never
       throw. No manifest change. Extend the C1 proof file with › "event
       resolves its proposal and accepted revision". → AC-002
-- [ ] **C5. Consolidate date formatting.** `ProposalEventPrefill.toDatetimeLocal`
+- [x] **C5. Consolidate date formatting.** `ProposalEventPrefill.toDatetimeLocal`
       (`ProposalEventPrefill.ts:55-65`) duplicates `toDatetimeLocalValue` in
       `src/lib/format.ts:79`. Use the library helper; delete the private copy.
       Both format local time as `YYYY-MM-DDTHH:MM`; the only difference is
@@ -958,7 +990,7 @@ Order = build order. Earlier tasks unblock later ones.
       send → accept → create event from proposal → event has date, start,
       end, headcount, resolved venue, copied menu servings, enhancements, and
       the proposal points at it. This is the release gate. → AC-017
-- [ ] **D2. Refresh the stale status table in
+- [x] **D2. Refresh the stale status table in
       `specs/capsule-complete-feature-spec.md` §0** (verified 2026-07-24,
       wrong on 2026-09-03). Rows to change: 3.2 ❌→✅ (`service-style.manifest`),
       3.3 ❌→🟡 (`sales_lock` stage + `lockForSales`, Confirmed conflated with

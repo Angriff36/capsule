@@ -6,40 +6,40 @@
 
 ---
 
-## 0. Implementation status (verified against live code 2026-07-24)
+## 0. Implementation status (verified against live code 2026-09-05)
 
 Verdicts below reflect what exists in `src/**` today, checked section-by-section against this spec. Legend: ✅ done · 🟡 partial · ❌ not built. "Done" here means the core behavior exists; it does **not** certify the full "fully wired" bar in §1.17 (that requires per-slice wiring/command/UI proof per §13).
 
 | Spec § | Feature | Status | Evidence / gap |
 |--------|---------|--------|----------------|
 | 3.1 | Event detail crash | ✅ | `EventDetailPage.tsx` works, reads `event.stage`; no `is_active` reference. Bug does not reproduce. |
-| 3.2 | Service Style entity | ❌ | No entity/enum. Only free-text `serviceStyle` on MenuDish + `Event.serviceRequirements`. |
-| 3.3 | Sales Lock + pipeline | ❌ | `EventStage` = `planning/pending_approval/approved/executing/completed/cancelled/closed_out` — not Quote→Sales Lock→Confirmed→Final→Complete. No `sales_lock` state. |
+| 3.2 | Service Style entity | ✅ | `operations/service-style.manifest` (register/revise/retire/activate) + `/admin/catalogs` admin UI + idempotent seed; retired rows hidden on create, resolved on detail. Import mapping/reconciliation queue not built. |
+| 3.3 | Sales Lock + pipeline | 🟡 | `sales_lock` stage + `Event.lockForSales` command live. `quote` stage unreachable; Confirmed conflated with Executing. |
 | 3.4 | Equipment PackList ≠ PrepList | ✅ | Distinct `PackList`/`PackListItem` (`logistics/pack-list.manifest`), separate from food PrepList. Not yet linked to Equipment catalog. |
-| 4.1 | Event creation fields | 🟡 | Has date/guests/venue. Missing: occasion enum, service-style enum, labeled salesperson, referral source. |
+| 4.1 | Event creation fields | 🟡 | Date/guests/venue + occasion, service-style, salesperson, referral selectors live (e871648). Missing: duplicate/archive/reopen paths. |
 | 4.2 | Online menu pricing | 🟡 | Price in model (`MenuDish.sellingPrice`) but client portal omits it (`clientPortal.ts:131-138`). |
-| 4.3 | Self-service quote builder | ❌ | Client portal is read-only; quotes set internally by staff. |
+| 4.3 | Self-service quote builder | 🟡 | Public quote form + dedup + one-action conversion to client/lead/event/linked draft proposal live (proven by `tests/proofs/quote-to-booked-event.runtime.test.ts`). Menu selections/enhancements captured as text, not structured; estimate labelling and attribution not built. |
 | 4.4 | Social DM inquiry capture | ❌ | `Lead.source` free-text only; no webhook/ingestion. |
 | 4.5 | Mobile-first field use | ✅ | Viewport meta + Tailwind mobile-first throughout. No dedicated phone views. |
-| 4.6 | Social sharing / share links | 🟡 | Revocable portal share token exists (`createShareToken` → `/portal/events/{token}`). No deck sharing. |
+| 4.6 | Social sharing / share links | ✅ | Proposal share links + revocable portal tokens live (issue #115). Deck sharing not built. |
 | 5.1–5.2 | Proposal builder + templates | 🟡 | Manual authoring + one hard-coded branded PDF (`proposalPdf.ts`). Not event-driven; no template select/reorder. |
-| 5.2 | Timeline / venue-logistics / enhancements sections | ❌ | PDF is Overview→Menu→Estimate→Terms only. No timeline, logistics, or enhancements sections. |
+| 5.2 | Timeline / venue-logistics / enhancements sections | ✅ | `src/features/clients/proposalPdf.ts` renders timeline, venue logistics, and enhancements sections. |
 | 5.3 | TPP bridge | ❌ | Spec-only; no import code, no event→proposal command. |
-| 5.5 | Digital acceptance/signature | ❌ | No signature/acceptance entity; PDF has no CTA. Only internal operator `accept()`. |
-| 6 | TPP migration / parallel run | ❌ | No import framework, external record links, or comparison dashboard in `src/`. |
+| 5.5 | Digital acceptance/signature | ✅ | `sales/signature-request.manifest`; SignatureCompleted reaction accepts the proposal; digital accept proven in `tests/proofs/proposal-event-booking.runtime.test.ts`. |
+| 6 | TPP migration / parallel run | 🟡 | Import framework (`src/import/` manifests), external record links, reconcile pages, parallel-run dashboard, cutover page built. Production TPP data not migrated. |
 | 7.1 | Reporting foundation | 🟡 | `SavedReportDefinition` (config-only) + bespoke live reports (revenue, profit-margin, food-cost, staff-util, production-yield). No render engine. |
-| 7.4 | Named dashboards (Scorecard, L10, Avg Event Value, Comp Master, Sales) | ❌ | None integrated; `scorecard` hits are CSS class names only. |
+| 7.4 | Named dashboards (Scorecard, L10, Avg Event Value, Comp Master, Sales) | 🟡 | 7 dashboards live; parity bugs tracked in issue #124. |
 | 7.2 | Venue / on-off-premise filtering | ❌ | `VenueType` has no on/off-premise flag; event list filters venue by name substring. |
 | 7.3 / 8.5 | Revenue attribution + splits | ❌ | Revenue breaks down by event_type/client/service_line only. No venue dimension, no commission/split logic. |
 | 8.1 | Venue profile | 🟡 | Backend `Venue` entity exists (name, type, capacity, address, 2 free-text notes). No mgmt UI; missing logistics/vendor/scorecard depth. |
 | 8.2 | Event layouts / logistics snapshot | 🟡 | Events snapshot venue name/address/capacity; no venue-derived layout templates. |
-| 8.3 | Venue notes | 🟡 | Only `Venue.accessNotes`/`cateringNotes` free-text; no Note entity. |
-| 8.4 | Venue vendor ecosystem | ❌ | `preferredVendor` only on Ingredient/PurchaseNeed; none on Venue. |
+| 8.3 | Venue notes | ✅ | `operations/venue-note.manifest` (VenueNote entity). |
+| 8.4 | Venue vendor ecosystem | ✅ | `operations/venue-vendor-relationship.manifest`. |
 | 9.1 | Event staffing | ✅ | `shift.manifest` + `assignment.manifest` (EventAssignment lifecycle, EventStaffNeed, auto-seed on approval). |
-| 9.2 | Role scorecards | ❌ | No scorecard entity; roles are open strings. |
-| 9.3 | Hiring pipeline | ❌ | No candidate/interview entity. |
+| 9.2 | Role scorecards | ✅ | `workforce/role-scorecard.manifest`. |
+| 9.3 | Hiring pipeline | ✅ | `workforce/hiring.manifest` (Candidate + Interview). |
 | 9.4 | Performance tracking | 🟡 | `performance-review.manifest` (1–5 ratings, notes, manager-only) but **no eventId** — periodic, not per-event. |
-| 9.5 | Monthly one-on-ones | ❌ | No 1-on-1/goals/strengths entity. |
+| 9.5 | Monthly one-on-ones | ✅ | `workforce/one-on-one.manifest`. |
 | 10.1 | Menu management | ✅ | `menu.manifest` (category, pricing, template, lifecycle). Seasonal: no dedicated construct. |
 | 10.2 | Recipe management | ✅ | `recipe.manifest` (versions, BOM, steps, snapshots) + import pipeline. |
 | 10.3 | Food cost | ✅ | Computed `liveBatchCost`/`liveCostPerGuest`; food-cost-% UI. |
@@ -56,7 +56,7 @@ Verdicts below reflect what exists in `src/**` today, checked section-by-section
 | 12.6 | SMS | ✅ | `smsAlerts.ts` + Twilio (dispatch, starting-soon, allergen); opt-in + org toggle. |
 | 12.7 | Social media | ❌ | No social/DM integration. |
 
-**Slice roll-up (§14):** Slice 0 (event spine) — 2 of 4 blockers resolved (event detail ✅, PackList ✅), Service Style + Sales Lock still open. Slice 1 (proposal wedge) — mostly 🟡/❌. Slice 2 (migration) — ❌ not started. Slice 3 (venue + reporting) — thin Venue entity, dashboards ❌. **Slice 4 (operations) is the most complete** — kitchen ✅ end-to-end, equipment mostly ✅, staffing ✅. Slice 5 (integrations) — QuickBooks/Calendar/SMS ✅, Nowsta/social/email inbound ❌.
+**Slice roll-up (§14):** Slice 0 (event spine) — 3 of 4 blockers resolved (event detail ✅, PackList ✅, Service Style ✅); Sales Lock 🟡 (stage + `lockForSales` live, pipeline conflation remains). Slice 1 (proposal wedge) — lifecycle, PDF sections, signature seam ✅; public quote form + conversion 🟡 (§4.3). Slice 2 (migration) — 🟡 import, parallel-run dashboard, cutover built; production data not migrated. Slice 3 (venue + reporting) — VenueNote/VendorRelationship ✅; 7 dashboards 🟡 (parity in #124). **Slice 4 (operations) is the most complete** — kitchen ✅ end-to-end, equipment mostly ✅, staffing ✅. Slice 5 (integrations) — QuickBooks/Calendar/SMS ✅, Nowsta/social/email inbound ❌.
 
 ---
 
