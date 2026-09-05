@@ -161,6 +161,25 @@ no code change since `1b3abd9` (only the 7 spec-bullet lines, AC-018/019),
 (4 specs), AC-001…AC-019 PENDING, 0 PASS, 21 open tasks. No subagent audit.
 Operator: stop the plan loop and start BUILD at A1.
 
+Iteration 29 (BUILD iteration 1, 2026-09-04): A1 DONE. `convex/quoteBuilder.ts`
+`processQuoteSubmission` now passes `eventId` into `Proposal_createViaDraft`
+(the stale "ponytail: no eventId arg" comment is deleted; the manifest draft
+command already accepted `optional eventId`). Runtime proof
+`tests/proofs/quote-conversion.runtime.test.ts` › "convert builds client,
+lead, event and linked proposal" is green — AC-008 = PASS (public submitQuote
+needs an active `organizations` row, so the proof seeds one via
+`Organization_createViaRegister`; the proof-kit harness runs actions via a
+typed cast — convex-test has `.action`, `ManifestConvexTestHarness` does not
+declare it; `clients.email` is encrypted at rest, so the proof compares ids,
+not plaintext). Gates: `bun run test` 119 files / 1188 tests green; typecheck
+green after repairing `src/lib/llm-review.test.ts` — the loop-setup template
+(commit 274e379) referenced a nonexistent `generateWelcomeMessage` and
+Playwright `page` global, which broke `tsc --noEmit` at HEAD before this
+iteration; fixed in place with a local stand-in helper and comments for the
+screenshot steps (the file still throws without ANTHROPIC_API_KEY when run by
+path — that is by design). `format:check` green; `bunx vite build` green.
+Tag `v0.0.36` created. Next: A2 (queue shows style/occasion) → AC-007.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -241,7 +260,7 @@ Order = build order. Earlier tasks unblock later ones.
 
 ### A. Quote → lead → proposal (spec `specs/ralph/public-quote-form.md`)
 
-- [ ] **A1. Link the converted proposal to the event it creates.** In
+- [x] **A1. Link the converted proposal to the event it creates.** In
       `convex/quoteBuilder.ts` `processQuoteSubmission` call site (`:497-515`)
       pass `eventId` into `Proposal_createViaDraft`; the manifest command
       already accepts `optional eventId` (`src/sales/proposal.manifest:106`;

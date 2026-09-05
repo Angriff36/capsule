@@ -11,6 +11,12 @@
 import { test, expect } from "vitest";
 import { createReview, loadActiveCriteria } from "@/lib/llm-review";
 
+// Stand-in for whatever copy your app generates — the example only needs a
+// string artifact.
+function generateWelcomeMessage(): string {
+  return "Welcome back — your workspace is ready.";
+}
+
 // Example 1: Text evaluation
 test("welcome message tone", async () => {
   const message = generateWelcomeMessage();
@@ -25,7 +31,8 @@ test("welcome message tone", async () => {
 
 // Example 2: Vision evaluation (screenshot path)
 test("dashboard visual hierarchy", async () => {
-  await page.screenshot({ path: "./tmp/dashboard.png" });
+  // Capture ./tmp/dashboard.png with a browser tool first — this repo has no
+  // Playwright `page` global in vitest.
   const result = await createReview({
     criteria:
       "Layout demonstrates clear visual hierarchy with obvious primary action",
@@ -36,7 +43,7 @@ test("dashboard visual hierarchy", async () => {
 
 // Example 3: Smart intelligence for complex judgment
 test("brand visual consistency", async () => {
-  await page.screenshot({ path: "./tmp/homepage.png" });
+  // Capture ./tmp/homepage.png with a browser tool first — no `page` global.
   const result = await createReview({
     criteria:
       "Visual design maintains professional brand identity suitable for financial " +

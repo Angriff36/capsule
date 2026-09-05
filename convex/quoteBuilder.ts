@@ -508,15 +508,16 @@ export const processQuoteSubmission = action({
             taxAmount: 0,
             discountAmount: 0,
             total: 0,
+            eventId: eventId ?? undefined,
             notes:
               submission.notes ??
               "Draft proposal created from quote request. Menu selection and pricing to follow.",
           },
         );
         proposalId = proposalResult.docId;
-        // ponytail: no Proposal command links an event after creation
-        // (createViaDraft has no eventId arg), so the draft stays unlinked;
-        // both IDs are still recorded on the QuoteSubmission below.
+        // Linked at creation: draft accepts an optional eventId, so the
+        // proposal points at the event this conversion just created (the
+        // accept path then reuses it instead of booking a second event).
       }
     } catch (error) {
       errors.push(
