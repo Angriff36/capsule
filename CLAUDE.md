@@ -153,7 +153,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [Emergency bridge — running bridge was not updated]
-Files: src/features/events/EventTimelineAssigneePicker.tsx (edit)
+No changes or facts in this session.
 
 # === END COGNILAYER ===
 
