@@ -1,4 +1,5 @@
 import type { Doc } from "../../lib/api";
+import { toDatetimeLocalValue } from "../../lib/format";
 
 /** Default form values the create-event form seeds from an accepted proposal. */
 export type ProposalPrefillValues = {
@@ -22,11 +23,16 @@ export class ProposalEventPrefill {
     if (!proposal) return {};
     const guestCount = Number(proposal.guestCount ?? 0);
     const total = Number(proposal.total ?? 0);
+    // The lib helper needs a finite number; proposal fields are nullable.
+    const localDatetime = (
+      ms: number | null | undefined,
+    ): string | undefined =>
+      ms != null && Number.isFinite(ms) ? toDatetimeLocalValue(ms) : undefined;
     return {
       title: proposal.title || undefined,
       eventType: proposal.eventType ?? undefined,
-      startsAtLocal: this.toDatetimeLocal(proposal.eventDate),
-      endsAtLocal: this.toDatetimeLocal(proposal.eventEndDate),
+      startsAtLocal: localDatetime(proposal.eventDate),
+      endsAtLocal: localDatetime(proposal.eventEndDate),
       expectedHeadcount: guestCount > 0 ? guestCount : undefined,
       quotedPrice: total > 0 ? total : undefined,
     };
@@ -52,18 +58,6 @@ export class ProposalEventPrefill {
       proposal.deletedAt == null &&
       String(proposal.status) === "accepted" &&
       proposal.eventId == null
-    );
-  }
-
-  private toDatetimeLocal(
-    timestamp: number | null | undefined,
-  ): string | undefined {
-    if (timestamp == null || !Number.isFinite(timestamp)) return undefined;
-    const date = new Date(timestamp);
-    const pad = (part: number) => String(part).padStart(2, "0");
-    return (
-      `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
-      `T${pad(date.getHours())}:${pad(date.getMinutes())}`
     );
   }
 }
