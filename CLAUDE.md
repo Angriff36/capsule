@@ -152,7 +152,7 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-Capsule ralph/wiggum-loop BUILD iteration 2 complete (2026-09-04): A2 done — quote review queue shows service style + occasion (nameOf over useListServiceStyle/useListOccasion, "Not specified" fallback), AC-007 = PASS. Commit 8419d57, tag v0.0.37, branch pushed. Gates green: 120 files/1189 tests, typecheck, format:check, vite build. Open: next iteration = A3 (dedup regression proof → AC-009) in tests/proofs/quote-conversion.runtime.test.ts; then A4-A9, B1-B4, C1-C6, D1-D2 per IMPLEMENTATION_PLAN.md. 17 ACs still PENDING.
+Ralph loop BUILD iteration 17 on ralph/wiggum-loop (2026-09-05): C5+D2 DONE — BRANCH BUILD-COMPLETE. C5 (commit 20a28dc): ProposalEventPrefill.values uses lib toDatetimeLocalValue; private copy deleted; guard kept as local const in values(); no behavior change. D2 (commit 9033a65): §0 status table in specs/capsule-complete-feature-spec.md refreshed to 2026-09-05 — plan's pinned rows plus row 4.3 ❌→🟡 (stale since AC-017 proved §4.3's done-when) and the slice roll-up; .json untouched. Tag v0.0.52, pushed, pre-push regen-check green. ALL 21 tasks done, 19/19 AC PASS, no open checkboxes → loop halts. Gates: bun run test 127/1217 green, typecheck, format:check, vite build, lint_specs green. Open: (a) issue #265 Clerk prod keys in Vercel env — settle BEFORE release merge; (b) cross-model review then bash scripts/release.sh --reviewer <model> (the release is NOT a build-iteration action); (c) J-halves AC-006/AC-013 llm-review UX-01 need a session with ANTHROPIC_API_KEY (unset this session) — evidence only, not gates. CLAUDE.md stays dirty (session hook) — task commits stage explicit paths only.
 
 # === END COGNILAYER ===
 
