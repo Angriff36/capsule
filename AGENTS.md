@@ -304,6 +304,11 @@ Convex prod deploy for that branch — Vercel builds `main` only for a commit
 whose subject starts with `[release]`, so a merge made on GitHub, PR button
 or auto-merge, lands but never deploys), then renames the branch to
 `archive/<branch>` locally and on origin. Start the next task from `main`.
+After the main push it also produces the release receipt (PR13-06/AC-030):
+`bun scripts/release-receipt.ts` writes `.artifacts/release/receipt-<sha>.{json,md}`.
+Set `CAPSULE_RELEASE_URL` (canonical production URL) and optionally
+`VERCEL_TOKEN` / `CAPSULE_API_KEY` so its legs can verify; a leg without
+its input keeps the receipt PARTIAL by design.
 
 **Manual deploy commands and settings changes are HUMAN-AUTHORIZED only.** No
 loop or agent runs `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk

@@ -172,4 +172,16 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
 fi
 rm -f "$proof"
 
+# PR13-06 / AC-030 — release receipt for THIS merge. The production build
+# takes minutes; gather with a bounded wait. Partial stays partial and is
+# printed loudly: the push already shipped, so the archive is not withheld
+# for a partial receipt (that would hide state, not unship it). Legs verify
+# only when their inputs exist (CAPSULE_RELEASE_URL for the canonical URL,
+# Vercel CLI/token for inspect + env pull, CAPSULE_API_KEY for the
+# authenticated workflow); missing inputs keep the receipt honestly partial.
+bun scripts/release-receipt.ts \
+  --sha "$(git rev-parse main)" \
+  --wait "${CAPSULE_RELEASE_WAIT:-600}" \
+  || echo "release: receipt gathering failed (see above); the release itself already shipped."
+
 archive_branch

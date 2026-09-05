@@ -842,6 +842,55 @@ secrets, `bunx vite build` green; preview verified 7812. No manifest change,
 no regen. Tag `v0.0.61` created. NEXT: R2-12 (release receipt,
 `tests/release-receipt.test.ts` → AC-030).
 
+Iteration 56 (BUILD, release 2, 2026-09-05): R2-12 DONE. AC-030 = PASS —
+ALL 11 release-2 ACs PASS (AC-020…AC-030; left: R2-13 tenantName defect
+(no AC), R2-14 ship). New pure builder `src/lib/releaseReceipt.ts`
+(PR13-06): four legs, each returns verified/failed/unverified with a
+stable code — vercel (canonical URL → `vercel inspect <url> --json`
+deployment: READY + meta.gitCommitSha === integrated sha; sha mismatch =
+failed `vercel:stale_alias`, no sha reported = unverified), convex
+(expected deployment from the owner map vs the production
+VITE_CONVEX_URL host label, authenticated registry reachable, registry
+command count === convex/http.ts COMMAND_DISPATCH count — the
+over-the-wire code-surface match; functions+schema ride the READY
+build's `convex deploy` buildCommand, recorded in the leg's evidence
+chain), config (R2-11 DeploymentConfigReport.ok, zero blockers),
+workflow (GET /api/manifest/commands: 401 anonymous proves the auth
+gate is present, 200 with CAPSULE_API_KEY proves edge+API-key-gateway+
+Clerk+Convex end to end — the deployed gateway does the Clerk
+exchange, so the probe is read-only and real). COMPLETE only when every
+leg verified; anything else PARTIAL with named codes; unverified ≠
+success. Gatherer `scripts/release-receipt.ts` (run-only; scripts/ is
+outside tsconfig, the R2-11 shape): vercel inspect with bounded --wait
+poll (20 s interval; non-terminal states QUEUED/BUILDING/INITIALIZING),
+`vercel env pull --environment production -y` into
+.artifacts/release/prod.env (deleted in a finally; only redacted codes
+and host labels ever reach the receipt) feeding `bun
+scripts/check-deployment-config.ts --json`, fetch probes, writes
+receipt-<sha>.{json,md} under .artifacts/release/ and prints the
+headline; `--strict` exits 1 on partial for CI use. Wired into
+scripts/release.sh AFTER the one main push, BEFORE archive_branch:
+partial is printed loudly but never withholds the archive — the push
+already shipped, withholding would hide state, not unship it; a
+gatherer crash cannot abort the release (`|| echo`). The receipt for
+THIS release's `[release]` merge is produced by release.sh at R2-14
+ship time; set CAPSULE_RELEASE_URL (+ optional VERCEL_TOKEN /
+CAPSULE_API_KEY) before that run. GOTCHAs: mixing `??` with `||` in one
+expression is a SyntaxError (parenthesize); spawnSync cannot resolve
+the vercel .cmd shim on win32 without `shell: true` (args are
+sha/url/token shaped, so shell joining is safe); `vercel env pull`
+writes REAL production values — keep the temp file under gitignored
+.artifacts and rm it immediately. Smoke-run proof on this checkout (no
+CAPSULE_RELEASE_URL set): honest all-unverified PARTIAL receipt at
+.artifacts/release/receipt-39ca40da97.md. Gates: `bun run test` 140
+files / 1286 tests green; typecheck, format:check (prettier rewrapped
+the three new files), `bunx vite build` green. No manifest change, no
+regen. Tag `v0.0.62` created. NEXT: R2-13 (tenantName defect at
+convex/lib/proposalRevision.ts:228-230 — resolve from the tenant
+record, delete the "Tenant" placeholder; regression test only), then
+R2-14 (release proof bundle + cross-model review + `bash
+scripts/release.sh --reviewer <model>` with the receipt attached).
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
@@ -1034,7 +1083,7 @@ build iteration.
       production (issue #265). Wire the checker into the build/release
       path. Unit tests on the checker:
       `tests/deployment-config-check.test.ts`. → AC-028
-- [ ] **R2-12. Release receipt.** Tie integrated SHA → canonical Vercel
+- [x] **R2-12. Release receipt.** Tie integrated SHA → canonical Vercel
       URL + READY deployment → matching Convex code/schema → config
       checks → authenticated production workflow. Partial stays partial —
       no softening. Wire into `scripts/release.sh`; produce the receipt
