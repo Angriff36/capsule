@@ -152,8 +152,7 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[Emergency bridge — running bridge was not updated]
-No changes or facts in this session.
+Progress: Ralph loop BUILD iteration 1 on ralph/wiggum-loop (2026-09-04): task A1 complete — convex/quoteBuilder.ts passes eventId into Proposal_createViaDraft; new proof tests/proofs/quote-conversion.runtime.test.ts green; AC-008 = PASS (first PASS in ACCEPTANCE_TESTS.md). Fixed pre-existing tsc break in src/lib/llm-review.test.ts (loop-template fiction). Gates all green (1188 tests, typecheck, format, vite build). Commit a5f7628, tag v0.0.36, pushed to origin. Open: next iteration is task A2 (QuoteSubmissionsReviewPage shows serviceStyleId/occasionId, AC-007), then A3; build order A2→D2 per IMPLEMENTATION_PLAN.md (20 open tasks).
 
 # === END COGNILAYER ===
 

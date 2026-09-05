@@ -2,7 +2,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
-import { useListQuoteSubmission } from "../../lib/manifest-convex-react";
+import {
+  useListOccasion,
+  useListQuoteSubmission,
+  useListServiceStyle,
+} from "../../lib/manifest-convex-react";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { formatCountNoun, formatDate } from "../../lib/format";
@@ -33,6 +37,18 @@ const STATUS_TONE: Record<string, string> = {
   failed: "bg-danger-soft text-danger",
 };
 
+type Named = { _id: string; name: string };
+
+// Resolves a catalog id to its name from the full live list, so retired rows
+// still resolve on captured submissions (same pattern as EventDetailsCard).
+function nameOf(
+  rows: readonly Named[] | undefined,
+  id: string | null | undefined,
+): string | null {
+  if (!id) return null;
+  return rows?.find((row) => row._id === id)?.name ?? null;
+}
+
 /**
  * Sales review queue for self-service quote submissions captured from the
  * public /quote form. Sales staff convert a captured submission into a real
@@ -41,6 +57,8 @@ const STATUS_TONE: Record<string, string> = {
  */
 export function QuoteSubmissionsReviewPage() {
   const submissions = useListQuoteSubmission();
+  const serviceStyles = useListServiceStyle();
+  const occasions = useListOccasion();
   const process = useAction(api.quoteBuilder.processQuoteSubmission);
 
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -194,6 +212,13 @@ export function QuoteSubmissionsReviewPage() {
                   <p className="text-xs text-ink-2 mt-1">
                     {sub.email}
                     {sub.phone ? ` · ${sub.phone}` : ""}
+                  </p>
+                  <p className="text-xs text-ink-2 mt-1">
+                    Style:{" "}
+                    {nameOf(serviceStyles, sub.serviceStyleId) ??
+                      "Not specified"}{" "}
+                    · Occasion:{" "}
+                    {nameOf(occasions, sub.occasionId) ?? "Not specified"}
                   </p>
                 </div>
                 <div className="text-right text-xs text-ink-2 shrink-0">

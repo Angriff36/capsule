@@ -180,6 +180,18 @@ screenshot steps (the file still throws without ANTHROPIC_API_KEY when run by
 path — that is by design). `format:check` green; `bunx vite build` green.
 Tag `v0.0.36` created. Next: A2 (queue shows style/occasion) → AC-007.
 
+Iteration 30 (BUILD iteration 2, 2026-09-04): A2 DONE. The review queue
+(`src/features/sales/QuoteSubmissionsReviewPage.tsx`) now shows service style
+and occasion on every submission row: module-private `nameOf` helper (same
+pattern as `EventDetailsCard.tsx:26-34`) over the live
+`useListServiceStyle`/`useListOccasion` lists — retired rows still resolve,
+unset reads "Not specified". New test
+`tests/features/sales/quote-submissions-review.test.ts` › "queue shows all
+seven submitted fields" (source-text style) green — AC-007 = PASS. Gates:
+`bun run test` 120 files / 1189 tests green; typecheck, `format:check`,
+`bunx vite build` green. Tag `v0.0.37` created. Next: A3 (dedup regression
+proof) → AC-009.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -187,7 +199,7 @@ Activities in `specs/` in the order a real event moves through the business.
 
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
-| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 form + dedup + client match built; queue omits style/occasion, no dismiss, no free-text fallback | 2 (catalog rows), active `organizations` row |
+| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 form + dedup + client match built; queue shows style/occasion; no dismiss, no free-text fallback | 2 (catalog rows), active `organizations` row |
 | 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; **no admin UI**; occasion has no empty state; no runtime proof | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 one-action convert builds client/lead/event/proposal; proposal is **not linked to the event** it just created | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
@@ -271,7 +283,7 @@ Order = build order. Earlier tasks unblock later ones.
       yields client + lead + event + proposal with
       `proposal.eventId == event._id`. This file is the home for A3/A4/A5/A9
       proofs too. → AC-008
-- [ ] **A2. Show service style and occasion in the review queue.**
+- [x] **A2. Show service style and occasion in the review queue.**
       `src/features/sales/QuoteSubmissionsReviewPage.tsx:183-245` (queue
       route `/clients/quote-requests`, `src/app/App.tsx:1213-1219`) renders
       contact/date/guests/venue/menu but not `serviceStyleId`/`occasionId`.
