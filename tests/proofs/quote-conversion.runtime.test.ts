@@ -468,3 +468,151 @@ describe("runtime proof: free-text style/occasion with empty catalogs (AC-011, A
     expect(proposal.notes).toContain("Occasion: Retirement party");
   });
 });
+
+describe("runtime proof: retry after partial failure (AC-019)", () => {
+  it("retry after partial failure reuses checkpointed records", async () => {
+    const tenantId = "tenant-quote-retry-a9";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-retry-a9",
+      role: "owner",
+      tenantId,
+    });
+
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      { name: "Retry proof kitchen" },
+    );
+
+    // Simulate the partial failure the checkpoint exists for: the client and
+    // lead steps succeeded, then the conversion died before event/proposal.
+    // Create the two records with the same generated commands the conversion
+    // uses, then checkpoint them onto a failed submission by hand — in
+    // production checkpointQuoteSubmissionIds + QuoteSubmission_fail produce
+    // exactly this row state.
+    await proof.executeCommand(owner, api.mutations.Client_createViaRegister, {
+      clientType: "company",
+      companyName: "Dana Prospect",
+      // Deliberately NOT the submission's email: reuse must win through the
+      // checkpointed id alone (the email match never runs on a retry), so a
+      // single client row proves the reuse rather than the match.
+      email: "existing-client@example.com",
+      phone: "555-0100",
+    });
+    const clientId = ((await liveRows(owner, "clients"))[0] as { _id?: string })
+      ._id;
+    expect(clientId).toBeTruthy();
+
+    await proof.executeCommand(owner, api.mutations.Lead_createViaCapture, {
+      leadType: "company",
+      source: "quote-builder",
+      estimatedValue: 0,
+      companyName: "Dana Prospect",
+      email: "existing-client@example.com",
+      phone: "555-0100",
+    });
+    const leadId = ((await liveRows(owner, "leads"))[0] as { _id?: string })
+      ._id;
+    expect(leadId).toBeTruthy();
+
+    const eventDate = Date.UTC(2026, 9, 15, 17, 0);
+    const submitted = (await asActions(owner).action(
+      api.quoteBuilder.submitQuote,
+      {
+        clientName: "Dana Prospect",
+        email: "dana-retry@example.com",
+        phone: "555-0100",
+        eventDate,
+        eventEndTime: eventDate + 5 * 60 * 60 * 1000,
+        guestCount: 60,
+        consent: true,
+        venueName: "Orchard Barn",
+        menuPreferences: "BBQ buffet",
+        dietaryRestrictions: "",
+        notes: "",
+      },
+    )) as { submissionId: string; isDuplicate: boolean };
+    expect(submitted.isDuplicate).toBe(false);
+
+    await owner.run(async (ctx) => {
+      await ctx.db.patch(submitted.submissionId, {
+        status: "failed",
+        clientId,
+        leadId,
+        errorMessage: "Conversion could not complete all steps",
+        processingErrors: "event: simulated failure for the retry proof",
+      });
+    });
+
+    // Staff retries: the row reopens as pending with the errors cleared and
+    // the checkpointed ids kept.
+    await proof.executeCommand(owner, api.mutations.QuoteSubmission_retry, {
+      docId: submitted.submissionId,
+    });
+    const reopened = (await owner.run(async (ctx) =>
+      ctx.db.get(submitted.submissionId),
+    )) as {
+      status: string;
+      errorMessage: string | null;
+      processingErrors: string | null;
+      clientId: string | null;
+      leadId: string | null;
+    };
+    expect(reopened.status).toBe("pending");
+    expect(reopened.errorMessage ?? null).toBeNull();
+    expect(reopened.processingErrors ?? null).toBeNull();
+    expect(reopened.clientId).toBe(clientId);
+    expect(reopened.leadId).toBe(leadId);
+
+    // Convert again: only the missing records (event, proposal) are created;
+    // the client and lead are REUSED, so nothing is duplicated.
+    const converted = (await asActions(owner).action(
+      api.quoteBuilder.processQuoteSubmission,
+      { submissionId: submitted.submissionId },
+    )) as {
+      clientId: string | null;
+      leadId: string | null;
+      eventId: string | null;
+      proposalId: string | null;
+      errors: string[];
+    };
+    expect(converted.errors).toEqual([]);
+    expect(converted.clientId).toBe(clientId);
+    expect(converted.leadId).toBe(leadId);
+    expect(converted.eventId).toBeTruthy();
+    expect(converted.proposalId).toBeTruthy();
+
+    // Counts did not grow: still one client and one lead; the event and
+    // proposal are the ones this retry created.
+    expect(await liveRows(owner, "clients")).toHaveLength(1);
+    expect(await liveRows(owner, "leads")).toHaveLength(1);
+    expect(await liveRows(owner, "events")).toHaveLength(1);
+    expect(await liveRows(owner, "proposals")).toHaveLength(1);
+
+    const row = (await owner.run(async (ctx) =>
+      ctx.db.get(submitted.submissionId),
+    )) as {
+      status: string;
+      eventId: string | null;
+      proposalId: string | null;
+    };
+    expect(row.status).toBe("completed");
+    expect(row.eventId).toBe(converted.eventId);
+    expect(row.proposalId).toBe(converted.proposalId);
+
+    // The retry-created proposal is linked to the retry-created event.
+    const proposals = (await liveRows(owner, "proposals")) as {
+      eventId?: string | null;
+    }[];
+    expect(proposals[0].eventId).toBe(converted.eventId);
+
+    // Retry is a failed-only transition: a completed row refuses it (the
+    // proof harness surfaces a failed guard generically, not its message).
+    await expect(
+      proof.executeCommand(owner, api.mutations.QuoteSubmission_retry, {
+        docId: submitted.submissionId,
+      }),
+    ).rejects.toThrow(/Guard \d+ failed/);
+  });
+});

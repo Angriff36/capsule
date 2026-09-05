@@ -285,6 +285,40 @@ Gates: `bun run test` 120 files / 1198 tests green; typecheck, `format:check`
 `v0.0.41` created. 7 of 19 ACs PASS (AC-007…AC-011, AC-014, AC-018). Next:
 A8 (failed conversion shows checkpointed records) → AC-019.
 
+Iteration 35 (BUILD iteration 7, 2026-09-04): A8 + A9 DONE (batched: AC-019's
+two required tests span both). `command retry()` added to
+`src/sales/quote-submission.manifest` (guards: submitted, status failed, not
+deleted; sets status "pending" and clears errorMessage/processingErrors with
+`mutate … = null` — established repo idiom, 15+ existing uses; the
+checkpointed ids are kept). One regen landed mutations/http/hooks/wiring + 9
+new `.builder/baselines` files and +1 case in the generated
+`manifest-convex.contract.test.ts` (hence 1201 tests); no schema change, no
+new createVia. `processQuoteSubmission` now seeds each step from the
+checkpoint (`submission.clientId ?? null` etc.) and skips that create when
+already set, so a retry never duplicates a client, lead, event or proposal;
+both "failed is terminal" comments (quoteBuilder + review page) are deleted.
+Review queue: failed rows render the checkpointed links under a "Created
+before the failure:" lead-in — proposal via the A7 deep link, event, client
+via `CLIENTS_ROUTES.detail`, lead via `CLIENTS_ROUTES.pipeline`; the links
+block is unified with completed rows (which gain the same client/lead
+links); "Retry conversion" on failed rows chains retry → convert; the
+partial-failure banner now names the retry. AC-019 = PASS (8 of 19:
+AC-007…011, AC-014, AC-018, AC-019). Runtime proof
+"retry after partial failure reuses checkpointed records": the client+lead
+are created with the same generated commands conversion uses, then the row is
+hand-patched to `status: "failed"` with both ids (the exact state
+checkpointQuoteSubmissionIds + fail produce); the submission email is
+deliberately DIFFERENT from the client's so a single client row proves the
+checkpointed-id reuse, not the email match; asserts reopen clears errors and
+keeps ids, convert reuses client+lead and creates only event+proposal, counts
+stay 1/1/1/1, status completed, proposal linked to the retry-created event.
+Guard-refusal assertion must match `/Guard \d+ failed/` — the proof harness
+surfaces failed command guards generically, unlike the action path which
+carries the message. Gates: `bun run test` 120 files / 1201 tests green;
+typecheck, `format:check` (one prettier rewrap on the review page),
+`bunx vite build` green. Tag `v0.0.42` created. Next: B1 (admin catalogs
+page) → AC-012.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -292,9 +326,9 @@ Activities in `specs/` in the order a real event moves through the business.
 
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
-| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 form + dedup + client match built; queue shows style/occasion + free text; junk dismissable; offline notice; A7/A8/A9 links+retry missing | 2 (catalog rows), active `organizations` row |
+| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ form + dedup + client match; queue shows style/occasion + free text; junk dismissable; offline notice; one-click proposal links (A7); failed rows link checkpointed records and retry (A8/A9) | 2 (catalog rows), active `organizations` row |
 | 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; **no admin UI**; occasion has no empty state; no runtime proof | — |
-| 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 one-action convert builds client/lead/event/proposal; proposal is **not linked to the event** it just created | 1 |
+| 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
 | 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event; proof sits outside `tests/proofs/` | 4, 2 (service style/occasion on create) |
 | 6 | Event is planned: staffing, prep, equipment, purchasing | Josh, Sales, Kitchen | feature §9–§11 | ✅ (My Day, prep board, pack lists, equipment, receiving) | 5 |
@@ -459,7 +493,7 @@ Order = build order. Earlier tasks unblock later ones.
       `?proposal=` and the pipeline links to the queue route (same style as
       `tests/clients-routes.test.ts` › "deep-links accepted Proposal into
       Event create with client prefill"). → AC-018
-- [ ] **A8. Failed conversion shows what was created and can be dismissed.**
+- [x] **A8. Failed conversion shows what was created and can be dismissed.**
       Depends on A4 (dismiss). `checkpointQuoteSubmissionIds` (call at
       `convex/quoteBuilder.ts:551-563`, mutation at `:581`) persists the
       client/lead/event/proposal ids created before a failure, but the review
@@ -472,7 +506,7 @@ Order = build order. Earlier tasks unblock later ones.
       manifest change beyond A4. Test: `quote-submissions-review.test.ts` ›
       "failed row shows checkpointed records" — a failed submission with a
       checkpointed `clientId` renders the client link. → AC-019
-- [ ] **A9. Retry a failed conversion without duplicating records.** Depends
+- [x] **A9. Retry a failed conversion without duplicating records.** Depends
       on A8. There is NO retry today: `isActionable`
       (`QuoteSubmissionsReviewPage.tsx:24-27`) returns false for `failed`,
       `processQuoteSubmission` rejects non-pending rows

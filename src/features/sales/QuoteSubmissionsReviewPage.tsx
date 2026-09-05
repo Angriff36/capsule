@@ -8,6 +8,7 @@ import {
   useListQuoteSubmission,
   useListServiceStyle,
   useQuoteSubmissionDismiss,
+  useQuoteSubmissionRetry,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure } from "../events/CommandFailure";
@@ -26,12 +27,20 @@ import type { Doc } from "../../lib/api";
 type QuoteSubmission = Doc<"quoteSubmissions">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
 
-// A submission is convertible while pending. The manifest transitions are
-// pending → processing → completed|failed, and failed is terminal (no reopen),
-// so failed submissions are shown for awareness but cannot be retried from here.
+// A submission is convertible while pending. A failed one first reopens via
+// retry (QuoteSubmission_retry sets it back to pending and keeps the
+// checkpointed ids); the conversion then reuses those records.
 function isActionable(sub: QuoteSubmission): boolean {
   if (sub.deletedAt != null) return false;
   return sub.status === "pending";
+}
+
+// Retriable while failed and not deleted — the retry command's guard matches.
+// The failed row keeps its checkpointed record links, so a retry (or a manual
+// fix) never strands a partial client/lead/event/proposal.
+function canRetry(sub: QuoteSubmission): boolean {
+  if (sub.deletedAt != null) return false;
+  return sub.status === "failed";
 }
 
 // Dismissable while pending or failed (the manifest dismiss guard matches).
@@ -67,6 +76,7 @@ export function QuoteSubmissionsReviewPage() {
   const organizations = useListOrganization();
   const process = useAction(api.quoteBuilder.processQuoteSubmission);
   const dismissSubmission = useQuoteSubmissionDismiss();
+  const retrySubmission = useQuoteSubmissionRetry();
   const { prompt, host: promptHost } = useActionPrompt();
 
   const [showDismissed, setShowDismissed] = useState(false);
@@ -91,12 +101,13 @@ export function QuoteSubmissionsReviewPage() {
       });
       if (result.errors.length > 0) {
         // Conversion did not complete all steps — the submission is now failed
-        // (terminal). Do NOT show the green success banner; surface the per-step
-        // errors for manual reconciliation.
+        // (retriable). Do NOT show the green success banner; surface the
+        // per-step errors. Records already created are linked on the row, and
+        // the retry reuses them.
         setPartialErrors(
           `Conversion incomplete — some steps failed: ${result.errors.join(
             "; ",
-          )}. The submission is marked failed. Any records that were created exist in their respective lists.`,
+          )}. The submission is marked failed. Records already created are linked on its row, and Retry conversion reuses them.`,
         );
       } else {
         setLastConverted({
@@ -111,6 +122,25 @@ export function QuoteSubmissionsReviewPage() {
     } finally {
       setBusyId(null);
     }
+  };
+
+  // Retry = reopen (failed → pending, checkpointed ids kept) then convert.
+  // processQuoteSubmission reuses the checkpointed records, so the retry only
+  // creates what is still missing — it never duplicates a client, lead, event
+  // or proposal.
+  const retry = async (id: string, clientName: string) => {
+    setFailure(null);
+    setPartialErrors(null);
+    setLastConverted(null);
+    setBusyId(id);
+    try {
+      await retrySubmission({ docId: id as Doc<"quoteSubmissions">["_id"] });
+    } catch (err) {
+      setFailure(classifyCommandFailure(err));
+      setBusyId(null);
+      return;
+    }
+    await convert(id, clientName);
   };
 
   const dismiss = async (sub: QuoteSubmission) => {
@@ -371,9 +401,20 @@ export function QuoteSubmissionsReviewPage() {
                 </div>
               )}
 
-              {sub.status === "completed" &&
-                (sub.eventId || sub.proposalId) && (
+              {/* Completed rows link their records; failed rows link whichever
+                  checkpointed ids the partial conversion created, so no
+                  partial record is unreachable from the queue. */}
+              {(sub.status === "completed" || sub.status === "failed") &&
+                (sub.clientId ||
+                  sub.leadId ||
+                  sub.eventId ||
+                  sub.proposalId) && (
                   <p className="mt-3 text-xs">
+                    {sub.status === "failed" && (
+                      <span className="text-ink-3 mr-2">
+                        Created before the failure:
+                      </span>
+                    )}
                     {sub.proposalId && (
                       <Link
                         to={CLIENTS_ROUTES.proposal(sub.proposalId)}
@@ -385,15 +426,31 @@ export function QuoteSubmissionsReviewPage() {
                     {sub.eventId && (
                       <Link
                         to={`/events/${sub.eventId}`}
-                        className="text-ink-2 underline"
+                        className="text-ink-2 underline mr-3"
                       >
                         Open converted event →
+                      </Link>
+                    )}
+                    {sub.clientId && (
+                      <Link
+                        to={CLIENTS_ROUTES.detail(sub.clientId)}
+                        className="text-ink-2 underline mr-3"
+                      >
+                        Open client →
+                      </Link>
+                    )}
+                    {sub.leadId && (
+                      <Link
+                        to={CLIENTS_ROUTES.pipeline}
+                        className="text-ink-2 underline"
+                      >
+                        See lead in pipeline →
                       </Link>
                     )}
                   </p>
                 )}
 
-              {(isActionable(sub) || canDismiss(sub)) && (
+              {(isActionable(sub) || canRetry(sub) || canDismiss(sub)) && (
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   {isActionable(sub) && (
                     <button
@@ -407,6 +464,18 @@ export function QuoteSubmissionsReviewPage() {
                       {busyId === sub._id
                         ? "Converting…"
                         : "Convert to lead, event & proposal"}
+                    </button>
+                  )}
+                  {canRetry(sub) && (
+                    <button
+                      type="button"
+                      disabled={busyId === sub._id}
+                      onClick={() =>
+                        void retry(sub._id, sub.clientName ?? "the lead")
+                      }
+                      className="btn btn-primary"
+                    >
+                      {busyId === sub._id ? "Retrying…" : "Retry conversion"}
                     </button>
                   )}
                   {canDismiss(sub) && (

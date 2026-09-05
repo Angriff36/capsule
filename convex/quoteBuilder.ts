@@ -385,9 +385,9 @@ export const processQuoteSubmission = action({
       throw new ConvexError("Quote submission not found");
     }
     // Only pending submissions can be converted: the manifest transitions are
-    // pending → processing → completed|failed, and failed is terminal (there is
-    // no failed → processing reopen command). A failed conversion is surfaced
-    // to the operator for manual handling rather than offered a broken retry.
+    // pending → processing → completed|failed. A failed conversion reopens via
+    // QuoteSubmission_retry (failed → pending, checkpointed ids kept) before
+    // this action runs again — the steps below then reuse those records.
     if (submission.status !== "pending") {
       throw new ConvexError(
         `Only pending submissions can be converted (this one is ${submission.status}).`,
@@ -404,103 +404,112 @@ export const processQuoteSubmission = action({
       docId: submissionId,
     });
 
-    // Client — match by email, else create.
-    let clientId: Id<"clients"> | null = null;
-    try {
-      const existingClients = await ctx.runQuery(api.queries.listClient);
-      const existingClient = existingClients.find(
-        (c) =>
-          c.email?.toLowerCase() === email.toLowerCase() &&
-          !c.deletedAt &&
-          c.status === "active",
-      );
-      if (existingClient) {
-        clientId = existingClient._id;
-      } else {
-        const created = await ctx.runMutation(
-          api.mutations.Client_createViaRegister,
-          { clientType: "company", companyName: clientName, email, phone },
+    // Client — match by email, else create. A retry (failed → pending) reuses
+    // the checkpointed id from the failed attempt, so the retry never
+    // duplicates the client.
+    let clientId: Id<"clients"> | null = submission.clientId ?? null;
+    if (!clientId) {
+      try {
+        const existingClients = await ctx.runQuery(api.queries.listClient);
+        const existingClient = existingClients.find(
+          (c) =>
+            c.email?.toLowerCase() === email.toLowerCase() &&
+            !c.deletedAt &&
+            c.status === "active",
         );
-        clientId = created.docId;
+        if (existingClient) {
+          clientId = existingClient._id;
+        } else {
+          const created = await ctx.runMutation(
+            api.mutations.Client_createViaRegister,
+            { clientType: "company", companyName: clientName, email, phone },
+          );
+          clientId = created.docId;
+        }
+      } catch (error) {
+        errors.push(
+          `client: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
-    } catch (error) {
-      errors.push(
-        `client: ${error instanceof Error ? error.message : String(error)}`,
-      );
     }
 
-    // Lead.
-    let leadId: Id<"leads"> | null = null;
-    try {
-      if (clientId) {
-        const leadResult = await ctx.runMutation(
-          api.mutations.Lead_createViaCapture,
-          {
-            leadType: "company",
-            source: "quote-builder",
-            estimatedValue: 0,
-            companyName: clientName,
-            email,
-            phone,
-          },
-        );
-        const createdLeadId = leadResult.docId;
-        leadId = createdLeadId;
-        await ctx.runMutation(api.mutations.Lead_stageConversion, {
-          docId: createdLeadId,
-          clientId,
-          clientContactId: undefined,
-        });
-        await ctx.runMutation(api.mutations.Lead_confirmConversion, {
-          docId: createdLeadId,
-        });
-      }
-    } catch (error) {
-      errors.push(
-        `lead: ${error instanceof Error ? error.message : String(error)}`,
-      );
-    }
-
-    // Event.
-    let eventId: Id<"events"> | null = null;
-    try {
-      if (clientId) {
-        const eventStart = submission.eventDate ?? Date.now();
-        // Default to a 4-hour event when no end time is supplied OR the supplied
-        // end is invalid / non-positive-duration (e.g. an "00:00" end equals the
-        // midnight start) — otherwise Event creation fails terminally.
-        const rawEnd = submission.eventEndTime ?? 0;
-        const eventEnd =
-          Number.isFinite(rawEnd) && rawEnd > eventStart
-            ? rawEnd
-            : eventStart + 4 * 60 * 60 * 1000;
-        const eventResult = await ctx.runMutation(
-          api.mutations.Event_createViaPlanEngagement,
-          {
+    // Lead — reused from the checkpoint on retry, else created fresh.
+    let leadId: Id<"leads"> | null = submission.leadId ?? null;
+    if (!leadId) {
+      try {
+        if (clientId) {
+          const leadResult = await ctx.runMutation(
+            api.mutations.Lead_createViaCapture,
+            {
+              leadType: "company",
+              source: "quote-builder",
+              estimatedValue: 0,
+              companyName: clientName,
+              email,
+              phone,
+            },
+          );
+          const createdLeadId = leadResult.docId;
+          leadId = createdLeadId;
+          await ctx.runMutation(api.mutations.Lead_stageConversion, {
+            docId: createdLeadId,
             clientId,
-            title: `Quote Request: ${clientName}`,
-            eventType: "Catering Inquiry",
-            startsAt: eventStart,
-            endsAt: eventEnd,
-            expectedHeadcount: submission.guestCount ?? 0,
-            primaryContactName: clientName,
-            budgetAmount: 0,
-            quotedPrice: 0,
-            serviceStyleId: submission.serviceStyleId ?? undefined,
-            occasionId: submission.occasionId ?? undefined,
-            venueName: submission.venueName ?? undefined,
-            venueAddress: submission.venueAddress ?? undefined,
-            serviceRequirements: submission.menuPreferences ?? undefined,
-            operationalRequirements:
-              submission.dietaryRestrictions ?? undefined,
-          },
+            clientContactId: undefined,
+          });
+          await ctx.runMutation(api.mutations.Lead_confirmConversion, {
+            docId: createdLeadId,
+          });
+        }
+      } catch (error) {
+        errors.push(
+          `lead: ${error instanceof Error ? error.message : String(error)}`,
         );
-        eventId = eventResult.docId;
       }
-    } catch (error) {
-      errors.push(
-        `event: ${error instanceof Error ? error.message : String(error)}`,
-      );
+    }
+
+    // Event — reused from the checkpoint on retry, else created fresh.
+    let eventId: Id<"events"> | null = submission.eventId ?? null;
+    if (!eventId) {
+      try {
+        if (clientId) {
+          const eventStart = submission.eventDate ?? Date.now();
+          // Default to a 4-hour event when no end time is supplied OR the
+          // supplied end is invalid / non-positive-duration (e.g. an
+          // "00:00" end equals the midnight start) — otherwise Event
+          // creation fails terminally.
+          const rawEnd = submission.eventEndTime ?? 0;
+          const eventEnd =
+            Number.isFinite(rawEnd) && rawEnd > eventStart
+              ? rawEnd
+              : eventStart + 4 * 60 * 60 * 1000;
+          const eventResult = await ctx.runMutation(
+            api.mutations.Event_createViaPlanEngagement,
+            {
+              clientId,
+              title: `Quote Request: ${clientName}`,
+              eventType: "Catering Inquiry",
+              startsAt: eventStart,
+              endsAt: eventEnd,
+              expectedHeadcount: submission.guestCount ?? 0,
+              primaryContactName: clientName,
+              budgetAmount: 0,
+              quotedPrice: 0,
+              serviceStyleId: submission.serviceStyleId ?? undefined,
+              occasionId: submission.occasionId ?? undefined,
+              venueName: submission.venueName ?? undefined,
+              venueAddress: submission.venueAddress ?? undefined,
+              serviceRequirements: submission.menuPreferences ?? undefined,
+              operationalRequirements:
+                submission.dietaryRestrictions ?? undefined,
+            },
+          );
+          eventId = eventResult.docId;
+        }
+      } catch (error) {
+        errors.push(
+          `event: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
     }
 
     // Draft proposal.
@@ -520,43 +529,47 @@ export const processQuoteSubmission = action({
         "Draft proposal created from quote request. Menu selection and pricing to follow.",
       ...freeTextNotes,
     ].join(" ");
-    let proposalId: Id<"proposals"> | null = null;
-    try {
-      if (clientId) {
-        const proposalResult = await ctx.runMutation(
-          api.mutations.Proposal_createViaDraft,
-          {
-            clientId,
-            title: `Proposal for ${clientName}`,
-            eventDate: submission.eventDate ?? Date.now(),
-            eventType: "Catering Inquiry",
-            venueName: submission.venueName ?? undefined,
-            venueAddress: submission.venueAddress ?? undefined,
-            guestCount: submission.guestCount ?? 0,
-            subtotal: 0,
-            taxAmount: 0,
-            discountAmount: 0,
-            total: 0,
-            eventId: eventId ?? undefined,
-            notes: proposalNotes,
-          },
+    // Draft proposal — reused from the checkpoint on retry, else created
+    // fresh.
+    let proposalId: Id<"proposals"> | null = submission.proposalId ?? null;
+    if (!proposalId) {
+      try {
+        if (clientId) {
+          const proposalResult = await ctx.runMutation(
+            api.mutations.Proposal_createViaDraft,
+            {
+              clientId,
+              title: `Proposal for ${clientName}`,
+              eventDate: submission.eventDate ?? Date.now(),
+              eventType: "Catering Inquiry",
+              venueName: submission.venueName ?? undefined,
+              venueAddress: submission.venueAddress ?? undefined,
+              guestCount: submission.guestCount ?? 0,
+              subtotal: 0,
+              taxAmount: 0,
+              discountAmount: 0,
+              total: 0,
+              eventId: eventId ?? undefined,
+              notes: proposalNotes,
+            },
+          );
+          proposalId = proposalResult.docId;
+          // Linked at creation: draft accepts an optional eventId, so the
+          // proposal points at the event this conversion just created (the
+          // accept path then reuses it instead of booking a second event).
+        }
+      } catch (error) {
+        errors.push(
+          `proposal: ${error instanceof Error ? error.message : String(error)}`,
         );
-        proposalId = proposalResult.docId;
-        // Linked at creation: draft accepts an optional eventId, so the
-        // proposal points at the event this conversion just created (the
-        // accept path then reuses it instead of booking a second event).
       }
-    } catch (error) {
-      errors.push(
-        `proposal: ${error instanceof Error ? error.message : String(error)}`,
-      );
     }
 
     // Only mark complete when every entity was created: complete's id fields
     // are schema-typed ids, so passing ""/null for a missing one throws AFTER
     // startProcessing committed — which would strand the submission in
-    // "processing". A partial conversion is marked failed (terminal) with the
-    // per-step errors so the operator can reconcile manually.
+    // "processing". A partial conversion is marked failed (retriable via
+    // QuoteSubmission_retry) with the per-step errors.
     if (errors.length === 0 && clientId && leadId && eventId && proposalId) {
       // Best-effort: link the draft proposal back onto the lead so the pipeline
       // shows it (and avoids a duplicate-proposal prompt). Non-fatal.
@@ -577,8 +590,9 @@ export const processQuoteSubmission = action({
       });
     } else {
       // Persist whatever IDs WERE created onto the submission before marking it
-      // failed, so the terminal failed row keeps durable links to the partial
-      // records (and reconciliation doesn't lose them or create duplicates).
+      // failed, so the failed row keeps durable links to the partial records —
+      // the review queue links them, and a retry reuses them instead of
+      // creating duplicates.
       await ctx.runMutation(
         internal.quoteBuilder.checkpointQuoteSubmissionIds,
         {
@@ -603,8 +617,9 @@ export const processQuoteSubmission = action({
 
 /**
  * Persists whichever sales-record IDs a partial conversion created onto the
- * QuoteSubmission (used before marking a conversion failed, so the terminal
- * row retains its links for reconciliation). Internal — only processQuoteSubmission calls it.
+ * QuoteSubmission (used before marking a conversion failed, so the failed
+ * row retains its links for the queue and for retry). Internal — only
+ * processQuoteSubmission calls it.
  */
 export const checkpointQuoteSubmissionIds = internalMutation({
   args: {

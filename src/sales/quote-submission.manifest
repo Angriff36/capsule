@@ -207,6 +207,19 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate errorMessage = reason
   }
 
+  // Staff retries a failed conversion: the row reopens as pending with the
+  // checkpointed ids kept, and processQuoteSubmission reuses those records so
+  // a retry never duplicates a client, lead, event or proposal.
+  command retry() {
+    guard self.submittedAt != null "Quote submission must be created first"
+    guard self.status == "failed" "Only failed submissions can be retried"
+    guard self.deletedAt == null "Cannot retry a deleted quote submission"
+
+    mutate status = "pending"
+    mutate errorMessage = null
+    mutate processingErrors = null
+  }
+
   store QuoteSubmission in durable
 }
 

@@ -119,4 +119,32 @@ describe("quote submissions review queue", () => {
     // the quote queue is reachable from the pipeline page
     expect(pipeline).toContain("CLIENTS_ROUTES.quoteRequests");
   });
+
+  // AC-019: a conversion that failed part-way shows which records were
+  // already created — the checkpointed ids render as links on the FAILED row
+  // (client, pipeline, event, proposal), same components as completed rows —
+  // and the row can be retried (failed reopens as pending; the conversion
+  // reuses the checkpointed records) and dismissed.
+  it("failed row shows checkpointed records", () => {
+    // failed rows render the checkpointed record links, not just the error
+    expect(page).toContain('sub.status === "failed"');
+    expect(page).toContain("CLIENTS_ROUTES.proposal(sub.proposalId)");
+    expect(page).toContain("CLIENTS_ROUTES.detail(sub.clientId)");
+    expect(page).toContain("CLIENTS_ROUTES.pipeline");
+    expect(page).toContain("sub.eventId");
+    // retry: reopen (failed → pending, ids kept) then convert, which reuses
+    // the checkpointed records instead of duplicating them
+    expect(page).toContain("useQuoteSubmissionRetry");
+    expect(page).toContain("Retry conversion");
+    // the failed row keeps its dismiss action (guard: pending or failed)
+    expect(page).toContain("canDismiss");
+    // the retry command is failed-only, exactly as the UI assumes
+    const manifest = readFileSync(
+      "src/sales/quote-submission.manifest",
+      "utf8",
+    );
+    expect(manifest).toContain(
+      'guard self.status == "failed" "Only failed submissions can be retried"',
+    );
+  });
 });
