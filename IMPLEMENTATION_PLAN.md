@@ -544,6 +544,42 @@ updated). No manifest change, no regen. Gates: `bun run test` 126 files /
 D1 (end-to-end journey proof `quote-to-booked-event.runtime.test.ts`) →
 AC-017.
 
+Iteration 44 (BUILD iteration 16, 2026-09-05): D1 DONE. AC-017 = PASS —
+ALL 19 AC PASS (left open: C5 and D2, neither carries an AC). New proof
+`tests/proofs/quote-to-booked-event.runtime.test.ts` › "quote to booked
+event journey": one tenant, one submission — public submit (free-text
+style/occasion, venue text, menu prefs, dietary, notes) → the submission
+row holds every queue field (AC-007's data source) → processQuoteSubmission
+(client + lead + event + linked draft proposal) → dish selections (one
+removed) + enhancements (two live, one withdrawn) in the draft window →
+send with revision capture (UI path) → markViewed → Proposal_accept. The
+accept cascade (proposal.manifest:199 sets dishSelectionProposalId
+non-null because eventId is set at draft; proposal-dish-selection.manifest
+:138 fanOut runs EventDish.confirmFromProposal) copies the live selection
+onto the CONVERSION event — the one leg no prior proof exercised (C1 books
+through createEventFromAcceptedProposal, which refuses already-linked
+proposals). Assertions: event startsAt/endsAt/expectedHeadcount equal the
+submission values exactly; venueName/venueAddress snapshot +
+serviceRequirements/operationalRequirements carried; exactly 1 EventDish
+row (qty 75, course main; the removed side never copied); enhancements
+reachable from the event via listProposalByEventId → 2 live rows;
+revision 1 captured at send; submission completed with all four ids; ONE
+event (accept books no second event). Venue note recorded in the proof
+header: name→Venue resolution is the create-screen behavior (AC-003,
+prefill test); the quote journey books via the conversion event, which
+snapshots the prospect's venue text — conversion must not silently
+name-match a Venue the operator never chose. Implementation needed NO
+change; the chain was fully built, only the composite proof was missing.
+Gates: `bun run test` 127 files / 1217 tests green (one single-test
+failure on the FIRST full run whose name was not captured; 4 later runs —
+incl. 3 logged under .artifacts/test-run-{1,2,3}.log — all green; if it
+recurs, capture the failing test name and escalate); typecheck,
+format:check (one prettier rewrap on the new file), `bunx vite build`
+green. Tag v0.0.51 created. Next: C5 (consolidate toDatetimeLocal, no
+AC), then D2 (spec status table refresh, no AC). AC-006/AC-013 J halves
+(llm-review UX-01) still need a session with ANTHROPIC_API_KEY (unset
+again this session; no .env.local).
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -916,7 +952,7 @@ Order = build order. Earlier tasks unblock later ones.
 
 ### D. Release proof
 
-- [ ] **D1. End-to-end journey runtime proof.**
+- [x] **D1. End-to-end journey runtime proof.**
       `tests/proofs/quote-to-booked-event.runtime.test.ts`: public submit →
       convert → proposal has client/date/end/headcount/venue text/notes →
       send → accept → create event from proposal → event has date, start,
