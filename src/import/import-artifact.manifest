@@ -1,0 +1,207 @@
+// Capsule import artifact — one row per workbook found in an uploaded archive.
+// Inventory + disposition + provenance for every source record (PR01-01..03):
+// an artifact is evidence about the source, never proof of normalized data.
+
+use "./import-run.manifest"
+
+// PR01-02 disposition taxonomy — every workbook ends in exactly one.
+// "pending" is the pre-classification state, not a final disposition.
+enum ImportArtifactDisposition {
+  pending
+  normalized
+  linked_reference
+  duplicate_view
+  needs_mapping
+  unsupported
+  invalid
+}
+
+// Parse outcome for the workbook's own container (sheets/parts read).
+enum ImportArtifactParseStatus {
+  pending
+  parsed
+  failed
+}
+
+entity ImportArtifact mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, importRunId, name]
+  timestamps
+  versionProperty version: number
+
+  // Archive linkage — one workbook of one import run's archive.
+  property required importRunId: string = ""
+
+  // Workbook identity inside the archive (entry path/name, unique per archive).
+  property required name: string = ""
+
+  // Provenance spine (PR01-03): preserved original, checksum, sizes.
+  property storageId: string?
+  property checksum: string?
+  property required byteSize: int = 0
+  property required entryCount: int = 0
+  property required provenance: string = "{}"
+
+  // Classification + parse outcome.
+  property required disposition: ImportArtifactDisposition = "pending"
+  property required parseStatus: ImportArtifactParseStatus = "pending"
+
+  // References
+  ref importRun: ImportRun fields [tenantId, importRunId] references [tenantId, id]
+
+  // Constraints
+  constraint artifactImportRunPresent: length(trim(self.importRunId)) > 0 "Import run id is required"
+  constraint artifactNamePresent: length(trim(self.name)) > 0 "Artifact name is required"
+  constraint artifactByteSizeNonNegative: self.byteSize >= 0 "Byte size must not be negative"
+  constraint artifactEntryCountNonNegative: self.entryCount >= 0 "Entry count must not be negative"
+
+  // Policies
+  default policy importArtifactRead read: roleAllows(user.role, "importAccess") "Staff may read import artifacts"
+  default policy importArtifactWrite write: roleAllows(user.role, "importAccess") "Staff may write import artifacts through commands"
+  default policy importArtifactExecute execute: roleAllows(user.role, "importAccess") "Staff may execute import artifact commands"
+
+  // register - Inventory one workbook of an archive into a durable row.
+  command register(
+    importRunId: string,
+    name: string,
+    byteSize: int,
+    entryCount: int,
+    optional checksum: string,
+    optional storageId: string,
+    optional provenance: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt == null
+    constraint registerImportRunPresent: length(trim(importRunId)) > 0 "Import run id is required"
+    constraint registerNamePresent: length(trim(name)) > 0 "Artifact name is required"
+    constraint registerByteSizeNonNegative: byteSize >= 0 "Byte size must not be negative"
+    constraint registerEntryCountNonNegative: entryCount >= 0 "Entry count must not be negative"
+    constraint registerChecksumPresent: checksum == null or length(trim(checksum)) > 0 "Checksum must be non-empty when present"
+    constraint registerStorageIdPresent: storageId == null or length(trim(storageId)) > 0 "Storage id must be non-empty when present"
+    constraint registerProvenancePresent: provenance == null or length(trim(provenance)) > 0 "Provenance must be non-empty when present"
+    mutate importRunId = importRunId
+    mutate name = name
+    mutate byteSize = byteSize
+    mutate entryCount = entryCount
+    mutate checksum = checksum
+    mutate storageId = storageId
+    mutate provenance = provenance != null ? provenance : "{}"
+    mutate disposition = "pending"
+    mutate parseStatus = "pending"
+    emit ImportArtifactRegistered {
+      importArtifactId: self.id
+      tenantId: self.tenantId
+      importRunId: importRunId
+      name: name
+      checksum: checksum
+      byteSize: byteSize
+      entryCount: entryCount
+    }
+  }
+
+  // classify - Assign the workbook's single disposition (PR01-02).
+  command classify(disposition: ImportArtifactDisposition) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint classifyNotPending: disposition != "pending" "Disposition must be a final classification, not pending"
+    compute previousDisposition = self.disposition
+    mutate disposition = disposition
+    emit ImportArtifactClassified {
+      importArtifactId: self.id
+      tenantId: self.tenantId
+      importRunId: self.importRunId
+      name: self.name
+      previousDisposition: previousDisposition
+      disposition: disposition
+    }
+  }
+
+  // recordParse - Record the workbook container's parse outcome and provenance.
+  // parseStatus is an outcome marker, not a workflow state machine: retries
+  // (R2-6 resume) may legitimately move failed back to parsed.
+  command recordParse(
+    parseStatus: ImportArtifactParseStatus,
+    optional provenance: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint recordParseNotPending: parseStatus != "pending" "Parse status must be parsed or failed, not pending"
+    constraint recordParseProvenancePresent: provenance == null or length(trim(provenance)) > 0 "Provenance must be non-empty when present"
+    mutate parseStatus = parseStatus
+    mutate provenance = provenance != null ? provenance : self.provenance
+    emit ImportArtifactParseRecorded {
+      importArtifactId: self.id
+      tenantId: self.tenantId
+      importRunId: self.importRunId
+      name: self.name
+      parseStatus: parseStatus
+    }
+  }
+
+  store ImportArtifact in durable
+}
+
+// Queries
+query findAllByImportRun(
+  tenantId: string,
+  importRunId: string
+): ImportArtifact[] {
+  assert tenantId != null
+  assert importRunId != null
+  filter self.tenantId == tenantId
+  filter self.importRunId == importRunId
+  filter self.deletedAt == null
+  sort self.createdAt asc
+}
+
+query findByChecksum(
+  tenantId: string,
+  checksum: string
+): ImportArtifact[] {
+  assert tenantId != null
+  assert checksum != null
+  filter self.tenantId == tenantId
+  filter self.checksum == checksum
+  filter self.deletedAt == null
+  sort self.createdAt desc
+}
+
+query findUnclassified(
+  tenantId: string,
+  optional importRunId: string
+): ImportArtifact[] {
+  assert tenantId != null
+  filter self.tenantId == tenantId
+  filter self.disposition == "pending"
+  filter importRunId == null or self.importRunId == importRunId
+  filter self.deletedAt == null
+  sort self.createdAt asc
+}
+
+// Events
+event ImportArtifactRegistered: "import_artifact.registered" {
+  importArtifactId: string
+  tenantId: string
+  importRunId: string
+  name: string
+  checksum: string?
+  byteSize: int
+  entryCount: int
+}
+
+event ImportArtifactClassified: "import_artifact.classified" {
+  importArtifactId: string
+  tenantId: string
+  importRunId: string
+  name: string
+  previousDisposition: ImportArtifactDisposition
+  disposition: ImportArtifactDisposition
+}
+
+event ImportArtifactParseRecorded: "import_artifact.parse_recorded" {
+  importArtifactId: string
+  tenantId: string
+  importRunId: string
+  name: string
+  parseStatus: ImportArtifactParseStatus
+}

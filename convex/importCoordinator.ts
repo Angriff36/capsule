@@ -177,6 +177,9 @@ export const startImport = mutation({
       startTime: Date.now(),
       recordCounts: "{}",
       actorId: auth.id,
+      archiveWorkbookCount: 0,
+      indexWorkbookCount: 0,
+      discrepancyExplained: false,
       checksum: args.checksum ?? undefined,
       version: 0,
     });

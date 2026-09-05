@@ -49,6 +49,15 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   property required actorId: string = ""
   property failureDetails: string?
 
+  // Archive linkage (PR01-01, additive): the uploaded archive this run
+  // inventories. Additive fields only — existing run fields never change.
+  property archiveStorageId: string?
+  property archiveChecksum: string?
+  property required archiveWorkbookCount: int = 0
+  property required indexWorkbookCount: int = 0
+  property required discrepancyExplained: boolean = false
+  property discrepancyNote: string?
+
   constraint recordCountsPresent: self.recordCounts != null "Record counts must be present"
 
   transition status from "started" to ["parsing", "failed"]
@@ -216,6 +225,56 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // recordArchiveInventory - Persist the archive inventory after safe-listing
+  // every workbook (R2-3). The counts are the R2-4 reconciliation inputs.
+  command recordArchiveInventory(
+    archiveWorkbookCount: int,
+    optional archiveStorageId: string,
+    optional archiveChecksum: string,
+    optional indexWorkbookCount: int
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    guard self.status == "started" or self.status == "parsing"
+    constraint archiveInventoryCountNonNegative: archiveWorkbookCount >= 0 "Archive workbook count must not be negative"
+    constraint archiveInventoryIndexNonNegative: indexWorkbookCount == null or indexWorkbookCount >= 0 "Index workbook count must not be negative"
+    constraint archiveInventoryStorageIdPresent: archiveStorageId == null or length(trim(archiveStorageId)) > 0 "Archive storage id must be non-empty when present"
+    constraint archiveInventoryChecksumPresent: archiveChecksum == null or length(trim(archiveChecksum)) > 0 "Archive checksum must be non-empty when present"
+    mutate archiveStorageId = archiveStorageId
+    mutate archiveChecksum = archiveChecksum
+    mutate archiveWorkbookCount = archiveWorkbookCount
+    mutate indexWorkbookCount = indexWorkbookCount != null ? indexWorkbookCount : 0
+    emit ImportRunArchiveInventoryRecorded {
+      importRunId: self.id
+      tenantId: self.tenantId
+      archiveWorkbookCount: archiveWorkbookCount
+      indexWorkbookCount: indexWorkbookCount != null ? indexWorkbookCount : 0
+      archiveChecksum: archiveChecksum
+      archiveStorageId: archiveStorageId
+    }
+  }
+
+  // explainArchiveDiscrepancy - Operator explains an index-vs-archive count
+  // mismatch (the 90-vs-70 case) before commit may proceed (R2-4).
+  command explainArchiveDiscrepancy(
+    note: string,
+    optional actorId: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint explainDiscrepancyNotePresent: length(trim(note)) > 0 "Discrepancy note is required"
+    constraint explainDiscrepancyActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate discrepancyExplained = true
+    mutate discrepancyNote = note
+    emit ImportRunArchiveDiscrepancyExplained {
+      importRunId: self.id
+      tenantId: self.tenantId
+      note: note
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
   store ImportRun in durable
 }
 
@@ -271,5 +330,21 @@ event ImportRunFailed: "import_run.failed" {
 event ImportRunReverted: "import_run.reverted" {
   importRunId: string
   tenantId: string
+  actorId: string
+}
+
+event ImportRunArchiveInventoryRecorded: "import_run.archive_inventory_recorded" {
+  importRunId: string
+  tenantId: string
+  archiveWorkbookCount: int
+  indexWorkbookCount: int
+  archiveChecksum: string?
+  archiveStorageId: string?
+}
+
+event ImportRunArchiveDiscrepancyExplained: "import_run.archive_discrepancy_explained" {
+  importRunId: string
+  tenantId: string
+  note: string
   actorId: string
 }

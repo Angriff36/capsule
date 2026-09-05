@@ -639,6 +639,52 @@ Plan tasks R2-1 … R2-14 are written below; 5 honesty issues were filed
 (see Escalations under "Prioritized tasks — release 2"). The build loop
 can start at R2-1.
 
+Iteration 47 (BUILD, release 2, 2026-09-05): R2-1 + R2-2 DONE. R2-1:
+new `src/import/import-artifact.manifest` — entity ImportArtifact
+(`unique [tenantId, importRunId, name]`, ref to ImportRun; fields
+importRunId/name, checksum?/storageId?, byteSize/entryCount `int`,
+provenance JSON `"{}"`, disposition, parseStatus; enums
+ImportArtifactDisposition {pending, normalized, linked_reference,
+duplicate_view, needs_mapping, unsupported, invalid} and
+ImportArtifactParseStatus {pending, parsed, failed}; commands
+register/classify/recordParse; queries findAllByImportRun / findByChecksum
+/ findUnclassified; importAccess policies like its siblings) registered in
+`src/app.manifest`. ImportRun gained ADDITIVE archive fields only
+(archiveStorageId?, archiveChecksum?, archiveWorkbookCount int=0,
+indexWorkbookCount int=0, discrepancyExplained bool=false,
+discrepancyNote?) plus commands `recordArchiveInventory` (guarded status
+started|parsing) and `explainArchiveDiscrepancy` — the R2-4 gate inputs.
+One regen landed schema/queries/mutations/http/wiring/seed + 12 new
+`.builder/baselines` files. Regen emitted NO new createVia export
+(`register` generates `ImportArtifact_register`, the ImportRun/ImportDataset
+naming shape), so `governed-creation-mappings.test.ts` needed NO hand edit —
+that hand-edit rule only fires for `*_createVia*` names. One authored-seam
+fix: `convex/importCoordinator.ts` `startImport` inserts a full run row,
+so it needed the 3 new required defaults (0/0/false) at its insert literal.
+AC-020/021/022 stay PENDING by design — their proofs land with
+R2-3/R2-5/R2-8. R2-2: `src/lib/tppReports/zipReader.ts` hardened —
+ZipArchiveError with a stable `code` (14 codes), DEFAULT_ZIP_LIMITS
+(1000 entries, 64 MiB/entry, 256 MiB total, nested archives rejected by
+default), new `listZipEntries` (central-directory-only listing: names,
+sizes, encrypted flag surfaced, no inflate — limits and progress visible
+BEFORE expensive work), `readZipEntries(buffer, limits?)` with a
+pre-flight pass over declared sizes before any inflate, explicit bounds
+checks everywhere (no RangeError), and named failures for traversal (both
+separators), absolute paths (POSIX + drive letters), NUL/oversized names,
+duplicate filenames, encrypted entries, nested archives (by name or PK
+magic; `allowArchiveEntries: true` is the outer-archive mode), corrupt
+central/local records, size mismatches, unsupported compression, zip64.
+The only existing caller (`xlsxReader.ts`) is unchanged and green —
+workbook parts are never archives, so the safe default holds.
+`tests/zip-archive-abuse.test.ts`: 25 tests with a byte-level zip builder
+(fixture gotcha: EOCD total-entries is at +10, NOT +8 — the reader reads
++10 per spec). AC-026 = PASS (1 of 11 release-2 ACs). Gates: `bun run
+test` 128 files / 1247 tests green; typecheck, `format:check` (prettier
+rewrapped the two new files), `bunx vite build`,
+`manifest-regen-check`, `lint_specs.sh specs/ralph` (19 specs) green.
+Tag `v0.0.53` created. Next: R2-3 (archive inventory ingest action +
+`tests/proofs/import-archive-inventory.runtime.test.ts`) → AC-020.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
@@ -729,7 +775,7 @@ AC-030=PR13-06. Each task below names the ids it must turn to `PASS`.
 Order = build order. Earlier tasks unblock later ones. Each task is one
 build iteration.
 
-- [ ] **R2-1. ImportArtifact manifest + ImportRun archive linkage.**
+- [x] **R2-1. ImportArtifact manifest + ImportRun archive linkage.**
       Author `src/import/import-artifact.manifest` (tenant-scoped: name,
       checksum, byte size, entry count, disposition, parse status,
       provenance JSON) and additive archive linkage on
@@ -744,7 +790,7 @@ build iteration.
       R2-5 (`tests/proofs/import-archive-disposition.runtime.test.ts`)
       and R2-8 (`tests/proofs/import-provenance.runtime.test.ts`).
       → AC-020, AC-021, AC-022
-- [ ] **R2-2. Harden the zip reader.**
+- [x] **R2-2. Harden the zip reader.**
       `src/lib/tppReports/zipReader.ts:39-71` reads entries with zero
       bounds today. Add traversal, absolute-path, nested-archive,
       expanded-bytes cap, duplicate-filename, encrypted-workbook and
