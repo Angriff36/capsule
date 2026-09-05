@@ -541,6 +541,9 @@ export const processQuoteSubmission = action({
               clientId,
               title: `Proposal for ${clientName}`,
               eventDate: submission.eventDate ?? Date.now(),
+              // The submission's end time carries onto the draft proposal
+              // (C2) so the create-event prefill can seed the event's endsAt.
+              eventEndDate: submission.eventEndTime ?? undefined,
               eventType: "Catering Inquiry",
               venueName: submission.venueName ?? undefined,
               venueAddress: submission.venueAddress ?? undefined,

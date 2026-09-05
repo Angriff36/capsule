@@ -19,7 +19,11 @@ import {
   PRICING_BASIS_LABELS,
   type PricingBasis,
 } from "../../lib/pricing";
-import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import {
+  BoundedDateInput,
+  BoundedDateTimeLocalInput,
+} from "../../ui/BoundedDateInputs";
+import { toDatetimeLocalValue } from "../../lib/format";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
@@ -42,6 +46,14 @@ const dateValue = (value: FormDataEntryValue | null, endOfDay = false) => {
   const timestamp = new Date(
     `${raw}T${endOfDay ? "23:59:59.999" : "12:00:00.000"}`,
   ).getTime();
+  return Number.isNaN(timestamp) ? undefined : timestamp;
+};
+
+// datetime-local values already carry "YYYY-MM-DDTHH:MM" — parse as local time.
+const datetimeLocalValue = (value: FormDataEntryValue | null) => {
+  const raw = String(value ?? "").trim();
+  if (!raw) return undefined;
+  const timestamp = new Date(raw).getTime();
   return Number.isNaN(timestamp) ? undefined : timestamp;
 };
 
@@ -103,6 +115,10 @@ export function ProposalCreateForm({
         guestCount: Number(fromEvent.expectedHeadcount ?? 0),
         eventType: fromEvent.eventType ?? "",
         eventDate: dateInputFromEpoch(fromEvent.startsAt),
+        eventEndDate:
+          fromEvent.endsAt != null
+            ? toDatetimeLocalValue(fromEvent.endsAt)
+            : undefined,
         venueName: fromEvent.venueName ?? "",
         venueAddress: fromEvent.venueAddress ?? "",
       }
@@ -245,6 +261,7 @@ export function ProposalCreateForm({
         discountAmount: pricing.discountAmount,
         total: pricing.total,
         eventDate: dateValue(data.get("eventDate")),
+        eventEndDate: datetimeLocalValue(data.get("eventEndDate")),
         eventType: String(data.get("eventType") || "").trim() || undefined,
         venueName: String(data.get("venueName") || "").trim() || undefined,
         venueAddress:
@@ -396,6 +413,14 @@ export function ProposalCreateForm({
                 className="input"
                 name="eventDate"
                 defaultValue={prefill?.eventDate}
+              />
+            </label>
+            <label className="field-label">
+              Event end
+              <BoundedDateTimeLocalInput
+                className="input"
+                name="eventEndDate"
+                defaultValue={prefill?.eventEndDate}
               />
             </label>
             <label className="field-label">

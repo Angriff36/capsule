@@ -6,6 +6,8 @@ export type ProposalPrefillValues = {
   eventType?: string;
   /** Proposal event date in the datetime-local input format. */
   startsAtLocal?: string;
+  /** Proposal event end (C2) in the datetime-local input format. */
+  endsAtLocal?: string;
   expectedHeadcount?: number;
   quotedPrice?: number;
 };
@@ -24,6 +26,7 @@ export class ProposalEventPrefill {
       title: proposal.title || undefined,
       eventType: proposal.eventType ?? undefined,
       startsAtLocal: this.toDatetimeLocal(proposal.eventDate),
+      endsAtLocal: this.toDatetimeLocal(proposal.eventEndDate),
       expectedHeadcount: guestCount > 0 ? guestCount : undefined,
       quotedPrice: total > 0 ? total : undefined,
     };

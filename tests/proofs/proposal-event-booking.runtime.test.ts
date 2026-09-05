@@ -19,6 +19,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { proposalEventPrefill } from "../../src/features/events/ProposalEventPrefill";
 
 function harness() {
   return createManifestTestContext({
@@ -87,6 +88,7 @@ async function acceptedProposalWithMenu(
       total: 1300,
       eventType: "gala dinner",
       eventDate: Date.parse("2026-10-01T18:00:00Z"),
+      eventEndDate: Date.parse("2026-10-01T23:00:00Z"),
       guestCount: 80,
       venueName: "Riverside Hall",
     },
@@ -196,6 +198,72 @@ describe("accepted proposal → create event (issue #141)", () => {
     );
     expect((eventRow as { title?: string }).title).toBe("Autumn gala");
     expect((eventRow as { stage?: string }).stage).toBe("planning");
+  });
+
+  it("typed date, times and headcount carry over", async () => {
+    const tenantId = "tenant-booking-carry";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-carry",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedCatalog(proof, owner, tenantId);
+    const proposalId = await acceptedProposalWithMenu(proof, owner, seed);
+
+    // The proposal stores date, end and headcount as typed values (C2 adds
+    // eventEndDate; eventDate/guestCount already existed).
+    const proposalRow = (await owner.run(async (ctx) =>
+      ctx.db.get(proposalId as never),
+    )) as {
+      eventDate?: number | null;
+      eventEndDate?: number | null;
+      guestCount?: number;
+    };
+    expect(proposalRow.eventDate).toBe(Date.parse("2026-10-01T18:00:00Z"));
+    expect(proposalRow.eventEndDate).toBe(Date.parse("2026-10-01T23:00:00Z"));
+    expect(proposalRow.guestCount).toBe(80);
+
+    // The real prefill the create-event screen seeds from
+    // (ProposalEventPrefill), parsed the way the form mapper parses
+    // datetime-local values (Date.parse, local time) — a same-process local
+    // round trip, so the parsed instants equal the stored ones.
+    const prefill = proposalEventPrefill.values(proposalRow as never);
+    expect(prefill.startsAtLocal).toBeTruthy();
+    expect(prefill.endsAtLocal).toBeTruthy();
+    expect(prefill.expectedHeadcount).toBe(80);
+
+    const booked = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId,
+        event: {
+          clientId: seed.clientId,
+          title: "Autumn gala",
+          eventType: "gala dinner",
+          startsAt: Date.parse(prefill.startsAtLocal as string),
+          endsAt: Date.parse(prefill.endsAtLocal as string),
+          expectedHeadcount: prefill.expectedHeadcount as number,
+          primaryContactName: "Casey Contact",
+          budgetAmount: 0,
+          quotedPrice: 1300,
+          venueName: "Riverside Hall",
+        },
+      },
+    )) as { docId: string };
+
+    // No re-entry: the event inherits the proposal's typed values exactly.
+    const eventRow = (await owner.run(async (ctx) =>
+      ctx.db.get(booked.docId as never),
+    )) as {
+      startsAt?: number;
+      endsAt?: number;
+      expectedHeadcount?: number;
+    };
+    expect(eventRow.startsAt).toBe(proposalRow.eventDate);
+    expect(eventRow.endsAt).toBe(proposalRow.eventEndDate);
+    expect(eventRow.expectedHeadcount).toBe(80);
   });
 
   it("sales_staff can complete the whole flow, menu copy included", async () => {

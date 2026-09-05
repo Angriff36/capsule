@@ -39,6 +39,9 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property unique proposalNumber: string?
   property required searchable title: string = ""
   property eventDate: datetime?
+  // Event end (specs/ralph/signed-proposal-becomes-the-event.md C2): typed
+  // datetime the create-event prefill seeds onto the new event's endsAt.
+  property eventEndDate: datetime?
   property eventType: string?
   property required guestCount: int = 0
   property venueName: string?
@@ -96,6 +99,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     total: money(12, 2),
     optional proposalNumber: string,
     optional eventDate: datetime,
+    optional eventEndDate: datetime,
     optional eventType: string,
     optional guestCount: number,
     optional venueName: string,
@@ -118,6 +122,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate title = title
     mutate proposalNumber = proposalNumber
     mutate eventDate = eventDate
+    mutate eventEndDate = eventEndDate
     mutate eventType = eventType
     mutate guestCount = guestCount != null ? guestCount : 0
     mutate venueName = venueName

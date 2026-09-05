@@ -427,6 +427,34 @@ extend this proof file. Gates: `bun run test` 123 files / 1209 tests
 green; typecheck, `format:check`, `bunx vite build` green. Tag `v0.0.47`
 created. Next: C2 (end time carries over) → AC-004.
 
+Iteration 41 (BUILD iteration 13, 2026-09-04): C2 DONE. `eventEndDate:
+datetime?` added to Proposal + its draft command only
+(`src/sales/proposal.manifest`); one regen landed schema/mutations/http/
+wiring/schemas/seed + 9 new `.builder/baselines` files (no new createVia —
+governed-creation-mappings untouched). Pass-through:
+`convex/lib/proposalDraft.ts` gains the arg + forward; quoteBuilder passes
+`submission.eventEndTime ?? undefined`, so the QuoteSubmission end time now
+reaches the converted proposal; ProposalCreateForm gains an "Event end"
+`BoundedDateTimeLocalInput` (optional, prefilled from `fromEvent.endsAt`
+via lib `toDatetimeLocalValue`, parsed by a local datetime-local helper);
+`ProposalEventPrefill.values` adds `endsAtLocal`; EventCreatePage seeds the
+Ends field from it and the preview panel's Proposal card has an end-time
+line — "Ends: <date> · <time>", or when the proposal has none "No end time
+on the proposal — set the end time on the event." (the AC-004
+create-screen half; the preview-listing half is AC-006/C6). Runtime proof
+"typed date, times and headcount carry over" (booking proof file, now 8
+tests): the shared acceptedProposalWithMenu helper drafts with eventEndDate
+23:00Z; the proof asserts the proposal stores typed
+eventDate/eventEndDate/guestCount, runs the REAL ProposalEventPrefill
+prefill, parses its datetime-local strings with Date.parse (the same parse
+EventPlanEngagementFormMapper applies), and books through
+createEventFromAcceptedProposal — the event's startsAt/endsAt/
+expectedHeadcount equal the proposal's values exactly. AC-004 = PASS (14 of
+19: AC-001, AC-004, AC-007…AC-016, AC-018, AC-019). Gates: `bun run test`
+123 files / 1210 tests green; typecheck, format:check (no rewrap needed),
+`bunx vite build`, `manifest-regen-check` green. Tag `v0.0.48` created.
+Next: C3 (accepted enhancements visible on the event) → AC-005, AC-006.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -721,7 +749,7 @@ Order = build order. Earlier tasks unblock later ones.
       runs under the default `node` environment; under `tests/proofs/` it runs
       in `edge-runtime` like every other proof. Run it once after the move
       and fix any environment-only failure before marking C1 done. → AC-001
-- [ ] **C2. End time carries over.** Proposal stores only `eventDate`
+- [x] **C2. End time carries over.** Proposal stores only `eventDate`
       (`src/sales/proposal.manifest:41`). Manifest: add
       `eventEndDate: datetime?` to `Proposal` and to `draft(...)` only —
       Proposal has no details-revise command (commands are draft, send,

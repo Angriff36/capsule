@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateClient,
@@ -498,6 +498,7 @@ export function EventCreatePage() {
                 Ends *
                 <BoundedDateTimeLocalInput
                   name="endsAt"
+                  defaultValue={proposalPrefill.endsAtLocal}
                   className="input"
                   required
                 />
@@ -707,6 +708,11 @@ export function EventCreatePage() {
                     {proposal.eventType ? `${proposal.eventType} · ` : ""}
                     {Number(proposal.guestCount ?? 0)} guests ·{" "}
                     {formatMoneyExact(Number(proposal.total ?? 0))}
+                  </p>
+                  <p>
+                    {proposal.eventEndDate != null
+                      ? `Ends: ${formatDate(proposal.eventEndDate)} · ${formatTime(proposal.eventEndDate)}`
+                      : "No end time on the proposal — set the end time on the event."}
                   </p>
                   {proposal.venueName ? (
                     <p>
