@@ -391,6 +391,26 @@ prettier rewrap on the new file), `bunx vite build` green. Tag `v0.0.45`
 created. 11 of 19 ACs PASS (AC-007…014, AC-016, AC-018, AC-019). Next:
 B4 (retired rows hidden on create, kept on existing records) → AC-015.
 
+Iteration 39 (BUILD iteration 11, 2026-09-04): B4 DONE. Unit test
+`tests/features/events/service-style-retired.test.ts` › "retired hidden on
+create, resolved on detail" — AC-015 = PASS. Implementation needed NO
+change; the behavior was already built: `serviceStyleSelectOptions` filters
+`status === "active"` with the built-in fallback (`serviceStyleCatalog.ts:53-67`),
+`EventDetailsCard` resolves ids from the UNFILTERED `useListServiceStyle()`
+list (`EventDetailsCard.tsx:28-34,94`), and the create page feeds the picker
+only the filtered options (`EventCreatePage.tsx:216`). The test pins all
+three: mixed active+retired catalog → picker offers the active row only;
+retired-only catalog → built-in fallback, never the retired row;
+source-text asserts the detail lookup `nameOf(useListServiceStyle(),
+serviceStyleId)` and its no-status-filter `rows?.find((row) => row._id ===
+id)?.name`. The spec's "imports" half has no id-mapping surface yet
+(`mapServiceStyle` unimplemented, future work) — noted in the test header,
+not testable. No manifest change, no regen. Gates: `bun run test` 123 files
+/ 1209 tests green; typecheck, `format:check` (no rewrap needed),
+`bunx vite build` green. Tag `v0.0.46` created. 12 of 19 ACs PASS
+(AC-007…AC-016, AC-018, AC-019). Next: C1 (move the booking proof under
+`tests/proofs/`) → AC-001.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -399,7 +419,7 @@ Activities in `specs/` in the order a real event moves through the business.
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
 | 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ form + dedup + client match; queue shows style/occasion + free text; junk dismissable; offline notice; one-click proposal links (A7); failed rows link checkpointed records and retry (A8/A9) | 2 (catalog rows), active `organizations` row |
-| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; admin UI at `/admin/catalogs` (B1); event-create empty state done (B2); runtime proof done (B3); retired-rows unit test pending (B4) | — |
+| 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | ✅ entities + commands + seed script; admin UI `/admin/catalogs` (B1); create-time empty states (B2); runtime proof (B3); retired rows hidden on create, kept on detail (B4) | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
 | 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event; proof sits outside `tests/proofs/` | 4, 2 (service style/occasion on create) |
@@ -661,7 +681,7 @@ Order = build order. Earlier tasks unblock later ones.
       (`package.json:49`); `scripts/emit-proof-kit.ts` binds only
       `CATALOG_ENTITIES` proof ids (Event/Proposal/QuoteSubmission are not in
       it) and `check:proof` only checks registered paths exist. → AC-016
-- [ ] **B4. Retired rows: hidden on create, kept on existing records.**
+- [x] **B4. Retired rows: hidden on create, kept on existing records.**
       Behavior exists (`EventCreatePage.tsx:212-213`,
       `serviceStyleCatalog.ts:57-59`, `EventDetailsCard.tsx:28-34,93-94`) but
       has no test. Unit test
@@ -798,7 +818,7 @@ Order = build order. Earlier tasks unblock later ones.
 - [x] Venue match by name + visible mismatch banner (`src/features/events/ProposalEventPrefill.ts:32-40`, `EventCreatePage.tsx:237-243,701-706`) — behavior only; test in C6.
 - [x] Create-page preview of carried values (`EventCreatePage.tsx:658-707`).
 - [x] ServiceStyle/Occasion/ReferralSource entities with register/reviseDetails/activate/deactivate + idempotent seed (`scripts/seed-catalogs.ts`).
-- [x] Retired styles hidden on create, shown on existing events (behavior; test in B4).
+- [x] Retired styles hidden on create, shown on existing events (behavior; proven by the B4 test).
 - [x] Organization row creatable in-app (`src/features/admin/BrandingPage.tsx:35`).
 - [x] Proposal lifecycle, revisions, central pricing, share links, signature acceptance (feature §5, §4.6).
 
