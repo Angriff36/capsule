@@ -340,3 +340,131 @@ describe("runtime proof: quote dismiss (AC-010)", () => {
     ).rejects.toThrow(/Only pending submissions can be converted/);
   });
 });
+
+describe("runtime proof: free-text style/occasion with empty catalogs (AC-011, AC-014)", () => {
+  it("public submit with empty catalogs captures free text", async () => {
+    const tenantId = "tenant-quote-freetext-a5";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-freetext-a5",
+      role: "owner",
+      tenantId,
+    });
+
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      { name: "Free-text proof kitchen" },
+    );
+
+    // The catalogs are empty: nothing has seeded ServiceStyle/Occasion rows
+    // for this tenant — the exact state the public form must survive (the
+    // form swaps each dead select for a free-text input).
+    expect(await liveRows(owner, "serviceStyles")).toHaveLength(0);
+    expect(await liveRows(owner, "occasions")).toHaveLength(0);
+
+    const submitted = (await asActions(owner).action(
+      api.quoteBuilder.submitQuote,
+      {
+        clientName: "Renee Prospect",
+        email: "renee@example.com",
+        phone: "555-0142",
+        eventDate: Date.UTC(2026, 10, 5, 18, 0),
+        eventEndTime: Date.UTC(2026, 10, 5, 23, 0),
+        guestCount: 40,
+        consent: true,
+        serviceStyleText: "Family-style buffet",
+        occasionText: "Retirement party",
+        venueName: "Lakeside Pavilion",
+        menuPreferences: "",
+        dietaryRestrictions: "",
+        notes: "",
+      },
+    )) as { submissionId: string; isDuplicate: boolean; status: string };
+    expect(submitted.isDuplicate).toBe(false);
+    expect(submitted.status).toBe("pending");
+
+    // The free-text answers are captured on the raw submission; no catalog id
+    // exists and nothing threw.
+    const row = (await owner.run(async (ctx) =>
+      ctx.db.get(submitted.submissionId),
+    )) as {
+      serviceStyleId: string | null;
+      occasionId: string | null;
+      serviceStyleText: string | null;
+      occasionText: string | null;
+    };
+    expect(row.serviceStyleId).toBeNull();
+    expect(row.occasionId).toBeNull();
+    expect(row.serviceStyleText).toBe("Family-style buffet");
+    expect(row.occasionText).toBe("Retirement party");
+  });
+
+  it("empty catalogs convert as text", async () => {
+    const tenantId = "tenant-quote-freetext-convert-a5";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-freetext-convert-a5",
+      role: "owner",
+      tenantId,
+    });
+
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      { name: "Free-text convert kitchen" },
+    );
+    expect(await liveRows(owner, "serviceStyles")).toHaveLength(0);
+    expect(await liveRows(owner, "occasions")).toHaveLength(0);
+
+    const submitted = (await asActions(owner).action(
+      api.quoteBuilder.submitQuote,
+      {
+        clientName: "Renee Prospect",
+        email: "renee-convert@example.com",
+        phone: "555-0142",
+        eventDate: Date.UTC(2026, 10, 5, 18, 0),
+        eventEndTime: Date.UTC(2026, 10, 5, 23, 0),
+        guestCount: 40,
+        consent: true,
+        serviceStyleText: "Family-style buffet",
+        occasionText: "Retirement party",
+        venueName: "Lakeside Pavilion",
+        menuPreferences: "",
+        dietaryRestrictions: "",
+        notes: "",
+      },
+    )) as { submissionId: string; isDuplicate: boolean };
+    expect(submitted.isDuplicate).toBe(false);
+
+    // Conversion with zero catalog rows succeeds end to end — no throw, event
+    // created with null style/occasion, proposal drafted.
+    const converted = (await asActions(owner).action(
+      api.quoteBuilder.processQuoteSubmission,
+      { submissionId: submitted.submissionId },
+    )) as {
+      clientId: string | null;
+      leadId: string | null;
+      eventId: string | null;
+      proposalId: string | null;
+      errors: string[];
+    };
+    expect(converted.errors).toEqual([]);
+    expect(converted.clientId).toBeTruthy();
+    expect(converted.leadId).toBeTruthy();
+    expect(converted.eventId).toBeTruthy();
+    expect(converted.proposalId).toBeTruthy();
+
+    // The prospect's free-text answers surface on the draft proposal (its
+    // notes), so sales reads them without re-opening the raw submission.
+    const proposals = await liveRows(owner, "proposals");
+    expect(proposals).toHaveLength(1);
+    const proposal = proposals[0] as {
+      notes: string | null;
+      eventId: string | null;
+    };
+    expect(proposal.eventId).toBe(converted.eventId);
+    expect(proposal.notes).toContain("Service style: Family-style buffet");
+    expect(proposal.notes).toContain("Occasion: Retirement party");
+  });
+});

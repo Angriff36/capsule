@@ -61,4 +61,26 @@ describe("quote submissions review queue", () => {
     const statusLabels = readFileSync("src/lib/statusLabels.ts", "utf8");
     expect(statusLabels).toContain('dismissed: "mute"');
   });
+
+  // A5 / AC-011: when the catalogs were empty the prospect answered as free
+  // text; the queue shows that text (id name → captured text → "Not
+  // specified"), never a silent blank.
+  it("queue shows free-text style and occasion answers", () => {
+    expect(page).toContain("sub.serviceStyleText");
+    expect(page).toContain("sub.occasionText");
+  });
+
+  // AC-014: a missing organization row is reported to STAFF with a link to
+  // where the record is created — the public form refuses every submit in
+  // that state (issue #119), and that must not stay invisible to sales.
+  it("offline notice when no organization", () => {
+    // reads the live organization list
+    expect(page).toContain("useListOrganization");
+    // the notice keys on an ACTIVE row (and not while the list is loading)
+    expect(page).toContain("publicFormOffline");
+    expect(page).toContain('org.status === "active"');
+    // staff-facing message + link to where the organization row is created
+    expect(page).toContain("quote form is offline");
+    expect(page).toContain('"/admin/branding"');
+  });
 });

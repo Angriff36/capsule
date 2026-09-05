@@ -4,6 +4,7 @@ import { useAction } from "convex/react";
 import { api } from "../../lib/api";
 import {
   useListOccasion,
+  useListOrganization,
   useListQuoteSubmission,
   useListServiceStyle,
   useQuoteSubmissionDismiss,
@@ -62,6 +63,7 @@ export function QuoteSubmissionsReviewPage() {
   const submissions = useListQuoteSubmission();
   const serviceStyles = useListServiceStyle();
   const occasions = useListOccasion();
+  const organizations = useListOrganization();
   const process = useAction(api.quoteBuilder.processQuoteSubmission);
   const dismissSubmission = useQuoteSubmissionDismiss();
   const { prompt, host: promptHost } = useActionPrompt();
@@ -154,6 +156,14 @@ export function QuoteSubmissionsReviewPage() {
     .sort((a, b) => (b.submittedAt ?? 0) - (a.submittedAt ?? 0));
   const pendingCount = visible.filter(isActionable).length;
 
+  // The public form resolves its tenant from the ACTIVE organizations row;
+  // without one, every public submit is refused (issue #119). Tell staff here
+  // instead of leaving the form silently broken — link to where the row is
+  // created (BrandingPage's useCreateOrganization).
+  const publicFormOffline =
+    organizations !== undefined &&
+    !organizations.some((org) => org.status === "active");
+
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-4">
@@ -196,6 +206,16 @@ export function QuoteSubmissionsReviewPage() {
       </div>
       <ClientsWorkspaceNav />
 
+      {publicFormOffline && (
+        <div className="mb-4 p-3 bg-warn-soft border border-warn/40 rounded-sm text-xs text-warn">
+          The public quote form is offline — this workspace has no active
+          organization record, so new quote requests are refused. Create one in{" "}
+          <Link to="/admin/branding" className="underline font-medium">
+            Admin → Branding
+          </Link>
+          .
+        </div>
+      )}
       {failure && (
         <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />
       )}
@@ -266,9 +286,12 @@ export function QuoteSubmissionsReviewPage() {
                   <p className="text-xs text-ink-2 mt-1">
                     Style:{" "}
                     {nameOf(serviceStyles, sub.serviceStyleId) ??
+                      sub.serviceStyleText ??
                       "Not specified"}{" "}
                     · Occasion:{" "}
-                    {nameOf(occasions, sub.occasionId) ?? "Not specified"}
+                    {nameOf(occasions, sub.occasionId) ??
+                      sub.occasionText ??
+                      "Not specified"}
                   </p>
                 </div>
                 <div className="text-right text-xs text-ink-2 shrink-0">

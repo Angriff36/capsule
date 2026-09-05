@@ -34,6 +34,13 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
   property serviceStyleId: uuid?
   property occasionId: uuid?
 
+  // Free-text style/occasion captured when the tenant has no catalog rows:
+  // the public form swaps each empty select for a text input, so a missing
+  // catalog never blocks submission. Conversion carries the text onto the
+  // draft proposal's notes (no catalog row exists to link).
+  property serviceStyleText: string?
+  property occasionText: string?
+
   // Venue information (from form)
   property searchable venueName: string?
   property searchable venueAddress: string?
@@ -87,6 +94,8 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     guestCount: number,
     serviceStyleId: uuid,
     occasionId: uuid,
+    serviceStyleText: string,
+    occasionText: string,
     venueName: string,
     venueAddress: string,
     menuPreferences: string,
@@ -111,6 +120,8 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
     mutate guestCount = guestCount
     mutate serviceStyleId = serviceStyleId
     mutate occasionId = occasionId
+    mutate serviceStyleText = serviceStyleText
+    mutate occasionText = occasionText
     mutate venueName = venueName
     mutate venueAddress = venueAddress
     mutate menuPreferences = menuPreferences

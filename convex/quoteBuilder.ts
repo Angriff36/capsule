@@ -87,6 +87,8 @@ export const ingressQuoteSubmission = internalMutation({
     guestCount: v.number(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    serviceStyleText: v.string(),
+    occasionText: v.string(),
     venueName: v.string(),
     venueAddress: v.string(),
     menuPreferences: v.string(),
@@ -192,6 +194,10 @@ export const ingressQuoteSubmission = internalMutation({
       guestCount: args.guestCount,
       serviceStyleId: args.serviceStyleId ?? null,
       occasionId: args.occasionId ?? null,
+      // Free-text answers from the empty-catalog fallback inputs (A5): stored
+      // as text because no catalog row exists to reference.
+      serviceStyleText: args.serviceStyleText.trim() || null,
+      occasionText: args.occasionText.trim() || null,
       venueName: args.venueName.trim() || null,
       venueAddress: args.venueAddress.trim() || null,
       menuPreferences: args.menuPreferences.trim() || null,
@@ -271,6 +277,8 @@ export const submitQuote = action({
     consent: v.boolean(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
+    serviceStyleText: v.optional(v.string()),
+    occasionText: v.optional(v.string()),
     venueName: v.optional(v.string()),
     venueAddress: v.optional(v.string()),
     menuPreferences: v.optional(v.string()),
@@ -327,6 +335,8 @@ export const submitQuote = action({
         guestCount: args.guestCount,
         serviceStyleId: args.serviceStyleId,
         occasionId: args.occasionId,
+        serviceStyleText: bounded(args.serviceStyleText),
+        occasionText: bounded(args.occasionText),
         venueName: bounded(args.venueName),
         venueAddress: bounded(args.venueAddress),
         menuPreferences: bounded(args.menuPreferences, MAX_LONG),
@@ -494,6 +504,22 @@ export const processQuoteSubmission = action({
     }
 
     // Draft proposal.
+    // Free-text style/occasion (A5): when the catalogs were empty the
+    // prospect answered as text and there is no catalog row to link, so the
+    // draft proposal's notes carry the answer — sales reads it without
+    // re-opening the raw submission.
+    const freeTextNotes: string[] = [];
+    if (!submission.serviceStyleId && submission.serviceStyleText) {
+      freeTextNotes.push(`Service style: ${submission.serviceStyleText}`);
+    }
+    if (!submission.occasionId && submission.occasionText) {
+      freeTextNotes.push(`Occasion: ${submission.occasionText}`);
+    }
+    const proposalNotes = [
+      submission.notes ??
+        "Draft proposal created from quote request. Menu selection and pricing to follow.",
+      ...freeTextNotes,
+    ].join(" ");
     let proposalId: Id<"proposals"> | null = null;
     try {
       if (clientId) {
@@ -512,9 +538,7 @@ export const processQuoteSubmission = action({
             discountAmount: 0,
             total: 0,
             eventId: eventId ?? undefined,
-            notes:
-              submission.notes ??
-              "Draft proposal created from quote request. Menu selection and pricing to follow.",
+            notes: proposalNotes,
           },
         );
         proposalId = proposalResult.docId;

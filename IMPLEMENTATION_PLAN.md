@@ -238,6 +238,28 @@ re-acceptance would need an un-dismiss/reopen command or a dedup window (spec
 line 24 names a 24h window the built system does not implement either).
 Recorded, not changed. Next: A5 (free-text style/occasion) → AC-011, AC-014.
 
+Iteration 33 (BUILD iteration 5, 2026-09-04): A5 + A6 DONE (batched: AC-014's
+two required tests span both). `serviceStyleText`/`occasionText` (`string?`)
+added to QuoteSubmission + its create command; one regen landed
+schema/mutations/http/wiring + 9 new `.builder/baselines` files (regen also
+rewrote `scripts/seed-convex.ts`; `src/lib/manifest-convex-react.ts` needed no
+change this time — create-hook args flow from the wiring bindings). Public
+form swaps each empty `<select>` for a text input only once options have
+LOADED (`options !== undefined` — loading renders the select, so no flash);
+label `htmlFor` follows the rendered control (`styleAsText`/`occasionAsText`
+consts). `submitQuote` takes the two optional strings (bounded, MAX_SHORT);
+`ingressQuoteSubmission` stores them trimmed-or-null; `processQuoteSubmission`
+appends `Service style: <text>` / `Occasion: <text>` to the draft proposal
+notes when no catalog id was linked. Review queue resolves
+`nameOf(...) ?? sub.serviceStyleText ?? "Not specified"`. A6: `publicFormOffline`
+inline warn banner (same styling as the partialErrors banner) when
+`useListOrganization()` has no row with `status === "active"` and the list is
+loaded, linking to `/admin/branding`. AC-011 = PASS, AC-014 = PASS (7 of 19
+now PASS). Gates: `bun run test` 120 files / 1197 tests green; typecheck,
+`format:check` (one prettier fix on QuoteSubmissionPage), `bunx vite build`
+green. Tag `v0.0.40` created. Next: A7 (one-click proposal links from queue +
+pipeline) → AC-018.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -245,7 +267,7 @@ Activities in `specs/` in the order a real event moves through the business.
 
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
-| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 form + dedup + client match built; queue shows style/occasion; junk dismissable; no free-text fallback | 2 (catalog rows), active `organizations` row |
+| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 form + dedup + client match built; queue shows style/occasion + free text; junk dismissable; offline notice; A7/A8/A9 links+retry missing | 2 (catalog rows), active `organizations` row |
 | 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; **no admin UI**; occasion has no empty state; no runtime proof | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 one-action convert builds client/lead/event/proposal; proposal is **not linked to the event** it just created | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
@@ -365,7 +387,7 @@ Order = build order. Earlier tasks unblock later ones.
       "dismiss keeps the raw submission": dismiss keeps the row readable and a
       re-submit of the same key still dedups (extend the dedup filter at
       `quoteBuilder.ts:166-168` to include `dismissed`). → AC-010
-- [ ] **A5. Free-text service style / occasion when catalogs are empty.**
+- [x] **A5. Free-text service style / occasion when catalogs are empty.**
       Manifest: add `serviceStyleText: string?` and `occasionText: string?`
       to `QuoteSubmission` and its `create` command; regen. Public form
       `src/features/sales/QuoteSubmissionPage.tsx:365-409` shows a text input
@@ -377,7 +399,7 @@ Order = build order. Earlier tasks unblock later ones.
       captures free text" (AC-014) and "empty catalogs convert as text"
       (AC-011): submit + convert with zero `serviceStyles`/`occasions` rows →
       no throw, text visible on submission and proposal. → AC-011, AC-014
-- [ ] **A6. Admin notice when the public form is offline.** `ingressQuoteSubmission`
+- [x] **A6. Admin notice when the public form is offline.** `ingressQuoteSubmission`
       throws a plain `ConvexError("Unable to process quote. Please contact us
       directly.")` when no active `organizations` row exists
       (`convex/quoteBuilder.ts:111-115`); the public copy is already safe —
