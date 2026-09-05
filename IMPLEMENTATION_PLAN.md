@@ -455,6 +455,58 @@ expectedHeadcount equal the proposal's values exactly. AC-004 = PASS (14 of
 `bunx vite build`, `manifest-regen-check` green. Tag `v0.0.48` created.
 Next: C3 (accepted enhancements visible on the event) → AC-005, AC-006.
 
+Iteration 42 (BUILD iteration 14, 2026-09-04): C3 + C6 DONE (batched:
+AC-006's required test is the C6 file and asserts C3's preview count).
+AC-005 = PASS, AC-006 = PASS, AC-003 = PASS (17 of 19; left: AC-002 = C4,
+AC-017 = D1). The Enhancements card does NOT live under
+src/features/events: `tests/event-manifest-integration-guard.test.ts`
+(over scripts/check-event-manifest-integration.ts) permits direct
+useQuery/convex-react ONLY in EventGuestPanel.tsx for src/features/events/** —
+the plan's "same direct-useQuery shape as EventGuestPanel" was right about
+the query, wrong about the file; the first full-suite run failed the guard.
+Card lives at src/features/clients/EventProposalEnhancementsCard.tsx (beside
+the other Proposal readers; clients/ already calls useQuery directly in
+ProposalAcceptancePage/SharedProposalPage and has no integration guard),
+renders the events EventOverviewCard shell (cross-feature imports into
+../events are established — chat/workforce/sales), and is mounted by
+EventOverviewTab after EventDetailsCard. Read path:
+useQuery(api.queries.listProposalByEventId, { eventId }) → first live
+proposal → useQuery(api.queries.listProposalEnhancementByProposalId,
+proposal ? { proposalId } : "skip") (the generated-hooks skip idiom,
+manifest-convex-react.ts:611); live = addedAt != null && removedAt == null
+sorted by sortOrder; self-hides while loading, without a linked proposal,
+and with zero live rows — generated reads return [] (never throw) without
+salesAccess, so no error-boundary risk. C6 test file
+tests/features/events/proposal-event-prefill.test.ts: matchVenue
+hit/miss/blank + mismatch-notice source-text + the venueId auto-select
+wiring (AC-003); values() keys incl. endsAtLocal with Date.parse
+round-trip equality, canLinkOnCreate 3-branch, and a source-text sweep of
+every preview line — title/type/headcount/money, new "Starts:" line,
+"Ends:" line, venue + mismatch, proposalMenuCount, new
+"Enhancements: {proposalEnhancementCount}" line, all three linking
+branches (AC-006). EventCreatePage: the "Starts:" line mirrors C2's Ends
+line (incl. the no-start-date note); the count comes from generated
+useListProposalEnhancement (list-all + proposalId/deletedAt/removedAt
+filter — same shape as proposalMenuCount). Booking proof now 9 tests:
+helper acceptedProposalWithMenu gained optional beforeSend? (offer and
+withdraw guard proposal.status == "draft", so both run before
+Proposal_send); "accepted enhancements reachable from the event" offers
+two enhancements, withdraws one, books, then walks the card's EXACT read
+path via actor.query — listProposalByEventId returns the one proposal,
+listProposalEnhancementByProposalId returns the 2 live rows, and the
+withdrawn row is already dropped by the query's deletedAt filter. Card
+wiring pinned by tests/features/events/event-enhancements-card.test.ts.
+AC-006 J half (llm-review UX-01 on the preview copy) could NOT run:
+ANTHROPIC_API_KEY unset, no .env.local — same as AC-013 (iteration 37);
+evidence pending under .artifacts/llm-review/AC-006.md in a session with
+the key. C4 NOTE: the "Booked from proposal" line hits the same guard —
+put the reader in clients/ (same seam) or hand rows into an events
+component as props. Gates: bun run test 125 files / 1214 tests green (the
+guard failure was the only failure, fixed by the clients/ move);
+typecheck, format:check (one prettier rewrap on EventCreatePage + the
+proof), bunx vite build green. Tag v0.0.49 created. Next: C4 (event links
+back to the proposal and its accepted revision) → AC-002.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -466,7 +518,7 @@ Activities in `specs/` in the order a real event moves through the business.
 | 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | ✅ entities + commands + seed script; admin UI `/admin/catalogs` (B1); create-time empty states (B2); runtime proof (B3); retired rows hidden on create, kept on detail (B4) | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | ✅ one-action convert builds client/lead/event/proposal, linked to the event (A1); failure checkpoints and retry reuse partial records (A8/A9) | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
-| 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview built (issue #141 closed); **end time and enhancements do not carry**; no reverse link on the event | 4, 2 (service style/occasion on create) |
+| 5 | Accepted proposal becomes a linked event with its menu | Josh, Sales | `ralph/proposal-to-event-handoff` | 🟡 link + menu copy + venue match + preview + end time (C2) + enhancements visible on the event (C3) built; no reverse link on the event (C4) | 4, 2 (service style/occasion on create) |
 | 6 | Event is planned: staffing, prep, equipment, purchasing | Josh, Sales, Kitchen | feature §9–§11 | ✅ (My Day, prep board, pack lists, equipment, receiving) | 5 |
 | 7 | Field staff execute from a phone; no dead ends | Kayden | `ralph/field-flow-defect-burndown` | 🟡 #149/#150 fixed and tested; #142–#146 open (empty states, dish cost, dietary tags, draft-list packing) | 6 |
 | 8 | Closeout, invoice, money truth | Josh | feature §7, issue #136 | 🟡 dashboards live; invoice numbers still raw doc ids at the source | 7 |
@@ -770,7 +822,7 @@ Order = build order. Earlier tasks unblock later ones.
       When the proposal has no end time the preview panel says so in one
       line. Extend the C1 proof file with › "typed date, times and headcount
       carry over". → AC-004
-- [ ] **C3. Accepted enhancements visible on the event.** `ProposalEnhancement`
+- [x] **C3. Accepted enhancements visible on the event.** `ProposalEnhancement`
       exists (`src/sales/proposal-enhancement.manifest:14-27`: proposalId,
       name, description, price, sortOrder, addedAt, removedAt; `withdraw` at
       `:93` also sets `deletedAt` at `:99`) with no event-side surface. The
@@ -815,7 +867,7 @@ Order = build order. Earlier tasks unblock later ones.
       that the private copy accepts `null`/non-finite and returns
       `undefined`, while the library helper takes a required `number` — keep
       that guard at the call site in `values()`. (Standard-library rule.)
-- [ ] **C6. Unit test for the prefill seam.** No test covers
+- [x] **C6. Unit test for the prefill seam.** No test covers
       `ProposalEventPrefill` today (`grep -rl ProposalEventPrefill tests` is
       empty). Add `tests/features/events/proposal-event-prefill.test.ts`
       (kebab-case, pure-helper style like its siblings): `matchVenue`

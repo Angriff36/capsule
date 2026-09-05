@@ -14,6 +14,7 @@ import {
   useListOccasion,
   useListPerson,
   useListProposalDishSelection,
+  useListProposalEnhancement,
   useListReferralSource,
   useListServiceStyle,
   useListVenue,
@@ -155,6 +156,7 @@ export function EventCreatePage() {
   const proposalId = searchParams.get("proposalId")?.trim() || "";
   const proposal = useGetProposal(proposalId || "skip");
   const proposalDishSelections = useListProposalDishSelection();
+  const proposalEnhancements = useListProposalEnhancement();
   const createEventFromProposal = useCreateEventFromProposal();
   const template = useRouteRecord(useGetEventTemplate, templateId || undefined);
   const menus = useListMenu();
@@ -189,6 +191,16 @@ export function EventCreatePage() {
     ? (proposalDishSelections ?? []).filter(
         (selection) =>
           selection.proposalId === proposalId && selection.deletedAt == null,
+      ).length
+    : 0;
+  // Live enhancements (withdraw sets removedAt + deletedAt) — the rows the
+  // event overview card will list once this event exists (C3).
+  const proposalEnhancementCount = proposalId
+    ? (proposalEnhancements ?? []).filter(
+        (row) =>
+          row.proposalId === proposalId &&
+          row.deletedAt == null &&
+          row.removedAt == null,
       ).length
     : 0;
   // Proposal deep links may arrive without ?clientId= — seed it once loaded.
@@ -710,10 +722,21 @@ export function EventCreatePage() {
                     {formatMoneyExact(Number(proposal.total ?? 0))}
                   </p>
                   <p>
+                    {proposal.eventDate != null
+                      ? `Starts: ${formatDate(proposal.eventDate)} · ${formatTime(proposal.eventDate)}`
+                      : "No start date on the proposal — set the start time on the event."}
+                  </p>
+                  <p>
                     {proposal.eventEndDate != null
                       ? `Ends: ${formatDate(proposal.eventEndDate)} · ${formatTime(proposal.eventEndDate)}`
                       : "No end time on the proposal — set the end time on the event."}
                   </p>
+                  {proposalEnhancementCount > 0 ? (
+                    <p>
+                      Enhancements: {proposalEnhancementCount} on the proposal —
+                      they will show on the event.
+                    </p>
+                  ) : null}
                   {proposal.venueName ? (
                     <p>
                       Venue: {proposal.venueName}

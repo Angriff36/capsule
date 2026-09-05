@@ -75,6 +75,8 @@ async function acceptedProposalWithMenu(
   proof: ReturnType<typeof harness>,
   actor: Actor,
   seed: Awaited<ReturnType<typeof seedCatalog>>,
+  /** Draft-window hook (C3): offer/withdraw enhancements before send. */
+  beforeSend?: (proposalId: string) => Promise<void>,
 ) {
   const proposal = (await proof.executeCommand(
     actor,
@@ -120,6 +122,7 @@ async function acceptedProposalWithMenu(
     api.mutations.ProposalDishSelection_remove,
     { docId: removed.docId },
   );
+  if (beforeSend) await beforeSend(proposal.docId);
   await proof.executeCommand(actor, api.mutations.Proposal_send, {
     docId: proposal.docId,
   });
@@ -264,6 +267,87 @@ describe("accepted proposal → create event (issue #141)", () => {
     expect(eventRow.startsAt).toBe(proposalRow.eventDate);
     expect(eventRow.endsAt).toBe(proposalRow.eventEndDate);
     expect(eventRow.expectedHeadcount).toBe(80);
+  });
+
+  it("accepted enhancements reachable from the event", async () => {
+    const tenantId = "tenant-booking-enh";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-enh",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedCatalog(proof, owner, tenantId);
+    let withdrawnId = "";
+    // offer/withdraw guard proposal.status == "draft", so both run in the
+    // draft window: two live enhancements plus one withdrawn before send.
+    const proposalId = await acceptedProposalWithMenu(
+      proof,
+      owner,
+      seed,
+      async (id) => {
+        await proof.executeCommand(
+          owner,
+          api.mutations.ProposalEnhancement_createViaOffer,
+          {
+            proposalId: id,
+            name: "Late-night snack board",
+            price: 250,
+            description: "Served at 22:00",
+          },
+        );
+        await proof.executeCommand(
+          owner,
+          api.mutations.ProposalEnhancement_createViaOffer,
+          { proposalId: id, name: "Valet parking", price: 400 },
+        );
+        const withdrawn = (await proof.executeCommand(
+          owner,
+          api.mutations.ProposalEnhancement_createViaOffer,
+          { proposalId: id, name: "Dry ice display", price: 99 },
+        )) as { docId: string };
+        withdrawnId = withdrawn.docId;
+        await proof.executeCommand(
+          owner,
+          api.mutations.ProposalEnhancement_withdraw,
+          { docId: withdrawn.docId },
+        );
+      },
+    );
+
+    const booked = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId,
+        event: { clientId: seed.clientId, ...EVENT_ARGS },
+      },
+    )) as { docId: string };
+
+    // The exact read path the event overview card uses
+    // (EventEnhancementsCard): reverse lookup from the event id, then live
+    // enhancement rows on the resolved proposal.
+    const proposals = (await owner.query(api.queries.listProposalByEventId, {
+      eventId: booked.docId,
+    })) as Array<{ _id: string }>;
+    expect(proposals.map((row) => row._id)).toEqual([proposalId]);
+
+    const enhancements = (await owner.query(
+      api.queries.listProposalEnhancementByProposalId,
+      { proposalId },
+    )) as Array<{
+      _id: string;
+      name: string;
+      removedAt: number | null;
+    }>;
+    const live = enhancements
+      .filter((row) => row.removedAt == null)
+      .map((row) => row.name)
+      .sort();
+    expect(live).toEqual(["Late-night snack board", "Valet parking"]);
+    // Withdraw soft-deletes (removedAt AND deletedAt), so the generated read
+    // already drops the row — the withdrawn offer never reaches the event.
+    expect(enhancements.map((row) => row._id)).not.toContain(withdrawnId);
   });
 
   it("sales_staff can complete the whole flow, menu copy included", async () => {
