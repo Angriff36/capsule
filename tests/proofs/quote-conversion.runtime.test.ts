@@ -253,3 +253,90 @@ describe("runtime proof: quote dedup (AC-009)", () => {
     expect(await liveRows(owner, "clients")).toHaveLength(1);
   });
 });
+
+describe("runtime proof: quote dismiss (AC-010)", () => {
+  it("dismiss keeps the raw submission", async () => {
+    const tenantId = "tenant-quote-dismiss-a4";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-dismiss-a4",
+      role: "owner",
+      tenantId,
+    });
+
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      { name: "Dismiss proof kitchen" },
+    );
+
+    const eventDate = Date.UTC(2026, 9, 15, 17, 0);
+    const submit = (email: string) =>
+      asActions(owner).action(api.quoteBuilder.submitQuote, {
+        clientName: "Dana Prospect",
+        email,
+        phone: "555-0100",
+        eventDate,
+        eventEndTime: eventDate + 5 * 60 * 60 * 1000,
+        guestCount: 75,
+        consent: true,
+        venueName: "Orchard Barn",
+        menuPreferences: "BBQ buffet",
+        dietaryRestrictions: "",
+        notes: "",
+      }) as Promise<{
+        submissionId: string;
+        isDuplicate: boolean;
+        status: string;
+      }>;
+
+    const first = await submit("dana@example.com");
+    expect(first.isDuplicate).toBe(false);
+    expect(first.status).toBe("pending");
+
+    // Staff dismisses the junk/duplicate with a reason (generated command,
+    // salesAccess write policy — same path the review queue button takes).
+    await proof.executeCommand(owner, api.mutations.QuoteSubmission_dismiss, {
+      docId: first.submissionId,
+      reason: "Duplicate — booked by phone",
+    });
+
+    // The raw submission stays readable: retained (not deleted), reason
+    // recorded in errorMessage, every captured field intact, dedupKey kept.
+    const row = (await owner.run(async (ctx) =>
+      ctx.db.get(first.submissionId),
+    )) as {
+      status: string;
+      errorMessage: string | null;
+      clientName: string;
+      dedupKey: string;
+      deletedAt: number | null;
+    };
+    expect(row.status).toBe("dismissed");
+    expect(row.errorMessage).toBe("Duplicate — booked by phone");
+    expect(row.clientName).toBe("Dana Prospect");
+    expect(row.dedupKey).toBeTruthy();
+    expect(row.deletedAt ?? null).toBeNull();
+
+    // Leaves the default queue: no open (non-dismissed) live row remains.
+    const open = (await liveRows(owner, "quoteSubmissions")).filter(
+      (r) => (r as { status?: string }).status !== "dismissed",
+    );
+    expect(open).toHaveLength(0);
+
+    // Still participates in dedup: a resubmit of the same key returns the SAME
+    // dismissed row and mints no second submission.
+    const repeat = await submit("dana@example.com");
+    expect(repeat.isDuplicate).toBe(true);
+    expect(repeat.submissionId).toBe(first.submissionId);
+    expect(repeat.status).toBe("dismissed");
+    expect(await liveRows(owner, "quoteSubmissions")).toHaveLength(1);
+
+    // A dismissed row cannot be converted (only pending converts).
+    await expect(
+      asActions(owner).action(api.quoteBuilder.processQuoteSubmission, {
+        submissionId: first.submissionId,
+      }),
+    ).rejects.toThrow(/Only pending submissions can be converted/);
+  });
+});

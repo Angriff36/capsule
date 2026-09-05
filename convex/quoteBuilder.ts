@@ -154,7 +154,9 @@ export const ingressQuoteSubmission = internalMutation({
     }
 
     // Dedup: a prior active submission for the same key is returned as-is so a
-    // repeat submit is a no-op (submit-once). Failed submissions can be retried.
+    // repeat submit is a no-op (submit-once). Dismissed rows still count — the
+    // raw capture is retained, and a repeat submit of a dismissed key must not
+    // mint a second row. Failed submissions can be retried via a resubmit.
     const candidates = await ctx.db
       .query("quoteSubmissions")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -165,7 +167,8 @@ export const ingressQuoteSubmission = internalMutation({
         sub.deletedAt == null &&
         (sub.status === "pending" ||
           sub.status === "processing" ||
-          sub.status === "completed"),
+          sub.status === "completed" ||
+          sub.status === "dismissed"),
     );
     if (existing) {
       return {

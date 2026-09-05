@@ -6,6 +6,7 @@ enum QuoteSubmissionStatus {
   processing
   completed
   failed
+  dismissed
 }
 
 entity QuoteSubmission mixin TenantScoped, SoftDeletable {
@@ -178,6 +179,21 @@ entity QuoteSubmission mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       errorMessage: errorMessage
     }
+  }
+
+  // Staff dismisses a junk/duplicate submission with a required reason. The
+  // raw capture row and its dedupKey are retained (never deleted); the review
+  // queue hides dismissed rows behind its dismissed filter, and the same key
+  // still dedups a repeat submit.
+  command dismiss(reason: string) {
+    guard self.submittedAt != null "Quote submission must be created first"
+    guard self.status == "pending" or self.status == "failed" "Only pending or failed submissions can be dismissed"
+    guard self.deletedAt == null "Cannot dismiss a deleted quote submission"
+
+    constraint dismissReasonRequired: length(trim(reason)) > 0 "Dismissal reason is required"
+
+    mutate status = "dismissed"
+    mutate errorMessage = reason
   }
 
   store QuoteSubmission in durable

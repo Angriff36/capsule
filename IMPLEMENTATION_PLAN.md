@@ -208,6 +208,36 @@ needed NO change; the built dedup was already correct. Gates: `bun run test`
 green. Tag `v0.0.38` created. Next: A4 (dismiss a junk/duplicate submission)
 → AC-010.
 
+Iteration 32 (BUILD iteration 4, 2026-09-04): A4 DONE. `dismissed` added to
+`QuoteSubmissionStatus` + `command dismiss(reason: string)` on
+`src/sales/quote-submission.manifest` (guards: submitted, status pending or
+failed, not deleted; required-reason constraint; reason stored in
+`errorMessage`; raw row + dedupKey kept) — the build loop's first regen
+(`bun run manifest:regen` landed mutations/schema/hooks/contract updates in one
+step; no new createVia so `governed-creation-mappings.test.ts` untouched;
+`bun run codegen` NOT needed — `convex/_generated/api.d.ts` derives function
+types from module imports and `mutations.ts` was already registered). Dedup
+filter in `convex/quoteBuilder.ts` now includes `dismissed`, so a dismissed
+key still returns the same row on resubmit. Review queue
+(`QuoteSubmissionsReviewPage.tsx`): Dismiss button on pending and failed rows
+via `useActionPrompt.askReason` + generated `useQuoteSubmissionDismiss`;
+"Show dismissed (n)" toggle (inline useState pattern, like ClientsPage
+showArchived); dismissed rows hidden by default; reason rendered as
+"Dismissed — <reason>"; private `STATUS_TONE` map deleted — `StatusChip`
+falls back to `statusChipClass` with `dismissed: "mute"` added to
+`TONE_BY_STATUS` in `src/lib/statusLabels.ts`. AC-010 = PASS: runtime proof
+"dismiss keeps the raw submission" (row retained with reason and dedupKey,
+open queue empty, resubmit dedups to the same id, convert refused) plus
+source-text test "dismiss hides from the default queue and keeps the raw row".
+Gates: `bun run test` 120 files / 1193 tests green; typecheck, `format:check`,
+`bunx vite build` green. Tag `v0.0.39` created. Spec note: public-quote-form.md
+line 27 ("can be re-submitted and accepted after dismissal") is in tension
+with contract AC-010 ("still participates in dedup") — the owner-reviewed
+contract chose permanent dedup, so a dismissed key never reopens a pending row;
+re-acceptance would need an un-dismiss/reopen command or a dedup window (spec
+line 24 names a 24h window the built system does not implement either).
+Recorded, not changed. Next: A5 (free-text style/occasion) → AC-011, AC-014.
+
 ## User journey map (audience: AUDIENCE_JTBD.md)
 
 Activities in `specs/` in the order a real event moves through the business.
@@ -215,7 +245,7 @@ Activities in `specs/` in the order a real event moves through the business.
 
 | # | Activity | Actor | Spec | Status | Depends on |
 | - | -------- | ----- | ---- | ------ | ---------- |
-| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 form + dedup + client match built; queue shows style/occasion; no dismiss, no free-text fallback | 2 (catalog rows), active `organizations` row |
+| 1 | Prospect prices and submits a quote from a phone | Client | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 form + dedup + client match built; queue shows style/occasion; junk dismissable; no free-text fallback | 2 (catalog rows), active `organizations` row |
 | 2 | Reference catalogs exist and are fixable in-app | Josh (admin) | `ralph/reference-catalogs-self-serve` | 🟡 entities + commands + seed script built; **no admin UI**; occasion has no empty state; no runtime proof | — |
 | 3 | Sales sees the lead and converts it to a draft proposal | Sales | feature §4.3, `ralph/quote-to-proposal-conversion` | 🟡 one-action convert builds client/lead/event/proposal; proposal is **not linked to the event** it just created | 1 |
 | 4 | Sales edits, prices, sends a branded proposal; client accepts/signs | Sales, Client | feature §5.1–§5.5, §4.6 | ✅ lifecycle, revisions, central pricing, PDF sections, share links, signature seam all live (issue #115 closed) | 3 |
@@ -317,7 +347,7 @@ Order = build order. Earlier tasks unblock later ones.
       untested. Runtime proof `quote-conversion.runtime.test.ts` › "dedup by
       contact and event date": same email + event date submitted twice →
       one `QuoteSubmission`, one `Lead`; different date → two. → AC-009
-- [ ] **A4. Dismiss a junk/duplicate submission without deleting it.**
+- [x] **A4. Dismiss a junk/duplicate submission without deleting it.**
       Manifest: add `dismissed` to `QuoteSubmissionStatus` and a
       `command dismiss(reason: string)` on `src/sales/quote-submission.manifest`
       (guard status in pending/failed; mutate status + `errorMessage`/reason;

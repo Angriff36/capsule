@@ -6,7 +6,9 @@ import {
   useListOccasion,
   useListQuoteSubmission,
   useListServiceStyle,
+  useQuoteSubmissionDismiss,
 } from "../../lib/manifest-convex-react";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { formatCountNoun, formatDate } from "../../lib/format";
@@ -30,12 +32,13 @@ function isActionable(sub: QuoteSubmission): boolean {
   return sub.status === "pending";
 }
 
-const STATUS_TONE: Record<string, string> = {
-  pending: "bg-warn-soft text-warn",
-  processing: "bg-info-soft text-info",
-  completed: "bg-ok-soft text-ok",
-  failed: "bg-danger-soft text-danger",
-};
+// Dismissable while pending or failed (the manifest dismiss guard matches).
+// Dismissal keeps the raw row and its dedupKey; it only hides the request from
+// the default queue.
+function canDismiss(sub: QuoteSubmission): boolean {
+  if (sub.deletedAt != null) return false;
+  return sub.status === "pending" || sub.status === "failed";
+}
 
 type Named = { _id: string; name: string };
 
@@ -60,7 +63,10 @@ export function QuoteSubmissionsReviewPage() {
   const serviceStyles = useListServiceStyle();
   const occasions = useListOccasion();
   const process = useAction(api.quoteBuilder.processQuoteSubmission);
+  const dismissSubmission = useQuoteSubmissionDismiss();
+  const { prompt, host: promptHost } = useActionPrompt();
 
+  const [showDismissed, setShowDismissed] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
   const [partialErrors, setPartialErrors] = useState<string | null>(null);
@@ -102,6 +108,29 @@ export function QuoteSubmissionsReviewPage() {
     }
   };
 
+  const dismiss = async (sub: QuoteSubmission) => {
+    setFailure(null);
+    // The reason is required (manifest constraint); a blank prompt cancels.
+    const reason = (
+      await prompt.askReason({
+        title: "Dismiss quote request",
+        description:
+          "Hides this request from the queue. The raw submission is kept and still blocks duplicate submits of the same event.",
+        label: "Reason",
+        confirmLabel: "Dismiss",
+      })
+    )?.trim();
+    if (!reason) return;
+    setBusyId(sub._id);
+    try {
+      await dismissSubmission({ docId: sub._id, reason });
+    } catch (err) {
+      setFailure(classifyCommandFailure(err));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   if (submissions === undefined) {
     return (
       <div className="p-6 max-w-6xl mx-auto">
@@ -114,8 +143,14 @@ export function QuoteSubmissionsReviewPage() {
     );
   }
 
-  const visible = [...submissions]
-    .filter((sub) => sub.deletedAt == null)
+  // Dismissed rows leave the default queue but stay reachable through the
+  // "Show dismissed" toggle (they are retained, never deleted).
+  const live = submissions.filter((sub) => sub.deletedAt == null);
+  const dismissedCount = live.filter(
+    (sub) => sub.status === "dismissed",
+  ).length;
+  const visible = [...live]
+    .filter((sub) => showDismissed || sub.status !== "dismissed")
     .sort((a, b) => (b.submittedAt ?? 0) - (a.submittedAt ?? 0));
   const pendingCount = visible.filter(isActionable).length;
 
@@ -137,12 +172,25 @@ export function QuoteSubmissionsReviewPage() {
             </>
           }
           actions={
-            <Link
-              to="/clients/pipeline"
-              className="text-xs text-ink-2 hover:text-ink underline"
-            >
-              View lead pipeline →
-            </Link>
+            <>
+              {dismissedCount > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setShowDismissed((value) => !value)}
+                >
+                  {showDismissed
+                    ? "Hide dismissed"
+                    : `Show dismissed (${dismissedCount})`}
+                </button>
+              )}
+              <Link
+                to="/clients/pipeline"
+                className="text-xs text-ink-2 hover:text-ink underline"
+              >
+                View lead pipeline →
+              </Link>
+            </>
           }
         />
       </div>
@@ -156,6 +204,7 @@ export function QuoteSubmissionsReviewPage() {
           {partialErrors}
         </div>
       )}
+      {promptHost}
 
       {lastConverted && (
         <div className="mb-4 p-4 bg-ok-soft border border-ok/40 rounded-sm text-xs text-ok">
@@ -183,7 +232,11 @@ export function QuoteSubmissionsReviewPage() {
 
       {visible.length === 0 ? (
         <EmptyState
-          title="No quote requests yet"
+          title={
+            dismissedCount > 0
+              ? "No open quote requests"
+              : "No quote requests yet"
+          }
           hint="When someone asks for a quote on your website, it lands here."
           action={
             <Link to="/quote" className="btn btn-ghost btn-sm">
@@ -204,10 +257,7 @@ export function QuoteSubmissionsReviewPage() {
                     <h2 className="font-semibold text-ink truncate">
                       {sub.clientName ?? "Unknown"}
                     </h2>
-                    <StatusChip
-                      status={sub.status ?? "pending"}
-                      color={STATUS_TONE[sub.status ?? "pending"]}
-                    />
+                    <StatusChip status={sub.status ?? "pending"} />
                   </div>
                   <p className="text-xs text-ink-2 mt-1">
                     {sub.email}
@@ -281,6 +331,12 @@ export function QuoteSubmissionsReviewPage() {
                   </div>
                 )}
 
+              {sub.status === "dismissed" && sub.errorMessage && (
+                <div className="mt-2 p-2 bg-mute-soft border border-line-2 rounded-xs text-2xs text-ink-2">
+                  Dismissed — {sub.errorMessage}
+                </div>
+              )}
+
               {sub.status === "completed" && sub.eventId && (
                 <p className="mt-3 text-xs">
                   <Link
@@ -292,20 +348,32 @@ export function QuoteSubmissionsReviewPage() {
                 </p>
               )}
 
-              {isActionable(sub) && (
-                <div className="mt-3">
-                  <button
-                    type="button"
-                    disabled={busyId === sub._id}
-                    onClick={() =>
-                      convert(sub._id, sub.clientName ?? "the lead")
-                    }
-                    className="btn btn-primary"
-                  >
-                    {busyId === sub._id
-                      ? "Converting…"
-                      : "Convert to lead, event & proposal"}
-                  </button>
+              {(isActionable(sub) || canDismiss(sub)) && (
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {isActionable(sub) && (
+                    <button
+                      type="button"
+                      disabled={busyId === sub._id}
+                      onClick={() =>
+                        convert(sub._id, sub.clientName ?? "the lead")
+                      }
+                      className="btn btn-primary"
+                    >
+                      {busyId === sub._id
+                        ? "Converting…"
+                        : "Convert to lead, event & proposal"}
+                    </button>
+                  )}
+                  {canDismiss(sub) && (
+                    <button
+                      type="button"
+                      disabled={busyId === sub._id}
+                      onClick={() => void dismiss(sub)}
+                      className="btn btn-ghost"
+                    >
+                      {busyId === sub._id ? "Dismissing…" : "Dismiss"}
+                    </button>
+                  )}
                 </div>
               )}
             </div>

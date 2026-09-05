@@ -41,4 +41,24 @@ describe("quote submissions review queue", () => {
     expect(page).toContain("sub.menuPreferences");
     expect(page).toContain("sub.dietaryRestrictions");
   });
+
+  // AC-010 UI wiring: dismiss runs through the generated command with a
+  // REQUIRED reason, dismissed rows leave the default queue behind a
+  // "Show dismissed" filter (retained, never deleted), and the reason is
+  // shown on the row.
+  it("dismiss hides from the default queue and keeps the raw row", () => {
+    expect(page).toContain("useQuoteSubmissionDismiss");
+    expect(page).toContain("askReason");
+    // hidden by default, reachable via the toggle
+    expect(page).toContain("Show dismissed");
+    expect(page).toContain('sub.status !== "dismissed"');
+    // the dismiss reason is shown on the dismissed row (raw row stays readable)
+    expect(page).toContain("Dismissed —");
+    // the reason prompt cancels on a blank reason (required reason)
+    expect(page).toContain("if (!reason) return;");
+    // chip tone comes from the shared status vocabulary, not a private map
+    expect(page).not.toContain("STATUS_TONE");
+    const statusLabels = readFileSync("src/lib/statusLabels.ts", "utf8");
+    expect(statusLabels).toContain('dismissed: "mute"');
+  });
 });

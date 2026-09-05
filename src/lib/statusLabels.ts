@@ -49,6 +49,7 @@ const TONE_BY_STATUS: Record<string, ChipTone> = {
   archived: "mute",
   superseded: "mute",
   deferred: "mute",
+  dismissed: "mute",
   // in motion
   in_progress: "info",
   in_transit: "info",
