@@ -48,6 +48,17 @@ const STATUS_LABELS: Record<string, string> = {
   reverted: "Reverted",
 };
 
+// Workbook disposition labels (import archive classification)
+const DISPOSITION_LABELS: Record<string, string> = {
+  pending: "Pending",
+  normalized: "Normalized",
+  linked_reference: "Linked reference",
+  duplicate_view: "Duplicate view",
+  needs_mapping: "Needs mapping",
+  unsupported: "Unsupported",
+  invalid: "Invalid",
+};
+
 // Stage transitions allowed from each status
 const STAGE_TRANSITIONS: Record<string, { next: string; label: string }[]> = {
   started: [
@@ -332,6 +343,10 @@ export function ImportRunDetailPage() {
   };
 
   const counts = parseRecordCounts(importRun.recordCounts);
+  const dispositionSummary = parseRecordCounts(
+    importRun.dispositionCounts ?? "{}",
+  );
+  const unaccountedRecords = importRun.unaccountedRecordCount ?? 0;
   const totalRecords = Object.values(counts).reduce(
     (sum, count) => sum + count,
     0,
@@ -678,6 +693,18 @@ export function ImportRunDetailPage() {
               <dd className="mt-1 text-ink-2">{totalRecords}</dd>
             </div>
             <div>
+              <dt className="font-medium text-ink">Unaccounted Records</dt>
+              <dd
+                className={
+                  unaccountedRecords > 0
+                    ? "mt-1 text-danger font-medium"
+                    : "mt-1 text-ink-2"
+                }
+              >
+                {unaccountedRecords}
+              </dd>
+            </div>
+            <div>
               <dt className="font-medium text-ink">Started At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDateTime(importRun.startTime)}
@@ -783,6 +810,49 @@ export function ImportRunDetailPage() {
                 </div>
               ))}
             </dl>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Workbook Dispositions Section (archive classification) */}
+      {importRun.archiveWorkbookCount > 0 ||
+      Object.keys(dispositionSummary).length > 0 ? (
+        <div className="card mt-4">
+          <div className="border-b border-line px-3">
+            <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+              Workbook Dispositions
+            </h2>
+          </div>
+          <div className="p-4">
+            {unaccountedRecords > 0 ? (
+              <p className="mb-3 text-xs text-danger">
+                Commit stays closed until every workbook is classified and row
+                counts reconcile — {unaccountedRecords} unaccounted.
+              </p>
+            ) : null}
+            {Object.keys(dispositionSummary).length > 0 ? (
+              <dl className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
+                {Object.entries(dispositionSummary).map(
+                  ([disposition, count]) => (
+                    <div key={disposition}>
+                      <dt className="font-medium text-ink">
+                        {DISPOSITION_LABELS[disposition] || disposition}
+                      </dt>
+                      <dd className="mt-1 text-ink-2">{count}</dd>
+                    </div>
+                  ),
+                )}
+              </dl>
+            ) : (
+              <p className="text-xs text-ink-2">
+                Archive inventoried — workbooks are not classified yet.
+              </p>
+            )}
+            <p className="mt-3 text-xs text-ink-3">
+              Dispositions describe the source archive, not operational records
+              — unsupported, duplicate and linked-reference content stays listed
+              here after commit.
+            </p>
           </div>
         </div>
       ) : null}

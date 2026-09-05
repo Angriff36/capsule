@@ -198,6 +198,15 @@ export const inventoryArchive = action({
         checksum,
         provenance,
       });
+      // The register command completes creation but leaves the timestamps
+      // unset (creation mode guards createdAt == null); stamp them so the
+      // post-creation commands (recordParse, classify) accept the row.
+      await ctx.runMutation(
+        internal.archiveInventoryStore.stampArtifactCreated,
+        {
+          artifactId: docId,
+        },
+      );
       registered += 1;
       workbooks.push({ name, checksum, byteSize: content.length, entryCount });
     }

@@ -180,6 +180,8 @@ export const startImport = mutation({
       archiveWorkbookCount: 0,
       indexWorkbookCount: 0,
       discrepancyExplained: false,
+      dispositionCounts: "{}",
+      unaccountedRecordCount: 0,
       checksum: args.checksum ?? undefined,
       // Timestamps-mixin fields: commands (recordArchiveInventory,
       // explainArchiveDiscrepancy, …) guard on createdAt being present, so

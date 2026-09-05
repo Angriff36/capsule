@@ -58,6 +58,14 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   property required discrepancyExplained: boolean = false
   property discrepancyNote: string?
 
+  // Disposition roll-up (PR01-02/PR01-09, R2-5): workbook disposition counts
+  // plus the unaccounted-record count. unaccountedRecordCount starts at the
+  // inventoried workbook count (every workbook starts unaccounted) and the
+  // commit gate requires it to reach zero — classified workbooks whose row
+  // counts do not reconcile also count as unaccounted.
+  property required dispositionCounts: string = "{}"
+  property required unaccountedRecordCount: int = 0
+
   constraint recordCountsPresent: self.recordCounts != null "Record counts must be present"
 
   transition status from "started" to ["parsing", "failed"]
@@ -173,10 +181,16 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // shape) cannot complete until an operator explains the gap via
   // explainArchiveDiscrepancy. Runs without an archive keep 0 == 0 and are
   // unaffected — existing row-based imports behave exactly as before.
+  // R2-5 / AC-027 additionally requires zero unaccounted records: every
+  // workbook classified with row counts that reconcile. Partial, unsupported
+  // and reference-only dispositions count as accounted for and stay visible
+  // in dispositionCounts — completion never implies all source data became
+  // operational records.
   command commit(optional actorId: string) {
     guard self.status == "committing"
     guard self.reviewApprovedAt != null
     guard self.archiveWorkbookCount == self.indexWorkbookCount or self.discrepancyExplained == true
+    guard self.unaccountedRecordCount == 0
     guard self.deletedAt == null
     constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
     mutate actorId = actorId != null ? actorId : self.actorId
@@ -250,6 +264,9 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     mutate archiveChecksum = archiveChecksum
     mutate archiveWorkbookCount = archiveWorkbookCount
     mutate indexWorkbookCount = indexWorkbookCount != null ? indexWorkbookCount : 0
+    // Every inventoried workbook starts unaccounted; commit stays closed
+    // until classification records a reconciled summary (R2-5 / AC-027).
+    mutate unaccountedRecordCount = archiveWorkbookCount
     emit ImportRunArchiveInventoryRecorded {
       importRunId: self.id
       tenantId: self.tenantId
@@ -277,6 +294,35 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
       importRunId: self.id
       tenantId: self.tenantId
       note: note
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  // recordDispositionSummary - Persist the workbook disposition roll-up after
+  // classification (R2-5 / PR01-02). The commit gate reads
+  // unaccountedRecordCount: an artifact still pending, or one whose row
+  // outcome counts do not sum to its total row count, is unaccounted.
+  // Allowed through "committing" so a premature approve can still be rescued
+  // by classifying — the gate is commit, not review approval.
+  command recordDispositionSummary(
+    dispositionCounts: string,
+    unaccountedRecordCount: int,
+    optional actorId: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    guard self.status == "started" or self.status == "parsing" or self.status == "validating" or self.status == "reviewing" or self.status == "committing"
+    constraint dispositionSummaryCountsPresent: length(trim(dispositionCounts)) > 0 "Disposition counts are required"
+    constraint dispositionSummaryUnaccountedNonNegative: unaccountedRecordCount >= 0 "Unaccounted record count must not be negative"
+    constraint dispositionSummaryActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate dispositionCounts = dispositionCounts
+    mutate unaccountedRecordCount = unaccountedRecordCount
+    mutate actorId = actorId != null ? actorId : self.actorId
+    emit ImportRunDispositionSummaryRecorded {
+      importRunId: self.id
+      tenantId: self.tenantId
+      dispositionCounts: dispositionCounts
+      unaccountedRecordCount: unaccountedRecordCount
       actorId: actorId != null ? actorId : self.actorId
     }
   }
@@ -352,5 +398,13 @@ event ImportRunArchiveDiscrepancyExplained: "import_run.archive_discrepancy_expl
   importRunId: string
   tenantId: string
   note: string
+  actorId: string
+}
+
+event ImportRunDispositionSummaryRecorded: "import_run.disposition_summary_recorded" {
+  importRunId: string
+  tenantId: string
+  dispositionCounts: string
+  unaccountedRecordCount: int
   actorId: string
 }

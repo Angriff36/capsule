@@ -46,6 +46,12 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   property required disposition: ImportArtifactDisposition = "pending"
   property required parseStatus: ImportArtifactParseStatus = "pending"
 
+  // Counted row outcomes (PR01-02): every source row of the workbook lands in
+  // exactly one bucket; the buckets always sum to totalRowCount. Header and
+  // summary rows are counted separately from data outcomes.
+  property required totalRowCount: int = 0
+  property required rowOutcomeCounts: string = "{}"
+
   // References
   ref importRun: ImportRun fields [tenantId, importRunId] references [tenantId, id]
 
@@ -99,13 +105,24 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // classify - Assign the workbook's single disposition (PR01-02).
-  command classify(disposition: ImportArtifactDisposition) {
+  // classify - Assign the workbook's single disposition (PR01-02), together
+  // with its counted row outcomes. Counts are optional so an operator can
+  // re-classify a workbook (e.g. mark reference data linked_reference)
+  // without re-deriving the row walk; omitting them keeps the recorded counts.
+  command classify(
+    disposition: ImportArtifactDisposition,
+    optional totalRowCount: int,
+    optional rowOutcomeCounts: string
+  ) {
     guard self.deletedAt == null
     guard self.createdAt != null
     constraint classifyNotPending: disposition != "pending" "Disposition must be a final classification, not pending"
+    constraint classifyTotalRowCountNonNegative: totalRowCount == null or totalRowCount >= 0 "Total row count must not be negative when present"
+    constraint classifyRowOutcomeCountsPresent: rowOutcomeCounts == null or length(trim(rowOutcomeCounts)) > 0 "Row outcome counts must be non-empty when present"
     compute previousDisposition = self.disposition
     mutate disposition = disposition
+    mutate totalRowCount = totalRowCount != null ? totalRowCount : self.totalRowCount
+    mutate rowOutcomeCounts = rowOutcomeCounts != null ? rowOutcomeCounts : self.rowOutcomeCounts
     emit ImportArtifactClassified {
       importArtifactId: self.id
       tenantId: self.tenantId
@@ -113,6 +130,8 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
       name: self.name
       previousDisposition: previousDisposition
       disposition: disposition
+      totalRowCount: totalRowCount
+      rowOutcomeCounts: rowOutcomeCounts
     }
   }
 
@@ -196,6 +215,8 @@ event ImportArtifactClassified: "import_artifact.classified" {
   name: string
   previousDisposition: ImportArtifactDisposition
   disposition: ImportArtifactDisposition
+  totalRowCount: int?
+  rowOutcomeCounts: string?
 }
 
 event ImportArtifactParseRecorded: "import_artifact.parse_recorded" {

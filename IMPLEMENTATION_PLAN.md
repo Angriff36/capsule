@@ -742,6 +742,52 @@ new files), `bunx vite build`, manifest-regen-check green. Tag v0.0.54
 created. Next: R2-5 (disposition taxonomy + counted outcomes) → AC-021,
 AC-027.
 
+Iteration 49 (BUILD, release 2, 2026-09-05): R2-5 DONE. AC-021 = PASS,
+AC-027 = PASS (4 of 11 release-2 ACs: AC-020, AC-021, AC-026, AC-027).
+Additive manifest fields (one regen, no new createVia — governed-creation
+mappings untouched): ImportArtifact totalRowCount + rowOutcomeCounts,
+classify(disposition, totalRowCount?, rowOutcomeCounts?); ImportRun
+dispositionCounts + unaccountedRecordCount, new command
+recordDispositionSummary (allowed through committing so a premature
+approve can be rescued), recordArchiveInventory now seeds
+unaccountedRecordCount = archiveWorkbookCount, commit gained Guard
+`unaccountedRecordCount == 0` — legacy no-archive runs keep 0 and are
+unaffected. New pure classifier `src/lib/tppReports/workbookDisposition.ts`
+reuses the REAL content detection (`detectWorkbookSource`, now exported
+from loadEventBundle.ts): rows classified header (blank/title/table-
+heading/lone-cell heading), summary (printed-date/total/prepared-by/
+signature labels), normalized (labelled row with value), needs_mapping
+(labelled row with missing value, or content the label/value walk cannot
+account for — rows today's parsers silently `continue` past now surface);
+zero-sheet/corrupt containers → invalid; unrecognized shapes →
+unsupported with every row counted. New "use node" action
+`convex/archiveDisposition.ts` (archiveInventory pattern): verifies
+archive sha256 vs run.archiveChecksum, classifies pending artifacts only
+(re-run no-op), duplicate_view by content-checksum occurrence ≥ 2 within
+the run, then persists the run roll-up; unaccounted = pending artifacts +
+artifacts whose rowOutcomeCounts do not sum to totalRowCount. Review-stage
+surface: ImportRunDetailPage "Workbook Dispositions" card + Unaccounted
+Records fact (same idiom as Record Counts by Type), copy states
+dispositions describe the source, not operational records; wire test
+tests/features/admin/import-run-disposition.test.ts. PRE-EXISTING DEFECT
+FOUND AND FIXED: the docId-contract register command guards
+`createdAt == null` at entry and never stamps the timestamps, so every
+ImportArtifact command guarding `createdAt != null` (recordParse,
+classify) was unusable on inventory-created rows — R2-1 shipped commands
+nothing could call. Fix: `stampArtifactCreated` internalMutation in
+archiveInventoryStore.ts called by inventory right after register (the
+startImport hand-stamp idiom); new required defaults also added to
+allocateArtifactDraft and startImport's insert. Shared proof fixture
+builder `tests/proofs/zipFixture.ts` (zip builder + REAL minimal xlsx:
+workbook.xml + rels + inlineStr worksheet, so readXlsxSheets parses
+actual rows). AC-020 proof EXTENDED (not weakened): a classify step now
+runs before its successful commit because the commit gate legitimately
+got stricter — all original assertions unchanged. Gates: `bun run test`
+132 files / 1252 tests green; typecheck, format:check, `bunx vite
+build`, manifest-regen-check, lint_specs (19 specs) green. Tag v0.0.55
+created. Next: R2-6 (checkpoints + resume with fault injection) →
+AC-024.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
@@ -876,7 +922,7 @@ build iteration.
       (AC-020) and feeds the completion counts asserted by
       `tests/proofs/import-archive-completion.runtime.test.ts` (AC-027).
       → AC-020, AC-027
-- [ ] **R2-5. Disposition taxonomy + counted outcomes.** Workbook-level
+- [x] **R2-5. Disposition taxonomy + counted outcomes.** Workbook-level
       disposition on ImportArtifact (normalized, linked reference,
       duplicate view, needs mapping, unsupported, invalid) plus counted
       per-row/section outcomes; headers and summaries classified

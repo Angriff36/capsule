@@ -9,6 +9,7 @@
  */
 
 import type * as apiKeys from "../apiKeys.js";
+import type * as archiveDisposition from "../archiveDisposition.js";
 import type * as archiveInventory from "../archiveInventory.js";
 import type * as archiveInventoryStore from "../archiveInventoryStore.js";
 import type * as authLink from "../authLink.js";
@@ -124,6 +125,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
+  archiveDisposition: typeof archiveDisposition;
   archiveInventory: typeof archiveInventory;
   archiveInventoryStore: typeof archiveInventoryStore;
   authLink: typeof authLink;

@@ -322,6 +322,19 @@ describe("runtime proof: import archive inventory (AC-020)", () => {
       note: "20 workbooks were exported after the index was generated; all 90 are accounted for as archive-only artifacts.",
     });
 
+    // R2-5 gate: every workbook must also be classified (zero unaccounted)
+    // before commit — the synthetic fixtures are zero-sheet containers, so
+    // all 90 classify as invalid with reconciled 0 == 0 counts.
+    const disposition = (await asActions(owner).action(
+      api.archiveDisposition.classifyArchiveWorkbooks,
+      { importRunId },
+    )) as {
+      classified: number;
+      unaccountedRecordCount: number;
+    };
+    expect(disposition.classified).toBe(REPORT_COUNT);
+    expect(disposition.unaccountedRecordCount).toBe(0);
+
     const versionExplained = (await owner.run(async (ctx) =>
       ctx.db.get(importRunId),
     )) as { version: number };
