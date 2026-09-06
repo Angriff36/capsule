@@ -5,6 +5,21 @@
 
 # Implementation plan — capsule
 
+## Current work — full wiring audit, 2026-09-06
+
+Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after the prior narrow release omitted it. The active source-backed plan and coverage ledger are `codex-plans/full-wiring-audit/task_plan.md` and `findings.md`, on branch `fix/full-wiring-audit-20260906`. No new Ralph loop was started. This work is not a claim that every separate PR01–PR14 readiness requirement is complete.
+
+- [x] WIRING-1: repair generated command targets and honest inbox/document delivery actions; commits a7b5b98/407b5c4, independent review approved.
+- [x] WIRING-2: operator-entered yield, truthful estimate labels and correct commission allocation/application-period scope; commits2514043/9093eed, independent review approved.
+- [ ] WIRING-3: safe pack/layout template generation and draft purchase-order retries.
+- [ ] WIRING-4: safe culinary clone/import/snapshot restore.
+- [ ] WIRING-5: operational bulk, event menu/prep/stock issuance and timeline recovery.
+- [ ] WIRING-6: shared attachment/default-view failures, outreach retry and confirmed form-retention gaps.
+- [ ] WIRING-7: proposal-template selection/defaults through persistence, revisions and client renderers.
+- [ ] WIRING-8: reconcile acceptance evidence, full gates, independent whole-branch review and work-branch push. Deployment is separate.
+
+Release 2 was previously verified at `9eccdbc`; the historical release completion and superseded Clerk-key retry blocker are recorded in commit `78a876f` and `.artifacts/r2-dev-auth-live-verification.md`. The generator seed issue #113 remains tracked with refreshed source evidence: its entrypoint now exists, but authentication/reference resolution is not production-ready. No seed was run against a live database during this audit.
+
 Scope notice (2026-09-05, release 2 planned): release 2, "Every source
 record accounted for", is planned below — tasks R2-1 … R2-14, acceptance
 contract AC-020 … AC-030 in `ACCEPTANCE_TESTS.md`. Everything from "Plan
@@ -3563,7 +3578,7 @@ build iteration.
       release): extend `tests/proofs/proposal-event-booking.runtime.test.ts`
       or add a focused runtime test asserting the branded revision/PDF
       carries the tenant's real name.
-- [ ] **R2-14. Release proof bundle + ship.** All new proofs green under
+- [x] **R2-14. Release proof bundle + ship.** Previously released as9eccdbc; recorded verification in78a876f includes the automatic-receipt limitation (#280), not full-app certification. All new proofs green under
       `tests/proofs/`; full gates (`bun run test`, typecheck,
       `format:check`, `bunx vite build`, manifest-regen-check);
       cross-model review; `bash scripts/release.sh --reviewer <model>`

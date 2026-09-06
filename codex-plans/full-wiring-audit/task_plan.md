@@ -58,6 +58,10 @@ Additional same-shape creation owner: EventDraftPoCoordinator.ts and EventDraftP
 Own menuTemplates.ts/MenuDetailPage.tsx, ComponentImportFinalizer.ts/ComponentImportPage.tsx, ComponentDetailPage.tsx and focused helper/tests.
 Preserve new menu/component/ingredient IDs and confirmed line progress after failure; retry must finish existing work rather than create duplicates. Prefer atomic governed seams or persisted reconciliation as in Task 3. Snapshot restore must disclose partial changes and support finishing; snapshot capture failure gets a nonblocking warning. Cover each mid-operation failure and retry. Coordinate shared recovery interface from Task 3 rather than duplicating an identical abstraction.
 
+Read-only architecture map: prefer a focused authored culinary mutation module using Task3's transaction/key conventions, not a cross-domain growing monolith. Menu clone accepts sourceMenuId/name/isTemplate/operationKey and loads source/header/lines server-side. Import accepts a resolved plain reviewed projection, validates referenced tenant-owned ingredients, and creates ingredients/component/lines in one transaction. Keep ComponentImportFinalizer API for CapsuleDocumentEnterCoordinator: that separate capability-based caller already supplies deterministic document keys and retired-record recovery; do not break it by removing the class. Restore accepts durable snapshotId and componentId (not trusted client JSON), loads current rows/server versions, and restores through generated commands atomically. VersionHistoryPanel must forward snapshotId. Explicitly validate tenant/live foreign references missing from generated line creators; do not invent stricter lifecycle requirements beyond existing source semantics.
+
+Snapshot fidelity also needs repair: preserve prepNotes and backward-compatible sortOrder/wasteFactor fields (currently omitted/ignored); generated adjustQuantity cannot set all metadata, so use supported generated operations or atomic remove/re-add as needed. Old snapshots remain restorable. Capture-before remains best-effort with a visible warning, not a new blocker. Existing fixtures: tests/proofs/component-import-finalize.runtime.test.ts, component-text-parser.test.ts, quote-to-booked-event.runtime.test.ts. Test actual rollback, same-operation retry, wrong-tenant references, snapshot/component mismatch and exact restored metadata.
+
 ### Task 5: Safe operational bulk and event operations
 
 Own KitchenDashboardPage.tsx, KitchenPrepAssignManager.ts and its consumers, EventMenuTab.tsx, EventTimelinePanel.tsx plus focused tests/helpers.
@@ -73,6 +77,8 @@ Own AttachmentsSection.tsx and useSavedViews.ts plus focused tests/helpers.
 Await attachment removal, catch into existing visible failure state, and disable duplicate pending removal. Saved-view default changes must not silently leave no default after a second write fails; use an existing atomic command or preserve/recover previous state with truthful error. Cover reject/success/pending and partial-failure behavior.
 
 Additional bulk owner: ClientRetentionPage.tsx opening outreach tasks. Ensure retries do not duplicate open tasks after ambiguous commits (atomic ensure-open seam or stable generated idempotency keys), preserve ability to open a later task after prior task dismissal/completion, and show completed/remaining bulk counts. Preserve current uncovered-candidate filtering.
+
+Verify shared form-retention candidate: RevenueAttributionDetailPage apply-amount effect depends on reactive event and can overwrite operator edits when event data refreshes. Add a mounted regression changing the event query after editing; if reproduced, initialize per apply context without overwriting edited amount/provenance. This is separate from Task2's now-correct estimate labels and must preserve them.
 
 ### Task 7: Connect proposal templates end to end
 

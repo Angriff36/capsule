@@ -12,3 +12,9 @@ Adapter audit completed: all enumerated references/dynamic arguments target docI
 Tasks1 and2 now independently approved by gpt-5.6-terra. Task2 commits2514043/9093eed: explicit KDS actual yield, route/vendor/revenue provenance labels, truthful commission allocation and appliedAt period, missing-person totals retained. Full suite at2514043:144 files/1314 tests; fix tests7 pass and typecheck at9093eed. Raw fix evidence .artifacts/task-2-fix-tests.log. Baseline warnings remain.
 
 Manifest source-first check: Capsule installed package and sibling Builder both3.6.48; `bun scripts/manifest-regen-check.ts` passes. Builder has pre-existing dirty package.json/package-lock.json/bun.lock/.claude paths; none touched. No regeneration or deployment performed for this check.
+
+Checkpoint b19e798 pushed successfully to origin/fix/full-wiring-audit-20260906; pre-push generated-output gate green. This branch push is not a production deployment. Task3 repair_templates now owns pack/layout/draft-PO atomic/retry work.
+
+React checklist applied to completed Task1/2 source and reviewed markup: new KDS per-record input uses functional state updates and accessible label; inbox draft remains controlled/editable and manual copy is event-driven; report calculations derive from current query state rather than mirrored effects. No new dependencies or design-token changes. Real browser rendering is still separate from these source/jsdom checks.
+
+Task3 committed addd337; independent review in progress. Atomic parent mutations call generated commands with persistent client operation keys. Runtime tests 5 pass; initial full suite had 2 import guard failures, corrected with 21 focused tests and typecheck passing. Root will rerun the full gate after remaining work. Review specifically checks tenant foreign references and ambiguous retries with changed source projections.
