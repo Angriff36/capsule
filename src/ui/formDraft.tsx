@@ -113,6 +113,7 @@ export function useFormDraft(key: string) {
       arm(); // restored content is unsaved until submitted
     }
     setDraft(null); // dismiss the banner; storage stays until submit/discard
+    return saved;
   }, [form, storageKey, arm]);
 
   return { formRef: setForm, draft, restore, discard: clear, clear };

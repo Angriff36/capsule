@@ -11,6 +11,7 @@ import {
   useListProposalEnhancement,
   useListProposalDishSelection,
   useListProposalRevision,
+  useListDish,
   useProposalAccept,
   useProposalDecline,
   useProposalExpire,
@@ -76,6 +77,7 @@ export function ProposalsPage() {
   const proposalEnhancements = useListProposalEnhancement();
   const proposalDishSelections = useListProposalDishSelection();
   const proposalRevisions = useListProposalRevision();
+  const dishes = useListDish();
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.
@@ -578,8 +580,26 @@ export function ProposalsPage() {
                         <button
                           className="btn btn-ghost"
                           type="button"
-                          disabled={busy != null}
+                          disabled={
+                            busy != null ||
+                            (String(row.status) !== "draft" &&
+                              proposalRevisions === undefined) ||
+                            (String(row.status) === "draft" &&
+                              (proposalDishSelections === undefined ||
+                                dishes === undefined))
+                          }
                           onClick={() => {
+                            if (
+                              String(row.status) !== "draft" &&
+                              proposalRevisions === undefined
+                            )
+                              return;
+                            if (
+                              String(row.status) === "draft" &&
+                              (proposalDishSelections === undefined ||
+                                dishes === undefined)
+                            )
+                              return;
                             // Enrich proposal with timeline and venue logistics data
                             const event = events?.find(
                               (e) => e._id === row.eventId,
@@ -610,6 +630,27 @@ export function ProposalsPage() {
                               venueLogistics: event
                                 ? transformVenueLogistics(venue || null, event)
                                 : undefined,
+                              dishSelections: (proposalDishSelections ?? [])
+                                .filter(
+                                  (selection) =>
+                                    selection.proposalId === row._id &&
+                                    selection.deletedAt == null,
+                                )
+                                .flatMap((selection) => {
+                                  const dish = dishes?.find(
+                                    (candidate) =>
+                                      candidate._id === selection.dishId,
+                                  );
+                                  return dish
+                                    ? [
+                                        {
+                                          dishName: dish.name,
+                                          dishDescription:
+                                            dish.description ?? null,
+                                        },
+                                      ]
+                                    : [];
+                                }),
                               pricingLines: (proposalLineItems ?? [])
                                 .filter(
                                   (line) =>

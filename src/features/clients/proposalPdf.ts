@@ -305,21 +305,25 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
         "To be confirmed",
     ],
   ] as const;
-  doc.setFillColor(...PAPER);
-  doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 112, 8, 8, "F");
-  let overviewY = y + 22;
-  for (const [label, value] of overview) {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED);
-    doc.text(label.toUpperCase(), MARGIN + 16, overviewY);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(...INK);
-    doc.text(value, MARGIN + 94, overviewY, { maxWidth: CONTENT_WIDTH - 112 });
-    overviewY += 19;
+  if (sectionVisible("event_summary")) {
+    doc.setFillColor(...PAPER);
+    doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 112, 8, 8, "F");
+    let overviewY = y + 22;
+    for (const [label, value] of overview) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...MUTED);
+      doc.text(label.toUpperCase(), MARGIN + 16, overviewY);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      doc.text(value, MARGIN + 94, overviewY, {
+        maxWidth: CONTENT_WIDTH - 112,
+      });
+      overviewY += 19;
+    }
+    y += 140;
   }
-  y += 140;
 
   // Menu and transparent per-person rate.
   const guestCount = Number(proposal.guestCount ?? 0);
@@ -342,15 +346,17 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     sectionLabel("Proposed menu");
     doc.setFillColor(251, 250, 247);
     doc.roundedRect(MARGIN, y - 8, CONTENT_WIDTH, menuHeight, 6, 6, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    doc.setTextColor(...brand);
-    doc.text(
-      perPerson == null ? "Custom pricing" : `${usd(perPerson)} / person`,
-      RIGHT - 14,
-      y + 12,
-      { align: "right" },
-    );
+    if (sectionVisible("pricing_summary")) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(...brand);
+      doc.text(
+        perPerson == null ? "Custom pricing" : `${usd(perPerson)} / person`,
+        RIGHT - 14,
+        y + 12,
+        { align: "right" },
+      );
+    }
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(...INK);

@@ -94,6 +94,8 @@ describe("published proposal PDF projection", () => {
     expect(rendered).toContain("Nut-free service requested");
     expect(rendered).not.toContain("Hidden payment terms");
     expect(rendered).not.toContain("Changed live activity");
+    expect(rendered).not.toContain("Changed live title");
+    expect(rendered).not.toContain("/ person");
     expect(rendered).not.toContain("Total estimate");
   });
 });

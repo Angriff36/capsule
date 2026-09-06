@@ -116,4 +116,48 @@ describe("proposal public renderers", () => {
     expect(text).toContain("Accept Proposal");
     expect(text).not.toContain("Hidden terms");
   });
+
+  it("renders timeline start and end times with date context", async () => {
+    queryResult = {
+      ok: true,
+      proposal: {
+        title: "Timed proposal",
+        proposalNumber: "P-2",
+        eventDate: Date.UTC(2026, 8, 20),
+        eventType: "Dinner",
+        guestCount: 10,
+        venueName: null,
+        venueAddress: null,
+        subtotal: 0,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 0,
+        expiresAt: null,
+        notes: null,
+        terms: null,
+        visibleSections: ["timeline"],
+      },
+      venueLogistics: null,
+      clientName: "Client",
+      lineItems: [],
+      enhancements: [],
+      dishSelections: [],
+      timeline: [
+        {
+          name: "Dinner service",
+          startsAt: Date.UTC(2026, 8, 20, 18),
+          endsAt: Date.UTC(2026, 8, 20, 21, 30),
+        },
+      ],
+      revisionNumber: 1,
+      capturedAt: null,
+      linkCreatedAt: null,
+      linkExpiresAt: null,
+    };
+    const text = await mountedText(
+      createElement(SharedProposalPage, { token: "token" }),
+    );
+    expect(text).toContain("Dinner service");
+    expect(text).toContain("Sep 20, 2026 at 11:00 AM – 2:30 PM");
+  });
 });

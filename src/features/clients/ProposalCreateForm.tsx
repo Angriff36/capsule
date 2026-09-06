@@ -148,6 +148,10 @@ export function ProposalCreateForm({
   const [draftVisibleSections, setDraftVisibleSections] = useState<string[]>(
     [],
   );
+  const [templateTaxRate, setTemplateTaxRate] = useState<number | null>(null);
+  const [templateServiceLineKey, setTemplateServiceLineKey] = useState<
+    string | null
+  >(null);
 
   // Live pricing preview via the ONE central calc (spec §5.4): lines → totals.
   const draftPricing = useMemo(
@@ -180,29 +184,91 @@ export function ProposalCreateForm({
       (row) => row._id === templateId && row.status === "active",
     );
     if (!template) return;
-    const defaults = proposalTemplateDefaults(template, draftPricing.subtotal);
+    const baseLines = draftLines.filter(
+      (line) => line.key !== templateServiceLineKey,
+    );
+    const basePricing = computeProposalPricing({
+      lines: baseLines.map((line) => ({
+        pricingBasis: line.pricingBasis,
+        unitPrice: Number(line.unitPrice) || 0,
+        quantity: Number(line.quantity) || 0,
+      })),
+      guestCount: draftGuestCount,
+      taxAmount: 0,
+      discountAmount: draftDiscount,
+    });
+    const defaults = proposalTemplateDefaults(template, basePricing.subtotal);
     setDraftTerms(defaults.terms);
     setDraftNotes(defaults.notes);
     setDraftExpiresOn(defaults.expiresOn);
-    setDraftTax(defaults.taxAmount);
+    setTemplateTaxRate(template.defaultTaxRate ?? null);
     setDraftVisibleSections(defaults.visibleSections);
     const serviceChargeLine = defaults.serviceChargeLine;
+    let nextLines = baseLines;
+    let nextServiceLineKey: string | null = null;
     if (serviceChargeLine) {
-      setDraftLines((lines) => [
-        ...lines.filter(
-          (line) =>
-            !(
-              line.pricingBasis === "percentage" &&
-              line.description === "Service charge"
-            ),
-        ),
-        {
-          ...newDraftLine(),
-          ...serviceChargeLine,
-          quantity: String(serviceChargeLine.quantity),
-          unitPrice: String(serviceChargeLine.unitPrice),
-        },
-      ]);
+      const nextServiceLine = {
+        ...newDraftLine(),
+        ...serviceChargeLine,
+        quantity: String(serviceChargeLine.quantity),
+        unitPrice: String(serviceChargeLine.unitPrice),
+      };
+      nextServiceLineKey = nextServiceLine.key;
+      nextLines = [...baseLines, nextServiceLine];
+    }
+    setTemplateServiceLineKey(nextServiceLineKey);
+    setDraftLines(nextLines);
+    const resultingPricing = computeProposalPricing({
+      lines: nextLines.map((line) => ({
+        pricingBasis: line.pricingBasis,
+        unitPrice: Number(line.unitPrice) || 0,
+        quantity: Number(line.quantity) || 0,
+      })),
+      guestCount: draftGuestCount,
+      taxAmount: 0,
+      discountAmount: draftDiscount,
+    });
+    setDraftTax(
+      Math.round(
+        resultingPricing.subtotal * (template.defaultTaxRate ?? 0) * 100,
+      ) / 100,
+    );
+  };
+
+  useEffect(() => {
+    if (templateTaxRate == null) return;
+    setDraftTax(
+      Math.round(draftPricing.subtotal * templateTaxRate * 100) / 100,
+    );
+  }, [draftPricing.subtotal, templateTaxRate]);
+
+  const restoreProposalDraft = () => {
+    const saved = draftForm.restore();
+    if (!saved) return;
+    setDraftGuestCount(Number(saved.values.guestCount) || 0);
+    setDraftTax(Number(saved.values.taxAmount) || 0);
+    setDraftDiscount(Number(saved.values.discountAmount) || 0);
+    setDraftNotes(saved.values.notes ?? "");
+    setDraftTerms(saved.values.terms ?? "");
+    setDraftExpiresOn(saved.values.expiresAt ?? defaultValidityDate());
+    try {
+      const metadata = JSON.parse(saved.values.proposalDraftState ?? "{}") as {
+        lines?: DraftLine[];
+        visibleSections?: string[];
+        templateTaxRate?: number | null;
+        templateServiceLineKey?: string | null;
+      };
+      setDraftLines(Array.isArray(metadata.lines) ? metadata.lines : []);
+      setDraftVisibleSections(
+        Array.isArray(metadata.visibleSections) ? metadata.visibleSections : [],
+      );
+      setTemplateTaxRate(metadata.templateTaxRate ?? null);
+      setTemplateServiceLineKey(metadata.templateServiceLineKey ?? null);
+    } catch {
+      setDraftLines([]);
+      setDraftVisibleSections([]);
+      setTemplateTaxRate(null);
+      setTemplateServiceLineKey(null);
     }
   };
 
@@ -332,6 +398,8 @@ export function ProposalCreateForm({
       setDraftNotes("");
       setDraftExpiresOn(defaultValidityDate());
       setDraftVisibleSections([]);
+      setTemplateTaxRate(null);
+      setTemplateServiceLineKey(null);
       onClose();
       if (fromEventId) {
         const nextParams = new URLSearchParams(searchParams);
@@ -369,7 +437,7 @@ export function ProposalCreateForm({
       </div>
       <DraftRestoreBanner
         draft={draftForm.draft}
-        onRestore={draftForm.restore}
+        onRestore={restoreProposalDraft}
         onDiscard={draftForm.discard}
       />
       {!hasClientSource ? (
@@ -382,6 +450,16 @@ export function ProposalCreateForm({
         </p>
       ) : (
         <>
+          <input
+            type="hidden"
+            name="proposalDraftState"
+            value={JSON.stringify({
+              lines: draftLines,
+              visibleSections: draftVisibleSections,
+              templateTaxRate,
+              templateServiceLineKey,
+            })}
+          />
           <div className="supply-form-grid">
             <label className="field-label supply-span-2">
               Proposal template
@@ -700,11 +778,14 @@ export function ProposalCreateForm({
                 step="0.01"
                 min={0}
                 value={draftTax}
-                onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
+                onChange={(e) => {
+                  setTemplateTaxRate(null);
+                  setDraftTax(Number(e.target.value) || 0);
+                }}
               />
               <span className="text-2xs text-ink-3">
-                Template tax is calculated once from the current subtotal and
-                service charge, then saved as this editable fixed amount.
+                Template tax follows the current subtotal and service charge
+                until you edit this fixed amount.
               </span>
             </label>
             <label className="field-label">

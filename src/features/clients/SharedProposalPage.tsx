@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../lib/api";
-import { formatDate, formatMoneyExact } from "../../lib/format";
+import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 
 /**
@@ -19,6 +19,16 @@ const PRICING_BASIS_LABEL: Record<string, string> = {
   percentage: "Percentage",
   package: "Package",
 };
+
+function formatTimelineWindow(startsAt: number, endsAt: number | null) {
+  const start = `${formatDate(startsAt)} at ${formatTime(startsAt)}`;
+  if (endsAt == null) return start;
+  const end =
+    formatDate(endsAt) === formatDate(startsAt)
+      ? formatTime(endsAt)
+      : `${formatDate(endsAt)} at ${formatTime(endsAt)}`;
+  return `${start} – ${end}`;
+}
 
 // token comes in as a prop: App renders this page directly off useMatch (no
 // <Route> context), so useParams() here would always be empty and the query
@@ -161,9 +171,9 @@ export function SharedProposalPage({ token }: { token: string }) {
           <div className="p-8">
             {sectionVisible("event_summary") ? (
               <div className="bg-inset rounded-sm p-6 mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-4">
+                <h2 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-4">
                   Event Details
-                </h3>
+                </h2>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-ink-2">Date:</span>
@@ -192,9 +202,12 @@ export function SharedProposalPage({ token }: { token: string }) {
             {sectionVisible("menu_sections") &&
             data.dishSelections.length > 0 ? (
               <div className="mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
-                  Menu
-                </h3>
+                <div className="mb-3 flex items-center gap-3">
+                  <h2 className="text-xs font-bold text-ink uppercase tracking-wide">
+                    Menu
+                  </h2>
+                  <span className="h-px flex-1 bg-ink" aria-hidden="true" />
+                </div>
                 <div className="divide-y divide-line">
                   {data.dishSelections.map((dish, index) => (
                     <div className="py-2" key={index}>
@@ -212,15 +225,18 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {sectionVisible("timeline") && data.timeline.length > 0 ? (
               <div className="mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
-                  Timeline
-                </h3>
+                <div className="mb-3 flex items-center gap-3">
+                  <h2 className="text-xs font-bold text-ink uppercase tracking-wide">
+                    Timeline
+                  </h2>
+                  <span className="h-px flex-1 bg-ink" aria-hidden="true" />
+                </div>
                 <div className="space-y-2">
                   {data.timeline.map((item, index) => (
                     <div className="flex justify-between gap-4" key={index}>
                       <span className="text-ink">{item.name}</span>
                       <span className="text-ink-2">
-                        {formatDate(item.startsAt)}
+                        {formatTimelineWindow(item.startsAt, item.endsAt)}
                       </span>
                     </div>
                   ))}
@@ -231,9 +247,9 @@ export function SharedProposalPage({ token }: { token: string }) {
             {sectionVisible("venue_logistics") &&
               venueLogisticsRows.length > 0 && (
                 <div className="bg-inset rounded-sm p-6 mb-6">
-                  <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-4">
+                  <h2 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-4">
                     Venue Logistics
-                  </h3>
+                  </h2>
                   <div className="space-y-2">
                     {venueLogisticsRows.map(([label, value], index) => (
                       <div key={index} className="flex justify-between gap-4">
@@ -249,9 +265,9 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {sectionVisible("pricing_summary") && lineItems.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                <h2 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
                   Pricing Breakdown
-                </h3>
+                </h2>
                 <div className="divide-y divide-line">
                   {lineItems.map((line, index) => (
                     <div
@@ -277,9 +293,9 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {sectionVisible("enhancements") && enhancements.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                <h2 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
                   Optional Enhancements
-                </h3>
+                </h2>
                 <div className="divide-y divide-line">
                   {enhancements.map((item, index) => (
                     <div
@@ -338,9 +354,9 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {sectionVisible("terms") && proposal.terms && (
               <div className="mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
+                <h2 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Terms
-                </h3>
+                </h2>
                 <p className="text-ink-2 text-xs whitespace-pre-wrap">
                   {proposal.terms}
                 </p>
@@ -349,9 +365,9 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {proposal.notes && (
               <div className="mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
+                <h2 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Notes
-                </h3>
+                </h2>
                 <p className="text-ink-2 text-xs whitespace-pre-wrap">
                   {proposal.notes}
                 </p>
