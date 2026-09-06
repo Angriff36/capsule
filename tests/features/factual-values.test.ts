@@ -85,7 +85,8 @@ describe("factual values", () => {
           attributionType: "sales_commission",
           status: "applied",
           allocatedAmount: 125,
-          createdAt: 150,
+          createdAt: 50,
+          appliedAt: 150,
         },
         {
           eventId: "e",
@@ -93,7 +94,7 @@ describe("factual values", () => {
           attributionType: "venue_commission",
           status: "applied",
           allocatedAmount: 900,
-          createdAt: 150,
+          appliedAt: 150,
         },
         {
           eventId: "e",
@@ -101,7 +102,7 @@ describe("factual values", () => {
           attributionType: "sales_commission",
           status: "approved",
           allocatedAmount: 400,
-          createdAt: 150,
+          appliedAt: 150,
         },
         {
           eventId: "e",
@@ -109,7 +110,8 @@ describe("factual values", () => {
           attributionType: "sales_commission",
           status: "applied",
           allocatedAmount: 300,
-          createdAt: 99,
+          createdAt: 150,
+          appliedAt: 99,
         },
         {
           eventId: "cancelled",
@@ -117,13 +119,82 @@ describe("factual values", () => {
           attributionType: "sales_commission",
           status: "applied",
           allocatedAmount: 700,
-          createdAt: 150,
+          appliedAt: 150,
         },
       ],
     });
     expect(metrics.totalCommission).toBe(125);
-    expect(metrics.salespeople).toEqual([
-      { name: "Ari Lee", commission: 125, eventCount: 1 },
-    ]);
+    expect(metrics.salespeople).toEqual([{ name: "Ari Lee", commission: 125 }]);
+  });
+
+  it("uses appliedAt across month boundaries and excludes undated records from a period", () => {
+    const base = {
+      cancelledEventIds: new Set<string>(),
+      people: [{ _id: "p", givenName: "Ari", familyName: "Lee" }],
+      attributions: [
+        {
+          eventId: "created-before",
+          salespersonId: "p",
+          attributionType: "sales_commission",
+          status: "applied",
+          allocatedAmount: 20,
+          createdAt: 90,
+          appliedAt: 150,
+        },
+        {
+          eventId: "created-during",
+          salespersonId: "p",
+          attributionType: "sales_commission",
+          status: "applied",
+          allocatedAmount: 30,
+          createdAt: 150,
+          appliedAt: 210,
+        },
+        {
+          eventId: "legacy",
+          salespersonId: "p",
+          attributionType: "sales_commission",
+          status: "applied",
+          allocatedAmount: 40,
+          createdAt: 150,
+        },
+        {
+          eventId: "missing-person",
+          salespersonId: "deleted-person",
+          attributionType: "sales_commission",
+          status: "applied",
+          allocatedAmount: 10,
+          appliedAt: 150,
+        },
+        {
+          eventId: "another-missing-person",
+          salespersonId: "another-deleted-person",
+          attributionType: "sales_commission",
+          status: "applied",
+          allocatedAmount: 15,
+          appliedAt: 150,
+        },
+      ],
+    };
+    const monthly = calculateCommissionMetrics({
+      ...base,
+      periodStart: 100,
+      periodEnd: 200,
+    });
+    expect(monthly.totalCommission).toBe(45);
+    expect(monthly.salespeople).toContainEqual({
+      name: "Unknown salesperson",
+      commission: 15,
+    });
+    expect(
+      monthly.salespeople.filter(({ name }) => name === "Unknown salesperson"),
+    ).toHaveLength(2);
+    expect(
+      calculateCommissionMetrics({
+        ...base,
+        periodStart: Number.NEGATIVE_INFINITY,
+        periodEnd: Number.POSITIVE_INFINITY,
+      }).totalCommission,
+    ).toBe(115);
   });
 });

@@ -1,6 +1,6 @@
 export type CommissionMetrics = {
   totalCommission: number;
-  salespeople: Array<{ name: string; commission: number; eventCount: number }>;
+  salespeople: Array<{ name: string; commission: number }>;
 };
 
 export function calculateCommissionMetrics(input: {
@@ -15,35 +15,37 @@ export function calculateCommissionMetrics(input: {
     status: string;
     allocatedAmount?: number | null;
     createdAt?: number | null;
+    appliedAt?: number | null;
   }>;
 }): CommissionMetrics {
-  const byPerson = new Map<
-    string,
-    { name: string; commission: number; eventCount: number }
-  >();
+  const byPerson = new Map<string, { name: string; commission: number }>();
+  const periodRestricted =
+    Number.isFinite(input.periodStart) || Number.isFinite(input.periodEnd);
   for (const attribution of input.attributions) {
-    const createdAt = attribution.createdAt ?? 0;
+    const appliedAt = attribution.appliedAt;
     if (
       attribution.attributionType !== "sales_commission" ||
       attribution.status !== "applied" ||
       !attribution.salespersonId ||
       input.cancelledEventIds.has(String(attribution.eventId)) ||
-      createdAt < input.periodStart ||
-      createdAt >= input.periodEnd
+      (periodRestricted &&
+        (appliedAt == null ||
+          appliedAt < input.periodStart ||
+          appliedAt >= input.periodEnd))
     )
       continue;
     const person = input.people.find(
       (candidate) => candidate._id === attribution.salespersonId,
     );
-    if (!person) continue;
-    const current = byPerson.get(person._id) ?? {
-      name: `${person.givenName} ${person.familyName}`.trim(),
+    const groupId = person?._id ?? attribution.salespersonId;
+    const current = byPerson.get(groupId) ?? {
+      name: person
+        ? `${person.givenName} ${person.familyName}`.trim()
+        : "Unknown salesperson",
       commission: 0,
-      eventCount: 0,
     };
     current.commission += Number(attribution.allocatedAmount) || 0;
-    current.eventCount += 1;
-    byPerson.set(person._id, current);
+    byPerson.set(groupId, current);
   }
   const salespeople = Array.from(byPerson.values()).sort(
     (a, b) => b.commission - a.commission,

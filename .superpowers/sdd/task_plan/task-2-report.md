@@ -43,3 +43,13 @@ The route distance/missing-leg and purchasing-week boundary calculations already
 - Comp Master has no payment entity linkage proving commission payout, so paid/pending presentation was removed rather than relabeled.
 - Test output retains pre-existing React Router future-flag and server-render `useLayoutEffect` warnings; no test failed.
 - No generated files, manifests, domain policy, deployment configuration, production data, or root-owned audit files were edited.
+
+## Review round 1 correction
+
+- RED: cross-month fixtures failed because the bounded commission calculation used `createdAt`. A record created before the period and applied inside it was omitted, while a record created inside and applied after it was included. The focused test received `300` instead of `125`, then the dedicated cross-month case received `70` instead of `20`.
+- GREEN: bounded periods now use Manifest's `appliedAt`. Applied records without `appliedAt` remain in explicitly all-time totals for legacy completeness, but are excluded from bounded periods because no application date can be established.
+- RED/GREEN follow-up: an applied allocation whose referenced Person was missing initially left the headline total `10` below the visible record table. The regression failed at `20` versus expected `30`; the helper now retains authoritative allocations under the truthful `Unknown salesperson` label. Two distinct missing Person ids remain distinct internal groups, so the Salespeople count does not collapse them into one fabricated identity.
+- Cleanup: removed the unused per-person `eventCount` output.
+- Verification command: `bunx vitest run tests/features/factual-values.test.ts tests/features/production/kitchen-display-yield.test.ts --reporter verbose && bun run typecheck`.
+- Result: PASS, 2 test files / 7 tests; TypeScript `tsc --noEmit` exited 0.
+- Captured output: `.artifacts/task-2-fix-tests.log` (ignored local evidence; intentionally not committed).
