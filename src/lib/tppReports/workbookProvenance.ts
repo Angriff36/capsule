@@ -21,6 +21,12 @@ export const PROVENANCE_CELL_CAP = 2000;
  */
 export const PROVENANCE_BYTE_BUDGET = 256 * 1024;
 
+/**
+ * Recorded sheets per workbook — sheets beyond this cap keep counts
+ * (sheetCount stays the truth) and set sheetsTruncated.
+ */
+const PROVENANCE_SHEET_CAP = 128;
+
 /** Longest single string kept per cell field (raw/value/formula). */
 const PROVENANCE_VALUE_CHARS = 2048;
 
@@ -63,6 +69,8 @@ export interface WorkbookProvenance {
   cellsTruncated: boolean;
   /** Merge ranges were dropped (count cap or byte budget). */
   mergedRangesTruncated: boolean;
+  /** Sheets were dropped (count cap or the serialized-document backstop). */
+  sheetsTruncated: boolean;
   sheets: ProvenanceSheet[];
 }
 
@@ -137,7 +145,19 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
   let budget = PROVENANCE_BYTE_BUDGET;
   let taken = 0;
   let rangesTruncated = false;
-  const sheets = workbook.sheets.map((sheet) => {
+  let sheetsTruncated = false;
+  const sheets: ProvenanceSheet[] = [];
+  for (const sheet of workbook.sheets) {
+    // Sheet metadata is charged and truncated like every other field
+    // (review round 5: a 1.2 M-char sheet name bypassed every per-field
+    // cap), and the recorded sheet list stops at a count cap.
+    const name = truncateText(sheet.name);
+    const nameCost = name.text.length + 12;
+    if (sheets.length >= PROVENANCE_SHEET_CAP || nameCost > budget) {
+      sheetsTruncated = true;
+      break;
+    }
+    budget -= nameCost;
     // Merge ranges are charged to the same budget as cells (review round 2:
     // a merge-heavy sheet must not bypass the document bound). Each range is
     // checked against the REMAINING budget before it is taken (review round
@@ -166,13 +186,13 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
       taken += 1;
       budget -= cost;
     }
-    return {
-      name: sheet.name,
+    sheets.push({
+      name: name.text,
       mergedRanges,
       cells,
-    };
-  });
-  return {
+    });
+  }
+  const result: WorkbookProvenance = {
     parserVersion: workbook.parserVersion,
     dateSystem: workbook.dateSystem,
     timezone: workbook.timezone,
@@ -184,8 +204,29 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
     byteBudget: PROVENANCE_BYTE_BUDGET,
     cellsTruncated: taken < cellCount,
     mergedRangesTruncated: rangesTruncated,
+    sheetsTruncated,
     sheets,
   };
+  // BACKSTOP (review round 5): the per-field caps bound every known field,
+  // but structural overhead and future fields must not be able to blow the
+  // document either — the COMPLETE serialized document is validated against
+  // the budget and trimmed (last cells, then last sheets) until it fits.
+  // Every trim sets its flag, so nothing is dropped silently.
+  let cellsDropped = false;
+  while (JSON.stringify(result).length > PROVENANCE_BYTE_BUDGET) {
+    const lastSheet = result.sheets[result.sheets.length - 1];
+    if (lastSheet !== undefined && lastSheet.cells.length > 0) {
+      lastSheet.cells.pop();
+      cellsDropped = true;
+    } else if (result.sheets.length > 0) {
+      result.sheets.pop();
+      result.sheetsTruncated = true;
+    } else {
+      break;
+    }
+  }
+  if (cellsDropped) result.cellsTruncated = true;
+  return result;
 }
 
 /** Error provenance for an unreadable container — named, never silent. */

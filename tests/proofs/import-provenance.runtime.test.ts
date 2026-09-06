@@ -369,5 +369,20 @@ describe("runtime proof: import provenance (AC-022)", () => {
     expect(JSON.stringify(anchorCapped).length).toBeLessThan(
       PROVENANCE_BYTE_BUDGET + 4096,
     );
+
+    // Round 5: an adversarial SHEET NAME (the reviewer reproduced a
+    // 1.2 M-char name producing a 1.2 MB document) — sheet metadata is
+    // truncated and charged, and the complete serialized document is
+    // validated against the budget before it is ever persisted.
+    const namedAbsurd = buildStyledWorkbook({
+      sheetName: "S".repeat(1200 * 1024),
+      cells: [{ ref: "A1", is: "sheet title" }],
+    });
+    const nameCapped = buildWorkbookProvenance(Buffer.from(namedAbsurd));
+    expect(nameCapped.sheets[0]!.name.length).toBeLessThanOrEqual(2200);
+    expect(nameCapped.sheets[0]!.name).toContain("…[truncated]");
+    expect(JSON.stringify(nameCapped).length).toBeLessThanOrEqual(
+      PROVENANCE_BYTE_BUDGET,
+    );
   });
 });

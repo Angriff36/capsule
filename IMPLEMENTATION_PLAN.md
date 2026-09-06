@@ -1088,6 +1088,21 @@ Typecheck + provenance proof green. NEXT: full check, commit/tag
 v0.0.68, review round 5. Release still blocked on #265 key rotation
 only.
 
+Iteration 63 (BUILD, release 2, 2026-09-05): review ROUND 5
+(.artifacts/review/r2-14/report5.md) — rounds 1-4 confirmed resolved; ONE
+remaining P2 (the reviewer reproduced a 1.2 M-char SHEET NAME producing a
+1.2 MB provenance document, since sheet.name was copied unbudgeted).
+Fixed TOTALLY in this iteration's commit: sheet names truncate like every
+other field (marked) and are charged to the budget; the recorded sheet
+list stops at a 128-sheet cap (sheetsTruncated flag); and the definitive
+BACKSTOP the reviewer suggested — the COMPLETE serialized document is
+validated against PROVENANCE_BYTE_BUDGET and trimmed (last cells, then
+last sheets, flags set on every trim) until it fits, so no field class
+can ever blow the document again. Proof leg: 1.2 M-char sheet name →
+name ≤ 2200 chars with the marker, serialized doc ≤ budget. Typecheck +
+provenance proof green. NEXT: full check, commit/tag v0.0.69, review
+round 6. Release still blocked on #265 key rotation only.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
