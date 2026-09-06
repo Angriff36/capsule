@@ -353,3 +353,10 @@
 - `bun run check` exits0:161files1376tests/all repository gates including unchanged baseline cap and local build. Regen-check green; spec lint19pass; command scan326directcalls0missingdocId. Source branch pushed; no deployment.
 - Historical AC006/013 required manual receipts absent: combined statuses honestly PENDING, programmatic passes retained; independent gpt-5.6-terra approves correction.
 - Plan/findings/progress and unique review evidence archived at docs/task-plans/2026-09-06-full-wiring-audit. Only reproducible review diffs/empty task folders removed; user worktrees untouched.
+
+## 2026-09-06: Production-readiness continuation plan
+
+- Compared all 132 PR01–14 criteria against released source cf23268; four evidence ledgers distinguish missing behavior, existing implementation and incomplete qualification.
+- Added a delivery sequence and the first honest/resumable recipe-review plan under codex-plans/production-readiness-next; preserved the sole product roadmap and historical acceptance IDs.
+- Corrected stale roadmap deferrals and culinary durable-import claims. No product implementation, private import, provider operation or deployment occurred.
+- Fresh local full check passed 161 files / 1,376 tests; spec lint passed 19 specs. Missing-criterion scan returned zero. Local source/test proof is not authenticated production qualification.
