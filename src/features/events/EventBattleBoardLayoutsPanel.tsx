@@ -22,6 +22,11 @@ import {
   layoutHasInstructions,
   trimLayoutField,
 } from "./layoutTrim";
+import { useApplyLayoutTemplate } from "../../lib/safeMaterialization";
+import {
+  confirmPendingOperation,
+  pendingOperationKey,
+} from "../../lib/pendingOperationKey";
 
 // Mirrors a VenueLayoutTemplate's stored sections JSON (see §8.2): each entry
 // is the editable shape of an EventLayoutSection, copied verbatim into the
@@ -58,6 +63,7 @@ type Props = {
 export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   const sections = useListEventLayoutSection();
   const addSection = useCreateEventLayoutSection();
+  const applyLayoutTemplate = useApplyLayoutTemplate();
   const updateSection = useEventLayoutSectionUpdate();
   const removeSection = useEventLayoutSectionRemove();
   const event = useGetEvent(eventId);
@@ -169,19 +175,18 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       return;
     }
     const base = eventSections.length;
-    // ponytail: each section is a separate mutation, so a mid-loop network
-    // drop can leave a partial (but valid) copy — upgrade to a server-side
-    // bulk-copy action if that ever bites operators in practice.
     void run("copy", async () => {
-      for (let i = 0; i < templateSections.length; i++) {
-        const section = templateSections[i];
-        await addSection({
-          eventId,
+      const scope = `layout-template:${eventId}:${template._id}`;
+      await applyLayoutTemplate({
+        eventId,
+        operationKey: pendingOperationKey(scope),
+        baseSortOrder: base,
+        sections: templateSections.map((section) => ({
           type: section.type,
           instructions: section.instructions ?? "",
-          sortOrder: base + i,
-        });
-      }
+        })),
+      });
+      confirmPendingOperation(scope);
       setCopyTemplateId("");
     });
   };

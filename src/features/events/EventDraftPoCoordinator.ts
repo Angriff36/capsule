@@ -59,6 +59,18 @@ export type EventDraftPoPorts = {
     unitCost: number;
     ingredientDemandId?: string;
   }) => Promise<{ docId: string }>;
+  materialize?: (input: {
+    eventId: string;
+    vendorId: string;
+    existingOrderId?: string;
+    lines: Array<{
+      ingredientId: string;
+      ingredientDemandId: string;
+      orderedQuantity: number;
+      unit: string;
+      unitCost: number;
+    }>;
+  }) => Promise<{ vendorOrderId: string }>;
 };
 
 export type EventDraftPoInput = {
@@ -118,6 +130,64 @@ export class EventDraftPoCoordinator {
         order.eventId === input.eventId &&
         String(order.status) === "draft",
     );
+    const existingLines = existing
+      ? input.lines.filter(
+          (line) =>
+            isActive(line) &&
+            line.vendorOrderId === existing.id &&
+            line.status !== "cancelled",
+        )
+      : [];
+    const covered = new Set(
+      existingLines.flatMap((line) =>
+        [line.ingredientDemandId, line.ingredientId].filter(Boolean),
+      ),
+    );
+    const plannedLines = needs.flatMap((need) => {
+      if (covered.has(need.id) || covered.has(need.ingredientId)) return [];
+      const ingredient = input.ingredients.find(
+        (row) => isActive(row) && row.id === need.ingredientId,
+      );
+      const catalogCost = Number(ingredient?.costPerUnit);
+      const sameUnit = ingredient != null && ingredient.unit === need.unit;
+      covered.add(need.id);
+      covered.add(need.ingredientId);
+      return [
+        {
+          ingredientId: need.ingredientId,
+          ingredientDemandId: need.id,
+          orderedQuantity: Number(need.requiredQuantity),
+          unit: need.unit,
+          unitCost:
+            sameUnit && Number.isFinite(catalogCost) && catalogCost > 0
+              ? catalogCost
+              : 0,
+        },
+      ];
+    });
+
+    if (plannedLines.length === 0 && existing) {
+      return {
+        ok: false,
+        reason: "A draft PO already covers this event's needs.",
+      };
+    }
+
+    if (this.ports.materialize) {
+      const result = await this.ports.materialize({
+        eventId: input.eventId,
+        vendorId: input.vendorId,
+        existingOrderId: existing?.id,
+        lines: plannedLines,
+      });
+      return {
+        ok: true,
+        vendorOrderId: result.vendorOrderId,
+        lineCount: plannedLines.length,
+        createdOrder: existing == null,
+      };
+    }
+
     const vendorOrderId =
       existing?.id ??
       (
@@ -128,48 +198,13 @@ export class EventDraftPoCoordinator {
         })
       ).docId;
 
-    const existingLines = input.lines.filter(
-      (line) =>
-        isActive(line) &&
-        line.vendorOrderId === vendorOrderId &&
-        line.status !== "cancelled",
-    );
-    const covered = new Set(
-      existingLines.flatMap((line) =>
-        [line.ingredientDemandId, line.ingredientId].filter(Boolean),
-      ),
-    );
-
     let lineCount = 0;
-    for (const need of needs) {
-      if (covered.has(need.id) || covered.has(need.ingredientId)) continue;
-      const ingredient = input.ingredients.find(
-        (row) => isActive(row) && row.id === need.ingredientId,
-      );
-      const catalogCost = Number(ingredient?.costPerUnit);
-      const sameUnit = ingredient != null && ingredient.unit === need.unit;
-      const unitCost =
-        sameUnit && Number.isFinite(catalogCost) && catalogCost > 0
-          ? catalogCost
-          : 0;
+    for (const line of plannedLines) {
       await this.ports.createLine({
         vendorOrderId,
-        ingredientId: need.ingredientId,
-        orderedQuantity: Number(need.requiredQuantity),
-        unit: need.unit,
-        unitCost,
-        ingredientDemandId: need.id,
+        ...line,
       });
-      covered.add(need.id);
-      covered.add(need.ingredientId);
       lineCount += 1;
-    }
-
-    if (lineCount === 0 && existing) {
-      return {
-        ok: false,
-        reason: "A draft PO already covers this event's needs.",
-      };
     }
 
     return {

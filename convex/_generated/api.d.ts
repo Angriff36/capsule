@@ -73,6 +73,7 @@ import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
 import type * as lib_proposalRevision from "../lib/proposalRevision.js";
 import type * as lib_qboSync from "../lib/qboSync.js";
+import type * as lib_safeMaterialization from "../lib/safeMaterialization.js";
 import type * as lib_servingWeightGrams from "../lib/servingWeightGrams.js";
 import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
 import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
@@ -190,6 +191,7 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalPricing": typeof lib_proposalPricing;
   "lib/proposalRevision": typeof lib_proposalRevision;
   "lib/qboSync": typeof lib_qboSync;
+  "lib/safeMaterialization": typeof lib_safeMaterialization;
   "lib/servingWeightGrams": typeof lib_servingWeightGrams;
   "lib/staffSignInMailer": typeof lib_staffSignInMailer;
   "lib/staffSignInPassword": typeof lib_staffSignInPassword;

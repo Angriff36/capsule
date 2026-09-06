@@ -12,6 +12,11 @@ import {
 } from "../../lib/manifest-convex-react";
 import { EventDraftPoCoordinator } from "./EventDraftPoCoordinator";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
+import { useDraftPurchaseOrder } from "../../lib/safeMaterialization";
+import {
+  confirmPendingOperation,
+  pendingOperationKey,
+} from "../../lib/pendingOperationKey";
 
 type Props = {
   eventId: string;
@@ -27,6 +32,7 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
   const configs = useListWeeklyPurchasingConfig();
   const createOrder = useCreateVendorOrder();
   const createLine = useCreateVendorOrderLine();
+  const materializeDraft = useDraftPurchaseOrder();
   const [busy, setBusy] = useState(false);
   const { notice, setNotice } = useActionNotice();
   const { error, setError } = useActionFailure();
@@ -60,6 +66,15 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
         createLine: async (input) => {
           const created = (await createLine(input)) as { docId: string };
           return { docId: created.docId };
+        },
+        materialize: async (input) => {
+          const scope = `event-draft-po:${eventId}:${chosenVendorId}`;
+          const created = await materializeDraft({
+            ...input,
+            operationKey: pendingOperationKey(scope),
+          });
+          confirmPendingOperation(scope);
+          return created;
         },
       }).draftFromNeeds({
         eventId,

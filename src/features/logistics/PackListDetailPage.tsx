@@ -35,6 +35,11 @@ import { PackListItemForm } from "./PackListItemForm";
 import { PackListItemTable } from "./PackListItemTable";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
+import { useApplyPackTemplate } from "../../lib/safeMaterialization";
+import {
+  confirmPendingOperation,
+  pendingOperationKey,
+} from "../../lib/pendingOperationKey";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -58,6 +63,7 @@ export function PackListDetailPage() {
   const events = useListEvent();
   const dishes = useListDish();
   const createItem = useCreatePackListItem();
+  const applyPackTemplate = useApplyPackTemplate();
   const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
   const markItemPacked = usePackListItemMarkPacked();
@@ -237,17 +243,13 @@ export function PackListDetailPage() {
       if (lines.length === 0) {
         throw new Error("This template has no valid items to generate.");
       }
-      // ponytail: sequential client-side copy (non-atomic). A mid-loop network
-      // drop can leave a partial load sheet; a server-side bulk-generate action
-      // is the upgrade path if it bites. Mirrors VenueLayoutTemplate's copy.
-      for (const it of lines) {
-        await createItem({
-          packListId: packList._id,
-          description: it.description,
-          requiredQuantity: it.requiredQuantity,
-          unit: it.unit,
-        });
-      }
+      const scope = `pack-template:${packList._id}:${template._id}`;
+      await applyPackTemplate({
+        packListId: packList._id,
+        operationKey: pendingOperationKey(scope),
+        items: lines,
+      });
+      confirmPendingOperation(scope);
       setShowTemplates(false);
       setNotice(
         `${lines.length} ${lines.length === 1 ? "item" : "items"} generated from "${template.name}".`,
