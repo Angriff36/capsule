@@ -346,3 +346,10 @@
 - Commandless private receipt storage removes new recovery outputs from the globally replayable command cache and drops unused request payloads/redundant child caches. Exact/head replay and governed transaction behavior remain; broader generator issue281 is not claimed fixed.
 - Proposal defaults flow through actual draft publication and immutable shared/PDF/signing representations. Template-owned fees replace cleanly; tax follows central pricing until manual override. Dynamic draft removal persists, offered drafts remain protected, and edited work still arms unload warnings.
 - Commitsff40ad3,fcdcd58,8ac9ad5,19a7567,b595b6f,f8c7e34 independently approved by gpt-6-astra after three fix rounds. Actual mounted form/public-renderer, jsPDF and publication runtime evidence recorded; final8focusedtests/typecheck pass. Full check before review fixes passed1365tests/all gates except temporary root-cap cleanup. Final whole-branch gate and deployment remain separate.
+
+## 2026-09-06: Final wiring review and verification
+
+- fc07561 fixes outreach client relationships, visible legacy/malformed PDF fallback, No template hidden defaults and two body-copy sizes. Adds personal-view projection/exact receipt tenant proofs. All Important findings fixed; gpt-6-astra approves code/integration. One minor head-lookup test fixture gap remains explicitly open, not claimed proven.
+- `bun run check` exits0:161files1376tests/all repository gates including unchanged baseline cap and local build. Regen-check green; spec lint19pass; command scan326directcalls0missingdocId. Source branch pushed; no deployment.
+- Historical AC006/013 required manual receipts absent: combined statuses honestly PENDING, programmatic passes retained; independent gpt-5.6-terra approves correction.
+- Plan/findings/progress and unique review evidence archived at docs/task-plans/2026-09-06-full-wiring-audit. Only reproducible review diffs/empty task folders removed; user worktrees untouched.

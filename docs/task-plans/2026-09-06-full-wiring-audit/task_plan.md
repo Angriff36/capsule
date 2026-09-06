@@ -11,8 +11,8 @@ Architecture: preserve Manifest ownership and existing UI design; fix authored c
 - [x] Inventory route families and authored command calls; combine three independent read-only audits with root's global contract/stub scan.
 - [x] Turn every confirmed finding into a concrete fix task below and record inspected/untested areas in findings.md.
 - [x] Implement scoped fixes with focused regressions, then verify persistence/error/retry behavior; all seven groups independently reviewed through f8c7e34. Reports distinguish test-first from post-implementation evidence.
-- [ ] Run repository gates and independent cross-model review; fix review findings.
-- [ ] Commit/push the work branch; update spec/acceptance evidence and report deployment separately.
+- [x] Run repository gates and independent cross-model review; all Important findings fixed, code/integration approved atfc07561, one minor head-lookup test gap explicitly retained. Clean full check161files1376tests passes.
+- [x] Commit/push the work branch; update spec/acceptance evidence and report deployment separately. Sourcefc07561 pushed with regen gate green; no deployment.
 
 ## Initial repair tasks (verify owners before implementation)
 

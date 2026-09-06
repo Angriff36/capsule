@@ -7,7 +7,7 @@
 
 ## Current work — full wiring audit, 2026-09-06
 
-Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after the prior narrow release omitted it. The active source-backed plan and coverage ledger are `codex-plans/full-wiring-audit/task_plan.md` and `findings.md`, on branch `fix/full-wiring-audit-20260906`. No new Ralph loop was started. This work is not a claim that every separate PR01–PR14 readiness requirement is complete.
+Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after the prior narrow release omitted it. The source-backed plan and coverage ledger are archived under `docs/task-plans/2026-09-06-full-wiring-audit/`, on branch `fix/full-wiring-audit-20260906`. No new Ralph loop was started. This work is not a claim that every separate PR01–PR14 readiness requirement is complete.
 
 - [x] WIRING-1: repair generated command targets and honest inbox/document delivery actions; commits a7b5b98/407b5c4, independent review approved.
 - [x] WIRING-2: operator-entered yield, truthful estimate labels and correct commission allocation/application-period scope; commits2514043/9093eed, independent review approved.
@@ -16,7 +16,7 @@ Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after
 - [x] WIRING-5: operational bulk, event menu/prep/stock issuance and timeline recovery; reviewed at36be772.
 - [x] WIRING-6: shared attachment/default-view failures, outreach retry and confirmed form-retention gaps; reviewed atc8f1e6d.
 - [x] WIRING-7: proposal-template selection/defaults through persistence, revisions and client renderers; internal recovery receipts isolated from the generator cache; reviewed atf8c7e34.
-- [ ] WIRING-8: reconcile acceptance evidence, full gates, independent whole-branch review and work-branch push. Deployment is separate.
+- [x] WIRING-8: acceptance evidence reconciled; final gpt-6-astra code/integration APPROVE atfc07561 with one explicit minor test gap; clean full check161files1376tests passed; source branch pushed. Evidence archived under docs/task-plans/2026-09-06-full-wiring-audit. Deployment is separate.
 
 Release 2 was previously verified at `9eccdbc`; the historical release completion and superseded Clerk-key retry blocker are recorded in commit `78a876f` and `.artifacts/r2-dev-auth-live-verification.md`. The generator seed issue #113 remains tracked with refreshed source evidence: its entrypoint now exists, but authentication/reference resolution is not production-ready. No seed was run against a live database during this audit.
 

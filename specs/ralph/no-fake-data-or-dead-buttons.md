@@ -46,7 +46,7 @@ active implementation plan records repairs and additional findings):
       or fail loudly with what was created and a way to finish
 - [x] Estimates are labeled as estimates everywhere they appear (route
       planner, projected food cost); invented values never render as fact
-- [ ] Nothing in this spec weakens a guard or policy to make a flow "work"
+- [x] Nothing in this spec weakens a guard or policy to make a flow "work"
       (domain-gating-restraint still binds)
 
 ## Out of Scope

@@ -1,0 +1,4 @@
+### Task 2: Correct measured values and factual labels
+
+Own KitchenDisplayPage.tsx, RoutePlannerPage.tsx/routePlanner.ts, PurchasingQueueSplit.tsx/vendorPerformance.ts, RevenueAttributionDetailPage.tsx, CompMasterDashboardPage.tsx and focused tests/helpers.
+Capture explicit actual batch yield, including zero, with unit; retain input on failure. Do not strengthen historical provenance claims. Label route straight-line distance, 40 km/h assumption, missing legs and local-only reorder. Name vendor receipt metric as received by purchasing-week end. Attribute revenue input prefill to quote/budget estimates. Comp Master must use applied sales_commission allocatedAmount directly, remove fabricated payment facts and 3% conversion, and keep period/status scopes consistent. Cover calculations and user-input/error cases.

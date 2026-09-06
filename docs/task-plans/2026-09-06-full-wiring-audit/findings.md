@@ -2,7 +2,7 @@
 
 ## Current reconciliation
 
-All seven repair groups have independent approvals. Whole-branch verification remains pending. No audit-branch changes have been deployed.
+All seven repair groups have independent approvals. Final code/integration review approves fc07561, with one minor head-lookup tenant-test gap explicitly open below. Final clean full check passes161files1376tests and all repository gates; sourcefc07561 is pushed. No audit-branch changes have been deployed.
 
 | Findings below | Repair group | Verified checkpoint |
 | --- | --- | --- |
@@ -30,7 +30,11 @@ At the audit baseline, the prior plan intentionally chose import-only work. The 
 - Commercial audit: clients, sales, finance plus backend owners — completed source inventory.
 - Operations audit: kitchen, production, logistics, stock, procurement, facilities — completed source inventory.
 - Other routes audit: events, workforce/staff, admin, reports, home, portal — completed source inventory.
-- Root: route inventory, generated-command call contract scan, platform seed proof — completed initial checks; final post-implementation contract scan pending.
+- Root: route inventory, generated-command call contract scan, platform seed proof — completed. Final scan atfc07561 checks668authoredTS/TSXfiles and326directcalls against591required-docId hooks:0missingtargets,6previouslytraced dynamic adapters. Regen-check passes; spec lint passes19specs.
+
+### Final review residual
+
+Minor proof gap, not an observed leak: `tests/proofs/materialization-receipt-privacy.runtime.test.ts` seeds a different head key from the helper's computed lookup, so its cross-tenant head assertion passes on a key miss. Exact helper lookup isolation is genuinely covered; head-specific cross-tenant coverage still needs the matching-key fixture. Final reviewer approves code/integration while explicitly retaining this gap. See `evidence/final-scoped-review.md` and the final ruling in `evidence/sdd-ledger.md`.
 
 No full-app completion claim until the coverage and repair evidence are reconciled.
 

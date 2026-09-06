@@ -88,7 +88,7 @@ createRoot/act with installed jsdom supports render/input/click tests without
 
 ## Full wiring audit — 2026-09-06
 
-Scope: `specs/ralph/no-fake-data-or-dead-buttons.md`, detailed repairs/coverage in `codex-plans/full-wiring-audit/`. Historical AC-001..030 remain unchanged. Source sweep and generator blocker evidence are recorded in the findings ledger; #113 is not represented as a working seed capability. New rows remain PENDING until their actual tests and independent review establish the stated outcome. Passing these rows does not certify unrelated PR01–PR14 work or deployment.
+Scope: `specs/ralph/no-fake-data-or-dead-buttons.md`, detailed repairs/coverage in `docs/task-plans/2026-09-06-full-wiring-audit/`. Historical AC-001..030 IDs and requirements are preserved; AC-006/013 statuses were corrected to PENDING for missing required J evidence. Source sweep and generator blocker evidence are recorded in the findings ledger; #113 is not represented as a working seed capability. Passing these rows does not certify unrelated PR01–PR14 work or deployment. Final code review approves fc07561 with one explicit minor proof gap: the receipt helper's cross-tenant head-lookup assertion misses the seeded key, so it does not prove head tenant isolation; exact-lookup and generated-surface denial evidence remain valid.
 
 | Id | Spec | Outcome to verify (WHAT, not HOW) | Required test | Kind | Status |
 | --- | --- | --- | --- | --- | --- |
