@@ -257,6 +257,17 @@ describe("operational transactions", () => {
     expect(
       await seeded.owner.run((ctx) => ctx.db.get(seeded.itemId as never)),
     ).toMatchObject({ quantityOnHand: 10, version: 2 });
+    const revoked = proof.asRole({
+      subject: "stock-owner",
+      role: "driver",
+      tenantId: "stock-tenant",
+    });
+    await expect(
+      revoked.mutation(
+        (api.lib as any).operationalTransactions.issueEventStock,
+        args,
+      ),
+    ).rejects.toThrow(/access required/i);
     expect(
       await seeded.owner.mutation(
         (api.lib as any).operationalTransactions.issueEventStock,
@@ -314,5 +325,45 @@ describe("operational transactions", () => {
         ctx.db.get(seeded.reservationId as never),
       ),
     ).toMatchObject({ status: "active", version: 1 });
+  });
+
+  it("recovers the actual atomic menu materialization after a lost acknowledgement without duplicate lines", async () => {
+    const proof = harness();
+    const seeded = await seedStockOperation(proof);
+    const dish = async (name: string) =>
+      proof.seedEntity(seeded.owner, "dishes", {
+        tenantId: "stock-tenant",
+        name,
+        category: "main",
+        portionSize: 1,
+        portionUnit: "serving",
+        status: "active",
+        version: 1,
+      });
+    const firstDish = await dish("First");
+    const secondDish = await dish("Second");
+    const args = {
+      eventId: seeded.eventId,
+      operationKey: "event-menu:lost-ack",
+      lines: [
+        { dishId: firstDish, quantityServings: 10, course: "main" },
+        { dishId: secondDish, quantityServings: 10, course: "dessert" },
+      ],
+    };
+    const first = (await seeded.owner.mutation(
+      (api.lib as any).operationalTransactions.materializeEventMenuTemplate,
+      args,
+    )) as Record<string, unknown>;
+    const retry = (await seeded.owner.mutation(
+      (api.lib as any).operationalTransactions.materializeEventMenuTemplate,
+      { ...args, lines: args.lines.slice(0, 1) },
+    )) as Record<string, unknown>;
+    expect(retry).toEqual({ ...first, recovered: true });
+    expect(retry).toMatchObject({ savedCount: 2, requestedCount: 2 });
+    expect(
+      (
+        (await seeded.owner.query(api.queries.listEventDish, {})) as any[]
+      ).filter((row: any) => row.eventId === seeded.eventId),
+    ).toHaveLength(2);
   });
 });
