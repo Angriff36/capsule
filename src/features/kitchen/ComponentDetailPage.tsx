@@ -56,6 +56,7 @@ import {
   confirmPendingOperation,
 } from "../../lib/pendingOperationKey";
 import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperations";
+import { componentRestoreOutcome } from "./culinaryRecovery";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -188,11 +189,13 @@ export function ComponentDetailPage() {
         componentId: component._id,
         snapshotId,
       });
-      await restoreSnapshotCommand({
+      const result = await restoreSnapshotCommand({
         ...pending.payload,
         operationKey: pending.key,
       } as never);
       confirmPendingOperation(scope);
+      const outcome = componentRestoreOutcome(result);
+      if (outcome.notice) setSnapshotWarning(outcome.notice);
     });
   };
   const latestPrices = latestPriceByIngredient(priceObservations ?? []);

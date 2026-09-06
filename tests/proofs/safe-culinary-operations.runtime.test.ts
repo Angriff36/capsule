@@ -86,7 +86,7 @@ describe("runtime proof: safe culinary operations", () => {
       sourceMenuId: source.docId,
       name: "Copy",
       isTemplate: false,
-      operationKey: "menu-clone:stable",
+      operationKey: "menu-clone:storage-unavailable",
     };
     const first = (await proof.executeCommand(
       kitchen,
@@ -102,6 +102,12 @@ describe("runtime proof: safe culinary operations", () => {
       args,
     )) as any;
     expect(retry).toEqual({ ...first, recovered: true });
+    const changedRequest = (await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.cloneMenu,
+      { ...args, name: "Different requested copy" },
+    )) as any;
+    expect(changedRequest).toEqual({ ...first, recovered: true });
     const copies = (await kitchen.query(api.queries.listMenuDish, {})) as any[];
     expect(copies.filter((row) => row.menuId === first.menuId)).toMatchObject([
       { sortOrder: 3, specialInstructions: "hot" },
@@ -185,7 +191,7 @@ describe("runtime proof: safe culinary operations", () => {
     expect(await kitchen.query(api.queries.listComponent, {})).toEqual([]);
     expect(await kitchen.query(api.queries.listIngredient, {})).toEqual([]);
     const args = {
-      operationKey: "import:stable",
+      operationKey: "component-import:storage-unavailable",
       projection: {
         ...createdProjection,
         lines: createdProjection.lines.slice(0, 1),
@@ -202,6 +208,18 @@ describe("runtime proof: safe culinary operations", () => {
       args,
     )) as any;
     expect(retry).toEqual({ ...first, recovered: true });
+    const changed = (await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.importComponent,
+      {
+        operationKey: args.operationKey,
+        projection: {
+          ...args.projection,
+          name: "Different reviewed component",
+        },
+      },
+    )) as any;
+    expect(changed).toEqual({ ...first, recovered: true });
   });
 
   it("restores the durable snapshot exactly and rejects a snapshot/component mismatch", async () => {
@@ -291,7 +309,7 @@ describe("runtime proof: safe culinary operations", () => {
       {
         componentId: component.docId,
         snapshotId: snapshot.docId,
-        operationKey: "restore:exact",
+        operationKey: "component-restore:storage-unavailable",
       },
     )) as any;
     const rows = (await kitchen.query(
@@ -318,7 +336,29 @@ describe("runtime proof: safe culinary operations", () => {
         {
           componentId: component.docId,
           snapshotId: snapshot.docId,
-          operationKey: "restore:exact",
+          operationKey: "component-restore:storage-unavailable",
+        },
+      ),
+    ).toEqual({ ...result, recovered: true });
+    const newerSnapshot = (await proof.executeCommand(
+      kitchen,
+      api.mutations.ComponentSnapshot_createViaCapture,
+      {
+        componentId: component.docId,
+        versionNumber: 2,
+        capturedByName: "Chef",
+        changeSummary: "Different target",
+        snapshot: JSON.stringify({ ...capturedShape, name: "Different" }),
+      },
+    )) as { docId: string };
+    expect(
+      await proof.executeCommand(
+        kitchen,
+        (api.lib as any).culinaryOperations.restoreComponentSnapshot,
+        {
+          componentId: component.docId,
+          snapshotId: newerSnapshot.docId,
+          operationKey: "component-restore:storage-unavailable",
         },
       ),
     ).toEqual({ ...result, recovered: true });

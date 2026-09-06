@@ -49,6 +49,7 @@ import {
   confirmPendingOperation,
 } from "../../lib/pendingOperationKey";
 import { useCloneMenuSafely } from "../../lib/safeCulinaryOperations";
+import { menuCloneOutcome } from "./culinaryRecovery";
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -389,13 +390,16 @@ export function MenuDetailPage() {
                       name,
                       isTemplate,
                     });
-                    const createdId = await duplicateMenu({
+                    const result = await duplicateMenu({
                       ...pending.payload,
                       operationKey: pending.key,
                       cloneMenu: (args) => cloneMenu(args as never),
                     });
                     confirmPendingOperation(scope);
-                    navigate(menuPath(createdId));
+                    const outcome = menuCloneOutcome(result);
+                    if (outcome.notice) setNotice(outcome.notice);
+                    if (outcome.navigateToId)
+                      navigate(menuPath(outcome.navigateToId));
                   });
                 })();
               }}

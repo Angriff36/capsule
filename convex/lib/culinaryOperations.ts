@@ -37,10 +37,10 @@ export const cloneMenu = mutation({
     isTemplate: v.boolean(),
     operationKey: v.string(),
   },
-  handler: async (ctx, args): Promise<{ menuId: string; lineCount: number; recovered: boolean }> => {
+  handler: async (ctx, args): Promise<{ menuId: string; menuName: string; lineCount: number; recovered: boolean }> => {
     const tenantId = await authorize(ctx);
     const source = await ownedLive(ctx, args.sourceMenuId, tenantId, "Menu");
-    const prior = await readMaterializationReceipt<{ menuId: string; lineCount: number }>(
+    const prior = await readMaterializationReceipt<{ menuId: string; menuName: string; lineCount: number }>(
       ctx, tenantId, "menuClone", args.operationKey, args,
     );
     if (prior) return { ...prior, recovered: true };
@@ -73,7 +73,7 @@ export const cloneMenu = mutation({
         idempotencyKey: `${tenantId}:${args.operationKey}:line:${line._id}`,
       });
     }
-    const output = { menuId: String(created.docId), lineCount: liveLines.length };
+    const output = { menuId: String(created.docId), menuName: args.name, lineCount: liveLines.length };
     await writeMaterializationReceipt(ctx, tenantId, "menuClone", args.operationKey, args, output);
     return { ...output, recovered: false };
   },
@@ -149,12 +149,12 @@ type SnapshotData = { name: string; yieldQuantity: number; yieldUnit: string; ba
 
 export const restoreComponentSnapshot = mutation({
   args: { componentId: v.id("components"), snapshotId: v.id("componentSnapshots"), operationKey: v.string() },
-  handler: async (ctx, args): Promise<{ componentId: string; lineCount: number; recovered: boolean }> => {
+  handler: async (ctx, args): Promise<{ componentId: string; snapshotId: string; lineCount: number; recovered: boolean }> => {
     const tenantId = await authorize(ctx);
     const component = await ownedLive(ctx, args.componentId, tenantId, "Component");
     const snapshot = await ownedLive(ctx, args.snapshotId, tenantId, "ComponentSnapshot");
     if (snapshot.componentId !== args.componentId) throw new Error("Snapshot does not belong to this component");
-    const prior = await readMaterializationReceipt<{ componentId: string; lineCount: number }>(ctx, tenantId, "componentRestore", args.operationKey, args);
+    const prior = await readMaterializationReceipt<{ componentId: string; snapshotId: string; lineCount: number }>(ctx, tenantId, "componentRestore", args.operationKey, args);
     if (prior) return { ...prior, recovered: true };
     const target = JSON.parse(snapshot.snapshot) as SnapshotData;
     if (!target || !Array.isArray(target.lines)) throw new Error("Snapshot payload is invalid");
@@ -183,7 +183,7 @@ export const restoreComponentSnapshot = mutation({
         idempotencyKey: `${tenantId}:${args.operationKey}:add:${index}`,
       });
     }
-    const output = { componentId: String(args.componentId), lineCount: target.lines.length };
+    const output = { componentId: String(args.componentId), snapshotId: String(args.snapshotId), lineCount: target.lines.length };
     await writeMaterializationReceipt(ctx, tenantId, "componentRestore", args.operationKey, args, output);
     return { ...output, recovered: false };
   },

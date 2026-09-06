@@ -6,13 +6,22 @@ export async function duplicateMenu(options: {
   name: string;
   isTemplate: boolean;
   operationKey: string;
-  cloneMenu: (args: Record<string, unknown>) => Promise<{ menuId: string }>;
-}): Promise<string> {
-  const result = await options.cloneMenu({
+  cloneMenu: (args: Record<string, unknown>) => Promise<{
+    menuId: string;
+    menuName: string;
+    lineCount: number;
+    recovered: boolean;
+  }>;
+}): Promise<{
+  menuId: string;
+  menuName: string;
+  lineCount: number;
+  recovered: boolean;
+}> {
+  return options.cloneMenu({
     sourceMenuId: options.sourceMenuId,
     name: options.name,
     isTemplate: options.isTemplate,
     operationKey: options.operationKey,
   });
-  return result.menuId;
 }

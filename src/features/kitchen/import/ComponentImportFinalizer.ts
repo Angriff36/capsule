@@ -51,6 +51,7 @@ export interface ComponentImportFinalizeResult {
   componentId: string;
   createdIngredientIds: string[];
   lineIds: string[];
+  recovered?: boolean;
 }
 
 /**
