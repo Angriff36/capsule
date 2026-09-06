@@ -1159,6 +1159,25 @@ zero blockers), then `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
 bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
 record at .artifacts/review/r2-14/report6.md).
 
+Iteration 67 (BUILD, release 2, 2026-09-05): R2-14 re-verified, STILL
+BLOCKED on the owner action — no code change this iteration. Workspace:
+`origin/main` still 279f6a3 (already an ancestor; nothing to integrate).
+Issue #265 still OPEN, zero comments. Fresh precheck against the LIVE
+production env (`vercel env pull --environment production` into a temp
+file under .artifacts, deleted at once; redacted JSON refreshed at
+.artifacts/release/precheck265.json): the same 2 blockers —
+`clerk:dev_credential_in_production` (VITE_CLERK_PUBLISHABLE_KEY still
+pk_test_*) and `clerk:secret_key_unrecognized`. Preview verified on 7812
+serving this checkout. ANTHROPIC_API_KEY unset again, so the AC-006/
+AC-013 J-halves stay recorded evidence gaps. Docs-only commit, no new
+tag (iteration-46/65/66 precedent). Unblock path unchanged: rotate the
+keys per the checker's action text, re-run the precheck (must report
+zero blockers), then `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
+bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
+record at .artifacts/review/r2-14/report6.md). Until the owner rotates
+the keys, each build iteration records one line here and stops; the
+release is the ONLY remaining `- [ ]` item.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
