@@ -24,44 +24,51 @@ export function buildStoredZip(
 ) {
   const local: number[] = [];
   const central: number[] = [];
+  // Spread-appending large entries overflows the call stack (a 100 KB+
+  // worksheet is already too many spread arguments) — push in a loop.
+  const pushAll = (target: number[], chunks: number[][]) => {
+    for (const chunk of chunks) {
+      for (const byte of chunk) target.push(byte);
+    }
+  };
   let offset = 0;
   for (const entry of entries) {
     const name = bytesOf(entry.name);
-    local.push(
-      ...u32(0x04034b50),
-      ...u16(20),
-      ...u16(0),
-      ...u16(0),
-      ...u16(0),
-      ...u16(0),
-      ...u32(0),
-      ...u32(entry.data.length),
-      ...u32(entry.data.length),
-      ...u16(name.length),
-      ...u16(0),
-      ...name,
-      ...entry.data,
-    );
-    central.push(
-      ...u32(0x02014b50),
-      ...u16(20),
-      ...u16(20),
-      ...u16(0),
-      ...u16(0),
-      ...u16(0),
-      ...u16(0),
-      ...u32(0),
-      ...u32(entry.data.length),
-      ...u32(entry.data.length),
-      ...u16(name.length),
-      ...u16(0),
-      ...u16(0),
-      ...u16(0),
-      ...u16(0),
-      ...u32(0),
-      ...u32(offset),
-      ...name,
-    );
+    pushAll(local, [
+      u32(0x04034b50),
+      u16(20),
+      u16(0),
+      u16(0),
+      u16(0),
+      u16(0),
+      u32(0),
+      u32(entry.data.length),
+      u32(entry.data.length),
+      u16(name.length),
+      u16(0),
+      name,
+      entry.data,
+    ]);
+    pushAll(central, [
+      u32(0x02014b50),
+      u16(20),
+      u16(20),
+      u16(0),
+      u16(0),
+      u16(0),
+      u16(0),
+      u32(0),
+      u32(entry.data.length),
+      u32(entry.data.length),
+      u16(name.length),
+      u16(0),
+      u16(0),
+      u16(0),
+      u16(0),
+      u32(0),
+      u32(offset),
+      name,
+    ]);
     offset += 30 + name.length + entry.data.length;
   }
   return new Uint8Array([

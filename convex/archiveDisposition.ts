@@ -128,19 +128,24 @@ export const classifyArchiveWorkbooks = action({
     }>;
 
     // Duplicate detection: identical workbook bytes within the run. The
-    // first occurrence classifies by content; later copies are duplicate
-    // views. Iteration order is stable within this action, so exactly one of
-    // a pair is marked.
+    // canonical first occurrence is the FIRST same-checksum artifact in the
+    // full stable artifact list — computed over every live artifact
+    // regardless of classification state, so a resume after a mid-pair
+    // crash cannot shift which copy is the duplicate: occurrence order is a
+    // property of the inventory, never of this invocation.
     const checksumCounts = new Map<string, number>();
+    const occurrenceById = new Map<string, number>();
+    const seenSoFar = new Map<string, number>();
     for (const artifact of artifacts) {
-      if (artifact.checksum) {
-        checksumCounts.set(
-          artifact.checksum,
-          (checksumCounts.get(artifact.checksum) ?? 0) + 1,
-        );
-      }
+      if (!artifact.checksum) continue;
+      checksumCounts.set(
+        artifact.checksum,
+        (checksumCounts.get(artifact.checksum) ?? 0) + 1,
+      );
+      const seen = (seenSoFar.get(artifact.checksum) ?? 0) + 1;
+      seenSoFar.set(artifact.checksum, seen);
+      occurrenceById.set(artifact._id, seen);
     }
-    const occurrences = new Map<string, number>();
 
     let classified = 0;
     let skipped = 0;
@@ -157,8 +162,7 @@ export const classifyArchiveWorkbooks = action({
       }
       let result = classifyWorkbook(bytes);
       if (artifact.checksum) {
-        const seen = (occurrences.get(artifact.checksum) ?? 0) + 1;
-        occurrences.set(artifact.checksum, seen);
+        const seen = occurrenceById.get(artifact._id) ?? 0;
         if ((checksumCounts.get(artifact.checksum) ?? 0) > 1 && seen > 1) {
           result = { ...result, disposition: "duplicate_view" };
         }

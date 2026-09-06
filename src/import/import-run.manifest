@@ -51,11 +51,17 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
 
   // Archive linkage (PR01-01, additive): the uploaded archive this run
   // inventories. Additive fields only — existing run fields never change.
+  // Optional on purpose: production already holds importRuns rows created
+  // before this release, and Manifest defaults apply at command time, not to
+  // stored documents — required validators would fail Convex schema
+  // validation for every pre-release row the moment the new schema pushes.
+  // New rows are always created complete (startImport stamps the defaults);
+  // read seams treat absence as 0/false/"{}".
   property archiveStorageId: string?
   property archiveChecksum: string?
-  property required archiveWorkbookCount: int = 0
-  property required indexWorkbookCount: int = 0
-  property required discrepancyExplained: boolean = false
+  property archiveWorkbookCount: int?
+  property indexWorkbookCount: int?
+  property discrepancyExplained: boolean?
   property discrepancyNote: string?
 
   // Disposition roll-up (PR01-02/PR01-09, R2-5): workbook disposition counts
@@ -63,8 +69,8 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // inventoried workbook count (every workbook starts unaccounted) and the
   // commit gate requires it to reach zero — classified workbooks whose row
   // counts do not reconcile also count as unaccounted.
-  property required dispositionCounts: string = "{}"
-  property required unaccountedRecordCount: int = 0
+  property dispositionCounts: string?
+  property unaccountedRecordCount: int?
 
   // Commit checkpoint (PR01-05, R2-6, additive): the resume cursor INSIDE the
   // committing stage — cumulative processed/committed/skipped/pending counts.
@@ -72,7 +78,13 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
   // The durable resume truth stays the per-record ExternalRecordLink + create
   // idempotency keys (importCommit.ts) — the checkpoint is operator
   // visibility and batch bookkeeping, never a second source of record state.
-  property required commitCheckpoint: string = "{}"
+  property commitCheckpoint: string?
+
+  // Index-vs-archive NAME reconciliation (R2-14 review fix): counts alone
+  // miss the equal-count substitution (one archive-only workbook replacing
+  // one index-only workbook). recordArchiveInventory sets this flag from the
+  // computed name deltas; commit requires an explanation when it is true.
+  property indexNameMismatch: boolean?
 
   constraint recordCountsPresent: self.recordCounts != null "Record counts must be present"
 
@@ -198,6 +210,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.status == "committing"
     guard self.reviewApprovedAt != null
     guard self.archiveWorkbookCount == self.indexWorkbookCount or self.discrepancyExplained == true
+    guard self.indexNameMismatch != true or self.discrepancyExplained == true
     guard self.unaccountedRecordCount == 0
     guard self.deletedAt == null
     constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
@@ -259,7 +272,8 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     archiveWorkbookCount: int,
     optional archiveStorageId: string,
     optional archiveChecksum: string,
-    optional indexWorkbookCount: int
+    optional indexWorkbookCount: int,
+    optional indexNameMismatch: boolean
   ) {
     guard self.deletedAt == null
     guard self.createdAt != null
@@ -272,6 +286,7 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     mutate archiveChecksum = archiveChecksum
     mutate archiveWorkbookCount = archiveWorkbookCount
     mutate indexWorkbookCount = indexWorkbookCount != null ? indexWorkbookCount : 0
+    mutate indexNameMismatch = indexNameMismatch != null ? indexNameMismatch : false
     // Every inventoried workbook starts unaccounted; commit stays closed
     // until classification records a reconciled summary (R2-5 / AC-027).
     mutate unaccountedRecordCount = archiveWorkbookCount
@@ -423,6 +438,7 @@ event ImportRunArchiveInventoryRecorded: "import_run.archive_inventory_recorded"
   tenantId: string
   archiveWorkbookCount: int
   indexWorkbookCount: int
+  indexNameMismatch: boolean?
   archiveChecksum: string?
   archiveStorageId: string?
 }

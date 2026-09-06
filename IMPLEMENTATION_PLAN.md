@@ -970,6 +970,58 @@ precheck (vercel env pull + check-deployment-config --json must report
 zero blockers) and `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
 bash scripts/release.sh --reviewer gpt-5.6-sol`.
 
+Iteration 59 (BUILD, release 2, 2026-09-05): R2-14 cross-model review
+(gpt-5.6-sol, merge framing, report at .artifacts/review/r2-14/report.md)
+returned 9 findings (4 P1 + 5 P2) and called four of them release-blocking
+— a REJECT under the merge gate. All 9 verified against the code, then
+FIXED this iteration. P1-1 (required ImportRun fields would fail schema
+validation for pre-release production rows): the six R2 fields
+(archiveWorkbookCount, indexWorkbookCount, discrepancyExplained,
+dispositionCounts, unaccountedRecordCount, commitCheckpoint) are now
+optional in src/import/import-run.manifest — one regen; guards compile to
+strict ===, where undefined === undefined keeps legacy no-archive rows
+passing the count guard; read seams treat absence as 0/false/"{}"
+(seedCheckpoint/importCoordinator/ImportRunDetailPage null-safe).
+P1-2 (unbounded inflate despite the declared-size preflight): zipReader
+inflateRawSync now passes maxOutputLength = limits.maxEntryExpandedBytes;
+a lying directory (declares 64 B, expands 32 KiB) fails
+entry_bytes_exceeded BEFORE allocating (RangeError mapped; unit test).
+P1-3 (counts-only reconciliation): recordArchiveInventory persists
+indexNameMismatch (archiveOnly/indexOnly non-empty) and ImportRun.commit
+gained the guard `indexNameMismatch != true or discrepancyExplained ==
+true` — an equal-count substitution (2==2, disjoint names) now refuses
+commit until explained; proof leg added. P1-4 (crash-window artifact
+drafts skipped forever): allocateArtifactDraft inserts the workbook NAME
+(never a blank row); listArtifactRows returns id/name/createdAt; the
+inventory action repairs a createdAt==null row by re-running the governed
+register in creation mode on the SAME docId + stamping (repaired count in
+the result); proof leg added. P2s: (1) completeRun floors the final
+checkpoint's committedCount at the run's live ExternalRecordLink count
+(new countRunLinks internalQuery, cursor-paginated past linksForRun's 500
+cap) — resume proof gained Fault A′ (stop checkpoint also lost; return
+count honestly 3, persisted checkpoint floored to 5=durable links);
+(2) duplicate_view occurrence order is derived from the FULL stable
+artifact list (listArtifacts order), so a mid-pair classification crash
+cannot shift which copy is the duplicate — proof leg added; (3)
+workbookProvenance gained PROVENANCE_BYTE_BUDGET (256 KiB serialized) +
+per-field truncation at 2048 chars (marked `…[truncated]`, typed values
+stay typed below the cap) + byteBudget recorded — proof leg; (4)+(5)
+ImportProvenancePanel artifacts are now ruled sections (divide-y, no
+nested rounded cards — DESIGN.md "the sheet is the only rounded surface")
+and the evidence table scrolls in an overflow-x-auto boundary (the repo's
+table idiom); wire test extended. GOTCHAs: the zipFixture builder
+overflowed the call stack spreading a >100 KB worksheet entry — pushAll
+loop now (identical bytes); provenance typed values must NOT be
+stringified during truncation (AC-022 asserts value -1234.5 as a number).
+Focused tests: all new legs green (35 across 6 files, then the provenance
+pair after the two fixture fixes). ACCEPTANCE_TESTS rows AC-020/021/022/
+024/026 extended with the review-fix legs (statuses stay PASS). The
+#265 release blocker (production still on pk_test_* Clerk keys — proven
+by vercel env pull + the production-build config gate) still stands: the
+release ships the moment the owner rotates the keys; all other release.sh
+preconditions are ready (branch pushed, local main == origin/main,
+primary checkout parked on main-parked-d04d5ec at the same commit).
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.

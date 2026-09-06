@@ -148,6 +148,7 @@ async function sha256Hex(data: Uint8Array) {
 interface InventoryResult {
   registered: number;
   skipped: number;
+  repaired: number;
   workbooks: Array<{
     name: string;
     checksum: string;
@@ -280,6 +281,7 @@ describe("runtime proof: import archive inventory (AC-020)", () => {
     )) as InventoryResult;
     expect(rerun.registered).toBe(0);
     expect(rerun.skipped).toBe(REPORT_COUNT);
+    expect(rerun.repaired).toBe(0);
 
     // --- Walk the run to the commit boundary (generated transitions, the
     // same walk quickImport performs). ---
@@ -343,6 +345,187 @@ describe("runtime proof: import archive inventory (AC-020)", () => {
       version: versionExplained.version,
     })) as { status: string };
 
+    expect(committed.status).toBe("completed");
+  });
+
+  it("a crash-window artifact draft is repaired on re-run, never skipped", async () => {
+    const tenantId = "tenant-import-archive-repair";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-archive-repair-owner",
+      role: "owner",
+      tenantId,
+    });
+
+    const names = [reportNames[0], reportNames[1]];
+    const archiveBytes = buildStoredZip(
+      names.map((name) => ({ name, data: Array.from(workbookBytes(name)) })),
+    );
+    const storageId = (await owner.run(async (ctx) =>
+      (
+        ctx as unknown as {
+          storage: { store: (blob: Blob) => Promise<string> };
+        }
+      ).storage.store(new Blob([archiveBytes])),
+    )) as string;
+
+    const started = (await owner.mutation(api.importCoordinator.startImport, {
+      sourceSystem: "tpp_legacy",
+      datasetType: "events",
+    })) as { importRunId: string };
+    const importRunId = started.importRunId;
+
+    // The crash window (review R2-14): allocateArtifactDraft inserted the
+    // named draft, then the action died — no register, no timestamp stamp.
+    // A name-only skip would leave this row unusable forever, because every
+    // artifact command guards createdAt != null.
+    await owner.run(async (ctx) => {
+      await ctx.db.insert("importArtifacts", {
+        tenantId,
+        importRunId,
+        name: names[0],
+        byteSize: 0,
+        entryCount: 0,
+        provenance: "{}",
+        disposition: "pending",
+        parseStatus: "pending",
+        totalRowCount: 0,
+        rowOutcomeCounts: "{}",
+        version: 0,
+      });
+    });
+
+    const inventory = (await asActions(owner).action(
+      api.archiveInventory.inventoryArchive,
+      { importRunId, storageId },
+    )) as InventoryResult;
+    expect(inventory.registered).toBe(1); // names[1]
+    expect(inventory.repaired).toBe(1); // names[0] completed in place
+    expect(inventory.skipped).toBe(0);
+
+    const repairedRow = (await owner.run(async (ctx) =>
+      (await ctx.db.query("importArtifacts").collect()).find(
+        (row) =>
+          (row as { name: string }).name === names[0] &&
+          (row as { deletedAt?: number | null }).deletedAt == null,
+      ),
+    )) as {
+      checksum: string | null;
+      byteSize: number;
+      createdAt: number | null;
+    };
+    expect(repairedRow.checksum).toBe(await sha256Hex(workbookBytes(names[0])));
+    expect(repairedRow.byteSize).toBe(workbookBytes(names[0]).length);
+    // The stamp is what makes the row usable downstream.
+    expect(repairedRow.createdAt).not.toBeNull();
+
+    // The repaired artifact classifies like any healthy one.
+    const disposition = (await asActions(owner).action(
+      api.archiveDisposition.classifyArchiveWorkbooks,
+      { importRunId },
+    )) as { classified: number };
+    expect(disposition.classified).toBe(2);
+  });
+
+  it("an equal-count index substitution still blocks commit until explained", async () => {
+    const tenantId = "tenant-import-archive-name-swap";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-archive-swap-owner",
+      role: "owner",
+      tenantId,
+    });
+
+    const names = [reportNames[0], reportNames[1]];
+    const archiveBytes = buildStoredZip(
+      names.map((name) => ({ name, data: Array.from(workbookBytes(name)) })),
+    );
+    const storageId = (await owner.run(async (ctx) =>
+      (
+        ctx as unknown as {
+          storage: { store: (blob: Blob) => Promise<string> };
+        }
+      ).storage.store(new Blob([archiveBytes])),
+    )) as string;
+    const started = (await owner.mutation(api.importCoordinator.startImport, {
+      sourceSystem: "tpp_legacy",
+      datasetType: "events",
+    })) as { importRunId: string };
+    const importRunId = started.importRunId;
+
+    // Counts match (2 == 2); the name SETS do not — one index entry names a
+    // workbook the archive does not contain (review R2-14: counts-only
+    // reconciliation let exactly this shape commit unexplained).
+    const swappedIndex = [names[0], "report-not-in-the-archive.xlsx"];
+    const inventory = (await asActions(owner).action(
+      api.archiveInventory.inventoryArchive,
+      { importRunId, storageId, indexReportNames: swappedIndex },
+    )) as InventoryResult;
+    expect(inventory.reconciliation.archiveWorkbookCount).toBe(2);
+    expect(inventory.reconciliation.indexWorkbookCount).toBe(2);
+    expect(inventory.reconciliation.archiveOnly).toEqual([names[1]]);
+    expect(inventory.reconciliation.indexOnly).toEqual([
+      "report-not-in-the-archive.xlsx",
+    ]);
+
+    const runRecorded = (await owner.run(async (ctx) =>
+      ctx.db.get(importRunId),
+    )) as {
+      archiveWorkbookCount: number;
+      indexWorkbookCount: number;
+      indexNameMismatch: boolean;
+      discrepancyExplained: boolean;
+    };
+    expect(runRecorded.archiveWorkbookCount).toBe(2);
+    expect(runRecorded.indexWorkbookCount).toBe(2);
+    expect(runRecorded.indexNameMismatch).toBe(true);
+    expect(runRecorded.discrepancyExplained).toBe(false);
+
+    const counts = JSON.stringify({ events: 0 });
+    await owner.mutation(api.mutations.ImportRun_recordParse, {
+      docId: importRunId,
+      recordCounts: counts,
+    });
+    await owner.mutation(api.mutations.ImportRun_validate, {
+      docId: importRunId,
+    });
+    await owner.mutation(api.mutations.ImportRun_beginReview, {
+      docId: importRunId,
+    });
+    await owner.mutation(api.mutations.ImportRun_approveReview, {
+      docId: importRunId,
+      finalRecordCounts: counts,
+    });
+
+    // Zero unaccounted (the zero-sheet fixtures classify invalid, 0 == 0),
+    // so the ONLY guard refusing commit is the unexplained name mismatch.
+    const disposition = (await asActions(owner).action(
+      api.archiveDisposition.classifyArchiveWorkbooks,
+      { importRunId },
+    )) as { unaccountedRecordCount: number };
+    expect(disposition.unaccountedRecordCount).toBe(0);
+
+    const versionRefused = (await owner.run(async (ctx) =>
+      ctx.db.get(importRunId),
+    )) as { version: number };
+    await expect(
+      owner.mutation(api.mutations.ImportRun_commit, {
+        docId: importRunId,
+        version: versionRefused.version,
+      }),
+    ).rejects.toThrow(/Guard \d+ failed/);
+
+    await owner.mutation(api.mutations.ImportRun_explainArchiveDiscrepancy, {
+      docId: importRunId,
+      note: "One index entry names a workbook the archive does not contain; the archive-only workbook is accounted for as an artifact.",
+    });
+    const versionExplained = (await owner.run(async (ctx) =>
+      ctx.db.get(importRunId),
+    )) as { version: number };
+    const committed = (await owner.mutation(api.mutations.ImportRun_commit, {
+      docId: importRunId,
+      version: versionExplained.version,
+    })) as { status: string };
     expect(committed.status).toBe("completed");
   });
 });

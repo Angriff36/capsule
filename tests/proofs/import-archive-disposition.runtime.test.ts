@@ -294,4 +294,77 @@ describe("runtime proof: import archive disposition (AC-021)", () => {
     expect(JSON.parse(run.dispositionCounts)).toEqual(second.dispositionCounts);
     expect(run.unaccountedRecordCount).toBe(0);
   });
+
+  it("duplicate order survives a mid-pair classification crash", async () => {
+    const tenantId = "tenant-import-disposition-resume";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-disposition-resume-owner",
+      role: "owner",
+      tenantId,
+    });
+
+    const archive = buildStoredZip([
+      { name: "copy-first.xlsx", data: Array.from(buildWorkbook(COPY_ROWS)) },
+      {
+        name: "copy-second.xlsx",
+        data: Array.from(buildWorkbook(COPY_ROWS)),
+      },
+    ]);
+    const storageId = (await owner.run(async (ctx) =>
+      (
+        ctx as unknown as {
+          storage: { store: (blob: Blob) => Promise<string> };
+        }
+      ).storage.store(new Blob([archive])),
+    )) as string;
+
+    const started = (await owner.mutation(api.importCoordinator.startImport, {
+      sourceSystem: "tpp_legacy",
+      datasetType: "events",
+    })) as { importRunId: string };
+    const importRunId = started.importRunId;
+
+    await asActions(owner).action(api.archiveInventory.inventoryArchive, {
+      importRunId,
+      storageId,
+      indexReportNames: ["copy-first.xlsx", "copy-second.xlsx"],
+    });
+
+    // The crash (review R2-14): the first copy of the byte-identical pair
+    // was classified, then the action died before reaching the second. The
+    // insertion-ordered artifact list is the order the action itself sees.
+    const artifacts = (await owner.run(async (ctx) =>
+      (await ctx.db.query("importArtifacts").collect()).filter(
+        (row) => (row as { deletedAt?: number | null }).deletedAt == null,
+      ),
+    )) as Array<{ _id: string; name: string }>;
+    const byInsertion = [...artifacts].sort((a, b) => (a._id < b._id ? -1 : 1));
+    const firstRow = byInsertion[0];
+    const secondRow = byInsertion[1];
+    expect(firstRow.name).toBe("copy-first.xlsx");
+
+    await owner.mutation(api.mutations.ImportArtifact_classify, {
+      docId: firstRow._id,
+      disposition: "normalized",
+      totalRowCount: COPY_ROWS.length,
+      rowOutcomeCounts: JSON.stringify({ normalized: COPY_ROWS.length }),
+    });
+
+    // Resume: the pending second copy must STILL be the duplicate —
+    // occurrence order comes from the full artifact list, never from what
+    // this invocation happens to see (the pre-fix code would treat it as
+    // occurrence 1 and classify it normalized).
+    const resumed = (await asActions(owner).action(
+      api.archiveDisposition.classifyArchiveWorkbooks,
+      { importRunId },
+    )) as DispositionResult;
+    expect(resumed.classified).toBe(1);
+    expect(resumed.skipped).toBe(1);
+
+    const secondAfter = (await owner.run(async (ctx) =>
+      ctx.db.get(secondRow._id),
+    )) as { disposition: string };
+    expect(secondAfter.disposition).toBe("duplicate_view");
+  });
 });

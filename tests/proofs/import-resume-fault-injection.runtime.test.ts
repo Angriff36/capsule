@@ -283,6 +283,22 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
     const venueLinksAfterStop = await linksFor(owner, tenantId, "venue");
     expect(venueLinksAfterStop).toHaveLength(2);
 
+    // Fault A′ (review R2-14): the crash ALSO lost the stop checkpoint —
+    // the worker died before any checkpoint persisted. The durable state is
+    // the two links; the resume must still finish with checkpoint totals
+    // that match the durable truth (completeRun floors committedCount at
+    // the run's live link count, so no completed run undercounts).
+    await owner.run(async (ctx) => {
+      await ctx.db.patch(venuesRunId, {
+        commitCheckpoint: JSON.stringify({
+          processedCount: 0,
+          committedCount: 0,
+          skippedCount: 0,
+          pendingCount: 0,
+        }),
+      });
+    });
+
     // Newer user edits AFTER the fault, BEFORE the resume: rename the two
     // venues that already exist (one batch-committed, one crash-window).
     const v1Link = venueLinksAfterStop.find(
@@ -309,7 +325,10 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
     });
     expect(resumed.stoppedEarly).toBeUndefined();
     expect(resumed.committed).toBe(3);
-    expect(resumed.processedCount).toBe(5);
+    // The invocation's own honest count is 3 (the checkpoint seed was lost
+    // in Fault A′); the PERSISTED final checkpoint below is floored at the
+    // durable link count, which is the number that must never undercount.
+    expect(resumed.processedCount).toBe(3);
 
     const venuesAfter = await owner.run(async (ctx) =>
       (await ctx.db.query("venues").collect()).filter(

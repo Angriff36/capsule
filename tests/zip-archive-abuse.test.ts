@@ -93,6 +93,28 @@ const text = (value: string) => Buffer.from(value, "utf8");
 const smallLimits = { maxEntryExpandedBytes: 100, maxTotalExpandedBytes: 150 };
 
 describe("readZipEntries", () => {
+  it("a lying directory cannot bypass the per-entry expansion bound", () => {
+    // Review R2-14: the central directory declares 64 uncompressed bytes
+    // while the deflated stream expands to 32 KiB. The declared-size
+    // preflight cannot see the lie — only the inflate-time maxOutputLength
+    // bound stops the allocation before the post-inflate size check runs.
+    const zip = buildZip([
+      {
+        name: "xl/worksheets/sheet1.xml",
+        data: Buffer.alloc(32 * 1024, 0x41),
+        declaredUncompressed: 64,
+      },
+    ]);
+    expect(
+      failureCode(() =>
+        readZipEntries(zip, {
+          ...DEFAULT_ZIP_LIMITS,
+          maxEntryExpandedBytes: 4096,
+        }),
+      ),
+    ).toBe("entry_bytes_exceeded");
+  });
+
   it("reads stored and deflated entries with exact bytes", () => {
     const storedData = text("plain stored bytes");
     const deflatedData = text("deflated workbook part " + "x".repeat(500));

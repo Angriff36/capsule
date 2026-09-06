@@ -294,8 +294,21 @@ function inflateEntry(
     data = Buffer.from(raw);
   } else if (entry.compressionMethod === DEFLATED) {
     try {
-      data = inflateRawSync(raw);
-    } catch {
+      // Bound the allocation itself: a hostile directory can declare a small
+      // uncompressedSize while the deflated stream expands far larger, and
+      // the declared-size preflight cannot see that lie. maxOutputLength
+      // makes zlib stop (RangeError) at the configured entry limit instead
+      // of allocating the full expansion before the post-inflate size check.
+      data = inflateRawSync(raw, {
+        maxOutputLength: limits.maxEntryExpandedBytes,
+      });
+    } catch (error) {
+      if (error instanceof RangeError) {
+        fail(
+          "entry_bytes_exceeded",
+          `ZIP entry expands beyond the per-entry byte limit: ${showName(entry.name)}`,
+        );
+      }
       fail(
         "corrupt_entry",
         `ZIP entry failed to decompress: ${showName(entry.name)}`,

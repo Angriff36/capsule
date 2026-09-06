@@ -67,6 +67,8 @@ export interface RegisteredInventoryResult {
   status: "registered";
   registered: number;
   skipped: number;
+  /** Crash-window drafts this re-run completed (see listArtifactRows). */
+  repaired: number;
   workbooks: Array<{
     name: string;
     checksum: string;
@@ -186,14 +188,21 @@ export const inventoryArchive = action({
     const archiveOnly = workbookNames.filter((name) => !indexSet.has(name));
     const indexOnly = indexNames.filter((name) => !workbookSet.has(name));
 
-    const existing = new Set(
-      (await ctx.runQuery(internal.archiveInventoryStore.listArtifactNames, {
+    const existingRows = (await ctx.runQuery(
+      internal.archiveInventoryStore.listArtifactRows,
+      {
         importRunId: args.importRunId,
-      })) as string[],
-    );
+      },
+    )) as Array<{
+      id: Id<"importArtifacts">;
+      name: string;
+      createdAt: number | null;
+    }>;
+    const existingByName = new Map(existingRows.map((row) => [row.name, row]));
 
     let registered = 0;
     let skipped = 0;
+    let repaired = 0;
     const workbooks: RegisteredInventoryResult["workbooks"] = [];
     const currentChecksums = new Map<string, string>();
     for (const name of workbookNames) {
@@ -215,8 +224,54 @@ export const inventoryArchive = action({
           error instanceof ZipArchiveError ? error.code : "unknown";
       }
 
-      if (existing.has(name)) {
-        skipped += 1;
+      const provenance = JSON.stringify({
+        archiveEntry: name,
+        containerError,
+        indexed: indexSet.has(name) ? "in_both" : "archive_only",
+      });
+
+      const registerArtifact = async (docId: Id<"importArtifacts">) => {
+        await ctx.runMutation(api.mutations.ImportArtifact_register, {
+          docId,
+          importRunId: args.importRunId,
+          name,
+          byteSize: content.length,
+          entryCount,
+          checksum,
+          provenance,
+        });
+        // The register command completes creation but leaves the timestamps
+        // unset (creation mode guards createdAt == null); stamp them so the
+        // post-creation commands (recordParse, classify) accept the row.
+        await ctx.runMutation(
+          internal.archiveInventoryStore.stampArtifactCreated,
+          {
+            artifactId: docId,
+          },
+        );
+      };
+
+      const prior = existingByName.get(name);
+      if (prior) {
+        if (prior.createdAt != null) {
+          skipped += 1;
+          currentChecksums.set(name, checksum);
+          workbooks.push({
+            name,
+            checksum,
+            byteSize: content.length,
+            entryCount,
+          });
+          continue;
+        }
+        // Crash-window repair (review R2-14): the draft was allocated — and
+        // possibly registered — but the action died before the stamp, and a
+        // plain name-skip would leave the row unusable forever (every
+        // artifact command guards createdAt != null). Register guards
+        // creation mode on exactly that state, so re-running it on the SAME
+        // docId completes the row with this archive's real bytes.
+        await registerArtifact(prior.id);
+        repaired += 1;
         currentChecksums.set(name, checksum);
         workbooks.push({
           name,
@@ -227,33 +282,11 @@ export const inventoryArchive = action({
         continue;
       }
 
-      const provenance = JSON.stringify({
-        archiveEntry: name,
-        containerError,
-        indexed: indexSet.has(name) ? "in_both" : "archive_only",
-      });
       const docId = (await ctx.runMutation(
         internal.archiveInventoryStore.allocateArtifactDraft,
-        { tenantId: auth.tenantId, importRunId: args.importRunId },
+        { tenantId: auth.tenantId, importRunId: args.importRunId, name },
       )) as Id<"importArtifacts">;
-      await ctx.runMutation(api.mutations.ImportArtifact_register, {
-        docId,
-        importRunId: args.importRunId,
-        name,
-        byteSize: content.length,
-        entryCount,
-        checksum,
-        provenance,
-      });
-      // The register command completes creation but leaves the timestamps
-      // unset (creation mode guards createdAt == null); stamp them so the
-      // post-creation commands (recordParse, classify) accept the row.
-      await ctx.runMutation(
-        internal.archiveInventoryStore.stampArtifactCreated,
-        {
-          artifactId: docId,
-        },
-      );
+      await registerArtifact(docId);
       registered += 1;
       currentChecksums.set(name, checksum);
       workbooks.push({ name, checksum, byteSize: content.length, entryCount });
@@ -265,6 +298,9 @@ export const inventoryArchive = action({
       archiveStorageId: args.storageId,
       archiveChecksum: wholeChecksum,
       indexWorkbookCount: indexNames.length,
+      // Name-set reconciliation (review R2-14): counts alone miss the
+      // equal-count substitution, so the gate also blocks on this flag.
+      indexNameMismatch: archiveOnly.length > 0 || indexOnly.length > 0,
     });
 
     // R2-9 / PR01-04: an archive that is NOT byte-identical to the prior
@@ -297,6 +333,7 @@ export const inventoryArchive = action({
       status: "registered",
       registered,
       skipped,
+      repaired,
       workbooks,
       reconciliation: {
         archiveWorkbookCount: workbookNames.length,

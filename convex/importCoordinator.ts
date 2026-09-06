@@ -224,10 +224,9 @@ export const getImportRunStatus = query({
     // Commit-stage resume checkpoint (R2-6) — processed counts + cursor.
     let parsedCheckpoint: Record<string, unknown> | null = null;
     try {
-      parsedCheckpoint = JSON.parse(importRun.commitCheckpoint) as Record<
-        string,
-        unknown
-      >;
+      parsedCheckpoint = JSON.parse(
+        importRun.commitCheckpoint ?? "{}",
+      ) as Record<string, unknown>;
     } catch {
       // Invalid JSON, leave as null
     }

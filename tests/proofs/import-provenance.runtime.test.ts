@@ -10,6 +10,10 @@ import {
   bytesOf,
   sha256Hex,
 } from "./zipFixture";
+import {
+  buildWorkbookProvenance,
+  PROVENANCE_BYTE_BUDGET,
+} from "../../src/lib/tppReports/workbookProvenance";
 
 /**
  * Runtime proof AC-022 (PR01-03): an authorized operator can inspect, from
@@ -285,5 +289,43 @@ describe("runtime proof: import provenance (AC-022)", () => {
       { importRunId },
     )) as ArtifactRow[];
     expect(ownerStill).toHaveLength(2);
+  });
+
+  it("provenance is byte-bounded: huge cell values truncate, never blow the document", () => {
+    // Review R2-14: a cell-count cap cannot bound the persisted JSON — a
+    // single legal cell can hold hundreds of kilobytes, and Convex caps the
+    // whole document at 1 MiB. The builder truncates values (marked) and
+    // stops recording cells at a serialized-byte budget.
+    // 32 KiB single value: over the per-field cap (fixture spreads cap out
+    // below ~64 KiB), far above what one field should persist verbatim.
+    const oneHuge = buildStyledWorkbook({
+      cells: [{ ref: "A1", is: "Q".repeat(32 * 1024) }],
+    });
+    const single = buildWorkbookProvenance(Buffer.from(oneHuge));
+    expect(single.byteBudget).toBe(PROVENANCE_BYTE_BUDGET);
+    expect(JSON.stringify(single).length).toBeLessThan(64 * 1024);
+    const cell = single.sheets[0].cells[0];
+    expect(cell.truncated).toBe(true);
+    expect(cell.raw.endsWith("…[truncated]")).toBe(true);
+    expect(cell.raw.length).toBeLessThanOrEqual(2200);
+
+    const manyBig = buildStyledWorkbook({
+      cells: Array.from({ length: 200 }, (_, i) => ({
+        ref: `A${i + 1}`,
+        is: "z".repeat(8 * 1024),
+      })),
+    });
+    const capped = buildWorkbookProvenance(Buffer.from(manyBig));
+    expect(capped.cellCount).toBe(200);
+    expect(capped.cellsTruncated).toBe(true);
+    const recorded = capped.sheets.reduce(
+      (sum, sheet) => sum + sheet.cells.length,
+      0,
+    );
+    expect(recorded).toBeGreaterThan(0);
+    expect(recorded).toBeLessThan(200);
+    expect(JSON.stringify(capped).length).toBeLessThan(
+      PROVENANCE_BYTE_BUDGET + 4096,
+    );
   });
 });

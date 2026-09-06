@@ -816,7 +816,7 @@ export function ImportRunDetailPage() {
       ) : null}
 
       {/* Workbook Dispositions Section (archive classification) */}
-      {importRun.archiveWorkbookCount > 0 ||
+      {(importRun.archiveWorkbookCount ?? 0) > 0 ||
       Object.keys(dispositionSummary).length > 0 ? (
         <div className="card mt-4">
           <div className="border-b border-line px-3">

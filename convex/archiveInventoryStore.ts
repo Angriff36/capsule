@@ -9,14 +9,24 @@
 import { v } from "convex/values";
 import { internalMutation, internalQuery } from "./_generated/server";
 
-/** Allocate one blank ImportArtifact draft for the register command. */
+/**
+ * Allocate one blank ImportArtifact draft for the register command. The
+ * draft carries the workbook NAME from allocation on: a crash between this
+ * insert and the governed register leaves a findable, completable row
+ * instead of an anonymous blank — the retry repairs it by re-running
+ * register in creation mode on the same docId (see inventoryArchive).
+ */
 export const allocateArtifactDraft = internalMutation({
-  args: { tenantId: v.string(), importRunId: v.id("importRuns") },
+  args: {
+    tenantId: v.string(),
+    importRunId: v.id("importRuns"),
+    name: v.string(),
+  },
   handler: async (ctx, args) => {
     return await ctx.db.insert("importArtifacts", {
       tenantId: args.tenantId,
       importRunId: args.importRunId,
-      name: "",
+      name: args.name,
       byteSize: 0,
       entryCount: 0,
       provenance: "{}",
@@ -50,15 +60,26 @@ export const stampArtifactCreated = internalMutation({
   },
 });
 
-/** Existing live artifact names for a run — the re-run skip set. */
-export const listArtifactNames = internalQuery({
+/**
+ * Existing live artifact rows (id, name, createdAt) for a run — the re-run
+ * skip/repair set. createdAt == null marks a draft the inventory action died
+ * before finishing; the retry completes that row instead of skipping the
+ * name forever.
+ */
+export const listArtifactRows = internalQuery({
   args: { importRunId: v.id("importRuns") },
   handler: async (ctx, args) => {
     const rows = await ctx.db
       .query("importArtifacts")
       .withIndex("by_importRunId", (q) => q.eq("importRunId", args.importRunId))
       .collect();
-    return rows.filter((row) => row.deletedAt == null).map((row) => row.name);
+    return rows
+      .filter((row) => row.deletedAt == null)
+      .map((row) => ({
+        id: row._id,
+        name: row.name,
+        createdAt: row.createdAt ?? null,
+      }));
   },
 });
 

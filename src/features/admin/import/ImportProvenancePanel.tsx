@@ -44,6 +44,7 @@ interface ProvenanceWorkbook {
   sheetCount?: number;
   cellCount?: number;
   cellCap?: number;
+  byteBudget?: number;
   cellsTruncated?: boolean;
   error?: string;
   sheets?: Array<{
@@ -98,135 +99,143 @@ export function ImportProvenancePanel({
           Source Provenance
         </h2>
       </div>
-      <div className="p-4 space-y-4">
+      <div className="p-4">
         <p className="text-xs text-ink-3">
           Raw source evidence for every workbook: the preserved original
           (checksum, byte size), cell coordinates, raw stored values, and their
           interpretation under the parser version and date system recorded at
           parse time. Raw evidence stays separate from the interpreted value.
         </p>
-        {sorted.map((artifact) => {
-          const workbook = parseProvenance(artifact.provenance)["workbook"] as
-            ProvenanceWorkbook | undefined;
-          return (
-            <div
-              key={artifact._id}
-              className="rounded-xs border border-line p-3"
-            >
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
-                <span className="font-medium font-mono text-ink">
-                  {artifact.name}
-                </span>
-                <span className="text-ink-2">
-                  {DISPOSITION_LABELS[artifact.disposition] ??
-                    artifact.disposition}
-                </span>
-                <span className="text-ink-3">
-                  parse{" "}
-                  {PARSE_STATUS_LABELS[artifact.parseStatus] ??
-                    artifact.parseStatus}
-                </span>
-                {artifact.checksum ? (
-                  <span className="font-mono text-2xs text-ink-3">
-                    sha256 {artifact.checksum.slice(0, 12)}…
+        <div className="mt-4 divide-y divide-line">
+          {sorted.map((artifact) => {
+            const workbook = parseProvenance(artifact.provenance)[
+              "workbook"
+            ] as ProvenanceWorkbook | undefined;
+            return (
+              // DESIGN.md: the sheet is the only rounded surface — children are
+              // separated by rules, not nested cards.
+              <div key={artifact._id} className="pt-4 first:pt-0">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
+                  <span className="font-medium font-mono text-ink">
+                    {artifact.name}
                   </span>
-                ) : null}
-                <span className="text-ink-3">
-                  {artifact.byteSize.toLocaleString()} bytes ·{" "}
-                  {artifact.entryCount} entries
-                </span>
-              </div>
-              {workbook === undefined ? (
-                <p className="mt-2 text-xs text-ink-2">
-                  Provenance not recorded yet — it records when the archive is
-                  parsed.
-                </p>
-              ) : workbook.error !== undefined ? (
-                <p className="mt-2 text-xs text-danger">
-                  Workbook unreadable: {workbook.error}
-                </p>
-              ) : (
-                <>
+                  <span className="text-ink-2">
+                    {DISPOSITION_LABELS[artifact.disposition] ??
+                      artifact.disposition}
+                  </span>
+                  <span className="text-ink-3">
+                    parse{" "}
+                    {PARSE_STATUS_LABELS[artifact.parseStatus] ??
+                      artifact.parseStatus}
+                  </span>
+                  {artifact.checksum ? (
+                    <span className="font-mono text-2xs text-ink-3">
+                      sha256 {artifact.checksum.slice(0, 12)}…
+                    </span>
+                  ) : null}
+                  <span className="text-ink-3">
+                    {artifact.byteSize.toLocaleString()} bytes ·{" "}
+                    {artifact.entryCount} entries
+                  </span>
+                </div>
+                {workbook === undefined ? (
                   <p className="mt-2 text-xs text-ink-2">
-                    Parser{" "}
-                    <span className="font-mono">{workbook.parserVersion}</span>{" "}
-                    · date system {workbook.dateSystem} ·{" "}
-                    {workbook.timezoneAssumption} · macros {workbook.macros}
+                    Provenance not recorded yet — it records when the archive is
+                    parsed.
                   </p>
-                  {workbook.sheets?.map((sheet) => {
-                    const shown = sheet.cells.slice(0, RENDERED_CELL_LIMIT);
-                    return (
-                      <div key={sheet.name} className="mt-2">
-                        <p className="text-xs font-medium text-ink">
-                          {sheet.name}
-                          {sheet.mergedRanges.length > 0
-                            ? ` (merged: ${sheet.mergedRanges.join(", ")})`
-                            : ""}
-                        </p>
-                        <table className="mt-1 w-full text-2xs">
-                          <thead>
-                            <tr className="text-left text-ink-3">
-                              <th className="py-1 pr-3 font-medium">
-                                Coordinate
-                              </th>
-                              <th className="py-1 pr-3 font-medium">
-                                Raw value
-                              </th>
-                              <th className="py-1 pr-3 font-medium">
-                                Normalized value
-                              </th>
-                              <th className="py-1 pr-3 font-medium">Outcome</th>
-                              <th className="py-1 font-medium">Unit</th>
-                            </tr>
-                          </thead>
-                          <tbody className="font-mono text-ink-2">
-                            {shown.map((cell) => (
-                              <tr
-                                key={cell.ref}
-                                className="border-t border-line"
-                              >
-                                <td className="py-1 pr-3">
-                                  {sheet.name}!{cell.ref}
-                                </td>
-                                <td className="py-1 pr-3">
-                                  {cell.raw === "" ? "—" : cell.raw}
-                                </td>
-                                <td className="py-1 pr-3">
-                                  {cellText(cell.value)}
-                                </td>
-                                <td className="py-1 pr-3">
-                                  {cell.outcome}
-                                  {cell.dateSystem !== undefined
-                                    ? ` (${cell.dateSystem})`
-                                    : ""}
-                                  {cell.formula !== undefined
-                                    ? ` (${cell.formula})`
-                                    : ""}
-                                </td>
-                                <td className="py-1">{cell.unit ?? "—"}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        {sheet.cells.length > RENDERED_CELL_LIMIT ||
-                        workbook.cellsTruncated ? (
-                          <p className="mt-1 text-2xs text-ink-3">
-                            {sheet.cells.length > RENDERED_CELL_LIMIT
-                              ? `+${sheet.cells.length - RENDERED_CELL_LIMIT} more cells recorded on the artifact. `
-                              : ""}
-                            {workbook.cellsTruncated
-                              ? `Provenance caps at ${workbook.cellCap} cells; this workbook has ${workbook.cellCount}.`
+                ) : workbook.error !== undefined ? (
+                  <p className="mt-2 text-xs text-danger">
+                    Workbook unreadable: {workbook.error}
+                  </p>
+                ) : (
+                  <>
+                    <p className="mt-2 text-xs text-ink-2">
+                      Parser{" "}
+                      <span className="font-mono">
+                        {workbook.parserVersion}
+                      </span>{" "}
+                      · date system {workbook.dateSystem} ·{" "}
+                      {workbook.timezoneAssumption} · macros {workbook.macros}
+                    </p>
+                    {workbook.sheets?.map((sheet) => {
+                      const shown = sheet.cells.slice(0, RENDERED_CELL_LIMIT);
+                      return (
+                        <div key={sheet.name} className="mt-2">
+                          <p className="text-xs font-medium text-ink">
+                            {sheet.name}
+                            {sheet.mergedRanges.length > 0
+                              ? ` (merged: ${sheet.mergedRanges.join(", ")})`
                               : ""}
                           </p>
-                        ) : null}
-                      </div>
-                    );
-                  })}
-                </>
-              )}
-            </div>
-          );
-        })}
+                          <div className="mt-1 overflow-x-auto">
+                            <table className="w-full text-2xs">
+                              <thead>
+                                <tr className="text-left text-ink-3">
+                                  <th className="py-1 pr-3 font-medium">
+                                    Coordinate
+                                  </th>
+                                  <th className="py-1 pr-3 font-medium">
+                                    Raw value
+                                  </th>
+                                  <th className="py-1 pr-3 font-medium">
+                                    Normalized value
+                                  </th>
+                                  <th className="py-1 pr-3 font-medium">
+                                    Outcome
+                                  </th>
+                                  <th className="py-1 font-medium">Unit</th>
+                                </tr>
+                              </thead>
+                              <tbody className="font-mono text-ink-2">
+                                {shown.map((cell) => (
+                                  <tr
+                                    key={cell.ref}
+                                    className="border-t border-line"
+                                  >
+                                    <td className="py-1 pr-3">
+                                      {sheet.name}!{cell.ref}
+                                    </td>
+                                    <td className="py-1 pr-3">
+                                      {cell.raw === "" ? "—" : cell.raw}
+                                    </td>
+                                    <td className="py-1 pr-3">
+                                      {cellText(cell.value)}
+                                    </td>
+                                    <td className="py-1 pr-3">
+                                      {cell.outcome}
+                                      {cell.dateSystem !== undefined
+                                        ? ` (${cell.dateSystem})`
+                                        : ""}
+                                      {cell.formula !== undefined
+                                        ? ` (${cell.formula})`
+                                        : ""}
+                                    </td>
+                                    <td className="py-1">{cell.unit ?? "—"}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          {sheet.cells.length > RENDERED_CELL_LIMIT ||
+                          workbook.cellsTruncated ? (
+                            <p className="mt-1 text-2xs text-ink-3">
+                              {sheet.cells.length > RENDERED_CELL_LIMIT
+                                ? `+${sheet.cells.length - RENDERED_CELL_LIMIT} more cells recorded on the artifact. `
+                                : ""}
+                              {workbook.cellsTruncated
+                                ? `Provenance caps at ${workbook.cellCap} cells / ${Math.round((workbook.byteBudget ?? 0) / 1024)} KiB of detail; this workbook has ${workbook.cellCount} cells.`
+                                : ""}
+                            </p>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

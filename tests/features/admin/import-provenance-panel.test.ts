@@ -53,5 +53,17 @@ describe("import run detail: source provenance panel", () => {
     expect(page).toContain(
       "<ImportProvenancePanel importRunId={importRun._id} />",
     );
+
+    // DESIGN.md (review R2-14): the sheet is the only rounded surface —
+    // workbooks are ruled sections, never nested rounded cards.
+    expect(panel).not.toContain("rounded-xs border");
+    expect(panel).toContain("divide-y divide-line");
+
+    // Wide evidence tables scroll inside the card instead of clipping the
+    // page (DESIGN.md collapsing strategy; the repo's table idiom).
+    expect(panel).toContain("overflow-x-auto");
+
+    // The serialized byte budget is stated where truncation is reported.
+    expect(panel).toContain("workbook.byteBudget");
   });
 });

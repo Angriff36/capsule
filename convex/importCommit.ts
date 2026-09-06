@@ -210,6 +210,39 @@ export const linksForRun = internalQuery({
   },
 });
 
+/**
+ * COUNT of the live, non-superseded links a run created — the durable floor
+ * for the final commit checkpoint (review R2-14). linksForRun is bounded at
+ * 500 for revert paging; this pages with a cursor so larger runs count fully.
+ */
+export const countRunLinks = internalQuery({
+  args: { sourceImportRunId: v.id("importRuns") },
+  handler: async (ctx, args): Promise<number> => {
+    let count = 0;
+    let cursor: string | null = null;
+    for (;;) {
+      const page = await ctx.db
+        .query("externalRecordLinks")
+        .withIndex("by_sourceImportRunId", (q) =>
+          q.eq("sourceImportRunId", args.sourceImportRunId),
+        )
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("deletedAt"), null),
+            q.or(
+              q.eq(q.field("conflictStatus"), "resolved"),
+              q.eq(q.field("conflictStatus"), "pending_conflict"),
+            ),
+          ),
+        )
+        .paginate({ numItems: 500, cursor });
+      count += page.page.length;
+      if (page.isDone) return count;
+      cursor = page.continueCursor;
+    }
+  },
+});
+
 /** Insert or update the link for a (tenant, source, recordType, externalId) key. */
 export const upsertLink = internalMutation({
   args: {
@@ -331,9 +364,9 @@ type CommitCheckpoint = {
 };
 
 /** Seed the checkpoint from the run's stored JSON (malformed ⇒ zeroed). */
-function seedCheckpoint(raw: string): CommitCheckpoint {
+function seedCheckpoint(raw: string | null | undefined): CommitCheckpoint {
   try {
-    const parsed = JSON.parse(raw) as Partial<CommitCheckpoint>;
+    const parsed = JSON.parse(raw ?? "{}") as Partial<CommitCheckpoint>;
     return {
       processedCount: Math.max(0, parsed.processedCount ?? 0),
       committedCount: Math.max(0, parsed.committedCount ?? 0),
@@ -459,11 +492,34 @@ export const commitImportRun = action({
       skipped: number;
       pending: number;
     }): Promise<void> => {
+      // Crash-window floor (review R2-14): a fault between a link write and
+      // the checkpoint boundary loses that invocation's counts (resume skips
+      // own-run links silently), so accumulated totals can finish below the
+      // durable truth. Every terminal outcome this run produced is a live
+      // ExternalRecordLink — count them and never persist a committedCount
+      // under that floor.
+      const linked = (await ctx.runQuery(internal.importCommit.countRunLinks, {
+        sourceImportRunId: args.importRunId,
+      })) as number;
+      const merged = mergeCheckpoint(checkpoint, invocation);
+      const committedFloor = Math.max(
+        merged.committedCount,
+        linked - merged.pendingCount,
+      );
+      const reconciled =
+        committedFloor > merged.committedCount
+          ? {
+              ...merged,
+              committedCount: committedFloor,
+              processedCount: Math.max(
+                merged.processedCount,
+                committedFloor + merged.skippedCount,
+              ),
+            }
+          : merged;
       await ctx.runMutation(api.mutations.ImportRun_recordCommitCheckpoint, {
         docId: args.importRunId,
-        commitCheckpoint: JSON.stringify(
-          mergeCheckpoint(checkpoint, invocation),
-        ),
+        commitCheckpoint: JSON.stringify(reconciled),
       });
       // recordCommitCheckpoint bumps the run's version — re-read so the
       // terminal flip passes OCC (the entry snapshot is now stale).
