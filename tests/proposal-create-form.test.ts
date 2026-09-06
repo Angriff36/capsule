@@ -196,6 +196,15 @@ describe("ProposalCreateForm template state", () => {
         } as any),
       ),
     );
+    await act(async () =>
+      change(
+        container.querySelector('input[name="guestCount"]') as HTMLInputElement,
+        "99",
+      ),
+    );
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 650));
+    });
     const restore = Array.from(container.querySelectorAll("button")).find(
       (button) => button.textContent === "Restore",
     )!;
@@ -209,5 +218,47 @@ describe("ProposalCreateForm template state", () => {
         .value,
     ).toBe("Restored terms");
     expect(taxInput().value).toBe("33");
+    expect(
+      (container.querySelector('input[name="guestCount"]') as HTMLInputElement)
+        .value,
+    ).toBe("25");
+  });
+
+  it("persists removal of a dynamic pricing row before remount and restore", async () => {
+    await addFlatLine("1000");
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 650));
+    });
+
+    const remove = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent === "Remove",
+    )!;
+    await act(async () => remove.click());
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 650));
+    });
+    await act(async () => root.unmount());
+
+    root = createRoot(container);
+    await act(async () =>
+      root.render(
+        createElement(ProposalCreateForm, {
+          open: true,
+          fromEvent: undefined,
+          clients: [],
+          activeClients: [{ _id: "client-1" }],
+          busy: null,
+          run: async (_key: string, work: () => Promise<void>) => work(),
+          onFailure: vi.fn(),
+          onNotice: vi.fn(),
+          onClose: vi.fn(),
+        } as any),
+      ),
+    );
+    const restore = Array.from(container.querySelectorAll("button")).find(
+      (button) => button.textContent === "Restore",
+    )!;
+    await act(async () => restore.click());
+    expect(container.querySelectorAll("tbody tr")).toHaveLength(0);
   });
 });

@@ -39,6 +39,9 @@ export function useFormDraft(key: string) {
     readDraft(storageKey),
   );
   const armed = useRef(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const offeredDraft = useRef(draft);
+  offeredDraft.current = draft;
 
   const arm = useCallback(() => {
     if (armed.current) return;
@@ -51,38 +54,42 @@ export function useFormDraft(key: string) {
     window.removeEventListener("beforeunload", beforeUnload);
   }, []);
 
+  const persist = useCallback(() => {
+    if (!form) return;
+    const values: Record<string, string> = {};
+    new FormData(form).forEach((value, name) => {
+      if (typeof value === "string" && value !== "") values[name] = value;
+    });
+    try {
+      localStorage.setItem(
+        storageKey,
+        JSON.stringify({ savedAt: Date.now(), values }),
+      );
+    } catch {
+      // storage full or disabled — the unload guard still protects the user
+    }
+  }, [form, storageKey]);
+
+  const schedulePersist = useCallback(() => {
+    // Never replace a recoverable draft before the operator chooses Restore or
+    // Discard. This also makes explicit controlled-state scheduling safe on mount.
+    if (!form || offeredDraft.current) return;
+    arm();
+    clearTimeout(timer.current);
+    timer.current = setTimeout(persist, SAVE_DEBOUNCE_MS);
+  }, [form, arm, persist]);
+
   // Persist edits (debounced) and arm the unload guard while dirty.
   useEffect(() => {
     if (!form) return;
-    let timer: ReturnType<typeof setTimeout> | undefined;
-
-    const persist = () => {
-      const values: Record<string, string> = {};
-      new FormData(form).forEach((value, name) => {
-        if (typeof value === "string" && value !== "") values[name] = value;
-      });
-      try {
-        localStorage.setItem(
-          storageKey,
-          JSON.stringify({ savedAt: Date.now(), values }),
-        );
-      } catch {
-        // storage full or disabled — the unload guard still protects the user
-      }
-    };
-
-    const onInput = () => {
-      arm();
-      clearTimeout(timer);
-      timer = setTimeout(persist, SAVE_DEBOUNCE_MS);
-    };
+    const onInput = () => schedulePersist();
 
     form.addEventListener("input", onInput);
     return () => {
       form.removeEventListener("input", onInput);
-      clearTimeout(timer);
+      clearTimeout(timer.current);
     };
-  }, [form, storageKey, arm]);
+  }, [form, schedulePersist]);
 
   // Drop the unload guard if the whole page unmounts (e.g. after submit+nav).
   useEffect(() => disarm, [disarm]);
@@ -116,7 +123,14 @@ export function useFormDraft(key: string) {
     return saved;
   }, [form, storageKey, arm]);
 
-  return { formRef: setForm, draft, restore, discard: clear, clear };
+  return {
+    formRef: setForm,
+    draft,
+    restore,
+    discard: clear,
+    clear,
+    schedulePersist,
+  };
 }
 
 export function DraftRestoreBanner({

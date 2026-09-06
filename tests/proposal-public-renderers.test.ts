@@ -16,6 +16,7 @@ vi.mock("convex/react", () => ({
 
 import { SharedProposalPage } from "../src/features/clients/SharedProposalPage";
 import { ProposalAcceptancePage } from "../src/features/clients/ProposalAcceptancePage";
+import { formatDate, formatTime } from "../src/lib/format";
 
 let container: HTMLDivElement | null = null;
 afterEach(() => {
@@ -158,6 +159,10 @@ describe("proposal public renderers", () => {
       createElement(SharedProposalPage, { token: "token" }),
     );
     expect(text).toContain("Dinner service");
-    expect(text).toContain("Sep 20, 2026 at 11:00 AM – 2:30 PM");
+    const startsAt = Date.UTC(2026, 8, 20, 18);
+    const endsAt = Date.UTC(2026, 8, 20, 21, 30);
+    expect(text).toContain(
+      `${formatDate(startsAt)} at ${formatTime(startsAt)} – ${formatTime(endsAt)}`,
+    );
   });
 });

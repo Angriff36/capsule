@@ -175,15 +175,21 @@ export function ProposalCreateForm({
         l.key === key ? ({ ...l, [field]: value } as DraftLine) : l,
       ),
     );
-  const removeLine = (key: string) =>
+  const removeLine = (key: string) => {
     setDraftLines((lines) => lines.filter((l) => l.key !== key));
-  const addLine = () => setDraftLines((lines) => [...lines, newDraftLine()]);
+    draftForm.schedulePersist();
+  };
+  const addLine = () => {
+    setDraftLines((lines) => [...lines, newDraftLine()]);
+    draftForm.schedulePersist();
+  };
 
   const selectTemplate = (templateId: string) => {
     const template = (proposalTemplates ?? []).find(
       (row) => row._id === templateId && row.status === "active",
     );
     if (!template) return;
+    draftForm.schedulePersist();
     const baseLines = draftLines.filter(
       (line) => line.key !== templateServiceLineKey,
     );
