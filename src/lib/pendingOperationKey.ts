@@ -20,7 +20,20 @@ export function beginPendingOperation<T>(
   }
   const randomUUID = deps.randomUUID ?? (() => crypto.randomUUID());
   const inMemory = volatile.get(scope) as Pending<T> | undefined;
-  if (inMemory) return inMemory;
+  // Every consumer must submit to an authenticated, tenant-scoped parent
+  // receipt. The stable key identifies the operation; current input may replace
+  // an uncommitted invalid attempt. If the earlier attempt committed, the
+  // parent receipt remains authoritative and returns its actual saved result.
+  if (inMemory) {
+    const current = { key: inMemory.key, payload };
+    volatile.set(scope, current);
+    try {
+      storage?.setItem(storageKey(scope), JSON.stringify(current));
+    } catch {
+      // Navigation recovery is best effort.
+    }
+    return current;
+  }
   const wasConfirmed = confirmed.has(scope);
   let storageAvailable = true;
   if (!wasConfirmed) {
@@ -29,8 +42,14 @@ export function beginPendingOperation<T>(
       if (raw) {
         const stored = JSON.parse(raw) as Pending<T>;
         if (stored?.key && stored.payload != null) {
-          volatile.set(scope, stored);
-          return stored;
+          const current = { key: stored.key, payload };
+          volatile.set(scope, current);
+          try {
+            storage?.setItem(storageKey(scope), JSON.stringify(current));
+          } catch {
+            // Navigation recovery is best effort.
+          }
+          return current;
         }
       }
     } catch {

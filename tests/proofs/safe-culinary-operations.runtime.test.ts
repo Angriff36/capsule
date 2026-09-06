@@ -183,7 +183,7 @@ describe("runtime proof: safe culinary operations", () => {
         kitchen,
         (api.lib as any).culinaryOperations.importComponent,
         {
-          operationKey: "import:rollback",
+          operationKey: "import:correctable",
           projection: createdProjection,
         },
       ),
@@ -191,7 +191,7 @@ describe("runtime proof: safe culinary operations", () => {
     expect(await kitchen.query(api.queries.listComponent, {})).toEqual([]);
     expect(await kitchen.query(api.queries.listIngredient, {})).toEqual([]);
     const args = {
-      operationKey: "component-import:storage-unavailable",
+      operationKey: "import:correctable",
       projection: {
         ...createdProjection,
         lines: createdProjection.lines.slice(0, 1),
@@ -220,6 +220,146 @@ describe("runtime proof: safe culinary operations", () => {
       },
     )) as any;
     expect(changed).toEqual({ ...first, recovered: true });
+
+    const local = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Local salt", unit: "gram", costPerUnit: 1, allergens: [] },
+    )) as { docId: string };
+    const matchedArgs = {
+      operationKey: "import:deleted-match",
+      projection: {
+        ...projection,
+        name: "Matched dressing",
+        lines: [{ ...projection.lines[0], ingredientId: local.docId }],
+      },
+    };
+    const matched = (await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.importComponent,
+      matchedArgs,
+    )) as any;
+    await kitchen.run((ctx) =>
+      ctx.db.patch(local.docId as never, { deletedAt: Date.now() }),
+    );
+    expect(
+      await proof.executeCommand(
+        kitchen,
+        (api.lib as any).culinaryOperations.importComponent,
+        matchedArgs,
+      ),
+    ).toEqual({ ...matched, recovered: true });
+  });
+
+  it("rolls back restore after removing existing lines, then retries a corrected legacy snapshot", async () => {
+    const proof = harness();
+    const kitchen = proof.asRole({
+      subject: "restore-retry",
+      role: "kitchen_manager",
+      tenantId: "restore-retry-tenant",
+    });
+    const ingredient = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      {
+        name: "Butter",
+        unit: "gram",
+        costPerUnit: 1,
+        allergens: [],
+      },
+    )) as { docId: string };
+    const component = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Component_createViaDraft,
+      {
+        name: "Original",
+        yieldQuantity: 1,
+        yieldUnit: "batch",
+      },
+    )) as { docId: string };
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.ComponentIngredient_createViaAdd,
+      {
+        componentId: component.docId,
+        ingredientId: ingredient.docId,
+        quantity: 10,
+        unit: "gram",
+        sortOrder: 9,
+        wasteFactor: 1.4,
+        prepNotes: "original",
+      },
+    );
+    const snapshotOf = async (name: string, quantity: number) =>
+      (await proof.executeCommand(
+        kitchen,
+        api.mutations.ComponentSnapshot_createViaCapture,
+        {
+          componentId: component.docId,
+          versionNumber: 1,
+          capturedByName: "Chef",
+          changeSummary: name,
+          snapshot: JSON.stringify({
+            name,
+            yieldQuantity: 2,
+            yieldUnit: "batch",
+            lines: [
+              {
+                ingredientId: ingredient.docId,
+                ingredientName: "Butter",
+                quantity,
+                unit: "gram",
+                prepNotes: "legacy",
+              },
+            ],
+          }),
+        },
+      )) as { docId: string };
+    const invalid = await snapshotOf("Invalid target", -1);
+    const operationKey = "restore:correctable";
+    await expect(
+      proof.executeCommand(
+        kitchen,
+        (api.lib as any).culinaryOperations.restoreComponentSnapshot,
+        {
+          componentId: component.docId,
+          snapshotId: invalid.docId,
+          operationKey,
+        },
+      ),
+    ).rejects.toThrow(/positive/i);
+    const afterFailure = await kitchen.run(async (ctx) => ({
+      component: await ctx.db.get(component.docId as never),
+      lines: await ctx.db.query("componentIngredients").collect(),
+    }));
+    expect(afterFailure.component).toMatchObject({ name: "Original" });
+    expect(
+      afterFailure.lines.filter((line) => line.deletedAt == null),
+    ).toMatchObject([
+      { quantity: 10, sortOrder: 9, wasteFactor: 1.4, prepNotes: "original" },
+    ]);
+    const corrected = await snapshotOf("Corrected target", 5);
+    await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.restoreComponentSnapshot,
+      {
+        componentId: component.docId,
+        snapshotId: corrected.docId,
+        operationKey,
+      },
+    );
+    const restored = (await kitchen.query(
+      api.queries.listComponentIngredient,
+      {},
+    )) as any[];
+    expect(
+      restored.filter(
+        (line) =>
+          line.componentId === component.docId && line.deletedAt == null,
+      ),
+    ).toMatchObject([
+      { quantity: 5, sortOrder: 0, wasteFactor: 1, prepNotes: "legacy" },
+    ]);
   });
 
   it("restores the durable snapshot exactly and rejects a snapshot/component mismatch", async () => {

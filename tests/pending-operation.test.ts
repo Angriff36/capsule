@@ -13,7 +13,7 @@ const payloadB = {
 beforeEach(() => resetPendingOperationsForTest());
 
 describe("pending operation payload", () => {
-  it("replays the frozen request when live source data changes", () => {
+  it("preserves the operation key while retrying current operator input", () => {
     const values = new Map<string, string>();
     const storage = {
       getItem: (key: string) => values.get(key) ?? null,
@@ -28,8 +28,8 @@ describe("pending operation payload", () => {
       storage,
       randomUUID: () => "two",
     });
-    expect(retry).toEqual(first);
-    expect(retry.payload).toEqual(payloadA);
+    expect(retry.key).toBe(first.key);
+    expect(retry.payload).toEqual(payloadB);
   });
 
   it("continues safely when storage fails before submission", () => {
@@ -80,7 +80,7 @@ describe("pending operation payload", () => {
       storage,
       randomUUID: () => "ignored",
     });
-    expect(afterRefresh).toEqual({ key: "old", payload: payloadA });
+    expect(afterRefresh).toEqual({ key: "old", payload: payloadB });
   });
 
   it("survives the window.localStorage property getter throwing", () => {

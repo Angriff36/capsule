@@ -102,14 +102,14 @@ export const importComponent = mutation({
   },
   handler: async (ctx, args): Promise<{ componentId: string; createdIngredientIds: string[]; lineIds: string[]; recovered: boolean }> => {
     const tenantId = await authorize(ctx);
-    for (const line of args.projection.lines) {
-      if (line.ingredientId) await ownedLive(ctx, line.ingredientId, tenantId, "Ingredient");
-      else if (!line.createNew) throw new Error(`${line.name} is missing a matched ingredient`);
-    }
     const prior = await readMaterializationReceipt<{ componentId: string; createdIngredientIds: string[]; lineIds: string[] }>(
       ctx, tenantId, "componentImport", args.operationKey, args.projection,
     );
     if (prior) return { ...prior, recovered: true };
+    for (const line of args.projection.lines) {
+      if (line.ingredientId) await ownedLive(ctx, line.ingredientId, tenantId, "Ingredient");
+      else if (!line.createNew) throw new Error(`${line.name} is missing a matched ingredient`);
+    }
     const createdIngredientIds: string[] = [];
     const ingredientIds: Id<"ingredients">[] = [];
     for (let index = 0; index < args.projection.lines.length; index++) {
