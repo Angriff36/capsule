@@ -44,6 +44,7 @@ import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
 import { useActionNotice } from "../../ui/action-result";
+import { projectProposalPdf } from "./proposalPdfProjection";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
 // EventDish.confirmFromProposal stage guard).
@@ -596,7 +597,7 @@ export function ProposalsPage() {
                                 ? venues.find((v) => v._id === event.venueId)
                                 : null;
 
-                            let enrichedProposal: ProposalPdfRecord = {
+                            const enrichedProposal: ProposalPdfRecord = {
                               ...row,
                               visibleSections: (
                                 row.visibleSections ?? []
@@ -644,7 +645,7 @@ export function ProposalsPage() {
                                   price: Number(item.price) || 0,
                                 })),
                             };
-                            let pdfClientName = clientDisplayName(
+                            const pdfClientName = clientDisplayName(
                               row.clientId,
                               clients,
                             );
@@ -652,70 +653,21 @@ export function ProposalsPage() {
                             const publishedRevision = latestRevisionFor(
                               row._id,
                             );
-                            if (
-                              String(row.status) !== "draft" &&
-                              publishedRevision?.snapshot
-                            ) {
-                              try {
-                                const frozen = JSON.parse(
-                                  publishedRevision.snapshot,
-                                ) as any;
-                                const frozenProposal = frozen.proposal ?? {};
-                                pdfClientName =
-                                  typeof frozen.client?.name === "string"
-                                    ? frozen.client.name
-                                    : pdfClientName;
-                                enrichedProposal = {
-                                  ...enrichedProposal,
-                                  ...frozenProposal,
-                                  _id: row._id,
-                                  visibleSections:
-                                    frozenProposal.visibleSections ?? [],
-                                  dishSelections: frozen.dishSelections ?? [],
-                                  pricingLines: (frozen.lineItems ?? []).map(
-                                    (line: any) => ({
-                                      description: line.description,
-                                      pricingBasis: line.pricingBasis,
-                                      unitPrice: line.unitPrice,
-                                      quantity: line.quantity,
-                                      unit: line.unit,
-                                    }),
-                                  ),
-                                  enhancements: frozen.enhancements ?? [],
-                                  venueLogistics: frozen.venue
-                                    ? {
-                                        loadIn:
-                                          frozen.venue.loadInInstructions ??
-                                          undefined,
-                                        access:
-                                          frozen.venue.kitchenAccess ??
-                                          undefined,
-                                        restrictions:
-                                          frozen.venue.restrictions ??
-                                          undefined,
-                                      }
-                                    : undefined,
-                                  timelineItems: (frozen.timeline ?? []).map(
-                                    (item: any) => ({
-                                      time: new Date(
-                                        item.startsAt,
-                                      ).toLocaleTimeString([], {
-                                        hour: "numeric",
-                                        minute: "2-digit",
-                                      }),
-                                      activity: item.name,
-                                    }),
-                                  ),
-                                };
-                              } catch {
-                                // Legacy malformed/missing snapshots retain the
-                                // explicit live-data fallback above.
-                              }
-                            }
+                            const pdfProjection =
+                              String(row.status) === "draft"
+                                ? {
+                                    proposal: enrichedProposal,
+                                    clientName: pdfClientName,
+                                  }
+                                : projectProposalPdf(
+                                    enrichedProposal,
+                                    pdfClientName,
+                                    publishedRevision,
+                                  );
 
                             void downloadProposalPdf({
-                              proposal: enrichedProposal,
-                              clientName: pdfClientName,
+                              proposal: pdfProjection.proposal,
+                              clientName: pdfProjection.clientName,
                               branding,
                             })
                               .then(() => setNotice("Proposal PDF downloaded."))
