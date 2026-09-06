@@ -4,6 +4,10 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import {
+  beginPendingOperation,
+  resetPendingOperationsForTest,
+} from "../../src/lib/pendingOperationKey";
 
 function harness() {
   return createManifestTestContext({
@@ -105,29 +109,126 @@ describe("runtime proof: safe template materialization", () => {
       api.mutations.PackList_createViaOpen,
       { eventId, name: "Retry load" },
     )) as { docId: string };
-    const args = {
+    resetPendingOperationsForTest();
+    const values = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => values.get(key) ?? null,
+      setItem: (key: string, value: string) => values.set(key, value),
+      removeItem: (key: string) => values.delete(key),
+    };
+    const original = {
       packListId: pack.docId,
-      operationKey: "pack-template:retry:one",
       items: [
         { description: "Chafers", requiredQuantity: 2, unit: "each" },
         { description: "Linens", requiredQuantity: 12, unit: "each" },
       ],
     };
+    const first = beginPendingOperation("runtime-pack", original, {
+      storage,
+      randomUUID: () => "one",
+    });
     await proof.executeCommand(
       logistics,
       (api.lib as any).safeMaterialization.applyPackTemplate,
-      args,
+      { ...first.payload, operationKey: first.key },
     );
+    const changed = {
+      ...original,
+      items: [
+        { description: "New source row", requiredQuantity: 1, unit: "each" },
+        ...original.items,
+      ],
+    };
+    const retry = beginPendingOperation("runtime-pack", changed, {
+      storage,
+      randomUUID: () => "two",
+    });
+    expect(retry.payload).toEqual(original);
     await proof.executeCommand(
       logistics,
       (api.lib as any).safeMaterialization.applyPackTemplate,
-      args,
+      { ...retry.payload, operationKey: retry.key },
     );
     const rows = (await logistics.query(
       api.queries.listPackListItem,
       {},
     )) as unknown[];
     expect(rows).toHaveLength(2);
+  });
+
+  it("rejects foreign-tenant parents before replaying generated idempotency keys", async () => {
+    const proof = harness();
+    const eventId = await seedEvent(proof, "tenant-parent-owner");
+    const owner = proof.asRole({
+      subject: "parent-owner",
+      role: "logistics_manager",
+      tenantId: "tenant-parent-owner",
+    });
+    const outsider = proof.asRole({
+      subject: "parent-outsider",
+      role: "logistics_manager",
+      tenantId: "tenant-parent-outsider",
+    });
+    const pack = (await proof.executeCommand(
+      owner,
+      api.mutations.PackList_createViaOpen,
+      { eventId, name: "Owned load" },
+    )) as { docId: string };
+    const args = {
+      packListId: pack.docId,
+      operationKey: "shared-key",
+      items: [{ description: "Owned", requiredQuantity: 1, unit: "each" }],
+    };
+    await proof.executeCommand(
+      owner,
+      (api.lib as any).safeMaterialization.applyPackTemplate,
+      args,
+    );
+    await expect(
+      proof.executeCommand(
+        outsider,
+        (api.lib as any).safeMaterialization.applyPackTemplate,
+        args,
+      ),
+    ).rejects.toThrow(/not found/i);
+  });
+
+  it("rechecks the generated command role before returning a cached replay", async () => {
+    const proof = harness();
+    const tenantId = "tenant-role-replay";
+    const eventId = await seedEvent(proof, tenantId);
+    const logistics = proof.asRole({
+      subject: "role-logistics",
+      role: "logistics_manager",
+      tenantId,
+    });
+    const unrelated = proof.asRole({
+      subject: "role-unrelated",
+      role: "staff",
+      tenantId,
+    });
+    const pack = (await proof.executeCommand(
+      logistics,
+      api.mutations.PackList_createViaOpen,
+      { eventId, name: "Role load" },
+    )) as { docId: string };
+    const args = {
+      packListId: pack.docId,
+      operationKey: "role-replay",
+      items: [{ description: "Owned", requiredQuantity: 1, unit: "each" }],
+    };
+    await proof.executeCommand(
+      logistics,
+      (api.lib as any).safeMaterialization.applyPackTemplate,
+      args,
+    );
+    await expect(
+      proof.executeCommand(
+        unrelated,
+        (api.lib as any).safeMaterialization.applyPackTemplate,
+        args,
+      ),
+    ).rejects.toThrow(/logistics/i);
   });
 
   it("atomically copies layout sections and makes confirmed retries idempotent", async () => {
@@ -314,5 +415,101 @@ describe("runtime proof: safe template materialization", () => {
     expect(await buyer.query(api.queries.listVendorOrderLine, {})).toHaveLength(
       1,
     );
+  });
+
+  it("enforces live event stage and demand/event/order ownership at the PO seam", async () => {
+    const proof = harness();
+    const tenantId = "tenant-po-ownership";
+    const eventId = await seedEvent(proof, tenantId);
+    const otherEventId = await seedEvent(proof, tenantId);
+    const buyer = proof.asRole({
+      subject: "po-owner-buyer",
+      role: "procurement_staff",
+      tenantId,
+    });
+    const kitchen = proof.asRole({
+      subject: "po-owner-kitchen",
+      role: "kitchen_manager",
+      tenantId,
+    });
+    const vendor = (await proof.executeCommand(
+      buyer,
+      api.mutations.Vendor_createViaOnboard,
+      { name: "Ownership Produce", paymentTermsDays: 14 },
+    )) as { docId: string };
+    const ingredient = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      {
+        name: "Ownership herbs",
+        unit: "kilogram",
+        costPerUnit: 1,
+        allergens: [],
+        category: "produce",
+      },
+    )) as { docId: string };
+    const demandId = await proof.seedEntity(buyer, "ingredientDemands", {
+      tenantId,
+      eventId: otherEventId,
+      ingredientId: ingredient.docId,
+      requiredQuantity: 1,
+      unit: "kilogram",
+      status: "calculated",
+      version: 1,
+    });
+    const line = {
+      ingredientId: ingredient.docId,
+      ingredientDemandId: demandId,
+      orderedQuantity: 1,
+      unit: "kilogram",
+      unitCost: 1,
+    };
+    await expect(
+      proof.executeCommand(
+        buyer,
+        (api.lib as any).safeMaterialization.draftPurchaseOrder,
+        {
+          eventId,
+          vendorId: vendor.docId,
+          operationKey: "wrong-demand",
+          lines: [line],
+        },
+      ),
+    ).rejects.toThrow(/does not belong/);
+
+    const otherOrder = (await proof.executeCommand(
+      buyer,
+      api.mutations.VendorOrder_createViaOpen,
+      { vendorId: vendor.docId, eventId: otherEventId },
+    )) as { docId: string };
+    await expect(
+      proof.executeCommand(
+        buyer,
+        (api.lib as any).safeMaterialization.draftPurchaseOrder,
+        {
+          eventId,
+          vendorId: vendor.docId,
+          existingOrderId: otherOrder.docId,
+          operationKey: "wrong-order",
+          lines: [],
+        },
+      ),
+    ).rejects.toThrow(/matching draft/);
+
+    await buyer.run(async (ctx) =>
+      ctx.db.patch(eventId as never, { stage: "approved" }),
+    );
+    await expect(
+      proof.executeCommand(
+        buyer,
+        (api.lib as any).safeMaterialization.draftPurchaseOrder,
+        {
+          eventId,
+          vendorId: vendor.docId,
+          operationKey: "wrong-stage",
+          lines: [],
+        },
+      ),
+    ).rejects.toThrow(/approved/);
   });
 });

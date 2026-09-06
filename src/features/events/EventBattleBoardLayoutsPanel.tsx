@@ -24,8 +24,8 @@ import {
 } from "./layoutTrim";
 import { useApplyLayoutTemplate } from "../../lib/safeMaterialization";
 import {
+  beginPendingOperation,
   confirmPendingOperation,
-  pendingOperationKey,
 } from "../../lib/pendingOperationKey";
 
 // Mirrors a VenueLayoutTemplate's stored sections JSON (see §8.2): each entry
@@ -177,14 +177,17 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
     const base = eventSections.length;
     void run("copy", async () => {
       const scope = `layout-template:${eventId}:${template._id}`;
-      await applyLayoutTemplate({
+      const pending = beginPendingOperation(scope, {
         eventId,
-        operationKey: pendingOperationKey(scope),
         baseSortOrder: base,
         sections: templateSections.map((section) => ({
           type: section.type,
           instructions: section.instructions ?? "",
         })),
+      });
+      await applyLayoutTemplate({
+        ...pending.payload,
+        operationKey: pending.key,
       });
       confirmPendingOperation(scope);
       setCopyTemplateId("");

@@ -37,8 +37,8 @@ import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
 import { useApplyPackTemplate } from "../../lib/safeMaterialization";
 import {
+  beginPendingOperation,
   confirmPendingOperation,
-  pendingOperationKey,
 } from "../../lib/pendingOperationKey";
 
 const policy = new LogisticsLifecyclePolicy();
@@ -244,10 +244,13 @@ export function PackListDetailPage() {
         throw new Error("This template has no valid items to generate.");
       }
       const scope = `pack-template:${packList._id}:${template._id}`;
-      await applyPackTemplate({
+      const pending = beginPendingOperation(scope, {
         packListId: packList._id,
-        operationKey: pendingOperationKey(scope),
         items: lines,
+      });
+      await applyPackTemplate({
+        ...pending.payload,
+        operationKey: pending.key,
       });
       confirmPendingOperation(scope);
       setShowTemplates(false);

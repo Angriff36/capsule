@@ -14,8 +14,8 @@ import { EventDraftPoCoordinator } from "./EventDraftPoCoordinator";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import { useDraftPurchaseOrder } from "../../lib/safeMaterialization";
 import {
+  beginPendingOperation,
   confirmPendingOperation,
-  pendingOperationKey,
 } from "../../lib/pendingOperationKey";
 
 type Props = {
@@ -69,9 +69,10 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
         },
         materialize: async (input) => {
           const scope = `event-draft-po:${eventId}:${chosenVendorId}`;
+          const pending = beginPendingOperation(scope, input);
           const created = await materializeDraft({
-            ...input,
-            operationKey: pendingOperationKey(scope),
+            ...pending.payload,
+            operationKey: pending.key,
           });
           confirmPendingOperation(scope);
           return created;
