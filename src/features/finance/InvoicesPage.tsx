@@ -206,7 +206,9 @@ export function InvoicesPage() {
       form.reset();
       setShowIssue(false);
       clearIssuePrefill();
-      setNotice("Invoice issued. Send it when ready for payment.");
+      setNotice(
+        "Invoice issued. Deliver it outside Capsule, then record it sent here.",
+      );
     });
   };
 
@@ -259,7 +261,11 @@ export function InvoicesPage() {
         if (key === "send") await send(args);
         if (key === "markViewed") await markViewed(args);
         if (key === "markOverdue") await markOverdue(args);
-        setNotice(`Invoice updated (${key}).`);
+        setNotice(
+          key === "send"
+            ? "Invoice marked sent in Capsule. Share the invoice or payment link through your external channel."
+            : `Invoice updated (${key}).`,
+        );
       });
     })();
   };
@@ -273,7 +279,7 @@ export function InvoicesPage() {
       });
       selection.clear();
       setNotice(
-        `${targets.length} ${targets.length === 1 ? "invoice" : "invoices"} sent.`,
+        `${targets.length} ${targets.length === 1 ? "invoice" : "invoices"} marked sent in Capsule. Deliver them through your external channel.`,
       );
     });
   };
@@ -467,7 +473,9 @@ export function InvoicesPage() {
                               >
                                 {busy === `${row._id}:${action.key}`
                                   ? "Working…"
-                                  : action.label}
+                                  : action.key === "send"
+                                    ? "Record sent"
+                                    : action.label}
                               </button>
                             ))}
                         </div>
@@ -493,7 +501,7 @@ export function InvoicesPage() {
           disabled={busy != null || selection.count === 0}
           onClick={runBulkSend}
         >
-          Send {selection.count}
+          Record {selection.count} sent
         </button>
       </BulkActionBar>
     </div>

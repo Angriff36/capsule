@@ -345,7 +345,7 @@ export function InvoiceDetailPage() {
           await send(args);
           if (dueDate == null) {
             setNotice(
-              "Invoice sent. Automatic reminders need a due date set when the invoice is issued.",
+              "Invoice marked sent in Capsule. Deliver it through your external channel. Automatic reminders need a due date set when the invoice is issued.",
             );
             return;
           }
@@ -357,13 +357,13 @@ export function InvoiceDetailPage() {
             setReminderSchedule(schedule);
             setReminderOffsetsInput(schedule.offsetsDays.join(", "));
             setNotice(
-              "Invoice sent. Automatic payment reminder schedule saved.",
+              "Invoice marked sent in Capsule. Automatic payment reminder schedule saved; deliver the initial invoice through your external channel.",
             );
           } catch (error) {
             const detail =
               error instanceof Error ? error.message : "setup failed";
             throw new Error(
-              `Invoice sent, but automatic reminder setup failed: ${detail}`,
+              `Invoice marked sent, but automatic reminder setup failed: ${detail}`,
             );
           }
           return;
@@ -685,7 +685,11 @@ export function InvoiceDetailPage() {
                 disabled={busy != null}
                 onClick={() => invoke(action.key)}
               >
-                {busy === action.key ? "Working…" : action.label}
+                {busy === action.key
+                  ? "Working…"
+                  : action.key === "send"
+                    ? "Record sent"
+                    : action.label}
               </button>
             ))}
         </div>

@@ -419,7 +419,7 @@ export function ProposalsPage() {
         if (key === "expire") await expire(args);
         setNotice(
           key === "send"
-            ? "Proposal sent."
+            ? "Proposal published in Capsule. Copy its share link or PDF into your delivery channel; Capsule does not send it externally."
             : key === "markViewed"
               ? "Proposal marked as viewed."
               : key === "expire"
@@ -700,7 +700,9 @@ export function ProposalsPage() {
                               disabled={busy != null}
                               onClick={() => invoke(row, action.key)}
                             >
-                              {action.label}
+                              {action.key === "send"
+                                ? "Publish proposal"
+                                : action.label}
                             </button>
                           ))}
                         {String(row.status) === "accepted" ? (

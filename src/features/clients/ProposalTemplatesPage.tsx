@@ -126,7 +126,7 @@ export function ProposalTemplatesPage() {
       try {
         const visibleSectionsArray = Array.from(selectedSections);
         await revise({
-          id,
+          docId: id,
           name: String(data.get("name")),
           description: String(data.get("description") || "") || undefined,
           visibleSections: visibleSectionsArray,
@@ -164,7 +164,7 @@ export function ProposalTemplatesPage() {
       setFailure(null);
       setBusy(true);
       try {
-        await archive({ id, reason });
+        await archive({ docId: id, reason });
       } catch (error) {
         setFailure(error);
       } finally {
@@ -177,7 +177,7 @@ export function ProposalTemplatesPage() {
     setFailure(null);
     setBusy(true);
     try {
-      await reactivate({ id });
+      await reactivate({ docId: id });
     } catch (error) {
       setFailure(error);
     } finally {

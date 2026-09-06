@@ -20,6 +20,7 @@ import { PasteIncomingMessageForm } from "./PasteIncomingMessageForm";
 import { SyncErrorsPanel } from "./SyncErrorsPanel";
 import type { Doc } from "../../lib/api";
 import { useActionNotice } from "../../ui/action-result";
+import { deliveryStatusLabel, replyDisposition } from "./deliveryHonesty";
 
 type Thread = Doc<"messageThreads">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
@@ -154,16 +155,19 @@ export function MessageInboxPage() {
     const body = reply.trim();
     if (!body) return;
     setFailure(null);
+    setNotice(null);
+    const disposition = replyDisposition(selected.provider);
+    if (!disposition.canRecord) {
+      fail(new Error(disposition.notice ?? "Cannot send this message."));
+      return;
+    }
     setSending(true);
     try {
-      // Internal threads record the reply as sent (no external delivery). For
-      // any real provider the message is queued — this increment has no
-      // provider/outbox wired, so we never claim "sent" for an unsent message;
-      // a future provider worker moves queued -> sent on acknowledgement.
+      // Internal threads are conversation notes, not external delivery.
       await createMessage({
         threadId: selected._id,
         direction: "outbound",
-        status: selected.provider === "internal" ? "sent" : "queued",
+        status: "sent",
         bodyText: body,
       });
       setReply("");
@@ -581,6 +585,9 @@ export function MessageInboxPage() {
                           <p className="mt-1 text-2xs text-ink-3">
                             {m.createdAt ? formatTime(m.createdAt) : ""}
                             {m.senderIdentity ? ` · ${m.senderIdentity}` : ""}
+                            {mine && deliveryStatusLabel(String(m.status))
+                              ? ` · ${deliveryStatusLabel(String(m.status))}`
+                              : ""}
                           </p>
                         </div>
                       );
@@ -608,7 +615,13 @@ export function MessageInboxPage() {
                     className="btn btn-primary"
                     disabled={sending || reply.trim().length === 0}
                   >
-                    {sending ? "Sending…" : "Send"}
+                    {sending
+                      ? selected.provider === "internal"
+                        ? "Logging…"
+                        : "Sending…"
+                      : selected.provider === "internal"
+                        ? "Log note"
+                        : "Send"}
                   </button>
                 </form>
               </>
