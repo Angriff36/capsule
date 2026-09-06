@@ -211,7 +211,10 @@ entity ImportRun mixin TenantScoped, SoftDeletable {
     guard self.reviewApprovedAt != null
     guard self.archiveWorkbookCount == self.indexWorkbookCount or self.discrepancyExplained == true
     guard self.indexNameMismatch != true or self.discrepancyExplained == true
-    guard self.unaccountedRecordCount == 0
+    // Legacy rows (created before the R2 fields existed) have NO
+    // unaccountedRecordCount — absence means zero, the same normalization
+    // the read seams apply; a pre-release run must stay completable.
+    guard (self.unaccountedRecordCount != null ? self.unaccountedRecordCount : 0) == 0
     guard self.deletedAt == null
     constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
     mutate actorId = actorId != null ? actorId : self.actorId

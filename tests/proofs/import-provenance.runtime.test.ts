@@ -327,5 +327,18 @@ describe("runtime proof: import provenance (AC-022)", () => {
     expect(JSON.stringify(capped).length).toBeLessThan(
       PROVENANCE_BYTE_BUDGET + 4096,
     );
+
+    // Merge-heavy sheets are bounded too (review round 2): ranges share the
+    // byte budget and stop at a count cap, flagged in the document.
+    const mergeHeavy = buildStyledWorkbook({
+      cells: [{ ref: "A1", is: "merge title" }],
+      merges: Array.from({ length: 5000 }, (_, i) => `A${i + 1}:C${i + 1}`),
+    });
+    const mergeCapped = buildWorkbookProvenance(Buffer.from(mergeHeavy));
+    expect(mergeCapped.mergedRangesTruncated).toBe(true);
+    expect(mergeCapped.sheets[0].mergedRanges.length).toBeLessThanOrEqual(256);
+    expect(JSON.stringify(mergeCapped).length).toBeLessThan(
+      PROVENANCE_BYTE_BUDGET + 4096,
+    );
   });
 });

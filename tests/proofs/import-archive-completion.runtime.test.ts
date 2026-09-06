@@ -215,4 +215,36 @@ describe("runtime proof: import archive completion (AC-027)", () => {
     expect(artifacts).toHaveLength(5);
     expect(artifacts.every((row) => row.disposition !== "pending")).toBe(true);
   });
+
+  it("a pre-release legacy run without the R2 fields still completes", async () => {
+    // Review round 2: the R2 fields are optional for rows created before
+    // they existed, and absence must read as zero in the commit gate — a
+    // legacy committing run is completable, never stranded.
+    const tenantId = "tenant-import-legacy-run";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-legacy-run-owner",
+      role: "owner",
+      tenantId,
+    });
+
+    const legacyRunId = (await owner.run(async (ctx) =>
+      ctx.db.insert("importRuns", {
+        tenantId,
+        sourceSystem: "tpp_legacy",
+        datasetType: "venues",
+        status: "committing",
+        recordCounts: "{}",
+        actorId: "",
+        reviewApprovedAt: Date.now(),
+        deletedAt: null,
+        version: 0,
+      }),
+    )) as unknown as string;
+
+    const committed = (await owner.mutation(api.mutations.ImportRun_commit, {
+      docId: legacyRunId,
+    })) as { status: string };
+    expect(committed.status).toBe("completed");
+  });
 });

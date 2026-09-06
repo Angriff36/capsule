@@ -63,7 +63,9 @@ describe("import run detail: source provenance panel", () => {
     // page (DESIGN.md collapsing strategy; the repo's table idiom).
     expect(panel).toContain("overflow-x-auto");
 
-    // The serialized byte budget is stated where truncation is reported.
+    // The serialized byte budget is stated where truncation is reported,
+    // including omitted merge ranges.
     expect(panel).toContain("workbook.byteBudget");
+    expect(panel).toContain("workbook.mergedRangesTruncated");
   });
 });

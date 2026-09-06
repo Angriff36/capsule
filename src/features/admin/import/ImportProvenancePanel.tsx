@@ -46,6 +46,7 @@ interface ProvenanceWorkbook {
   cellCap?: number;
   byteBudget?: number;
   cellsTruncated?: boolean;
+  mergedRangesTruncated?: boolean;
   error?: string;
   sheets?: Array<{
     name: string;
@@ -217,13 +218,17 @@ export function ImportProvenancePanel({
                             </table>
                           </div>
                           {sheet.cells.length > RENDERED_CELL_LIMIT ||
-                          workbook.cellsTruncated ? (
+                          workbook.cellsTruncated ||
+                          workbook.mergedRangesTruncated ? (
                             <p className="mt-1 text-2xs text-ink-3">
                               {sheet.cells.length > RENDERED_CELL_LIMIT
                                 ? `+${sheet.cells.length - RENDERED_CELL_LIMIT} more cells recorded on the artifact. `
                                 : ""}
                               {workbook.cellsTruncated
                                 ? `Provenance caps at ${workbook.cellCap} cells / ${Math.round((workbook.byteBudget ?? 0) / 1024)} KiB of detail; this workbook has ${workbook.cellCount} cells.`
+                                : ""}
+                              {workbook.mergedRangesTruncated
+                                ? " Some merged ranges are omitted."
                                 : ""}
                             </p>
                           ) : null}

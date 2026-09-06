@@ -211,35 +211,46 @@ export const linksForRun = internalQuery({
 });
 
 /**
- * COUNT of the live, non-superseded links a run created — the durable floor
- * for the final commit checkpoint (review R2-14). linksForRun is bounded at
- * 500 for revert paging; this pages with a cursor so larger runs count fully.
+ * ONE bounded page of the live, non-superseded links a run created — the
+ * durable floor input for the final commit checkpoint (review R2-14). Each
+ * call reads at most 500 docs; completeRun accumulates across calls, so a
+ * large import never blows a single query's transaction read budget
+ * (Convex query guidance: unbounded accumulation belongs outside the
+ * transaction).
  */
 export const countRunLinks = internalQuery({
-  args: { sourceImportRunId: v.id("importRuns") },
-  handler: async (ctx, args): Promise<number> => {
-    let count = 0;
-    let cursor: string | null = null;
-    for (;;) {
-      const page = await ctx.db
-        .query("externalRecordLinks")
-        .withIndex("by_sourceImportRunId", (q) =>
-          q.eq("sourceImportRunId", args.sourceImportRunId),
-        )
-        .filter((q) =>
-          q.and(
-            q.eq(q.field("deletedAt"), null),
-            q.or(
-              q.eq(q.field("conflictStatus"), "resolved"),
-              q.eq(q.field("conflictStatus"), "pending_conflict"),
-            ),
+  args: {
+    sourceImportRunId: v.id("importRuns"),
+    cursor: v.optional(v.union(v.string(), v.null())),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    count: number;
+    isDone: boolean;
+    continueCursor: string;
+  }> => {
+    const page = await ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_sourceImportRunId", (q) =>
+        q.eq("sourceImportRunId", args.sourceImportRunId),
+      )
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("deletedAt"), null),
+          q.or(
+            q.eq(q.field("conflictStatus"), "resolved"),
+            q.eq(q.field("conflictStatus"), "pending_conflict"),
           ),
-        )
-        .paginate({ numItems: 500, cursor });
-      count += page.page.length;
-      if (page.isDone) return count;
-      cursor = page.continueCursor;
-    }
+        ),
+      )
+      .paginate({ numItems: 500, cursor: args.cursor ?? null });
+    return {
+      count: page.page.length,
+      isDone: page.isDone,
+      continueCursor: page.continueCursor,
+    };
   },
 });
 
@@ -496,27 +507,39 @@ export const commitImportRun = action({
       // the checkpoint boundary loses that invocation's counts (resume skips
       // own-run links silently), so accumulated totals can finish below the
       // durable truth. Every terminal outcome this run produced is a live
-      // ExternalRecordLink — count them and never persist a committedCount
-      // under that floor.
-      const linked = (await ctx.runQuery(internal.importCommit.countRunLinks, {
-        sourceImportRunId: args.importRunId,
-      })) as number;
+      // ExternalRecordLink — count them in bounded pages across
+      // transactions and never persist counts under that floor.
+      let linked = 0;
+      let countCursor: string | null = null;
+      for (;;) {
+        const page = (await ctx.runQuery(internal.importCommit.countRunLinks, {
+          sourceImportRunId: args.importRunId,
+          cursor: countCursor,
+        })) as {
+          count: number;
+          isDone: boolean;
+          continueCursor: string;
+        };
+        linked += page.count;
+        if (page.isDone) break;
+        countCursor = page.continueCursor;
+      }
       const merged = mergeCheckpoint(checkpoint, invocation);
       const committedFloor = Math.max(
         merged.committedCount,
         linked - merged.pendingCount,
       );
-      const reconciled =
-        committedFloor > merged.committedCount
-          ? {
-              ...merged,
-              committedCount: committedFloor,
-              processedCount: Math.max(
-                merged.processedCount,
-                committedFloor + merged.skippedCount,
-              ),
-            }
-          : merged;
+      // The recovered processed total includes this invocation's pending
+      // outcomes (review round 2): recovered resolved links + skipped +
+      // pending is the durable lower bound.
+      const reconciled: CommitCheckpoint = {
+        ...merged,
+        committedCount: committedFloor,
+        processedCount: Math.max(
+          merged.processedCount,
+          committedFloor + merged.skippedCount + merged.pendingCount,
+        ),
+      };
       await ctx.runMutation(api.mutations.ImportRun_recordCommitCheckpoint, {
         docId: args.importRunId,
         commitCheckpoint: JSON.stringify(reconciled),

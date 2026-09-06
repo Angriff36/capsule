@@ -562,4 +562,64 @@ describe("runtime proof: import resume with fault injection (AC-024)", () => {
       pendingCount: 0,
     });
   });
+
+  it("completion counts large runs in bounded pages across transactions", async () => {
+    const tenantId = "tenant-import-resume-pagination";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-resume-pagination-owner",
+      role: "owner",
+      tenantId,
+    });
+
+    // A run whose durable links exceed one bounded page (500): the final
+    // checkpoint floor must count them ALL — one query per page, accumulated
+    // in the action, never inside a single query's read budget (review
+    // round 2).
+    const venueRows = [
+      {
+        VenueID: "V-001",
+        VenueName: "Pagination Venue",
+        VenueType: "Office",
+        Address: "1 Main Street",
+        City: "Seattle",
+        State: "WA",
+        ZipCode: "98101",
+        Capacity: 100,
+        CreatedDate: "2026-05-01",
+      },
+    ];
+    const runId = await startRun(owner, "venues");
+    await walkToCommitting(owner, runId, "venues", venueRows.length);
+
+    await owner.run(async (ctx) => {
+      for (let i = 0; i < 501; i += 1) {
+        await ctx.db.insert("externalRecordLinks", {
+          tenantId,
+          sourceSystem: "tpp_legacy",
+          recordType: "venue",
+          externalId: `noise-${i}`,
+          capsuleEntity: "venue",
+          capsuleId: `noise-${i}`,
+          verified: false,
+          sourceImportRunId: runId,
+          conflictStatus: "resolved",
+          deletedAt: null,
+          version: 0,
+        });
+      }
+    });
+
+    const result = await commit(owner, {
+      importRunId: runId,
+      rawRows: venueRows,
+    });
+    expect(result.stoppedEarly).toBeUndefined();
+
+    const after = await runRow(owner, runId);
+    expect(after?.status).toBe("completed");
+    const checkpoint = JSON.parse(after!.commitCheckpoint) as Checkpoint;
+    // 501 noise links + 1 real venue — the floor counts every durable link.
+    expect(checkpoint.committedCount).toBe(502);
+  });
 });

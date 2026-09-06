@@ -24,6 +24,13 @@ export const PROVENANCE_BYTE_BUDGET = 256 * 1024;
 /** Longest single string kept per cell field (raw/value/formula). */
 const PROVENANCE_VALUE_CHARS = 2048;
 
+/**
+ * Recorded merged ranges per sheet. Merges are metadata, not evidence rows,
+ * but a pathological sheet can carry tens of thousands of mergeCell
+ * entries — they share the byte budget and stop at this count cap.
+ */
+const PROVENANCE_RANGE_CAP = 256;
+
 export interface ProvenanceCell {
   ref: string;
   raw: string;
@@ -54,6 +61,8 @@ export interface WorkbookProvenance {
   cellCap: number;
   byteBudget: number;
   cellsTruncated: boolean;
+  /** Merge ranges were dropped (count cap or byte budget). */
+  mergedRangesTruncated: boolean;
   sheets: ProvenanceSheet[];
 }
 
@@ -115,7 +124,19 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
   let remaining = PROVENANCE_CELL_CAP;
   let budget = PROVENANCE_BYTE_BUDGET;
   let taken = 0;
+  let rangesTruncated = false;
   const sheets = workbook.sheets.map((sheet) => {
+    // Merge ranges are charged to the same budget as cells (review round 2:
+    // a merge-heavy sheet must not bypass the document bound).
+    const mergedRanges: string[] = [];
+    for (const range of sheet.mergedRanges) {
+      if (mergedRanges.length >= PROVENANCE_RANGE_CAP || budget <= 0) {
+        rangesTruncated = true;
+        break;
+      }
+      mergedRanges.push(range);
+      budget -= range.length + 3;
+    }
     const cells: ProvenanceCell[] = [];
     for (const cell of sheet.cells) {
       if (remaining <= 0 || budget <= 0) break;
@@ -127,7 +148,7 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
     }
     return {
       name: sheet.name,
-      mergedRanges: sheet.mergedRanges,
+      mergedRanges,
       cells,
     };
   });
@@ -142,6 +163,7 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
     cellCap: PROVENANCE_CELL_CAP,
     byteBudget: PROVENANCE_BYTE_BUDGET,
     cellsTruncated: taken < cellCount,
+    mergedRangesTruncated: rangesTruncated,
     sheets,
   };
 }

@@ -1022,6 +1022,33 @@ release ships the moment the owner rotates the keys; all other release.sh
 preconditions are ready (branch pushed, local main == origin/main,
 primary checkout parked on main-parked-d04d5ec at the same commit).
 
+Iteration 60 (BUILD, release 2, 2026-09-05): review ROUND 2 (report at
+.artifacts/review/r2-14/report2.md) — the original 9 findings confirmed
+fixed, panel passed DESIGN.md, but the reviewer REJECTed again on 5 new
+findings in the fix code (2 P1 + 3 P2); all verified real and FIXED:
+(1) legacy committing rows had unaccountedRecordCount ABSENT (undefined
+=== 0 is false), so the commit guard would strand every pre-release run
+in "committing" — the guard now normalizes absence to 0 (compiled as
+`((doc.unaccountedRecordCount != null) ? doc.unaccountedRecordCount : 0)
+=== 0`); completion proof gained a legacy-run leg (raw insert without
+the R2 fields → commit completes). (2) countRunLinks accumulated ALL
+pages inside ONE query — a large run would exceed a single Convex
+transaction's read budget at completion; the query now returns ONE
+bounded page ({count, isDone, continueCursor}, ≤500 docs) and
+completeRun accumulates across transactions; resume proof gained a
+501-noise-link leg (finishes committedCount 502). (3) the recovered
+processedCount floor omitted pending outcomes — now committedFloor +
+skipped + pending. (4) merge ranges escaped the provenance byte budget —
+they now share it and stop at a 256-range cap, flagged
+mergedRangesTruncated (panel note + provenance leg with 5000 merges).
+(5) the identical-bytes short-circuit could fire on a run holding
+crashed same-run drafts, stranding them without archive linkage —
+listArtifactRows is read FIRST and the cross-run duplicate branch runs
+only when the run holds no artifact rows. Regen landed the guard change;
+typecheck green; 10 focused tests green (5 files). NEXT: full bun run
+check, commit/tag v0.0.66, review round 3 on the delta; release still
+blocked on #265 key rotation only.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.

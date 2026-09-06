@@ -138,21 +138,40 @@ export const inventoryArchive = action({
     const archive = Buffer.from(await blob.arrayBuffer());
     const wholeChecksum = sha256Hex(archive);
 
+    // Same-run rows first (review round 2): a crashed earlier inventory of
+    // these bytes may have left rows on THIS run. Finishing that inventory
+    // is the idempotent action, so the cross-run duplicate shortcut below
+    // must never fire while same-run rows exist — it would strand the
+    // half-registered rows without archive linkage.
+    const existingRows = (await ctx.runQuery(
+      internal.archiveInventoryStore.listArtifactRows,
+      {
+        importRunId: args.importRunId,
+      },
+    )) as Array<{
+      id: Id<"importArtifacts">;
+      name: string;
+      createdAt: number | null;
+    }>;
+    const existingByName = new Map(existingRows.map((row) => [row.name, row]));
+
     // R2-9 / PR01-04 identical-bytes short-circuit — BEFORE any inflate or
-    // registration: a different live prior run already inventoried these
+    // registration: a DIFFERENT live prior run already inventoried these
     // exact bytes, so this upload is a no-op that names that run. The new
     // run keeps no archive linkage (0/0 defaults stay commit-safe) and no
-    // second artifact copy exists at any level. Same-run re-inventory does
-    // NOT hit this path (the run is excluded) and keeps the name-skip
-    // idempotency of the original inventory.
-    const duplicate = (await ctx.runQuery(
-      internal.archiveInventoryStore.findPriorArchivedRun,
-      {
-        tenantId: auth.tenantId,
-        excludeImportRunId: args.importRunId,
-        archiveChecksum: wholeChecksum,
-      },
-    )) as { importRunId: string } | null;
+    // second artifact copy exists at any level. Only reachable when this
+    // run itself holds no artifact rows (a fresh upload).
+    const duplicate =
+      existingRows.length === 0
+        ? ((await ctx.runQuery(
+            internal.archiveInventoryStore.findPriorArchivedRun,
+            {
+              tenantId: auth.tenantId,
+              excludeImportRunId: args.importRunId,
+              archiveChecksum: wholeChecksum,
+            },
+          )) as { importRunId: string } | null)
+        : null;
     if (duplicate) {
       return { status: "duplicate", priorImportRunId: duplicate.importRunId };
     }
@@ -187,18 +206,6 @@ export const inventoryArchive = action({
     const workbookSet = new Set(workbookNames);
     const archiveOnly = workbookNames.filter((name) => !indexSet.has(name));
     const indexOnly = indexNames.filter((name) => !workbookSet.has(name));
-
-    const existingRows = (await ctx.runQuery(
-      internal.archiveInventoryStore.listArtifactRows,
-      {
-        importRunId: args.importRunId,
-      },
-    )) as Array<{
-      id: Id<"importArtifacts">;
-      name: string;
-      createdAt: number | null;
-    }>;
-    const existingByName = new Map(existingRows.map((row) => [row.name, row]));
 
     let registered = 0;
     let skipped = 0;
