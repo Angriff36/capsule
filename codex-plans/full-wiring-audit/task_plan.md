@@ -19,7 +19,7 @@ Architecture: preserve Manifest ownership and existing UI design; fix authored c
 - [x] W01: Proposal template save/archive/publish calls use generated docId contract; 335 direct calls plus enumerated adapters checked with no remaining missing docId.
 - [x] W02: Batch completion captures actual completed yield; zero and failure retention covered. Historical uncertainty disclosed.
 - [x] W03: Inbox outbound replies have explicit cannot-send/provider guidance and Copy draft, including honest legacy queued records; interaction tests and independent review pass.
-- [ ] W04: Pack/layout template operations expose partial results with a safe finish path, or use existing atomic command.
+- [x] W04: Pack/layout/draft-PO operations use atomic governed commands, whole-operation receipts and honest recovery; independent review approved at fab99af.
 - [x] W05: Route/projection estimates disclose assumptions; Task2 corrects commission totals/status/date basis and revenue/vendor labels with independent review.
 - [ ] W06: Audit remaining reachable placeholders/stubs and add confirmed repairs without dropping them into unrelated future releases.
 - [x] W07: Generator seed blocker #113 refreshed with source proof; no generated edit or live seed run.
@@ -30,7 +30,7 @@ Base 9eccdbc (deployed R2). Work branch fix/full-wiring-audit-20260906 in isolat
 
 ## Errors
 
-Long combined instruction reads were truncated and are being read in smaller chunks before relying on them. Early full check at addd337 passed 145 files/1320 tests, coverage, types, formatting, secrets, integration guards and local build, then failed root-cap 71 > 70 because this task's temporary .superpowers workspace adds one root. Do not weaken the cap: preserve durable report evidence under the existing plan directory, untrack the mistakenly force-added Task2 scratch report, and remove only this plan's temporary workspace at final cleanup. Verify the parent is empty before removing it; never remove another plan's artifacts.
+Long combined instruction reads were truncated and are being read in smaller chunks before relying on them. Early full check at addd337 passed 145 files/1320 tests, coverage, types, formatting, secrets, integration guards and local build, then failed root-cap 71 > 70 because this task's temporary .superpowers workspace adds one root. Do not weaken the cap: preserve durable report evidence under the existing plan directory, untrack the mistakenly force-added Task1 and Task2 scratch reports (both confirmed by git ls-files), and remove only this plan's temporary workspace at final cleanup. Verify the parent is empty before removing it; never remove another plan's artifacts.
 
 ## Global Constraints
 

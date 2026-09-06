@@ -315,3 +315,10 @@
 - Comp Master uses applied sales_commission allocations directly, actual appliedAt for calendar periods, no fabricated payouts/3% conversion, and retains allocations when Person records are missing.
 - Commits2514043 and9093eed; independent gpt-5.6-terra task review approved after one fix round.
 - Verification: full `bun run test`144 files/1314 tests; fix `bunx vitest run tests/features/factual-values.test.ts tests/features/production/kitchen-display-yield.test.ts --reporter verbose`7 tests; `bun run typecheck`passes. Existing warning baseline remains; raw fix log .artifacts/task-2-fix-tests.log.
+
+## 2026-09-06: Atomic template and draft purchase-order recovery
+
+- Pack and layout templates plus draft purchase orders commit through authored parent mutations and generated governed commands. Parent receipts and scope heads recover confirmed outcomes across ambiguous responses, changed templates and storage failures; counts describe actual saved work.
+- Added authenticated typed tenant/reference validation before cached replay while preserving generated role capability behavior and existing-draft vendor reuse.
+- Commits addd337,7561ac1,d71c8b4,fab99af; independent gpt-6-astra approved after three fix rounds. Generator-wide cache concern tracked separately in #281, not claimed repaired globally.
+- Final command: `bun run test -- tests/pending-operation.test.ts tests/proofs/safe-template-materialization.runtime.test.ts tests/event-draft-po-coordinator.test.ts tests/event-manifest-integration-guard.test.ts tests/logistics-manifest-integration-guard.test.ts`31 pass; `bun run typecheck`pass. Early full checkpoint1320 tests passes, final gate still required after remaining groups.
