@@ -36,7 +36,6 @@ export const cloneMenu = mutation({
     name: v.string(),
     isTemplate: v.boolean(),
     operationKey: v.string(),
-    failAfterWriteForTest: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<{ menuId: string; lineCount: number; recovered: boolean }> => {
     const tenantId = await authorize(ctx);
@@ -60,7 +59,6 @@ export const cloneMenu = mutation({
       maxGuests: source.maxGuests,
       idempotencyKey: `${tenantId}:${args.operationKey}:menu`,
     });
-    if (args.failAfterWriteForTest === 1) throw new Error("Injected test failure");
     const liveLines = lines.filter((row) => row.deletedAt == null);
     for (let index = 0; index < liveLines.length; index++) {
       const line = liveLines[index];
@@ -101,7 +99,6 @@ export const importComponent = mutation({
       cuisine: v.optional(v.string()), description: v.optional(v.string()),
       instructions: v.optional(v.string()), lines: v.array(importLine),
     }),
-    failAfterWriteForTest: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<{ componentId: string; createdIngredientIds: string[]; lineIds: string[]; recovered: boolean }> => {
     const tenantId = await authorize(ctx);
@@ -131,7 +128,6 @@ export const importComponent = mutation({
       ...args.projection, lines: undefined, yieldUnit: args.projection.yieldUnit as never,
       idempotencyKey: `${tenantId}:${args.operationKey}:component`,
     });
-    if (args.failAfterWriteForTest === 2) throw new Error("Injected test failure");
     const lineIds: string[] = [];
     for (let index = 0; index < args.projection.lines.length; index++) {
       const line = args.projection.lines[index];
@@ -152,7 +148,7 @@ type SnapshotLine = { ingredientId: string; quantity: number; unit: string; sort
 type SnapshotData = { name: string; yieldQuantity: number; yieldUnit: string; batchMultiplier?: number; servesPerYield?: number; category?: string; cuisine?: string; description?: string; instructions?: string; lines: SnapshotLine[] };
 
 export const restoreComponentSnapshot = mutation({
-  args: { componentId: v.id("components"), snapshotId: v.id("componentSnapshots"), operationKey: v.string(), failAfterWriteForTest: v.optional(v.number()) },
+  args: { componentId: v.id("components"), snapshotId: v.id("componentSnapshots"), operationKey: v.string() },
   handler: async (ctx, args): Promise<{ componentId: string; lineCount: number; recovered: boolean }> => {
     const tenantId = await authorize(ctx);
     const component = await ownedLive(ctx, args.componentId, tenantId, "Component");
@@ -178,7 +174,6 @@ export const restoreComponentSnapshot = mutation({
         idempotencyKey: `${tenantId}:${args.operationKey}:remove:${line._id}`,
       });
     }
-    if (args.failAfterWriteForTest === 1) throw new Error("Injected test failure");
     for (let index = 0; index < target.lines.length; index++) {
       const line = target.lines[index];
       await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {

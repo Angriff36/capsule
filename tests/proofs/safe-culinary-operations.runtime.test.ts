@@ -4,6 +4,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { buildComponentSnapshotData } from "../../src/features/kitchen/componentSnapshot";
 
 const harness = () =>
   createManifestTestContext({
@@ -56,6 +57,14 @@ describe("runtime proof: safe culinary operations", () => {
       serviceStyle: "plated",
       specialInstructions: "hot",
     });
+    const invalidLineId = await proof.seedEntity(kitchen, "menuDishes", {
+      tenantId: "menu-tenant",
+      menuId: source.docId,
+      dishId: dish.docId,
+      sortOrder: 4,
+      sellingPrice: -1,
+      version: 1,
+    });
     await expect(
       proof.executeCommand(
         kitchen,
@@ -65,11 +74,13 @@ describe("runtime proof: safe culinary operations", () => {
           name: "Broken",
           isTemplate: false,
           operationKey: "menu-clone:broken",
-          failAfterWriteForTest: 1,
         },
       ),
-    ).rejects.toThrow(/test failure/i);
+    ).rejects.toThrow(/negative/i);
     expect(await kitchen.query(api.queries.listMenu, {})).toHaveLength(1);
+    await kitchen.run((ctx) =>
+      ctx.db.patch(invalidLineId as never, { deletedAt: Date.now() }),
+    );
 
     const args = {
       sourceMenuId: source.docId,
@@ -151,6 +162,14 @@ describe("runtime proof: safe culinary operations", () => {
       ...projection,
       lines: [
         { ...projection.lines[0], ingredientId: undefined, createNew: true },
+        {
+          ...projection.lines[0],
+          name: "Invalid",
+          ingredientId: undefined,
+          createNew: true,
+          quantity: -1,
+          sortOrder: 2,
+        },
       ],
     };
     await expect(
@@ -160,15 +179,17 @@ describe("runtime proof: safe culinary operations", () => {
         {
           operationKey: "import:rollback",
           projection: createdProjection,
-          failAfterWriteForTest: 2,
         },
       ),
-    ).rejects.toThrow(/test failure/i);
+    ).rejects.toThrow(/positive/i);
     expect(await kitchen.query(api.queries.listComponent, {})).toEqual([]);
     expect(await kitchen.query(api.queries.listIngredient, {})).toEqual([]);
     const args = {
       operationKey: "import:stable",
-      projection: createdProjection,
+      projection: {
+        ...createdProjection,
+        lines: createdProjection.lines.slice(0, 1),
+      },
     };
     const first = (await proof.executeCommand(
       kitchen,
@@ -218,6 +239,30 @@ describe("runtime proof: safe culinary operations", () => {
         yieldUnit: "liter",
       },
     )) as { docId: string };
+    const capturedShape = buildComponentSnapshotData(
+      {
+        name: "Saved",
+        category: "sauce",
+        cuisine: "French",
+        description: "desc",
+        instructions: "mix",
+        yieldQuantity: 1,
+        yieldUnit: "liter",
+        batchMultiplier: 1,
+        servesPerYield: 4,
+      },
+      [
+        {
+          ingredientId: ingredient.docId,
+          quantity: 0.5,
+          unit: "liter",
+          sortOrder: 7,
+          wasteFactor: 1.2,
+          prepNotes: "slowly",
+        },
+      ],
+      () => "Oil",
+    );
     const snapshot = (await proof.executeCommand(
       kitchen,
       api.mutations.ComponentSnapshot_createViaCapture,
@@ -226,28 +271,7 @@ describe("runtime proof: safe culinary operations", () => {
         versionNumber: 1,
         capturedByName: "Chef",
         changeSummary: "Exact",
-        snapshot: JSON.stringify({
-          name: "Saved",
-          category: "sauce",
-          cuisine: "French",
-          description: "desc",
-          instructions: "mix",
-          yieldQuantity: 1,
-          yieldUnit: "liter",
-          batchMultiplier: 1,
-          servesPerYield: 4,
-          lines: [
-            {
-              ingredientId: ingredient.docId,
-              ingredientName: "Oil",
-              quantity: 0.5,
-              unit: "liter",
-              sortOrder: 7,
-              wasteFactor: 1.2,
-              prepNotes: "slowly",
-            },
-          ],
-        }),
+        snapshot: JSON.stringify(capturedShape),
       },
     )) as { docId: string };
     await expect(
