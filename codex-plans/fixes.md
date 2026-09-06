@@ -340,3 +340,9 @@
 
 - Attachment removal awaits errors and tracks pending state per row. Personal saved-view defaults are atomic and current-person scoped. Outreach ensure-open reuses governed visible rows, respects denied roles, and permits new reminders after dismissal/completion.
 - Mounted revenue apply proof preserves entered amount/provenance across reactive event updates. Commits4c42c56,c8f1e6d independently approved by gpt-6-astra after one fix round;9focusedtests/typecheck pass. Full pre-review-fix checkpoint1353tests passed. Mounted personal-view projection coverage remains noted for final review; no deployment claim.
+
+## 2026-09-06: Proposal defaults and private recovery receipts
+
+- Commandless private receipt storage removes new recovery outputs from the globally replayable command cache and drops unused request payloads/redundant child caches. Exact/head replay and governed transaction behavior remain; broader generator issue281 is not claimed fixed.
+- Proposal defaults flow through actual draft publication and immutable shared/PDF/signing representations. Template-owned fees replace cleanly; tax follows central pricing until manual override. Dynamic draft removal persists, offered drafts remain protected, and edited work still arms unload warnings.
+- Commitsff40ad3,fcdcd58,8ac9ad5,19a7567,b595b6f,f8c7e34 independently approved by gpt-6-astra after three fix rounds. Actual mounted form/public-renderer, jsPDF and publication runtime evidence recorded; final8focusedtests/typecheck pass. Full check before review fixes passed1365tests/all gates except temporary root-cap cleanup. Final whole-branch gate and deployment remain separate.

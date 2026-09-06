@@ -15,7 +15,7 @@ Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after
 - [x] WIRING-4: safe culinary clone/import/snapshot restore (11ec7e8, independent gpt-6-astra review approved).
 - [x] WIRING-5: operational bulk, event menu/prep/stock issuance and timeline recovery; reviewed at36be772.
 - [x] WIRING-6: shared attachment/default-view failures, outreach retry and confirmed form-retention gaps; reviewed atc8f1e6d.
-- [ ] WIRING-7: proposal-template selection/defaults through persistence, revisions and client renderers; isolate internal recovery receipts from the generator cache before release.
+- [x] WIRING-7: proposal-template selection/defaults through persistence, revisions and client renderers; internal recovery receipts isolated from the generator cache; reviewed atf8c7e34.
 - [ ] WIRING-8: reconcile acceptance evidence, full gates, independent whole-branch review and work-branch push. Deployment is separate.
 
 Release 2 was previously verified at `9eccdbc`; the historical release completion and superseded Clerk-key retry blocker are recorded in commit `78a876f` and `.artifacts/r2-dev-auth-live-verification.md`. The generator seed issue #113 remains tracked with refreshed source evidence: its entrypoint now exists, but authentication/reference resolution is not production-ready. No seed was run against a live database during this audit.

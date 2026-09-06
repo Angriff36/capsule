@@ -2,7 +2,7 @@
 
 ## Current reconciliation
 
-Six repair groups have independent approvals. Proposal-template integration and private receipt isolation remain in progress; whole-branch verification remains pending. No audit-branch changes have been deployed.
+All seven repair groups have independent approvals. Whole-branch verification remains pending. No audit-branch changes have been deployed.
 
 | Findings below | Repair group | Verified checkpoint |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ Six repair groups have independent approvals. Proposal-template integration and 
 | 10, 11, 12 | Culinary clone/import/restore recovery | Task4 approved11ec7e8; AC036 |
 | 13, 16, 17, 19, 22 | Operational bulk/menu/prep/stock/timeline recovery | Task5 approved36be772; AC037 |
 | 15, 18, 20; reactive follow-through to8 | Attachment/default-view/outreach/form retention | Task6 approvedc8f1e6d; AC038 |
-| 7; new receipt privacy follow-through | Proposal defaults through publication/PDF; internal receipt isolation | Task7 pending; AC039/041 |
+| 7; new receipt privacy follow-through | Proposal defaults through publication/PDF; internal receipt isolation | Task7 approvedf8c7e34; AC039/041 |
 
 The numbered findings retain their original source observations below as audit history. Later repairs supersede those descriptions; they are not a claim that the original defects still exist. Runtime/controller/jsdom evidence is distinct from authenticated browser verification, which has not been performed in this turn.
 
@@ -136,7 +136,7 @@ Task5 trace verified atomic stock issuance is preferable: consume decrements sto
   - Docs claim: the historical loop report says its listed tasks are complete and the branch is pushed.
     - Real-world example (Docs claim): the operator could assume every started feature is wired and the production site contains it.
   - Implementation: C:\projects\capsule-release-20260905\IMPLEMENTATION_PLAN.md now starts with WIRING-1 through WIRING-8, retaining the historical release boundary; C:\projects\capsule-release-20260905\scripts\vercel-build.sh and branch deployment rules separate work-branch pushes from production releases.
-    - Real-world example (Implementation): reviewed Tasks1-6 are pushed at a69b10b, while proposal-template integration and private receipts remain pending. No new production release has occurred.
+    - Real-world example (Implementation): all seven groups are independently reviewed through f8c7e34, while the final whole-branch gate remains pending. No new production release has occurred.
 
 Saved-view default safety follow-through (Task6, same finding18): C:\projects\capsule-release-20260905\src\features\views\useSavedViews.ts assumes listSavedReportDefinition is owner-scoped. Generated C:\projects\capsule-release-20260905\convex\queries.ts:9748-9762 correctly allows managers/shared reports per Manifest, so a manager's personal-view adapter can include and clear another owner's default. Restrict the personal adapter's projection/default transaction to caller-owned page views, while preserving broader report management policies. Add two-owner manager regression.
 

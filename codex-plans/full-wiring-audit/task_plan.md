@@ -10,7 +10,7 @@ Architecture: preserve Manifest ownership and existing UI design; fix authored c
 
 - [x] Inventory route families and authored command calls; combine three independent read-only audits with root's global contract/stub scan.
 - [x] Turn every confirmed finding into a concrete fix task below and record inspected/untested areas in findings.md.
-- [ ] Implement scoped fixes with focused failing regressions, then verify persistence/error/retry behavior.
+- [x] Implement scoped fixes with focused regressions, then verify persistence/error/retry behavior; all seven groups independently reviewed through f8c7e34. Reports distinguish test-first from post-implementation evidence.
 - [ ] Run repository gates and independent cross-model review; fix review findings.
 - [ ] Commit/push the work branch; update spec/acceptance evidence and report deployment separately.
 
@@ -21,7 +21,7 @@ Architecture: preserve Manifest ownership and existing UI design; fix authored c
 - [x] W03: Inbox outbound replies have explicit cannot-send/provider guidance and Copy draft, including honest legacy queued records; interaction tests and independent review pass.
 - [x] W04: Pack/layout/draft-PO operations use atomic governed commands, whole-operation receipts and honest recovery; independent review approved at fab99af.
 - [x] W05: Route/projection estimates disclose assumptions; Task2 corrects commission totals/status/date basis and revenue/vendor labels with independent review.
-- [ ] W06: Audit remaining reachable placeholders/stubs and add confirmed repairs without dropping them into unrelated future releases.
+- [x] W06: Remaining reachable placeholders/stubs audited;22 original findings and follow-throughs mapped to reviewed repairs, with platform blockers explicitly tracked.
 - [x] W07: Generator seed blocker #113 refreshed with source proof; no generated edit or live seed run.
 
 ## Constraints and evidence
