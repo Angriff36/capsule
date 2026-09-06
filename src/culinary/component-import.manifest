@@ -38,6 +38,8 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   property required rawSourceText: string = ""
   property required sourceByteCount: int = 0
   property required sourceFingerprint: string = ""
+  property csvSheetText: string?
+  property csvLinesText: string?
   property parsedName: string?
   property parsedDescription: string?
   property parsedCategory: string?
@@ -90,7 +92,9 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     rawSourceText: string,
     sourceByteCount: int,
     sourceFingerprint: string,
-    optional sourceFilename: string
+    optional sourceFilename: string,
+    optional csvSheetText: string,
+    optional csvLinesText: string
   ) {
     guard self.uploadedAt == null
     guard self.deletedAt == null
@@ -99,6 +103,8 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "Source fingerprint is required"
     mutate sourceKind = sourceKind
     mutate sourceFilename = sourceFilename
+    mutate csvSheetText = csvSheetText
+    mutate csvLinesText = csvLinesText
     mutate rawSourceText = rawSourceText
     mutate sourceByteCount = sourceByteCount
     mutate sourceFingerprint = sourceFingerprint

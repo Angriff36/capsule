@@ -44,6 +44,8 @@ export interface ReviewIngredientLine extends ParsedIngredientLine {
 
 export interface ComponentImportReviewState {
   importId?: string;
+  /** Durable optimistic-concurrency revision; set after create/load from storage. */
+  reviewRevision?: number;
   sourceKind: ComponentImportSourceKind;
   sourceFilename?: string;
   name: string;

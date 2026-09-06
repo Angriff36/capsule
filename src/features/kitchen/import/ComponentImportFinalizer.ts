@@ -37,6 +37,11 @@ export interface ComponentImportCommandPorts {
   importComponent?: (input: {
     operationKey: string;
     projection: Record<string, unknown>;
+    /** Durable review identity; makes the atomic finalize complete the import. */
+    review?: {
+      importId: string;
+      expectedRevision: number;
+    };
   }) => Promise<ComponentImportFinalizeResult>;
   createIngredient: (
     input: CreateIngredientInput,
@@ -101,8 +106,16 @@ export class ComponentImportFinalizer {
     }
 
     if (this.ports.importComponent && operationKey) {
+      const reviewRef =
+        review.importId != null && review.reviewRevision != null
+          ? {
+              importId: review.importId,
+              expectedRevision: review.reviewRevision,
+            }
+          : undefined;
       return this.ports.importComponent({
         operationKey,
+        review: reviewRef,
         projection: {
           name,
           yieldQuantity,
