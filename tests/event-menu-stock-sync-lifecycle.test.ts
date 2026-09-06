@@ -1,29 +1,37 @@
 import { describe, expect, it } from "vitest";
 import { TemplateStockSyncLifecycle } from "../src/features/events/TemplateStockSyncLifecycle";
 
-const observed = (ids: string[], revision: string) => ({
+const observed = (
+  ids: string[],
+  demandVersions: Record<string, number> = {},
+) => ({
   ready: true,
   eventDishIds: ids,
-  demandRevision: revision,
+  demandVersions,
 });
 
 describe("TemplateStockSyncLifecycle", () => {
-  it("waits for readiness, exact rows and demand, then exposes a deliberate failed retry", () => {
+  it("waits for readiness and exact recovered rows when demand already reflects the commit", () => {
     const lifecycle = new TemplateStockSyncLifecycle();
     const attempt = lifecycle.begin({
       savedDishIds: ["saved-a", "saved-b"],
-      baselineDemandRevision: "old",
-      expectsDemandChange: true,
+      savedDemandVersions: { demand: 3 },
     });
-    expect(lifecycle.next({ ...observed([], "old"), ready: false })).toBeNull();
-    expect(lifecycle.next(observed(["other-a", "other-b"], "new"))).toBeNull();
-    expect(lifecycle.next(observed(["saved-a", "saved-b"], "old"))).toBeNull();
-    expect(lifecycle.next(observed(["saved-a", "saved-b"], "new"))).toEqual({
+    expect(lifecycle.next({ ...observed([]), ready: false })).toBeNull();
+    expect(
+      lifecycle.next(observed(["other-a", "other-b"], { demand: 3 })),
+    ).toBeNull();
+    expect(
+      lifecycle.next(observed(["saved-a", "saved-b"], { demand: 2 })),
+    ).toBeNull();
+    expect(
+      lifecycle.next(observed(["saved-a", "saved-b"], { demand: 3 })),
+    ).toEqual({
       attemptId: attempt,
       savedLines: 2,
     });
     expect(
-      lifecycle.next(observed(["saved-a", "saved-b"], "newer")),
+      lifecycle.next(observed(["saved-a", "saved-b"], { demand: 4 })),
     ).toBeNull();
     lifecycle.failed(attempt);
     expect(lifecycle.status()).toMatchObject({
@@ -31,7 +39,9 @@ describe("TemplateStockSyncLifecycle", () => {
       savedLines: 2,
     });
     lifecycle.retry();
-    expect(lifecycle.next(observed(["saved-a", "saved-b"], "new"))).toEqual({
+    expect(
+      lifecycle.next(observed(["saved-a", "saved-b"], { demand: 3 })),
+    ).toEqual({
       attemptId: attempt,
       savedLines: 2,
     });
@@ -43,14 +53,12 @@ describe("TemplateStockSyncLifecycle", () => {
     const lifecycle = new TemplateStockSyncLifecycle();
     const oldAttempt = lifecycle.begin({
       savedDishIds: ["old"],
-      baselineDemandRevision: "0",
-      expectsDemandChange: false,
+      savedDemandVersions: {},
     });
-    lifecycle.next(observed(["old"], "0"));
+    lifecycle.next(observed(["old"]));
     const newAttempt = lifecycle.begin({
       savedDishIds: ["new"],
-      baselineDemandRevision: "1",
-      expectsDemandChange: false,
+      savedDemandVersions: {},
     });
     lifecycle.succeeded(oldAttempt);
     expect(lifecycle.status()).toMatchObject({

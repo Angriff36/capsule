@@ -63,13 +63,13 @@ export function useEventMenuSync() {
     inventoryReservations !== undefined &&
     dishIngredients !== undefined;
 
-  const stockRevisionForEvent = useCallback(
+  const demandVersionsForEvent = useCallback(
     (eventId: string) =>
-      (demands ?? [])
-        .filter((row) => row.eventId === eventId && row.deletedAt == null)
-        .map((row) => `${row._id}:${row.version}:${row.status}`)
-        .sort()
-        .join("|"),
+      Object.fromEntries(
+        (demands ?? [])
+          .filter((row) => row.eventId === eventId && row.deletedAt == null)
+          .map((row) => [String(row._id), Number(row.version)]),
+      ),
     [demands],
   );
 
@@ -123,7 +123,7 @@ export function useEventMenuSync() {
 
   return {
     ready,
-    stockRevisionForEvent,
+    demandVersionsForEvent,
     // Reconcile prep tasks against the dish's templates. Only needed AFTER an
     // event dish already exists — adding one generates its prep tasks
     // server-side (EventDishAdded fanOut in production/task.manifest). Calling

@@ -2,8 +2,7 @@ type Phase = "waiting" | "in_flight" | "failed" | "complete";
 type Pending = {
   attemptId: number;
   savedDishIds: readonly string[];
-  baselineDemandRevision: string;
-  expectsDemandChange: boolean;
+  savedDemandVersions: Readonly<Record<string, number>>;
   phase: Phase;
 };
 
@@ -20,15 +19,16 @@ export class TemplateStockSyncLifecycle {
   next(input: {
     ready: boolean;
     eventDishIds: readonly string[];
-    demandRevision: string;
+    demandVersions: Readonly<Record<string, number>>;
   }): { attemptId: number; savedLines: number } | null {
     const pending = this.pending;
     if (!pending || pending.phase !== "waiting" || !input.ready) return null;
     const observed = new Set(input.eventDishIds);
     if (pending.savedDishIds.some((id) => !observed.has(id))) return null;
     if (
-      pending.expectsDemandChange &&
-      input.demandRevision === pending.baselineDemandRevision
+      Object.entries(pending.savedDemandVersions).some(
+        ([id, version]) => (input.demandVersions[id] ?? -1) < version,
+      )
     )
       return null;
     pending.phase = "in_flight";

@@ -4,6 +4,8 @@ import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-
 import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
+import { reconcileRecoveredMenuRequest } from "../../src/features/events/reconcileRecoveredMenuRequest";
+import { TemplateStockSyncLifecycle } from "../../src/features/events/TemplateStockSyncLifecycle";
 
 const harness = () =>
   createManifestTestContext({
@@ -142,6 +144,7 @@ describe("operational transactions", () => {
       eventId,
       otherEventId,
       itemId,
+      ingredientId,
       demandId,
       reservationId,
       mismatchReservationId,
@@ -342,13 +345,19 @@ describe("operational transactions", () => {
       });
     const firstDish = await dish("First");
     const secondDish = await dish("Second");
+    await proof.seedEntity(seeded.owner, "dishIngredients", {
+      tenantId: "stock-tenant",
+      dishId: firstDish,
+      ingredientId: seeded.ingredientId,
+      quantity: 1,
+      unit: "kilogram",
+      sortOrder: 0,
+      version: 1,
+    });
     const args = {
       eventId: seeded.eventId,
       operationKey: "event-menu:lost-ack",
-      lines: [
-        { dishId: firstDish, quantityServings: 10, course: "main" },
-        { dishId: secondDish, quantityServings: 10, course: "dessert" },
-      ],
+      lines: [{ dishId: firstDish, quantityServings: 10, course: "main" }],
     };
     const first = (await seeded.owner.mutation(
       (api.lib as any).operationalTransactions.materializeEventMenuTemplate,
@@ -356,14 +365,48 @@ describe("operational transactions", () => {
     )) as Record<string, unknown>;
     const retry = (await seeded.owner.mutation(
       (api.lib as any).operationalTransactions.materializeEventMenuTemplate,
-      { ...args, lines: args.lines.slice(0, 1) },
+      {
+        ...args,
+        lines: [
+          ...args.lines,
+          { dishId: secondDish, quantityServings: 10, course: "dessert" },
+        ],
+      },
     )) as Record<string, unknown>;
     expect(retry).toEqual({ ...first, recovered: true });
-    expect(retry).toMatchObject({ savedCount: 2, requestedCount: 2 });
+    expect(retry).toMatchObject({ savedCount: 1, requestedCount: 1 });
     expect(
-      (
-        (await seeded.owner.query(api.queries.listEventDish, {})) as any[]
-      ).filter((row: any) => row.eventId === seeded.eventId),
-    ).toHaveLength(2);
+      reconcileRecoveredMenuRequest(
+        [String(firstDish), String(secondDish)],
+        retry.appliedDishIds as string[],
+      ),
+    ).toEqual({
+      appliedDishIds: [String(firstDish)],
+      outstandingDishIds: [String(secondDish)],
+    });
+    const savedRows = (
+      (await seeded.owner.query(api.queries.listEventDish, {})) as any[]
+    ).filter((row: any) => row.eventId === seeded.eventId);
+    expect(savedRows).toHaveLength(1);
+    const demands = (
+      (await seeded.owner.query(api.queries.listIngredientDemand, {})) as any[]
+    ).filter((row: any) => row.eventId === seeded.eventId);
+    expect(Object.keys(retry.savedDemandVersions as object)).not.toHaveLength(
+      0,
+    );
+    const lifecycle = new TemplateStockSyncLifecycle();
+    lifecycle.begin({
+      savedDishIds: retry.savedDishIds as string[],
+      savedDemandVersions: retry.savedDemandVersions as Record<string, number>,
+    });
+    expect(
+      lifecycle.next({
+        ready: true,
+        eventDishIds: savedRows.map((row) => String(row._id)),
+        demandVersions: Object.fromEntries(
+          demands.map((row) => [String(row._id), Number(row.version)]),
+        ),
+      }),
+    ).toMatchObject({ savedLines: 1 });
   });
 });

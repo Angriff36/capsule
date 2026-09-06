@@ -200,6 +200,8 @@ export const materializeEventMenuTemplate = mutation({
     }
     type Output = {
       savedDishIds: string[];
+      appliedDishIds: string[];
+      savedDemandVersions: Record<string, number>;
       savedCount: number;
       requestedCount: number;
       recovered?: boolean;
@@ -228,8 +230,22 @@ export const materializeEventMenuTemplate = mutation({
       );
       savedDishIds.push(String(created.docId));
     }
+    const savedDemandVersions = Object.fromEntries(
+      (
+        await ctx.db
+          .query("ingredientDemands")
+          .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId))
+          .collect()
+      )
+        .filter(
+          (demand) => demand.tenantId === tenantId && demand.deletedAt == null,
+        )
+        .map((demand) => [String(demand._id), demand.version]),
+    );
     const output: Output = {
       savedDishIds,
+      appliedDishIds: args.lines.map((line) => String(line.dishId)),
+      savedDemandVersions,
       savedCount: savedDishIds.length,
       requestedCount: args.lines.length,
     };
