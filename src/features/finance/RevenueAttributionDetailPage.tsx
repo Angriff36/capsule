@@ -19,6 +19,7 @@ import {
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { useActionNotice } from "../../ui/action-result";
+import { eventRevenueEstimate } from "./revenueAttributionValues";
 
 const usd = formatMoneyExact;
 
@@ -86,6 +87,8 @@ export function RevenueAttributionDetailPage() {
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
   const [eventRevenue, setEventRevenue] = useState(0);
+  const [eventRevenueBasis, setEventRevenueBasis] =
+    useState("Operator entered");
 
   // Load existing data when editing
   useEffect(() => {
@@ -107,10 +110,9 @@ export function RevenueAttributionDetailPage() {
   // Set event revenue for apply mode
   useEffect(() => {
     if (event && isApplyMode) {
-      // Use event total or estimated value
-      const revenue =
-        Number(event.quotedPrice) || Number(event.budgetAmount) || 0;
-      setEventRevenue(revenue);
+      const estimate = eventRevenueEstimate(event);
+      setEventRevenue(estimate.amount);
+      setEventRevenueBasis(estimate.basis);
     }
   }, [event, isApplyMode]);
 
@@ -269,13 +271,16 @@ export function RevenueAttributionDetailPage() {
                   min="0"
                   step="0.01"
                   value={eventRevenue || ""}
-                  onChange={(e) => setEventRevenue(Number(e.target.value))}
+                  onChange={(e) => {
+                    setEventRevenue(Number(e.target.value));
+                    setEventRevenueBasis("Operator entered");
+                  }}
                   placeholder="0.00"
                 />
               </div>
               <small className="field-help">
-                Current event total:{" "}
-                {usd(Number(existingEvent.quotedPrice) || 0)}
+                Prefilled from: {eventRevenueBasis}. Confirm or replace this
+                estimate before applying.
               </small>
             </label>
             <div className="form-summary">

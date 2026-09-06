@@ -38,6 +38,9 @@ export interface VendorPerformance {
   score: number | null;
 }
 
+export const receivedByWeekEndLabel = (rate: number) =>
+  `Received by purchasing-week end ${Math.round(rate * 100)}%`;
+
 export const PERFORMANCE_WINDOW_MS = 90 * 24 * 60 * 60 * 1000;
 
 function num(value: number | string): number {

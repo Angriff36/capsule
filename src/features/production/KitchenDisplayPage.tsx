@@ -86,6 +86,7 @@ export function KitchenDisplayPage() {
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [actualYields, setActualYields] = useState<Record<string, string>>({});
   const optimistic = useOptimisticStatus();
   const now = Date.now();
 
@@ -193,11 +194,20 @@ export function KitchenDisplayPage() {
       } else if (action.key === "start") {
         await batchStart({ docId: item.id, version: item.version });
       } else {
-        // ponytail: bump records planned yield as actual; adjust later on the prep board
+        const enteredYield = actualYields[item.id];
+        const actualYield = Number(enteredYield);
+        if (
+          enteredYield == null ||
+          enteredYield.trim() === "" ||
+          !Number.isFinite(actualYield) ||
+          actualYield < 0
+        ) {
+          throw new Error("Enter a nonnegative actual batch yield.");
+        }
         await batchComplete({
           docId: item.id,
           version: item.version,
-          actualYield: item.plannedYield ?? 0,
+          actualYield,
         });
       }
     } catch (error) {
@@ -290,6 +300,26 @@ export function KitchenDisplayPage() {
                     </span>{" "}
                     {prepTaskDependencyLabel(item.dependency)}
                   </p>
+                ) : null}
+                {item.kind === "batch" && bumpAction?.key === "complete" ? (
+                  <label className="kds-detail">
+                    Actual yield ({item.detail.split(" ").at(-1)})
+                    <input
+                      className="input"
+                      type="number"
+                      min="0"
+                      step="any"
+                      required
+                      aria-label={`Actual yield for ${item.title} in ${item.detail.split(" ").at(-1)}`}
+                      value={actualYields[item.id] ?? ""}
+                      onChange={(event) =>
+                        setActualYields((current) => ({
+                          ...current,
+                          [item.id]: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
                 ) : null}
                 {bumpAction ? (
                   <button

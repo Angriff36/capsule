@@ -4,7 +4,10 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import type { ReorderSuggestion } from "./reorderSuggestion";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
-import type { VendorPerformance } from "./vendorPerformance";
+import {
+  receivedByWeekEndLabel,
+  type VendorPerformance,
+} from "./vendorPerformance";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import type { IngredientCatalogRow } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
@@ -252,7 +255,7 @@ export function PurchasingQueueSplit({
                       {performance?.score != null ? (
                         <span
                           className="ml-2 text-ink-2"
-                          title="Rolling 90-day performance: on-time delivery, order fill accuracy, price stability"
+                          title="Rolling 90-day performance: received by purchasing-week end, order fill accuracy, price stability"
                         >
                           {performance.score}/100
                         </span>
@@ -265,7 +268,7 @@ export function PurchasingQueueSplit({
                       <small className="block">
                         {[
                           performance.onTimeRate != null
-                            ? `On-time ${percent(performance.onTimeRate)}`
+                            ? receivedByWeekEndLabel(performance.onTimeRate)
                             : null,
                           performance.fillAccuracy != null
                             ? `Fill ${percent(performance.fillAccuracy)}`

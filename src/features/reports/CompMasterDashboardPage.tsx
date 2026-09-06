@@ -12,15 +12,8 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
-import { formatDate, formatMoney } from "@/lib/format";
-
-/**
- * Comp Master Dashboard (Priority 39)
- *
- * Sales commission tracking on the 3% basis: commission by salesperson,
- * paid vs. pending amounts, and the top events behind each number — all
- * computed live from events, revenue attributions, and team members.
- */
+import { formatMoney } from "@/lib/format";
+import { calculateCommissionMetrics } from "./compMasterValues";
 
 export function CompMasterDashboardPage() {
   const events = useListEvent();
@@ -29,212 +22,87 @@ export function CompMasterDashboardPage() {
   const cancelledEventIds = useMemo(
     () =>
       new Set(
-        (events || [])
+        (events ?? [])
           .filter((event) => event.stage === "cancelled")
-          .map((event) => event._id),
+          .map((event) => String(event._id)),
       ),
     [events],
   );
-
-  // Commission metrics (3% basis)
-  const commissionMetrics = useMemo(() => {
-    if (!events || !people) return null;
-
-    const COMMISSION_RATE = 0.03; // 3% commission basis
-
-    const salesMap = new Map<
-      string,
-      {
-        name: string;
-        attributedRevenue: number;
-        commission: number;
-        eventCount: number;
-        paid: number;
-        pending: number;
-      }
-    >();
-
-    // Calculate from revenue attributions first, then fall back to assigned events
-    if (attributions && attributions.length > 0) {
-      attributions.forEach((attr) => {
-        if (!attr.salespersonId || cancelledEventIds.has(String(attr.eventId)))
-          return;
-
-        const person = people.find((p) => p._id === attr.salespersonId);
-        if (!person) return;
-
-        const name = `${person.givenName} ${person.familyName}`.trim();
-        if (!salesMap.has(attr.salespersonId)) {
-          salesMap.set(attr.salespersonId, {
-            name,
-            attributedRevenue: 0,
-            commission: 0,
-            eventCount: 0,
-            paid: 0,
-            pending: 0,
-          });
-        }
-
-        const data = salesMap.get(attr.salespersonId)!;
-        data.attributedRevenue += attr.allocatedAmount || 0;
-        data.commission += (attr.allocatedAmount || 0) * COMMISSION_RATE;
-
-        if (attr.status === "approved") {
-          data.paid += (attr.allocatedAmount || 0) * COMMISSION_RATE;
-        } else {
-          data.pending += (attr.allocatedAmount || 0) * COMMISSION_RATE;
-        }
-        data.eventCount += 1;
-      });
-    } else {
-      // Fallback to event.assignedToId
-      events.forEach((event) => {
-        if (
-          event.stage === "cancelled" ||
-          !event.assignedToId ||
-          event.quotedPrice == null
-        )
-          return;
-
-        const person = people.find((p) => p._id === event.assignedToId);
-        if (!person) return;
-
-        const name = `${person.givenName} ${person.familyName}`.trim();
-
-        if (!salesMap.has(event.assignedToId)) {
-          salesMap.set(event.assignedToId, {
-            name,
-            attributedRevenue: 0,
-            commission: 0,
-            eventCount: 0,
-            paid: 0,
-            pending: 0,
-          });
-        }
-
-        const data = salesMap.get(event.assignedToId)!;
-        const revenue = event.quotedPrice || 0;
-        data.attributedRevenue += revenue;
-        data.commission += revenue * COMMISSION_RATE;
-        data.pending += revenue * COMMISSION_RATE; // All pending without attribution
-        data.eventCount += 1;
-      });
-    }
-
-    const totalCommission = Array.from(salesMap.values()).reduce(
-      (sum, s) => sum + s.commission,
-      0,
-    );
-    const totalPaid = Array.from(salesMap.values()).reduce(
-      (sum, s) => sum + s.paid,
-      0,
-    );
-    const totalPending = Array.from(salesMap.values()).reduce(
-      (sum, s) => sum + s.pending,
-      0,
-    );
-
-    return {
-      totalCommission,
-      totalPaid,
-      totalPending,
-      salespeople: Array.from(salesMap.values()).sort(
-        (a, b) => b.commission - a.commission,
-      ),
-      totalRevenue: Array.from(salesMap.values()).reduce(
-        (sum, s) => sum + s.attributedRevenue,
-        0,
-      ),
-    };
-  }, [events, attributions, people, cancelledEventIds]);
-
-  // Payment status breakdown
-  const paymentStatus = useMemo(() => {
-    if (!commissionMetrics) return null;
-
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-
-    // Current month commission
-    const currentMonthAttributions = (attributions || []).filter((attr) => {
-      if (!attr.createdAt || cancelledEventIds.has(String(attr.eventId)))
-        return false;
-      const date = new Date(attr.createdAt);
-      return (
-        date.getMonth() === currentMonth && date.getFullYear() === currentYear
-      );
-    });
-
-    const currentMonthCommission = currentMonthAttributions.reduce(
-      (sum, attr) => {
-        return sum + (attr.allocatedAmount || 0) * 0.03;
-      },
-      0,
-    );
-
-    return {
-      currentMonth: currentMonthCommission,
-      paid: commissionMetrics.totalPaid,
-      pending: commissionMetrics.totalPending,
-      total: commissionMetrics.totalCommission,
-    };
-  }, [commissionMetrics, attributions, cancelledEventIds]);
-
-  // Top events by commission
-  const topEventsByCommission = useMemo(() => {
-    if (!events || !people) return [];
-
-    const COMMISSION_RATE = 0.03;
-
-    return events
-      .filter((e) => e.stage !== "cancelled" && e.quotedPrice != null)
-      .map((event) => {
-        const person = event.assignedToId
-          ? people.find((p) => p._id === event.assignedToId)
-          : null;
-        return {
-          title: event.title,
-          salesperson: person
-            ? `${person.givenName} ${person.familyName}`.trim()
-            : "Unassigned",
-          revenue: event.quotedPrice || 0,
-          commission: (event.quotedPrice || 0) * COMMISSION_RATE,
-          date: event.startsAt ? formatDate(event.startsAt) : "",
-          stage: event.stage || "unknown",
-        };
-      })
-      .sort((a, b) => b.commission - a.commission)
-      .slice(0, 10);
-  }, [events, people]);
-
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
+  const allTime = useMemo(
+    () =>
+      events && attributions && people
+        ? calculateCommissionMetrics({
+            periodStart: Number.NEGATIVE_INFINITY,
+            periodEnd: Number.POSITIVE_INFINITY,
+            cancelledEventIds,
+            people,
+            attributions,
+          })
+        : null,
+    [events, attributions, people, cancelledEventIds],
+  );
+  const thisMonth = useMemo(
+    () =>
+      events && attributions && people
+        ? calculateCommissionMetrics({
+            periodStart: monthStart,
+            periodEnd: monthEnd,
+            cancelledEventIds,
+            people,
+            attributions,
+          })
+        : null,
+    [events, attributions, people, cancelledEventIds, monthStart, monthEnd],
+  );
+  const eventName = new Map(
+    (events ?? []).map((event) => [String(event._id), event.title]),
+  );
+  const personName = new Map(
+    (people ?? []).map((person) => [
+      String(person._id),
+      `${person.givenName} ${person.familyName}`.trim(),
+    ]),
+  );
+  const appliedRows = (attributions ?? [])
+    .filter(
+      (attr) =>
+        attr.attributionType === "sales_commission" &&
+        attr.status === "applied" &&
+        attr.salespersonId &&
+        !cancelledEventIds.has(String(attr.eventId)),
+    )
+    .map((attr) => ({
+      event: eventName.get(String(attr.eventId)) ?? "Unknown event",
+      salesperson:
+        personName.get(String(attr.salespersonId)) ?? "Unknown salesperson",
+      commission: Number(attr.allocatedAmount) || 0,
+      status: "Applied",
+    }))
+    .sort((a, b) => b.commission - a.commission);
   const dashboardItems: Array<{
     id: string;
     size: DashboardGridSize;
     content: React.ReactNode;
     title?: string;
   }> = [
-    // Summary cards
     {
-      id: "total-commission",
+      id: "total",
       size: "small",
       content: (
         <StatCard
-          title="Total Commission"
+          title="Applied Commission"
           main={{
-            value: commissionMetrics?.totalCommission || 0,
+            value: allTime?.totalCommission ?? 0,
             format: "currency" as const,
           }}
           rows={[
             {
-              label: "Paid",
-              value: commissionMetrics?.totalPaid || 0,
-              format: "currency" as const,
-            },
-            {
-              label: "Pending",
-              value: commissionMetrics?.totalPending || 0,
-              format: "currency" as const,
+              label: "Applied records",
+              value: appliedRows.length,
+              format: "number" as const,
             },
           ]}
           tone="brand"
@@ -243,202 +111,107 @@ export function CompMasterDashboardPage() {
       ),
     },
     {
-      id: "attributed-revenue",
+      id: "month",
       size: "small",
       content: (
         <StatCard
-          title="Attributed Revenue"
+          title="Applied This Month"
           main={{
-            value: commissionMetrics?.totalRevenue || 0,
+            value: thisMonth?.totalCommission ?? 0,
             format: "currency" as const,
           }}
-          rows={[
-            {
-              label: "Salespeople",
-              value: commissionMetrics?.salespeople.length || 0,
-              format: "number" as const,
-            },
-          ]}
-          tone="ok"
-          isLive
-        />
-      ),
-    },
-    {
-      id: "current-month",
-      size: "small",
-      content: (
-        <StatCard
-          title="This Month"
-          main={{
-            value: paymentStatus?.currentMonth || 0,
-            format: "currency" as const,
-          }}
-          rows={[
-            {
-              label: "Paid",
-              value: paymentStatus?.paid || 0,
-              format: "currency" as const,
-            },
-            {
-              label: "Pending",
-              value: paymentStatus?.pending || 0,
-              format: "currency" as const,
-            },
-          ]}
+          rows={[{ label: "Period", value: "Calendar month" }]}
           tone="accent"
           isLive
         />
       ),
     },
     {
-      id: "commission-rate",
+      id: "people",
       size: "small",
       content: (
         <StatCard
-          title="Commission Rate"
-          main={{ value: 3, format: "percent" as const }}
-          rows={[
-            {
-              label: "Basis",
-              value: "Booked Revenue",
-            },
-            { label: "Rate Type", value: "Flat %" },
-          ]}
-          tone="info"
+          title="Salespeople"
+          main={{
+            value: allTime?.salespeople.length ?? 0,
+            format: "number" as const,
+          }}
+          rows={[{ label: "Basis", value: "Applied allocations" }]}
+          tone="ok"
+          isLive
         />
       ),
     },
-    // Salesperson performance
     {
-      id: "sales-performance-chart",
+      id: "chart",
       size: "large",
+      title: "Applied Commission by Salesperson",
       content: (
         <BarChart
-          data={
-            commissionMetrics?.salespeople.map((s) => ({
-              salesperson: s.name,
-              commission: s.commission,
-              revenue: s.attributedRevenue,
-              eventCount: s.eventCount,
-            })) || []
-          }
+          data={(allTime?.salespeople ?? []).map((person) => ({
+            salesperson: person.name,
+            commission: person.commission,
+          }))}
           xAxisKey="salesperson"
           series={[
             {
               dataKey: "commission",
-              name: "Commission",
+              name: "Applied commission",
               color: "var(--color-info)",
-            },
-            {
-              dataKey: "revenue",
-              name: "Attributed Revenue",
-              color: "var(--color-ok)",
             },
           ]}
           height={300}
           formatYAxis={formatMoney}
         />
       ),
-      title: "Commission by Salesperson",
     },
-    // Payment status table
     {
-      id: "payment-status-table",
+      id: "records",
       size: "full",
+      title: "Applied Sales Commission Records",
       content: (
         <TableDisplay
           columns={[
-            { key: "title", header: "Event", type: "string" as const },
+            { key: "event", header: "Event", type: "string" as const },
             {
               key: "salesperson",
               header: "Salesperson",
               type: "string" as const,
             },
-            { key: "revenue", header: "Revenue", type: "currency" as const },
             {
               key: "commission",
-              header: "Commission (3%)",
+              header: "Allocated Commission",
               type: "currency" as const,
             },
-            { key: "date", header: "Event Date", type: "string" as const },
-            { key: "stage", header: "Stage", type: "string" as const },
+            {
+              key: "status",
+              header: "Attribution Status",
+              type: "string" as const,
+            },
           ]}
-          data={topEventsByCommission}
+          data={appliedRows}
           height={350}
         />
       ),
-      title: "Top Events by Commission",
-    },
-    // Salesperson detail table
-    {
-      id: "salesperson-detail",
-      size: "full",
-      content: (
-        <TableDisplay
-          columns={[
-            { key: "name", header: "Salesperson", type: "string" as const },
-            {
-              key: "attributedRevenue",
-              header: "Attributed Revenue",
-              type: "currency" as const,
-            },
-            {
-              key: "commission",
-              header: "Commission (3%)",
-              type: "currency" as const,
-            },
-            { key: "paid", header: "Paid", type: "currency" as const },
-            { key: "pending", header: "Pending", type: "currency" as const },
-            { key: "eventCount", header: "Events", type: "number" as const },
-          ]}
-          data={
-            commissionMetrics?.salespeople.map((s) => ({
-              name: s.name,
-              attributedRevenue: s.attributedRevenue,
-              commission: s.commission,
-              paid: s.paid,
-              pending: s.pending,
-              eventCount: s.eventCount,
-            })) || []
-          }
-          height={300}
-        />
-      ),
-      title: "Commission Detail by Salesperson",
     },
   ];
-
   return (
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Comp Master Dashboard"
-        lead="Sales commission tracking on the 3% basis: who earned what, what's been approved, and the events behind each number."
+        lead="Applied sales commission allocations, shown directly from revenue attribution records."
       />
-
       <DashboardGrid items={dashboardItems} />
-
-      {/* Evidence Trail */}
       <div className="mt-6 rounded-sm border border-line bg-panel p-4">
         <h4 className="text-xs font-semibold text-ink">
           Where these numbers come from
         </h4>
-        <div className="mt-2 text-xs text-ink-2">
-          <p>
-            Commissions are 3% of attributed revenue. When revenue attribution
-            records exist, the allocated amounts are used; otherwise the event's
-            quoted price is credited to the assigned salesperson.
-          </p>
-          <ul className="list-inside list-disc mt-2 space-y-1">
-            <li>Events: quoted price, assigned salesperson, stage</li>
-            <li>Revenue attributions: allocated amounts and approval</li>
-            <li>Team members: who the salesperson is</li>
-          </ul>
-          <p className="mt-2">
-            Paid means the revenue attribution is approved; pending means it's
-            still waiting on approval.
-          </p>
-        </div>
+        <p className="mt-2 text-xs text-ink-2">
+          Only RevenueAttribution records whose type is sales commission and
+          whose status is applied are included. Allocated amount is already the
+          commission amount; no percentage or payment status is inferred.
+          Cancelled events are excluded consistently.
+        </p>
       </div>
     </div>
   );
