@@ -329,3 +329,9 @@
 - Recovery reports actual prior saved identities and preserves new reviewed input. Shared pending helper retains keys but accepts current corrections, relying on complete parent receipts at all six audited consumers.
 - Commits5666235,2cc55d1,ec79152,11ec7e8; independent gpt-6-astra approves after one fix round. Restore failure rolls back existing-line removal; legacy snapshots remain compatible; deleted ingredient does not block recovery of an already committed import.
 - Full checkpoint149files1338tests passed at ec79152. Final `bun run typecheck` and Task3/Task4 focused gate10files49tests pass; exact commands in task progress/report. Warning proof is helper-level with reviewed UI wiring; no authenticated browser/deployment claim.
+
+## 2026-09-06: Operational bulk and event recovery
+
+- Atomic stock issuance rolls back consumption if demand reconciliation fails; receipts recover actual output without consuming twice. Timeline reorder rolls back all adjustments if a later row is stale.
+- Menu materialization uses atomic parent receipts, retains newly requested lines after recovery, and presents saved/stock phases with stock-only retry. Attempt identities prevent overlapping sync and stale completion; authoritative demand versions establish readiness.
+- Bulk failures preserve original cause and completed/unfinished rows so successful prefixes are not repeated. Commitsf0af99a,fe98972,747f683,36be772; independent gpt-6-astra approved after two fix rounds. Final9focusedtests/types/3guards pass; full checkpoint1346tests passed before review fixes. Private receipt storage remains tracked Task7/AC041; nothing deployed.
