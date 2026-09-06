@@ -178,6 +178,24 @@ export function MessageInboxPage() {
     }
   };
 
+  const copyExternalDraft = async () => {
+    const body = reply.trim();
+    if (!body || sending) return;
+    setFailure(null);
+    setNotice(null);
+    setSending(true);
+    try {
+      await navigator.clipboard.writeText(body);
+      setNotice(
+        "Draft copied. Send it from your email, SMS, or social provider; Capsule did not create an outbound message.",
+      );
+    } catch (e) {
+      fail(e);
+    } finally {
+      setSending(false);
+    }
+  };
+
   const submitLogInbound = async () => {
     if (!selected) return;
     setFailure(null);
@@ -595,11 +613,25 @@ export function MessageInboxPage() {
                   )}
                 </div>
 
+                {selected.provider !== "internal" ? (
+                  <p
+                    className="border-t border-line-2 px-4 pt-3 text-sm text-ink-2"
+                    role="status"
+                  >
+                    No external delivery provider is connected. Keep editing
+                    here, then copy the draft into your email, SMS, or social
+                    provider.
+                  </p>
+                ) : null}
                 <form
                   className="flex min-w-0 gap-2 border-t border-line-2 px-4 py-3"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    void submitReply();
+                    if (selected.provider === "internal") {
+                      void submitReply();
+                    } else {
+                      void copyExternalDraft();
+                    }
                   }}
                 >
                   <input
@@ -611,17 +643,24 @@ export function MessageInboxPage() {
                     aria-label="Reply text"
                   />
                   <button
-                    type="submit"
+                    type={
+                      selected.provider === "internal" ? "submit" : "button"
+                    }
                     className="btn btn-primary"
                     disabled={sending || reply.trim().length === 0}
+                    onClick={
+                      selected.provider === "internal"
+                        ? undefined
+                        : () => void copyExternalDraft()
+                    }
                   >
                     {sending
                       ? selected.provider === "internal"
                         ? "Logging…"
-                        : "Sending…"
+                        : "Copying…"
                       : selected.provider === "internal"
                         ? "Log note"
-                        : "Send"}
+                        : "Copy draft"}
                   </button>
                 </form>
               </>

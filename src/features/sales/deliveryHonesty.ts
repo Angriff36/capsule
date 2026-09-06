@@ -13,7 +13,8 @@ export function replyDisposition(provider: string): ReplyDisposition {
 }
 
 export function deliveryStatusLabel(status: string): string | null {
-  if (status === "queued") return "Delivery queued";
-  if (status === "failed") return "Delivery failed";
+  if (status === "queued")
+    return "Legacy queued — not delivered; no provider is connected";
+  if (status === "failed") return "Delivery failed — not delivered";
   return null;
 }

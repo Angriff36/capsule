@@ -71,3 +71,40 @@ The suite emitted pre-existing Vitest `environmentMatchGlobs` deprecation output
 - No provider, generated, Manifest, policy, deployment, or production data changes were made.
 - Existing historical `sent` rows are not relabeled as delivered because their true external acknowledgement cannot be established; only the explicitly required queued/failed states receive delivery labels.
 - The untracked `codex-plans/full-wiring-audit/` directory was left untouched and excluded from the commit.
+
+## Review round 1
+
+Addressed both review findings from base `a7b5b9830655e4089b2ab4db8e1410011cf80ee9`:
+
+- External threads now show the provider limitation persistently before interaction and offer `Copy draft`, the available manual workflow, rather than `Send`.
+- Enter and button activation both copy the draft without creating an outbound row; the draft remains editable and retained.
+- Legacy queued history now reads `Legacy queued — not delivered; no provider is connected`; failed history explicitly says `not delivered`.
+- Added jsdom component interaction coverage for email, SMS, social, other, and internal threads.
+
+### Review RED
+
+Initial command:
+
+`C:/Program Files/Git/bin/bash.exe -lc 'bun run test tests/features/sales/message-inbox-delivery.test.ts'`
+
+Initial result: 1 file failed at render because the test double returned a command function instead of the `useListSyncError` array required by the real nested `SyncErrorsPanel`. The test double was corrected and RED rerun before production changes.
+
+Valid RED command:
+
+`C:/Program Files/Git/bin/bash.exe -lc 'bun run test tests/features/sales/message-inbox-delivery.test.ts'`
+
+Result: 1 file failed; 4/5 tests failed for email, SMS, social, and other because the rendered page lacked the persistent limitation/manual-copy workflow. The existing internal note interaction passed.
+
+### Review GREEN
+
+Command:
+
+`C:/Program Files/Git/bin/bash.exe -lc 'bun run test tests/features/sales/message-inbox-delivery.test.ts tests/delivery-honesty.test.ts'`
+
+Result: 2 test files passed; 10/10 tests passed. Output included only the existing Vitest deprecation and React Router future-flag warnings.
+
+Typecheck command:
+
+`C:/Program Files/Git/bin/bash.exe -lc 'bun run typecheck'`
+
+Result: `tsc --noEmit` passed, exit 0.

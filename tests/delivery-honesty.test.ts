@@ -37,16 +37,20 @@ describe("immediate command and delivery honesty", () => {
     const page = read("src/features/sales/MessageInboxPage.tsx");
     expect(page).toContain('status: "sent"');
     expect(page).toMatch(
-      /selected\.provider === "internal"\s*\? "Log note"\s*:\s*"Send"/,
+      /selected\.provider === "internal"\s*\? "Log note"\s*:\s*"Copy draft"/,
     );
     expect(page).toMatch(
-      /selected\.provider === "internal"\s*\? "Logging…"\s*:\s*"Sending…"/,
+      /selected\.provider === "internal"\s*\? "Logging…"\s*:\s*"Copying…"/,
     );
   });
 
   it("renders historical outbound queued and failed delivery states", () => {
-    expect(deliveryStatusLabel("queued")).toBe("Delivery queued");
-    expect(deliveryStatusLabel("failed")).toBe("Delivery failed");
+    expect(deliveryStatusLabel("queued")).toBe(
+      "Legacy queued — not delivered; no provider is connected",
+    );
+    expect(deliveryStatusLabel("failed")).toBe(
+      "Delivery failed — not delivered",
+    );
     expect(deliveryStatusLabel("sent")).toBeNull();
     expect(deliveryStatusLabel("draft")).toBeNull();
 
