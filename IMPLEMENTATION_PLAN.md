@@ -20,6 +20,8 @@ Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after
 
 Release 2 was previously verified at `9eccdbc`; the historical release completion and superseded Clerk-key retry blocker are recorded in commit `78a876f` and `.artifacts/r2-dev-auth-live-verification.md`. The generator seed issue #113 remains tracked with refreshed source evidence: its entrypoint now exists, but authentication/reference resolution is not production-ready. No seed was run against a live database during this audit.
 
+Evidence correction, 2026-09-06: historical AC-006 and AC-013 programmatic tests pass, but their required manual J review receipts could not be found in the three Capsule checkouts. Their combined acceptance statuses are PENDING for that missing evidence; this audit does not claim those prior manual reviews occurred.
+
 Scope notice (2026-09-05, release 2 planned): release 2, "Every source
 record accounted for", is planned below — tasks R2-1 … R2-14, acceptance
 contract AC-020 … AC-030 in `ACCEPTANCE_TESTS.md`. Everything from "Plan
