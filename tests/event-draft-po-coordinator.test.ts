@@ -120,7 +120,9 @@ describe("EventDraftPoCoordinator", () => {
   });
 
   it("continues an existing event draft with that draft's vendor", async () => {
-    const materialize = vi.fn().mockResolvedValue({ vendorOrderId: "po-1" });
+    const materialize = vi
+      .fn()
+      .mockResolvedValue({ vendorOrderId: "po-1", lineCount: 7 });
     const coordinator = new EventDraftPoCoordinator({
       ...ports(),
       materialize,
@@ -138,6 +140,7 @@ describe("EventDraftPoCoordinator", () => {
       ],
     });
     expect(result.ok).toBe(true);
+    if (result.ok) expect(result.lineCount).toBe(7);
     expect(materialize).toHaveBeenCalledWith(
       expect.objectContaining({
         existingOrderId: "po-1",

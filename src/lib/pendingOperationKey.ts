@@ -10,7 +10,14 @@ export function beginPendingOperation<T>(
   payload: T,
   deps: { storage?: StorageLike; randomUUID?: () => string } = {},
 ): Pending<T> {
-  const storage = deps.storage ?? window.localStorage;
+  let storage: StorageLike | undefined = deps.storage;
+  if (!storage) {
+    try {
+      storage = window.localStorage;
+    } catch {
+      storage = undefined;
+    }
+  }
   const randomUUID = deps.randomUUID ?? (() => crypto.randomUUID());
   const inMemory = volatile.get(scope) as Pending<T> | undefined;
   if (inMemory) return inMemory;
@@ -18,7 +25,7 @@ export function beginPendingOperation<T>(
   let storageAvailable = true;
   if (!wasConfirmed) {
     try {
-      const raw = storage.getItem(storageKey(scope));
+      const raw = storage?.getItem(storageKey(scope));
       if (raw) {
         const stored = JSON.parse(raw) as Pending<T>;
         if (stored?.key && stored.payload != null) {
@@ -40,6 +47,7 @@ export function beginPendingOperation<T>(
   };
   volatile.set(scope, pending);
   try {
+    if (!storage) throw new Error("Storage unavailable");
     storage.setItem(storageKey(scope), JSON.stringify(pending));
   } catch {
     pending = {
@@ -55,11 +63,12 @@ export function beginPendingOperation<T>(
 
 export function confirmPendingOperation(
   scope: string,
-  storage: StorageLike = window.localStorage,
+  storage?: StorageLike,
 ): void {
   volatile.delete(scope);
   confirmed.add(scope);
   try {
+    storage ??= window.localStorage;
     storage.removeItem(storageKey(scope));
   } catch {
     // Backend success remains success. Ignore stale storage for this tab.

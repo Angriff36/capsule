@@ -4,10 +4,6 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
-import {
-  beginPendingOperation,
-  resetPendingOperationsForTest,
-} from "../../src/lib/pendingOperationKey";
 
 function harness() {
   return createManifestTestContext({
@@ -109,13 +105,6 @@ describe("runtime proof: safe template materialization", () => {
       api.mutations.PackList_createViaOpen,
       { eventId, name: "Retry load" },
     )) as { docId: string };
-    resetPendingOperationsForTest();
-    const values = new Map<string, string>();
-    const storage = {
-      getItem: (key: string) => values.get(key) ?? null,
-      setItem: (key: string, value: string) => values.set(key, value),
-      removeItem: (key: string) => values.delete(key),
-    };
     const original = {
       packListId: pack.docId,
       items: [
@@ -123,10 +112,10 @@ describe("runtime proof: safe template materialization", () => {
         { description: "Linens", requiredQuantity: 12, unit: "each" },
       ],
     };
-    const first = beginPendingOperation("runtime-pack", original, {
-      storage,
-      randomUUID: () => "one",
-    });
+    const first = {
+      key: "runtime-pack:storage-unavailable",
+      payload: original,
+    };
     const firstResult = await proof.executeCommand(
       logistics,
       (api.lib as any).safeMaterialization.applyPackTemplate,
@@ -139,22 +128,17 @@ describe("runtime proof: safe template materialization", () => {
         ...original.items,
       ],
     };
-    const retry = beginPendingOperation("runtime-pack", changed, {
-      storage,
-      randomUUID: () => "two",
-    });
-    expect(retry.payload).toEqual(original);
     const retryResult = await proof.executeCommand(
       logistics,
       (api.lib as any).safeMaterialization.applyPackTemplate,
-      { ...retry.payload, operationKey: retry.key },
+      { ...original, operationKey: first.key },
     );
     expect(firstResult).toEqual({ itemCount: 2, recovered: false });
     expect(retryResult).toEqual({ itemCount: 2, recovered: true });
     const secondResult = await proof.executeCommand(
       logistics,
       (api.lib as any).safeMaterialization.applyPackTemplate,
-      { ...original, operationKey: "runtime-pack:two" },
+      { ...original, operationKey: "runtime-pack:second" },
     );
     expect(secondResult).toEqual({ itemCount: 2, recovered: false });
     const afterAmbiguousRefresh = await proof.executeCommand(
@@ -560,5 +544,61 @@ describe("runtime proof: safe template materialization", () => {
         },
       ),
     ).rejects.toThrow(/approved/);
+  });
+
+  it("preserves generated procurementAccess OR manageAccess capability semantics", async () => {
+    const proof = harness();
+    const tenantId = "tenant-po-disabled-capability";
+    const eventId = await seedEvent(proof, tenantId);
+    const manager = proof.asRole({
+      subject: "po-event-manager",
+      role: "event_manager",
+      tenantId,
+    });
+    const procurement = proof.asRole({
+      subject: "po-disabled-procurement",
+      role: "procurement_staff",
+      tenantId,
+    });
+    const owner = proof.asRole({
+      subject: "po-cap-owner",
+      role: "owner",
+      tenantId,
+    });
+    const vendor = (await proof.executeCommand(
+      owner,
+      api.mutations.Vendor_createViaOnboard,
+      { name: "Disabled capability vendor", paymentTermsDays: 14 },
+    )) as { docId: string };
+    await proof.seedEntity(owner, "organizationCapabilitySettings", {
+      tenantId,
+      capability: "procurement",
+      enabled: false,
+      version: 1,
+    });
+    await expect(
+      proof.executeCommand(
+        manager,
+        (api.lib as any).safeMaterialization.draftPurchaseOrder,
+        {
+          eventId,
+          vendorId: vendor.docId,
+          operationKey: "manager-allowed",
+          lines: [],
+        },
+      ),
+    ).resolves.toMatchObject({ recovered: false });
+    await expect(
+      proof.executeCommand(
+        procurement,
+        (api.lib as any).safeMaterialization.draftPurchaseOrder,
+        {
+          eventId,
+          vendorId: vendor.docId,
+          operationKey: "procurement-denied",
+          lines: [],
+        },
+      ),
+    ).rejects.toThrow(/procurement/i);
   });
 });

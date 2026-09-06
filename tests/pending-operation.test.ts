@@ -82,4 +82,30 @@ describe("pending operation payload", () => {
     });
     expect(afterRefresh).toEqual({ key: "old", payload: payloadA });
   });
+
+  it("survives the window.localStorage property getter throwing", () => {
+    const originalWindow = Object.getOwnPropertyDescriptor(
+      globalThis,
+      "window",
+    );
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: Object.defineProperty({}, "localStorage", {
+        get() {
+          throw new Error("storage getter denied");
+        },
+      }),
+    });
+    try {
+      const pending = beginPendingOperation("pack:getter", payloadA, {
+        randomUUID: () => "unused",
+      });
+      expect(pending.key).toBe("pack:getter:storage-unavailable");
+      expect(() => confirmPendingOperation("pack:getter")).not.toThrow();
+    } finally {
+      if (originalWindow)
+        Object.defineProperty(globalThis, "window", originalWindow);
+      else Reflect.deleteProperty(globalThis, "window");
+    }
+  });
 });

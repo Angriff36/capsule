@@ -14,6 +14,15 @@ export async function readMaterializationReceipt<T>(
   operationKey: string,
   payload: unknown,
 ): Promise<T | undefined> {
+  if (operationKey.endsWith(":storage-unavailable")) {
+    const head = await ctx.db
+      .query("commandIdempotencyKeys")
+      .withIndex("by_key", (q) =>
+        q.eq("key", headKey(tenantId, family, operationKey)),
+      )
+      .first();
+    if (head) return (head.result as { output: T }).output;
+  }
   const exact = await ctx.db
     .query("commandIdempotencyKeys")
     .withIndex("by_key", (q) =>
@@ -22,15 +31,7 @@ export async function readMaterializationReceipt<T>(
     .first();
   if (exact) return (exact.result as { output: T }).output;
 
-  if (!operationKey.endsWith(":storage-unavailable")) return undefined;
-  const head = await ctx.db
-    .query("commandIdempotencyKeys")
-    .withIndex("by_key", (q) =>
-      q.eq("key", headKey(tenantId, family, operationKey)),
-    )
-    .first();
-  if (!head) return undefined;
-  return (head.result as { output: T }).output;
+  return undefined;
 }
 
 export async function writeMaterializationReceipt<T>(

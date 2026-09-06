@@ -29,16 +29,15 @@ function requireRole(
   auth: Awaited<ReturnType<typeof getAuthContext>>,
   action: "logisticsAccess" | "eventAccess" | "procurementAccess",
 ) {
-  const allowed =
-    action === "logisticsAccess"
-      ? LOGISTICS_ROLES.has(auth.role)
-      : action === "eventAccess"
-        ? EVENT_ROLES.has(auth.role)
-        : PROCUREMENT_ROLES.has(auth.role) || MANAGE_ROLES.has(auth.role);
-  if (
-    !allowed ||
-    orgCapabilityDeniesAction(action, auth.disabledCapabilities)
-  ) {
+  const allowed = action === "procurementAccess"
+    ? (PROCUREMENT_ROLES.has(auth.role) &&
+        !orgCapabilityDeniesAction(action, auth.disabledCapabilities)) ||
+      MANAGE_ROLES.has(auth.role)
+    : (action === "logisticsAccess"
+        ? LOGISTICS_ROLES.has(auth.role)
+        : EVENT_ROLES.has(auth.role)) &&
+      !orgCapabilityDeniesAction(action, auth.disabledCapabilities);
+  if (!allowed) {
     throw new Error(`${action.replace("Access", "")} access required`);
   }
 }

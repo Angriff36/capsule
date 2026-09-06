@@ -189,7 +189,7 @@ export class EventDraftPoCoordinator {
       return {
         ok: true,
         vendorOrderId: result.vendorOrderId,
-        lineCount: plannedLines.length,
+        lineCount: result.lineCount ?? plannedLines.length,
         createdOrder: existing == null,
         recovered: result.recovered,
       };
