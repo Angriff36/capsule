@@ -49,8 +49,13 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
   // Template status
   property required status: ProposalTemplateStatus = "active"
   property definedAt: datetime?
+  property definedById: uuid?
+  property updatedById: uuid?
   property archivedAt: datetime?
+  property archivedById: uuid?
   property archiveReason: string?
+  property reactivatedAt: datetime?
+  property reactivatedById: uuid?
 
   computed isActive: boolean = self.status == "active"
 

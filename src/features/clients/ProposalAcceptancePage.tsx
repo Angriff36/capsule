@@ -194,16 +194,18 @@ export function ProposalAcceptancePage({
               </div>
             </div>
 
-            {pending.proposal.terms && (
-              <div className="mb-6">
-                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
-                  Terms
-                </h3>
-                <p className="text-ink-2 text-xs whitespace-pre-wrap">
-                  {pending.proposal.terms}
-                </p>
-              </div>
-            )}
+            {(pending.proposal.visibleSections.length === 0 ||
+              pending.proposal.visibleSections.includes("terms")) &&
+              pending.proposal.terms && (
+                <div className="mb-6">
+                  <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
+                    Terms
+                  </h3>
+                  <p className="text-ink-2 text-xs whitespace-pre-wrap">
+                    {pending.proposal.terms}
+                  </p>
+                </div>
+              )}
 
             {error ? (
               <div className="mb-6">

@@ -36,6 +36,7 @@ type SharedProposal = {
     expiresAt: number | null;
     notes: string | null;
     terms: string | null;
+    visibleSections: string[];
   };
   // §5.2 L263 "Venue logistics snapshot": the client-facing projection of the
   // frozen venue logistics (§8.2). Null when the proposal wasn't linked to a
@@ -70,6 +71,13 @@ type SharedProposal = {
     description: string | null;
     price: number;
   }>;
+  dishSelections: Array<{
+    dishName: string;
+    dishDescription: string | null;
+    course: string | null;
+    serviceStyle: string | null;
+  }>;
+  timeline: Array<{ name: string; startsAt: number; endsAt: number | null }>;
   revisionNumber: number;
   capturedAt: number | null;
   linkCreatedAt: number | null;
@@ -160,6 +168,11 @@ export const getSharedProposal = query({
           typeof proposal.expiresAt === "number" ? proposal.expiresAt : null,
         notes: str(proposal.notes),
         terms: str(proposal.terms),
+        visibleSections: Array.isArray(proposal.visibleSections)
+          ? proposal.visibleSections.filter(
+              (section): section is string => typeof section === "string",
+            )
+          : [],
       },
       venueLogistics,
       clientName:
@@ -189,6 +202,28 @@ export const getSharedProposal = query({
           name,
           description,
           price,
+        })),
+      dishSelections: (Array.isArray(snapshot.dishSelections)
+        ? (snapshot.dishSelections as Array<Record<string, unknown>>)
+        : []
+      ).map((dish) => ({
+        dishName: str(dish.dishName) ?? "Menu item",
+        dishDescription: str(dish.dishDescription),
+        course: str(dish.course),
+        serviceStyle: str(dish.serviceStyle),
+      })),
+      timeline: (Array.isArray(snapshot.timeline)
+        ? (snapshot.timeline as Array<Record<string, unknown>>)
+        : []
+      )
+        .filter(
+          (item) =>
+            typeof item.name === "string" && typeof item.startsAt === "number",
+        )
+        .map((item) => ({
+          name: String(item.name),
+          startsAt: Number(item.startsAt),
+          endsAt: typeof item.endsAt === "number" ? item.endsAt : null,
         })),
       revisionNumber: revision.revisionNumber,
       capturedAt: revision.capturedAt ?? null,

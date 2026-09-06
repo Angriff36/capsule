@@ -53,6 +53,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property expiresAt: datetime?
   property notes: string?
   property terms: string?
+  property visibleSections: list<string>?
   property required status: ProposalStatus = "draft"
   property draftedAt: datetime?
   property sentAt: datetime?
@@ -107,6 +108,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     optional expiresAt: datetime,
     optional notes: string,
     optional terms: string,
+    optional visibleSections: list<string>,
     optional eventId: uuid
   ) {
     guard self.draftedAt == null
@@ -134,6 +136,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate expiresAt = expiresAt
     mutate notes = notes
     mutate terms = terms
+    mutate visibleSections = visibleSections
     mutate eventId = eventId
     mutate draftedAt = now()
     emit ProposalDrafted {

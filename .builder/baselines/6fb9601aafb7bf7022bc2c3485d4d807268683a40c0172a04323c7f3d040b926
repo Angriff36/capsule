@@ -2204,13 +2204,8 @@ export const ProposalTemplateSchema = z.object({
   validityDays: z.number().int().nullable().optional(),
   status: z.enum(["active", "archived"]).default("active"),
   definedAt: z.coerce.date().nullable().optional(),
-  definedById: z.string().uuid().nullable().optional(),
-  updatedById: z.string().uuid().nullable().optional(),
   archivedAt: z.coerce.date().nullable().optional(),
-  archivedById: z.string().uuid().nullable().optional(),
   archiveReason: z.string().nullable().optional(),
-  reactivatedAt: z.coerce.date().nullable().optional(),
-  reactivatedById: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

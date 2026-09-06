@@ -24,6 +24,8 @@ import {
   BoundedDateTimeLocalInput,
 } from "../../ui/BoundedDateInputs";
 import { toDatetimeLocalValue } from "../../lib/format";
+import { useListProposalTemplate } from "../../lib/manifest-convex-react";
+import { proposalTemplateDefaults } from "./proposalTemplateDefaults";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
@@ -105,6 +107,7 @@ export function ProposalCreateForm({
   const draftForm = useFormDraft("proposal");
   // Published-catalog dishes a pricing line can be priced from (spec §5.4 L276).
   const catalog = useCatalogDishes();
+  const proposalTemplates = useListProposalTemplate();
   const [searchParams, setSearchParams] = useSearchParams();
   const fromEventId = searchParams.get("event");
 
@@ -139,6 +142,12 @@ export function ProposalCreateForm({
   const [draftGuestCount, setDraftGuestCount] = useState<number>(0);
   const [draftTax, setDraftTax] = useState<number>(0);
   const [draftDiscount, setDraftDiscount] = useState<number>(0);
+  const [draftTerms, setDraftTerms] = useState("");
+  const [draftNotes, setDraftNotes] = useState("");
+  const [draftExpiresOn, setDraftExpiresOn] = useState(defaultValidityDate);
+  const [draftVisibleSections, setDraftVisibleSections] = useState<string[]>(
+    [],
+  );
 
   // Live pricing preview via the ONE central calc (spec §5.4): lines → totals.
   const draftPricing = useMemo(
@@ -165,6 +174,37 @@ export function ProposalCreateForm({
   const removeLine = (key: string) =>
     setDraftLines((lines) => lines.filter((l) => l.key !== key));
   const addLine = () => setDraftLines((lines) => [...lines, newDraftLine()]);
+
+  const selectTemplate = (templateId: string) => {
+    const template = (proposalTemplates ?? []).find(
+      (row) => row._id === templateId && row.status === "active",
+    );
+    if (!template) return;
+    const defaults = proposalTemplateDefaults(template, draftPricing.subtotal);
+    setDraftTerms(defaults.terms);
+    setDraftNotes(defaults.notes);
+    setDraftExpiresOn(defaults.expiresOn);
+    setDraftTax(defaults.taxAmount);
+    setDraftVisibleSections(defaults.visibleSections);
+    const serviceChargeLine = defaults.serviceChargeLine;
+    if (serviceChargeLine) {
+      setDraftLines((lines) => [
+        ...lines.filter(
+          (line) =>
+            !(
+              line.pricingBasis === "percentage" &&
+              line.description === "Service charge"
+            ),
+        ),
+        {
+          ...newDraftLine(),
+          ...serviceChargeLine,
+          quantity: String(serviceChargeLine.quantity),
+          unitPrice: String(serviceChargeLine.unitPrice),
+        },
+      ]);
+    }
+  };
 
   // Link (or unlink) a draft line to a catalog dish (spec §5.4 L276). Picking a
   // dish autofills its name + sellingPrice; tweaking unitPrice away from that
@@ -269,6 +309,7 @@ export function ProposalCreateForm({
         expiresAt: dateValue(data.get("expiresAt"), true),
         notes: String(data.get("notes") || "").trim() || undefined,
         terms: String(data.get("terms") || "").trim() || undefined,
+        visibleSections: draftVisibleSections,
         eventId: eventIdRaw ? (eventIdRaw as Id<"events">) : undefined,
         lines: validLines.map((line, i) => ({
           description: line.description.trim(),
@@ -287,6 +328,10 @@ export function ProposalCreateForm({
       setDraftLines([]);
       setDraftTax(0);
       setDraftDiscount(0);
+      setDraftTerms("");
+      setDraftNotes("");
+      setDraftExpiresOn(defaultValidityDate());
+      setDraftVisibleSections([]);
       onClose();
       if (fromEventId) {
         const nextParams = new URLSearchParams(searchParams);
@@ -295,8 +340,8 @@ export function ProposalCreateForm({
       }
       onNotice(
         fromEventId
-          ? "Proposal drafted and linked to the event. Send it when ready for the client."
-          : "Proposal drafted. Send it when ready for the client.",
+          ? "Proposal drafted and linked to the event. Publish and share it when ready."
+          : "Proposal drafted. Publish and share it when ready.",
       );
     });
   };
@@ -338,6 +383,27 @@ export function ProposalCreateForm({
       ) : (
         <>
           <div className="supply-form-grid">
+            <label className="field-label supply-span-2">
+              Proposal template
+              <select
+                className="input"
+                defaultValue=""
+                onChange={(event) => selectTemplate(event.target.value)}
+              >
+                <option value="">No template</option>
+                {(proposalTemplates ?? [])
+                  .filter((row) => row.status === "active")
+                  .map((row) => (
+                    <option key={row._id} value={row._id}>
+                      {row.name}
+                    </option>
+                  ))}
+              </select>
+              <span className="text-2xs text-ink-3">
+                Selecting a template initializes this draft. Your later edits
+                stay unchanged.
+              </span>
+            </label>
             {fromEvent ? (
               <label className="field-label supply-span-2">
                 Client
@@ -636,6 +702,10 @@ export function ProposalCreateForm({
                 value={draftTax}
                 onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
               />
+              <span className="text-2xs text-ink-3">
+                Template tax is calculated once from the current subtotal and
+                service charge, then saved as this editable fixed amount.
+              </span>
             </label>
             <label className="field-label">
               Discount
@@ -658,12 +728,14 @@ export function ProposalCreateForm({
           </p>
           <div className="supply-form-grid">
             <label className="field-label supply-span-2">
-              Proposed menu
+              Notes
               <textarea
                 className="input"
                 name="notes"
                 rows={4}
-                placeholder="List menu items, one per line"
+                value={draftNotes}
+                onChange={(event) => setDraftNotes(event.target.value)}
+                placeholder="Client-facing notes"
               />
             </label>
             <label className="field-label">
@@ -671,7 +743,8 @@ export function ProposalCreateForm({
               <BoundedDateInput
                 className="input"
                 name="expiresAt"
-                defaultValue={defaultValidityDate()}
+                value={draftExpiresOn}
+                onChange={(event) => setDraftExpiresOn(event.target.value)}
               />
             </label>
             <label className="field-label supply-span-2">
@@ -680,6 +753,8 @@ export function ProposalCreateForm({
                 className="input"
                 name="terms"
                 rows={3}
+                value={draftTerms}
+                onChange={(event) => setDraftTerms(event.target.value)}
                 placeholder="Deposit, service, cancellation, or other terms"
               />
             </label>

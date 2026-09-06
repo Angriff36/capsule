@@ -596,8 +596,14 @@ export function ProposalsPage() {
                                 ? venues.find((v) => v._id === event.venueId)
                                 : null;
 
-                            const enrichedProposal: ProposalPdfRecord = {
+                            let enrichedProposal: ProposalPdfRecord = {
                               ...row,
+                              visibleSections: (
+                                row.visibleSections ?? []
+                              ).filter(
+                                (section): section is string =>
+                                  typeof section === "string",
+                              ),
                               timelineItems:
                                 transformTimelineActivities(eventTimelineItems),
                               venueLogistics: event
@@ -638,13 +644,78 @@ export function ProposalsPage() {
                                   price: Number(item.price) || 0,
                                 })),
                             };
+                            let pdfClientName = clientDisplayName(
+                              row.clientId,
+                              clients,
+                            );
+
+                            const publishedRevision = latestRevisionFor(
+                              row._id,
+                            );
+                            if (
+                              String(row.status) !== "draft" &&
+                              publishedRevision?.snapshot
+                            ) {
+                              try {
+                                const frozen = JSON.parse(
+                                  publishedRevision.snapshot,
+                                ) as any;
+                                const frozenProposal = frozen.proposal ?? {};
+                                pdfClientName =
+                                  typeof frozen.client?.name === "string"
+                                    ? frozen.client.name
+                                    : pdfClientName;
+                                enrichedProposal = {
+                                  ...enrichedProposal,
+                                  ...frozenProposal,
+                                  _id: row._id,
+                                  visibleSections:
+                                    frozenProposal.visibleSections ?? [],
+                                  dishSelections: frozen.dishSelections ?? [],
+                                  pricingLines: (frozen.lineItems ?? []).map(
+                                    (line: any) => ({
+                                      description: line.description,
+                                      pricingBasis: line.pricingBasis,
+                                      unitPrice: line.unitPrice,
+                                      quantity: line.quantity,
+                                      unit: line.unit,
+                                    }),
+                                  ),
+                                  enhancements: frozen.enhancements ?? [],
+                                  venueLogistics: frozen.venue
+                                    ? {
+                                        loadIn:
+                                          frozen.venue.loadInInstructions ??
+                                          undefined,
+                                        access:
+                                          frozen.venue.kitchenAccess ??
+                                          undefined,
+                                        restrictions:
+                                          frozen.venue.restrictions ??
+                                          undefined,
+                                      }
+                                    : undefined,
+                                  timelineItems: (frozen.timeline ?? []).map(
+                                    (item: any) => ({
+                                      time: new Date(
+                                        item.startsAt,
+                                      ).toLocaleTimeString([], {
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                      }),
+                                      activity: item.name,
+                                    }),
+                                  ),
+                                };
+                              } catch {
+                                // Legacy malformed/missing snapshots retain the
+                                // explicit live-data fallback above.
+                              }
+                            }
 
                             void downloadProposalPdf({
                               proposal: enrichedProposal,
-                              clientName: clientDisplayName(
-                                row.clientId,
-                                clients,
-                              ),
+                              clientName: pdfClientName,
                               branding,
                             })
                               .then(() => setNotice("Proposal PDF downloaded."))
