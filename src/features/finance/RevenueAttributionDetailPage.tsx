@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useState, useEffect, useMemo, type FormEvent } from "react";
+import { useState, useEffect, useMemo, useRef, type FormEvent } from "react";
 import {
   useGetRevenueAttribution,
   useGetEvent,
@@ -89,6 +89,7 @@ export function RevenueAttributionDetailPage() {
   const [eventRevenue, setEventRevenue] = useState(0);
   const [eventRevenueBasis, setEventRevenueBasis] =
     useState("Operator entered");
+  const initializedApplyContext = useRef<string | null>(null);
 
   // Load existing data when editing
   useEffect(() => {
@@ -109,12 +110,14 @@ export function RevenueAttributionDetailPage() {
 
   // Set event revenue for apply mode
   useEffect(() => {
-    if (event && isApplyMode) {
+    const context = isApplyMode && attribution ? String(attribution._id) : null;
+    if (event && context && initializedApplyContext.current !== context) {
       const estimate = eventRevenueEstimate(event);
       setEventRevenue(estimate.amount);
       setEventRevenueBasis(estimate.basis);
+      initializedApplyContext.current = context;
     }
-  }, [event, isApplyMode]);
+  }, [event, attribution, isApplyMode]);
 
   const calculatedAllocation = useMemo(() => {
     if (allocationMethod === "percent" && eventRevenue > 0) {
