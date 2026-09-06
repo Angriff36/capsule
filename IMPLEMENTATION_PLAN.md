@@ -2955,6 +2955,29 @@ zero blockers), then
 `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
 bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
 record at .artifacts/review/r2-14/report6.md).
+Iteration 139 (BUILD, release 2, 2026-09-05): R2-14 re-verified, STILL
+BLOCKED on the owner action — no code change this iteration. Workspace:
+`origin/main` still 279f6a3 (confirmed an ancestor; nothing to
+integrate); tree clean at e7bf5b8 before this docs commit. Issue #265
+still OPEN, zero comments. Fresh precheck against the LIVE production
+env with the full production-build gate flags (--environment
+production, --require VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY and
+--expected-deployment impartial-mule-193, matching
+scripts/vercel-build.sh exactly, env fed via --env-file +
+--no-env-files): STILL the same 2 blockers only —
+`clerk:secret_key_unrecognized` and `clerk:dev_credential_in_production`
+(VITE_CLERK_PUBLISHABLE_KEY still pk_test_*) — no expected-deployment
+finding, so the production frontend stays pointed at impartial-mule-193
+and the Clerk key class stays the only defect. Temp env file deleted
+(trap verified gone); redacted JSON refreshed at
+.artifacts/release/precheck265.json. Preview verified on 7812 serving
+this checkout (ralph-preview.ps1: "serves C:/projects/capsule-ralph",
+exit 0). Docs-only commit, no new tag (iteration-46/65..138
+precedent). Unblock path unchanged: rotate the keys per the checker's
+action text, re-run the precheck (must report zero blockers), then
+`CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
+bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
+record at .artifacts/review/r2-14/report6.md).
 
 ## Recommended SLC release 2: Every source record accounted for
 
