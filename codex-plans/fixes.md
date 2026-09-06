@@ -322,3 +322,10 @@
 - Added authenticated typed tenant/reference validation before cached replay while preserving generated role capability behavior and existing-draft vendor reuse.
 - Commits addd337,7561ac1,d71c8b4,fab99af; independent gpt-6-astra approved after three fix rounds. Generator-wide cache concern tracked separately in #281, not claimed repaired globally.
 - Final command: `bun run test -- tests/pending-operation.test.ts tests/proofs/safe-template-materialization.runtime.test.ts tests/event-draft-po-coordinator.test.ts tests/event-manifest-integration-guard.test.ts tests/logistics-manifest-integration-guard.test.ts`31 pass; `bun run typecheck`pass. Early full checkpoint1320 tests passes, final gate still required after remaining groups.
+
+## 2026-09-06: Atomic culinary clone, import and restore
+
+- Menu clone, manual component import and snapshot restore use governed atomic operations with authenticated parent receipts; agent-driven import API remains compatible. Snapshot IDs/ownership and metadata are preserved; capture failure is a visible nonblocking warning.
+- Recovery reports actual prior saved identities and preserves new reviewed input. Shared pending helper retains keys but accepts current corrections, relying on complete parent receipts at all six audited consumers.
+- Commits5666235,2cc55d1,ec79152,11ec7e8; independent gpt-6-astra approves after one fix round. Restore failure rolls back existing-line removal; legacy snapshots remain compatible; deleted ingredient does not block recovery of an already committed import.
+- Full checkpoint149files1338tests passed at ec79152. Final `bun run typecheck` and Task3/Task4 focused gate10files49tests pass; exact commands in task progress/report. Warning proof is helper-level with reviewed UI wiring; no authenticated browser/deployment claim.

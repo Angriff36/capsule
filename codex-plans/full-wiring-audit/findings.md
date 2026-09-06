@@ -103,3 +103,23 @@ Task7 creation-form follow-through: src/features/clients/ProposalCreateForm.tsx 
 Generator-wide idempotency scope/replay concern filed per escalation rule: https://github.com/Angriff36/capsule/issues/281. Public issue contains high-level source boundaries and expected local tests, no credentials/record IDs/exploit procedure. New authored seams mitigate their own paths; this is not a platform-wide generated-wrapper repair, and production was not probed. Existing seed blocker #113 remains separate.
 
 Task5 trace verified atomic stock issuance is preferable: consume decrements stock in its transaction; confirming/fulfilling demand must share it and use actual reread versions. Demand relation is event+ingredient rather than reservation field. Timeline stale later-row version must roll back prior adjusts. Event menu immediate refreshStock captures pre-create controller/demand snapshots (useEventMenuSync:66-112, EventMenuSyncController:215-240), so retry only after reactive rows arrive. These details are in Task5, not silently dropped after template line recovery.
+
+## Documentation versus implementation reconciliation
+
+- **Seed execution**
+  - Docs claim: the initial no-fake-data spec says seed defines a function and exits.
+    - Real-world example (Docs claim): running seed with a URL would perform no writes.
+  - Implementation: C:\projects\capsule-release-20260905\scripts\seed-convex.ts:1412-1422 now invokes the function, but authentication is not configured and line178 still supplies placeholder related-record IDs. No live seed was run; #113 remains open for those actual blockers.
+    - Real-world example (Implementation): a reachable entry point is not proof that a protected event with valid client relationships can be seeded.
+- **Actual yield provenance**
+  - Docs claim: the acceptance wording asks the production-yield report to state its data is real.
+    - Real-world example (Docs claim): a historical row showing ten units could be mistaken for an observed measurement.
+  - Implementation: C:\projects\capsule-release-20260905\src\features\production\KitchenDisplayPage.tsx requires an entered yield, including zero; C:\projects\capsule-release-20260905\src\features\production\ProductionYieldDashboardPage.tsx:297-300 discloses the historical copied-plan limitation. Old values are not relabeled as verified observations.
+    - Real-world example (Implementation): an operator completing seven units records seven; an old ten-unit record remains of uncertain provenance.
+- **Completion versus deployment**
+  - Docs claim: the historical loop report says its listed tasks are complete and the branch is pushed.
+    - Real-world example (Docs claim): the operator could assume every started feature is wired and the production site contains it.
+  - Implementation: C:\projects\capsule-release-20260905\IMPLEMENTATION_PLAN.md now starts with WIRING-1 through WIRING-8, retaining the historical release boundary; C:\projects\capsule-release-20260905\scripts\vercel-build.sh and branch deployment rules separate work-branch pushes from production releases.
+    - Real-world example (Implementation): reviewed Task1-3 fixes are pushed at01194ef, while culinary, operational, shared and proposal-template work is still pending and no new production release has occurred.
+
+Saved-view default safety follow-through (Task6, same finding18): C:\projects\capsule-release-20260905\src\features\views\useSavedViews.ts assumes listSavedReportDefinition is owner-scoped. Generated C:\projects\capsule-release-20260905\convex\queries.ts:9748-9762 correctly allows managers/shared reports per Manifest, so a manager's personal-view adapter can include and clear another owner's default. Restrict the personal adapter's projection/default transaction to caller-owned page views, while preserving broader report management policies. Add two-owner manager regression.

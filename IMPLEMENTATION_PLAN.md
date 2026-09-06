@@ -12,7 +12,7 @@ Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after
 - [x] WIRING-1: repair generated command targets and honest inbox/document delivery actions; commits a7b5b98/407b5c4, independent review approved.
 - [x] WIRING-2: operator-entered yield, truthful estimate labels and correct commission allocation/application-period scope; commits2514043/9093eed, independent review approved.
 - [x] WIRING-3: safe pack/layout template generation and draft purchase-order retries (fab99af, independent gpt-6-astra review approved).
-- [ ] WIRING-4: safe culinary clone/import/snapshot restore.
+- [x] WIRING-4: safe culinary clone/import/snapshot restore (11ec7e8, independent gpt-6-astra review approved).
 - [ ] WIRING-5: operational bulk, event menu/prep/stock issuance and timeline recovery.
 - [ ] WIRING-6: shared attachment/default-view failures, outreach retry and confirmed form-retention gaps.
 - [ ] WIRING-7: proposal-template selection/defaults through persistence, revisions and client renderers.

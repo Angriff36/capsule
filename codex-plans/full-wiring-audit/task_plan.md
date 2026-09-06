@@ -75,6 +75,8 @@ Shared owner: src/ui/bulk-select.tsx useBulkRun also clears successful-prefix pr
 
 Read-only trace: stock seam should load reservation/demand server-side, validate same tenant/event/ingredient, call generated consume then needed confirm/fulfill atomically, and reread actual demand version after confirm rather than assuming +2. Preserve intersection of generated inventory/event-management and demand permissions. Timeline seam validates complete row set against event/tenant and uses generated adjust with supplied versions; stale later row rolls all back. Event menu stock sync must wait for reactive saved EventDish/demand rows: current refreshStock closes over stale controller demand snapshots, so immediate post-create sync can miss new demands. Make saved-lines and retry-stock-sync phases explicit. Shared BulkRunFailure should carry cause and counts; classifier unwraps cause before preserving category/title/action and adding counts. Existing invoice/pack/purchasing selection already clears only after complete success; retain or remove confirmed IDs appropriately.
 
+Reviewed recovery interface update from Task4: beginPendingOperation preserves operation identity but permits current corrected input; this is safe ONLY with an atomic parent receipt, never just positional child keys. Recovered output must name/count actual prior saved work and not discard a newly requested template/input. Reuse this for menu materialization only with its full transaction/receipt contract; otherwise use persisted-row reconciliation and truthful phases.
+
 ### Task 6: Shared failure handling
 
 Own AttachmentsSection.tsx and useSavedViews.ts plus focused tests/helpers.
@@ -85,6 +87,8 @@ Additional bulk owner: ClientRetentionPage.tsx opening outreach tasks. Ensure re
 Verify shared form-retention candidate: RevenueAttributionDetailPage apply-amount effect depends on reactive event and can overwrite operator edits when event data refreshes. Add a mounted regression changing the event query after editing; if reproduced, initialize per apply context without overwriting edited amount/provenance. This is separate from Task2's now-correct estimate labels and must preserve them.
 
 Saved views actually reuse owner-scoped SavedReportDefinition, chartType list-view, definition {pageKey,isDefault,state}. Prefer an authored atomic seam that loads the caller's current live defaults and target server-side, invokes existing create/update commands, and rolls back all changes on failure; do not introduce a competing SavedView entity. For outreach, ensure-open must return whether it created or reused a task, so single/bulk notices count actual creations accurately; preserve valid later outreach after complete/dismiss.
+
+Correct the personal-view projection as part of default safety: useSavedViews currently assumes listSavedReportDefinition is owner-only, but generated queries intentionally also return managers' visible reports and shared reports. Personal view choices/default clearing must use the current person's rows for the page, not another owner's default. Preserve the broader report-management policy and shared-report feature; this is the personal list-view adapter's scope, not a global authorization change. Prove two owners' defaults remain independent even for a manager.
 
 ### Task 7: Connect proposal templates end to end
 
