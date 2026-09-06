@@ -32,6 +32,8 @@ export interface DeploymentConfigFinding {
 export interface DeploymentConfigInput {
   /** "production" | "development" | "preview" (VERCEL_ENV ?? NODE_ENV). */
   environment: string;
+  /** Explicit owner-approved test-login deployment; never relaxes mismatch checks. */
+  allowDevelopmentAuth?: boolean;
   /** VITE_CONVEX_URL — the backend the shipped frontend talks to. */
   viteConvexUrl?: string | null;
   /** VITE_CLERK_PUBLISHABLE_KEY — Clerk frontend key, baked at build. */
@@ -75,16 +77,29 @@ export interface DeploymentConfigReport {
 
 /** Redact a credential to its class marker. Never returns the value. */
 export function redactCredential(value: string): string {
-  if (/^pk_live_[A-Za-z0-9_-]*$/.test(value)) return "pk_live_*";
-  if (/^pk_test_[A-Za-z0-9_-]*$/.test(value)) return "pk_test_*";
-  if (/^sk_live_[A-Za-z0-9_-]*$/.test(value)) return "sk_live_*";
-  if (/^sk_test_[A-Za-z0-9_-]*$/.test(value)) return "sk_test_*";
+  if (/^pk_live_[A-Za-z0-9_+/-]+=*$/.test(value)) return "pk_live_*";
+  if (/^pk_test_[A-Za-z0-9_+/-]+=*$/.test(value)) return "pk_test_*";
+  if (/^sk_live_[A-Za-z0-9_-]+$/.test(value)) return "sk_live_*";
+  if (/^sk_test_[A-Za-z0-9_-]+$/.test(value)) return "sk_test_*";
   return "<redacted>";
 }
 
 function credentialClass(value: string): string | null {
   const redacted = redactCredential(value);
   return redacted === "<redacted>" ? null : redacted.slice(0, -2);
+}
+
+function publishableKeyHost(value: string): string | null {
+  try {
+    const decoded = atob(value.slice(8).replace(/-/g, "+").replace(/_/g, "/"));
+    if (!decoded.endsWith("$")) return null;
+    const host = decoded.slice(0, -1).toLowerCase();
+    return /^(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9-]+$/.test(host)
+      ? host
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 const MISSING_CONFIG_ACTIONS: Record<string, string> = {
@@ -210,7 +225,10 @@ export function checkDeploymentConfig(
   // --- Clerk application keys ---------------------------------------------
   const pkValue = trimmed(input.viteClerkPublishableKey);
   const pkClass = pkValue ? credentialClass(pkValue) : null;
-  if (pkValue && !pkClass) {
+  const pkHost = pkClass?.startsWith("pk_")
+    ? publishableKeyHost(pkValue)
+    : null;
+  if (pkValue && !pkHost) {
     blocker(
       "clerk:publishable_key_unrecognized",
       "VITE_CLERK_PUBLISHABLE_KEY does not look like a Clerk key (expected pk_live_* or pk_test_*).",
@@ -219,7 +237,7 @@ export function checkDeploymentConfig(
   }
   const skValue = trimmed(input.clerkSecretKey);
   const skClass = skValue ? credentialClass(skValue) : null;
-  if (skValue && !skClass) {
+  if (skValue && !skClass?.startsWith("sk_")) {
     blocker(
       "clerk:secret_key_unrecognized",
       "CLERK_SECRET_KEY does not look like a Clerk secret key (expected sk_live_* or sk_test_*).",
@@ -246,6 +264,22 @@ export function checkDeploymentConfig(
   const issuerUrl = present(input.clerkJwtIssuerDomain)
     ? parseUrl(input.clerkJwtIssuerDomain)
     : null;
+  for (const [name, configured] of [
+    ["CLERK_JWT_ISSUER_DOMAIN", input.clerkJwtIssuerDomain],
+    ["CLERK_FRONTEND_API_URL", input.clerkFrontendApiUrl],
+  ] as const) {
+    if (
+      pkHost &&
+      present(configured) &&
+      parseUrl(configured)?.hostname.toLowerCase() !== pkHost
+    ) {
+      blocker(
+        "clerk:publishable_key_instance_mismatch",
+        `${name} does not match the instance encoded by VITE_CLERK_PUBLISHABLE_KEY.`,
+        "Use the publishable key and issuer/frontend API URL from the same Clerk instance.",
+      );
+    }
+  }
   if (present(input.clerkJwtIssuerDomain) && !issuerUrl) {
     blocker(
       "clerk:issuer_unparseable",
@@ -407,11 +441,13 @@ export function checkDeploymentConfig(
     );
   }
   if (prod && devCredentials.length > 0) {
-    blocker(
-      "clerk:dev_credential_in_production",
-      `Development Clerk credentials while the environment is production: ${devCredentials.join("; ")}. Development instances have strict usage limits and are not production-ready (issue #265).`,
-      "Rotate on the production Clerk instance: set VITE_CLERK_PUBLISHABLE_KEY (pk_live_*) in the Vercel project env, set CLERK_SECRET_KEY (sk_live_*) where the gateway runs, set CLERK_JWT_ISSUER_DOMAIN via npx convex env set --prod, add the production domains to Clerk allowed origins, then release again.",
-    );
+    findings.push({
+      code: "clerk:dev_credential_in_production",
+      severity: input.allowDevelopmentAuth === true ? "warning" : "blocker",
+      message: `Development Clerk credentials while the environment is production: ${devCredentials.join("; ")}. ${input.allowDevelopmentAuth === true ? "Explicit development-auth allowance enabled; this is not production-auth readiness." : "Development authentication has not been explicitly allowed for this deployment (issue #265)."}`,
+      action:
+        "Rotate to matching production Clerk credentials for production-auth readiness, or set VITE_CLERK_ALLOW_DEVELOPMENT_AUTH=true only with owner approval to retain the existing development login instance. Invalid keys and service mismatches remain blockers.",
+    });
   }
 
   return {

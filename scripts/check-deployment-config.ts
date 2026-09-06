@@ -112,10 +112,17 @@ function parseEnvFile(path: string): Map<string, string> {
       .slice(0, separator)
       .trim()
       .replace(/^export\s+/, "");
-    const value = line
-      .slice(separator + 1)
-      .trim()
-      .replace(/^["']|["']$/g, "");
+    const encoded = line.slice(separator + 1).trim();
+    let value = encoded.replace(/^["']|["']$/g, "");
+    // Vercel exports JSON-quoted values: decode escaped newlines before
+    // credential validation, just as the build environment supplies them.
+    if (encoded.startsWith('"') && encoded.endsWith('"')) {
+      try {
+        value = JSON.parse(encoded) as string;
+      } catch {
+        // Preserve the existing dotenv subset for non-JSON quoted values.
+      }
+    }
     values.set(key, value);
   }
   return values;
@@ -143,6 +150,7 @@ function buildInput(
   };
   return {
     environment: options.environment,
+    allowDevelopmentAuth: value("VITE_CLERK_ALLOW_DEVELOPMENT_AUTH") === "true",
     viteConvexUrl: value("VITE_CONVEX_URL"),
     viteClerkPublishableKey: value("VITE_CLERK_PUBLISHABLE_KEY"),
     clerkJwtIssuerDomain: value("CLERK_JWT_ISSUER_DOMAIN"),

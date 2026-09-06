@@ -31,11 +31,14 @@ const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as
 // issue #265). Log-only; the render tree below already degrades safely.
 const startupConfigFindings = checkDeploymentConfig({
   environment: import.meta.env.MODE,
+  allowDevelopmentAuth:
+    import.meta.env.VITE_CLERK_ALLOW_DEVELOPMENT_AUTH === "true",
   viteConvexUrl: convexUrl,
   viteClerkPublishableKey: clerkPublishableKey,
 }).findings;
 for (const finding of startupConfigFindings) {
-  console.error(
+  const log = finding.severity === "warning" ? console.warn : console.error;
+  log(
     `[capsule config] ${finding.code}: ${finding.message} Fix: ${finding.action}`,
   );
 }

@@ -16,8 +16,8 @@ if [ "${VERCEL_ENV:-}" = "production" ]; then
   echo "capsule vercel-build: production convex deploy + vite build"
   # PR12-01 / AC-028 — production config gate. The build env is the one
   # place the real production frontend env is visible before deploy, so a
-  # development Clerk key (issue #265) or a frontend pointed at the wrong
-  # Convex deployment fails loudly here, before anything ships. Empty
+  # development Clerk key without explicit owner allowance (issue #265), or
+  # a frontend pointed at the wrong Convex deployment, fails here. Empty
   # CONVEX_DEPLOYMENT just skips the deployment-target cross-check.
   bun scripts/check-deployment-config.ts \
     --environment production \

@@ -12,6 +12,8 @@ Draft requirements; shared contract: [production readiness](../../docs/product/p
 
 ## Acceptance Criteria
 
+Owner decision, 2026-09-05: deployment may retain the current development Clerk instance through the explicit `VITE_CLERK_ALLOW_DEVELOPMENT_AUTH=true` allowance. The development-auth finding stays visible as a warning; this is not a claim of production-auth readiness. Actual malformed credentials and service mismatches remain blockers. This qualifies PR12-01 and AC-028 without requiring an authentication migration just to publish updates.
+
 - [ ] PR12-01: Production startup/deployment checks detect mismatched Clerk issuer, application keys, Convex audience, callback URLs, and environment. Missing configuration produces a redacted actionable error; a development credential cannot silently qualify as production-ready.
 - [ ] PR12-02: Identity provisioning verifies caller authority, intended tenant, and target identity before changing an external user's credentials. Failure or a conflicting link cannot reset another person's password; retry preserves the original identity relationship.
 - [ ] PR12-03: The supported personal/no-organization onboarding path and organization path each resolve the intended tenant and branding. Lack of a Clerk organization is not an invented blanket prohibition if the product supports a person-owned workspace.
