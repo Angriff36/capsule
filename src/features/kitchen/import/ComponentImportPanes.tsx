@@ -1,6 +1,35 @@
 import { formatCountNoun } from "../../../lib/format";
 import type { ImportSourceMode } from "./ImportSourceReadiness";
-import type { ComponentImportReviewState } from "./ComponentImportTypes";
+import {
+  reviewMeasurementIssues,
+  type ComponentImportReviewState,
+} from "./ComponentImportTypes";
+import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
+
+const UNIT_CHOICES = [
+  "each",
+  "gram",
+  "kilogram",
+  "ounce",
+  "pound",
+  "milliliter",
+  "liter",
+  "teaspoon",
+  "tablespoon",
+  "cup",
+  "pint",
+  "quart",
+  "gallon",
+  "portion",
+] as const satisfies readonly UnitOfMeasure[];
+
+/** Parses a numeric input honestly: blank/bad edits stay null, never 1. */
+function parseQuantityInput(value: string): number | null {
+  const trimmed = value.trim();
+  if (trimmed === "") return null;
+  const parsed = Number(trimmed);
+  return Number.isFinite(parsed) ? parsed : null;
+}
 
 export interface ComponentImportSourcePaneProps {
   mode: ImportSourceMode;
@@ -224,6 +253,7 @@ export function ComponentImportReviewPane({
     (line) =>
       line.matchStatus === "new" || line.matchStatus === "confirmed_new",
   ).length;
+  const measurementIssues = reviewMeasurementIssues(review);
 
   return (
     <section
@@ -265,6 +295,29 @@ export function ComponentImportReviewPane({
         </div>
       ) : null}
 
+      {measurementIssues.length > 0 ? (
+        <div className="component-import-unresolved">
+          <p>
+            {formatCountNoun(measurementIssues.length, "measurement")} needs
+            correction before saving — Capsule does not guess amounts or units.
+          </p>
+          <ul className="component-import-warnings">
+            {measurementIssues.map((issue, index) => (
+              <li key={`${issue.lineIndex}-${issue.field}-${index}`}>
+                {issue.message}
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={onJumpUnresolved}
+          >
+            Jump to first issue
+          </button>
+        </div>
+      ) : null}
+
       <label className="field-label">
         Component name
         <input
@@ -282,11 +335,11 @@ export function ComponentImportReviewPane({
             type="number"
             min={0.01}
             step="any"
-            value={review.yieldQuantity}
+            value={review.yieldQuantity ?? ""}
             onChange={(event) =>
               onReviewChange({
                 ...review,
-                yieldQuantity: Number(event.target.value),
+                yieldQuantity: parseQuantityInput(event.target.value),
               })
             }
           />
@@ -294,34 +347,20 @@ export function ComponentImportReviewPane({
         <label className="field-label">
           Unit
           <select
-            value={review.yieldUnit}
+            value={review.yieldUnit ?? ""}
             onChange={(event) =>
               onReviewChange(
                 coordinator.setYieldUnit(
                   review,
-                  event.target.value as ComponentImportReviewState["yieldUnit"],
+                  event.target.value === ""
+                    ? null
+                    : (event.target.value as UnitOfMeasure),
                 ),
               )
             }
           >
-            {(
-              [
-                "each",
-                "gram",
-                "kilogram",
-                "ounce",
-                "pound",
-                "milliliter",
-                "liter",
-                "teaspoon",
-                "tablespoon",
-                "cup",
-                "pint",
-                "quart",
-                "gallon",
-                "portion",
-              ] as const
-            ).map((unit) => (
+            <option value="">Unknown — select unit</option>
+            {UNIT_CHOICES.map((unit) => (
               <option key={unit} value={unit}>
                 {unit}
               </option>
@@ -443,11 +482,11 @@ export function ComponentImportReviewPane({
                   type="number"
                   min={0.01}
                   step="any"
-                  value={line.quantity}
+                  value={line.quantity ?? ""}
                   onChange={(event) =>
                     onReviewChange(
                       coordinator.updateLine(review, index, {
-                        quantity: Number(event.target.value),
+                        quantity: parseQuantityInput(event.target.value),
                       }),
                     )
                   }
@@ -456,34 +495,21 @@ export function ComponentImportReviewPane({
               <label className="field-label">
                 Unit
                 <select
-                  value={line.unit}
+                  value={line.unit ?? ""}
                   onChange={(event) =>
                     onReviewChange(
                       coordinator.updateLine(review, index, {
-                        unit: event.target.value as typeof line.unit,
+                        unit:
+                          event.target.value === ""
+                            ? null
+                            : (event.target.value as UnitOfMeasure),
                         unitRaw: event.target.value,
                       }),
                     )
                   }
                 >
-                  {(
-                    [
-                      "each",
-                      "gram",
-                      "kilogram",
-                      "ounce",
-                      "pound",
-                      "milliliter",
-                      "liter",
-                      "teaspoon",
-                      "tablespoon",
-                      "cup",
-                      "pint",
-                      "quart",
-                      "gallon",
-                      "portion",
-                    ] as const
-                  ).map((unit) => (
+                  <option value="">Unknown — select unit</option>
+                  {UNIT_CHOICES.map((unit) => (
                     <option key={unit} value={unit}>
                       {unit}
                     </option>
@@ -513,7 +539,12 @@ export function ComponentImportReviewPane({
         <button
           type="button"
           className="btn btn-primary"
-          disabled={busy || unresolvedCount > 0 || review.lines.length === 0}
+          disabled={
+            busy ||
+            unresolvedCount > 0 ||
+            measurementIssues.length > 0 ||
+            review.lines.length === 0
+          }
           aria-busy={busy}
           onClick={onFinalize}
         >

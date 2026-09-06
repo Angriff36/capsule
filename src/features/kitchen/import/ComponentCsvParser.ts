@@ -107,8 +107,13 @@ export class ComponentCsvParser {
       })
       .filter((line): line is NonNullable<typeof line> => line != null);
 
-    const yieldQuantity = Number(sheet[4]);
-    const yieldUnit = this.textParser.mapUnitAlias(sheet[5] ?? "portion");
+    const yieldRaw = sheet[4]?.trim() ?? "";
+    const yieldNumber = Number(yieldRaw);
+    const yieldQuantity =
+      yieldRaw !== "" && Number.isFinite(yieldNumber) && yieldNumber > 0
+        ? yieldNumber
+        : null;
+    const yieldUnit = this.textParser.mapUnitAlias(sheet[5]);
     const batchMultiplier = Number(sheet[6]);
 
     return {
@@ -117,10 +122,7 @@ export class ComponentCsvParser {
         description: sheet[1]?.trim() || undefined,
         category: sheet[2]?.trim() || undefined,
         cuisine: sheet[3]?.trim() || undefined,
-        yieldQuantity:
-          Number.isFinite(yieldQuantity) && yieldQuantity > 0
-            ? yieldQuantity
-            : 1,
+        yieldQuantity,
         yieldUnit,
         batchMultiplier:
           Number.isFinite(batchMultiplier) && batchMultiplier > 0
@@ -146,8 +148,8 @@ export class ComponentCsvParser {
   private emptyDraft(name: string): ParsedComponentDraft {
     return {
       name,
-      yieldQuantity: 1,
-      yieldUnit: "portion",
+      yieldQuantity: null,
+      yieldUnit: null,
       lines: [],
       warnings: [],
     };

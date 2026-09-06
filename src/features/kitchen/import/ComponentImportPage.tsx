@@ -28,6 +28,7 @@ import {
 import {
   countUnresolvedLines,
   reviewIsReady,
+  reviewMeasurementIssues,
   type ComponentImportReviewState,
 } from "./ComponentImportTypes";
 
@@ -146,7 +147,7 @@ export function ComponentImportPage() {
       setReview(next);
       setMobilePane("review");
       announce(
-        `Parsed ${next.lines.length} ingredient lines with ${countUnresolvedLines(next.lines)} unresolved matches.`,
+        `Parsed ${next.lines.length} ingredient lines, ${countUnresolvedLines(next.lines)} unresolved matches, ${reviewMeasurementIssues(next).length} missing measurements.`,
       );
     } catch (error) {
       setFailure(error);
@@ -174,7 +175,13 @@ export function ComponentImportPage() {
 
   const jumpUnresolved = () => {
     if (!review) return;
-    const index = coordinator.firstUnresolvedIndex(review);
+    let index = coordinator.firstUnresolvedIndex(review);
+    if (index < 0) {
+      const firstIssueLine = reviewMeasurementIssues(review).find(
+        (issue) => issue.lineIndex != null,
+      )?.lineIndex;
+      if (firstIssueLine != null) index = firstIssueLine;
+    }
     if (index < 0) return;
     document
       .querySelector(`[data-unresolved]:nth-child(${index + 1})`)
