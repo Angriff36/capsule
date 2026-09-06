@@ -35,6 +35,11 @@ import { PackListItemForm } from "./PackListItemForm";
 import { PackListItemTable } from "./PackListItemTable";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
+import { useApplyPackTemplate } from "../../lib/safeMaterialization";
+import {
+  beginPendingOperation,
+  confirmPendingOperation,
+} from "../../lib/pendingOperationKey";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -58,6 +63,7 @@ export function PackListDetailPage() {
   const events = useListEvent();
   const dishes = useListDish();
   const createItem = useCreatePackListItem();
+  const applyPackTemplate = useApplyPackTemplate();
   const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
   const markItemPacked = usePackListItemMarkPacked();
@@ -237,20 +243,21 @@ export function PackListDetailPage() {
       if (lines.length === 0) {
         throw new Error("This template has no valid items to generate.");
       }
-      // ponytail: sequential client-side copy (non-atomic). A mid-loop network
-      // drop can leave a partial load sheet; a server-side bulk-generate action
-      // is the upgrade path if it bites. Mirrors VenueLayoutTemplate's copy.
-      for (const it of lines) {
-        await createItem({
-          packListId: packList._id,
-          description: it.description,
-          requiredQuantity: it.requiredQuantity,
-          unit: it.unit,
-        });
-      }
+      const scope = `pack-template:${packList._id}:${template._id}`;
+      const pending = beginPendingOperation(scope, {
+        packListId: packList._id,
+        items: lines,
+      });
+      const result = await applyPackTemplate({
+        ...pending.payload,
+        operationKey: pending.key,
+      });
+      confirmPendingOperation(scope);
       setShowTemplates(false);
       setNotice(
-        `${lines.length} ${lines.length === 1 ? "item" : "items"} generated from "${template.name}".`,
+        result.recovered
+          ? `${result.itemCount} ${result.itemCount === 1 ? "item was" : "items were"} already saved from "${template.name}"; the earlier result was recovered.`
+          : `${pending.payload.items.length} ${pending.payload.items.length === 1 ? "item" : "items"} generated from "${template.name}".`,
       );
     });
   };

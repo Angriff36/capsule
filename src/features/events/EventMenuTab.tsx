@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateEventDish,
@@ -21,6 +21,12 @@ import {
   useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
+import type { Id } from "../../lib/api";
+import { useMaterializeEventMenuTemplate } from "../../lib/operational-transactions";
+import {
+  beginPendingOperation,
+  confirmPendingOperation,
+} from "../../lib/pendingOperationKey";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
@@ -33,6 +39,8 @@ import { ActionMenu, ActionMenuRule } from "../../ui/primitives";
 import { PlusIcon } from "../../ui/icons";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import type { EventStockShortage } from "./EventStockReservationCoordinator";
+import { TemplateStockSyncLifecycle } from "./TemplateStockSyncLifecycle";
+import { reconcileRecoveredMenuRequest } from "./reconcileRecoveredMenuRequest";
 import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 import { EventDraftPoButton } from "./EventDraftPoButton";
@@ -91,13 +99,18 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const containers = useListDishContainer();
   const inventoryItems = useListInventoryItem();
   const inventoryReservations = useListInventoryReservation();
+  const materializeTemplate = useMaterializeEventMenuTemplate();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
   const changeCourse = useEventDishChangeCourse();
   const removeDish = useEventDishRemove();
   const setHeadcountOverride = useEventDishSetHeadcountOverride();
   const updateInstructions = useEventDishUpdateInstructions();
-  const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
+  const {
+    ready: prepSyncReady,
+    syncStockForEvent,
+    demandVersionsForEvent,
+  } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
     [],
@@ -105,6 +118,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const [openRecipeId, setOpenRecipeId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const stockLifecycle = useRef(new TemplateStockSyncLifecycle());
+  const [stockPhase, setStockPhase] = useState(0);
+  const [menuSyncStatus, setMenuSyncStatus] = useState<{
+    phase: "waiting" | "syncing" | "failed";
+    savedCount: number;
+    requestedCount: number;
+    recovered: boolean;
+  } | null>(null);
+  const [remainingTemplateLines, setRemainingTemplateLines] = useState<{
+    template: MenuTemplate;
+    lines: MenuTemplate["lines"];
+    servings: number;
+  } | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 
   const selections = useMemo(
@@ -124,6 +150,37 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     if (!prepSyncReady) return;
     setStockShortages(await syncStockForEvent(eventId));
   };
+
+  useEffect(() => {
+    const phase = stockLifecycle.current.next({
+      ready: prepSyncReady,
+      eventDishIds: selections.map((row) => String(row._id)),
+      demandVersions: demandVersionsForEvent(eventId),
+    });
+    if (!phase) return;
+    setMenuSyncStatus((current) => current && { ...current, phase: "syncing" });
+    void run("template:stock-sync", async () => {
+      try {
+        await refreshStock();
+        stockLifecycle.current.succeeded(phase.attemptId);
+        if (stockLifecycle.current.status().phase === "complete") {
+          setMenuSyncStatus(null);
+        }
+      } catch (cause) {
+        stockLifecycle.current.failed(phase.attemptId);
+        if (stockLifecycle.current.status().attemptId === phase.attemptId) {
+          setMenuSyncStatus(
+            (current) => current && { ...current, phase: "failed" },
+          );
+          const classified = classifyCommandFailure(cause);
+          setFailure({
+            ...classified,
+            detail: `${classified.detail} ${phase.savedLines} menu line${phase.savedLines === 1 ? " was" : "s were"} saved or reconciled; stock synchronization is unfinished.`,
+          });
+        }
+      }
+    });
+  }, [demandVersionsForEvent, eventId, prepSyncReady, selections, stockPhase]);
 
   const costRollup = useMemo(
     () =>
@@ -275,6 +332,48 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     (line) => eventMenuDishEstimateKind(line) !== "priced",
   ).length;
 
+  const materializeTemplateLines = async (
+    template: MenuTemplate,
+    lines: MenuTemplate["lines"],
+    servings: number,
+  ) => {
+    const scope = `event-menu-template:${eventId}:${template.menuId}`;
+    const pending = beginPendingOperation(scope, {
+      eventId: eventId as Id<"events">,
+      lines: lines.map((line) => ({
+        dishId: line.dishId as Id<"dishes">,
+        quantityServings: servings,
+        course: line.course,
+        serviceStyle: line.serviceStyle,
+      })),
+    });
+    const result = await materializeTemplate({
+      ...pending.payload,
+      operationKey: pending.key,
+    });
+    confirmPendingOperation(scope);
+    const reconciliation = reconcileRecoveredMenuRequest(
+      lines.map((line) => line.dishId),
+      result.appliedDishIds,
+    );
+    const outstanding = new Set(reconciliation.outstandingDishIds);
+    const remaining = lines.filter((line) => outstanding.has(line.dishId));
+    setRemainingTemplateLines(
+      remaining.length > 0 ? { template, lines: remaining, servings } : null,
+    );
+    stockLifecycle.current.begin({
+      savedDishIds: result.savedDishIds,
+      savedDemandVersions: result.savedDemandVersions,
+    });
+    setMenuSyncStatus({
+      phase: "waiting",
+      savedCount: result.savedCount,
+      requestedCount: result.requestedCount,
+      recovered: result.recovered === true,
+    });
+    setStockPhase((current) => current + 1);
+  };
+
   const applyTemplate = (template: MenuTemplate) =>
     void run(`template:${template.menuId}`, async () => {
       const confirmed = await prompt.askConfirm({
@@ -284,19 +383,31 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       });
       if (!confirmed) return;
       const servings = Math.max(1, expectedHeadcount || 1);
-      for (const line of template.lines) {
-        if (existingDishIds.includes(line.dishId)) continue;
-        await createEventDish({
-          eventId,
-          dishId: line.dishId,
-          quantityServings: servings,
-          headcountOverride: 0,
-          course: line.course,
-          serviceStyle: line.serviceStyle,
-        });
-      }
-      await refreshStock();
+      const missing = template.lines.filter(
+        (line) => !existingDishIds.includes(line.dishId),
+      );
+      await materializeTemplateLines(template, missing, servings);
     });
+
+  const applyRemainingTemplateLines = () => {
+    const remaining = remainingTemplateLines;
+    if (!remaining) return;
+    void run(`template:${remaining.template.menuId}:remaining`, async () => {
+      await materializeTemplateLines(
+        remaining.template,
+        remaining.lines,
+        remaining.servings,
+      );
+    });
+  };
+
+  const retryTemplateStockSync = () => {
+    stockLifecycle.current.retry();
+    setMenuSyncStatus((current) =>
+      current ? { ...current, phase: "waiting" } : current,
+    );
+    setStockPhase((current) => current + 1);
+  };
 
   const editLineNote = (row: EventMenuNoteRow) => {
     void (async () => {
@@ -362,6 +473,79 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         </div>
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
+      {menuSyncStatus ? (
+        <div
+          className="attention-band px-4 py-3"
+          role="status"
+          aria-live="polite"
+        >
+          <p className="font-semibold text-ink">
+            {menuSyncStatus.savedCount} of {menuSyncStatus.requestedCount}{" "}
+            template lines saved or reconciled
+            {menuSyncStatus.recovered
+              ? " (recovered from the prior attempt)"
+              : ""}
+            .
+          </p>
+          <p className="mt-1 text-base text-ink-2">
+            {menuSyncStatus.phase === "failed"
+              ? "Menu lines are safe. Stock synchronization is still unfinished."
+              : menuSyncStatus.phase === "syncing"
+                ? "Synchronizing stock for the saved menu lines…"
+                : "Waiting for the saved menu rows to arrive. Ingredient demand was reconciled in the completed server operation."}
+          </p>
+          {remainingTemplateLines ? (
+            <div className="mt-2">
+              <p className="text-base font-semibold text-ink">
+                {remainingTemplateLines.lines.length} newly requested template
+                line
+                {remainingTemplateLines.lines.length === 1
+                  ? " remains"
+                  : "s remain"}{" "}
+                unapplied.
+              </p>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm mt-2"
+                disabled={busy != null}
+                onClick={applyRemainingTemplateLines}
+              >
+                Apply remaining {remainingTemplateLines.lines.length}
+              </button>
+            </div>
+          ) : null}
+          {menuSyncStatus.phase === "failed" ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm mt-2"
+              disabled={busy != null}
+              onClick={retryTemplateStockSync}
+            >
+              Retry stock sync only
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+      {!menuSyncStatus && remainingTemplateLines ? (
+        <div className="attention-band px-4 py-3" role="status">
+          <p className="font-semibold text-ink">
+            Prior template work is complete.{" "}
+            {remainingTemplateLines.lines.length} newly requested line
+            {remainingTemplateLines.lines.length === 1
+              ? " remains"
+              : "s remain"}{" "}
+            unapplied.
+          </p>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm mt-2"
+            disabled={busy != null}
+            onClick={applyRemainingTemplateLines}
+          >
+            Apply remaining {remainingTemplateLines.lines.length}
+          </button>
+        </div>
+      ) : null}
       {host}
       <EventMenuStockShortageBanner
         shortages={stockShortages}

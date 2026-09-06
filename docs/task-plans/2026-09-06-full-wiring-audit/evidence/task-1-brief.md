@@ -1,0 +1,4 @@
+### Task 1: Repair immediate command and delivery honesty
+
+Own ProposalTemplatesPage.tsx, MessageInboxPage.tsx, ProposalsPage.tsx, ContractsPage.tsx, InvoicesPage.tsx and InvoiceDetailPage.tsx plus focused authored tests/helpers.
+Fix proposal-template revise/archive/reactivate to pass docId. Inbox external email/SMS/social submission must visibly say cannot send because no provider is connected, preserve the draft, and never create a misleading queued outbound row. Display historical queued/failed delivery state; internal conversation logging stays usable and honestly named. Relabel status-only proposal/contract/initial invoice actions and notifications to publication/manual sent recording with concise external-delivery guidance. Preserve genuine invoice reminders and signature links. Verify commands, labels, retention and failure behavior with focused tests. No provider implementation or policy changes.

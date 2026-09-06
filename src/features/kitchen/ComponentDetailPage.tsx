@@ -22,12 +22,9 @@ import {
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { useAuthStatus } from "../../lib/useAuthStatus";
-import {
-  buildComponentSnapshotData,
-  planLineRestore,
-  type ComponentSnapshotData,
-} from "./componentSnapshot";
+import { buildComponentSnapshotData } from "./componentSnapshot";
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
+import { captureBeforeChange } from "./componentSnapshotCapture";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -54,6 +51,12 @@ import {
   UNIT_OF_MEASURE,
   unitOptionsFor,
 } from "./import/UnitOfMeasureMapper";
+import {
+  beginPendingOperation,
+  confirmPendingOperation,
+} from "../../lib/pendingOperationKey";
+import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperations";
+import { componentRestoreOutcome } from "./culinaryRecovery";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -82,6 +85,7 @@ export function ComponentDetailPage() {
   // Creation path: the governed create hook (ComponentSnapshot_createViaCapture),
   // not the entity-command hook which targets an existing doc via docId.
   const captureSnapshot = useCreateComponentSnapshot();
+  const restoreSnapshotCommand = useRestoreComponentSnapshotSafely();
   const snapshots = useListComponentSnapshot();
   const people = useListPerson();
   const authStatus = useAuthStatus();
@@ -90,6 +94,7 @@ export function ComponentDetailPage() {
   const [showLineForm, setShowLineForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [snapshotWarning, setSnapshotWarning] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt();
   const draftForm = useFormDraft(`component-revise:${id ?? "none"}`);
 
@@ -162,72 +167,35 @@ export function ComponentDetailPage() {
   // Snapshot the component's state BEFORE a modification, so history holds the
   // prior editions with author + timestamp. Capture failures never block edits.
   const captureBefore = async (changeSummary: string) => {
-    try {
-      await captureSnapshot({
-        componentId: component._id,
-        versionNumber: component.versionNumber,
-        capturedByName: myName,
-        changeSummary,
-        snapshot: JSON.stringify(currentData),
-      });
-    } catch {
-      // Non-fatal: the edit itself is the source of truth.
-    }
+    setSnapshotWarning(null);
+    await captureBeforeChange(
+      () =>
+        captureSnapshot({
+          componentId: component._id,
+          versionNumber: component.versionNumber,
+          capturedByName: myName,
+          changeSummary,
+          snapshot: JSON.stringify(currentData),
+        }),
+      setSnapshotWarning,
+    );
   };
 
-  const restoreSnapshot = (
-    target: ComponentSnapshotData,
-    versionLabel: string,
-  ) => {
+  const restoreSnapshot = (snapshotId: string, versionLabel: string) => {
     void run("restore", async () => {
       await captureBefore(`Before restore to ${versionLabel}`);
-      await revise({
-        docId: component._id,
-        name: target.name,
-        yieldQuantity: target.yieldQuantity,
-        yieldUnit: target.yieldUnit as (typeof UNITS)[number],
-        batchMultiplier: target.batchMultiplier,
-        servesPerYield: target.servesPerYield,
-        category: target.category || undefined,
-        cuisine: target.cuisine || undefined,
-        description: target.description || undefined,
-        instructions: target.instructions || undefined,
-        version: component.version,
+      const scope = `component-restore:${component._id}`;
+      const pending = beginPendingOperation(scope, {
+        componentId: component._id,
+        snapshotId,
       });
-      const plan = planLineRestore(currentData, target);
-      for (const add of plan.add) {
-        await createLine({
-          componentId: component._id,
-          ingredientId: add.ingredientId,
-          quantity: add.quantity,
-          unit: add.unit as (typeof UNITS)[number],
-          sortOrder: 0,
-          prepNotes: add.prepNotes || undefined,
-        });
-      }
-      for (const change of plan.adjust) {
-        const line = componentLines.find(
-          (l) => l.ingredientId === change.ingredientId,
-        );
-        if (!line) continue;
-        await adjustLine({
-          docId: line._id,
-          quantity: change.quantity,
-          unit: change.unit as (typeof UNITS)[number],
-          version: line.version,
-        });
-      }
-      for (const ingredientId of plan.remove) {
-        const line = componentLines.find(
-          (l) => l.ingredientId === ingredientId,
-        );
-        if (!line) continue;
-        await removeLine({
-          docId: line._id,
-          reason: `Restored to ${versionLabel}`,
-          version: line.version,
-        });
-      }
+      const result = await restoreSnapshotCommand({
+        ...pending.payload,
+        operationKey: pending.key,
+      } as never);
+      confirmPendingOperation(scope);
+      const outcome = componentRestoreOutcome(result);
+      if (outcome.notice) setSnapshotWarning(outcome.notice);
     });
   };
   const latestPrices = latestPriceByIngredient(priceObservations ?? []);
@@ -354,6 +322,11 @@ export function ComponentDetailPage() {
         <div className="mt-4">
           <CulinaryFailureBanner error={failure} />
         </div>
+      ) : null}
+      {snapshotWarning ? (
+        <p className="mt-4 text-base text-warn" role="status">
+          {snapshotWarning}
+        </p>
       ) : null}
       <header className="culinary-header-compact">
         <div className="flex flex-wrap items-start justify-between gap-3">

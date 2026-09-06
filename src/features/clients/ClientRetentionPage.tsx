@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
   useClientOutreachTaskComplete,
   useClientOutreachTaskDismiss,
-  useCreateClientOutreachTask,
   useListClient,
   useListClientOutreachTask,
   useListEvent,
@@ -15,6 +14,9 @@ import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { useActionNotice } from "../../ui/action-result";
+import { useEnsureOpenClientOutreach } from "../../lib/useEnsureOpenClientOutreach";
+import { BulkRunFailure, runBulkItems } from "../../ui/bulk-select";
+import type { Id } from "../../lib/api";
 
 interface RetentionRow {
   clientId: string;
@@ -91,7 +93,7 @@ export function ClientRetentionPage() {
   const clients = useListClient();
   const events = useListEvent();
   const outreachTasks = useListClientOutreachTask();
-  const openOutreachTask = useCreateClientOutreachTask();
+  const ensureOpenOutreachTask = useEnsureOpenClientOutreach();
   const completeOutreachTask = useClientOutreachTaskComplete();
   const dismissOutreachTask = useClientOutreachTaskDismiss();
   const [busy, setBusy] = useState(false);
@@ -141,23 +143,38 @@ export function ClientRetentionPage() {
 
   const openForCandidate = (row: RetentionRow) =>
     run(async () => {
-      await openOutreachTask({
-        clientId: row.clientId,
+      const result = await ensureOpenOutreachTask({
+        clientId: row.clientId as Id<"clients">,
         reason: churnReason(row),
       });
-      setNotice("Outreach task opened.");
+      setNotice(
+        result.created
+          ? "Outreach task opened."
+          : "Outreach task was already open.",
+      );
     });
 
   const openForAll = () =>
     run(async () => {
-      for (const row of uncoveredCandidates) {
-        await openOutreachTask({
-          clientId: row.clientId,
-          reason: churnReason(row),
+      let createdCount = 0;
+      try {
+        await runBulkItems(uncoveredCandidates, async (row) => {
+          const result = await ensureOpenOutreachTask({
+            clientId: row.clientId as Id<"clients">,
+            reason: churnReason(row),
+          });
+          if (result.created) createdCount += 1;
         });
+      } catch (error) {
+        if (error instanceof BulkRunFailure) {
+          setNotice(
+            `${createdCount} opened; ${error.unfinishedItems.length} remaining.`,
+          );
+        }
+        throw error;
       }
       setNotice(
-        `Opened ${uncoveredCandidates.length} outreach task${uncoveredCandidates.length === 1 ? "" : "s"}.`,
+        `Opened ${createdCount} outreach task${createdCount === 1 ? "" : "s"}.`,
       );
     });
 

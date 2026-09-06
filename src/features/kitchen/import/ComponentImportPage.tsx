@@ -12,6 +12,12 @@ import { componentPath } from "../kitchenRoutes";
 import { ComponentImportCoordinator } from "./ComponentImportCoordinator";
 import { ComponentImportFinalizer } from "./ComponentImportFinalizer";
 import {
+  beginPendingOperation,
+  confirmPendingOperation,
+} from "../../../lib/pendingOperationKey";
+import { useImportComponentSafely } from "../../../lib/safeCulinaryOperations";
+import { componentImportOutcome } from "../culinaryRecovery";
+import {
   ImportSourceReadinessChecker,
   type ImportSourceMode,
 } from "./ImportSourceReadiness";
@@ -31,6 +37,7 @@ const sourceReadiness = new ImportSourceReadinessChecker();
 type MobilePane = "source" | "review";
 
 export function ComponentImportPage() {
+  const importComponent = useImportComponentSafely();
   const navigate = useNavigate();
   const liveRef = useRef<HTMLDivElement>(null);
   const ingredients = useListIngredient();
@@ -52,6 +59,10 @@ export function ComponentImportPage() {
   const [sourceHint, setSourceHint] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [statusMessage, setStatusMessage] = useState("");
+  const [recoveredComponentId, setRecoveredComponentId] = useState<
+    string | null
+  >(null);
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
 
   const catalog = useMemo(
     () =>
@@ -104,6 +115,8 @@ export function ComponentImportPage() {
   const parseSource = () => {
     if (parsing || busy) return;
     setFailure(null);
+    setRecoveryNotice(null);
+    setRecoveredComponentId(null);
     if (!readiness.ready) {
       setSourceHint(readiness.message ?? "Add source input before parsing.");
       announce(readiness.message ?? "Add source input before parsing.");
@@ -175,6 +188,7 @@ export function ComponentImportPage() {
     announce("Saving your import…");
     try {
       const finalizer = new ComponentImportFinalizer({
+        importComponent: (input) => importComponent(input as never),
         createIngredient: (input) =>
           createIngredient(input) as Promise<{ docId: string }>,
         createComponent: (input) =>
@@ -182,9 +196,20 @@ export function ComponentImportPage() {
         createComponentIngredient: (input) =>
           createComponentIngredient(input) as Promise<{ docId: string }>,
       });
-      const saved = await finalizer.finalize(review);
-      announce("Import completed.");
-      navigate(componentPath(saved.componentId));
+      const scope = "component-import";
+      const pending = beginPendingOperation(scope, review);
+      const saved = await finalizer.finalize(pending.payload, pending.key);
+      confirmPendingOperation(scope);
+      const outcome = componentImportOutcome({
+        ...saved,
+        recovered: saved.recovered === true,
+      });
+      if (outcome.notice) {
+        setRecoveryNotice(outcome.notice);
+        setRecoveredComponentId(outcome.recoveredId);
+        announce(outcome.notice);
+      } else announce("Import completed.");
+      if (outcome.navigateToId) navigate(componentPath(outcome.navigateToId));
     } catch (error) {
       setFailure(error);
       announce("Import failed.");
@@ -220,6 +245,16 @@ export function ComponentImportPage() {
         <div className="mt-4">
           <CulinaryFailureBanner error={failure} />
         </div>
+      ) : null}
+      {recoveryNotice ? (
+        <p className="mt-4 text-base text-warn" role="status">
+          {recoveryNotice}{" "}
+          {recoveredComponentId ? (
+            <Link to={componentPath(recoveredComponentId)} className="link">
+              Open saved component
+            </Link>
+          ) : null}
+        </p>
       ) : null}
 
       <div

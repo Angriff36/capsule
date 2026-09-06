@@ -24,6 +24,8 @@ import {
   BoundedDateTimeLocalInput,
 } from "../../ui/BoundedDateInputs";
 import { toDatetimeLocalValue } from "../../lib/format";
+import { useListProposalTemplate } from "../../lib/manifest-convex-react";
+import { proposalTemplateDefaults } from "./proposalTemplateDefaults";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
@@ -105,6 +107,7 @@ export function ProposalCreateForm({
   const draftForm = useFormDraft("proposal");
   // Published-catalog dishes a pricing line can be priced from (spec §5.4 L276).
   const catalog = useCatalogDishes();
+  const proposalTemplates = useListProposalTemplate();
   const [searchParams, setSearchParams] = useSearchParams();
   const fromEventId = searchParams.get("event");
 
@@ -139,6 +142,16 @@ export function ProposalCreateForm({
   const [draftGuestCount, setDraftGuestCount] = useState<number>(0);
   const [draftTax, setDraftTax] = useState<number>(0);
   const [draftDiscount, setDraftDiscount] = useState<number>(0);
+  const [draftTerms, setDraftTerms] = useState("");
+  const [draftNotes, setDraftNotes] = useState("");
+  const [draftExpiresOn, setDraftExpiresOn] = useState(defaultValidityDate);
+  const [draftVisibleSections, setDraftVisibleSections] = useState<string[]>(
+    [],
+  );
+  const [templateTaxRate, setTemplateTaxRate] = useState<number | null>(null);
+  const [templateServiceLineKey, setTemplateServiceLineKey] = useState<
+    string | null
+  >(null);
 
   // Live pricing preview via the ONE central calc (spec §5.4): lines → totals.
   const draftPricing = useMemo(
@@ -162,9 +175,117 @@ export function ProposalCreateForm({
         l.key === key ? ({ ...l, [field]: value } as DraftLine) : l,
       ),
     );
-  const removeLine = (key: string) =>
+  const removeLine = (key: string) => {
     setDraftLines((lines) => lines.filter((l) => l.key !== key));
-  const addLine = () => setDraftLines((lines) => [...lines, newDraftLine()]);
+    draftForm.schedulePersist();
+  };
+  const addLine = () => {
+    setDraftLines((lines) => [...lines, newDraftLine()]);
+    draftForm.schedulePersist();
+  };
+
+  const selectTemplate = (templateId: string) => {
+    const template = (proposalTemplates ?? []).find(
+      (row) => row._id === templateId && row.status === "active",
+    );
+    if (!template) {
+      draftForm.schedulePersist();
+      setDraftLines((lines) =>
+        lines.filter((line) => line.key !== templateServiceLineKey),
+      );
+      setDraftVisibleSections([]);
+      setTemplateTaxRate(null);
+      setTemplateServiceLineKey(null);
+      return;
+    }
+    draftForm.schedulePersist();
+    const baseLines = draftLines.filter(
+      (line) => line.key !== templateServiceLineKey,
+    );
+    const basePricing = computeProposalPricing({
+      lines: baseLines.map((line) => ({
+        pricingBasis: line.pricingBasis,
+        unitPrice: Number(line.unitPrice) || 0,
+        quantity: Number(line.quantity) || 0,
+      })),
+      guestCount: draftGuestCount,
+      taxAmount: 0,
+      discountAmount: draftDiscount,
+    });
+    const defaults = proposalTemplateDefaults(template, basePricing.subtotal);
+    setDraftTerms(defaults.terms);
+    setDraftNotes(defaults.notes);
+    setDraftExpiresOn(defaults.expiresOn);
+    setTemplateTaxRate(template.defaultTaxRate ?? null);
+    setDraftVisibleSections(defaults.visibleSections);
+    const serviceChargeLine = defaults.serviceChargeLine;
+    let nextLines = baseLines;
+    let nextServiceLineKey: string | null = null;
+    if (serviceChargeLine) {
+      const nextServiceLine = {
+        ...newDraftLine(),
+        ...serviceChargeLine,
+        quantity: String(serviceChargeLine.quantity),
+        unitPrice: String(serviceChargeLine.unitPrice),
+      };
+      nextServiceLineKey = nextServiceLine.key;
+      nextLines = [...baseLines, nextServiceLine];
+    }
+    setTemplateServiceLineKey(nextServiceLineKey);
+    setDraftLines(nextLines);
+    const resultingPricing = computeProposalPricing({
+      lines: nextLines.map((line) => ({
+        pricingBasis: line.pricingBasis,
+        unitPrice: Number(line.unitPrice) || 0,
+        quantity: Number(line.quantity) || 0,
+      })),
+      guestCount: draftGuestCount,
+      taxAmount: 0,
+      discountAmount: draftDiscount,
+    });
+    setDraftTax(
+      Math.round(
+        resultingPricing.subtotal * (template.defaultTaxRate ?? 0) * 100,
+      ) / 100,
+    );
+  };
+
+  useEffect(() => {
+    if (templateTaxRate == null) return;
+    setDraftTax(
+      Math.round(draftPricing.subtotal * templateTaxRate * 100) / 100,
+    );
+  }, [draftPricing.subtotal, templateTaxRate]);
+
+  const restoreProposalDraft = () => {
+    const saved = draftForm.restore();
+    if (!saved) return;
+    setDraftGuestCount(Number(saved.values.guestCount) || 0);
+    setDraftTax(Number(saved.values.taxAmount) || 0);
+    setDraftDiscount(Number(saved.values.discountAmount) || 0);
+    setDraftNotes(saved.values.notes ?? "");
+    setDraftTerms(saved.values.terms ?? "");
+    setDraftExpiresOn(saved.values.expiresAt ?? defaultValidityDate());
+    try {
+      const metadata = JSON.parse(saved.values.proposalDraftState ?? "{}") as {
+        lines?: DraftLine[];
+        visibleSections?: string[];
+        templateTaxRate?: number | null;
+        templateServiceLineKey?: string | null;
+      };
+      setDraftLines(Array.isArray(metadata.lines) ? metadata.lines : []);
+      setDraftVisibleSections(
+        Array.isArray(metadata.visibleSections) ? metadata.visibleSections : [],
+      );
+      setTemplateTaxRate(metadata.templateTaxRate ?? null);
+      setTemplateServiceLineKey(metadata.templateServiceLineKey ?? null);
+    } catch {
+      setDraftLines([]);
+      setDraftVisibleSections([]);
+      setTemplateTaxRate(null);
+      setTemplateServiceLineKey(null);
+    }
+  };
 
   // Link (or unlink) a draft line to a catalog dish (spec §5.4 L276). Picking a
   // dish autofills its name + sellingPrice; tweaking unitPrice away from that
@@ -269,6 +390,7 @@ export function ProposalCreateForm({
         expiresAt: dateValue(data.get("expiresAt"), true),
         notes: String(data.get("notes") || "").trim() || undefined,
         terms: String(data.get("terms") || "").trim() || undefined,
+        visibleSections: draftVisibleSections,
         eventId: eventIdRaw ? (eventIdRaw as Id<"events">) : undefined,
         lines: validLines.map((line, i) => ({
           description: line.description.trim(),
@@ -287,6 +409,12 @@ export function ProposalCreateForm({
       setDraftLines([]);
       setDraftTax(0);
       setDraftDiscount(0);
+      setDraftTerms("");
+      setDraftNotes("");
+      setDraftExpiresOn(defaultValidityDate());
+      setDraftVisibleSections([]);
+      setTemplateTaxRate(null);
+      setTemplateServiceLineKey(null);
       onClose();
       if (fromEventId) {
         const nextParams = new URLSearchParams(searchParams);
@@ -295,8 +423,8 @@ export function ProposalCreateForm({
       }
       onNotice(
         fromEventId
-          ? "Proposal drafted and linked to the event. Send it when ready for the client."
-          : "Proposal drafted. Send it when ready for the client.",
+          ? "Proposal drafted and linked to the event. Publish and share it when ready."
+          : "Proposal drafted. Publish and share it when ready.",
       );
     });
   };
@@ -324,7 +452,7 @@ export function ProposalCreateForm({
       </div>
       <DraftRestoreBanner
         draft={draftForm.draft}
-        onRestore={draftForm.restore}
+        onRestore={restoreProposalDraft}
         onDiscard={draftForm.discard}
       />
       {!hasClientSource ? (
@@ -337,7 +465,38 @@ export function ProposalCreateForm({
         </p>
       ) : (
         <>
+          <input
+            type="hidden"
+            name="proposalDraftState"
+            value={JSON.stringify({
+              lines: draftLines,
+              visibleSections: draftVisibleSections,
+              templateTaxRate,
+              templateServiceLineKey,
+            })}
+          />
           <div className="supply-form-grid">
+            <label className="field-label supply-span-2">
+              Proposal template
+              <select
+                className="input"
+                defaultValue=""
+                onChange={(event) => selectTemplate(event.target.value)}
+              >
+                <option value="">No template</option>
+                {(proposalTemplates ?? [])
+                  .filter((row) => row.status === "active")
+                  .map((row) => (
+                    <option key={row._id} value={row._id}>
+                      {row.name}
+                    </option>
+                  ))}
+              </select>
+              <span className="text-2xs text-ink-3">
+                Selecting a template initializes this draft. Your later edits
+                stay unchanged.
+              </span>
+            </label>
             {fromEvent ? (
               <label className="field-label supply-span-2">
                 Client
@@ -634,8 +793,15 @@ export function ProposalCreateForm({
                 step="0.01"
                 min={0}
                 value={draftTax}
-                onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
+                onChange={(e) => {
+                  setTemplateTaxRate(null);
+                  setDraftTax(Number(e.target.value) || 0);
+                }}
               />
+              <span className="text-2xs text-ink-3">
+                Template tax follows the current subtotal and service charge
+                until you edit this fixed amount.
+              </span>
             </label>
             <label className="field-label">
               Discount
@@ -658,12 +824,14 @@ export function ProposalCreateForm({
           </p>
           <div className="supply-form-grid">
             <label className="field-label supply-span-2">
-              Proposed menu
+              Notes
               <textarea
                 className="input"
                 name="notes"
                 rows={4}
-                placeholder="List menu items, one per line"
+                value={draftNotes}
+                onChange={(event) => setDraftNotes(event.target.value)}
+                placeholder="Client-facing notes"
               />
             </label>
             <label className="field-label">
@@ -671,7 +839,8 @@ export function ProposalCreateForm({
               <BoundedDateInput
                 className="input"
                 name="expiresAt"
-                defaultValue={defaultValidityDate()}
+                value={draftExpiresOn}
+                onChange={(event) => setDraftExpiresOn(event.target.value)}
               />
             </label>
             <label className="field-label supply-span-2">
@@ -680,6 +849,8 @@ export function ProposalCreateForm({
                 className="input"
                 name="terms"
                 rows={3}
+                value={draftTerms}
+                onChange={(event) => setDraftTerms(event.target.value)}
                 placeholder="Deposit, service, cancellation, or other terms"
               />
             </label>

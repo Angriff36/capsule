@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import {
-  useCreateSavedReportDefinition,
   useListSavedReportDefinition,
   useSavedReportDefinitionArchive,
-  useSavedReportDefinitionUpdateDefinition,
 } from "../../lib/manifest-convex-react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import { useSavedViewOperations } from "../../lib/useSavedViewOperations";
+import type { Id } from "../../lib/api";
 
 // ponytail: saved list views reuse the owner-scoped SavedReportDefinition entity
 // (schemaless `definition` json + soft delete + per-owner read gate) instead of a
@@ -34,16 +35,17 @@ type ViewDefinition<S> = { pageKey: string; isDefault: boolean; state: S };
 
 /**
  * Per-user saved filter/sort/column combinations for one list page, persisted in
- * Convex. Reads are owner-scoped by the SavedReportDefinition read policy, so no
- * client-side owner filtering is required. Exactly one view may be the default.
+ * Convex. The generated report query also exposes manager-visible/shared rows,
+ * so this personal adapter filters to the current owner. Exactly one personal
+ * view may be the default.
  */
 export function useSavedViews<S>(
   pageKey: string,
   subjectArea: ReportSubjectArea,
 ) {
   const rows = useListSavedReportDefinition();
-  const create = useCreateSavedReportDefinition();
-  const update = useSavedReportDefinitionUpdateDefinition();
+  const auth = useAuthStatus();
+  const operations = useSavedViewOperations();
   const archive = useSavedReportDefinitionArchive();
 
   const views = useMemo<SavedView<S>[]>(() => {
@@ -53,6 +55,7 @@ export function useSavedViews<S>(
         return (
           String(r.chartType) === VIEW_MARKER &&
           String(r.status) !== "archived" &&
+          String(r.ownerId) === String(auth?.personId) &&
           def?.pageKey === pageKey
         );
       })
@@ -67,40 +70,20 @@ export function useSavedViews<S>(
         };
       })
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [rows, pageKey]);
+  }, [rows, pageKey, auth?.personId]);
 
   const defaultView = views.find((v) => v.isDefault) ?? null;
 
-  // Clear isDefault on every currently-default view (usually zero or one).
-  async function clearDefault() {
-    for (const v of views.filter((v) => v.isDefault)) {
-      await update({
-        docId: v.id,
-        version: v.version,
-        definition: { pageKey, isDefault: false, state: v.state },
-      });
-    }
-  }
-
   async function save(name: string, state: S, makeDefault: boolean) {
-    if (makeDefault) await clearDefault();
-    await create({
-      name,
-      subjectArea,
-      chartType: VIEW_MARKER,
-      definition: { pageKey, isDefault: makeDefault, state },
-      sharingScope: "owner_only",
-    });
+    await operations.create({ pageKey, name, subjectArea, state, makeDefault });
   }
 
   async function setDefault(id: string) {
     const view = views.find((v) => v.id === id);
     if (!view || view.isDefault) return; // no-op avoids a version conflict on self
-    await clearDefault();
-    await update({
-      docId: view.id,
-      version: view.version,
-      definition: { pageKey, isDefault: true, state: view.state },
+    await operations.setDefault({
+      pageKey,
+      targetId: view.id as Id<"savedReportDefinitions">,
     });
   }
 
@@ -111,7 +94,7 @@ export function useSavedViews<S>(
   }
 
   return {
-    ready: rows !== undefined,
+    ready: rows !== undefined && auth !== undefined,
     views,
     defaultView,
     save,

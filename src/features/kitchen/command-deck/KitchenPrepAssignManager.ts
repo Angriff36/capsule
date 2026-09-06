@@ -1,4 +1,5 @@
 import type { PrepTaskLike } from "./KitchenCommandDeckTypes";
+import { runBulkItems } from "../../../ui/bulk-select";
 
 type AssignFn = (args: {
   docId: string;
@@ -45,9 +46,7 @@ export class KitchenPrepAssignManager {
 
   async assignMany(tasks: PrepTaskLike[], personId: string): Promise<number> {
     const targets = tasks.filter((t) => KitchenPrepAssignManager.canAssign(t));
-    for (const task of targets) {
-      await this.assignOne(task, personId);
-    }
+    await runBulkItems(targets, (task) => this.assignOne(task, personId));
     return targets.length;
   }
 

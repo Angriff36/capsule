@@ -22,6 +22,11 @@ import {
   layoutHasInstructions,
   trimLayoutField,
 } from "./layoutTrim";
+import { useApplyLayoutTemplate } from "../../lib/safeMaterialization";
+import {
+  beginPendingOperation,
+  confirmPendingOperation,
+} from "../../lib/pendingOperationKey";
 
 // Mirrors a VenueLayoutTemplate's stored sections JSON (see §8.2): each entry
 // is the editable shape of an EventLayoutSection, copied verbatim into the
@@ -58,6 +63,7 @@ type Props = {
 export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   const sections = useListEventLayoutSection();
   const addSection = useCreateEventLayoutSection();
+  const applyLayoutTemplate = useApplyLayoutTemplate();
   const updateSection = useEventLayoutSectionUpdate();
   const removeSection = useEventLayoutSectionRemove();
   const event = useGetEvent(eventId);
@@ -65,6 +71,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   const templates = useListVenueLayoutTemplate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
   const [copyTemplateId, setCopyTemplateId] = useState<string>("");
 
   const eventSections = useMemo(
@@ -121,6 +128,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
+    setRecoveryNotice(null);
     setBusy(key);
     try {
       await work();
@@ -169,20 +177,27 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       return;
     }
     const base = eventSections.length;
-    // ponytail: each section is a separate mutation, so a mid-loop network
-    // drop can leave a partial (but valid) copy — upgrade to a server-side
-    // bulk-copy action if that ever bites operators in practice.
     void run("copy", async () => {
-      for (let i = 0; i < templateSections.length; i++) {
-        const section = templateSections[i];
-        await addSection({
-          eventId,
+      const scope = `layout-template:${eventId}:${template._id}`;
+      const pending = beginPendingOperation(scope, {
+        eventId,
+        baseSortOrder: base,
+        sections: templateSections.map((section) => ({
           type: section.type,
           instructions: section.instructions ?? "",
-          sortOrder: base + i,
-        });
-      }
+        })),
+      });
+      const result = await applyLayoutTemplate({
+        ...pending.payload,
+        operationKey: pending.key,
+      });
+      confirmPendingOperation(scope);
       setCopyTemplateId("");
+      if (result.recovered) {
+        setRecoveryNotice(
+          `${result.sectionCount} saved template sections were recovered; no duplicate sections were added.`,
+        );
+      }
     });
   };
 
@@ -250,6 +265,11 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
         </section>
 
         {failure ? <FailureBanner failure={failure} /> : null}
+        {recoveryNotice ? (
+          <p className="text-sm text-ok" role="status">
+            {recoveryNotice}
+          </p>
+        ) : null}
 
         {/* Preset suggestions for every area-name input below. The stored value
             is a free string, so “Main Bar” and “Patio Bar” are both valid. */}

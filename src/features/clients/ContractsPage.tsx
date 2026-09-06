@@ -98,7 +98,9 @@ export function ContractsPage() {
       });
       form.reset();
       setShowDraft(false);
-      setNotice("Contract drafted. Send it to your client when it's ready.");
+      setNotice(
+        "Contract drafted. Deliver the document outside Capsule, then record it sent here.",
+      );
     });
   };
 
@@ -147,7 +149,7 @@ export function ContractsPage() {
         if (key === "expire") await expire(args);
         setNotice(
           key === "send"
-            ? "Contract sent."
+            ? "Contract marked sent in Capsule. Deliver its document or signature link through your external channel."
             : key === "markViewed"
               ? "Contract marked as viewed."
               : key === "expire"
@@ -314,7 +316,7 @@ export function ContractsPage() {
                           disabled={busy != null}
                           onClick={() => invoke(row, action.key)}
                         >
-                          {action.label}
+                          {action.key === "send" ? "Record sent" : action.label}
                         </button>
                       ))}
                     <Link

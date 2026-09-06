@@ -300,3 +300,56 @@
 - **Issue:** The first temporary Playwright invocation loaded two runner copies and rejected test registration before discovery.
 - **Fix:** Used the repository's local Playwright 1.61.1 CLI and imported `playwright/test`; the in-memory generated API lifecycle verification passed (`1 passed`) and the temporary spec was deleted.
 - **Commands:** `bun run manifest:regen`; `bun run typecheck`; `bun run check:logistics-manifest`; `bun node_modules/playwright/cli.js test output/playwright/vehicle-fleet-catalog.spec.ts --reporter=line`; `bun run build`.
+# 2026-09-06: Commercial command and delivery honesty
+
+- Fixed proposal-template revise/archive/reactivate target contract (`docId`).
+- Inbox external threads now explain unavailable delivery and provide Copy draft without creating an outbound row; legacy queued/failed rows say not delivered. Internal notes remain usable.
+- Proposal publication and contract/invoice manual sent-recording labels no longer imply provider delivery. Real invoice reminders preserved.
+- Commits: a7b5b98, 407b5c4. Independent task reviewer gpt-5.6-terra approved after one fix round.
+- Verification: `bun run test` at a7b5b98: 141 files / 1303 tests pass. `bun run test tests/features/sales/message-inbox-delivery.test.ts tests/delivery-honesty.test.ts` at 407b5c4: 10 pass; `bun run typecheck` passes. Existing Vitest/React Router warnings remain. Global contract scanner: 335 direct calls, zero missing docId, nine adapters inspected.
+
+## 2026-09-06: Measured yields and factual financial/route labels
+
+- KDS records entered actual yield (including zero) and retains it on failure; historical report provenance caveated without rewriting records.
+- Route distances/times disclose straight-line/40 km/h/missing-leg/local-order assumptions. Vendor receipt timing names purchasing-week basis. Revenue prefill names quote/budget estimate.
+- Comp Master uses applied sales_commission allocations directly, actual appliedAt for calendar periods, no fabricated payouts/3% conversion, and retains allocations when Person records are missing.
+- Commits2514043 and9093eed; independent gpt-5.6-terra task review approved after one fix round.
+- Verification: full `bun run test`144 files/1314 tests; fix `bunx vitest run tests/features/factual-values.test.ts tests/features/production/kitchen-display-yield.test.ts --reporter verbose`7 tests; `bun run typecheck`passes. Existing warning baseline remains; raw fix log .artifacts/task-2-fix-tests.log.
+
+## 2026-09-06: Atomic template and draft purchase-order recovery
+
+- Pack and layout templates plus draft purchase orders commit through authored parent mutations and generated governed commands. Parent receipts and scope heads recover confirmed outcomes across ambiguous responses, changed templates and storage failures; counts describe actual saved work.
+- Added authenticated typed tenant/reference validation before cached replay while preserving generated role capability behavior and existing-draft vendor reuse.
+- Commits addd337,7561ac1,d71c8b4,fab99af; independent gpt-6-astra approved after three fix rounds. Generator-wide cache concern tracked separately in #281, not claimed repaired globally.
+- Final command: `bun run test -- tests/pending-operation.test.ts tests/proofs/safe-template-materialization.runtime.test.ts tests/event-draft-po-coordinator.test.ts tests/event-manifest-integration-guard.test.ts tests/logistics-manifest-integration-guard.test.ts`31 pass; `bun run typecheck`pass. Early full checkpoint1320 tests passes, final gate still required after remaining groups.
+
+## 2026-09-06: Atomic culinary clone, import and restore
+
+- Menu clone, manual component import and snapshot restore use governed atomic operations with authenticated parent receipts; agent-driven import API remains compatible. Snapshot IDs/ownership and metadata are preserved; capture failure is a visible nonblocking warning.
+- Recovery reports actual prior saved identities and preserves new reviewed input. Shared pending helper retains keys but accepts current corrections, relying on complete parent receipts at all six audited consumers.
+- Commits5666235,2cc55d1,ec79152,11ec7e8; independent gpt-6-astra approves after one fix round. Restore failure rolls back existing-line removal; legacy snapshots remain compatible; deleted ingredient does not block recovery of an already committed import.
+- Full checkpoint149files1338tests passed at ec79152. Final `bun run typecheck` and Task3/Task4 focused gate10files49tests pass; exact commands in task progress/report. Warning proof is helper-level with reviewed UI wiring; no authenticated browser/deployment claim.
+
+## 2026-09-06: Operational bulk and event recovery
+
+- Atomic stock issuance rolls back consumption if demand reconciliation fails; receipts recover actual output without consuming twice. Timeline reorder rolls back all adjustments if a later row is stale.
+- Menu materialization uses atomic parent receipts, retains newly requested lines after recovery, and presents saved/stock phases with stock-only retry. Attempt identities prevent overlapping sync and stale completion; authoritative demand versions establish readiness.
+- Bulk failures preserve original cause and completed/unfinished rows so successful prefixes are not repeated. Commitsf0af99a,fe98972,747f683,36be772; independent gpt-6-astra approved after two fix rounds. Final9focusedtests/types/3guards pass; full checkpoint1346tests passed before review fixes. Private receipt storage remains tracked Task7/AC041; nothing deployed.
+
+## 2026-09-06: Shared failure workflows
+
+- Attachment removal awaits errors and tracks pending state per row. Personal saved-view defaults are atomic and current-person scoped. Outreach ensure-open reuses governed visible rows, respects denied roles, and permits new reminders after dismissal/completion.
+- Mounted revenue apply proof preserves entered amount/provenance across reactive event updates. Commits4c42c56,c8f1e6d independently approved by gpt-6-astra after one fix round;9focusedtests/typecheck pass. Full pre-review-fix checkpoint1353tests passed. Mounted personal-view projection coverage remains noted for final review; no deployment claim.
+
+## 2026-09-06: Proposal defaults and private recovery receipts
+
+- Commandless private receipt storage removes new recovery outputs from the globally replayable command cache and drops unused request payloads/redundant child caches. Exact/head replay and governed transaction behavior remain; broader generator issue281 is not claimed fixed.
+- Proposal defaults flow through actual draft publication and immutable shared/PDF/signing representations. Template-owned fees replace cleanly; tax follows central pricing until manual override. Dynamic draft removal persists, offered drafts remain protected, and edited work still arms unload warnings.
+- Commitsff40ad3,fcdcd58,8ac9ad5,19a7567,b595b6f,f8c7e34 independently approved by gpt-6-astra after three fix rounds. Actual mounted form/public-renderer, jsPDF and publication runtime evidence recorded; final8focusedtests/typecheck pass. Full check before review fixes passed1365tests/all gates except temporary root-cap cleanup. Final whole-branch gate and deployment remain separate.
+
+## 2026-09-06: Final wiring review and verification
+
+- fc07561 fixes outreach client relationships, visible legacy/malformed PDF fallback, No template hidden defaults and two body-copy sizes. Adds personal-view projection/exact receipt tenant proofs. All Important findings fixed; gpt-6-astra approves code/integration. One minor head-lookup test fixture gap remains explicitly open, not claimed proven.
+- `bun run check` exits0:161files1376tests/all repository gates including unchanged baseline cap and local build. Regen-check green; spec lint19pass; command scan326directcalls0missingdocId. Source branch pushed; no deployment.
+- Historical AC006/013 required manual receipts absent: combined statuses honestly PENDING, programmatic passes retained; independent gpt-5.6-terra approves correction.
+- Plan/findings/progress and unique review evidence archived at docs/task-plans/2026-09-06-full-wiring-audit. Only reproducible review diffs/empty task folders removed; user worktrees untouched.

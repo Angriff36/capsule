@@ -295,7 +295,9 @@ export function ProductionYieldDashboard({
           Expected yield is the batch&apos;s planned yield, not the component
           catalog yield. Cancelled, active, deleted, or incomplete batches are
           excluded. Different yield units remain separate so portions are never
-          added to weight or volume.
+          added to weight or volume. Older completed batches may contain a
+          planned yield copied into the recorded actual-yield field; new KDS
+          completions require an operator-entered measurement.
         </p>
       </aside>
     </div>

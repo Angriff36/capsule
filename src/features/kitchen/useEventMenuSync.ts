@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import {
   useCreateInventoryReservation,
   useCreatePrepTask,
@@ -63,6 +63,16 @@ export function useEventMenuSync() {
     inventoryReservations !== undefined &&
     dishIngredients !== undefined;
 
+  const demandVersionsForEvent = useCallback(
+    (eventId: string) =>
+      Object.fromEntries(
+        (demands ?? [])
+          .filter((row) => row.eventId === eventId && row.deletedAt == null)
+          .map((row) => [String(row._id), Number(row.version)]),
+      ),
+    [demands],
+  );
+
   const controller = useMemo(() => {
     if (!ready) return null;
     return new EventMenuSyncController(
@@ -113,6 +123,7 @@ export function useEventMenuSync() {
 
   return {
     ready,
+    demandVersionsForEvent,
     // Reconcile prep tasks against the dish's templates. Only needed AFTER an
     // event dish already exists — adding one generates its prep tasks
     // server-side (EventDishAdded fanOut in production/task.manifest). Calling

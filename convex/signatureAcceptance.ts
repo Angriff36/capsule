@@ -35,6 +35,7 @@ type PendingSignatureView = {
     eventDate: number | null;
     guestCount: number;
     venueName: string | null;
+    visibleSections: string[];
   };
   enhancements: Array<{
     name: string;
@@ -113,6 +114,11 @@ export const getPendingSignatureRequest = query({
           typeof proposal.eventDate === "number" ? proposal.eventDate : null,
         guestCount: num(proposal.guestCount),
         venueName: str(proposal.venueName),
+        visibleSections: Array.isArray(proposal.visibleSections)
+          ? proposal.visibleSections.filter(
+              (section): section is string => typeof section === "string",
+            )
+          : [],
       },
       enhancements: enhancements
         .map((item, index) => ({

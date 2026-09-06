@@ -59,6 +59,7 @@ export interface ProposalRevisionSnapshot {
     expiresAt: number | null;
     notes: string | null;
     terms: string | null;
+    visibleSections: string[];
     status: "draft" | "sent" | "viewed" | "accepted" | "declined" | "expired" | "superseded";
     draftedAt: number | null;
     sentAt: number | null;
@@ -106,6 +107,11 @@ export interface ProposalRevisionSnapshot {
     serviceStyle: string | null;
     specialInstructions: string | null;
     selectedAt: number | null;
+  }>;
+  timeline: Array<{
+    name: string;
+    startsAt: number;
+    endsAt: number | null;
   }>;
   // Priced lines (spec §5.4) captured at publication so an accepted revision
   // stays reproducible after later catalog/menu edits. `amount` is the central
@@ -301,6 +307,32 @@ export async function buildProposalRevisionSnapshot(
     }))
     .sort((a: any, b: any) => a.sortOrder - b.sortOrder);
 
+  const timelineData = proposal.eventId
+    ? (
+        await ctx.db
+          .query("eventTimelineActivities")
+          .withIndex("by_eventId", (q: any) =>
+            q.eq("eventId", proposal.eventId),
+          )
+          .collect()
+      )
+        .filter(
+          (row: any) =>
+            row.tenantId === proposal.tenantId &&
+            row.deletedAt == null &&
+            row.startsAt != null,
+        )
+        .sort(
+          (a: any, b: any) =>
+            Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0),
+        )
+        .map((row: any) => ({
+          name: row.name,
+          startsAt: row.startsAt,
+          endsAt: row.endsAt ?? null,
+        }))
+    : [];
+
   const snapshot: ProposalRevisionSnapshot = {
     proposal: {
       id: proposal._id.toString(),
@@ -318,6 +350,9 @@ export async function buildProposalRevisionSnapshot(
       expiresAt: proposal.expiresAt ?? null,
       notes: proposal.notes ?? null,
       terms: proposal.terms ?? null,
+      visibleSections: (proposal.visibleSections ?? []).filter(
+        (section): section is string => typeof section === "string",
+      ),
       status: proposal.status,
       draftedAt: proposal.draftedAt ?? null,
       sentAt: proposal.sentAt ?? null,
@@ -328,6 +363,7 @@ export async function buildProposalRevisionSnapshot(
     },
     venue: await resolveVenueLogistics(ctx, proposal),
     dishSelections: dishSelectionsData,
+    timeline: timelineData,
     lineItems: lineItemsData,
     enhancements: enhancementsData,
     tenant: {

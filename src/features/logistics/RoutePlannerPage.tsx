@@ -10,6 +10,7 @@ import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import {
   geocodeDestination,
   routeLegs,
+  routeLegLabel,
   suggestVisitOrder,
   type GeoPoint,
 } from "./routePlanner";
@@ -174,9 +175,9 @@ export function RoutePlannerPage() {
           <p className="eyebrow">Logistics · Route planner</p>
           <h1 className="display-title mt-2">Suggested visit order</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Stops for one vehicle on one day, ordered by a nearest-neighbor pass
-            over geocoded destinations to keep total drive time low. Reorder
-            stops manually when local knowledge beats the estimate.
+            Browser-local suggestion using straight-line distance between
+            geocoded stops. Drive time assumes 40 km/h; reorder changes stay
+            only in this browser session and are not saved.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -222,7 +223,7 @@ export function RoutePlannerPage() {
           <span>
             {stops.length} stop{stops.length === 1 ? "" : "s"}
             {totalKm > 0
-              ? ` · ~${totalKm.toFixed(1)} km · ~${Math.round(totalMinutes)} min driving`
+              ? ` · ${totalKm.toFixed(1)} km straight-line · ~${Math.round(totalMinutes)} min at 40 km/h`
               : ""}
             {geocoding ? " · geocoding…" : ""}
           </span>
@@ -257,7 +258,7 @@ export function RoutePlannerPage() {
                   <th>Destination</th>
                   <th>Event</th>
                   <th>Window</th>
-                  <th>Leg</th>
+                  <th>Straight-line leg (40 km/h estimate)</th>
                   <th>Reorder</th>
                 </tr>
               </thead>
@@ -280,13 +281,7 @@ export function RoutePlannerPage() {
                         {formatTime(stop.windowStartsAt ?? dayStart)} →{" "}
                         {formatTime(stop.windowEndsAt ?? dayEnd)}
                       </td>
-                      <td>
-                        {leg
-                          ? `${leg.distanceKm.toFixed(1)} km · ~${Math.round(leg.minutes)} min`
-                          : index === 0
-                            ? "Start"
-                            : "—"}
-                      </td>
+                      <td>{routeLegLabel(leg, index)}</td>
                       <td>
                         <div className="supply-row-actions">
                           <button
@@ -316,7 +311,7 @@ export function RoutePlannerPage() {
             </table>
             {manualOrder ? (
               <p className="mt-3 text-base text-ink-2">
-                Custom order.{" "}
+                Browser-local custom order (not saved).{" "}
                 <button
                   className="text-link"
                   type="button"

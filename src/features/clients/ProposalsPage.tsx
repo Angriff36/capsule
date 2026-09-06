@@ -11,6 +11,7 @@ import {
   useListProposalEnhancement,
   useListProposalDishSelection,
   useListProposalRevision,
+  useListDish,
   useProposalAccept,
   useProposalDecline,
   useProposalExpire,
@@ -44,6 +45,10 @@ import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
 import { useActionNotice } from "../../ui/action-result";
+import {
+  projectProposalPdf,
+  downloadProjectedProposalPdf,
+} from "./proposalPdfProjection";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
 // EventDish.confirmFromProposal stage guard).
@@ -75,6 +80,7 @@ export function ProposalsPage() {
   const proposalEnhancements = useListProposalEnhancement();
   const proposalDishSelections = useListProposalDishSelection();
   const proposalRevisions = useListProposalRevision();
+  const dishes = useListDish();
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.
@@ -419,7 +425,7 @@ export function ProposalsPage() {
         if (key === "expire") await expire(args);
         setNotice(
           key === "send"
-            ? "Proposal sent."
+            ? "Proposal published in Capsule. Copy its share link or PDF into your delivery channel; Capsule does not send it externally."
             : key === "markViewed"
               ? "Proposal marked as viewed."
               : key === "expire"
@@ -577,8 +583,26 @@ export function ProposalsPage() {
                         <button
                           className="btn btn-ghost"
                           type="button"
-                          disabled={busy != null}
+                          disabled={
+                            busy != null ||
+                            (String(row.status) !== "draft" &&
+                              proposalRevisions === undefined) ||
+                            (String(row.status) === "draft" &&
+                              (proposalDishSelections === undefined ||
+                                dishes === undefined))
+                          }
                           onClick={() => {
+                            if (
+                              String(row.status) !== "draft" &&
+                              proposalRevisions === undefined
+                            )
+                              return;
+                            if (
+                              String(row.status) === "draft" &&
+                              (proposalDishSelections === undefined ||
+                                dishes === undefined)
+                            )
+                              return;
                             // Enrich proposal with timeline and venue logistics data
                             const event = events?.find(
                               (e) => e._id === row.eventId,
@@ -598,11 +622,38 @@ export function ProposalsPage() {
 
                             const enrichedProposal: ProposalPdfRecord = {
                               ...row,
+                              visibleSections: (
+                                row.visibleSections ?? []
+                              ).filter(
+                                (section): section is string =>
+                                  typeof section === "string",
+                              ),
                               timelineItems:
                                 transformTimelineActivities(eventTimelineItems),
                               venueLogistics: event
                                 ? transformVenueLogistics(venue || null, event)
                                 : undefined,
+                              dishSelections: (proposalDishSelections ?? [])
+                                .filter(
+                                  (selection) =>
+                                    selection.proposalId === row._id &&
+                                    selection.deletedAt == null,
+                                )
+                                .flatMap((selection) => {
+                                  const dish = dishes?.find(
+                                    (candidate) =>
+                                      candidate._id === selection.dishId,
+                                  );
+                                  return dish
+                                    ? [
+                                        {
+                                          dishName: dish.name,
+                                          dishDescription:
+                                            dish.description ?? null,
+                                        },
+                                      ]
+                                    : [];
+                                }),
                               pricingLines: (proposalLineItems ?? [])
                                 .filter(
                                   (line) =>
@@ -638,17 +689,45 @@ export function ProposalsPage() {
                                   price: Number(item.price) || 0,
                                 })),
                             };
+                            const pdfClientName = clientDisplayName(
+                              row.clientId,
+                              clients,
+                            );
 
-                            void downloadProposalPdf({
-                              proposal: enrichedProposal,
-                              clientName: clientDisplayName(
-                                row.clientId,
-                                clients,
-                              ),
-                              branding,
-                            })
-                              .then(() => setNotice("Proposal PDF downloaded."))
-                              .catch((error) => setFailure(error));
+                            const publishedRevision = latestRevisionFor(
+                              row._id,
+                            );
+                            const pdfProjection =
+                              String(row.status) === "draft"
+                                ? {
+                                    proposal: enrichedProposal,
+                                    clientName: pdfClientName,
+                                    source: null,
+                                  }
+                                : projectProposalPdf(
+                                    enrichedProposal,
+                                    pdfClientName,
+                                    publishedRevision,
+                                  );
+
+                            if (pdfProjection.source) {
+                              void downloadProjectedProposalPdf({
+                                projection: pdfProjection,
+                                branding,
+                                download: downloadProposalPdf,
+                                onNotice: setNotice,
+                              }).catch((error) => setFailure(error));
+                            } else {
+                              void downloadProposalPdf({
+                                proposal: pdfProjection.proposal,
+                                clientName: pdfProjection.clientName,
+                                branding,
+                              })
+                                .then(() =>
+                                  setNotice("Proposal PDF downloaded."),
+                                )
+                                .catch((error) => setFailure(error));
+                            }
                           }}
                         >
                           Download PDF
@@ -700,7 +779,9 @@ export function ProposalsPage() {
                               disabled={busy != null}
                               onClick={() => invoke(row, action.key)}
                             >
-                              {action.label}
+                              {action.key === "send"
+                                ? "Publish proposal"
+                                : action.label}
                             </button>
                           ))}
                         {String(row.status) === "accepted" ? (

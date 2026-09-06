@@ -32,6 +32,11 @@ export interface ProposalPdfRecord {
   expiresAt?: number | null;
   notes?: string | null;
   terms?: string | null;
+  visibleSections?: string[];
+  dishSelections?: Array<{
+    dishName: string;
+    dishDescription?: string | null;
+  }>;
   // Optional sections for timeline, logistics, enhancements
   timelineItems?: TimelineItem[];
   venueLogistics?: VenueLogistics;
@@ -203,6 +208,9 @@ export function proposalPdfFileName(proposal: ProposalPdfRecord): string {
 
 export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   const { proposal, clientName, branding } = input;
+  const sectionVisible = (section: string) =>
+    !proposal.visibleSections?.length ||
+    proposal.visibleSections.includes(section);
   const brand = brandColorRgb(branding.primaryColor);
   const accent = brandColorRgb(branding.accentColor);
   const doc = new jsPDF({ unit: "pt", format: "letter" });
@@ -297,30 +305,33 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
         "To be confirmed",
     ],
   ] as const;
-  doc.setFillColor(...PAPER);
-  doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 112, 8, 8, "F");
-  let overviewY = y + 22;
-  for (const [label, value] of overview) {
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(...MUTED);
-    doc.text(label.toUpperCase(), MARGIN + 16, overviewY);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(...INK);
-    doc.text(value, MARGIN + 94, overviewY, { maxWidth: CONTENT_WIDTH - 112 });
-    overviewY += 19;
+  if (sectionVisible("event_summary")) {
+    doc.setFillColor(...PAPER);
+    doc.roundedRect(MARGIN, y, CONTENT_WIDTH, 112, 8, 8, "F");
+    let overviewY = y + 22;
+    for (const [label, value] of overview) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor(...MUTED);
+      doc.text(label.toUpperCase(), MARGIN + 16, overviewY);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      doc.text(value, MARGIN + 94, overviewY, {
+        maxWidth: CONTENT_WIDTH - 112,
+      });
+      overviewY += 19;
+    }
+    y += 140;
   }
-  y += 140;
 
   // Menu and transparent per-person rate.
   const guestCount = Number(proposal.guestCount ?? 0);
   const perPerson =
     guestCount > 0 ? Number(proposal.subtotal ?? 0) / guestCount : null;
-  const menuItems = String(proposal.notes ?? "")
-    .split(/\r?\n/)
-    .map((item) => item.trim())
-    .filter(Boolean);
+  const menuItems = (proposal.dishSelections ?? []).map(
+    (item) => item.dishName,
+  );
   const visibleMenuItems =
     menuItems.length > 0 ? menuItems : ["Menu details to be confirmed."];
   const menuLineCount = visibleMenuItems.reduce((count, item) => {
@@ -330,33 +341,43 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     );
   }, 0);
   const menuHeight = Math.max(58, 28 + menuLineCount * 14);
-  ensureSpace(menuHeight + 38);
-  sectionLabel("Proposed menu");
-  doc.setFillColor(251, 250, 247);
-  doc.roundedRect(MARGIN, y - 8, CONTENT_WIDTH, menuHeight, 6, 6, "F");
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(12);
-  doc.setTextColor(...brand);
-  doc.text(
-    perPerson == null ? "Custom pricing" : `${usd(perPerson)} / person`,
-    RIGHT - 14,
-    y + 12,
-    { align: "right" },
-  );
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(10);
-  doc.setTextColor(...INK);
-  let menuY = y + 12;
-  for (const item of visibleMenuItems) {
-    const lines = doc.splitTextToSize(item, CONTENT_WIDTH - 150) as string[];
-    doc.text("-", MARGIN + 14, menuY);
-    doc.text(lines, MARGIN + 28, menuY);
-    menuY += lines.length * 14;
+  if (sectionVisible("menu_sections")) {
+    ensureSpace(menuHeight + 38);
+    sectionLabel("Proposed menu");
+    doc.setFillColor(251, 250, 247);
+    doc.roundedRect(MARGIN, y - 8, CONTENT_WIDTH, menuHeight, 6, 6, "F");
+    if (sectionVisible("pricing_summary")) {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(12);
+      doc.setTextColor(...brand);
+      doc.text(
+        perPerson == null ? "Custom pricing" : `${usd(perPerson)} / person`,
+        RIGHT - 14,
+        y + 12,
+        { align: "right" },
+      );
+    }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(...INK);
+    let menuY = y + 12;
+    for (const item of visibleMenuItems) {
+      const lines = doc.splitTextToSize(item, CONTENT_WIDTH - 150) as string[];
+      doc.text("-", MARGIN + 14, menuY);
+      doc.text(lines, MARGIN + 28, menuY);
+      menuY += lines.length * 14;
+    }
+    y += menuHeight + 16;
   }
-  y += menuHeight + 16;
+
+  if (proposal.notes?.trim()) {
+    sectionLabel("Notes");
+    writeParagraph(proposal.notes.trim());
+    y += 10;
+  }
 
   // Venue logistics section (if provided).
-  if (proposal.venueLogistics != null) {
+  if (sectionVisible("venue_logistics") && proposal.venueLogistics != null) {
     sectionLabel("Venue logistics");
     const logistics = [
       ["Load-in", proposal.venueLogistics.loadIn ?? ""],
@@ -387,7 +408,11 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   }
 
   // Timeline section (if provided).
-  if (proposal.timelineItems != null && proposal.timelineItems.length > 0) {
+  if (
+    sectionVisible("timeline") &&
+    proposal.timelineItems != null &&
+    proposal.timelineItems.length > 0
+  ) {
     sectionLabel("Timeline");
     for (const item of proposal.timelineItems) {
       // Calculate card height based on content.
@@ -432,7 +457,7 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   // form and the read panel use, so percentage fees resolve against the base
   // subtotal identically everywhere.
   const pricingLines = proposal.pricingLines ?? [];
-  if (pricingLines.length > 0) {
+  if (sectionVisible("pricing_summary") && pricingLines.length > 0) {
     const priced = computeProposalPricing({
       lines: pricingLines.map((line) => ({
         pricingBasis: line.pricingBasis,
@@ -492,7 +517,11 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   }
 
   // Optional enhancements (if provided) — listed after pricing lines.
-  if (proposal.enhancements != null && proposal.enhancements.length > 0) {
+  if (
+    sectionVisible("enhancements") &&
+    proposal.enhancements != null &&
+    proposal.enhancements.length > 0
+  ) {
     sectionLabel("Optional Enhancements");
     for (const enhancement of proposal.enhancements) {
       let cardHeight = 24;
@@ -538,39 +567,43 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   }
 
   // Estimate summary.
-  sectionLabel("Estimate");
-  const summaryRows: Array<[string, string, boolean?]> = [
-    ["Catering subtotal", usd(proposal.subtotal)],
-  ];
-  if (Number(proposal.discountAmount ?? 0) > 0) {
-    summaryRows.push(["Discount", `-${usd(proposal.discountAmount)}`]);
+  if (sectionVisible("pricing_summary")) {
+    sectionLabel("Estimate");
+    const summaryRows: Array<[string, string, boolean?]> = [
+      ["Catering subtotal", usd(proposal.subtotal)],
+    ];
+    if (Number(proposal.discountAmount ?? 0) > 0) {
+      summaryRows.push(["Discount", `-${usd(proposal.discountAmount)}`]);
+    }
+    summaryRows.push(["Tax", usd(proposal.taxAmount)]);
+    summaryRows.push(["Total estimate", usd(proposal.total), true]);
+    for (const [label, value, bold] of summaryRows) {
+      ensureSpace(20);
+      doc.setFont("helvetica", bold ? "bold" : "normal");
+      doc.setFontSize(bold ? 12 : 10);
+      const rowColor = bold ? brand : INK;
+      doc.setTextColor(rowColor[0], rowColor[1], rowColor[2]);
+      doc.text(label, RIGHT - 210, y);
+      doc.text(value, RIGHT, y, { align: "right" });
+      y += bold ? 24 : 18;
+    }
+    doc.setDrawColor(...accent);
+    doc.setLineWidth(1.5);
+    doc.line(RIGHT - 218, y - 18, RIGHT, y - 18);
+    y += 12;
   }
-  summaryRows.push(["Tax", usd(proposal.taxAmount)]);
-  summaryRows.push(["Total estimate", usd(proposal.total), true]);
-  for (const [label, value, bold] of summaryRows) {
-    ensureSpace(20);
-    doc.setFont("helvetica", bold ? "bold" : "normal");
-    doc.setFontSize(bold ? 12 : 10);
-    const rowColor = bold ? brand : INK;
-    doc.setTextColor(rowColor[0], rowColor[1], rowColor[2]);
-    doc.text(label, RIGHT - 210, y);
-    doc.text(value, RIGHT, y, { align: "right" });
-    y += bold ? 24 : 18;
-  }
-  doc.setDrawColor(...accent);
-  doc.setLineWidth(1.5);
-  doc.line(RIGHT - 218, y - 18, RIGHT, y - 18);
-  y += 12;
 
   // Terms.
-  sectionLabel("Terms");
-  const terms = String(proposal.terms ?? "").trim();
-  writeParagraph(
-    terms || "No additional terms were provided for this proposal.",
-  );
+  if (sectionVisible("terms")) {
+    sectionLabel("Terms");
+    const terms = String(proposal.terms ?? "").trim();
+    writeParagraph(
+      terms || "No additional terms were provided for this proposal.",
+    );
+  }
 
   // Next steps / CTA section.
-  if (proposal.acceptanceUrl != null) {
+  if (sectionVisible("acceptance_cta") && proposal.acceptanceUrl != null) {
     sectionLabel("Next steps");
     ensureSpace(70);
     doc.setFillColor(251, 250, 247);
@@ -613,7 +646,7 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
       stepY + 14,
     );
     y += 76;
-  } else {
+  } else if (sectionVisible("acceptance_cta")) {
     // Generic next steps when no URL provided.
     sectionLabel("Next steps");
     ensureSpace(40);

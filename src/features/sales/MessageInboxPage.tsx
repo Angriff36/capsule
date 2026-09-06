@@ -20,6 +20,7 @@ import { PasteIncomingMessageForm } from "./PasteIncomingMessageForm";
 import { SyncErrorsPanel } from "./SyncErrorsPanel";
 import type { Doc } from "../../lib/api";
 import { useActionNotice } from "../../ui/action-result";
+import { deliveryStatusLabel, replyDisposition } from "./deliveryHonesty";
 
 type Thread = Doc<"messageThreads">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
@@ -154,19 +155,40 @@ export function MessageInboxPage() {
     const body = reply.trim();
     if (!body) return;
     setFailure(null);
+    setNotice(null);
+    const disposition = replyDisposition(selected.provider);
+    if (!disposition.canRecord) {
+      fail(new Error(disposition.notice ?? "Cannot send this message."));
+      return;
+    }
     setSending(true);
     try {
-      // Internal threads record the reply as sent (no external delivery). For
-      // any real provider the message is queued — this increment has no
-      // provider/outbox wired, so we never claim "sent" for an unsent message;
-      // a future provider worker moves queued -> sent on acknowledgement.
+      // Internal threads are conversation notes, not external delivery.
       await createMessage({
         threadId: selected._id,
         direction: "outbound",
-        status: selected.provider === "internal" ? "sent" : "queued",
+        status: "sent",
         bodyText: body,
       });
       setReply("");
+    } catch (e) {
+      fail(e);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const copyExternalDraft = async () => {
+    const body = reply.trim();
+    if (!body || sending) return;
+    setFailure(null);
+    setNotice(null);
+    setSending(true);
+    try {
+      await navigator.clipboard.writeText(body);
+      setNotice(
+        "Draft copied. Send it from your email, SMS, or social provider; Capsule did not create an outbound message.",
+      );
     } catch (e) {
       fail(e);
     } finally {
@@ -581,6 +603,9 @@ export function MessageInboxPage() {
                           <p className="mt-1 text-2xs text-ink-3">
                             {m.createdAt ? formatTime(m.createdAt) : ""}
                             {m.senderIdentity ? ` · ${m.senderIdentity}` : ""}
+                            {mine && deliveryStatusLabel(String(m.status))
+                              ? ` · ${deliveryStatusLabel(String(m.status))}`
+                              : ""}
                           </p>
                         </div>
                       );
@@ -588,11 +613,25 @@ export function MessageInboxPage() {
                   )}
                 </div>
 
+                {selected.provider !== "internal" ? (
+                  <p
+                    className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
+                    role="status"
+                  >
+                    No external delivery provider is connected. Keep editing
+                    here, then copy the draft into your email, SMS, or social
+                    provider.
+                  </p>
+                ) : null}
                 <form
                   className="flex min-w-0 gap-2 border-t border-line-2 px-4 py-3"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    void submitReply();
+                    if (selected.provider === "internal") {
+                      void submitReply();
+                    } else {
+                      void copyExternalDraft();
+                    }
                   }}
                 >
                   <input
@@ -604,11 +643,24 @@ export function MessageInboxPage() {
                     aria-label="Reply text"
                   />
                   <button
-                    type="submit"
+                    type={
+                      selected.provider === "internal" ? "submit" : "button"
+                    }
                     className="btn btn-primary"
                     disabled={sending || reply.trim().length === 0}
+                    onClick={
+                      selected.provider === "internal"
+                        ? undefined
+                        : () => void copyExternalDraft()
+                    }
                   >
-                    {sending ? "Sending…" : "Send"}
+                    {sending
+                      ? selected.provider === "internal"
+                        ? "Logging…"
+                        : "Copying…"
+                      : selected.provider === "internal"
+                        ? "Log note"
+                        : "Copy draft"}
                   </button>
                 </form>
               </>

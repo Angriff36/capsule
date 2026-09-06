@@ -119,6 +119,36 @@ describe("EventDraftPoCoordinator", () => {
     );
   });
 
+  it("continues an existing event draft with that draft's vendor", async () => {
+    const materialize = vi
+      .fn()
+      .mockResolvedValue({ vendorOrderId: "po-1", lineCount: 7 });
+    const coordinator = new EventDraftPoCoordinator({
+      ...ports(),
+      materialize,
+    });
+    const result = await coordinator.draftFromNeeds({
+      ...needInput("planning"),
+      vendorId: "new-default-vendor",
+      orders: [
+        {
+          id: "po-1",
+          eventId: needInput("planning").eventId,
+          vendorId: "original-vendor",
+          status: "draft",
+        },
+      ],
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.lineCount).toBe(7);
+    expect(materialize).toHaveBeenCalledWith(
+      expect.objectContaining({
+        existingOrderId: "po-1",
+        vendorId: "original-vendor",
+      }),
+    );
+  });
+
   it("explains why a draft is blocked instead of silently no-opping", async () => {
     const coordinator = new EventDraftPoCoordinator(ports());
     const cancelled = await coordinator.draftFromNeeds({

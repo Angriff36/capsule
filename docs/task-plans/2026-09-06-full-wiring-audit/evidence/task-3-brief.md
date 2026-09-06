@@ -1,0 +1,6 @@
+### Task 3: Safe pack and layout template recovery
+
+Own PackListDetailPage.tsx and EventBattleBoardLayoutsPanel.tsx plus narrowly shared helper and tests if justified.
+Template application must be atomic through existing governed commands OR explicitly track confirmed created/remaining items and retain a safe finish-remaining action. Retrying after partial failure must not duplicate confirmed writes. Account for refresh/navigation and ambiguous network failure honestly; do not claim exactly-once without a backend key. Reconcile persisted rows or choose an authored atomic seam preserving generated command policies if client recovery cannot be safe. Cover mid-loop failure and successful resume, loading/busy/failure UI. Read Convex guidelines before backend changes; no raw generated edits.
+
+Additional same-shape creation owner: EventDraftPoCoordinator.ts and EventDraftPoButton.tsx. Existing persisted draft/demand-line matching supports ordinary resume but generated order/line creation lacks stable keys, allowing ambiguous retries to duplicate. Add stable operation/demand keys across retries or atomic governed materialization; disclose partial outcome and safe finish. Preserve event-stage/role restrictions and current draft reuse.
