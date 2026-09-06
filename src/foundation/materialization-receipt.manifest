@@ -1,0 +1,22 @@
+// Internal receipts for authored multi-row materialization transactions.
+// Generated commands must not read or write these rows: the authored
+// transaction seam is the only owner, after its normal auth and role checks.
+
+use "./base.manifest"
+
+entity MaterializationReceipt mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, receiptKey]
+  timestamps
+
+  property indexed receiptKey: string?
+  property family: string?
+  property operationKey: string?
+  property output: json?
+
+  default policy materializationReceiptRead read: roleAllows(user.role, "materializationReceiptSeamOnly") "Materialization receipts are private implementation records"
+  default policy materializationReceiptWrite write: roleAllows(user.role, "materializationReceiptSeamOnly") "Materialization receipts are managed only by the transaction seam"
+  default policy materializationReceiptExecute execute: roleAllows(user.role, "materializationReceiptSeamOnly") "Materialization receipts expose no generated commands"
+
+  store MaterializationReceipt in durable
+}

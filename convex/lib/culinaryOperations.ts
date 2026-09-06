@@ -57,7 +57,6 @@ export const cloneMenu = mutation({
       pricePerPerson: source.pricePerPerson,
       minGuests: source.minGuests,
       maxGuests: source.maxGuests,
-      idempotencyKey: `${tenantId}:${args.operationKey}:menu`,
     });
     const liveLines = lines.filter((row) => row.deletedAt == null);
     for (let index = 0; index < liveLines.length; index++) {
@@ -70,7 +69,6 @@ export const cloneMenu = mutation({
         course: line.course ?? undefined,
         serviceStyle: line.serviceStyle ?? undefined,
         specialInstructions: line.specialInstructions ?? undefined,
-        idempotencyKey: `${tenantId}:${args.operationKey}:line:${line._id}`,
       });
     }
     const output = { menuId: String(created.docId), menuName: args.name, lineCount: liveLines.length };
@@ -118,7 +116,6 @@ export const importComponent = mutation({
       else {
         const created = await ctx.runMutation(api.mutations.Ingredient_createViaIntroduce, {
           name: line.name.trim(), unit: line.unit as never, costPerUnit: 0, allergens: [],
-          idempotencyKey: `${tenantId}:${args.operationKey}:ingredient:${index}`,
         });
         createdIngredientIds.push(String(created.docId));
         ingredientIds.push(created.docId);
@@ -126,7 +123,6 @@ export const importComponent = mutation({
     }
     const component = await ctx.runMutation(api.mutations.Component_createViaDraft, {
       ...args.projection, lines: undefined, yieldUnit: args.projection.yieldUnit as never,
-      idempotencyKey: `${tenantId}:${args.operationKey}:component`,
     });
     const lineIds: string[] = [];
     for (let index = 0; index < args.projection.lines.length; index++) {
@@ -134,7 +130,7 @@ export const importComponent = mutation({
       const created = await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
         componentId: component.docId, ingredientId: ingredientIds[index], quantity: line.quantity,
         unit: line.unit as never, sortOrder: line.sortOrder, wasteFactor: line.wasteFactor,
-        prepNotes: line.prepNotes, idempotencyKey: `${tenantId}:${args.operationKey}:line:${index}`,
+        prepNotes: line.prepNotes,
       });
       lineIds.push(String(created.docId));
     }
@@ -165,13 +161,11 @@ export const restoreComponentSnapshot = mutation({
       servesPerYield: target.servesPerYield ?? component.servesPerYield ?? 1, category: target.category || undefined,
       cuisine: target.cuisine || undefined, description: target.description || undefined,
       instructions: target.instructions || undefined, version: component.version,
-      idempotencyKey: `${tenantId}:${args.operationKey}:component`,
     });
     const currentLines = await ctx.db.query("componentIngredients").withIndex("by_componentId", (q) => q.eq("componentId", args.componentId)).collect();
     for (const line of currentLines.filter((row) => row.deletedAt == null)) {
       await ctx.runMutation(api.mutations.ComponentIngredient_remove, {
         docId: line._id, reason: `Restored from snapshot ${args.snapshotId}`, version: line.version,
-        idempotencyKey: `${tenantId}:${args.operationKey}:remove:${line._id}`,
       });
     }
     for (let index = 0; index < target.lines.length; index++) {
@@ -180,7 +174,6 @@ export const restoreComponentSnapshot = mutation({
         componentId: args.componentId, ingredientId: line.ingredientId as Id<"ingredients">,
         quantity: line.quantity, unit: line.unit as never, sortOrder: line.sortOrder ?? index,
         wasteFactor: line.wasteFactor, prepNotes: line.prepNotes || undefined,
-        idempotencyKey: `${tenantId}:${args.operationKey}:add:${index}`,
       });
     }
     const output = { componentId: String(args.componentId), snapshotId: String(args.snapshotId), lineCount: target.lines.length };

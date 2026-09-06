@@ -80,7 +80,6 @@ export const applyPackTemplate = mutation({
         description: item.description,
         requiredQuantity: item.requiredQuantity,
         unit: item.unit,
-        idempotencyKey: `${tenantId}:${args.operationKey}:item:${index}`,
       });
     }
     const output = { itemCount: args.items.length };
@@ -113,7 +112,6 @@ export const applyLayoutTemplate = mutation({
         type: section.type,
         instructions: section.instructions,
         sortOrder: args.baseSortOrder + index,
-        idempotencyKey: `${tenantId}:${args.operationKey}:section:${index}`,
       });
     }
     const output = { sectionCount: args.sections.length };
@@ -189,13 +187,11 @@ export const draftPurchaseOrder = mutation({
           vendorId: args.vendorId,
           eventId: args.eventId,
           notes: "Drafted from event needs",
-          idempotencyKey: `${tenantId}:${args.operationKey}:order`,
         });
     for (const line of args.lines) {
       await ctx.runMutation(api.mutations.VendorOrderLine_createViaAddLine, {
         vendorOrderId: order.docId,
         ...line,
-        idempotencyKey: `${tenantId}:${args.operationKey}:demand:${line.ingredientDemandId}`,
       });
     }
     const output = { vendorOrderId: String(order.docId), lineCount: args.lines.length };
