@@ -113,7 +113,13 @@ function provenanceCell(cell: XlsxTypedCell): ProvenanceCell {
     record.sharedFormulaSi = cell.sharedFormulaSi;
   }
   if (cell.dateSystem !== undefined) record.dateSystem = cell.dateSystem;
-  if (cell.mergedRange !== undefined) record.mergedRange = cell.mergedRange;
+  if (cell.mergedRange !== undefined) {
+    // The anchor cell's copy of an oversized merge ref must not reintroduce
+    // what the range loop dropped (review round 4).
+    const merged = truncateText(cell.mergedRange);
+    record.mergedRange = merged.text;
+    if (merged.truncated) record.truncated = true;
+  }
   return record;
 }
 
@@ -149,11 +155,16 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
     const cells: ProvenanceCell[] = [];
     for (const cell of sheet.cells) {
       if (remaining <= 0 || budget <= 0) break;
+      // Each record is charged against the REMAINING budget before it is
+      // taken (review round 4): an oversized record stops the loop, never
+      // overshoots.
       const record = provenanceCell(cell);
+      const cost = JSON.stringify(record)?.length ?? 0;
+      if (cost > budget) break;
       cells.push(record);
       remaining -= 1;
       taken += 1;
-      budget -= JSON.stringify(record)?.length ?? 0;
+      budget -= cost;
     }
     return {
       name: sheet.name,

@@ -1073,6 +1073,21 @@ proof helper — the known widening gotcha); 4-test inventory proof +
 provenance proof green. NEXT: full check, commit/tag v0.0.67, review
 round 4. Release still blocked on #265 key rotation only.
 
+Iteration 62 (BUILD, release 2, 2026-09-05): review ROUND 4
+(.artifacts/review/r2-14/report4.md) — rounds 1-3 confirmed resolved; ONE
+remaining P2, real and FIXED in 4f580da+ (this iteration's commit): the
+range loop dropped an oversized mergeCell ref, but the ANCHOR CELL's own
+mergedRange copy reintroduced it verbatim (a 1.2 MB "A1:" ref would
+exceed Convex's 1 MB value limit despite mergedRangesTruncated being
+set) — provenanceCell now truncates the cell's mergedRange like any
+other field (marked), and each complete cell record is charged against
+the REMAINING budget before it is taken (an oversized record stops the
+loop instead of overshooting by one); proof leg: 1.2 MB anchor ref →
+anchor cell's mergedRange ≤ 2200 chars, doc < budget + 4 KiB.
+Typecheck + provenance proof green. NEXT: full check, commit/tag
+v0.0.68, review round 5. Release still blocked on #265 key rotation
+only.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.

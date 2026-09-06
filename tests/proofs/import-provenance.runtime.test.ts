@@ -352,5 +352,22 @@ describe("runtime proof: import provenance (AC-022)", () => {
     expect(JSON.stringify(refCapped).length).toBeLessThan(
       PROVENANCE_BYTE_BUDGET + 4096,
     );
+
+    // Round 4: an oversized ref starting at a REAL anchor cell — the anchor
+    // cell's own mergedRange copy must not reintroduce what the range loop
+    // dropped, and cell records are charged before they are taken.
+    const anchorOversized = buildStyledWorkbook({
+      cells: [{ ref: "A1", is: "anchor title" }],
+      merges: [`A1:${"Z".repeat(1200 * 1024)}`],
+    });
+    const anchorCapped = buildWorkbookProvenance(Buffer.from(anchorOversized));
+    expect(anchorCapped.mergedRangesTruncated).toBe(true);
+    const anchorCell = anchorCapped.sheets[0].cells.find(
+      (cell) => cell.ref === "A1",
+    );
+    expect(anchorCell?.mergedRange?.length ?? 0).toBeLessThanOrEqual(2200);
+    expect(JSON.stringify(anchorCapped).length).toBeLessThan(
+      PROVENANCE_BYTE_BUDGET + 4096,
+    );
   });
 });
