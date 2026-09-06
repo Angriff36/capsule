@@ -1,20 +1,36 @@
 # Full wiring audit evidence
 
+## Current reconciliation
+
+Six repair groups have independent approvals. Proposal-template integration and private receipt isolation remain in progress; whole-branch verification remains pending. No audit-branch changes have been deployed.
+
+| Findings below | Repair group | Verified checkpoint |
+| --- | --- | --- |
+| 1, 3, 6 | Command targeting and delivery honesty | Task1 approved407b5c4; AC031/033/040 |
+| 2, 5, 8, 9, 14 | Actual values and estimate provenance | Task2 approved9093eed; AC032/035 |
+| 4, 21 | Atomic pack/layout/draft purchasing | Task3 approvedfab99af; AC034 |
+| 10, 11, 12 | Culinary clone/import/restore recovery | Task4 approved11ec7e8; AC036 |
+| 13, 16, 17, 19, 22 | Operational bulk/menu/prep/stock/timeline recovery | Task5 approved36be772; AC037 |
+| 15, 18, 20; reactive follow-through to8 | Attachment/default-view/outreach/form retention | Task6 approvedc8f1e6d; AC038 |
+| 7; new receipt privacy follow-through | Proposal defaults through publication/PDF; internal receipt isolation | Task7 pending; AC039/041 |
+
+The numbered findings retain their original source observations below as audit history. Later repairs supersede those descriptions; they are not a claim that the original defects still exist. Runtime/controller/jsdom evidence is distinct from authenticated browser verification, which has not been performed in this turn.
+
 ## Baseline
 
-The prior plan intentionally chose import-only work. The no-fake-data spec remains unimplemented; issues #275–#279 are existing findings, not sufficient evidence of a completed route sweep. 559 files under src/features at baseline. HTML input placeholders and deliberate idempotent no-ops are not automatically defects.
+At the audit baseline, the prior plan intentionally chose import-only work. The no-fake-data spec was unimplemented; issues #275–#279 were existing findings, not sufficient evidence of a completed route sweep. There were559 files under src/features at baseline. HTML input placeholders and deliberate idempotent no-ops are not automatically defects.
 
-## Confirmed candidates
+## Initial candidates (historical)
 
-- ProposalTemplatesPage save/archive/publish passes id where generated contract requires docId (agent evidence; root verification pending).
-- MessageInboxPage creates outbound queued rows but does not display delivery state (agent evidence; provider trace pending).
+- ProposalTemplatesPage save/archive/publish passed id where generated contract requires docId; confirmed and repaired in Task1.
+- MessageInboxPage created outbound queued rows without displaying delivery state; provider trace confirmed no sender and Task1 made that limitation explicit.
 
 ## Coverage
 
-- Commercial audit: clients, sales, finance plus backend owners — in progress.
-- Operations audit: kitchen, production, logistics, stock, procurement, facilities — in progress.
-- Other routes audit: events, workforce/staff, admin, reports, home, portal — in progress.
-- Root: route inventory, generated-command call contract scan, platform seed proof — in progress.
+- Commercial audit: clients, sales, finance plus backend owners — completed source inventory.
+- Operations audit: kitchen, production, logistics, stock, procurement, facilities — completed source inventory.
+- Other routes audit: events, workforce/staff, admin, reports, home, portal — completed source inventory.
+- Root: route inventory, generated-command call contract scan, platform seed proof — completed initial checks; final post-implementation contract scan pending.
 
 No full-app completion claim until the coverage and repair evidence are reconciled.
 
@@ -45,7 +61,7 @@ Confirmed repair ledger:
 
 Non-defects checked: labeled nutrition/seasonal/payroll estimates; missing-price costing; finalized closeout financial reports; real invoice reminder provider; MessageThread_create is genuine creation without docId; report sample labels are provenance, not fake runtime data. PrepBoardPage partial loop is dormant/unrouted and is recorded but not a shipped defect.
 
-Coverage: commercial clients/sales/finance; operations kitchen/production/logistics/inventory/facilities; events/workforce/staff/admin/reports/home/clientPortal/eventDay/notifications/chat/attachments/views/search/announcements. Event demand/prep synchronization needs additional focused recovery inspection. Root global generated-call and seed checks remain open.
+Coverage: commercial clients/sales/finance; operations kitchen/production/logistics/inventory/facilities; events/workforce/staff/admin/reports/home/clientPortal/eventDay/notifications/chat/attachments/views/search/announcements. Event demand/prep synchronization received the additional Task5 inspection and repairs. Root generated-call and seed evidence is recorded below; the final post-implementation scan remains pending.
 
 ## Seed refresh
 
@@ -120,7 +136,7 @@ Task5 trace verified atomic stock issuance is preferable: consume decrements sto
   - Docs claim: the historical loop report says its listed tasks are complete and the branch is pushed.
     - Real-world example (Docs claim): the operator could assume every started feature is wired and the production site contains it.
   - Implementation: C:\projects\capsule-release-20260905\IMPLEMENTATION_PLAN.md now starts with WIRING-1 through WIRING-8, retaining the historical release boundary; C:\projects\capsule-release-20260905\scripts\vercel-build.sh and branch deployment rules separate work-branch pushes from production releases.
-    - Real-world example (Implementation): reviewed Task1-3 fixes are pushed at01194ef, while culinary, operational, shared and proposal-template work is still pending and no new production release has occurred.
+    - Real-world example (Implementation): reviewed Tasks1-6 are pushed at a69b10b, while proposal-template integration and private receipts remain pending. No new production release has occurred.
 
 Saved-view default safety follow-through (Task6, same finding18): C:\projects\capsule-release-20260905\src\features\views\useSavedViews.ts assumes listSavedReportDefinition is owner-scoped. Generated C:\projects\capsule-release-20260905\convex\queries.ts:9748-9762 correctly allows managers/shared reports per Manifest, so a manager's personal-view adapter can include and clear another owner's default. Restrict the personal adapter's projection/default transaction to caller-owned page views, while preserving broader report management policies. Add two-owner manager regression.
 
