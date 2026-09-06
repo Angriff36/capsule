@@ -1103,6 +1103,24 @@ name ≤ 2200 chars with the marker, serialized doc ≤ budget. Typecheck +
 provenance proof green. NEXT: full check, commit/tag v0.0.69, review
 round 6. Release still blocked on #265 key rotation only.
 
+Iteration 64 (BUILD, release 2, 2026-09-05): review APPROVED. Round 6
+(.artifacts/review/r2-14/report6.md): "No prior blocking finding remains
+open and the fix introduces no regression or data-corrupting behavior",
+plus the explicit confirmation line "VERDICT: APPROVE" (the round-6
+summary omitted the literal line; one-line confirmation appended to the
+same report). Review saga: round 1 = 9 findings (4 P1), round 2 = 5
+(2 P1), round 3 = 3 (1 P1), round 4 = 1, round 5 = 1, round 6 = 0 —
+every finding verified against the code before fixing, every fix carries
+a proof leg, full `bun run check` exit 0 throughout. Branch is
+review-approved at e69ec4f+this commit, tags through v0.0.69. R2-14's
+ONLY remaining step is the release itself, blocked on the owner action
+(issue #265: rotate the production Clerk keys in Vercel + Clerk, then
+re-run the precheck — vercel env pull + check-deployment-config must
+report zero blockers — and `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
+bash scripts/release.sh --reviewer gpt-5.6-sol`). All other release.sh
+preconditions hold: clean tree, branch pushed, local main == origin/main
+(primary parked on main-parked-d04d5ec), preview verified on 7812.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.
