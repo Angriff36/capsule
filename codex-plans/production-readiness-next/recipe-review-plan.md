@@ -1,6 +1,6 @@
 # Honest, resumable recipe review implementation plan
 
-> For agentic workers: use superpowers:subagent-driven-development or superpowers:executing-plans to implement these tasks with review checkpoints. This document does not start implementation.
+> Owner execution choice, 2026-09-06: use Ralph loops. The active task queue is IMPLEMENTATION_PLAN.md (RR-1..RR-5), and ACCEPTANCE_TESTS.md binds AC-042..AC-046. This detailed plan supplies task interfaces and cases to each loop iteration; it does not itself start the loop.
 
 **Goal:** A kitchen user can correct an imported formula, save and reopen its review, finalize once, and inspect the original source from the resulting Component.
 

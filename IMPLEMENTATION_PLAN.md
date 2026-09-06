@@ -5,6 +5,22 @@
 
 # Implementation plan — capsule
 
+## Active Ralph delivery — honest, resumable recipe review
+
+Owner selected Ralph loops on 2026-09-06. Branch: `ralph/recipe-review`, based on the pushed readiness audit. Execute one of RR-1 through RR-5 per iteration, in dependency order. Read `codex-plans/production-readiness-next/recipe-review-plan.md` for exact owners, interfaces and test cases, and `data-audit.md` beside it for current source evidence. Recheck source before implementing. All sections below this active delivery are preserved history, not the next task queue.
+
+Current completion contract: AC-042 through AC-046. Historical AC-001 through AC-041 retain their requirements and statuses; AC-006/013 still lack required J receipts. Completing this delivery does not certify them, all PR03, full production readiness or deployment. Never clear a checkbox while its required evidence is absent.
+
+- [ ] RR-1 — Honest measurements (AC-042): implement recipe-plan Task 1, preserving raw text and valid fractions while representing missing/unknown yield, quantity and units explicitly. Preserve legacy callers. Correct affected fields without blocking unrelated kitchen work. Pass parser/readiness tests and typecheck.
+- [ ] RR-2 — Executable durable lifecycle (AC-043; follows RR-1): implement recipe-plan Task 2, including the verified old-foreign-key guard problem in recordComponent/confirmExisting/attachCreatedIngredient, editable reviewed values, immutable original source and revision conflicts. Author manifest changes, regenerate and prove the real command lifecycle with tenant denials; never hand-edit generated output.
+- [ ] RR-3 — Atomic persistence and recovery (AC-044; follows RR-2): implement recipe-plan Task 3. Durable save/load must preserve corrections, source and line decisions. Complete the same import with its Component/BOM and private operation receipt atomically. Prove failure rollback, lost-ack replay, changed-payload conflict and legacy finalizer compatibility.
+- [ ] RR-4 — Resumable normal UI (AC-045; follows RR-3): implement recipe-plan Task 4's workbench/source-panel integration. Save/reopen via importId, show unfinished reviews, preserve unsaved edits on failure/conflict and expose original source from Component detail. Preserve current incomplete-cost display and desktop/mobile design. Add mounted behavior tests; record real-browser qualification separately in RR-5.
+- [ ] RR-5 — Qualification and handoff (AC-046; follows RR-4): exercise the actual local authenticated workbench at desktop and 360px mobile: paste and CSV correction, save/reload, finalize/retry, source inspection, missing-price notice, denied access, keyboard/error recovery. Record reproducible evidence in `codex-plans/production-readiness-next/recipe-review-verification.md`. Run all active acceptance tests, full existing test/typecheck/format gates, `bunx vite build`, spec lint and generated ownership checks. Keep this task unchecked if required browser/backend access is unavailable; record the exact blocker. Update owning docs and scope-specific statuses; do not deploy or claim historical J reviews passed.
+
+Iteration commits may leave future task criteria PENDING. Each commit must pass its task's required tests and preserve prior passing regression tests. The delivery is complete only when AC-042 through AC-046 all have their required evidence. Do not start a new broad planning run that replaces this scope with all 132 readiness criteria.
+
+Run from this checkout in PowerShell: `& 'C:\Program Files\Git\bin\bash.exe' ./loop.sh 20 --branch ralph/recipe-review`. This bounds a run at 20 iterations, not a promise of completion in 20. Existing `.ralph.env` provider/model routing is unchanged. Only branch commits/pushes are permitted; main/release/provider operations and private production imports are not part of this run. Start instruction only: no loop was launched by preparing this plan.
+
 ## Current work — full wiring audit, 2026-09-06
 
 Owner requested execution of `specs/ralph/no-fake-data-or-dead-buttons.md` after the prior narrow release omitted it. The source-backed plan and coverage ledger are archived under `docs/task-plans/2026-09-06-full-wiring-audit/`, on branch `fix/full-wiring-audit-20260906`. No new Ralph loop was started. This work is not a claim that every separate PR01–PR14 readiness requirement is complete.
