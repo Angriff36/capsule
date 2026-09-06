@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateEventDish,
@@ -21,6 +21,7 @@ import {
   useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
+import { BulkRunFailure, runBulkItems } from "../../ui/bulk-select";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
@@ -105,6 +106,10 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const [openRecipeId, setOpenRecipeId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [pendingStockSync, setPendingStockSync] = useState<{
+    expectedLines: number;
+    savedLines: number;
+  } | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 
   const selections = useMemo(
@@ -124,6 +129,20 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     if (!prepSyncReady) return;
     setStockShortages(await syncStockForEvent(eventId));
   };
+
+  useEffect(() => {
+    if (!pendingStockSync || selections.length < pendingStockSync.expectedLines)
+      return;
+    const phase = pendingStockSync;
+    setPendingStockSync(null);
+    void run("template:stock-sync", async () => {
+      try {
+        await refreshStock();
+      } catch (cause) {
+        throw new BulkRunFailure(cause, phase.savedLines, 0, 0);
+      }
+    });
+  }, [pendingStockSync, selections.length]);
 
   const costRollup = useMemo(
     () =>
@@ -284,8 +303,10 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       });
       if (!confirmed) return;
       const servings = Math.max(1, expectedHeadcount || 1);
-      for (const line of template.lines) {
-        if (existingDishIds.includes(line.dishId)) continue;
+      const missing = template.lines.filter(
+        (line) => !existingDishIds.includes(line.dishId),
+      );
+      await runBulkItems(missing, async (line) => {
         await createEventDish({
           eventId,
           dishId: line.dishId,
@@ -294,8 +315,11 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           course: line.course,
           serviceStyle: line.serviceStyle,
         });
-      }
-      await refreshStock();
+      });
+      setPendingStockSync({
+        expectedLines: selections.length + missing.length,
+        savedLines: missing.length,
+      });
     });
 
   const editLineNote = (row: EventMenuNoteRow) => {

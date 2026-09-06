@@ -67,6 +67,7 @@ import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallb
 import type * as lib_materializationReceipt from "../lib/materializationReceipt.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
+import type * as lib_operationalTransactions from "../lib/operationalTransactions.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
 import type * as lib_parseSearchQuery from "../lib/parseSearchQuery.js";
 import type * as lib_personAuthPick from "../lib/personAuthPick.js";
@@ -187,6 +188,7 @@ declare const fullApi: ApiFromModules<{
   "lib/materializationReceipt": typeof lib_materializationReceipt;
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
+  "lib/operationalTransactions": typeof lib_operationalTransactions;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
   "lib/parseSearchQuery": typeof lib_parseSearchQuery;
   "lib/personAuthPick": typeof lib_personAuthPick;

@@ -1,9 +1,8 @@
 import { useMemo, useState } from "react";
+import { type Id } from "../../lib/api";
+import { useIssueEventStock } from "../../lib/operational-transactions";
 import {
   useCreateInventoryReservation,
-  useIngredientDemandConfirm,
-  useIngredientDemandFulfill,
-  useInventoryReservationConsume,
   useListIngredient,
   useListIngredientDemand,
   useListInventoryItem,
@@ -19,7 +18,6 @@ import {
   type EventInventoryDemandRow,
   type EventInventoryHoldRow,
 } from "./EventInventoryTables";
-import { EventStockIssueCoordinator } from "./EventStockIssueCoordinator";
 import {
   EventStockReservationCoordinator,
   type EventStockReservationCreated,
@@ -50,9 +48,7 @@ export function EventInventoryPanel({
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
   const createReservation = useCreateInventoryReservation();
-  const consumeReservation = useInventoryReservationConsume();
-  const confirmDemand = useIngredientDemandConfirm();
-  const fulfillDemand = useIngredientDemandFulfill();
+  const issueEventStock = useIssueEventStock();
   const [created, setCreated] = useState<EventStockReservationCreated[]>([]);
   const [shortages, setShortages] = useState<EventStockShortage[]>([]);
   const [ran, setRan] = useState(false);
@@ -210,40 +206,15 @@ export function EventInventoryPanel({
     onError(null);
     void (async () => {
       try {
-        const result = await new EventStockIssueCoordinator({
-          consumeReservation: (input) => consumeReservation(input),
-          confirmDemand: (input) => confirmDemand(input),
-          fulfillDemand: (input) => fulfillDemand(input),
-        }).issue({
-          eventId,
-          reservationId,
-          reservations: (reservations ?? []).map((reservation) => ({
-            id: reservation._id,
-            inventoryItemId: reservation.inventoryItemId,
-            eventId: reservation.eventId,
-            ingredientId: reservation.ingredientId,
-            quantity: Number(reservation.quantity),
-            status: String(reservation.status),
-            version: reservation.version,
-            deletedAt: reservation.deletedAt,
-          })),
-          demands: eventDemands.map((demand) => ({
-            id: demand._id,
-            eventId: demand.eventId,
-            ingredientId: demand.ingredientId,
-            requiredQuantity: Number(demand.requiredQuantity),
-            unit: String(demand.unit),
-            status: String(demand.status),
-            version: demand.version,
-            deletedAt: demand.deletedAt,
-          })),
-          items: (items ?? []).map((item) => ({
-            id: item._id,
-            quantityOnHand: Number(item.quantityOnHand),
-            locationId: item.locationId,
-            unit: String(item.unit),
-            useByAt: item.useByAt,
-          })),
+        const reservation = reservations.find(
+          (row) => row._id === reservationId,
+        );
+        if (!reservation)
+          throw new Error("Reservation not found for this event");
+        const result = await issueEventStock({
+          eventId: eventId as Id<"events">,
+          reservationId: reservation._id,
+          reservationVersion: reservation.version,
         });
         setLastIssue(
           result.fulfilledDemandId

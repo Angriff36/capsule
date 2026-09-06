@@ -11,6 +11,7 @@ import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
+import { runBulkItems } from "../../ui/bulk-select";
 import {
   suspectPrepQuantityFlag,
   suspectRowsFromRecipeLines,
@@ -64,7 +65,7 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
       }
       const reasons: string[] = [];
       let created = 0;
-      for (const row of selections) {
+      await runBulkItems(selections, async (row) => {
         const result = await syncPrepForDish({
           id: row._id,
           eventId,
@@ -76,7 +77,7 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
         if (result.noOpReason) {
           reasons.push(`${dishName(row.dishId)}: ${result.noOpReason}`);
         }
-      }
+      });
       if (reasons.length > 0 && created === 0) {
         setNotice(reasons.join(" "));
       } else if (reasons.length > 0) {

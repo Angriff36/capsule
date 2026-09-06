@@ -118,6 +118,29 @@ function isZodError(
 }
 
 export function classifyCommandFailure(error: unknown): CommandFailure {
+  const bulk =
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    error.name === "BulkRunFailure" &&
+    "cause" in error &&
+    "completed" in error &&
+    "failed" in error &&
+    "remaining" in error
+      ? (error as {
+          cause: unknown;
+          completed: number;
+          failed: number;
+          remaining: number;
+        })
+      : null;
+  if (bulk) {
+    const classified = classifyCommandFailure(bulk.cause);
+    return {
+      ...classified,
+      detail: `${classified.detail} (${bulk.completed} completed, ${bulk.failed} failed, ${bulk.remaining} remaining.)`,
+    };
+  }
   const normalized = normalizeCommandError(error);
   const { detail, operation, requestId } = normalized;
   if (isZodError(error)) {

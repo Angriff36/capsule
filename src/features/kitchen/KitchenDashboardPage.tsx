@@ -24,6 +24,7 @@ import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
 import { ActionMenu, TableSkeleton } from "../../ui/primitives";
+import { runBulkItems } from "../../ui/bulk-select";
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -258,7 +259,7 @@ export function KitchenDashboardPage() {
         }
         const reasons: string[] = [];
         let created = 0;
-        for (const row of rows) {
+        await runBulkItems(rows, async (row) => {
           const result = await syncPrepForDish({
             id: row._id,
             eventId,
@@ -267,7 +268,7 @@ export function KitchenDashboardPage() {
           });
           created += result.taskCount;
           if (result.noOpReason) reasons.push(result.noOpReason);
-        }
+        });
         if (created === 0 && reasons.length > 0) {
           throw new Error(reasons[0] ?? "Sync prep did nothing.");
         }
@@ -459,7 +460,7 @@ export function KitchenDashboardPage() {
       return;
     }
     void run(`bulk:${label}`, async () => {
-      for (const row of targets) await verb(row.task);
+      await runBulkItems(targets, (row) => verb(row.task));
       setPicked(new Set());
       showToast(
         `${formatCountNoun(targets.length, "step")} ${done}` +

@@ -46,6 +46,40 @@ export function useBulkSelection<T extends { _id: string }>(selectable: T[]) {
 
 export type BulkProgress = { done: number; total: number } | null;
 
+export class BulkRunFailure extends Error {
+  constructor(
+    public readonly cause: unknown,
+    public readonly completed: number,
+    public readonly failed: number,
+    public readonly remaining: number,
+  ) {
+    super(`${completed} completed, ${failed} failed, ${remaining} remaining`);
+    this.name = "BulkRunFailure";
+  }
+}
+
+export async function runBulkItems<T>(
+  items: readonly T[],
+  work: (item: T) => Promise<void>,
+  onProgress?: (done: number) => void,
+) {
+  let completed = 0;
+  for (const item of items) {
+    try {
+      await work(item);
+      completed += 1;
+      onProgress?.(completed);
+    } catch (cause) {
+      throw new BulkRunFailure(
+        cause,
+        completed,
+        1,
+        items.length - completed - 1,
+      );
+    }
+  }
+}
+
 /**
  * Runs an async action over selected rows one at a time, publishing progress
  * for the action bar. Errors propagate to the caller's existing failure
@@ -58,12 +92,9 @@ export function useBulkRun() {
       if (items.length === 0) return;
       setProgress({ done: 0, total: items.length });
       try {
-        let done = 0;
-        for (const item of items) {
-          await work(item);
-          done += 1;
-          setProgress({ done, total: items.length });
-        }
+        await runBulkItems(items, work, (done) =>
+          setProgress({ done, total: items.length }),
+        );
       } finally {
         setProgress(null);
       }

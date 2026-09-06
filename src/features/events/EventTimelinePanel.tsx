@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useReorderEventTimeline } from "../../lib/operational-transactions";
 import { type Doc, type Id } from "../../lib/api";
 import {
   useCreateEventTimelineActivity,
@@ -98,6 +99,7 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
   const schedule = useCreateEventTimelineActivity();
   const adjust = useEventTimelineActivityAdjust();
   const remove = useEventTimelineActivityRemove();
+  const reorderTimeline = useReorderEventTimeline();
   const [showAdd, setShowAdd] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -256,18 +258,24 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
     );
     const remapped = remapper.remap(previousIds, nextOrderedIds, byId);
     void run("reorder", async () => {
-      for (const slot of remapped) {
-        const activity = byId.get(slot.id);
-        if (activity == null) continue;
-        await adjust({
-          docId: activity._id,
-          startsAt: slot.startsAt,
-          endsAt: slot.endsAt,
-          sortOrder: slot.sortOrder,
-          version:
-            typeof activity.version === "number" ? activity.version : undefined,
-        });
-      }
+      await reorderTimeline({
+        eventId,
+        rows: remapped.map((slot) => {
+          const activity = byId.get(slot.id);
+          if (activity == null || typeof activity.version !== "number") {
+            throw new Error(
+              "Timeline activity is unavailable; refresh and retry",
+            );
+          }
+          return {
+            docId: activity._id,
+            startsAt: slot.startsAt,
+            endsAt: slot.endsAt,
+            sortOrder: slot.sortOrder,
+            version: activity.version,
+          };
+        }),
+      });
     });
   };
 
