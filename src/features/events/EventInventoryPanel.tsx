@@ -215,6 +215,7 @@ export function EventInventoryPanel({
           eventId: eventId as Id<"events">,
           reservationId: reservation._id,
           reservationVersion: reservation.version,
+          operationKey: `event-stock-issue:${reservation._id}`,
         });
         setLastIssue(
           result.fulfilledDemandId

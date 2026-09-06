@@ -3,11 +3,15 @@ import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import { mutation } from "../_generated/server";
 import { getAuthContext, requireTenant } from "./authContext";
+import { readMaterializationReceipt, writeMaterializationReceipt } from "./materializationReceipt";
 
 export const issueEventStock = mutation({
-  args: { eventId: v.id("events"), reservationId: v.id("inventoryReservations"), reservationVersion: v.number() },
+  args: { eventId: v.id("events"), reservationId: v.id("inventoryReservations"), reservationVersion: v.number(), operationKey: v.string() },
   handler: async (ctx, args) => {
     const tenantId = requireTenant(await getAuthContext(ctx));
+    type Output = { reservationId: Id<"inventoryReservations">; consumedQuantity: number; consumedForIngredient: number; fulfilledDemandId: Id<"ingredientDemands"> | null; recovered?: boolean };
+    const recovered = await readMaterializationReceipt<Output>(ctx, tenantId, "eventStockIssue", args.operationKey, args);
+    if (recovered) return { ...recovered, recovered: true };
     const reservation = await ctx.db.get(args.reservationId);
     if (!reservation || reservation.tenantId !== tenantId || reservation.eventId !== args.eventId) throw new Error("InventoryReservation not found");
     const item = await ctx.db.get(reservation.inventoryItemId);
@@ -25,7 +29,9 @@ export const issueEventStock = mutation({
       await ctx.runMutation(api.mutations.IngredientDemand_fulfill, { docId: currentDemand._id, version: currentDemand.version });
       fulfilledDemandId = currentDemand._id;
     }
-    return { reservationId: reservation._id, consumedQuantity: reservation.quantity, consumedForIngredient: consumedQuantity, fulfilledDemandId };
+    const output: Output = { reservationId: reservation._id, consumedQuantity: reservation.quantity, consumedForIngredient: consumedQuantity, fulfilledDemandId };
+    await writeMaterializationReceipt(ctx, tenantId, "eventStockIssue", args.operationKey, args, output);
+    return output;
   },
 });
 

@@ -52,6 +52,8 @@ export class BulkRunFailure extends Error {
     public readonly completed: number,
     public readonly failed: number,
     public readonly remaining: number,
+    public readonly completedItems: readonly unknown[],
+    public readonly unfinishedItems: readonly unknown[],
   ) {
     super(`${completed} completed, ${failed} failed, ${remaining} remaining`);
     this.name = "BulkRunFailure";
@@ -75,6 +77,8 @@ export async function runBulkItems<T>(
         completed,
         1,
         items.length - completed - 1,
+        items.slice(0, completed),
+        items.slice(completed),
       );
     }
   }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateEventDish,
@@ -34,6 +34,7 @@ import { ActionMenu, ActionMenuRule } from "../../ui/primitives";
 import { PlusIcon } from "../../ui/icons";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import type { EventStockShortage } from "./EventStockReservationCoordinator";
+import { TemplateStockSyncLifecycle } from "./TemplateStockSyncLifecycle";
 import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 import { EventDraftPoButton } from "./EventDraftPoButton";
@@ -98,7 +99,11 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const removeDish = useEventDishRemove();
   const setHeadcountOverride = useEventDishSetHeadcountOverride();
   const updateInstructions = useEventDishUpdateInstructions();
-  const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
+  const {
+    ready: prepSyncReady,
+    syncStockForEvent,
+    stockRevisionForEvent,
+  } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
     [],
@@ -106,10 +111,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const [openRecipeId, setOpenRecipeId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
-  const [pendingStockSync, setPendingStockSync] = useState<{
-    expectedLines: number;
-    savedLines: number;
-  } | null>(null);
+  const stockLifecycle = useRef(new TemplateStockSyncLifecycle());
+  const [stockPhase, setStockPhase] = useState(0);
   const { prompt, host } = useActionPrompt(busy != null);
 
   const selections = useMemo(
@@ -131,18 +134,22 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   };
 
   useEffect(() => {
-    if (!pendingStockSync || selections.length < pendingStockSync.expectedLines)
-      return;
-    const phase = pendingStockSync;
-    setPendingStockSync(null);
+    const phase = stockLifecycle.current.next({
+      ready: prepSyncReady,
+      eventDishIds: selections.map((row) => String(row._id)),
+      demandRevision: stockRevisionForEvent(eventId),
+    });
+    if (!phase) return;
     void run("template:stock-sync", async () => {
       try {
         await refreshStock();
+        stockLifecycle.current.succeeded();
       } catch (cause) {
-        throw new BulkRunFailure(cause, phase.savedLines, 0, 0);
+        stockLifecycle.current.failed();
+        throw new BulkRunFailure(cause, phase.savedLines, 0, 0, [], []);
       }
     });
-  }, [pendingStockSync, selections.length]);
+  }, [eventId, prepSyncReady, selections, stockPhase, stockRevisionForEvent]);
 
   const costRollup = useMemo(
     () =>
@@ -306,20 +313,36 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       const missing = template.lines.filter(
         (line) => !existingDishIds.includes(line.dishId),
       );
+      const baselineDemandRevision = stockRevisionForEvent(eventId);
+      const savedDishIds: string[] = [];
       await runBulkItems(missing, async (line) => {
-        await createEventDish({
+        const created = (await createEventDish({
           eventId,
           dishId: line.dishId,
           quantityServings: servings,
           headcountOverride: 0,
           course: line.course,
           serviceStyle: line.serviceStyle,
-        });
+        })) as { docId: string };
+        savedDishIds.push(created.docId);
       });
-      setPendingStockSync({
-        expectedLines: selections.length + missing.length,
-        savedLines: missing.length,
+      const missingDishIds = new Set(missing.map((line) => line.dishId));
+      const expectsDemandChange =
+        missing.some((line) =>
+          dishIngredients?.some(
+            (ingredient) =>
+              ingredient.deletedAt == null && ingredient.dishId === line.dishId,
+          ),
+        ) ||
+        dishComponents?.some(
+          (link) => link.deletedAt == null && missingDishIds.has(link.dishId),
+        ) === true;
+      stockLifecycle.current.begin({
+        savedDishIds,
+        baselineDemandRevision,
+        expectsDemandChange,
       });
+      setStockPhase((current) => current + 1);
     });
 
   const editLineNote = (row: EventMenuNoteRow) => {
