@@ -3201,6 +3201,35 @@ loop — pause until #265 is actioned. Resume path: re-run the precheck
 bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
 record at .artifacts/review/r2-14/report6.md).
 
+Iteration 149 (BUILD, release 2, 2026-09-05): R2-14 re-verified, STILL
+BLOCKED on the owner action — no code change this iteration. Workspace:
+`origin/main` still 279f6a3 (fetched and confirmed an ancestor; nothing
+to integrate); tree clean at 22e385f before this docs commit (only the
+CogniLayer bridge line in CLAUDE.md rides along, as every session). Issue
+#265 still OPEN, zero comments; newest issue still #279, nothing new to
+triage. Fresh precheck against the LIVE production env with the full
+production-build gate flags (--environment production,
+--expected-deployment impartial-mule-193, --require
+VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY, --env-file
+.artifacts/release/tmp-env-149 + --no-env-files, matching
+scripts/vercel-build.sh exactly): STILL the same 2 blockers only —
+`clerk:secret_key_unrecognized` and `clerk:dev_credential_in_production`
+(VITE_CLERK_PUBLISHABLE_KEY still pk_test_*) — no expected-deployment
+finding, so the production frontend stays pointed at impartial-mule-193
+and the Clerk key class stays the only defect. Temp env file deleted
+(verified: no tmp- files remain); redacted JSON refreshed at
+.artifacts/release/precheck265.json. Preview verified on 7812 serving
+this checkout (ralph-preview.ps1 -Ensure: "serves
+C:/projects/capsule-ralph", exit 0). ANTHROPIC_API_KEY still unset, so
+the AC-006/AC-013 J-halves stay evidence gaps. Docs-only commit, no new
+tag (iteration-46/65..148 precedent). The iteration-144 operator note
+stands: 85 consecutive blocked no-ops, no addressable work left in this
+loop — pause until #265 is actioned. Resume path: re-run the precheck
+(must report zero blockers), then
+`CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
+bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
+record at .artifacts/review/r2-14/report6.md).
+
 Iteration 148 (BUILD, release 2, 2026-09-05): R2-14 re-verified, STILL
 BLOCKED on the owner action — no code change this iteration. Workspace:
 `origin/main` still 279f6a3 (fetched and confirmed an ancestor; nothing
