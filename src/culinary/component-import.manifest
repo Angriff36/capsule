@@ -505,7 +505,8 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     expectedReviewRevision: int,
     optional parsedQuantity: decimal(10, 4),
     optional parsedUnit: UnitOfMeasure,
-    optional preparationNote: string
+    optional preparationNote: string,
+    optional parsedIngredientName: string
   ) {
     guard self.import != null
     guard self.import.status == "reviewing"
@@ -514,6 +515,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     mutate parsedQuantity = parsedQuantity
     mutate parsedUnit = parsedUnit
     mutate preparationNote = preparationNote
+    mutate parsedIngredientName = parsedIngredientName
     mutate revisedAt = now()
     emit ComponentImportLineMeasurementsRevised {
       componentImportLineId: self.id

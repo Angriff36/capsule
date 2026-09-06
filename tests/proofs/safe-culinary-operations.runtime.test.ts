@@ -891,6 +891,9 @@ Warm oil gently and steep herbs.`;
         expectedReviewRevision: 0,
         parsedQuantity: 0.5,
         parsedUnit: "cup",
+        // Unchanged fields restate their stored values: generated revise
+        // commands wipe omitted optionals.
+        parsedIngredientName: brokenParsed.lines[1].name.trim(),
       },
     );
     await proof.executeCommand(
@@ -924,5 +927,183 @@ Warm oil gently and steep herbs.`;
       status: "completed",
       resultingComponentId: recovered.componentId,
     });
+  });
+
+  it("persists workbench match decisions, name corrections and removed lines through the durable save", async () => {
+    const proof = harness();
+    const kitchen = proof.asRole({
+      subject: "decision-chef",
+      role: "kitchen_manager",
+      tenantId: "decision-tenant",
+    });
+    const coordinator = new ComponentImportCoordinator();
+    const olive = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Olive Oil", unit: "cup", costPerUnit: 0.05, allergens: [] },
+    )) as { docId: string };
+    const parsley = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Parsley", unit: "cup", costPerUnit: 0.1, allergens: [] },
+    )) as { docId: string };
+    const catalog = [
+      { id: olive.docId, name: "Olive Oil", unit: "cup" },
+      { id: parsley.docId, name: "Parsley", unit: "cup" },
+    ];
+    const source = `House Herb Oil
+
+Yield: 2 cups
+
+Ingredients:
+2 cups olive oil
+1 tsp mystery spice
+1/4 cup parsley, chopped`;
+    const parsed = coordinator.parseText(source, catalog);
+    expect(parsed.lines).toHaveLength(3);
+    const created = (await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.createComponentImportReview,
+      buildCreateReviewRequest(parsed, {
+        kind: "pasted_text",
+        rawText: source,
+      }) as never,
+    )) as { importId: string; reviewRevision: number; lineIds: string[] };
+
+    // The create itself stores the workbench match confidence — no manual
+    // per-line commands are needed for the initial decisions.
+    const rowAfterCreate = (await kitchen.query(
+      api.queries.getComponentImport,
+      { id: created.importId as never },
+    )) as Record<string, unknown>;
+    const linesAfterCreate = (
+      (await kitchen.query(api.queries.listComponentImportLineByImportId, {
+        importId: created.importId as never,
+      })) as Record<string, unknown>[]
+    ).sort((a, b) => Number(a.sourceOrder) - Number(b.sourceOrder));
+    expect(linesAfterCreate).toMatchObject([
+      { matchStatus: "exact", matchedIngredientId: olive.docId },
+      { matchStatus: "new" },
+      { matchStatus: "exact", matchedIngredientId: parsley.docId },
+    ]);
+    const reloaded = mapStoredReview(
+      rowAfterCreate as never,
+      linesAfterCreate as never,
+    );
+
+    // Workbench edits: confirm the exact match, rename + confirm the new
+    // ingredient, remove the parsley line, correct the yield.
+    const edited = {
+      ...reloaded,
+      yieldQuantity: 5,
+      lines: [
+        {
+          ...reloaded.lines[0],
+          matchStatus: "confirmed_existing" as const,
+          createNew: false,
+        },
+        {
+          ...reloaded.lines[1],
+          name: "Smoked paprika",
+          matchStatus: "confirmed_new" as const,
+          createNew: true,
+          matchedIngredientId: undefined,
+        },
+      ],
+    };
+    const saveRequest = buildSaveReviewRequest(
+      reloaded,
+      edited,
+      created.reviewRevision,
+    );
+    expect(saveRequest.discardedLines).toEqual([
+      { lineId: created.lineIds[2], reason: "Removed during review" },
+    ]);
+    expect(saveRequest.lines).toHaveLength(2);
+    const saved = await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.saveComponentImportReview,
+      saveRequest as never,
+    );
+    expect(saved).toEqual({ reviewRevision: 1 });
+
+    const row = (await kitchen.query(api.queries.getComponentImport, {
+      id: created.importId as never,
+    })) as Record<string, unknown>;
+    const lineRows = (
+      (await kitchen.query(api.queries.listComponentImportLineByImportId, {
+        importId: created.importId as never,
+      })) as Record<string, unknown>[]
+    ).sort((a, b) => Number(a.sourceOrder) - Number(b.sourceOrder));
+    expect(row).toMatchObject({ parsedYieldQuantity: 5, reviewRevision: 1 });
+    // The discarded line is gone from the live list; its source text survives
+    // verbatim on the import — a rename never rewrites the source. The save
+    // itself recomputed the resolution ledger: both remaining decisions plus
+    // the discard are counted outcomes.
+    expect(lineRows).toHaveLength(2);
+    expect(lineRows[0]).toMatchObject({
+      matchStatus: "confirmed_existing",
+      matchedIngredientId: olive.docId,
+    });
+    expect(lineRows[1]).toMatchObject({
+      matchStatus: "confirmed_new",
+      parsedIngredientName: "Smoked paprika",
+    });
+    expect(row).toMatchObject({
+      resolvedLineCount: 3,
+      parsedLineCount: 3,
+    });
+    expect(row.rawSourceText).toBe(source);
+
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.ComponentImport_approveReview,
+      { docId: created.importId },
+    );
+    const finalized = (await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.importComponent,
+      {
+        operationKey: "decision-review:finalize",
+        projection: {
+          name: "House Herb Oil",
+          yieldQuantity: 5,
+          yieldUnit: "cup",
+          lines: [
+            {
+              name: "olive oil",
+              ingredientId: olive.docId,
+              quantity: 2,
+              unit: "cup",
+              sortOrder: 1,
+            },
+            {
+              name: "Smoked paprika",
+              createNew: true,
+              quantity: 1,
+              unit: "teaspoon",
+              sortOrder: 2,
+            },
+          ],
+        },
+        review: { importId: created.importId, expectedRevision: 1 },
+      },
+    )) as { componentId: string; createdIngredientIds: string[] };
+    expect(finalized.createdIngredientIds).toHaveLength(1);
+    const bom = (await kitchen.query(
+      api.queries.listComponentIngredient,
+      {},
+    )) as Record<string, unknown>[];
+    expect(
+      bom.filter((line) => line.componentId === finalized.componentId),
+    ).toHaveLength(2);
+    const introduced = (
+      (await kitchen.query(api.queries.listIngredient, {})) as Record<
+        string,
+        unknown
+      >[]
+    ).find((item) => item._id === finalized.createdIngredientIds[0]);
+    expect(introduced).toMatchObject({ name: "Smoked paprika" });
+    expect(row.rawSourceText).toBe(source);
   });
 });

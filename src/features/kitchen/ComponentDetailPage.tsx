@@ -1,9 +1,10 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreateComponentIngredient,
   useGetComponent,
+  useListComponentImport,
   useListDish,
   useListDishComponent,
   useListIngredient,
@@ -51,6 +52,7 @@ import {
   UNIT_OF_MEASURE,
   unitOptionsFor,
 } from "./import/UnitOfMeasureMapper";
+import { ComponentImportSourcePanel } from "./import/ComponentImportSourcePanel";
 import {
   beginPendingOperation,
   confirmPendingOperation,
@@ -89,6 +91,31 @@ export function ComponentDetailPage() {
   const snapshots = useListComponentSnapshot();
   const people = useListPerson();
   const authStatus = useAuthStatus();
+  // Completed-import provenance: the original source this component came
+  // from. Older native components have none — absence is not an error.
+  // Culinary features use generated hooks only (integration guard), so the
+  // tenant's imports are filtered to this component's completed import.
+  const allImports = useListComponentImport();
+  const sourceImport = useMemo(() => {
+    const rows = (allImports ?? []).filter(
+      (row: {
+        resultingComponentId?: string | null;
+        deletedAt?: number | null;
+        status?: string;
+      }) =>
+        row.resultingComponentId === id &&
+        row.deletedAt == null &&
+        row.status === "completed",
+    );
+    return rows.length > 0
+      ? rows.sort(
+          (
+            a: { completedAt?: number | null },
+            b: { completedAt?: number | null },
+          ) => (b.completedAt ?? 0) - (a.completedAt ?? 0),
+        )[0]
+      : null;
+  }, [allImports, id]);
   const [editing, setEditing] = useState(false);
   const [targetYield, setTargetYield] = useState("");
   const [showLineForm, setShowLineForm] = useState(false);
@@ -417,6 +444,18 @@ export function ComponentDetailPage() {
         coverageNote={nutritionCoverageNote}
         loading={ingredients === undefined || lines === undefined}
       />
+
+      {sourceImport ? (
+        <ComponentImportSourcePanel
+          kind={sourceImport.sourceKind}
+          filename={sourceImport.sourceFilename ?? undefined}
+          rawText={sourceImport.rawSourceText ?? ""}
+          csvSheetText={sourceImport.csvSheetText ?? undefined}
+          csvLinesText={sourceImport.csvLinesText ?? undefined}
+          importId={String(sourceImport._id)}
+          status={sourceImport.status}
+        />
+      ) : null}
 
       <div className="culinary-work-grid">
         <section className="culinary-section">

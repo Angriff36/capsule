@@ -11,6 +11,7 @@
 import type {
   ComponentImportReviewState,
   ComponentImportSourceKind,
+  IngredientMatchStatus,
   ReviewIngredientLine,
 } from "./ComponentImportTypes";
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
@@ -54,7 +55,26 @@ export interface CreateComponentImportReviewRequest {
     parsedUnit?: UnitOfMeasure;
     parsedIngredientName?: string;
     preparationNote?: string;
+    /** Workbench match confidence to store with the staged line. */
+    match?: {
+      matchStatus: IngredientMatchStatus;
+      matchedIngredientId?: string;
+      possibleMatchIngredientIds?: string[];
+    };
   }[];
+}
+
+/** Durable match form of a review line: only fields storage keeps. */
+function durableMatch(line: ReviewIngredientLine) {
+  return {
+    matchStatus: line.matchStatus,
+    matchedIngredientId:
+      line.matchStatus === "exact" || line.matchStatus === "confirmed_existing"
+        ? line.matchedIngredientId
+        : undefined,
+    possibleMatchIngredientIds:
+      line.matchStatus === "possible" ? line.possibleMatchIds : undefined,
+  };
 }
 
 /** Builds the one-transaction create request from a parsed review state. */
@@ -91,6 +111,7 @@ export function buildCreateReviewRequest(
       parsedUnit: line.unit ?? undefined,
       parsedIngredientName: line.name?.trim() || undefined,
       preparationNote: line.prepNotes?.trim() || undefined,
+      match: line.matchStatus === "unresolved" ? undefined : durableMatch(line),
     })),
   };
 }
@@ -100,6 +121,9 @@ export interface StoredComponentImportRow {
   _id: string;
   sourceKind: ComponentImportSourceKind;
   sourceFilename?: string | null;
+  rawSourceText?: string | null;
+  csvSheetText?: string | null;
+  csvLinesText?: string | null;
   parsedName?: string | null;
   parsedDescription?: string | null;
   parsedCategory?: string | null;
@@ -110,6 +134,7 @@ export interface StoredComponentImportRow {
   parsedBatchMultiplier?: number | null;
   reviewRevision: number;
   status: string;
+  resultingComponentId?: string | null;
 }
 
 /** Stored ComponentImportLine row fields the review reload reads. */
@@ -127,6 +152,7 @@ export interface StoredComponentImportLineRow {
 }
 
 const MATCH_STATUSES: ReadonlySet<string> = new Set([
+  "unresolved",
   "exact",
   "possible",
   "new",
@@ -149,6 +175,9 @@ export function mapStoredReview(
     reviewRevision: row.reviewRevision,
     sourceKind: row.sourceKind,
     sourceFilename: row.sourceFilename ?? undefined,
+    rawSourceText: row.rawSourceText ?? undefined,
+    csvSheetText: row.csvSheetText ?? undefined,
+    csvLinesText: row.csvLinesText ?? undefined,
     name: row.parsedName ?? "",
     description: row.parsedDescription ?? undefined,
     category: row.parsedCategory ?? undefined,
@@ -197,13 +226,29 @@ export interface SaveComponentImportReviewRequest {
     parsedQuantity?: number;
     parsedUnit?: UnitOfMeasure;
     preparationNote?: string;
+    parsedIngredientName?: string;
+    match?: {
+      matchStatus:
+        | "unresolved"
+        | "exact"
+        | "possible"
+        | "new"
+        | "confirmed_existing"
+        | "confirmed_new";
+      matchedIngredientId?: string;
+      possibleMatchIngredientIds?: string[];
+    };
   }[];
+  /** Baseline lines removed from the edited review, soft-discarded on save. */
+  discardedLines?: { lineId: string; reason: string }[];
 }
 
 /**
  * Builds the one-transaction save request by diffing the edited review
  * against the loaded baseline. Only changed lines are sent, and omitted
  * fields keep their stored values — an unknown measurement stays unknown.
+ * Match decisions, name corrections and removed lines ride the same
+ * transaction so a saved review reopens exactly as it was left.
  */
 export function buildSaveReviewRequest(
   baseline: ComponentImportReviewState,
@@ -221,7 +266,18 @@ export function buildSaveReviewRequest(
     const unitChanged = before.unit !== line.unit;
     const prepChanged =
       (before.prepNotes ?? undefined) !== (line.prepNotes ?? undefined);
-    if (!quantityChanged && !unitChanged && !prepChanged) continue;
+    const nameChanged = before.name !== line.name;
+    const matchChanged =
+      JSON.stringify(durableMatch(before)) !==
+      JSON.stringify(durableMatch(line));
+    if (
+      !quantityChanged &&
+      !unitChanged &&
+      !prepChanged &&
+      !nameChanged &&
+      !matchChanged
+    )
+      continue;
     lines.push({
       lineId: line.importLineId,
       ...(quantityChanged
@@ -231,8 +287,21 @@ export function buildSaveReviewRequest(
       ...(prepChanged
         ? { preparationNote: line.prepNotes?.trim() || undefined }
         : {}),
+      ...(nameChanged
+        ? { parsedIngredientName: line.name.trim() || undefined }
+        : {}),
+      ...(matchChanged ? { match: durableMatch(line) } : {}),
     });
   }
+  const keptLineIds = new Set(
+    review.lines.map((line) => line.importLineId).filter(Boolean),
+  );
+  const discardedLines = baseline.lines
+    .filter((line) => line.importLineId && !keptLineIds.has(line.importLineId))
+    .map((line) => ({
+      lineId: line.importLineId as string,
+      reason: "Removed during review",
+    }));
   return {
     importId: review.importId ?? baseline.importId ?? "",
     expectedReviewRevision: expectedRevision,
@@ -247,6 +316,7 @@ export function buildSaveReviewRequest(
       batchMultiplier: review.batchMultiplier || undefined,
     },
     lines,
+    ...(discardedLines.length ? { discardedLines } : {}),
   };
 }
 
@@ -295,6 +365,15 @@ export class ComponentImportRepository {
     const state = mapStoredReview(row, lines);
     this.baseline = state;
     return state;
+  }
+
+  /**
+   * Adopts an externally loaded stored state (the workbench loads reactively
+   * through generated queries) as the save baseline, the same way `load`
+   * would. Pure bookkeeping — no writes.
+   */
+  adopt(state: ComponentImportReviewState): void {
+    this.baseline = state;
   }
 
   async save(

@@ -210,24 +210,37 @@ export function ComponentImportSourcePane({
   );
 }
 
+export type ComponentImportSaveState =
+  "idle" | "saving" | "saved" | "failed" | "conflict";
+
 export function ComponentImportReviewPane({
   review,
   coordinator,
   catalog,
   busy,
   unresolvedCount,
+  saveState,
+  dirty,
+  conflictNotice,
   onReviewChange,
   onJumpUnresolved,
   onFinalize,
+  onSaveReview,
+  onReloadSaved,
 }: {
   review: ComponentImportReviewState | null;
   coordinator: import("./ComponentImportCoordinator").ComponentImportCoordinator;
   catalog: { id: string; name: string }[];
   busy: boolean;
   unresolvedCount: number;
+  saveState: ComponentImportSaveState;
+  dirty: boolean;
+  conflictNotice: string | null;
   onReviewChange: (review: ComponentImportReviewState) => void;
   onJumpUnresolved: () => void;
   onFinalize: () => void;
+  onSaveReview: () => void;
+  onReloadSaved: () => void;
 }) {
   if (!review) {
     return (
@@ -535,12 +548,43 @@ export function ComponentImportReviewPane({
         />
       </label>
 
+      {conflictNotice ? (
+        <div className="component-import-unresolved" role="status">
+          <p>{conflictNotice}</p>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={onReloadSaved}
+          >
+            Reload saved version
+          </button>
+        </div>
+      ) : null}
+
       <div className="component-import-pane-actions">
+        {saveStatusText(saveState, dirty) ? (
+          <span className="component-import-save-state" role="status">
+            {saveStatusText(saveState, dirty)}
+          </span>
+        ) : null}
+        <button
+          type="button"
+          className="btn btn-ghost"
+          disabled={busy || saveState === "saving"}
+          onClick={onSaveReview}
+        >
+          {saveState === "saving"
+            ? "Saving…"
+            : saveState === "failed"
+              ? "Retry save"
+              : "Save review"}
+        </button>
         <button
           type="button"
           className="btn btn-primary"
           disabled={
             busy ||
+            saveState === "saving" ||
             unresolvedCount > 0 ||
             measurementIssues.length > 0 ||
             review.lines.length === 0
@@ -553,4 +597,17 @@ export function ComponentImportReviewPane({
       </div>
     </section>
   );
+}
+
+/** Truthful save status: what storage last said, never a fake success. */
+function saveStatusText(
+  saveState: ComponentImportSaveState,
+  dirty: boolean,
+): string | null {
+  if (saveState === "saving") return "Saving…";
+  if (saveState === "failed") return "Save failed — your edits are kept.";
+  if (saveState === "conflict")
+    return "Saved by someone else — your edits are kept.";
+  if (saveState === "saved") return dirty ? "Unsaved changes" : "Saved";
+  return dirty ? "Unsaved changes" : null;
 }

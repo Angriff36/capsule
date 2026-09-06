@@ -1,6 +1,6 @@
 import { mutation, type MutationCtx } from "../_generated/server";
 import { api } from "../_generated/api";
-import type { Id } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext, requireTenant } from "./authContext";
 import { requireKitchenAccess } from "./kitchenAccessGate";
@@ -323,6 +323,81 @@ const reviewSourceInput = v.object({
   fingerprint: v.string(),
 });
 
+/** Desired durable match state for one review line. */
+const lineMatchInput = v.object({
+  matchStatus: v.string(),
+  matchedIngredientId: v.optional(v.id("ingredients")),
+  possibleMatchIngredientIds: v.optional(v.array(v.string())),
+});
+
+type LineMatchTarget = { matchStatus: string; matchedIngredientId?: Id<"ingredients">; possibleMatchIngredientIds?: string[] };
+type StoredLineMatch = { matchStatus: string; matchedIngredientId?: Id<"ingredients"> | null; possibleMatchIngredientIds?: string[]; resolvedAt?: number | null };
+
+function sameLineMatch(stored: StoredLineMatch, target: LineMatchTarget): boolean {
+  const storedId = stored.matchedIngredientId ?? null;
+  const targetId = target.matchedIngredientId ?? null;
+  if (stored.matchStatus !== target.matchStatus || storedId !== targetId) return false;
+  const storedPossible = JSON.stringify(stored.possibleMatchIngredientIds ?? []);
+  const targetPossible = JSON.stringify(target.possibleMatchIngredientIds ?? []);
+  return storedPossible === targetPossible;
+}
+
+/**
+ * Translates a desired durable match state into generated line commands.
+ * "exact" stores the candidate suggestion, "possible" stores candidates,
+ * "new" marks the line new, the confirmed states confirm, and "unresolved"
+ * resets. An already-resolved line is reset first so a changed decision can
+ * replace the stored one; an existing-ingredient target is validated by
+ * confirmExisting through the tenant-scoped relation, so a foreign or
+ * retired ingredient fails here without writes past the reset.
+ */
+async function applyLineMatch(
+  ctx: MutationCtx,
+  lineId: Id<"componentImportLines">,
+  stored: StoredLineMatch,
+  target: LineMatchTarget,
+) {
+  if (sameLineMatch(stored, target)) return;
+  if (target.matchStatus === "unresolved") {
+    if (stored.matchStatus !== "unresolved" || stored.matchedIngredientId != null || (stored.possibleMatchIngredientIds ?? []).length > 0) {
+      await ctx.runMutation(api.mutations.ComponentImportLine_resetResolution, { docId: lineId });
+    }
+    return;
+  }
+  if (stored.resolvedAt != null) {
+    await ctx.runMutation(api.mutations.ComponentImportLine_resetResolution, { docId: lineId });
+  }
+  if (target.matchStatus === "exact" || target.matchStatus === "confirmed_existing") {
+    if (target.matchedIngredientId == null) {
+      throw new Error(`Line match ${target.matchStatus} requires an ingredient`);
+    }
+    await ctx.runMutation(api.mutations.ComponentImportLine_suggestExactMatch, {
+      docId: lineId, matchedIngredientId: target.matchedIngredientId,
+    });
+    if (target.matchStatus === "confirmed_existing") {
+      await ctx.runMutation(api.mutations.ComponentImportLine_confirmExisting, {
+        docId: lineId, matchedIngredientId: target.matchedIngredientId,
+      });
+    }
+    return;
+  }
+  if (target.matchStatus === "possible") {
+    await ctx.runMutation(api.mutations.ComponentImportLine_suggestPossibleMatches, {
+      docId: lineId, possibleMatchIngredientIds: target.possibleMatchIngredientIds ?? [],
+    });
+    return;
+  }
+  if (target.matchStatus === "new") {
+    await ctx.runMutation(api.mutations.ComponentImportLine_markNew, { docId: lineId });
+    return;
+  }
+  if (target.matchStatus === "confirmed_new") {
+    await ctx.runMutation(api.mutations.ComponentImportLine_confirmNew, { docId: lineId });
+    return;
+  }
+  throw new Error(`Unknown line match status ${target.matchStatus}`);
+}
+
 const stagedLineInput = v.object({
   sourceOrder: v.number(),
   sourceLine: v.string(),
@@ -330,6 +405,7 @@ const stagedLineInput = v.object({
   parsedUnit: v.optional(v.string()),
   parsedIngredientName: v.optional(v.string()),
   preparationNote: v.optional(v.string()),
+  match: v.optional(lineMatchInput),
 });
 
 const parsedHeaderInput = v.object({
@@ -394,6 +470,16 @@ export const createComponentImportReview = mutation({
         parsedIngredientName: line.parsedIngredientName,
         preparationNote: line.preparationNote,
       });
+      // The workbench match already knows exact/possible/new confidence; store
+      // it with the staged line so a saved review reopens with its decisions.
+      if (line.match) {
+        await applyLineMatch(ctx, staged.docId, {
+          matchStatus: "unresolved",
+          matchedIngredientId: null,
+          possibleMatchIngredientIds: [],
+          resolvedAt: null,
+        }, line.match);
+      }
       lineIds.push(String(staged.docId));
     }
     return { importId: String(uploaded.docId), reviewRevision: 0, lineIds };
@@ -416,14 +502,21 @@ const saveLineInput = v.object({
   parsedQuantity: v.optional(v.number()),
   parsedUnit: v.optional(v.string()),
   preparationNote: v.optional(v.string()),
+  parsedIngredientName: v.optional(v.string()),
+  match: v.optional(lineMatchInput),
+});
+
+const discardedLineInput = v.object({
+  lineId: v.id("componentImportLines"),
+  reason: v.string(),
 });
 
 /**
- * Saves review corrections in one transaction: header revision bump plus every
- * line measurement edit, guarded by the caller's expected revision. Omitted
- * fields keep their stored values, so unknown measurements stay explicitly
- * unknown instead of being coerced. A stale expected revision conflicts with
- * no writes.
+ * Saves review corrections in one transaction: header revision bump, every
+ * line measurement/name edit, every changed match decision and every removed
+ * line, guarded by the caller's expected revision. Omitted fields keep their
+ * stored values, so unknown measurements stay explicitly unknown instead of
+ * being coerced. A stale expected revision conflicts with no writes.
  */
 export const saveComponentImportReview = mutation({
   args: {
@@ -431,11 +524,12 @@ export const saveComponentImportReview = mutation({
     expectedReviewRevision: v.number(),
     header: saveHeaderInput,
     lines: v.array(saveLineInput),
+    discardedLines: v.optional(v.array(discardedLineInput)),
   },
   handler: async (ctx, args): Promise<{ reviewRevision: number }> => {
     const tenantId = await authorize(ctx);
     const row = await ownedImport(ctx, args.importId, tenantId);
-    if (row.status === "ready") {
+    if (row.status === "ready" || row.status === "failed") {
       await ctx.runMutation(api.mutations.ComponentImport_resumeReview, { docId: args.importId });
     } else if (row.status !== "reviewing") {
       throw new Error(`component import is ${row.status}; only reviewing or ready reviews can be saved`);
@@ -443,11 +537,33 @@ export const saveComponentImportReview = mutation({
     if (row.reviewRevision !== args.expectedReviewRevision) {
       throw new Error(`stale review revision: expected ${args.expectedReviewRevision}, stored ${row.reviewRevision}`);
     }
+    const storedLines = new Map<string, Doc<"componentImportLines">>();
     for (const line of args.lines) {
       const stored = await ctx.db.get(line.lineId);
       if (!stored || stored.deletedAt != null || stored.tenantId !== tenantId || stored.importId !== args.importId) {
         throw new Error("Review line not found for this import");
       }
+      storedLines.set(String(line.lineId), stored);
+    }
+    for (const discard of args.discardedLines ?? []) {
+      const stored = await ctx.db.get(discard.lineId);
+      if (!stored || stored.deletedAt != null || stored.tenantId !== tenantId || stored.importId !== args.importId) {
+        throw new Error("Discarded review line not found for this import");
+      }
+    }
+    // Match decisions carry no revision of their own, so they run inside this
+    // transaction after the revision check: a concurrent save fails the whole
+    // save instead of leaving half-updated decisions.
+    for (const line of args.lines) {
+      if (!line.match) continue;
+      const stored = storedLines.get(String(line.lineId))!;
+      await applyLineMatch(ctx, line.lineId, stored, line.match);
+    }
+    for (const discard of args.discardedLines ?? []) {
+      await ctx.runMutation(api.mutations.ComponentImportLine_discard, {
+        docId: discard.lineId,
+        reason: discard.reason,
+      });
     }
     // The generated revise commands wipe optional params that arrive omitted,
     // so every omitted field is resolved to its stored value here. A null
@@ -466,15 +582,31 @@ export const saveComponentImportReview = mutation({
     });
     const nextRevision = args.expectedReviewRevision + 1;
     for (const line of args.lines) {
-      const stored = (await ctx.db.get(line.lineId))!;
+      const stored = storedLines.get(String(line.lineId))!;
       await ctx.runMutation(api.mutations.ComponentImportLine_reviseMeasurements, {
         docId: line.lineId,
         expectedReviewRevision: nextRevision,
         parsedQuantity: line.parsedQuantity ?? stored.parsedQuantity ?? undefined,
         parsedUnit: (line.parsedUnit ?? stored.parsedUnit ?? null) as never,
         preparationNote: line.preparationNote ?? stored.preparationNote ?? undefined,
+        parsedIngredientName: line.parsedIngredientName ?? stored.parsedIngredientName ?? undefined,
       });
     }
+    // A confirmed decision and a discard are both counted outcomes, so the
+    // resolution ledger is recomputed from storage: every line that is
+    // resolved or discarded counts, and approval stays blocked while any
+    // live line still lacks a disposition.
+    const allLines = await ctx.db
+      .query("componentImportLines")
+      .withIndex("by_importId", (q) => q.eq("importId", args.importId))
+      .collect();
+    const resolvedCount = allLines.filter(
+      (line) => line.deletedAt != null || line.resolvedAt != null,
+    ).length;
+    await ctx.runMutation(api.mutations.ComponentImport_recordResolutionProgress, {
+      docId: args.importId,
+      resolvedLineCount: resolvedCount,
+    });
     return { reviewRevision: nextRevision };
   },
 });

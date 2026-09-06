@@ -206,6 +206,9 @@ describe("runtime proof: component import review lifecycle", () => {
         parsedQuantity: 1.75,
         parsedUnit: "cup",
         preparationNote: "extra virgin",
+        // Generated revise commands wipe omitted optionals — unchanged
+        // fields must restate their stored values.
+        parsedIngredientName: "Olive Oil",
       },
     );
 
@@ -661,6 +664,7 @@ describe("runtime proof: component import review lifecycle", () => {
         expectedReviewRevision: 0,
         parsedQuantity: 3,
         parsedUnit: "cup",
+        parsedIngredientName: "Olive Oil",
       },
     );
     await proof.executeCommand(

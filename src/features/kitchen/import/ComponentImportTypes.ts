@@ -1,7 +1,13 @@
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
 
 export type IngredientMatchStatus =
-  "exact" | "possible" | "new" | "confirmed_existing" | "confirmed_new";
+  /** Stored durable state: no local decision was ever recorded for this line. */
+  | "unresolved"
+  | "exact"
+  | "possible"
+  | "new"
+  | "confirmed_existing"
+  | "confirmed_new";
 
 export type ComponentImportSourceKind =
   "pasted_text" | "text_file" | "csv_bundle";
@@ -48,6 +54,14 @@ export interface ComponentImportReviewState {
   reviewRevision?: number;
   sourceKind: ComponentImportSourceKind;
   sourceFilename?: string;
+  /**
+   * Original source text of a durable review (raw paste/sheet CSV primary
+   * text plus the separately recoverable CSV pair). Read-only provenance:
+   * corrections never rewrite these.
+   */
+  rawSourceText?: string;
+  csvSheetText?: string;
+  csvLinesText?: string;
   name: string;
   description?: string;
   category?: string;
