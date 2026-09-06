@@ -300,3 +300,10 @@
 - **Issue:** The first temporary Playwright invocation loaded two runner copies and rejected test registration before discovery.
 - **Fix:** Used the repository's local Playwright 1.61.1 CLI and imported `playwright/test`; the in-memory generated API lifecycle verification passed (`1 passed`) and the temporary spec was deleted.
 - **Commands:** `bun run manifest:regen`; `bun run typecheck`; `bun run check:logistics-manifest`; `bun node_modules/playwright/cli.js test output/playwright/vehicle-fleet-catalog.spec.ts --reporter=line`; `bun run build`.
+# 2026-09-06: Commercial command and delivery honesty
+
+- Fixed proposal-template revise/archive/reactivate target contract (`docId`).
+- Inbox external threads now explain unavailable delivery and provide Copy draft without creating an outbound row; legacy queued/failed rows say not delivered. Internal notes remain usable.
+- Proposal publication and contract/invoice manual sent-recording labels no longer imply provider delivery. Real invoice reminders preserved.
+- Commits: a7b5b98, 407b5c4. Independent task reviewer gpt-5.6-terra approved after one fix round.
+- Verification: `bun run test` at a7b5b98: 141 files / 1303 tests pass. `bun run test tests/features/sales/message-inbox-delivery.test.ts tests/delivery-honesty.test.ts` at 407b5c4: 10 pass; `bun run typecheck` passes. Existing Vitest/React Router warnings remain. Global contract scanner: 335 direct calls, zero missing docId, nine adapters inspected.
