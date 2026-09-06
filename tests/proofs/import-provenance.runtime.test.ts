@@ -340,5 +340,17 @@ describe("runtime proof: import provenance (AC-022)", () => {
     expect(JSON.stringify(mergeCapped).length).toBeLessThan(
       PROVENANCE_BYTE_BUDGET + 4096,
     );
+
+    // One oversized merge ref (review round 3): the loop stops BEFORE taking
+    // it — the budget is never overshot, and the omission is flagged.
+    const oversizedRef = buildStyledWorkbook({
+      cells: [{ ref: "A1", is: "title" }],
+      merges: ["A1:B2", "Q".repeat(300 * 1024)],
+    });
+    const refCapped = buildWorkbookProvenance(Buffer.from(oversizedRef));
+    expect(refCapped.mergedRangesTruncated).toBe(true);
+    expect(JSON.stringify(refCapped).length).toBeLessThan(
+      PROVENANCE_BYTE_BUDGET + 4096,
+    );
   });
 });

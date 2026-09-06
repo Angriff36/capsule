@@ -151,6 +151,7 @@ export const inventoryArchive = action({
     )) as Array<{
       id: Id<"importArtifacts">;
       name: string;
+      checksum: string | null;
       createdAt: number | null;
     }>;
     const existingByName = new Map(existingRows.map((row) => [row.name, row]));
@@ -199,6 +200,23 @@ export const inventoryArchive = action({
       contents = readZipEntries(archive, { allowArchiveEntries: true });
     } catch (error) {
       archiveFailure(error);
+    }
+
+    // A run is tied to ONE archive (review round 3): same-run rows must
+    // belong to THESE bytes — every recorded name must exist here and every
+    // recorded checksum must match the current content. A retry with
+    // different bytes is refused loudly instead of mixing two archives'
+    // rows; the operator starts a fresh run.
+    for (const row of existingRows) {
+      const content = contents.get(row.name);
+      if (
+        !content ||
+        (row.checksum != null && row.checksum !== sha256Hex(content))
+      ) {
+        throw new ConvexError(
+          `Run already holds artifacts from a different archive (${row.name}); start a new import run for these bytes.`,
+        );
+      }
     }
 
     const indexNames = args.indexReportNames ?? [];

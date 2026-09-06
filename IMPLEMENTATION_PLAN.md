@@ -1049,6 +1049,30 @@ typecheck green; 10 focused tests green (5 files). NEXT: full bun run
 check, commit/tag v0.0.66, review round 3 on the delta; release still
 blocked on #265 key rotation only.
 
+Iteration 61 (BUILD, release 2, 2026-09-05): review ROUND 3
+(.artifacts/review/r2-14/report3.md) — rounds 1-2 confirmed resolved; 3
+new findings (1 P1 + 2 P2), all verified real and FIXED in 717acb1+
+(this iteration's commit): (1) the same-run gate suppressed the
+cross-run duplicate check whenever ANY artifact row existed, but the
+rows may come from a DIFFERENT archive (crashed inventory of A, retry
+with B) — listArtifactRows now returns checksum, and after reading the
+new archive's contents every same-run row must match (name present +
+recorded checksum equals current bytes; drafts with null checksum pass)
+or the action refuses loudly ("different archive … start a new import
+run"), so two archives' rows can never mix; proof leg: same name,
+different bytes → rejects. (2) paginate numItems is a TARGET not a scan
+bound (guidelines: reactive pagination + filtered rows still read) —
+countRunLinks pages now carry maximumRowsRead: 1000 (hard cap, partial
+page continues via cursor). (3) a single oversized mergeCell ref
+overshot the byte budget (checked budget before push, not the ref's
+cost) — each range is now compared against the REMAINING budget before
+it is taken; unit literals (from numFmt format codes) are truncated
+like raw values; proof leg: 300 KB ref stops the loop, flagged.
+Typecheck green (one Uint8Array<ArrayBuffer> annotation fix on the new
+proof helper — the known widening gotcha); 4-test inventory proof +
+provenance proof green. NEXT: full check, commit/tag v0.0.67, review
+round 4. Release still blocked on #265 key rotation only.
+
 ## Recommended SLC release 2: Every source record accounted for
 
 **Scope.** Finish the import lifecycle's accountability spine end to end.

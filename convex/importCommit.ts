@@ -245,7 +245,14 @@ export const countRunLinks = internalQuery({
           ),
         ),
       )
-      .paginate({ numItems: 500, cursor: args.cursor ?? null });
+      .paginate({
+        numItems: 500,
+        cursor: args.cursor ?? null,
+        // numItems is a target, not a scan bound (reactive pagination +
+        // filtered-out rows still read) — maximumRowsRead is the hard cap;
+        // a partial page just continues via the cursor.
+        maximumRowsRead: 1000,
+      });
     return {
       count: page.page.length,
       isDone: page.isDone,

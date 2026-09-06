@@ -80,13 +80,19 @@ function truncateText(text: string): { text: string; truncated: boolean } {
 /** Cell evidence for persistence; undefined optional fields drop in JSON. */
 function provenanceCell(cell: XlsxTypedCell): ProvenanceCell {
   const raw = truncateText(cell.raw);
+  // unit comes from the cell's own numFmt literal — adversarially long
+  // format codes must not ride through unbounded (review round 3).
+  const unit =
+    cell.unit !== null && cell.unit.length > PROVENANCE_VALUE_CHARS
+      ? truncateText(cell.unit)
+      : null;
   const record: ProvenanceCell = {
     ref: cell.ref,
     raw: raw.text,
     outcome: cell.outcome,
-    unit: cell.unit,
+    unit: unit?.text ?? cell.unit,
   };
-  if (raw.truncated) record.truncated = true;
+  if (raw.truncated || unit?.truncated) record.truncated = true;
   if (cell.value !== undefined) {
     // Typed values stay typed (dates as strings, numbers as numbers) —
     // only an over-long representation degrades to a marked string.
@@ -127,15 +133,18 @@ export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
   let rangesTruncated = false;
   const sheets = workbook.sheets.map((sheet) => {
     // Merge ranges are charged to the same budget as cells (review round 2:
-    // a merge-heavy sheet must not bypass the document bound).
+    // a merge-heavy sheet must not bypass the document bound). Each range is
+    // checked against the REMAINING budget before it is taken (review round
+    // 3): a single oversized ref must stop the loop, never overshoot.
     const mergedRanges: string[] = [];
     for (const range of sheet.mergedRanges) {
-      if (mergedRanges.length >= PROVENANCE_RANGE_CAP || budget <= 0) {
+      const cost = range.length + 3;
+      if (mergedRanges.length >= PROVENANCE_RANGE_CAP || budget < cost) {
         rangesTruncated = true;
         break;
       }
       mergedRanges.push(range);
-      budget -= range.length + 3;
+      budget -= cost;
     }
     const cells: ProvenanceCell[] = [];
     for (const cell of sheet.cells) {

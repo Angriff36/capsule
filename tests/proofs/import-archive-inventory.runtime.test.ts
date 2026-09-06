@@ -528,4 +528,54 @@ describe("runtime proof: import archive inventory (AC-020)", () => {
     })) as { status: string };
     expect(committed.status).toBe("completed");
   });
+
+  it("a run holding artifacts from a different archive refuses new bytes", async () => {
+    const tenantId = "tenant-import-archive-mismatch";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "import-archive-mismatch-owner",
+      role: "owner",
+      tenantId,
+    });
+
+    const store = (bytes: Uint8Array<ArrayBuffer>) =>
+      owner.run(async (ctx) =>
+        (
+          ctx as unknown as {
+            storage: { store: (blob: Blob) => Promise<string> };
+          }
+        ).storage.store(new Blob([bytes])),
+      );
+
+    // Archive A: one workbook, inventoried cleanly.
+    const nameA = reportNames[0];
+    const archiveA = buildStoredZip([
+      { name: nameA, data: Array.from(workbookBytes(nameA)) },
+    ]);
+    const started = (await owner.mutation(api.importCoordinator.startImport, {
+      sourceSystem: "tpp_legacy",
+      datasetType: "events",
+    })) as { importRunId: string };
+    const importRunId = started.importRunId;
+    await asActions(owner).action(api.archiveInventory.inventoryArchive, {
+      importRunId,
+      storageId: (await store(archiveA)) as string,
+    });
+
+    // Archive B: the SAME entry name, different bytes — a different archive.
+    // The retry must refuse loudly, never mix rows or re-record linkage
+    // (review round 3).
+    const archiveB = buildStoredZip([
+      {
+        name: nameA,
+        data: Array.from(workbookBytes(reportNames[1])),
+      },
+    ]);
+    await expect(
+      asActions(owner).action(api.archiveInventory.inventoryArchive, {
+        importRunId,
+        storageId: (await store(archiveB)) as string,
+      }),
+    ).rejects.toThrow(/different archive/);
+  });
 });

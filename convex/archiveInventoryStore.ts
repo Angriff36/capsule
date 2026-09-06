@@ -61,10 +61,11 @@ export const stampArtifactCreated = internalMutation({
 });
 
 /**
- * Existing live artifact rows (id, name, createdAt) for a run — the re-run
- * skip/repair set. createdAt == null marks a draft the inventory action died
- * before finishing; the retry completes that row instead of skipping the
- * name forever.
+ * Existing live artifact rows (id, name, checksum, createdAt) for a run —
+ * the re-run skip/repair set. createdAt == null marks a draft the inventory
+ * action died before finishing; the retry completes that row instead of
+ * skipping the name forever. checksum lets the caller prove the rows belong
+ * to the archive it is holding before treating them as same-run state.
  */
 export const listArtifactRows = internalQuery({
   args: { importRunId: v.id("importRuns") },
@@ -78,6 +79,7 @@ export const listArtifactRows = internalQuery({
       .map((row) => ({
         id: row._id,
         name: row.name,
+        checksum: row.checksum ?? null,
         createdAt: row.createdAt ?? null,
       }));
   },
