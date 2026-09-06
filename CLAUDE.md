@@ -152,8 +152,7 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-Progress: capsule-ralph ralph/wiggum-loop iteration 99 (2026-09-05) — R2-14 re-verified, still blocked on owner key rotation (issue #265, OPEN, zero comments, updatedAt unchanged since 2026-09-03). Fresh live-env precheck with full build-gate flags (--environment production, --require VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY, --expected-deployment impartial-mule-193, --env-file + --no-env-files): same 2 blockers only (pk_test_* publishable key, unrecognized secret key); no expected-deployment finding (frontend correctly on impartial-mule-193). Temp env file deleted (zero remain); redacted JSON at .artifacts/release/precheck265.json. Preview verified 7812 serving this checkout (exit 0). Docs-only commit 024fc67 pushed; no new tag. All 11 release-2 ACs PASS, review APPROVED (report6.md), tags through v0.0.70.
-Open: owner rotates production Clerk keys → re-run precheck (zero blockers) → CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app bash scripts/release.sh --reviewer gpt-5.6-sol. AC-006/AC-013 J-halves need a session with ANTHROPIC_API_KEY (evidence gaps, not gates).
+capsule-ralph ralph/wiggum-loop, iteration 118 (2026-09-05): R2-14 (ship) still blocked on owner action — issue #265 open (0 comments, unchanged since 2026-09-03), production Clerk keys still pk_test_*/unrecognized (precheck .artifacts/release/precheck265.json, 2 blockers only, full build-gate flags). origin/main 279f6a3 ancestor, branch pushed at 91b9c8a. All 11 release-2 ACs PASS; review APPROVED (report6.md). Unblock: rotate keys in Vercel + Clerk, re-run precheck (zero blockers), then CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app bash scripts/release.sh --reviewer gpt-5.6-sol. Open: AC-006/AC-013 J-halves need ANTHROPIC_API_KEY session.
 
 # === END COGNILAYER ===
 
