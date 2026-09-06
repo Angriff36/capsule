@@ -152,7 +152,7 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-Progress: capsule-ralph ralph/wiggum-loop iteration 95 (2026-09-05) — R2-14 re-verified, still blocked on owner key rotation (issue #265, OPEN, zero comments). Fresh live-env precheck with full build-gate flags: same 2 blockers only (pk_test_* publishable key, unrecognized secret key). Preview verified 7812. Docs-only commit 4853f9e pushed; no new tag (docs-only precedent). All 11 release-2 ACs PASS, review APPROVED (report6.md), tags through v0.0.70.
+Progress: capsule-ralph ralph/wiggum-loop iteration 97 (2026-09-05) — R2-14 re-verified, still blocked on owner key rotation (issue #265, OPEN, zero comments). Fresh live-env precheck with full build-gate flags: same 2 blockers only (pk_test_* publishable key, unrecognized secret key); no expected-deployment finding (frontend correctly on impartial-mule-193). Preview verified 7812. Docs-only commit 65ebdf0 pushed; no new tag. All 11 release-2 ACs PASS, review APPROVED (report6.md), tags through v0.0.70.
 Open: owner rotates production Clerk keys → re-run precheck (zero blockers) → CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app bash scripts/release.sh --reviewer gpt-5.6-sol. AC-006/AC-013 J-halves need a session with ANTHROPIC_API_KEY (evidence gaps, not gates).
 
 # === END COGNILAYER ===
