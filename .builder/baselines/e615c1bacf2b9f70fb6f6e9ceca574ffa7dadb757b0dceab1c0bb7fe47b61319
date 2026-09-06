@@ -3837,7 +3837,7 @@ async function __runComponentImportComplete(ctx: MutationCtx, { docId, version }
     if (!((doc.finalizationStartedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.resultingComponentId != null))) throw new Error("Guard 2 failed");
     if (!(((__rel_resultingComponent != null) && (__rel_resultingComponent.deletedAt == null)))) throw new Error("Guard 3 failed");
-    if (!((((((doc.lines) ?? []).filter((line: Record<string, any>) => (((line.matchedIngredientId != null) && (((line.matchedIngredient == null) || (line.matchedIngredient.deletedAt != null)) || (line.matchedIngredient.tenantId !== doc.tenantId)))))) ?? []).length === 0))) throw new Error("Guard 4 failed");
+    if (!((((((doc.lines) ?? []).filter((line: Record<string, any>) => (((line.matchedIngredientId != null) && ((line.matchedIngredient == null) || (line.matchedIngredient.deletedAt != null)))))) ?? []).length === 0))) throw new Error("Guard 4 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 5 failed");
     {
       const __cur = doc.status;
