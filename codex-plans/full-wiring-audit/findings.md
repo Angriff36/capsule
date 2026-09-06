@@ -87,3 +87,7 @@ Proposal integration architecture trace: current fields already persist terms/no
 Tooling note: Prettier emits no output for planning Markdown because .prettierignore ignores *.md/*.mdx. --file-info confirms ignored:true. This was not evidence of an executable failure; no ignore settings changed.
 
 Yield acceptance interpretation: new completed yields must be operator-entered and persisted. Existing rows lack measured/autofilled provenance, so the report must disclose historical uncertainty rather than claim those old values became real because the input bug was fixed. No historical quantity is overwritten or fabricated by this audit.
+
+Expanded generated-call scan to authored src/ui and src/lib as well as features/app: 656 TS/TSX files, same 335 direct calls, zero missing docId at 2514043. Nine dynamic/adaptor paths remain manually verified. No additional hook pass-throughs appeared in ui/lib.
+
+Task2 review found application-month filter using creation time despite canonical appliedAt. Root also found missing-person allocations omitted from totals but present in detail rows as Unknown salesperson. Both have been sent to the Task2 implementer with regression requirements before acceptance.

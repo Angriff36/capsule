@@ -307,3 +307,11 @@
 - Proposal publication and contract/invoice manual sent-recording labels no longer imply provider delivery. Real invoice reminders preserved.
 - Commits: a7b5b98, 407b5c4. Independent task reviewer gpt-5.6-terra approved after one fix round.
 - Verification: `bun run test` at a7b5b98: 141 files / 1303 tests pass. `bun run test tests/features/sales/message-inbox-delivery.test.ts tests/delivery-honesty.test.ts` at 407b5c4: 10 pass; `bun run typecheck` passes. Existing Vitest/React Router warnings remain. Global contract scanner: 335 direct calls, zero missing docId, nine adapters inspected.
+
+## 2026-09-06: Measured yields and factual financial/route labels
+
+- KDS records entered actual yield (including zero) and retains it on failure; historical report provenance caveated without rewriting records.
+- Route distances/times disclose straight-line/40 km/h/missing-leg/local-order assumptions. Vendor receipt timing names purchasing-week basis. Revenue prefill names quote/budget estimate.
+- Comp Master uses applied sales_commission allocations directly, actual appliedAt for calendar periods, no fabricated payouts/3% conversion, and retains allocations when Person records are missing.
+- Commits2514043 and9093eed; independent gpt-5.6-terra task review approved after one fix round.
+- Verification: full `bun run test`144 files/1314 tests; fix `bunx vitest run tests/features/factual-values.test.ts tests/features/production/kitchen-display-yield.test.ts --reporter verbose`7 tests; `bun run typecheck`passes. Existing warning baseline remains; raw fix log .artifacts/task-2-fix-tests.log.

@@ -8,8 +8,8 @@ Architecture: preserve Manifest ownership and existing UI design; fix authored c
 
 ## Phases
 
-- [ ] Inventory route families and authored command calls; combine three independent read-only audits with root's global contract/stub scan.
-- [ ] Turn every confirmed finding into a concrete fix task below and record inspected/untested areas in findings.md.
+- [x] Inventory route families and authored command calls; combine three independent read-only audits with root's global contract/stub scan.
+- [x] Turn every confirmed finding into a concrete fix task below and record inspected/untested areas in findings.md.
 - [ ] Implement scoped fixes with focused failing regressions, then verify persistence/error/retry behavior.
 - [ ] Run repository gates and independent cross-model review; fix review findings.
 - [ ] Commit/push the work branch; update spec/acceptance evidence and report deployment separately.
@@ -17,12 +17,12 @@ Architecture: preserve Manifest ownership and existing UI design; fix authored c
 ## Initial repair tasks (verify owners before implementation)
 
 - [x] W01: Proposal template save/archive/publish calls use generated docId contract; 335 direct calls plus enumerated adapters checked with no remaining missing docId.
-- [ ] W02: Batch completion captures actual completed yield and persists it; no planned-yield substitution.
+- [x] W02: Batch completion captures actual completed yield; zero and failure retention covered. Historical uncertainty disclosed.
 - [x] W03: Inbox outbound replies have explicit cannot-send/provider guidance and Copy draft, including honest legacy queued records; interaction tests and independent review pass.
 - [ ] W04: Pack/layout template operations expose partial results with a safe finish path, or use existing atomic command.
-- [ ] W05: Route/projection estimates disclose assumptions; no invented facts.
+- [x] W05: Route/projection estimates disclose assumptions; Task2 corrects commission totals/status/date basis and revenue/vendor labels with independent review.
 - [ ] W06: Audit remaining reachable placeholders/stubs and add confirmed repairs without dropping them into unrelated future releases.
-- [ ] W07: Verify generator seed blocker #113 with proof; do not hand-edit generated seed.
+- [x] W07: Generator seed blocker #113 refreshed with source proof; no generated edit or live seed run.
 
 ## Constraints and evidence
 
@@ -82,6 +82,8 @@ Provide template selection on new proposal. Snapshot template defaults into draf
 Verified existing interface: src/lib/pricing.ts already supports percentage pricing lines against the non-percentage base subtotal, and includes those fee amounts in subtotal. Reuse this central percentage-line path for an explicit service-charge line rather than introducing a competing fee calculation or changing the total invariant. Template rates are fractions 0..1; pricing percentage unitPrice is 0..100. Preserve the basis and make tax default calculation/override clear; do not silently treat the template rate as a currency amount.
 
 Implementation map from read-only architecture trace: the strictly necessary new persisted field is optional Proposal.visibleSections, forwarded through draft and revision JSON. Existing terms/notes/expiresAt/taxAmount and fee lines already persist. Default tax becomes an editable currency amount at creation; clearly explain that saved tax is fixed, and stop auto-updating when the operator manually edits it. Do not add an unused persisted tax-rate field. Absent/empty section lists retain manager's existing All sections compatibility. SharedProposalPage currently omits snapshotted dish selections, timeline and expiry; project real data through shareLinks.ts and snapshot timeline in proposalRevision.ts where needed. PDF export currently enriches from live data: use immutable revision data for published proposals, explicit legacy fallback without snapshots, live data for drafts. Render actual notes as notes rather than pretending they are a menu. Inspect signing's ProposalAcceptancePage/signatureAcceptance projection too; presentation CTA visibility must not disable the actual signing control. Test draft -> persistence -> publication snapshot -> shared/PDF output, then template changes do not change frozen output.
+
+Client projection privacy remains binding: timeline snapshot/render should use client-facing activity identity/times, not private site/staff notes, assignments or internal costs. Do not expand public sharing to raw operational documents merely to fill a visible section.
 
 ### Task 8: Global reconciliation and verification
 
