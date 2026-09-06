@@ -119,6 +119,8 @@ describe("proposal public renderers", () => {
   });
 
   it("renders timeline start and end times with date context", async () => {
+    const startsAt = new Date(2026, 8, 20, 18).getTime();
+    const endsAt = new Date(2026, 8, 20, 21, 30).getTime();
     queryResult = {
       ok: true,
       proposal: {
@@ -146,8 +148,8 @@ describe("proposal public renderers", () => {
       timeline: [
         {
           name: "Dinner service",
-          startsAt: Date.UTC(2026, 8, 20, 18),
-          endsAt: Date.UTC(2026, 8, 20, 21, 30),
+          startsAt,
+          endsAt,
         },
       ],
       revisionNumber: 1,
@@ -159,8 +161,6 @@ describe("proposal public renderers", () => {
       createElement(SharedProposalPage, { token: "token" }),
     );
     expect(text).toContain("Dinner service");
-    const startsAt = Date.UTC(2026, 8, 20, 18);
-    const endsAt = Date.UTC(2026, 8, 20, 21, 30);
     expect(text).toContain(
       `${formatDate(startsAt)} at ${formatTime(startsAt)} – ${formatTime(endsAt)}`,
     );

@@ -205,6 +205,9 @@ describe("ProposalCreateForm template state", () => {
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 650));
     });
+    const beforeUnload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(beforeUnload);
+    expect(beforeUnload.defaultPrevented).toBe(true);
     const restore = Array.from(container.querySelectorAll("button")).find(
       (button) => button.textContent === "Restore",
     )!;

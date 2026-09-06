@@ -71,10 +71,11 @@ export function useFormDraft(key: string) {
   }, [form, storageKey]);
 
   const schedulePersist = useCallback(() => {
-    // Never replace a recoverable draft before the operator chooses Restore or
-    // Discard. This also makes explicit controlled-state scheduling safe on mount.
-    if (!form || offeredDraft.current) return;
+    if (!form) return;
     arm();
+    // Never replace a recoverable draft before the operator chooses Restore or
+    // Discard. New edits still arm unload protection while that choice is open.
+    if (offeredDraft.current) return;
     clearTimeout(timer.current);
     timer.current = setTimeout(persist, SAVE_DEBOUNCE_MS);
   }, [form, arm, persist]);
