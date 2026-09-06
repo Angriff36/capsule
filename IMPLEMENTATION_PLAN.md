@@ -5,6 +5,32 @@
 
 # Implementation plan — capsule
 
+## Current release status — 2026-09-06 UTC
+
+Release 2 is deployed as `9eccdbc4d2467525cc65ba07a95cf80bded522b5` at
+https://capsule-tau-eight.vercel.app (Vercel `dpl_ENs1NnD2e8oWaT92cg42zjUm3trb`,
+READY, exact SHA and canonical alias verified through the deployment API).
+The merged-tree check passed: 140 files / 1298 tests; independent
+gpt-5.6-sol review APPROVE. Build logs confirm Convex deployment and new
+importArtifacts indexes. Authenticated production import-run and new
+ImportArtifact queries passed. Browser UX and a new full archive import were
+not exercised during this deployment verification.
+
+Owner approved retaining development Clerk authentication. The explicit
+VITE_CLERK_ALLOW_DEVELOPMENT_AUTH=true setting downgrades only that finding;
+invalid keys and service/instance mismatches still block. The secret-key
+warning was an exported-newline parsing defect, fixed and verified against
+Clerk (HTTP 200); no credentials or users were migrated. Historical #265
+retry notes below are superseded: do not retry key rotation as a release blocker.
+
+The automatic receipt remains partial because Vercel CLI inspect omits SHA
+metadata and its API-key probe lacked credentials. Independent deployment
+API, build logs, served frontend asset, and authenticated Convex evidence
+verified this release instead. Receipt tooling follow-up: GitHub issue #280.
+Evidence: C:/projects/capsule-release-20260905/.artifacts/r2-dev-auth-live-verification.md.
+Other PR01–PR14 requirements still need their subsequent gap plans; this is
+completion of release 2, not full production-readiness certification.
+
 Scope notice (2026-09-05, release 2 planned): release 2, "Every source
 record accounted for", is planned below — tasks R2-1 … R2-14, acceptance
 contract AC-020 … AC-030 in `ACCEPTANCE_TESTS.md`. Everything from "Plan
@@ -3563,7 +3589,7 @@ build iteration.
       release): extend `tests/proofs/proposal-event-booking.runtime.test.ts`
       or add a focused runtime test asserting the branded revision/PDF
       carries the tenant's real name.
-- [ ] **R2-14. Release proof bundle + ship.** All new proofs green under
+- [x] **R2-14. Release proof bundle + ship.** Released 2026-09-06 UTC; see current release status above, including automatic-receipt limitation (#280). All new proofs green under
       `tests/proofs/`; full gates (`bun run test`, typecheck,
       `format:check`, `bunx vite build`, manifest-regen-check);
       cross-model review; `bash scripts/release.sh --reviewer <model>`
