@@ -71,6 +71,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   const templates = useListVenueLayoutTemplate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [recoveryNotice, setRecoveryNotice] = useState<string | null>(null);
   const [copyTemplateId, setCopyTemplateId] = useState<string>("");
 
   const eventSections = useMemo(
@@ -127,6 +128,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
+    setRecoveryNotice(null);
     setBusy(key);
     try {
       await work();
@@ -185,12 +187,17 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
           instructions: section.instructions ?? "",
         })),
       });
-      await applyLayoutTemplate({
+      const result = await applyLayoutTemplate({
         ...pending.payload,
         operationKey: pending.key,
       });
       confirmPendingOperation(scope);
       setCopyTemplateId("");
+      if (result.recovered) {
+        setRecoveryNotice(
+          `${result.sectionCount} saved template sections were recovered; no duplicate sections were added.`,
+        );
+      }
     });
   };
 
@@ -258,6 +265,11 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
         </section>
 
         {failure ? <FailureBanner failure={failure} /> : null}
+        {recoveryNotice ? (
+          <p className="text-sm text-ok" role="status">
+            {recoveryNotice}
+          </p>
+        ) : null}
 
         {/* Preset suggestions for every area-name input below. The stored value
             is a free string, so “Main Bar” and “Patio Bar” are both valid. */}

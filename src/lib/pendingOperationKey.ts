@@ -14,7 +14,9 @@ export function beginPendingOperation<T>(
   const randomUUID = deps.randomUUID ?? (() => crypto.randomUUID());
   const inMemory = volatile.get(scope) as Pending<T> | undefined;
   if (inMemory) return inMemory;
-  if (!confirmed.has(scope)) {
+  const wasConfirmed = confirmed.has(scope);
+  let storageAvailable = true;
+  if (!wasConfirmed) {
     try {
       const raw = storage.getItem(storageKey(scope));
       if (raw) {
@@ -25,16 +27,28 @@ export function beginPendingOperation<T>(
         }
       }
     } catch {
+      storageAvailable = false;
       // Storage is navigation recovery, never a gate on submitting work.
     }
   }
   confirmed.delete(scope);
-  const pending = { key: `${scope}:${randomUUID()}`, payload };
+  let pending = {
+    key: storageAvailable
+      ? `${scope}:${randomUUID()}`
+      : `${scope}:storage-unavailable`,
+    payload,
+  };
   volatile.set(scope, pending);
   try {
     storage.setItem(storageKey(scope), JSON.stringify(pending));
   } catch {
-    // This tab can still retry safely from the frozen in-memory request.
+    pending = {
+      key: wasConfirmed
+        ? `${scope}:${randomUUID()}`
+        : `${scope}:storage-unavailable`,
+      payload,
+    };
+    volatile.set(scope, pending);
   }
   return pending;
 }

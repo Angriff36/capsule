@@ -73,7 +73,7 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
           const created = await materializeDraft({
             ...pending.payload,
             operationKey: pending.key,
-          });
+          } as never);
           confirmPendingOperation(scope);
           return created;
         },
@@ -93,6 +93,7 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
         orders: (orders ?? []).map((row) => ({
           id: row._id,
           eventId: row.eventId,
+          vendorId: row.vendorId,
           status: String(row.status),
           deletedAt: row.deletedAt,
         })),
@@ -117,9 +118,11 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
       }
       setOrderId(result.vendorOrderId);
       setNotice(
-        result.createdOrder
-          ? `Drafted a PO with ${result.lineCount} line${result.lineCount === 1 ? "" : "s"} from this event's needs.`
-          : `Added ${result.lineCount} line${result.lineCount === 1 ? "" : "s"} to the existing draft PO.`,
+        result.recovered
+          ? `Recovered the already-saved draft PO with ${result.lineCount} line${result.lineCount === 1 ? "" : "s"}; no duplicate order or lines were added.`
+          : result.createdOrder
+            ? `Drafted a PO with ${result.lineCount} line${result.lineCount === 1 ? "" : "s"} from this event's needs.`
+            : `Added ${result.lineCount} line${result.lineCount === 1 ? "" : "s"} to the existing draft PO.`,
       );
     } catch (cause) {
       setError(

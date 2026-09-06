@@ -248,14 +248,16 @@ export function PackListDetailPage() {
         packListId: packList._id,
         items: lines,
       });
-      await applyPackTemplate({
+      const result = await applyPackTemplate({
         ...pending.payload,
         operationKey: pending.key,
       });
       confirmPendingOperation(scope);
       setShowTemplates(false);
       setNotice(
-        `${lines.length} ${lines.length === 1 ? "item" : "items"} generated from "${template.name}".`,
+        result.recovered
+          ? `${result.itemCount} ${result.itemCount === 1 ? "item was" : "items were"} already saved from "${template.name}"; the earlier result was recovered.`
+          : `${pending.payload.items.length} ${pending.payload.items.length === 1 ? "item" : "items"} generated from "${template.name}".`,
       );
     });
   };

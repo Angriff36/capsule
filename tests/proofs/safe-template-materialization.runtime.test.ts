@@ -127,7 +127,7 @@ describe("runtime proof: safe template materialization", () => {
       storage,
       randomUUID: () => "one",
     });
-    await proof.executeCommand(
+    const firstResult = await proof.executeCommand(
       logistics,
       (api.lib as any).safeMaterialization.applyPackTemplate,
       { ...first.payload, operationKey: first.key },
@@ -144,16 +144,33 @@ describe("runtime proof: safe template materialization", () => {
       randomUUID: () => "two",
     });
     expect(retry.payload).toEqual(original);
-    await proof.executeCommand(
+    const retryResult = await proof.executeCommand(
       logistics,
       (api.lib as any).safeMaterialization.applyPackTemplate,
       { ...retry.payload, operationKey: retry.key },
     );
+    expect(firstResult).toEqual({ itemCount: 2, recovered: false });
+    expect(retryResult).toEqual({ itemCount: 2, recovered: true });
+    const secondResult = await proof.executeCommand(
+      logistics,
+      (api.lib as any).safeMaterialization.applyPackTemplate,
+      { ...original, operationKey: "runtime-pack:two" },
+    );
+    expect(secondResult).toEqual({ itemCount: 2, recovered: false });
+    const afterAmbiguousRefresh = await proof.executeCommand(
+      logistics,
+      (api.lib as any).safeMaterialization.applyPackTemplate,
+      {
+        ...changed,
+        operationKey: "runtime-pack:storage-unavailable",
+      },
+    );
+    expect(afterAmbiguousRefresh).toEqual({ itemCount: 2, recovered: true });
     const rows = (await logistics.query(
       api.queries.listPackListItem,
       {},
     )) as unknown[];
-    expect(rows).toHaveLength(2);
+    expect(rows).toHaveLength(4);
   });
 
   it("rejects foreign-tenant parents before replaying generated idempotency keys", async () => {
@@ -264,6 +281,38 @@ describe("runtime proof: safe template materialization", () => {
       {},
     )) as unknown[];
     expect(rows).toHaveLength(2);
+  });
+
+  it("rejects a same-tenant id from the wrong parent table at validation", async () => {
+    const proof = harness();
+    const tenantId = "tenant-wrong-table";
+    const sales = proof.asRole({
+      subject: "wrong-table-sales",
+      role: "sales_manager",
+      tenantId,
+    });
+    const events = proof.asRole({
+      subject: "wrong-table-events",
+      role: "event_manager",
+      tenantId,
+    });
+    const client = (await proof.executeCommand(
+      sales,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Not an event" },
+    )) as { docId: string };
+    await expect(
+      proof.executeCommand(
+        events,
+        (api.lib as any).safeMaterialization.applyLayoutTemplate,
+        {
+          eventId: client.docId,
+          operationKey: "wrong-table",
+          baseSortOrder: 0,
+          sections: [{ type: "Bar" }],
+        },
+      ),
+    ).rejects.toThrow(/Validator/);
   });
 
   it("rolls back a draft order and its first line when a later line rejects", async () => {

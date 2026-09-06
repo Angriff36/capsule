@@ -14,6 +14,7 @@ export type EventDraftDemand = SoftDelete & {
 export type EventDraftOrder = SoftDelete & {
   id: string;
   eventId?: string | null;
+  vendorId?: string | null;
   status: string;
 };
 
@@ -36,6 +37,7 @@ export type EventDraftPoOk = {
   vendorOrderId: string;
   lineCount: number;
   createdOrder: boolean;
+  recovered?: boolean;
 };
 
 export type EventDraftPoFail = {
@@ -70,7 +72,11 @@ export type EventDraftPoPorts = {
       unit: string;
       unitCost: number;
     }>;
-  }) => Promise<{ vendorOrderId: string }>;
+  }) => Promise<{
+    vendorOrderId: string;
+    recovered?: boolean;
+    lineCount?: number;
+  }>;
 };
 
 export type EventDraftPoInput = {
@@ -176,7 +182,7 @@ export class EventDraftPoCoordinator {
     if (this.ports.materialize) {
       const result = await this.ports.materialize({
         eventId: input.eventId,
-        vendorId: input.vendorId,
+        vendorId: existing?.vendorId ?? input.vendorId,
         existingOrderId: existing?.id,
         lines: plannedLines,
       });
@@ -185,6 +191,7 @@ export class EventDraftPoCoordinator {
         vendorOrderId: result.vendorOrderId,
         lineCount: plannedLines.length,
         createdOrder: existing == null,
+        recovered: result.recovered,
       };
     }
 

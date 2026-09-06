@@ -44,18 +44,21 @@ describe("pending operation payload", () => {
         throw new Error("blocked");
       },
     };
-    expect(() =>
-      beginPendingOperation("pack:2", payloadA, {
-        storage,
-        randomUUID: () => "fallback",
-      }),
-    ).not.toThrow();
+    const first = beginPendingOperation("pack:2", payloadA, {
+      storage,
+      randomUUID: () => "fallback",
+    });
+    expect(first.key).toBe("pack:2:storage-unavailable");
+    resetPendingOperationsForTest();
+    expect(beginPendingOperation("pack:2", payloadB, { storage }).key).toBe(
+      first.key,
+    );
     expect(
       beginPendingOperation("pack:2", payloadB, {
         storage,
         randomUUID: () => "unused",
       }).payload,
-    ).toEqual(payloadA);
+    ).toEqual(payloadB);
   });
 
   it("does not turn confirmed backend success into failure when cleanup throws", () => {
@@ -72,5 +75,11 @@ describe("pending operation payload", () => {
       randomUUID: () => "new",
     });
     expect(next).toEqual({ key: "pack:3:new", payload: payloadB });
+    resetPendingOperationsForTest();
+    const afterRefresh = beginPendingOperation("pack:3", payloadB, {
+      storage,
+      randomUUID: () => "ignored",
+    });
+    expect(afterRefresh).toEqual({ key: "old", payload: payloadA });
   });
 });
