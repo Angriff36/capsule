@@ -335,3 +335,8 @@
 - Atomic stock issuance rolls back consumption if demand reconciliation fails; receipts recover actual output without consuming twice. Timeline reorder rolls back all adjustments if a later row is stale.
 - Menu materialization uses atomic parent receipts, retains newly requested lines after recovery, and presents saved/stock phases with stock-only retry. Attempt identities prevent overlapping sync and stale completion; authoritative demand versions establish readiness.
 - Bulk failures preserve original cause and completed/unfinished rows so successful prefixes are not repeated. Commitsf0af99a,fe98972,747f683,36be772; independent gpt-6-astra approved after two fix rounds. Final9focusedtests/types/3guards pass; full checkpoint1346tests passed before review fixes. Private receipt storage remains tracked Task7/AC041; nothing deployed.
+
+## 2026-09-06: Shared failure workflows
+
+- Attachment removal awaits errors and tracks pending state per row. Personal saved-view defaults are atomic and current-person scoped. Outreach ensure-open reuses governed visible rows, respects denied roles, and permits new reminders after dismissal/completion.
+- Mounted revenue apply proof preserves entered amount/provenance across reactive event updates. Commits4c42c56,c8f1e6d independently approved by gpt-6-astra after one fix round;9focusedtests/typecheck pass. Full pre-review-fix checkpoint1353tests passed. Mounted personal-view projection coverage remains noted for final review; no deployment claim.
