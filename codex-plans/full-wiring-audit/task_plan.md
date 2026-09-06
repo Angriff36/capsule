@@ -30,7 +30,7 @@ Base 9eccdbc (deployed R2). Work branch fix/full-wiring-audit-20260906 in isolat
 
 ## Errors
 
-None in task execution; long combined instruction reads were truncated and are being read in smaller chunks before relying on them.
+Long combined instruction reads were truncated and are being read in smaller chunks before relying on them. Early full check at addd337 passed 145 files/1320 tests, coverage, types, formatting, secrets, integration guards and local build, then failed root-cap 71 > 70 because this task's temporary .superpowers workspace adds one root. Do not weaken the cap: preserve durable report evidence under the existing plan directory, untrack the mistakenly force-added Task2 scratch report, and remove only this plan's temporary workspace at final cleanup. Verify the parent is empty before removing it; never remove another plan's artifacts.
 
 ## Global Constraints
 
@@ -62,6 +62,8 @@ Read-only architecture map: prefer a focused authored culinary mutation module u
 
 Snapshot fidelity also needs repair: preserve prepNotes and backward-compatible sortOrder/wasteFactor fields (currently omitted/ignored); generated adjustQuantity cannot set all metadata, so use supported generated operations or atomic remove/re-add as needed. Old snapshots remain restorable. Capture-before remains best-effort with a visible warning, not a new blocker. Existing fixtures: tests/proofs/component-import-finalize.runtime.test.ts, component-text-parser.test.ts, quote-to-booked-event.runtime.test.ts. Test actual rollback, same-operation retry, wrong-tenant references, snapshot/component mismatch and exact restored metadata.
 
+Task3 review lesson: generated cache is globally keyed and checked before generated auth. New public seams must authenticate before replay and tenant-scope deterministic keys. Mutable source projections cannot be rebuilt against positional child keys after an ambiguous commit: freeze the durable pending operation or persist a whole-operation receipt before processing changed input. A browser storage cleanup exception after commit must not convert confirmed success into a reported backend failure. Reuse the reviewed Task3 helper where compatible.
+
 ### Task 5: Safe operational bulk and event operations
 
 Own KitchenDashboardPage.tsx, KitchenPrepAssignManager.ts and its consumers, EventMenuTab.tsx, EventTimelinePanel.tsx plus focused tests/helpers.
@@ -71,6 +73,8 @@ Confirmed sibling to own: EventStockIssueCoordinator.ts + EventInventoryPanel.ts
 
 Shared owner: src/ui/bulk-select.tsx useBulkRun also clears successful-prefix progress on failure for invoice/pack/purchasing callers. Surface completed/failed/remaining context through a reusable failure mechanism and preserve original denial/guard/conflict classification in CommandFailure.ts. Do not leave progress non-null after failure (would disable retry controls). Reuse this mechanism for compatible custom loops, with focused shared/helper tests and existing consumer tests.
 
+Read-only trace: stock seam should load reservation/demand server-side, validate same tenant/event/ingredient, call generated consume then needed confirm/fulfill atomically, and reread actual demand version after confirm rather than assuming +2. Preserve intersection of generated inventory/event-management and demand permissions. Timeline seam validates complete row set against event/tenant and uses generated adjust with supplied versions; stale later row rolls all back. Event menu stock sync must wait for reactive saved EventDish/demand rows: current refreshStock closes over stale controller demand snapshots, so immediate post-create sync can miss new demands. Make saved-lines and retry-stock-sync phases explicit. Shared BulkRunFailure should carry cause and counts; classifier unwraps cause before preserving category/title/action and adding counts. Existing invoice/pack/purchasing selection already clears only after complete success; retain or remove confirmed IDs appropriately.
+
 ### Task 6: Shared failure handling
 
 Own AttachmentsSection.tsx and useSavedViews.ts plus focused tests/helpers.
@@ -79,6 +83,8 @@ Await attachment removal, catch into existing visible failure state, and disable
 Additional bulk owner: ClientRetentionPage.tsx opening outreach tasks. Ensure retries do not duplicate open tasks after ambiguous commits (atomic ensure-open seam or stable generated idempotency keys), preserve ability to open a later task after prior task dismissal/completion, and show completed/remaining bulk counts. Preserve current uncovered-candidate filtering.
 
 Verify shared form-retention candidate: RevenueAttributionDetailPage apply-amount effect depends on reactive event and can overwrite operator edits when event data refreshes. Add a mounted regression changing the event query after editing; if reproduced, initialize per apply context without overwriting edited amount/provenance. This is separate from Task2's now-correct estimate labels and must preserve them.
+
+Saved views actually reuse owner-scoped SavedReportDefinition, chartType list-view, definition {pageKey,isDefault,state}. Prefer an authored atomic seam that loads the caller's current live defaults and target server-side, invokes existing create/update commands, and rolls back all changes on failure; do not introduce a competing SavedView entity. For outreach, ensure-open must return whether it created or reused a task, so single/bulk notices count actual creations accurately; preserve valid later outreach after complete/dismiss.
 
 ### Task 7: Connect proposal templates end to end
 
@@ -90,6 +96,8 @@ Verified existing interface: src/lib/pricing.ts already supports percentage pric
 Implementation map from read-only architecture trace: the strictly necessary new persisted field is optional Proposal.visibleSections, forwarded through draft and revision JSON. Existing terms/notes/expiresAt/taxAmount and fee lines already persist. Default tax becomes an editable currency amount at creation; clearly explain that saved tax is fixed, and stop auto-updating when the operator manually edits it. Do not add an unused persisted tax-rate field. Absent/empty section lists retain manager's existing All sections compatibility. SharedProposalPage currently omits snapshotted dish selections, timeline and expiry; project real data through shareLinks.ts and snapshot timeline in proposalRevision.ts where needed. PDF export currently enriches from live data: use immutable revision data for published proposals, explicit legacy fallback without snapshots, live data for drafts. Render actual notes as notes rather than pretending they are a menu. Inspect signing's ProposalAcceptancePage/signatureAcceptance projection too; presentation CTA visibility must not disable the actual signing control. Test draft -> persistence -> publication snapshot -> shared/PDF output, then template changes do not change frozen output.
 
 Client projection privacy remains binding: timeline snapshot/render should use client-facing activity identity/times, not private site/staff notes, assignments or internal costs. Do not expand public sharing to raw operational documents merely to fill a visible section.
+
+Preserve Task1 delivery honesty in the newly connected creation form: its existing success notice still says Send it when ready even though the action is publication/manual sharing. Use accurate publication/share wording here too.
 
 ### Task 8: Global reconciliation and verification
 
