@@ -16,13 +16,16 @@ export const ensureOpen = mutation({
     // The generated read and create commands use the same salesAccess policy.
     // Run the generated read before the reuse path so a cached/open result never
     // bypasses current authentication, role, or org-capability enforcement.
-    await ctx.runQuery(api.queries.listClientOutreachTask, {});
-    const existing = (
-      await ctx.db
-        .query("clientOutreachTasks")
-        .withIndex("by_clientId", (q) => q.eq("clientId", args.clientId))
-        .collect()
-    ).find((row) => row.tenantId === tenantId && row.status === "open");
+    const visible = await ctx.runQuery(
+      api.queries.listClientOutreachTask,
+      {},
+    );
+    const existing = visible.find(
+      (row) =>
+        row.tenantId === tenantId &&
+        row.clientId === args.clientId &&
+        row.status === "open",
+    );
     if (existing) return { taskId: existing._id, created: false };
     const created = await ctx.runMutation(
       api.mutations.ClientOutreachTask_createViaOpen,

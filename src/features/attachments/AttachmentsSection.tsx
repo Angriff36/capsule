@@ -42,7 +42,7 @@ export function AttachmentsSection({
   const removeAttachment = useAttachmentRemove();
   const fileInput = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
-  const [removingId, setRemovingId] = useState<string | null>(null);
+  const [removingIds, setRemovingIds] = useState<Set<string>>(() => new Set());
   const { error, setError } = useActionFailure();
 
   async function upload(file: File) {
@@ -74,15 +74,19 @@ export function AttachmentsSection({
   }
 
   async function remove(id: string, version: number) {
-    if (removingId) return;
-    setRemovingId(id);
+    if (removingIds.has(id)) return;
+    setRemovingIds((current) => new Set(current).add(id));
     setError(null);
     try {
       await removeAttachment({ docId: id, version });
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Removal failed");
     } finally {
-      setRemovingId(null);
+      setRemovingIds((current) => {
+        const next = new Set(current);
+        next.delete(id);
+        return next;
+      });
     }
   }
 
@@ -155,10 +159,10 @@ export function AttachmentsSection({
               <button
                 type="button"
                 className="btn btn-ghost"
-                disabled={removingId === row._id}
+                disabled={removingIds.has(row._id)}
                 onClick={() => void remove(row._id, row.version)}
               >
-                {removingId === row._id ? "Removing…" : "Remove"}
+                {removingIds.has(row._id) ? "Removing…" : "Remove"}
               </button>
             </li>
           ))}

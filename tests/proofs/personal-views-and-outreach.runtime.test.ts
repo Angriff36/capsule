@@ -158,4 +158,47 @@ describe("personal saved views and outreach", () => {
     expect(later.created).toBe(true);
     expect(later.taskId).not.toBe(first.taskId);
   });
+
+  it("does not leak or reuse an existing open task for a caller without sales access", async () => {
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner",
+      role: "owner",
+      tenantId: "tenant-denied",
+    });
+    const denied = proof.asRole({
+      subject: "cook",
+      role: "cook",
+      tenantId: "tenant-denied",
+    });
+    const clientId = await proof.seedEntity(owner, "clients", {
+      tenantId: "tenant-denied",
+      clientType: "company",
+      companyName: "Private client",
+      taxExempt: false,
+      paymentTermsDays: 0,
+      status: "active",
+      registeredAt: 1,
+      version: 1,
+    });
+    const existing = (await owner.mutation(api.lib.clientOutreach.ensureOpen, {
+      clientId,
+      reason: "Owner call",
+    })) as { taskId: string };
+    let thrown: unknown;
+    try {
+      await denied.mutation(api.lib.clientOutreach.ensureOpen, {
+        clientId,
+        reason: "Denied call",
+      });
+    } catch (error) {
+      thrown = error;
+    }
+    expect(thrown).toBeInstanceOf(Error);
+    expect(String(thrown)).not.toContain(existing.taskId);
+    const tasks = await owner.run(async (ctx) =>
+      ctx.db.query("clientOutreachTasks").collect(),
+    );
+    expect(tasks).toHaveLength(1);
+  });
 });

@@ -35,8 +35,9 @@ type ViewDefinition<S> = { pageKey: string; isDefault: boolean; state: S };
 
 /**
  * Per-user saved filter/sort/column combinations for one list page, persisted in
- * Convex. Reads are owner-scoped by the SavedReportDefinition read policy, so no
- * client-side owner filtering is required. Exactly one view may be the default.
+ * Convex. The generated report query also exposes manager-visible/shared rows,
+ * so this personal adapter filters to the current owner. Exactly one personal
+ * view may be the default.
  */
 export function useSavedViews<S>(
   pageKey: string,
