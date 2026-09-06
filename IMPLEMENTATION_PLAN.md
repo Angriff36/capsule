@@ -2383,10 +2383,10 @@ zero blockers), then
 bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
 record at .artifacts/review/r2-14/report6.md).
 
-Iteration 117 (BUILD, release 2, 2026-09-05): R2-14 re-verified, STILL
+Iteration 118 (BUILD, release 2, 2026-09-05): R2-14 re-verified, STILL
 BLOCKED on the owner action — no code change this iteration. Workspace:
 `origin/main` still 279f6a3 (fetched and confirmed an ancestor; nothing to
-integrate; branch pushed at 12c578a = HEAD). Issue #265 still OPEN, zero
+integrate; branch pushed at ea5d1e4 = HEAD). Issue #265 still OPEN, zero
 comments (updatedAt unchanged since 2026-09-03). Fresh precheck against
 the LIVE production env with the full production-build gate flags
 (--environment production, --require
@@ -2397,15 +2397,15 @@ impartial-mule-193, matching scripts/vercel-build.sh exactly, env fed via
 sk_test_*) and `clerk:dev_credential_in_production`
 (VITE_CLERK_PUBLISHABLE_KEY still pk_test_*) — no expected-deployment
 finding, so the production frontend IS pointed at impartial-mule-193 and
-the Clerk key class is the only defect. Temp env file deleted (trap,
-verified gone — zero temp files remain); redacted JSON refreshed at
-.artifacts/release/precheck265.json. Preview verified on 7812 serving
-this checkout (ralph-preview.ps1: "serves C:/projects/capsule-ralph",
-exit 0). ANTHROPIC_API_KEY unset again (no .env.local), so the AC-006/
-AC-013 J-halves stay evidence gaps. Docs-only commit, no new tag
-(iteration-46/65..116 precedent). Unblock path unchanged: rotate
-the keys per the checker's action text, re-run the precheck (must report
-zero blockers), then
+the Clerk key class is the only defect. Temp env file deleted on every
+exit path (trap, verified gone — zero temp env files remain); redacted
+JSON refreshed at .artifacts/release/precheck265.json. Preview verified
+on 7812 serving this checkout (ralph-preview.ps1: "serves
+C:/projects/capsule-ralph", exit 0). ANTHROPIC_API_KEY unset again (no
+.env.local), so the AC-006/AC-013 J-halves stay evidence gaps. Docs-only
+commit, no new tag (iteration-46/65..117 precedent). Unblock path
+unchanged: rotate the keys per the checker's action text, re-run the
+precheck (must report zero blockers), then
 `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
 bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
 record at .artifacts/review/r2-14/report6.md).
