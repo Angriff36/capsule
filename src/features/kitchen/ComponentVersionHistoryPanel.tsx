@@ -25,10 +25,7 @@ type Props = {
   readonly currentData: ComponentSnapshotData;
   readonly canRestore: boolean;
   readonly busy: boolean;
-  readonly onRestore: (
-    data: ComponentSnapshotData,
-    versionLabel: string,
-  ) => void;
+  readonly onRestore: (snapshotId: string, versionLabel: string) => void;
 };
 
 const CURRENT = "__current__";
@@ -124,7 +121,7 @@ export function ComponentVersionHistoryPanel({
                           confirmLabel: "Restore",
                         });
                         if (!confirmed) return;
-                        onRestore(data, `Edition ${row.versionNumber}`);
+                        onRestore(row._id, `Edition ${row.versionNumber}`);
                       })();
                     }}
                   >

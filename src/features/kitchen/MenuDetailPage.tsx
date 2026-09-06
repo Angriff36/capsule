@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
-  useCreateMenu,
-  useCreateMenuDish,
   useGetMenu,
   useListDish,
   useListDishComponent,
@@ -46,6 +44,11 @@ import { useTenantBranding } from "../admin/tenantBranding";
 import { downloadMenuPdf, type MenuPdfLayout } from "./menuPdf";
 import { deriveAllergenRows } from "./AllergenMatrixPage";
 import { useActionNotice } from "../../ui/action-result";
+import {
+  beginPendingOperation,
+  confirmPendingOperation,
+} from "../../lib/pendingOperationKey";
+import { useCloneMenuSafely } from "../../lib/safeCulinaryOperations";
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -68,8 +71,7 @@ export function MenuDetailPage() {
   const archive = useMenuArchive();
   const restore = useMenuRestore();
   const updateSellingPrice = useMenuDishUpdateSellingPrice();
-  const createMenu = useCreateMenu();
-  const createMenuDish = useCreateMenuDish();
+  const cloneMenu = useCloneMenuSafely();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -381,14 +383,18 @@ export function MenuDetailPage() {
                   if (!name) return;
                   setNotice(null);
                   await run("duplicate", async () => {
-                    const createdId = await duplicateMenu({
-                      source: menu,
-                      dishLines: selectedMenuDishes,
+                    const scope = `menu-clone:${menu._id}`;
+                    const pending = beginPendingOperation(scope, {
+                      sourceMenuId: menu._id,
                       name,
                       isTemplate,
-                      createMenu,
-                      createMenuDish,
                     });
+                    const createdId = await duplicateMenu({
+                      ...pending.payload,
+                      operationKey: pending.key,
+                      cloneMenu: (args) => cloneMenu(args as never),
+                    });
+                    confirmPendingOperation(scope);
                     navigate(menuPath(createdId));
                   });
                 })();

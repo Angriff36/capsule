@@ -45,6 +45,7 @@ import type * as lib_catalogUnitGrams from "../lib/catalogUnitGrams.js";
 import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
 import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
 import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
+import type * as lib_culinaryOperations from "../lib/culinaryOperations.js";
 import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
 import type * as lib_fdcNutrientMapper from "../lib/fdcNutrientMapper.js";
@@ -164,6 +165,7 @@ declare const fullApi: ApiFromModules<{
   "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
   "lib/clerkStaffAccount": typeof lib_clerkStaffAccount;
   "lib/clientPortalToken": typeof lib_clientPortalToken;
+  "lib/culinaryOperations": typeof lib_culinaryOperations;
   "lib/encryption": typeof lib_encryption;
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
   "lib/fdcNutrientMapper": typeof lib_fdcNutrientMapper;

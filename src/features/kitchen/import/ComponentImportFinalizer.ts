@@ -34,6 +34,10 @@ export interface CreateComponentIngredientInput {
 }
 
 export interface ComponentImportCommandPorts {
+  importComponent?: (input: {
+    operationKey: string;
+    projection: Record<string, unknown>;
+  }) => Promise<ComponentImportFinalizeResult>;
   createIngredient: (
     input: CreateIngredientInput,
   ) => Promise<{ docId: string }>;
@@ -57,6 +61,7 @@ export class ComponentImportFinalizer {
 
   async finalize(
     review: ComponentImportReviewState,
+    operationKey?: string,
   ): Promise<ComponentImportFinalizeResult> {
     const name = review.name.trim();
     if (!name) throw new Error("Component name is required");
@@ -72,10 +77,6 @@ export class ComponentImportFinalizer {
         `${unresolved} ingredient line${unresolved === 1 ? "" : "s"} still need review`,
       );
     }
-
-    const createdIngredientIds: string[] = [];
-    const ingredientIds: string[] = [];
-
     for (const line of review.lines) {
       if (line.quantity <= 0) {
         throw new Error(`Quantity must be positive for ${line.name}`);
@@ -83,6 +84,43 @@ export class ComponentImportFinalizer {
       if (!isLineResolved(line)) {
         throw new Error(`${line.name} is not resolved`);
       }
+    }
+
+    if (this.ports.importComponent && operationKey) {
+      return this.ports.importComponent({
+        operationKey,
+        projection: {
+          name,
+          yieldQuantity: review.yieldQuantity,
+          yieldUnit: review.yieldUnit,
+          batchMultiplier: review.batchMultiplier,
+          category: review.category?.trim() || undefined,
+          cuisine: review.cuisine?.trim() || undefined,
+          description: review.description?.trim() || undefined,
+          instructions: review.instructions?.trim() || undefined,
+          lines: review.lines.map((line, index) => ({
+            name: line.name.trim(),
+            ingredientId:
+              line.createNew || line.matchStatus === "confirmed_new"
+                ? undefined
+                : line.matchedIngredientId,
+            createNew:
+              line.createNew || line.matchStatus === "confirmed_new"
+                ? true
+                : undefined,
+            quantity: line.quantity,
+            unit: line.unit,
+            sortOrder: index + 1,
+            prepNotes: line.prepNotes?.trim() || undefined,
+          })),
+        },
+      });
+    }
+
+    const createdIngredientIds: string[] = [];
+    const ingredientIds: string[] = [];
+
+    for (const line of review.lines) {
       if (line.createNew || line.matchStatus === "confirmed_new") {
         const created = await this.ports.createIngredient({
           name: line.name.trim(),

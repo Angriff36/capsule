@@ -8,6 +8,8 @@ export type ComponentSnapshotLine = {
   quantity: number;
   unit: string;
   prepNotes: string;
+  sortOrder?: number;
+  wasteFactor?: number;
 };
 
 export type ComponentSnapshotData = {
@@ -40,6 +42,8 @@ type LineLike = {
   quantity: number | string;
   unit: string;
   prepNotes?: string | null;
+  sortOrder?: number;
+  wasteFactor?: number | null;
 };
 
 export function buildComponentSnapshotData(
@@ -63,6 +67,8 @@ export function buildComponentSnapshotData(
       quantity: Number(line.quantity),
       unit: String(line.unit),
       prepNotes: line.prepNotes ?? "",
+      sortOrder: line.sortOrder,
+      wasteFactor: line.wasteFactor ?? undefined,
     })),
   };
 }
