@@ -4491,3 +4491,34 @@ allowed origins), re-run the precheck (must report zero blockers), then
 `CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
 bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
 record at .artifacts/review/r2-14/report6.md).
+Iteration 164 (BUILD, release 2, 2026-09-05): R2-14 re-verified, STILL
+BLOCKED on the owner action — no code change this iteration. Workspace:
+`origin/main` fetched and still 279f6a3 (confirmed an ancestor; nothing
+to integrate); only the CogniLayer-rewritten CLAUDE.md rides dirty, as
+every session. Issue #265 still OPEN, zero comments (updatedAt unchanged
+since 2026-09-03); newest issue still #279, nothing new to triage. Fresh
+precheck against the LIVE production env (`vercel env pull --environment
+production` into a temp file under .artifacts/, exported then deleted
+before the checker ran; full production-build gate flags --environment
+production, --expected-deployment impartial-mule-193, --require
+VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY, --no-env-files, matching
+scripts/vercel-build.sh exactly): STILL the same 2 blockers only —
+`clerk:secret_key_unrecognized` and `clerk:dev_credential_in_production`
+(VITE_CLERK_PUBLISHABLE_KEY still pk_test_*) — no expected-deployment
+finding, so the production frontend stays pointed at impartial-mule-193
+and the Clerk key class stays the only defect. Temp env file deleted
+(verified: 0 tmp- files remain); redacted JSON refreshed at
+.artifacts/release/precheck265.json. Preview verified on 7812 serving
+this checkout (ralph-preview.ps1 -Ensure exit 0: "serves
+C:/projects/capsule-ralph"). ANTHROPIC_API_KEY still unset, so the
+AC-006/AC-013 J-halves stay evidence gaps. Docs-only commit, no new tag
+(iteration-46/65..163 precedent). The iteration-144 operator note
+stands: 100 consecutive blocked no-ops, no addressable work left in this
+loop — pause until #265 is actioned. Any code change now would
+invalidate the APPROVED review on record. Resume path: rotate the keys
+per the checker's action text (pk_live_*/sk_live_* in the Vercel project
+env, CLERK_JWT_ISSUER_DOMAIN via `npx convex env set --prod`, Clerk
+allowed origins), re-run the precheck (must report zero blockers), then
+`CAPSULE_RELEASE_URL=https://capsule-tau-eight.vercel.app
+bash scripts/release.sh --reviewer gpt-5.6-sol` (review APPROVE on
+record at .artifacts/review/r2-14/report6.md).
