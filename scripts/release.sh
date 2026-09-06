@@ -100,6 +100,13 @@ abort_release() {
 }
 trap abort_release INT TERM
 
+# PR12-01 / AC-028 — deployment config pre-flight. Shell env only
+# (--no-env-files): a local development .env.local must never impersonate
+# production config. The hard gate for the real production env runs inside
+# scripts/vercel-build.sh (VERCEL_ENV=production). set -e aborts here,
+# before any merge, when the release shell carries conflicting values.
+bun scripts/check-deployment-config.ts --environment production --no-env-files
+
 git checkout -q main
 subject="[release] $branch (reviewed by $reviewer)"
 if git merge-base --is-ancestor "$branch" main; then
@@ -164,5 +171,17 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
   fi
 fi
 rm -f "$proof"
+
+# PR13-06 / AC-030 — release receipt for THIS merge. The production build
+# takes minutes; gather with a bounded wait. Partial stays partial and is
+# printed loudly: the push already shipped, so the archive is not withheld
+# for a partial receipt (that would hide state, not unship it). Legs verify
+# only when their inputs exist (CAPSULE_RELEASE_URL for the canonical URL,
+# Vercel CLI/token for inspect + env pull, CAPSULE_API_KEY for the
+# authenticated workflow); missing inputs keep the receipt honestly partial.
+bun scripts/release-receipt.ts \
+  --sha "$(git rev-parse main)" \
+  --wait "${CAPSULE_RELEASE_WAIT:-600}" \
+  || echo "release: receipt gathering failed (see above); the release itself already shipped."
 
 archive_branch

@@ -80,7 +80,7 @@ bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is e
 # but are not package.json scripts in this checkout — use the MCP host + mint-jwt path above.
 ```
 
-**New `convex/*.ts` authored seam?** Run `bun run codegen` before `bun run typecheck` — `convex/_generated/api.d.ts` is a strict static module list (runtime `api = anyApi` is dynamic, but the types are not); the dev server does NOT auto-regenerate it, so a fresh authored query/mutation won't typecheck until codegen registers it.
+**New `convex/*.ts` authored seam?** Run `bun run codegen` before `bun run typecheck` — `convex/_generated/api.d.ts` is a strict static module list (runtime `api = anyApi` is dynamic, but the types are not); the dev server does NOT auto-regenerate it, so a fresh authored query/mutation won't typecheck until codegen registers it. In a worktree without `.env.local` (no `CONVEX_DEPLOYMENT`), run `CONVEX_DEPLOYMENT=befitting-armadillo-283 bunx convex codegen --typecheck disable` — codegen validates modules through a dry push and never modifies the deployment (`convex codegen --help`). Node-runtime rule: only actions may live in a `"use node"` file; put helper mutations/queries in a sibling non-node file. Raw `ctx.db.insert` on a mixin table must stamp the mixin's fields explicitly — generated creates write `deletedAt: null` and `createdAt`/`updatedAt`, and `q.eq(q.field("deletedAt"), null)` filters MISS rows whose field is absent (undefined); an insert without `deletedAt: null` is invisible to those filters (found the hard way in `importCommit.upsertLink`, 2026-09-05).
 
 Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).  
 Manifest CLI safe vs unsafe in Capsule: [docs/generation/manifest-cli-safety.md](docs/generation/manifest-cli-safety.md).
@@ -304,6 +304,11 @@ Convex prod deploy for that branch — Vercel builds `main` only for a commit
 whose subject starts with `[release]`, so a merge made on GitHub, PR button
 or auto-merge, lands but never deploys), then renames the branch to
 `archive/<branch>` locally and on origin. Start the next task from `main`.
+After the main push it also produces the release receipt (PR13-06/AC-030):
+`bun scripts/release-receipt.ts` writes `.artifacts/release/receipt-<sha>.{json,md}`.
+Set `CAPSULE_RELEASE_URL` (canonical production URL) and optionally
+`VERCEL_TOKEN` / `CAPSULE_API_KEY` so its legs can verify; a leg without
+its input keeps the receipt PARTIAL by design.
 
 **Manual deploy commands and settings changes are HUMAN-AUTHORIZED only.** No
 loop or agent runs `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk
@@ -329,6 +334,7 @@ When the human asks for a MANUAL deploy (no `main` push involved):
 Invariants agents must not break (each broke a real deploy once):
 
 - `vercel.json` SPA rewrites stay.
+- `scripts/vercel-build.sh` gates every production build on `bun scripts/check-deployment-config.ts` (PR12-01/AC-028). Owner-approved exception, 2026-09-05: `VITE_CLERK_ALLOW_DEVELOPMENT_AUTH=true` permits the existing development Clerk instance with a visible warning, not a production-auth readiness claim. Missing/invalid keys and mismatched frontend/backend/issuer configuration still fail. Do not demand key rotation solely because the deployment uses Vercel production. Standalone: `bun scripts/check-deployment-config.ts --environment production`.
 - `.vercelignore` patterns stay ROOT-ANCHORED (`/generated`, never bare
   `generated` — it swallows `src/generated`).
 - `package.json` `prepare` keeps its `|| exit 0` guard (gitless build env).

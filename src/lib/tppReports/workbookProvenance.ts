@@ -1,0 +1,241 @@
+import { readXlsxWorkbook, type XlsxTypedCell } from "./xlsxReader";
+import { XLSX_PARSER_VERSION } from "./xlsxValues";
+
+/**
+ * Workbook provenance for the import archive (PR01-03): the evidence record
+ * an operator inspects from the import run. Coordinates, raw stored text,
+ * interpreted value, date system and parser version ride one JSON document
+ * persisted on ImportArtifact.provenance — the raw evidence sits next to its
+ * interpretation and never replaces it. A source artifact is evidence, not
+ * proof of normalized data.
+ */
+
+/** Recorded cells per workbook — bigger workbooks keep counts, lose detail. */
+export const PROVENANCE_CELL_CAP = 2000;
+
+/**
+ * Serialized-size budget for the whole provenance document. Convex caps a
+ * document at 1 MiB and a single legal cell can hold tens of thousands of
+ * characters, so a cell-count cap alone cannot bound the persisted JSON.
+ * Truncation is always marked, never silent.
+ */
+export const PROVENANCE_BYTE_BUDGET = 256 * 1024;
+
+/**
+ * Recorded sheets per workbook — sheets beyond this cap keep counts
+ * (sheetCount stays the truth) and set sheetsTruncated.
+ */
+const PROVENANCE_SHEET_CAP = 128;
+
+/** Longest single string kept per cell field (raw/value/formula). */
+const PROVENANCE_VALUE_CHARS = 2048;
+
+/**
+ * Recorded merged ranges per sheet. Merges are metadata, not evidence rows,
+ * but a pathological sheet can carry tens of thousands of mergeCell
+ * entries — they share the byte budget and stop at this count cap.
+ */
+const PROVENANCE_RANGE_CAP = 256;
+
+export interface ProvenanceCell {
+  ref: string;
+  raw: string;
+  outcome: string;
+  value?: string | number | boolean;
+  unit: string | null;
+  formula?: string;
+  sharedFormulaSi?: number;
+  dateSystem?: string;
+  mergedRange?: string;
+  truncated?: boolean;
+}
+
+export interface ProvenanceSheet {
+  name: string;
+  mergedRanges: string[];
+  cells: ProvenanceCell[];
+}
+
+export interface WorkbookProvenance {
+  parserVersion: string;
+  dateSystem: string;
+  timezone: string;
+  timezoneAssumption: string;
+  macros: string;
+  sheetCount: number;
+  cellCount: number;
+  cellCap: number;
+  byteBudget: number;
+  cellsTruncated: boolean;
+  /** Merge ranges were dropped (count cap or byte budget). */
+  mergedRangesTruncated: boolean;
+  /** Sheets were dropped (count cap or the serialized-document backstop). */
+  sheetsTruncated: boolean;
+  sheets: ProvenanceSheet[];
+}
+
+/** Cap one string at the per-field length, marking the cut in the record. */
+function truncateText(text: string): { text: string; truncated: boolean } {
+  if (text.length <= PROVENANCE_VALUE_CHARS) {
+    return { text, truncated: false };
+  }
+  return {
+    text: `${text.slice(0, PROVENANCE_VALUE_CHARS)}…[truncated]`,
+    truncated: true,
+  };
+}
+
+/** Cell evidence for persistence; undefined optional fields drop in JSON. */
+function provenanceCell(cell: XlsxTypedCell): ProvenanceCell {
+  const raw = truncateText(cell.raw);
+  // unit comes from the cell's own numFmt literal — adversarially long
+  // format codes must not ride through unbounded (review round 3).
+  const unit =
+    cell.unit !== null && cell.unit.length > PROVENANCE_VALUE_CHARS
+      ? truncateText(cell.unit)
+      : null;
+  const record: ProvenanceCell = {
+    ref: cell.ref,
+    raw: raw.text,
+    outcome: cell.outcome,
+    unit: unit?.text ?? cell.unit,
+  };
+  if (raw.truncated || unit?.truncated) record.truncated = true;
+  if (cell.value !== undefined) {
+    // Typed values stay typed (dates as strings, numbers as numbers) —
+    // only an over-long representation degrades to a marked string.
+    const valueText = String(cell.value);
+    if (valueText.length > PROVENANCE_VALUE_CHARS) {
+      record.value = truncateText(valueText).text;
+      record.truncated = true;
+    } else {
+      record.value = cell.value;
+    }
+  }
+  if (cell.formula !== undefined) {
+    const formula = truncateText(cell.formula);
+    record.formula = formula.text;
+    if (formula.truncated) record.truncated = true;
+  }
+  if (cell.sharedFormulaSi !== undefined) {
+    record.sharedFormulaSi = cell.sharedFormulaSi;
+  }
+  if (cell.dateSystem !== undefined) record.dateSystem = cell.dateSystem;
+  if (cell.mergedRange !== undefined) {
+    // The anchor cell's copy of an oversized merge ref must not reintroduce
+    // what the range loop dropped (review round 4).
+    const merged = truncateText(cell.mergedRange);
+    record.mergedRange = merged.text;
+    if (merged.truncated) record.truncated = true;
+  }
+  return record;
+}
+
+/**
+ * Build the persisted provenance document for one workbook. Throws when the
+ * container is unreadable — the caller records that as a named error instead.
+ */
+export function buildWorkbookProvenance(buffer: Buffer): WorkbookProvenance {
+  const workbook = readXlsxWorkbook(buffer);
+  const cellCount = workbook.sheets.reduce(
+    (sum, sheet) => sum + sheet.cells.length,
+    0,
+  );
+  let remaining = PROVENANCE_CELL_CAP;
+  let budget = PROVENANCE_BYTE_BUDGET;
+  let taken = 0;
+  let rangesTruncated = false;
+  let sheetsTruncated = false;
+  const sheets: ProvenanceSheet[] = [];
+  for (const sheet of workbook.sheets) {
+    // Sheet metadata is charged and truncated like every other field
+    // (review round 5: a 1.2 M-char sheet name bypassed every per-field
+    // cap), and the recorded sheet list stops at a count cap.
+    const name = truncateText(sheet.name);
+    const nameCost = name.text.length + 12;
+    if (sheets.length >= PROVENANCE_SHEET_CAP || nameCost > budget) {
+      sheetsTruncated = true;
+      break;
+    }
+    budget -= nameCost;
+    // Merge ranges are charged to the same budget as cells (review round 2:
+    // a merge-heavy sheet must not bypass the document bound). Each range is
+    // checked against the REMAINING budget before it is taken (review round
+    // 3): a single oversized ref must stop the loop, never overshoot.
+    const mergedRanges: string[] = [];
+    for (const range of sheet.mergedRanges) {
+      const cost = range.length + 3;
+      if (mergedRanges.length >= PROVENANCE_RANGE_CAP || budget < cost) {
+        rangesTruncated = true;
+        break;
+      }
+      mergedRanges.push(range);
+      budget -= cost;
+    }
+    const cells: ProvenanceCell[] = [];
+    for (const cell of sheet.cells) {
+      if (remaining <= 0 || budget <= 0) break;
+      // Each record is charged against the REMAINING budget before it is
+      // taken (review round 4): an oversized record stops the loop, never
+      // overshoots.
+      const record = provenanceCell(cell);
+      const cost = JSON.stringify(record)?.length ?? 0;
+      if (cost > budget) break;
+      cells.push(record);
+      remaining -= 1;
+      taken += 1;
+      budget -= cost;
+    }
+    sheets.push({
+      name: name.text,
+      mergedRanges,
+      cells,
+    });
+  }
+  const result: WorkbookProvenance = {
+    parserVersion: workbook.parserVersion,
+    dateSystem: workbook.dateSystem,
+    timezone: workbook.timezone,
+    timezoneAssumption: workbook.timezoneAssumption,
+    macros: workbook.macros,
+    sheetCount: workbook.sheets.length,
+    cellCount,
+    cellCap: PROVENANCE_CELL_CAP,
+    byteBudget: PROVENANCE_BYTE_BUDGET,
+    cellsTruncated: taken < cellCount,
+    mergedRangesTruncated: rangesTruncated,
+    sheetsTruncated,
+    sheets,
+  };
+  // BACKSTOP (review round 5): the per-field caps bound every known field,
+  // but structural overhead and future fields must not be able to blow the
+  // document either — the COMPLETE serialized document is validated against
+  // the budget and trimmed (last cells, then last sheets) until it fits.
+  // Every trim sets its flag, so nothing is dropped silently.
+  let cellsDropped = false;
+  while (JSON.stringify(result).length > PROVENANCE_BYTE_BUDGET) {
+    const lastSheet = result.sheets[result.sheets.length - 1];
+    if (lastSheet !== undefined && lastSheet.cells.length > 0) {
+      lastSheet.cells.pop();
+      cellsDropped = true;
+    } else if (result.sheets.length > 0) {
+      result.sheets.pop();
+      result.sheetsTruncated = true;
+    } else {
+      break;
+    }
+  }
+  if (cellsDropped) result.cellsTruncated = true;
+  return result;
+}
+
+/** Error provenance for an unreadable container — named, never silent. */
+export function workbookErrorProvenance(error: unknown): {
+  parserVersion: string;
+  error: string;
+} {
+  return {
+    parserVersion: XLSX_PARSER_VERSION,
+    error: error instanceof Error ? error.message : String(error),
+  };
+}

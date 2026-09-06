@@ -3,7 +3,7 @@
 // lives in Convex storage, which only authored functions can reach.
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { deleteBlobIfOrphan } from "./lib/blobs";
 
@@ -85,7 +85,48 @@ export const listForParent = query({
   },
 });
 
-/** Resolve download URLs for dish (or other) primary image storage ids. */
+/**
+ * True when a live row in this tenant references the blob: an Attachment
+ * row (any parent type) or a Dish/Ingredient whose primary image it is —
+ * the same reference walk as convex/lib/blobs.ts, tenant-scoped and
+ * live-only. URL retrieval needs an authorized parent record (PR12-05);
+ * a bare storage id, or one only another tenant references, is not enough.
+ */
+async function storageReferencedByTenant(
+  ctx: QueryCtx,
+  tenantId: string,
+  storageId: string,
+): Promise<boolean> {
+  for await (const row of ctx.db
+    .query("attachments")
+    .withIndex("by_storageId", (q) => q.eq("storageId", storageId))) {
+    if (row.tenantId === tenantId && row.deletedAt == null) return true;
+  }
+  for await (const dish of ctx.db
+    .query("dishes")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    )) {
+    if (dish.tenantId === tenantId && dish.deletedAt == null) return true;
+  }
+  for await (const ingredient of ctx.db
+    .query("ingredients")
+    .withIndex("by_primaryImageStorageId", (q) =>
+      q.eq("primaryImageStorageId", storageId),
+    )) {
+    if (ingredient.tenantId === tenantId && ingredient.deletedAt == null) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Resolve download URLs for dish/ingredient primary image storage ids. A
+ * storage id resolves only when a live row in the caller's tenant
+ * references it (see storageReferencedByTenant); anything else maps to
+ * null — knowing a storage id grants nothing.
+ */
 export const urlsForStorageIds = query({
   args: {
     storageIds: v.array(v.string()),
@@ -96,7 +137,13 @@ export const urlsForStorageIds = query({
     const unique = [...new Set(args.storageIds.filter((id) => id.length > 0))];
     const entries = await Promise.all(
       unique.map(async (storageId) => {
-        const url = await ctx.storage.getUrl(storageId as Id<"_storage">);
+        const url = (await storageReferencedByTenant(
+          ctx,
+          auth.tenantId,
+          storageId,
+        ))
+          ? await ctx.storage.getUrl(storageId as Id<"_storage">)
+          : null;
         return [storageId, url] as const;
       }),
     );

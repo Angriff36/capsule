@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 68; // Includes the eight net Ralph workflow roots added to the 60-root production tree.
+const ROOT_CAP = 70; // 68 at release 1 + Ralph verified-preview harness (ralph-preview.ps1) and worktree sync (ralph-sync.sh).
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
@@ -55,6 +55,10 @@ class BaselineDecayCheck {
       ".vscode",
       // Gitignored local tool/loop state — never part of a clean CI checkout
       ".aboardai",
+      // Ralph loop per-machine state (gitignored "Ralph loop state" block)
+      ".ralph-checkpoint",
+      ".ralph-telemetry.jsonl",
+      ".ralph-failures.md",
       ".local",
       ".loop-worktrees",
       ".worktrees",

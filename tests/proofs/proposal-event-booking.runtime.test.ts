@@ -575,6 +575,43 @@ describe("accepted proposal → create event (issue #141)", () => {
     expect(rawRevisions).toEqual([]);
   });
 
+  it("revision snapshot carries the tenant's real name, not a placeholder", async () => {
+    const tenantId = "tenant-booking-tenant-name";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-tenant-name",
+      role: "owner",
+      tenantId,
+    });
+    // R2-13: the immutable revision must name the tenant from its live
+    // organization record. brandDisplayName is the customer-facing name (the
+    // PDF masthead shows it), so it wins over the legal name — the same
+    // precedence as convex/authProvision.ts companyNameForProvision. The
+    // placeholder "Tenant" must never freeze into the audit snapshot.
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      {
+        name: "Booking Proof Kitchen",
+        brandDisplayName: "Booking Proof Catering Co.",
+      },
+    );
+    const seed = await seedCatalog(proof, owner, tenantId);
+    const capturedId = await acceptedProposalWithMenu(proof, owner, seed, {
+      captureRevision: true,
+    });
+    const revisions = (await owner.query(
+      api.queries.listProposalRevisionByProposalId,
+      { proposalId: capturedId },
+    )) as Array<{ revisionNumber: number; snapshot: string }>;
+    expect(revisions).toHaveLength(1);
+    const snapshot = JSON.parse(revisions[0].snapshot) as {
+      tenant: { name: string };
+    };
+    expect(snapshot.tenant.name).toBe("Booking Proof Catering Co.");
+    expect(snapshot.tenant.name).not.toBe("Tenant");
+  });
+
   it("sales_staff can complete the whole flow, menu copy included", async () => {
     const tenantId = "tenant-booking-sales";
     const proof = harness();

@@ -20,10 +20,28 @@ import {
   SignInUnreachable,
   SlowSignInNotice,
 } from "./app/shell/OfflineShell";
+import { checkDeploymentConfig } from "./lib/deploymentConfigCheck";
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as
   string | undefined;
+
+// PR12-01 / AC-028 startup half: redacted, actionable findings when the
+// shipped frontend env is wrong (a development Clerk key in production is
+// issue #265). Log-only; the render tree below already degrades safely.
+const startupConfigFindings = checkDeploymentConfig({
+  environment: import.meta.env.MODE,
+  allowDevelopmentAuth:
+    import.meta.env.VITE_CLERK_ALLOW_DEVELOPMENT_AUTH === "true",
+  viteConvexUrl: convexUrl,
+  viteClerkPublishableKey: clerkPublishableKey,
+}).findings;
+for (const finding of startupConfigFindings) {
+  const log = finding.severity === "warning" ? console.warn : console.error;
+  log(
+    `[capsule config] ${finding.code}: ${finding.message} Fix: ${finding.action}`,
+  );
+}
 
 // A deploy rewrites every content-hashed chunk, so a tab opened before it
 // asks for a lazy route chunk that no longer exists. Vercel's SPA rewrite

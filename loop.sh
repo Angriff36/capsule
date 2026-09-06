@@ -10,7 +10,7 @@
 #   ./loop.sh --branch ralph/user-auth          # Build on a work branch
 #   ./loop.sh 20 --resume                        # Resume, skipping iterations in .ralph-checkpoint
 #   ./loop.sh plan --dry-run                     # Print rendered prompt + command, then exit
-#   ./loop.sh 20 --allow-dirty                   # Bypass the clean-tree startup guard
+#   ./loop.sh 20 --allow-dirty                   # Legacy flag; user edits are preserved automatically
 #
 # --branch <name> checks out <name> (creating it from the current HEAD if new), so
 # the loop targets that branch's IMPLEMENTATION_PLAN.md and pushes to that remote.
@@ -35,16 +35,9 @@ while [ $# -gt 0 ]; do
 done
 set -- "${POSITIONAL[@]}"
 
-# Refuse to start on a dirty tree. The loop commits and pushes every iteration,
-# so pre-existing uncommitted work either gets swept into Ralph's commits or
-# blocks a clean rollback. Commit/stash first, or pass --allow-dirty to accept
-# that risk knowingly. (--dry-run is exempt — it changes nothing.)
-if [ "$DRY_RUN" -ne 1 ] && [ "$ALLOW_DIRTY" -ne 1 ] && [ -n "$(git status --porcelain 2>/dev/null)" ]; then
-    echo "Error: working tree not clean ($(git status --porcelain | wc -l | tr -d ' ') dirty path(s))."
-    echo "The loop commits and pushes every iteration — your uncommitted work would ride along."
-    echo "Commit or stash first, or re-run with --allow-dirty to proceed anyway."
-    exit 1
-fi
+# The agent preserves pre-existing work instead of asking the owner to manage Git.
+# --allow-dirty remains accepted for compatibility with existing launch commands.
+RALPH_INITIAL_DIRTY=$(git status --porcelain 2>/dev/null)
 
 # Parse mode
 if [ "${1:-}" = "plan" ]; then
@@ -251,11 +244,19 @@ if [ "$DRY_RUN" -eq 1 ]; then
     exit 0
 fi
 
+. "$(dirname "${BASH_SOURCE[0]}")/ralph-sync.sh" || exit 1
+if [ -z "$CURRENT_BRANCH" ] || [ "$CURRENT_BRANCH" = "${RALPH_BASE_BRANCH:-main}" ]; then
+    echo "Error: Ralph needs a work branch. Use --branch ralph/work."
+    exit 1
+fi
+
 while true; do
     if [ $MAX_ITERATIONS -gt 0 ] && [ $ITERATION -ge $MAX_ITERATIONS ]; then
         echo "Reached max iterations: $MAX_ITERATIONS"
         break
     fi
+
+    ralph_sync_base || { echo "Ralph: cannot fetch upstream; no completion claimed."; exit 1; }
 
     # Run Ralph iteration with the selected prompt, driven by whichever CLI
     # RALPH_CLI names. build_cli_cmd maps the provider to its headless/output/model
@@ -265,13 +266,18 @@ while true; do
     build_cli_cmd "$MODEL"
     ITER_START=$(date +%s)
     # Inject .ralph.env values into the prompt via envsubst before piping to Claude.
-    PROMPT=$(render_prompt)
+    PROMPT="$(render_prompt)
+$(ralph_integration_prompt)"
     # Tee stderr to a temp file so a failed iteration can be logged with its tail,
     # while still showing it live. ponytail: the process-substitution tee may drop
     # the very last buffered line in a rare race — fine for a diagnostic tail.
     STDERR_LOG=$(mktemp)
     printf '%s' "$PROMPT" | "${CLI_CMD[@]}" 2> >(tee "$STDERR_LOG" >&2)
     EXIT_CODE=$?
+    if [ "$(git branch --show-current)" != "$CURRENT_BRANCH" ]; then
+        echo "Ralph: agent changed branches unexpectedly; stopping before any push."
+        exit 1
+    fi
     ELAPSED=$(( $(date +%s) - ITER_START ))
 
     # On a non-zero exit (Claude CLI crash, or backpressure surfaced through it),
@@ -295,7 +301,11 @@ while true; do
     # Push changes after each iteration. Record the completed iteration count to
     # the checkpoint only on a successful push, so --resume never skips work that
     # never made it upstream.
-    if git push origin "$CURRENT_BRANCH" || git push -u origin "$CURRENT_BRANCH"; then
+    PUSH_OK=0
+    if [ "$EXIT_CODE" -eq 0 ] && [ "$(git branch --show-current)" = "$CURRENT_BRANCH" ] &&
+        ! git rev-parse -q --verify MERGE_HEAD >/dev/null &&
+        git push -u "$RALPH_REMOTE" "$CURRENT_BRANCH"; then
+        PUSH_OK=1
         echo "$((ITERATION + 1))" > "$CHECKPOINT_FILE"
     else
         echo "Failed to push — checkpoint not advanced"
@@ -313,8 +323,11 @@ while true; do
 
     # Halt cleanly once the plan is exhausted (build mode only — plan mode
     # writes the plan, so an empty checklist there just means "not written yet")
-    if [ "$MODE" = "build" ] && ./check_done.sh; then
-        echo "All IMPLEMENTATION_PLAN.md items complete. Stopping."
+    if [ "$MODE" = "build" ] && [ "$EXIT_CODE" -eq 0 ] && [ "$PUSH_OK" -eq 1 ] &&
+        ./check_done.sh && ralph_ready_to_finish; then
+        echo "Plan complete. Branch includes $RALPH_REMOTE/$RALPH_BASE_BRANCH; local preview check passed."
+        echo "Worktree: $(git rev-parse --show-toplevel) | Branch: $CURRENT_BRANCH | Commit: $(git rev-parse --short HEAD)"
+        echo "Branch pushed. This is not a production deployment."
         break
     fi
 

@@ -52,7 +52,7 @@ function detectCsvSource(
   return undefined;
 }
 
-function detectWorkbookSource(
+export function detectWorkbookSource(
   rows: readonly (readonly string[])[],
 ): EventBundleSource | undefined {
   const head = rows

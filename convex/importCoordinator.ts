@@ -177,7 +177,18 @@ export const startImport = mutation({
       startTime: Date.now(),
       recordCounts: "{}",
       actorId: auth.id,
+      archiveWorkbookCount: 0,
+      indexWorkbookCount: 0,
+      discrepancyExplained: false,
+      dispositionCounts: "{}",
+      unaccountedRecordCount: 0,
+      commitCheckpoint: "{}",
       checksum: args.checksum ?? undefined,
+      // Timestamps-mixin fields: commands (recordArchiveInventory,
+      // explainArchiveDiscrepancy, …) guard on createdAt being present, so
+      // the authored insert stamps them exactly like a command-created row.
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       version: 0,
     });
 
@@ -210,6 +221,16 @@ export const getImportRunStatus = query({
       // Invalid JSON, leave as null
     }
 
+    // Commit-stage resume checkpoint (R2-6) — processed counts + cursor.
+    let parsedCheckpoint: Record<string, unknown> | null = null;
+    try {
+      parsedCheckpoint = JSON.parse(
+        importRun.commitCheckpoint ?? "{}",
+      ) as Record<string, unknown>;
+    } catch {
+      // Invalid JSON, leave as null
+    }
+
     return {
       id: importRun._id,
       status: importRun.status,
@@ -224,6 +245,7 @@ export const getImportRunStatus = query({
       reviewApprovedAt: importRun.reviewApprovedAt,
       commitStartedAt: importRun.commitStartedAt,
       recordCounts: parsedCounts,
+      commitCheckpoint: parsedCheckpoint,
       checksum: importRun.checksum,
       actorId: importRun.actorId,
       failureDetails: importRun.failureDetails,
@@ -281,7 +303,7 @@ export const loadImportContext = internalQuery({
   args: { importRunId: v.id("importRuns") },
   handler: async (ctx, args): Promise<ImportContext | null> => {
     const importRun = await ctx.db.get(args.importRunId);
-    if (!importRun || importRun.deletedAt !== null) {
+    if (!importRun || importRun.deletedAt != null) {
       return null;
     }
 
@@ -305,7 +327,7 @@ export const progressImportStage = internalMutation({
   },
   handler: async (ctx, args) => {
     const importRun = await ctx.db.get(args.importRunId);
-    if (!importRun || importRun.deletedAt !== null) {
+    if (!importRun || importRun.deletedAt != null) {
       throw new ConvexError("Import run not found");
     }
 
