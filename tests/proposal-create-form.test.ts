@@ -158,6 +158,48 @@ describe("ProposalCreateForm template state", () => {
     expect(container.querySelectorAll("tbody tr")).toHaveLength(1);
   });
 
+  it("detaches restrictive template configuration when No template is selected", async () => {
+    await addFlatLine("1000");
+    await pickTemplate("template-20");
+    const terms = container.querySelector(
+      'textarea[name="terms"]',
+    )! as HTMLTextAreaElement;
+    await act(async () => change(terms, "Operator edited terms"));
+    await pickTemplate("");
+    expect(container.querySelectorAll("tbody tr")).toHaveLength(1);
+    expect(taxInput().value).toBe("120");
+    await addFlatLine("1000");
+    expect(taxInput().value).toBe("120");
+
+    const title = container.querySelector(
+      'input[name="title"]',
+    )! as HTMLInputElement;
+    const client = container.querySelector(
+      'select[name="clientId"]',
+    )! as HTMLSelectElement;
+    await act(async () => {
+      change(client, "client-1");
+      change(title, "Detached proposal");
+    });
+    const form = container.querySelector("form")!;
+    await act(async () =>
+      form.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      ),
+    );
+    expect(draftMutation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        visibleSections: [],
+        taxAmount: 120,
+        terms: "Operator edited terms",
+        lines: expect.arrayContaining([
+          expect.objectContaining({ description: "Dinner", unitPrice: 1000 }),
+        ]),
+      }),
+    );
+    expect((draftMutation.mock.calls as any)[0][0].lines).toHaveLength(2);
+  });
+
   it("restores controlled proposal fields and template metadata from the saved draft", async () => {
     await act(async () => root.unmount());
     localStorage.setItem(

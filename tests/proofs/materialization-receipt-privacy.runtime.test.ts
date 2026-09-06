@@ -4,6 +4,7 @@ import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import { readMaterializationReceipt } from "../../convex/lib/materializationReceipt";
 
 function harness() {
   return createManifestTestContext({
@@ -19,6 +20,52 @@ beforeAll(() => {
 });
 
 describe("runtime proof: private materialization receipts", () => {
+  it("keeps exact and storage-unavailable head helper lookups tenant scoped", async () => {
+    const proof = harness();
+    const auth = proof.asRole({
+      subject: "receipt-helper",
+      role: "owner",
+      tenantId: "tenant-a",
+    });
+    await auth.run(async (ctx) => {
+      await ctx.db.insert("materializationReceipts", {
+        tenantId: "tenant-b",
+        receiptKey: "tenant-a:exact:pack:scope:one",
+        family: "pack",
+        operationKey: "scope:one",
+        output: { leaked: "exact" },
+        createdAt: 1,
+        updatedAt: 1,
+      });
+      await ctx.db.insert("materializationReceipts", {
+        tenantId: "tenant-b",
+        receiptKey: "tenant-a:head:pack:scope",
+        family: "pack",
+        operationKey: "scope:old",
+        output: { leaked: "head" },
+        createdAt: 1,
+        updatedAt: 1,
+      });
+      expect(
+        await readMaterializationReceipt(
+          ctx as never,
+          "tenant-a",
+          "pack",
+          "scope:one",
+          {},
+        ),
+      ).toBeUndefined();
+      expect(
+        await readMaterializationReceipt(
+          ctx as never,
+          "tenant-a",
+          "pack",
+          "scope:next:storage-unavailable",
+          {},
+        ),
+      ).toBeUndefined();
+    });
+  });
   it("keeps operation outputs out of generated command replay storage", async () => {
     const proof = harness();
     const tenantId = "tenant-private-receipt";

@@ -188,7 +188,16 @@ export function ProposalCreateForm({
     const template = (proposalTemplates ?? []).find(
       (row) => row._id === templateId && row.status === "active",
     );
-    if (!template) return;
+    if (!template) {
+      draftForm.schedulePersist();
+      setDraftLines((lines) =>
+        lines.filter((line) => line.key !== templateServiceLineKey),
+      );
+      setDraftVisibleSections([]);
+      setTemplateTaxRate(null);
+      setTemplateServiceLineKey(null);
+      return;
+    }
     draftForm.schedulePersist();
     const baseLines = draftLines.filter(
       (line) => line.key !== templateServiceLineKey,

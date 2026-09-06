@@ -201,4 +201,78 @@ describe("personal saved views and outreach", () => {
     );
     expect(tasks).toHaveLength(1);
   });
+
+  it("rejects foreign, deleted, and missing clients before outreach reuse or creation", async () => {
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "validating-owner",
+      role: "owner",
+      tenantId: "tenant-valid",
+    });
+    const foreign = proof.asRole({
+      subject: "foreign-owner",
+      role: "owner",
+      tenantId: "tenant-foreign",
+    });
+    const validId = await proof.seedEntity(owner, "clients", {
+      tenantId: "tenant-valid",
+      clientType: "company",
+      companyName: "Valid",
+      taxExempt: false,
+      paymentTermsDays: 0,
+      status: "archived",
+      registeredAt: 1,
+      version: 1,
+    });
+    const foreignId = await proof.seedEntity(foreign, "clients", {
+      tenantId: "tenant-foreign",
+      clientType: "company",
+      companyName: "Foreign",
+      taxExempt: false,
+      paymentTermsDays: 0,
+      status: "active",
+      registeredAt: 1,
+      version: 1,
+    });
+    const deletedId = await proof.seedEntity(owner, "clients", {
+      tenantId: "tenant-valid",
+      clientType: "company",
+      companyName: "Deleted",
+      taxExempt: false,
+      paymentTermsDays: 0,
+      status: "active",
+      registeredAt: 1,
+      version: 1,
+      deletedAt: 2,
+    });
+    const missingId = await proof.seedEntity(owner, "clients", {
+      tenantId: "tenant-valid",
+      clientType: "company",
+      companyName: "Missing",
+      taxExempt: false,
+      paymentTermsDays: 0,
+      status: "active",
+      registeredAt: 1,
+      version: 1,
+    });
+    await owner.run(async (ctx) => (ctx.db as any).delete(missingId));
+    for (const clientId of [foreignId, deletedId, missingId]) {
+      await expect(
+        owner.mutation(api.lib.clientOutreach.ensureOpen, {
+          clientId: clientId as never,
+          reason: "Call",
+        }),
+      ).rejects.toThrow("Client not found");
+    }
+    await expect(
+      owner.mutation(api.lib.clientOutreach.ensureOpen, {
+        clientId: validId,
+        reason: "Call inactive",
+      }),
+    ).resolves.toMatchObject({ created: true });
+    const tasks = await owner.run(async (ctx) =>
+      ctx.db.query("clientOutreachTasks").collect(),
+    );
+    expect(tasks).toHaveLength(1);
+  });
 });

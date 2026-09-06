@@ -45,7 +45,10 @@ import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
 import { useActionNotice } from "../../ui/action-result";
-import { projectProposalPdf } from "./proposalPdfProjection";
+import {
+  projectProposalPdf,
+  downloadProjectedProposalPdf,
+} from "./proposalPdfProjection";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
 // EventDish.confirmFromProposal stage guard).
@@ -699,6 +702,7 @@ export function ProposalsPage() {
                                 ? {
                                     proposal: enrichedProposal,
                                     clientName: pdfClientName,
+                                    source: null,
                                   }
                                 : projectProposalPdf(
                                     enrichedProposal,
@@ -706,13 +710,24 @@ export function ProposalsPage() {
                                     publishedRevision,
                                   );
 
-                            void downloadProposalPdf({
-                              proposal: pdfProjection.proposal,
-                              clientName: pdfProjection.clientName,
-                              branding,
-                            })
-                              .then(() => setNotice("Proposal PDF downloaded."))
-                              .catch((error) => setFailure(error));
+                            if (pdfProjection.source) {
+                              void downloadProjectedProposalPdf({
+                                projection: pdfProjection,
+                                branding,
+                                download: downloadProposalPdf,
+                                onNotice: setNotice,
+                              }).catch((error) => setFailure(error));
+                            } else {
+                              void downloadProposalPdf({
+                                proposal: pdfProjection.proposal,
+                                clientName: pdfProjection.clientName,
+                                branding,
+                              })
+                                .then(() =>
+                                  setNotice("Proposal PDF downloaded."),
+                                )
+                                .catch((error) => setFailure(error));
+                            }
                           }}
                         >
                           Download PDF

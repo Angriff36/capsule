@@ -2,6 +2,41 @@ import type { PricingBasis } from "../../lib/pricing";
 import type { ProposalPdfRecord } from "./proposalPdf";
 
 type Revision = { snapshot?: string | null } | null | undefined;
+export type ProposalPdfSource =
+  "revision" | "legacy-missing-snapshot" | "legacy-malformed-snapshot";
+
+export function proposalPdfDownloadNotice(source: ProposalPdfSource): string {
+  if (source === "legacy-missing-snapshot") {
+    return "Proposal PDF downloaded using current proposal data because this legacy proposal has no published snapshot.";
+  }
+  if (source === "legacy-malformed-snapshot") {
+    return "Proposal PDF downloaded using current proposal data because its published snapshot could not be read.";
+  }
+  return "Proposal PDF downloaded.";
+}
+
+export async function downloadProjectedProposalPdf<T>({
+  projection,
+  branding,
+  download,
+  onNotice,
+}: {
+  projection: ReturnType<typeof projectProposalPdf>;
+  branding: T;
+  download: (input: {
+    proposal: ProposalPdfRecord;
+    clientName: string;
+    branding: T;
+  }) => Promise<unknown>;
+  onNotice: (message: string) => void;
+}): Promise<void> {
+  await download({
+    proposal: projection.proposal,
+    clientName: projection.clientName,
+    branding,
+  });
+  onNotice(proposalPdfDownloadNotice(projection.source));
+}
 
 export function projectProposalPdf(
   live: ProposalPdfRecord,
@@ -10,13 +45,13 @@ export function projectProposalPdf(
 ): {
   proposal: ProposalPdfRecord;
   clientName: string;
-  source: "revision" | "legacy-live-fallback";
+  source: ProposalPdfSource;
 } {
   if (!revision?.snapshot) {
     return {
       proposal: live,
       clientName: liveClientName,
-      source: "legacy-live-fallback",
+      source: "legacy-missing-snapshot",
     };
   }
   try {
@@ -79,7 +114,7 @@ export function projectProposalPdf(
     return {
       proposal: live,
       clientName: liveClientName,
-      source: "legacy-live-fallback",
+      source: "legacy-malformed-snapshot",
     };
   }
 }

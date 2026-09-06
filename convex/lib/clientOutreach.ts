@@ -20,6 +20,10 @@ export const ensureOpen = mutation({
       api.queries.listClientOutreachTask,
       {},
     );
+    const client = await ctx.db.get(args.clientId);
+    if (!client || client.deletedAt != null || client.tenantId !== tenantId) {
+      throw new Error("Client not found");
+    }
     const existing = visible.find(
       (row) =>
         row.tenantId === tenantId &&

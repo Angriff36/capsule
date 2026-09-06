@@ -487,7 +487,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
               : ""}
             .
           </p>
-          <p className="mt-1 text-sm text-ink-2">
+          <p className="mt-1 text-base text-ink-2">
             {menuSyncStatus.phase === "failed"
               ? "Menu lines are safe. Stock synchronization is still unfinished."
               : menuSyncStatus.phase === "syncing"
@@ -496,7 +496,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           </p>
           {remainingTemplateLines ? (
             <div className="mt-2">
-              <p className="text-sm font-semibold text-ink">
+              <p className="text-base font-semibold text-ink">
                 {remainingTemplateLines.lines.length} newly requested template
                 line
                 {remainingTemplateLines.lines.length === 1

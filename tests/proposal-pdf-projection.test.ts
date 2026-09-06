@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { projectProposalPdf } from "../src/features/clients/proposalPdfProjection";
+import {
+  projectProposalPdf,
+  proposalPdfDownloadNotice,
+  downloadProjectedProposalPdf,
+} from "../src/features/clients/proposalPdfProjection";
 import { buildProposalPdf } from "../src/features/clients/proposalPdf";
 
 const live = {
@@ -64,10 +68,32 @@ describe("published proposal PDF projection", () => {
       snapshot: "not-json",
     });
     expect(result).toMatchObject({
-      source: "legacy-live-fallback",
+      source: "legacy-malformed-snapshot",
       clientName: "Live client",
       proposal: { title: "Changed live title" },
     });
+  });
+
+  it("distinguishes an absent legacy snapshot and gives both fallbacks visible provenance", async () => {
+    const missing = projectProposalPdf(live, "Live client", null);
+    expect(missing.source).toBe("legacy-missing-snapshot");
+    expect(proposalPdfDownloadNotice(missing.source)).toContain(
+      "no published snapshot",
+    );
+    expect(proposalPdfDownloadNotice("legacy-malformed-snapshot")).toContain(
+      "could not be read",
+    );
+    expect(proposalPdfDownloadNotice("revision")).toBe(
+      "Proposal PDF downloaded.",
+    );
+    const notices: string[] = [];
+    await downloadProjectedProposalPdf({
+      projection: missing,
+      branding: { displayName: "Capsule" },
+      download: async () => undefined,
+      onNotice: (message) => notices.push(message),
+    });
+    expect(notices).toEqual([expect.stringContaining("no published snapshot")]);
   });
 
   it("renders snapshot dishes and notes under their real labels and honors section visibility", () => {

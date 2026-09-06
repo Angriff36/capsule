@@ -615,7 +615,7 @@ export function MessageInboxPage() {
 
                 {selected.provider !== "internal" ? (
                   <p
-                    className="border-t border-line-2 px-4 pt-3 text-sm text-ink-2"
+                    className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
                     role="status"
                   >
                     No external delivery provider is connected. Keep editing
