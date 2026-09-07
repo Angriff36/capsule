@@ -15,7 +15,7 @@ export function useHireCandidateIntoTeam() {
   return useMutation(api.candidateToTeam.hireIntoTeam);
 }
 
-/** Email a hired person their sign-in link + password (Clerk provisioning). */
+/** Ask Clerk to email a hired person's Capsule invitation. */
 export function useProvisionStaffSignIn() {
   return useAction(api.authProvision.provisionStaffSignIn);
 }

@@ -11,9 +11,11 @@
 
 ## Staff sign-in (hire path)
 
-Hire account creation supplies an automatic unique provider username because the current Clerk instance requires one. It is not another hiring field or an employee number; staff still use their email and sign-in link. `bun scripts/verify-hire-username.ts` reproduces the missing-field failure from issue #286 against an isolated provider boundary. This proof is not email-delivery evidence. Production inspection for #286 found the Resend key, sender and public app URL absent from Convex; invitations remain blocked until those service settings are configured and a real delivery is verified.
+Hire account creation supplies an automatic unique provider username because the current Clerk instance requires one. It is not another hiring field or an employee number; staff still use their email and sign-in link. `bun scripts/verify-hire-username.ts` checks the provider boundary behind issue #286, including native invitations. This isolated proof is not email-delivery evidence.
 
-Hiring on Admin → Permissions → Team roles creates the identity-provider account, links `Person.authSubjectId`, and emails a Capsule link (plus a password when they do not already have one). Staff open that email and land in the app. They do not visit a separate sign-up site or paste account ids. Resend uses `RESEND_API_KEY`, `CAPSULE_PUBLIC_APP_URL`, and `INVOICE_REMINDER_FROM_EMAIL` (or `CAPSULE_SIGNIN_FROM_EMAIL`). The identity provider secret (`CLERK_SECRET_KEY`) stays on the Convex deployment.
+Hiring on Admin → Permissions → Team roles creates the identity-provider account, links `Person.authSubjectId`, then requests a Clerk organization invitation with a redirect to Capsule. The precreated account uses the existing embedded SignIn ticket flow; there is no second signup or profile selection. Clerk handles delivery; `CLERK_SECRET_KEY` and `CAPSULE_PUBLIC_APP_URL` are required on Convex. Resend and a custom sending domain are not required for this path. Development Clerk sends using its own accounts.dev sender; this does not certify a production Clerk instance.
+
+The provider invitation uses `org:member`; the linked Capsule Person retains the role assigned by the hiring manager. No password is emailed or reset on resend. Resending replaces only that recipient's pending invitation. An existing organization member keeps their access and receives an honest no-new-email notice directing them to normal Capsule login or Forgot password. Clerk accepting an invitation request is not proof of inbox delivery or recipient sign-in; verify those separately.
 
 ## Client gate flow
 

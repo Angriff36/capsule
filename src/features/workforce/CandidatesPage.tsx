@@ -230,11 +230,11 @@ export function CandidatesPage() {
           personId: result.personId as never,
         });
         setNotice({
-          text: `Hired ${candidate.fullName}. Emailed ${
-            provisioned.passwordIssued
-              ? "a sign-in link and password"
-              : "a sign-in link"
-          } to ${provisioned.email}.${
+          text: `Hired ${candidate.fullName}. ${
+            provisioned.emailed
+              ? `Emailed a sign-in invitation to ${provisioned.email}.`
+              : `They already have access. No new invitation was sent. Sign in at ${provisioned.appUrl} using ${provisioned.email}, or use Forgot password on that screen.`
+          }${
             result.roleDowngraded
               ? " They joined with the base staff role — an admin can set their manager role under Administration → Permissions → Team roles."
               : ""

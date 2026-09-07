@@ -48,3 +48,106 @@ for (let n = 0; n < 2; n++) {
 console.log(
   "PASS: required username supplied automatically, unique for same-name hires; email and profile name unchanged.",
 );
+
+let invitationSent = false;
+const invitationDirectory = new ClerkStaffAccountDirectory("fixture", (async (
+  url,
+  init,
+) => {
+  assert.equal(
+    String(url),
+    "https://api.clerk.com/v1/organizations/org_fixture/invitations",
+  );
+  assert.equal(init?.method, "POST");
+  const body = JSON.parse(String(init?.body));
+  assert.deepEqual(body, {
+    email_address: "fixture@example.invalid",
+    role: "org:member",
+    redirect_url: "https://capsule.example.invalid/",
+  });
+  invitationSent = true;
+  return new Response(
+    JSON.stringify({ id: "orginv_fixture", status: "pending" }),
+  );
+}) as typeof fetch);
+await invitationDirectory.sendOrganizationInvitation({
+  organizationId: "org_fixture",
+  email: "fixture@example.invalid",
+  appUrl: "https://capsule.example.invalid/",
+});
+assert.equal(invitationSent, true);
+console.log(
+  "PASS: isolated Clerk invitation request has scoped workspace and Capsule redirect; no Resend or password email.",
+);
+
+const joinedDirectory = new ClerkStaffAccountDirectory(
+  "fixture",
+  (async () =>
+    new Response(
+      JSON.stringify({
+        errors: [
+          {
+            code: "already_a_member_in_organization",
+            message: "Already joined",
+          },
+        ],
+      }),
+      { status: 400 },
+    )) as typeof fetch,
+);
+assert.equal(
+  await joinedDirectory.sendOrganizationInvitation({
+    organizationId: "org_fixture",
+    email: "fixture@example.invalid",
+    appUrl: "https://capsule.example.invalid/",
+  }),
+  false,
+);
+
+const requests: string[] = [];
+const resendDirectory = new ClerkStaffAccountDirectory("fixture", (async (
+  url,
+  init,
+) => {
+  requests.push(`${init?.method ?? "GET"} ${url}`);
+  if (requests.length === 1)
+    return new Response(
+      JSON.stringify({
+        errors: [{ code: "organization_invitation_not_unique" }],
+      }),
+      { status: 400 },
+    );
+  if (requests.length === 2)
+    return Response.json({
+      data: [
+        {
+          id: "other",
+          email_address: "other@example.invalid",
+          status: "pending",
+        },
+        {
+          id: "ours",
+          email_address: "fixture@example.invalid",
+          status: "pending",
+        },
+      ],
+      total_count: 2,
+    });
+  if (requests.length === 3) {
+    assert(String(url).endsWith("/ours/revoke"));
+    return Response.json({ id: "ours", status: "revoked" });
+  }
+  return Response.json({ id: "fresh", status: "pending" });
+}) as typeof fetch);
+assert.equal(
+  await resendDirectory.sendOrganizationInvitation({
+    organizationId: "org_fixture",
+    email: "fixture@example.invalid",
+    appUrl: "https://capsule.example.invalid/",
+  }),
+  true,
+);
+assert.equal(requests.length, 4);
+console.log(
+  "PASS: existing membership reports no email; resend replaces only the matching pending invitation.",
+);
