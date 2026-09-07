@@ -361,3 +361,9 @@
 - Full local check passed 162 files / 1,385 tests. Issue #282 tracks the production symptom. Live account mapping was not guessed or changed; no deployment. Final independent GLM review pending at initial commit after the Codex reviewer hit its usage limit.
 
 - Final GLM-5.3 review APPROVE; code 30036258 pushed with regeneration gate green. Cold-offline gate concern was traced to unchanged outer AuthGate behavior, not a new My Day regression. No guessed data correction or auth bypass was used.
+
+## 2026-09-06: One-login Capsule account bootstrap
+
+- Owner clarified that staff selection/linking is not an acceptable login flow. AuthGate now automatically establishes the account profile for authorized workspace members and waits for that same identity before opening screens.
+- Provider-derived account details and existing session permissions create one idempotent Person-backed profile; imported rows are neither selected nor modified. Imported email matches cannot claim app access. My Day and chat read their own profile directly from authStatus, independent of roster pagination.
+- Full local check passed again: 162 files / 1,385 tests. Scratch Convex runtime checks passed repeated/concurrent creation, account isolation, imported-record preservation, disabled-account handling and the real public setup action. Independent expanded GLM review is pending; no deployment or production data changes claimed.

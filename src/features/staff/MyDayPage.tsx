@@ -194,7 +194,11 @@ export function MyDayPage() {
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
   );
-  const me = resolveMyDayAccount(activePeople, authStatus, signedInSubjectId);
+  const me = resolveMyDayAccount(
+    authStatus?.profile ? [authStatus.profile] : activePeople,
+    authStatus,
+    signedInSubjectId,
+  );
   const linkedPersonName = me ? `${me.givenName} ${me.familyName}` : undefined;
   useOfflineSync(runnersRef, me ? offlineScope : null);
   const replayScope = useRef<string | null>(null);

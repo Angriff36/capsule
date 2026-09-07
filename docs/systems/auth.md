@@ -19,13 +19,14 @@ Hiring on Admin → Permissions → Team roles creates the identity-provider acc
 2. Unauthenticated → Capsule sign-in screen (embedded provider widget; no self-serve sign-up). Ticket links from hire email sign them in.
 3. Authenticated → ClaimGate / membership checks (self-link by verified email if hire has not linked yet).
 4. If several live Person rows share that email (or the same `authSubjectId`), pick one instead of failing closed: hinted workspace (active Clerk org), then a row already linked to this sign-in, then Admin/owner/system, then the oldest live row. Do not persist a cross-tenant pick when there is no tenant hint — ClaimGate stays not-ready and workspace buttons remain the recovery. Opening a workspace button awaits `setActive` until the session JWT tenant claim matches, then retries the link. A hint that does not match the already-linked pick rematches onto the live never-linked row in that tenant (previous `authSubjectId` cleared). Team roles is not the only recovery.
-5. Ready → children (AppShell + routes).
+5. Workspace membership without a profile → `ensureAccountProfile` automatically creates the signed-in account's Person-backed Capsule profile, using provider profile details and the session's existing tenant/role. It does not select or modify imported people. Creation is transactional and idempotent; disabled or explicitly released accounts are not recreated.
+6. Ready → children (AppShell + routes), only after `authStatus.accountId` matches the current sign-in and `personId` exists. The same status includes a minimal own-profile projection, so My Day and chat do not depend on finding the account in a paginated roster. Legacy email-based invitation recovery excludes externally imported people.
 
 ## My Day staff identity
 
 My Day uses `authStatus.personId` and its tenant together with the signed-in subject and active Person record. A Clerk nickname does not invalidate a persisted staff link. Browser-local name selections are not authentication or account linking and are no longer used by this page.
 
-For a workspace member without a staff link, My Day attempts the existing server-verified primary-email link automatically. A missing match, deliberately released link, missing configuration or provider error is shown as a staff-association issue; existing full-app access stays available. Retry does not sign the user out or create a new account. Wrong persisted associations still require an authorized correction to the actual Person account link; the UI must not guess another person's identity.
+The shared login boundary loads the Capsule profile before My Day or any other authenticated route opens. My Day's recovery component uses that same account setup, never a staff-name picker. Retry preserves the existing sign-in. Existing saved identities are retained; imported names, email collisions and browser selections do not choose a new identity. No identity-provider account or password is created during this bootstrap.
 
 Regression evidence: `tests/my-day-account-identity.test.ts` covers the real My Day route with a nickname, account-switch rejection, server/tenant/subject selection, and mounted link recovery. This local proof does not certify an individual production account's mapping or deployment.
 

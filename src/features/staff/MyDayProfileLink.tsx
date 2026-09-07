@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../lib/api";
 
-/** A staff association is not a second login. Only the server can establish it. */
+/** Recovery only; AuthGate normally loads the account before this page opens. */
 export function MyDayProfileLink({
   hasLinkedProfile,
   canManage,
@@ -11,7 +11,7 @@ export function MyDayProfileLink({
   hasLinkedProfile: boolean;
   canManage: boolean;
 }) {
-  const linkSelf = useAction(api.authLink.linkSelfByEmail);
+  const linkSelf = useAction(api.authLink.ensureAccountProfile);
   const [outcome, setOutcome] = useState("linking");
   const [attempt, setAttempt] = useState(0);
   const retry = useCallback(() => setAttempt((value) => value + 1), []);
@@ -31,38 +31,33 @@ export function MyDayProfileLink({
     };
   }, [hasLinkedProfile, linkSelf, attempt]);
   const messages: Record<string, string> = {
-    linking: "Connecting your existing sign-in to your staff profile…",
-    already:
-      "Your staff profile is linked. Waiting for your staff records to update…",
-    matched:
-      "Your staff profile is linked. Waiting for your staff records to update…",
+    linking: "Opening your Capsule profile…",
+    already: "Your Capsule profile is ready. Loading your records…",
+    matched: "Your Capsule profile is ready. Loading your records…",
     no_match:
-      "No staff profile matches your verified sign-in email. Your app access still works; My Day needs the staff record that owns your shifts and time.",
+      "Your account does not have workspace access yet. Imported staff records do not grant account access.",
     released:
-      "Your staff link was removed. A workspace administrator can restore the correct account link; signing in again will not repair it.",
+      "Access to this workspace was removed. Contact your workspace administrator to restore access.",
     ambiguous:
-      "Your account matches more than one staff record. The account link needs to be corrected in this workspace.",
+      "Your workspace could not be resolved. Open the workspace you want to use.",
     not_configured:
-      "The staff-link service is not configured. Your existing app session is still valid.",
+      "Account setup is unavailable. Your sign-in is saved; the service needs to be restored.",
     provider_error:
-      "The staff link could not be checked because the sign-in service is unavailable. Try again without signing out.",
-    error:
-      "The staff link could not be checked. Try again without signing out.",
-    no_email:
-      "Your account has no primary email for matching your existing staff record.",
-    email_unverified:
-      "Verify your account’s primary email so it can be matched to your staff record.",
+      "Your account could not be checked because the sign-in service is unavailable. Try again without signing out.",
+    error: "Your account could not be checked. Try again without signing out.",
+    no_email: "Your sign-in account needs a primary email address.",
+    email_unverified: "Verify your sign-in account’s primary email address.",
     unauthenticated:
       "Your session could not be confirmed. Wait for the app to refresh it, then try again.",
     needs_admin_link:
-      "A workspace administrator needs to connect your existing account to your staff record.",
+      "Your account needs workspace access. Contact your workspace administrator.",
   };
   return (
     <section className="card px-4 py-4">
       <h2 className="text-lg font-semibold">You’re signed in</h2>
       <p role="status" className="mt-2 text-base leading-relaxed text-ink-2">
         {hasLinkedProfile
-          ? "Your account has a staff link, but that staff record is unavailable in this workspace. Your app access is unchanged; the account link needs to be checked."
+          ? "Your Capsule profile is temporarily unavailable in this workspace. Your sign-in is saved."
           : (messages[outcome] ?? messages.error)}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -73,7 +68,7 @@ export function MyDayProfileLink({
             disabled={outcome === "linking"}
             onClick={retry}
           >
-            Check staff link
+            Try again
           </button>
         )}
         <Link className="btn btn-ghost min-h-11" to="/">
@@ -87,8 +82,7 @@ export function MyDayProfileLink({
       </div>
       {!canManage && outcome !== "linking" && (
         <p className="mt-3 text-base text-ink-2">
-          Your manager can correct your staff record in Team roles. You do not
-          need another sign-in.
+          You do not need another sign-in or a different profile.
         </p>
       )}
     </section>

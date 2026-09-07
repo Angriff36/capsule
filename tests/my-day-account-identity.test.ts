@@ -82,7 +82,9 @@ const ryan = {
   status: "active",
   deletedAt: null,
 };
-it("opens the actual My Day page for a linked account with a different display name", async () => {
+it("opens My Day from the account profile even when the roster page omits it", async () => {
+  state.auth.profile = ryan;
+  state.people = [];
   await act(async () =>
     root.render(createElement(MemoryRouter, {}, createElement(MyDayPage))),
   );
@@ -103,7 +105,7 @@ it("drops the previous staff identity when the signed-in account switches", asyn
   expect(node.querySelector("header")?.textContent).not.toContain(
     "Ryan Ostwind",
   );
-  expect(node.textContent).toContain("staff record is unavailable");
+  expect(node.textContent).toContain("profile is temporarily unavailable");
 });
 it("retains unowned older offline work unless the user explicitly confirms discarding it", async () => {
   localStorage.setItem("capsule.my-day.queue", JSON.stringify([{ old: true }]));
@@ -227,7 +229,9 @@ it("attempts real linking and explains an absent match without a fake name picke
     ),
   );
   expect(node.textContent).toContain("You’re signed in");
-  expect(node.textContent).toContain("No staff profile matches");
+  expect(node.textContent).toContain(
+    "Imported staff records do not grant account access",
+  );
   expect(node.textContent).not.toContain("Pick your name");
   expect(node.querySelector('a[href="/admin"]')).not.toBeNull();
 });
@@ -248,6 +252,6 @@ it("lets a transient provider failure be retried without signing out", async () 
   expect(node.textContent).toContain("could not be checked");
   state.link.mockResolvedValue({ linked: true, reason: "matched" });
   await act(async () => node.querySelector("button")!.click());
-  expect(node.textContent).toContain("Your staff profile is linked");
+  expect(node.textContent).toContain("Your Capsule profile is ready");
   expect(node.querySelector('a[href="/admin"]')).toBeNull();
 });

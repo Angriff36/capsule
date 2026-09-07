@@ -10,7 +10,11 @@ Fix: use existing server authStatus.personId with tenant/subject/active-row cons
 
 Required proof: mounted route with differing account/staff names, account switch, ignored browser picks, tenant/subject mismatch rejection, missing-match explanation, provider retry and full repository checks. Prior legacy resolver behavior tests remain intact; obsolete source-text expectations for the removed picker now check its absence and canonical resolver use.
 
-Live boundary: asked the owner whether the displayed Ryan profile is the intended staff identity. Until confirmed, no production mapping repair is authorized or claimed. Correcting the UI cannot prove an existing wrong persisted link is correct. Deployment remains separate from this source fix.
+Updated owner contract: sign in once, automatically open the Capsule profile, and use the same identity across every screen. Imported staff are not selectable identities or a second login. No staff-name confirmation is required. Deployment remains separate from this source fix.
+
+Account bootstrap extends the initial correction: the shared AuthGate waits for the signed-in account's canonical profile. Authorized workspace members receive a Person-backed account profile automatically from provider details and trusted session permissions. Existing saved identities remain unchanged. Imported records do not participate in legacy email self-linking. authStatus supplies the own-profile projection directly to My Day and chat, independent of roster pagination. No imported assignments/payroll are moved, and no identity-provider accounts/passwords are created.
+
+Backend scratch verification (`.artifacts/verify-account-bootstrap.ts`, convex-test) passed anonymous denial, simultaneous/repeated setup idempotency, imported-row preservation and exclusion, trusted role preservation, account isolation, and inactive-account recreation denial. Expanded local gate and independent GLM review are recorded separately below when complete.
 
 Tracked production symptom: https://github.com/Angriff36/capsule/issues/282.
 
