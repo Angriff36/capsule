@@ -145,6 +145,11 @@ export const enableAlerts = action({
         "Push is not configured on this deployment yet, so background alerts cannot run.",
       );
     }
+    if (await ctx.runQuery(internal.runOfShowAlerts.isEnabled, { tenantId })) {
+      // The scanner is already running for this tenant — enabling twice
+      // must not fork a second loop.
+      return { enabled: true };
+    }
     await ctx.runMutation(internal.runOfShowAlerts.recordConfigEvent, {
       tenantId,
       type: "RunAlertsEnabled",
@@ -360,16 +365,21 @@ export const recordRunPushResults = internalMutation({
         });
       }
     }
-    await ctx.db.insert("manifestEvents", {
-      type: "RunAlertSent",
-      entity: SENT_ENTITY,
-      entityId: args.alertKey.activityId,
-      payload: {
-        activityId: args.alertKey.activityId,
-        kind: args.alertKey.kind,
-      },
-      createdAt: args.now,
-    });
+    // Mark the alert sent ONLY when at least one device took the push: a
+    // full soft failure (network, 5xx on every target) must stay unsent so
+    // the next scan retries it inside the fire window.
+    if (args.used.length > 0) {
+      await ctx.db.insert("manifestEvents", {
+        type: "RunAlertSent",
+        entity: SENT_ENTITY,
+        entityId: args.alertKey.activityId,
+        payload: {
+          activityId: args.alertKey.activityId,
+          kind: args.alertKey.kind,
+        },
+        createdAt: args.now,
+      });
+    }
   },
 });
 
@@ -381,24 +391,29 @@ export const tick = internalAction({
     });
     if (!enabled) return;
     const now = Date.now();
-    const jobs = await ctx.runQuery(internal.runOfShowAlerts.collectDueAlerts, {
-      tenantId: args.tenantId,
-      now,
-    });
-    for (const job of jobs) {
-      await ctx.runAction(internal.runOfShowAlertsSend.deliver, {
-        activityId: job.activityId,
-        kind: job.kind,
-        targets: job.targets,
-        payload: job.payload,
-      });
-    }
-    if (args.scheduleNext) {
-      await ctx.scheduler.runAfter(
-        SCAN_INTERVAL_MS,
-        internal.runOfShowAlerts.tick,
-        { tenantId: args.tenantId, scheduleNext: true },
+    try {
+      const jobs = await ctx.runQuery(
+        internal.runOfShowAlerts.collectDueAlerts,
+        { tenantId: args.tenantId, now },
       );
+      for (const job of jobs) {
+        await ctx.runAction(internal.runOfShowAlertsSend.deliver, {
+          activityId: job.activityId,
+          kind: job.kind,
+          targets: job.targets,
+          payload: job.payload,
+        });
+      }
+    } finally {
+      // The scanner must always reschedule itself: a thrown delivery or a
+      // query error may never kill the crew's alert loop.
+      if (args.scheduleNext) {
+        await ctx.scheduler.runAfter(
+          SCAN_INTERVAL_MS,
+          internal.runOfShowAlerts.tick,
+          { tenantId: args.tenantId, scheduleNext: true },
+        );
+      }
     }
   },
 });

@@ -939,7 +939,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Day-sheet save for the battle board. Deliberately NOT stage-gated: the
   // board is a day-of document and live ops must stay correctable during the
   // event (docs/architecture/domain-gating-restraint.md). The editor sends
-  // the full set every save; an omitted value clears it.
+  // the full set every save; the UI clears a badge by writing an empty
+  // string.
   command updateDaySheet(
     optional barService: string,
     optional cocktailHourFood: string,

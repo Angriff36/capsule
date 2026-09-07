@@ -23,15 +23,16 @@ export function RunSettingsSheet({
   const push = usePushNotifications();
   const runStatus = useQuery(api.runOfShowAlerts.getStatus, {});
   const enableLoop = useAction(api.runOfShowAlerts.enableAlerts);
-  const disableLoop = useAction(api.runOfShowAlerts.disableAlerts);
 
   const turnOnBackground = async () => {
     await push.enable();
     if (runStatus != null && !runStatus.enabled) await enableLoop({});
   };
+  // Personal switch only: the account preference gates this phone's
+  // delivery. Turning it off must NOT stop the tenant-wide scanner the
+  // rest of the crew relies on.
   const turnOffBackground = async () => {
     await push.disable();
-    if (runStatus?.enabled) await disableLoop({});
   };
 
   const pushStatusHint = push.blocked
@@ -155,6 +156,8 @@ export function RunSettingsSheet({
                 Background alerts call the next task out on this phone even when
                 Capsule is closed — 5 minutes before, at the start, and once
                 when a task runs late. They also switch on message alerts.
+                Turning this off stops only your phone; the rest of the crew
+                keeps theirs.
               </p>
             </>
           )}
