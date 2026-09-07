@@ -16,6 +16,7 @@ import {
 } from "convex/react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { SessionPersistenceBoundary } from "./SessionPersistenceBoundary";
 import { PasswordSignIn } from "./PasswordSignIn";
 import { PushRevokeOnSignout } from "./PushRevokeOnSignout";
 import {
@@ -33,7 +34,7 @@ export function isAuthConfigured(
 
 export function AuthGate({ children }: { children?: ReactNode }) {
   return (
-    <>
+    <SessionPersistenceBoundary>
       <PushRevokeOnSignout />
       <AuthLoading>
         <GateShell title="Checking your session…">
@@ -54,7 +55,7 @@ export function AuthGate({ children }: { children?: ReactNode }) {
           Refreshing your session… your work is untouched.
         </div>
       </AuthRefreshing>
-    </>
+    </SessionPersistenceBoundary>
   );
 }
 

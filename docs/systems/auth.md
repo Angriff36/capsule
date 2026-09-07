@@ -54,3 +54,9 @@ Generated mutations/queries must not invent identity. They call `getAuthContext`
 ## Env
 
 See `.env.example`: client `VITE_*` keys; Convex `CLERK_JWT_ISSUER_DOMAIN` and `CONVEX_FIELD_ENCRYPTION_KEY` via `bunx convex env set`.
+
+## Keep me signed in
+
+The password form defaults **Keep me signed in** to checked, using Clerk's normal persistent session and configured lifetime. Unchecking it records a random browser-session cookie and a local preference keyed to the resulting Clerk session. Before protected screens mount on a later visit, Capsule signs that session out if its browser-session marker is gone. The choice also follows password reset and additional-provider verification. No credentials or tokens are copied to application storage.
+
+Temporary sign-in requires working site storage; the form reports unavailable storage before submitting credentials. Browser restore-session features can restore session cookies, so this follows the browser's session lifetime rather than detecting every window close. Clearing or blocking application preference storage can erase the preference; explicit Sign out remains the immediate way to end a session. Existing sessions without a preference retain Clerk's behavior.
