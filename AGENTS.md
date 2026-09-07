@@ -80,9 +80,28 @@ bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is e
 # but are not package.json scripts in this checkout — use the MCP host + mint-jwt path above.
 ```
 
-**New `convex/*.ts` authored seam?** Run `bun run codegen` before `bun run typecheck` — `convex/_generated/api.d.ts` is a strict static module list (runtime `api = anyApi` is dynamic, but the types are not); the dev server does NOT auto-regenerate it, so a fresh authored query/mutation won't typecheck until codegen registers it. In a worktree without `.env.local` (no `CONVEX_DEPLOYMENT`), run `CONVEX_DEPLOYMENT=befitting-armadillo-283 bunx convex codegen --typecheck disable` — codegen validates modules through a dry push and never modifies the deployment (`convex codegen --help`). Node-runtime rule: only actions may live in a `"use node"` file; put helper mutations/queries in a sibling non-node file. Raw `ctx.db.insert` on a mixin table must stamp the mixin's fields explicitly — generated creates write `deletedAt: null` and `createdAt`/`updatedAt`, and `q.eq(q.field("deletedAt"), null)` filters MISS rows whose field is absent (undefined); an insert without `deletedAt: null` is invisible to those filters (found the hard way in `importCommit.upsertLink`, 2026-09-05).
+**New `convex/*.ts` authored seam?** Run `bun run codegen` before `bun run typecheck` — `convex/_generated/api.d.ts` is a strict static module list (runtime `api = anyApi` is dynamic, but the types are not); the dev server does NOT auto-regenerate it, so a fresh authored query/mutation won't typecheck until codegen registers it. In a worktree without `.env.local` (no `CONVEX_DEPLOYMENT`), run `CONVEX_DEPLOYMENT=befitting-armadillo-283 bunx convex codegen --typecheck disable` — codegen validates modules through a dry push and never modifies the deployment (`convex codegen --help`). Node-runtime rule: only actions may live in a `"use node"` file; put helper mutations/queries in a sibling non-node file. Generated update commands (revise*/upload) WIPE optional params that arrive omitted — a partial update must pass the stored value for every field it does not change (see `saveComponentImportReview` in `convex/lib/culinaryOperations.ts`, 2026-09-06). Raw `ctx.db.insert` on a mixin table must stamp the mixin's fields explicitly — generated creates write `deletedAt: null` and `createdAt`/`updatedAt`, and `q.eq(q.field("deletedAt"), null)` filters MISS rows whose field is absent (undefined); an insert without `deletedAt: null` is invisible to those filters (found the hard way in `importCommit.upsertLink`, 2026-09-05).
 
-Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).  
+Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).
+
+## Local browser verification (worktrees)
+
+- The primary checkout owns the shared local backend (127.0.0.1:3210); never
+  push a worktree's functions there. A worktree gets its OWN anonymous local
+  backend: with no `CONVEX_DEPLOYMENT` and no `.convex/`, `bunx convex dev
+  --once --typecheck disable` creates one on a free port — set
+  `CLERK_JWT_ISSUER_DOMAIN` and `CONVEX_FIELD_ENCRYPTION_KEY` (`bunx convex
+  env set`) before the push, then keep `bunx convex dev` running (a `--once`
+  run stops its backend). Point `VITE_CONVEX_URL` at it in the worktree's
+  gitignored `.env.local`.
+- Password sign-in on the dev Clerk instance emails a new-device code to every
+  fresh browser. Unattended runs mint the product's own staff ticket instead:
+  `POST https://api.clerk.com/v1/sign_in_tokens` with the dev `sk_test`, then
+  visit `/?__clerk_ticket=<token>` (`convex/lib/clerkSignInTicket.ts`).
+- Recipe-review browser qualification: `scripts/recipe-review-browser-qualification.ts`
+  (NOT part of `bun run check`; scratch `playwright-core` install, run with
+  Node — Bun cannot complete playwright's CDP pipe launch; full bring-up:
+  codex-plans/production-readiness-next/recipe-review-verification.md).
 Manifest CLI safe vs unsafe in Capsule: [docs/generation/manifest-cli-safety.md](docs/generation/manifest-cli-safety.md).
 Agent enter prompt: [docs/generation/AGENT_PROMPT_ENTER_RECIPE.md](docs/generation/AGENT_PROMPT_ENTER_RECIPE.md).
 Agent MCP setup: [docs/generation/capsule-agent-mcp.md](docs/generation/capsule-agent-mcp.md).

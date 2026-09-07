@@ -353,3 +353,25 @@
 - `bun run check` exits0:161files1376tests/all repository gates including unchanged baseline cap and local build. Regen-check green; spec lint19pass; command scan326directcalls0missingdocId. Source branch pushed; no deployment.
 - Historical AC006/013 required manual receipts absent: combined statuses honestly PENDING, programmatic passes retained; independent gpt-5.6-terra approves correction.
 - Plan/findings/progress and unique review evidence archived at docs/task-plans/2026-09-06-full-wiring-audit. Only reproducible review diffs/empty task folders removed; user worktrees untouched.
+
+## 2026-09-06: My Day authenticated staff identity
+
+- Fixed the browser-only staff picker/nickname veto by consuming the server-selected account/tenant-bound Person. Missing associations use existing verified-email linking and specific recovery without another sign-in.
+- Scoped offline reads and queued writes to account, tenant and staff record; replay stops between writes on account changes. Legacy unowned queues are retained unless the user explicitly confirms discarding them.
+- Full local check passed 162 files / 1,385 tests. Issue #282 tracks the production symptom. Live account mapping was not guessed or changed; no deployment. Final independent GLM review pending at initial commit after the Codex reviewer hit its usage limit.
+
+- Final GLM-5.3 review APPROVE; code 30036258 pushed with regeneration gate green. Cold-offline gate concern was traced to unchanged outer AuthGate behavior, not a new My Day regression. No guessed data correction or auth bypass was used.
+
+## 2026-09-06: One-login Capsule account bootstrap
+
+- Owner clarified that staff selection/linking is not an acceptable login flow. AuthGate now automatically establishes the account profile for authorized workspace members and waits for that same identity before opening screens.
+- Provider-derived account details and existing session permissions create one idempotent Person-backed profile; imported rows are neither selected nor modified. Imported email matches cannot claim app access. My Day and chat read their own profile directly from authStatus, independent of roster pagination.
+- Full local check passed again: 162 files / 1,385 tests. Scratch Convex runtime checks passed repeated/concurrent creation, account isolation, imported-record preservation, disabled-account handling and the real public setup action. Independent expanded GLM review is pending; no deployment or production data changes claimed.
+
+- Final expanded-flow GLM-5.3 review APPROVE through `1faa85d3`. Review corrections preserve normal-member access and genuine invited workers' identities, remove the Manifest email-as-identity uniqueness conflict, and exclude imports from both revoked-account scans. Generated wiring/proof metadata regenerated from source. Fresh full check passes 162 files / 1,385 tests; no production deployment or account-data change performed.
+## 2026-09-06: Production-readiness continuation plan
+
+- Compared all 132 PR01–14 criteria against released source cf23268; four evidence ledgers distinguish missing behavior, existing implementation and incomplete qualification.
+- Added a delivery sequence and the first honest/resumable recipe-review plan under codex-plans/production-readiness-next; preserved the sole product roadmap and historical acceptance IDs.
+- Corrected stale roadmap deferrals and culinary durable-import claims. No product implementation, private import, provider operation or deployment occurred.
+- Fresh local full check passed 161 files / 1,376 tests; spec lint passed 19 specs. Missing-criterion scan returned zero. Local source/test proof is not authenticated production qualification.

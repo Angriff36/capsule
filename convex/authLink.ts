@@ -8,9 +8,11 @@
 // verified mailbox so the hire → email → open-app path is not blocked.
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import { action, internalMutation, internalQuery } from "./_generated/server";
+import type { MutationCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
-import { decrypt } from "./lib/encryption";
+import { decrypt, encrypt } from "./lib/encryption";
 import {
   decidePersonEmailLink,
   pickLivePerson,
@@ -19,6 +21,46 @@ import {
 
 /** Roles that carry adminAccess in src/foundation/base.manifest. */
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
+
+const ACCOUNT_ROLES: readonly Doc<"people">["role"][] = [
+  "staff",
+  "kitchen_staff",
+  "kitchen_lead",
+  "sales_staff",
+  "event_staff",
+  "inventory_staff",
+  "procurement_staff",
+  "logistics_staff",
+  "driver",
+  "workforce_staff",
+  "finance_staff",
+  "manager",
+  "kitchen_manager",
+  "sales_manager",
+  "event_manager",
+  "inventory_manager",
+  "logistics_manager",
+  "workforce_manager",
+  "finance_manager",
+  "admin",
+  "owner",
+  "system",
+];
+
+async function isImportedPerson(ctx: MutationCtx, person: Doc<"people">) {
+  return Boolean(
+    await ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", person.tenantId))
+      .filter((q) =>
+        q.and(
+          q.eq(q.field("capsuleEntity"), "person"),
+          q.eq(q.field("capsuleId"), String(person._id)),
+        ),
+      )
+      .first(),
+  );
+}
 
 export type LinkOutcome =
   | { linked: true; reason: "already" | "matched" }
@@ -45,6 +87,112 @@ export const resolveAuthContext = internalQuery({
   handler: async (ctx) => getAuthContext(ctx),
 });
 
+/** Establish the account once, before any authenticated screen opens. */
+export const ensureAccountProfile = action({
+  args: {},
+  handler: async (ctx): Promise<LinkOutcome> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return { linked: false, reason: "unauthenticated" };
+    const auth = await ctx.runQuery(internal.authLink.resolveAuthContext, {});
+    if (auth.personId) return { linked: true, reason: "already" };
+    const secret = process.env.CLERK_SECRET_KEY;
+    if (!secret) return { linked: false, reason: "not_configured" };
+    const email = await verifiedPrimaryEmail(identity.subject, secret);
+    if (email.kind !== "ok") return { linked: false, reason: email.kind };
+    if (auth.roleSource === "idp" && auth.tenantId) {
+      return await ctx.runMutation(internal.authLink.createAccountProfile, {
+        email: email.value,
+        givenName: email.givenName,
+        familyName: email.familyName,
+      });
+    }
+    // Existing employee invitations retain their automatic first-sign-in path.
+    return await ctx.runMutation(internal.authLink.linkBySubjectEmail, {
+      subject: identity.subject,
+      email: email.value,
+      tenantId: tenantIdFromIdentityClaims(identity as Record<string, unknown>),
+    });
+  },
+});
+
+/** Atomic and idempotent: authority comes from the session, never roster names. */
+export const createAccountProfile = internalMutation({
+  args: { email: v.string(), givenName: v.string(), familyName: v.string() },
+  handler: async (ctx, profile): Promise<LinkOutcome> => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return { linked: false, reason: "unauthenticated" };
+    const auth = await getAuthContext(ctx);
+    if (auth.personId) return { linked: true, reason: "already" };
+    if (auth.roleSource !== "idp" || !auth.tenantId) {
+      return { linked: false, reason: "no_match" };
+    }
+    const previous = await ctx.db
+      .query("people")
+      .withIndex("by_authSubjectId", (q) =>
+        q.eq("authSubjectId", identity.subject),
+      )
+      .filter((q) => q.eq(q.field("tenantId"), auth.tenantId))
+      .first();
+    if (previous) return { linked: false, reason: "released" };
+    // Explicitly removed account access is not a first-login bootstrap.
+    const unbound = ctx.db
+      .query("people")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("authSubjectId"), null),
+          q.eq(q.field("authSubjectId"), undefined),
+        ),
+      );
+    let hired: Doc<"people"> | null = null;
+    let multipleHires = false;
+    for await (const row of unbound) {
+      if ((await readEmail(ctx, row.email)) === profile.email) {
+        // Imports can carry null by default; that is not account revocation.
+        if (await isImportedPerson(ctx, row)) continue;
+        if (row.authSubjectId === null)
+          return { linked: false, reason: "released" };
+        if (row.status === "active" && row.deletedAt == null) {
+          if (hired) multipleHires = true;
+          else hired = row;
+        }
+      }
+    }
+    // Preserve a genuine manager-created invitation and its assigned work.
+    // Ambiguous contact records never choose the account's identity or role.
+    if (hired && !multipleHires) {
+      await ctx.db.patch(hired._id, {
+        authSubjectId: identity.subject,
+        updatedAt: Date.now(),
+        version: hired.version + 1,
+      });
+      return { linked: true, reason: "matched" };
+    }
+    const sealed = await encrypt(profile.email, {
+      ctx,
+      entity: "Person",
+      property: "email",
+    });
+    const now = Date.now();
+    await ctx.db.insert("people", {
+      tenantId: auth.tenantId,
+      authSubjectId: identity.subject,
+      givenName: profile.givenName,
+      familyName: profile.familyName,
+      email: JSON.stringify({ v: 1, kid: sealed.keyId, ct: sealed.ciphertext }),
+      // Preserve Capsule roles; Clerk member/custom roles get staff access.
+      role: ACCOUNT_ROLES.find((role) => role === auth.role) ?? "staff",
+      status: "active",
+      employmentType: "full_time",
+      deletedAt: null,
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+    });
+    return { linked: true, reason: "matched" };
+  },
+});
+
 /** Client entry point: resolve the verified email, then link. */
 export const linkSelfByEmail = action({
   args: {},
@@ -68,7 +216,7 @@ export const linkSelfByEmail = action({
 });
 
 type EmailLookup =
-  | { kind: "ok"; value: string }
+  | { kind: "ok"; value: string; givenName: string; familyName: string }
   | { kind: "provider_error" | "no_email" | "email_unverified" };
 
 /**
@@ -96,11 +244,20 @@ async function verifiedPrimaryEmail(
   if (primary.verification?.status !== "verified") {
     return { kind: "email_unverified" };
   }
-  return { kind: "ok", value: primary.email_address.trim().toLowerCase() };
+  return {
+    kind: "ok",
+    value: primary.email_address.trim().toLowerCase(),
+    givenName:
+      user.first_name?.trim() ||
+      user.username?.trim() ||
+      primary.email_address.split("@")[0]!,
+    familyName: user.last_name?.trim() || "",
+  };
 }
 
 type ClerkUser = {
   id: string;
+  username?: string | null;
   first_name?: string | null;
   last_name?: string | null;
   primary_email_address_id?: string | null;
@@ -149,7 +306,8 @@ export const linkBySubjectEmail = internalMutation({
       );
     const matches = [];
     for (const person of active(unset)) {
-      if ((await readEmail(ctx, person.email)) === email) matches.push(person);
+      if ((await readEmail(ctx, person.email)) !== email) continue;
+      if (!(await isImportedPerson(ctx, person))) matches.push(person);
     }
     if (matches.length === 0 && activeLinks.length === 0) {
       const released = await ctx.db
@@ -158,6 +316,7 @@ export const linkBySubjectEmail = internalMutation({
         .collect();
       for (const person of active(released)) {
         if ((await readEmail(ctx, person.email)) === email) {
+          if (await isImportedPerson(ctx, person)) continue;
           return { linked: false, reason: "released" };
         }
       }

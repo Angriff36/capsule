@@ -1,7 +1,8 @@
 import { UnitOfMeasureMapper, type UnitOfMeasure } from "./UnitOfMeasureMapper";
-import type {
-  ParsedIngredientLine,
-  ParsedComponentDraft,
+import {
+  isMissingQuantity,
+  type ParsedIngredientLine,
+  type ParsedComponentDraft,
 } from "./ComponentImportTypes";
 
 const FRACTIONS: Record<string, number> = {
@@ -26,9 +27,14 @@ const QUANTITY_TOKEN =
 export class ComponentTextParser {
   private readonly units = new UnitOfMeasureMapper();
 
-  mapUnitAlias(raw: string | undefined | null): UnitOfMeasure {
-    if (String(raw ?? "").trim() === "#") return "pound";
-    return this.units.map(raw);
+  /**
+   * Strict unit resolution for import parsing: "#" is catering pound
+   * notation; anything unrecognized stays null so review must correct it.
+   */
+  mapUnitAlias(raw: string | undefined | null): UnitOfMeasure | null {
+    const token = String(raw ?? "").trim();
+    if (token === "#") return "pound";
+    return this.units.resolve(token);
   }
 
   parse(source: string): ParsedComponentDraft {
@@ -37,8 +43,8 @@ export class ComponentTextParser {
     if (!text) {
       return {
         name: "Untitled component",
-        yieldQuantity: 1,
-        yieldUnit: "portion",
+        yieldQuantity: null,
+        yieldUnit: null,
         lines: [],
         warnings: ["Paste a component to begin."],
       };
@@ -110,7 +116,7 @@ export class ComponentTextParser {
   private extractYield(
     text: string,
     warnings: string[],
-  ): { yieldQuantity: number; yieldUnit: UnitOfMeasure } {
+  ): { yieldQuantity: number | null; yieldUnit: UnitOfMeasure | null } {
     const poundYield =
       text.match(
         new RegExp(
@@ -123,8 +129,13 @@ export class ComponentTextParser {
       );
     if (poundYield) {
       const quantity = this.parseQuantity(poundYield[1]);
+      if (isMissingQuantity(quantity)) {
+        warnings.push(
+          "Yield amount is not a positive number. Correct it before saving.",
+        );
+      }
       return {
-        yieldQuantity: quantity > 0 ? quantity : 1,
+        yieldQuantity: isMissingQuantity(quantity) ? null : quantity,
         yieldUnit: "pound",
       };
     }
@@ -143,13 +154,31 @@ export class ComponentTextParser {
         ),
       );
     if (!match) {
-      warnings.push("Yield not found; defaulting to 1 portion.");
-      return { yieldQuantity: 1, yieldUnit: "portion" };
+      warnings.push("Yield not found. Enter the yield before saving.");
+      return { yieldQuantity: null, yieldUnit: null };
     }
     const quantity = this.parseQuantity(match[1]);
-    const unit = this.mapUnitAlias(match[2] ?? "portion");
+    if (isMissingQuantity(quantity)) {
+      warnings.push(
+        "Yield amount is not a positive number. Correct it before saving.",
+      );
+    }
+    const rawUnit = match[2]?.trim();
+    if (!rawUnit) {
+      warnings.push("Yield has no unit. Choose the yield unit.");
+      return {
+        yieldQuantity: isMissingQuantity(quantity) ? null : quantity,
+        yieldUnit: null,
+      };
+    }
+    const unit = this.mapUnitAlias(rawUnit);
+    if (!unit) {
+      warnings.push(
+        `Yield unit “${rawUnit}” is not recognized. Choose the correct yield unit.`,
+      );
+    }
     return {
-      yieldQuantity: quantity > 0 ? quantity : 1,
+      yieldQuantity: isMissingQuantity(quantity) ? null : quantity,
       yieldUnit: unit,
     };
   }
@@ -224,7 +253,7 @@ export class ComponentTextParser {
       return {
         raw: cleaned,
         name,
-        quantity: quantity > 0 ? quantity : 1,
+        quantity: isMissingQuantity(quantity) ? null : quantity,
         unit: "pound",
         unitRaw: "#",
         prepNotes,
@@ -238,16 +267,16 @@ export class ComponentTextParser {
       return {
         raw: cleaned,
         name: this.titleCase(cleaned),
-        quantity: 1,
-        unit: "each",
-        unitRaw: "each",
+        quantity: null,
+        unit: null,
+        unitRaw: "",
       };
     }
 
     const quantity = this.parseQuantity(quantityMatch[1]);
     let rest = quantityMatch[2].trim();
-    let unitRaw = "each";
-    let unit: UnitOfMeasure = "each";
+    let unitRaw = "";
+    let unit: UnitOfMeasure | null = null;
 
     const unitMatch = rest.match(
       /^([#A-Za-z½¼¾]+)\b(?:\s*\(([^)]+)\))?\s+(.*)$/u,
@@ -271,7 +300,7 @@ export class ComponentTextParser {
     return {
       raw: cleaned,
       name,
-      quantity: quantity > 0 ? quantity : 1,
+      quantity: isMissingQuantity(quantity) ? null : quantity,
       unit,
       unitRaw,
       prepNotes,

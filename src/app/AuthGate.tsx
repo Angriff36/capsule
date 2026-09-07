@@ -59,8 +59,9 @@ export function AuthGate({ children }: { children?: ReactNode }) {
 }
 
 function ClaimGate({ children }: { children?: ReactNode }) {
+  const { user } = useUser();
   const status = useQuery(api.authStatus.getAuthStatus, {});
-  if (status === undefined) {
+  if (status === undefined || status.accountId !== user?.id) {
     return (
       <GateShell title="Loading workspace…">
         <p className="text-ink-2">Confirming your workspace membership.</p>
@@ -70,7 +71,50 @@ function ClaimGate({ children }: { children?: ReactNode }) {
   if (!workspaceMembershipPolicy.isReady(status as AuthStatusSnapshot)) {
     return <MembershipRequired />;
   }
+  if (!status.personId) {
+    return <AccountProfileSetup key={`${user?.id}:${status.tenantId}`} />;
+  }
   return <>{children}</>;
+}
+
+function AccountProfileSetup() {
+  const ensureProfile = useAction(api.authLink.ensureAccountProfile);
+  const [attempt, setAttempt] = useState(0);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let active = true;
+    setFailed(false);
+    void ensureProfile({})
+      .then((result) => {
+        if (active && !result.linked) setFailed(true);
+      })
+      .catch(() => {
+        if (active) setFailed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [ensureProfile, attempt]);
+  return (
+    <GateShell
+      title={failed ? "Couldn’t open your profile" : "Opening Capsule…"}
+    >
+      <p role="status" className="text-ink-2">
+        {failed
+          ? "Your sign-in is saved. We couldn’t load your Capsule account. Try again without signing out."
+          : "Loading your account and workspace."}
+      </p>
+      {failed && (
+        <button
+          className="btn btn-primary mt-4 min-h-11"
+          type="button"
+          onClick={() => setAttempt((value) => value + 1)}
+        >
+          Try again
+        </button>
+      )}
+    </GateShell>
+  );
 }
 
 function SignInScreen() {
@@ -131,7 +175,7 @@ function MembershipRequired() {
   const activeOrgId = organization?.id ?? "";
   // Display only — the server re-reads the verified email from the provider.
   const email = user?.primaryEmailAddress?.emailAddress ?? null;
-  const linkSelf = useAction(api.authLink.linkSelfByEmail);
+  const linkSelf = useAction(api.authLink.ensureAccountProfile);
   const [outcome, setOutcome] = useState<LinkOutcome>("linking");
   const attempt = useCallback(() => {
     setOutcome("linking");

@@ -16,6 +16,22 @@ const QUEUE_KEY = "capsule.my-day.queue";
 const QUEUE_EVENT = "capsule:my-day-queue";
 const CACHE_WRITE_DEBOUNCE_MS = 400;
 
+/** Only called after explicit user confirmation; sign-in never deletes older work. */
+export function discardUnscopedQueuedWork(): void {
+  localStorage.removeItem(QUEUE_KEY);
+  window.dispatchEvent(new Event(QUEUE_EVENT));
+}
+
+/** Older queues have no owner. Retain them, but never assign them to whoever signs in next. */
+export function hasUnscopedQueuedWork(): boolean {
+  try {
+    const rows: unknown = JSON.parse(localStorage.getItem(QUEUE_KEY) ?? "[]");
+    return Array.isArray(rows) && rows.length > 0;
+  } catch {
+    return false;
+  }
+}
+
 export interface QueuedAction {
   id: string;
   /** Stable key identifying which mutation to run, e.g. "clock-in". */
@@ -84,9 +100,15 @@ interface CachedSlot<T> {
   cachedAt: number;
 }
 
-export function readCache<T>(slot: string): T | undefined {
+export function readCache<T>(
+  slot: string,
+  scope: string | null = null,
+): T | undefined {
+  if (!scope) return undefined;
   try {
-    const raw = localStorage.getItem(CACHE_PREFIX + slot);
+    const raw = localStorage.getItem(
+      CACHE_PREFIX + encodeURIComponent(scope) + "." + slot,
+    );
     if (!raw) return undefined;
     const parsed = JSON.parse(raw) as CachedSlot<T>;
     return parsed?.data;
@@ -95,10 +117,10 @@ export function readCache<T>(slot: string): T | undefined {
   }
 }
 
-function writeCache<T>(slot: string, data: T): void {
+function writeCache<T>(slot: string, data: T, scope: string): void {
   try {
     localStorage.setItem(
-      CACHE_PREFIX + slot,
+      CACHE_PREFIX + encodeURIComponent(scope) + "." + slot,
       JSON.stringify({ data, cachedAt: Date.now() } satisfies CachedSlot<T>),
     );
   } catch {
@@ -106,9 +128,15 @@ function writeCache<T>(slot: string, data: T): void {
   }
 }
 
-export function cacheAgeMs(slot: string): number | undefined {
+export function cacheAgeMs(
+  slot: string,
+  scope: string | null = null,
+): number | undefined {
+  if (!scope) return undefined;
   try {
-    const raw = localStorage.getItem(CACHE_PREFIX + slot);
+    const raw = localStorage.getItem(
+      CACHE_PREFIX + encodeURIComponent(scope) + "." + slot,
+    );
     if (!raw) return undefined;
     const parsed = JSON.parse(raw) as CachedSlot<unknown>;
     return typeof parsed.cachedAt === "number" ? parsed.cachedAt : undefined;
@@ -125,21 +153,31 @@ export function cacheAgeMs(slot: string): number | undefined {
 export function useCachedRead<T>(
   slot: string,
   live: T | undefined,
+  scope: string | null = null,
 ): T | undefined {
-  const [cached, setCached] = useState<T | undefined>(() => readCache<T>(slot));
+  const [cached, setCached] = useState(() => ({
+    scope,
+    slot,
+    data: readCache<T>(slot, scope),
+  }));
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
-    if (live === undefined) return;
+    if (live === undefined || !scope) return;
     clearTimeout(timer.current);
     timer.current = setTimeout(() => {
-      writeCache(slot, live);
-      setCached(live);
+      writeCache(slot, live, scope);
+      setCached({ scope, slot, data: live });
     }, CACHE_WRITE_DEBOUNCE_MS);
     return () => clearTimeout(timer.current);
-  }, [slot, live]);
+  }, [slot, live, scope]);
 
-  return live ?? cached;
+  return (
+    live ??
+    (cached.scope === scope && cached.slot === slot
+      ? cached.data
+      : readCache<T>(slot, scope))
+  );
 }
 
 // ---------- write queue ----------
@@ -158,9 +196,12 @@ function isQueuedAction(value: unknown): value is QueuedAction {
   );
 }
 
-export function loadQueue(): QueuedAction[] {
+export function loadQueue(scope: string | null = null): QueuedAction[] {
+  if (!scope) return [];
   try {
-    const raw = localStorage.getItem(QUEUE_KEY);
+    const raw = localStorage.getItem(
+      QUEUE_KEY + "." + encodeURIComponent(scope),
+    );
     const parsed: unknown = raw ? JSON.parse(raw) : [];
     if (!Array.isArray(parsed)) return [];
     return parsed.filter(isQueuedAction);
@@ -169,13 +210,12 @@ export function loadQueue(): QueuedAction[] {
   }
 }
 
-function saveQueue(queue: QueuedAction[]): void {
-  try {
-    localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
-    window.dispatchEvent(new Event(QUEUE_EVENT));
-  } catch {
-    // Storage unavailable — the action just won't persist across reloads.
-  }
+function saveQueue(queue: QueuedAction[], scope: string): void {
+  localStorage.setItem(
+    QUEUE_KEY + "." + encodeURIComponent(scope),
+    JSON.stringify(queue),
+  );
+  window.dispatchEvent(new Event(QUEUE_EVENT));
 }
 
 function newId(): string {
@@ -187,49 +227,60 @@ function newId(): string {
 
 export function enqueueAction(
   action: Omit<QueuedAction, "id" | "idempotencyKey" | "queuedAt">,
+  scope: string | null = null,
 ): QueuedAction {
+  if (!scope)
+    throw new Error(
+      "Your staff identity must be confirmed before saving offline work.",
+    );
   const full: QueuedAction = {
     ...action,
     id: newId(),
     idempotencyKey: newId(),
     queuedAt: Date.now(),
   };
-  saveQueue([...loadQueue(), full]);
+  saveQueue([...loadQueue(scope), full], scope);
   return full;
 }
 
-export function removeAction(id: string): void {
-  saveQueue(loadQueue().filter((action) => action.id !== id));
+export function removeAction(id: string, scope: string): void {
+  saveQueue(
+    loadQueue(scope).filter((action) => action.id !== id),
+    scope,
+  );
 }
 
 export function updateAction(
   id: string,
   patch: Partial<Pick<QueuedAction, "lastError">>,
+  scope: string,
 ): void {
   saveQueue(
-    loadQueue().map((action) =>
+    loadQueue(scope).map((action) =>
       action.id === id ? { ...action, ...patch } : action,
     ),
+    scope,
   );
 }
 
-export function clearQueue(): void {
-  saveQueue([]);
+export function clearQueue(scope: string): void {
+  saveQueue([], scope);
 }
 
 /** Reactive view of the pending write queue. */
-export function useQueuedActions(): QueuedAction[] {
-  const [queue, setQueue] = useState<QueuedAction[]>(loadQueue);
+export function useQueuedActions(scope: string | null = null): QueuedAction[] {
+  const [queue, setQueue] = useState(() => ({ scope, rows: loadQueue(scope) }));
   useEffect(() => {
-    const sync = () => setQueue(loadQueue());
+    const sync = () => setQueue({ scope, rows: loadQueue(scope) });
+    sync();
     window.addEventListener(QUEUE_EVENT, sync);
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener(QUEUE_EVENT, sync);
       window.removeEventListener("storage", sync);
     };
-  }, []);
-  return queue;
+  }, [scope]);
+  return queue.scope === scope ? queue.rows : loadQueue(scope);
 }
 
 export function useOnlineStatus(): boolean {
@@ -258,21 +309,24 @@ function errorMessage(error: unknown): string {
  */
 export async function drainQueue(
   runners: Record<string, MutationRunner>,
+  scope: string | null = null,
+  stillCurrent: () => boolean = () => true,
 ): Promise<void> {
+  if (!scope) return;
   let sawFailure = false;
-  while (!sawFailure) {
-    const action = loadQueue()[0];
+  while (!sawFailure && stillCurrent()) {
+    const action = loadQueue(scope)[0];
     if (!action) return;
     const runner = runners[action.runKey];
     if (!runner) {
-      removeAction(action.id);
+      removeAction(action.id, scope);
       continue;
     }
     try {
       await runner({ ...action.args, idempotencyKey: action.idempotencyKey });
-      removeAction(action.id);
+      removeAction(action.id, scope);
     } catch (error) {
-      updateAction(action.id, { lastError: errorMessage(error) });
+      updateAction(action.id, { lastError: errorMessage(error) }, scope);
       sawFailure = true;
     }
   }
@@ -286,16 +340,29 @@ export async function drainQueue(
  * keeps failing — the drain only re-fires when online state or queue length
  * actually changes.
  */
-export function useOfflineSync(runnersRef: {
-  current: Record<string, MutationRunner>;
-}): void {
+export function useOfflineSync(
+  runnersRef: {
+    current: Record<string, MutationRunner>;
+  },
+  scope: string | null = null,
+): void {
   const online = useOnlineStatus();
-  const queue = useQueuedActions();
+  const queue = useQueuedActions(scope);
+  const scopeRef = useRef(scope);
+  scopeRef.current = scope;
   const draining = useRef(false);
   const lastSignature = useRef("");
+  const [settled, setSettled] = useState(0);
   useEffect(() => {
-    const signature = `${online ? "on" : "off"}:${queue.length}`;
+    scopeRef.current = scope;
+    return () => {
+      scopeRef.current = null;
+    };
+  }, [scope]);
+  useEffect(() => {
+    const signature = `${scope}:${online ? "on" : "off"}:${queue.length}`;
     if (
+      !scope ||
       !online ||
       queue.length === 0 ||
       draining.current ||
@@ -305,9 +372,15 @@ export function useOfflineSync(runnersRef: {
     }
     lastSignature.current = signature;
     draining.current = true;
-    void drainQueue(runnersRef.current).finally(() => {
-      draining.current = false;
-      lastSignature.current = `${online ? "on" : "off"}:${loadQueue().length}`;
-    });
-  }, [online, queue, runnersRef]);
+    void drainQueue(runnersRef.current, scope, () => scopeRef.current === scope)
+      .catch(() => {
+        // Preserve work if storage cannot record an acknowledgement.
+      })
+      .finally(() => {
+        draining.current = false;
+        if (scopeRef.current === scope)
+          lastSignature.current = `${scope}:${online ? "on" : "off"}:${loadQueue(scope).length}`;
+        if (scopeRef.current) setSettled((value) => value + 1);
+      });
+  }, [online, queue, runnersRef, scope, settled]);
 }

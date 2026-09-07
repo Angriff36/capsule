@@ -37,6 +37,11 @@ export interface ComponentImportCommandPorts {
   importComponent?: (input: {
     operationKey: string;
     projection: Record<string, unknown>;
+    /** Durable review identity; makes the atomic finalize complete the import. */
+    review?: {
+      importId: string;
+      expectedRevision: number;
+    };
   }) => Promise<ComponentImportFinalizeResult>;
   createIngredient: (
     input: CreateIngredientInput,
@@ -56,6 +61,9 @@ export interface ComponentImportFinalizeResult {
 
 /**
  * Finalizes a reviewed import draft through generated createVia commands only.
+ * Measured fields are nullable through review; finalize narrows them to the
+ * required-number projection only after validation, so no guessed default
+ * ever reaches a write.
  */
 export class ComponentImportFinalizer {
   constructor(private readonly ports: ComponentImportCommandPorts) {}
@@ -66,9 +74,14 @@ export class ComponentImportFinalizer {
   ): Promise<ComponentImportFinalizeResult> {
     const name = review.name.trim();
     if (!name) throw new Error("Component name is required");
-    if (review.yieldQuantity <= 0) {
-      throw new Error("Component yield quantity must be positive");
-    }
+    const yieldQuantity = requireMeasuredQuantity(
+      review.yieldQuantity,
+      "Component yield quantity must be positive",
+    );
+    const yieldUnit = requireMeasuredUnit(
+      review.yieldUnit,
+      "Component yield unit is required",
+    );
     if (review.lines.length === 0) {
       throw new Error("Add at least one ingredient line before saving");
     }
@@ -78,28 +91,41 @@ export class ComponentImportFinalizer {
         `${unresolved} ingredient line${unresolved === 1 ? "" : "s"} still need review`,
       );
     }
-    for (const line of review.lines) {
-      if (line.quantity <= 0) {
-        throw new Error(`Quantity must be positive for ${line.name}`);
-      }
+    const measuredLines = review.lines.map((line) => ({
+      line,
+      quantity: requireMeasuredQuantity(
+        line.quantity,
+        `Quantity must be positive for ${line.name}`,
+      ),
+      unit: requireMeasuredUnit(line.unit, `Unit is required for ${line.name}`),
+    }));
+    for (const { line } of measuredLines) {
       if (!isLineResolved(line)) {
         throw new Error(`${line.name} is not resolved`);
       }
     }
 
     if (this.ports.importComponent && operationKey) {
+      const reviewRef =
+        review.importId != null && review.reviewRevision != null
+          ? {
+              importId: review.importId,
+              expectedRevision: review.reviewRevision,
+            }
+          : undefined;
       return this.ports.importComponent({
         operationKey,
+        review: reviewRef,
         projection: {
           name,
-          yieldQuantity: review.yieldQuantity,
-          yieldUnit: review.yieldUnit,
+          yieldQuantity,
+          yieldUnit,
           batchMultiplier: review.batchMultiplier,
           category: review.category?.trim() || undefined,
           cuisine: review.cuisine?.trim() || undefined,
           description: review.description?.trim() || undefined,
           instructions: review.instructions?.trim() || undefined,
-          lines: review.lines.map((line, index) => ({
+          lines: measuredLines.map(({ line, quantity, unit }, index) => ({
             name: line.name.trim(),
             ingredientId:
               line.createNew || line.matchStatus === "confirmed_new"
@@ -109,8 +135,8 @@ export class ComponentImportFinalizer {
               line.createNew || line.matchStatus === "confirmed_new"
                 ? true
                 : undefined,
-            quantity: line.quantity,
-            unit: line.unit,
+            quantity,
+            unit,
             sortOrder: index + 1,
             prepNotes: line.prepNotes?.trim() || undefined,
           })),
@@ -121,11 +147,11 @@ export class ComponentImportFinalizer {
     const createdIngredientIds: string[] = [];
     const ingredientIds: string[] = [];
 
-    for (const line of review.lines) {
+    for (const { line, unit } of measuredLines) {
       if (line.createNew || line.matchStatus === "confirmed_new") {
         const created = await this.ports.createIngredient({
           name: line.name.trim(),
-          unit: line.unit,
+          unit,
           costPerUnit: 0,
           allergens: [],
         });
@@ -140,8 +166,8 @@ export class ComponentImportFinalizer {
 
     const component = await this.ports.createComponent({
       name,
-      yieldQuantity: review.yieldQuantity,
-      yieldUnit: review.yieldUnit,
+      yieldQuantity,
+      yieldUnit,
       batchMultiplier: review.batchMultiplier,
       category: review.category?.trim() || undefined,
       cuisine: review.cuisine?.trim() || undefined,
@@ -150,13 +176,13 @@ export class ComponentImportFinalizer {
     });
 
     const lineIds: string[] = [];
-    for (let index = 0; index < review.lines.length; index += 1) {
-      const line = review.lines[index];
+    for (let index = 0; index < measuredLines.length; index += 1) {
+      const { line, quantity, unit } = measuredLines[index];
       const created = await this.ports.createComponentIngredient({
         componentId: component.docId,
         ingredientId: ingredientIds[index],
-        quantity: line.quantity,
-        unit: line.unit,
+        quantity,
+        unit,
         sortOrder: index + 1,
         prepNotes: line.prepNotes?.trim() || undefined,
       });
@@ -169,4 +195,23 @@ export class ComponentImportFinalizer {
       lineIds,
     };
   }
+}
+
+function requireMeasuredQuantity(
+  value: number | null,
+  message: string,
+): number {
+  // Same rule as isMissingQuantity, inlined so the narrowing holds here.
+  if (value == null || !Number.isFinite(value) || value <= 0) {
+    throw new Error(message);
+  }
+  return value;
+}
+
+function requireMeasuredUnit(
+  value: UnitOfMeasure | null,
+  message: string,
+): UnitOfMeasure {
+  if (value == null) throw new Error(message);
+  return value;
 }

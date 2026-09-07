@@ -44,6 +44,16 @@ describe("UnitOfMeasureMapper", () => {
     expect(mapper.map("gals")).toBe("gallon");
     expect(mapper.isKnownAlias("C")).toBe(true);
   });
+
+  it("resolves strictly for imports: unknown units stay null, never each", () => {
+    const mapper = new UnitOfMeasureMapper();
+    expect(mapper.resolve("kg")).toBe("kilogram");
+    expect(mapper.resolve("fl oz")).toBeNull(); // no supported volume-oz unit
+    expect(mapper.resolve("mystery-pack")).toBeNull();
+    expect(mapper.resolve("medium")).toBeNull(); // size word, not a unit
+    expect(mapper.resolve("")).toBeNull();
+    expect(mapper.map("medium")).toBe("each"); // legacy map stays permissive
+  });
 });
 
 describe("SourceFingerprint", () => {
@@ -66,14 +76,65 @@ describe("ComponentTextParser", () => {
       quantity: 1,
       unit: "pound",
     });
+    // "1 small onion" states no real unit: the size word stays recorded as
+    // the raw token with a null unit, instead of a silent "each".
     expect(parsed.lines[1]).toMatchObject({
       name: "Onion",
-      unit: "each",
+      quantity: 1,
+      unit: null,
+      unitRaw: "small",
       prepNotes: "chopped",
     });
     expect(parsed.lines[2].quantity).toBeCloseTo(0.25);
     expect(parsed.lines[2].unit).toBe("cup");
     expect(parsed.instructions).toContain("Brown the turkey");
+  });
+
+  it("keeps a missing yield as an explicit gap instead of 1 portion", () => {
+    const parsed = new ComponentTextParser().parse(
+      "Sauce\n\nIngredients:\n2 kg flour\n",
+    );
+    expect(parsed.yieldQuantity).toBeNull();
+    expect(parsed.yieldUnit).toBeNull();
+    expect(parsed.warnings.join(" ")).toContain("Yield not found");
+  });
+
+  it("keeps unrecognized yield units and line units null with raw text preserved", () => {
+    const parsed = new ComponentTextParser().parse(
+      "Relish\n\nYield: 6 trays\n\nIngredients:\n1 medium onion, chopped\n2 fl oz lemon juice\ncase tomatoes\n",
+    );
+    expect(parsed.yieldQuantity).toBe(6);
+    expect(parsed.yieldUnit).toBeNull();
+    expect(parsed.warnings.join(" ")).toContain("trays");
+    expect(parsed.lines[0]).toMatchObject({
+      raw: "1 medium onion, chopped",
+      name: "Onion",
+      quantity: 1,
+      unit: null,
+      unitRaw: "medium",
+      prepNotes: "chopped",
+    });
+    expect(parsed.lines[1]).toMatchObject({
+      quantity: 2,
+      unit: null,
+      unitRaw: "",
+    });
+    expect(parsed.lines[1].name).toContain("Lemon Juice");
+    expect(parsed.lines[2]).toMatchObject({
+      raw: "case tomatoes",
+      quantity: null,
+      unit: null,
+    });
+  });
+
+  it("keeps mixed fractions and fraction glyphs exact", () => {
+    const parsed = new ComponentTextParser().parse(
+      "Base\n\nYield: 2 quarts\n\nIngredients:\n1 1/2 cups water\n½ tsp citric acid\n",
+    );
+    expect(parsed.lines[0].quantity).toBeCloseTo(1.5);
+    expect(parsed.lines[0].unit).toBe("cup");
+    expect(parsed.lines[1].quantity).toBeCloseTo(0.5);
+    expect(parsed.lines[1].unit).toBe("teaspoon");
   });
 
   it("handles pound notation and catering yields from fixtures", () => {
@@ -138,6 +199,38 @@ describe("ComponentCsvParser", () => {
     expect(result.draft.lines.length).toBeGreaterThan(0);
     expect(result.draft.yieldQuantity).toBe(2);
   });
+
+  it("keeps missing or unrecognized CSV yield values as gaps, not defaults", () => {
+    const sheet = [
+      "component_name,description,category,cuisine,yield_quantity,yield_unit,batch_multiplier,instructions",
+      "Sauce,,,,,trays,,",
+    ].join("\n");
+    const lines = [
+      "component_name,source_order,source_line,quantity,unit,ingredient_name,preparation_note",
+      "Sauce,1,1 cup water,,,,",
+      "Sauce,2,2 lb tomatoes,,,",
+    ].join("\n");
+    const result = new ComponentCsvParser().parseBundle(sheet, lines);
+    expect(result.errors).toEqual([]);
+    expect(result.draft.yieldQuantity).toBeNull();
+    expect(result.draft.yieldUnit).toBeNull();
+    expect(result.draft.lines[0]).toMatchObject({
+      quantity: 1,
+      unit: "cup",
+      raw: "1 cup water",
+    });
+    expect(result.draft.lines[1]).toMatchObject({ quantity: 2, unit: "pound" });
+  });
+
+  it("still reports structural CSV header errors", () => {
+    const result = new ComponentCsvParser().parseBundle(
+      "a,b\n1,2\n",
+      "x,y\n3,4\n",
+    );
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.errors[0]).toMatchObject({ row: 1 });
+    expect(result.draft.lines).toEqual([]);
+  });
 });
 
 describe("IngredientCatalogMatcher", () => {
@@ -190,7 +283,7 @@ describe("IngredientCatalogMatcher", () => {
 });
 
 describe("ComponentImportCoordinator", () => {
-  it("blocks finalize readiness until non-exact lines are confirmed", () => {
+  it("blocks finalize readiness until lines are confirmed and measurements corrected", () => {
     const review = new ComponentImportCoordinator().parseText(SAMPLE, [
       { id: "ing-onion", name: "Onion" },
     ]);
@@ -205,7 +298,16 @@ describe("ComponentImportCoordinator", () => {
           : { ...line, matchStatus: "confirmed_new" as const, createNew: true },
       ),
     };
-    expect(reviewIsReady(resolved)).toBe(true);
+    // Matches are settled but "1 small onion" still has no valid unit.
+    expect(reviewIsReady(resolved)).toBe(false);
+
+    const corrected = {
+      ...resolved,
+      lines: resolved.lines.map((line) =>
+        line.unit == null ? { ...line, unit: "each" as const } : line,
+      ),
+    };
+    expect(reviewIsReady(corrected)).toBe(true);
   });
 });
 
@@ -217,11 +319,20 @@ describe("ComponentImportFinalizer", () => {
     ]);
     const ready = {
       ...review,
-      lines: review.lines.map((line) =>
-        line.matchStatus === "exact"
-          ? line
-          : { ...line, matchStatus: "confirmed_new" as const, createNew: true },
-      ),
+      lines: review.lines
+        .map((line) =>
+          line.matchStatus === "exact"
+            ? line
+            : {
+                ...line,
+                matchStatus: "confirmed_new" as const,
+                createNew: true,
+              },
+        )
+        // Correct the unrecognized "small" unit the way a reviewer would.
+        .map((line) =>
+          line.unit == null ? { ...line, unit: "each" as const } : line,
+        ),
     };
     const finalizer = new ComponentImportFinalizer({
       createIngredient: async (input) => {

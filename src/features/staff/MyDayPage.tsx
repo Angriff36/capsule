@@ -40,6 +40,8 @@ import {
 import { WorkforceFailureBanner } from "../workforce/WorkforceFailureBanner";
 import {
   drainQueue,
+  discardUnscopedQueuedWork,
+  hasUnscopedQueuedWork,
   enqueueAction,
   useCachedRead,
   useOfflineSync,
@@ -48,10 +50,10 @@ import {
   type MutationRunner,
 } from "./offlineStore";
 import { MyDayFrame, OfflineStatusBar } from "./MyDayFrame";
-import {
-  clerkSignedInLabel,
-  myDayIdentityResolver,
-} from "./MyDayIdentityResolver";
+import { clerkSignedInLabel } from "./MyDayIdentityResolver";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import { resolveMyDayAccount } from "./resolveMyDayAccount";
+import { MyDayProfileLink } from "./MyDayProfileLink";
 import { ShiftSwapCard } from "./ShiftSwapCard";
 import { TimeOffRequestCard } from "./TimeOffRequestCard";
 import { WeeklyAvailabilityCard } from "./WeeklyAvailabilityCard";
@@ -81,22 +83,45 @@ const BLOCK_BTN = "btn btn-primary mt-3 w-full py-3 text-lg max-sm:min-h-11";
  */
 export function MyDayPage() {
   const { user, isLoaded: clerkLoaded } = useUser();
-  const people = useCachedRead("people", useListPerson());
-  const shifts = useCachedRead("shifts", useListShift());
+  const authStatus = useAuthStatus();
+  const offlineScope =
+    clerkLoaded && user?.id && authStatus?.tenantId && authStatus.personId
+      ? JSON.stringify([user.id, authStatus.tenantId, authStatus.personId])
+      : null;
+  const people = useCachedRead("people", useListPerson(), offlineScope);
+  const shifts = useCachedRead("shifts", useListShift(), offlineScope);
   const scheduleNotices = useCachedRead(
     "scheduleNotices",
     useListWeeklyScheduleNotice(),
+    offlineScope,
   );
-  const records = useCachedRead("timeRecords", useListTimeRecord());
-  const tasks = useCachedRead("prepTasks", useListPrepTask());
-  const deliveries = useCachedRead("deliveries", useListDelivery());
-  const closeouts = useCachedRead("closeouts", useListEventCloseout());
-  const events = useCachedRead("events", useListEvent());
-  const packLists = useCachedRead("packLists", useListPackList());
-  const packItems = useCachedRead("packItems", useListPackListItem());
+  const records = useCachedRead(
+    "timeRecords",
+    useListTimeRecord(),
+    offlineScope,
+  );
+  const tasks = useCachedRead("prepTasks", useListPrepTask(), offlineScope);
+  const deliveries = useCachedRead(
+    "deliveries",
+    useListDelivery(),
+    offlineScope,
+  );
+  const closeouts = useCachedRead(
+    "closeouts",
+    useListEventCloseout(),
+    offlineScope,
+  );
+  const events = useCachedRead("events", useListEvent(), offlineScope);
+  const packLists = useCachedRead("packLists", useListPackList(), offlineScope);
+  const packItems = useCachedRead(
+    "packItems",
+    useListPackListItem(),
+    offlineScope,
+  );
   const windows = useCachedRead(
     "availabilityWindows",
     useListAvailabilityWindow(),
+    offlineScope,
   );
 
   const clockIn = useCreateTimeRecord();
@@ -114,7 +139,7 @@ export function MyDayPage() {
   const withdrawWindow = useAvailabilityWindowWithdraw();
 
   const online = useOnlineStatus();
-  const pending = useQueuedActions();
+  const pending = useQueuedActions(offlineScope);
 
   // Registry of queueable mutations keyed by a stable runKey. Held in a ref so
   // the drain effect doesn't re-run on every render, while always calling the
@@ -149,7 +174,6 @@ export function MyDayPage() {
     "availability-declare": declareWindow,
     "availability-withdraw": withdrawWindow,
   };
-  useOfflineSync(runnersRef);
 
   const userId = user?.id;
   const signedInSubjectId = clerkLoaded && userId ? userId : undefined;
@@ -162,48 +186,29 @@ export function MyDayPage() {
       user?.emailAddresses?.[0]?.emailAddress,
   };
   const clerkDisplayName = clerkSignedInLabel(clerkProfileName);
-  const [storedPersonId, setStoredPersonId] = useState<string | null>(() =>
-    myDayIdentityResolver.readStoredPersonId(signedInSubjectId),
-  );
-  const [forcePicker, setForcePicker] = useState(false);
   const [showDeclare, setShowDeclare] = useState(false);
   const [openPhotoKey, setOpenPhotoKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
-  // Re-key the remembered pick when Clerk finishes loading or the account
-  // switches. A leftover device-global / previous-account pick must not stay
-  // in React state after the signed-in subject changes.
-  useEffect(() => {
-    setStoredPersonId(
-      myDayIdentityResolver.readStoredPersonId(signedInSubjectId),
-    );
-    setForcePicker(false);
-  }, [signedInSubjectId]);
-
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
   );
-  const { person: me, linkedToSignIn } = myDayIdentityResolver.resolve(
-    activePeople,
+  const me = resolveMyDayAccount(
+    authStatus?.profile ? [authStatus.profile] : activePeople,
+    authStatus,
     signedInSubjectId,
-    signedInSubjectId ? storedPersonId : null,
-    clerkProfileName,
   );
-  const linkedPersonName =
-    linkedToSignIn && me ? `${me.givenName} ${me.familyName}` : undefined;
-
-  const choosePerson = (id: string) => {
-    myDayIdentityResolver.storePersonId(signedInSubjectId, id);
-    setStoredPersonId(id);
-    setForcePicker(false);
-  };
-
-  const switchPerson = () => {
-    myDayIdentityResolver.clearStoredPersonId(signedInSubjectId);
-    setStoredPersonId(null);
-    setForcePicker(true);
-  };
+  const linkedPersonName = me ? `${me.givenName} ${me.familyName}` : undefined;
+  useOfflineSync(runnersRef, me ? offlineScope : null);
+  const replayScope = useRef<string | null>(null);
+  replayScope.current = me ? offlineScope : null;
+  useEffect(() => {
+    replayScope.current = me ? offlineScope : null;
+    return () => {
+      replayScope.current = null;
+    };
+  }, [me?._id, offlineScope]);
 
   const run = (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -228,7 +233,12 @@ export function MyDayPage() {
     afterSuccess?: () => void,
   ) => {
     if (!online) {
-      enqueueAction({ runKey, label, args });
+      setFailure(null);
+      try {
+        enqueueAction({ runKey, label, args }, offlineScope);
+      } catch (error) {
+        setFailure(error);
+      }
       return;
     }
     const runner = runnersRef.current[runKey];
@@ -243,10 +253,14 @@ export function MyDayPage() {
 
   const retryPending = () => {
     setFailure(null);
-    void drainQueue(runnersRef.current).catch(setFailure);
+    void drainQueue(
+      runnersRef.current,
+      offlineScope,
+      () => replayScope.current === offlineScope,
+    ).catch(setFailure);
   };
 
-  if (people === undefined || !clerkLoaded) {
+  if (people === undefined || !clerkLoaded || authStatus === undefined) {
     return (
       <MyDayFrame signedInName={clerkDisplayName || undefined}>
         <TableSkeleton rows={6} />
@@ -254,33 +268,14 @@ export function MyDayPage() {
     );
   }
 
-  if (!me || forcePicker) {
+  if (!me) {
     return (
       <MyDayFrame signedInName={clerkDisplayName || undefined}>
-        <section className="card px-4 py-4">
-          <p className="eyebrow">Who are you?</p>
-          <p className="mt-2 text-base leading-relaxed text-ink-2">
-            Your sign-in is not linked to a staff profile yet. Pick your name
-            once — it is remembered on this phone.
-          </p>
-          <div className="mt-3 flex flex-col gap-2">
-            {activePeople.map((person) => (
-              <button
-                key={person._id}
-                className="btn btn-ghost w-full justify-start py-3 text-lg max-sm:min-h-11"
-                onClick={() => choosePerson(person._id)}
-              >
-                {person.givenName} {person.familyName}
-              </button>
-            ))}
-            {activePeople.length === 0 ? (
-              <EmptyState
-                title="No active staff profiles yet"
-                hint="Ask a manager to add you to this workspace, then reload."
-              />
-            ) : null}
-          </div>
-        </section>
+        <MyDayProfileLink
+          key={`${signedInSubjectId}:${authStatus.tenantId}`}
+          hasLinkedProfile={Boolean(authStatus.personId)}
+          canManage={["admin", "owner", "system"].includes(authStatus.role)}
+        />
       </MyDayFrame>
     );
   }
@@ -439,8 +434,35 @@ export function MyDayPage() {
       wide
       signedInName={clerkDisplayName}
       linkedPersonName={linkedPersonName}
-      onSwitchPerson={linkedToSignIn ? undefined : switchPerson}
     >
+      {hasUnscopedQueuedWork() && (
+        <div className="text-base text-warn">
+          <p role="status">
+            Older unsynced actions have no account information and cannot be
+            replayed safely. They remain stored on this device unless you
+            discard them.
+          </p>
+          <button
+            type="button"
+            className="btn btn-danger mt-2 min-h-11"
+            onClick={() => {
+              if (
+                !window.confirm(
+                  "Discard the older unsynced actions on this device? They will not be sent. This cannot be undone.",
+                )
+              )
+                return;
+              try {
+                discardUnscopedQueuedWork();
+              } catch (error) {
+                setFailure(error);
+              }
+            }}
+          >
+            Discard older actions
+          </button>
+        </div>
+      )}
       <OfflineStatusBar
         online={online}
         pending={pending}

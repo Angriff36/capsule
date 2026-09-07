@@ -134,7 +134,7 @@ export class ComponentImportCoordinator {
 
   setYieldUnit(
     review: ComponentImportReviewState,
-    yieldUnit: UnitOfMeasure,
+    yieldUnit: UnitOfMeasure | null,
   ): ComponentImportReviewState {
     return { ...review, yieldUnit };
   }

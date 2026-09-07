@@ -126,6 +126,8 @@ export class IngredientCatalogMatcher {
 
   statusLabel(status: IngredientMatchStatus): string {
     switch (status) {
+      case "unresolved":
+        return "Needs review";
       case "exact":
         return "Exact match";
       case "possible":

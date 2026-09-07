@@ -52,7 +52,9 @@ enum CapsuleRole {
 
 entity Person mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
-  unique [tenantId, email]
+  // Email is contact data, not login identity: imported staff and a signed-in
+  // account can share it without becoming the same Person. Account bootstrap
+  // is idempotent by the authenticated subject, never by email or display name.
   timestamps
   versionProperty version: number
 
