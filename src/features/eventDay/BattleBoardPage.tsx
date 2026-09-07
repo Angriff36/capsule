@@ -159,10 +159,35 @@ function buildBoard(briefing: EventDayBriefing) {
         Number(left.windowStartsAt ?? 0) - Number(right.windowStartsAt ?? 0),
     );
 
+  const daySheet: [string, string][] = (
+    [
+      ["Bar service", event.barService],
+      ["Cocktail hour food", event.cocktailHourFood],
+      ["Dessert", event.dessertService],
+      ["Bussing", event.bussing],
+      ["Place settings", event.placeSettings],
+      ["Passed apps", event.passedApps],
+      ["Stationary apps", event.stationaryApps],
+      ["Beverages on menu", event.beveragesOnMenu],
+      ["Tableside water", event.tablesideWater],
+      ["Our disposables", event.mangiaDisposables],
+      ["Event rentals", event.eventRentals],
+      ["Scullery", event.scullery],
+      ["Power onsite", event.powerOnsite],
+      ["Water onsite", event.waterOnsite],
+    ] as const
+  ).filter(([, value]) => String(value ?? "").trim().length > 0) as [
+    string,
+    string,
+  ][];
+
   return {
     event,
     venue,
     layout,
+    daySheet,
+    buffetCold: String(event.buffetColdPlates ?? "").trim(),
+    buffetHot: String(event.buffetHotPlates ?? "").trim(),
     venueTraits,
     venueNotes,
     courses,
@@ -267,6 +292,36 @@ export function BattleBoardPage() {
               </div>
             </dl>
           </header>
+
+          {board.daySheet.length > 0 ? (
+            <section className="bbd-section">
+              <h2 className="bbd-kicker">Responsibilities</h2>
+              <div className="bbd-sheet">
+                {board.daySheet.map(([label, value]) => (
+                  <div className="bbd-sheet-row" key={label}>
+                    <span className="bbd-sheet-label">{label}</span>
+                    <span className="bbd-sheet-value">{value}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {board.buffetCold.length > 0 || board.buffetHot.length > 0 ? (
+            <section className="bbd-section">
+              <h2 className="bbd-kicker">Buffet layout</h2>
+              <p className="bbd-note">
+                {[
+                  board.buffetCold.length > 0
+                    ? `COLD: ${board.buffetCold}`
+                    : null,
+                  board.buffetHot.length > 0 ? `HOT: ${board.buffetHot}` : null,
+                ]
+                  .filter(Boolean)
+                  .join("  ·  ")}
+              </p>
+            </section>
+          ) : null}
 
           {board.layout.length > 0 ||
           board.venueTraits.length > 0 ||

@@ -32,6 +32,23 @@ export type EventDayEvent = {
   venueName: string | null;
   venueAddress: string | null;
   serviceStyleName: string | null;
+  /** Battle board day sheet — responsibility badges + buffet plate order. */
+  barService: string | null;
+  cocktailHourFood: string | null;
+  dessertService: string | null;
+  bussing: string | null;
+  placeSettings: string | null;
+  passedApps: string | null;
+  stationaryApps: string | null;
+  beveragesOnMenu: string | null;
+  tablesideWater: string | null;
+  mangiaDisposables: string | null;
+  eventRentals: string | null;
+  scullery: string | null;
+  powerOnsite: string | null;
+  waterOnsite: string | null;
+  buffetColdPlates: string | null;
+  buffetHotPlates: string | null;
   clientId: string | null;
   primaryContactName: string | null;
   primaryContactEmail: string | null;

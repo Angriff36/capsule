@@ -99,6 +99,8 @@ import type * as queries from "../queries.js";
 import type * as quickImport from "../quickImport.js";
 import type * as quoteBuilder from "../quoteBuilder.js";
 import type * as recurringEvents from "../recurringEvents.js";
+import type * as runOfShowAlerts from "../runOfShowAlerts.js";
+import type * as runOfShowAlertsSend from "../runOfShowAlertsSend.js";
 import type * as sagas from "../sagas.js";
 import type * as search from "../search.js";
 import type * as shareLinks from "../shareLinks.js";
@@ -222,6 +224,8 @@ declare const fullApi: ApiFromModules<{
   quickImport: typeof quickImport;
   quoteBuilder: typeof quoteBuilder;
   recurringEvents: typeof recurringEvents;
+  runOfShowAlerts: typeof runOfShowAlerts;
+  runOfShowAlertsSend: typeof runOfShowAlertsSend;
   sagas: typeof sagas;
   search: typeof search;
   shareLinks: typeof shareLinks;

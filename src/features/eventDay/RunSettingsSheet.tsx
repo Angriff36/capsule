@@ -1,3 +1,6 @@
+import { useAction, useQuery } from "convex/react";
+import { api } from "../../lib/api";
+import { usePushNotifications } from "../chat/usePushNotifications";
 import { LEAD_MINUTE_CHOICES, type RunSettings } from "./runOfShowModel";
 
 /**
@@ -17,6 +20,32 @@ export function RunSettingsSheet({
   onTry: () => void;
   onClose: () => void;
 }) {
+  const push = usePushNotifications();
+  const runStatus = useQuery(api.runOfShowAlerts.getStatus, {});
+  const enableLoop = useAction(api.runOfShowAlerts.enableAlerts);
+  const disableLoop = useAction(api.runOfShowAlerts.disableAlerts);
+
+  const turnOnBackground = async () => {
+    await push.enable();
+    if (runStatus != null && !runStatus.enabled) await enableLoop({});
+  };
+  const turnOffBackground = async () => {
+    await push.disable();
+    if (runStatus?.enabled) await disableLoop({});
+  };
+
+  const pushStatusHint = push.blocked
+    ? "Notifications are blocked in this phone's settings"
+    : push.keyMissing
+      ? "Not set up on this deployment yet"
+      : push.accountEnabled
+        ? push.deviceActive
+          ? runStatus?.enabled
+            ? "On — this phone receives task calls"
+            : "On — task calls starting up"
+          : "Needs one Allow tap on this phone"
+        : "Off — alerts only while the page is open";
+
   return (
     <>
       <div className="evd-scrim" onClick={onClose} />
@@ -89,6 +118,46 @@ export function RunSettingsSheet({
               </div>
             </>
           ) : null}
+          <p className="evd-kicker">Background alerts</p>
+          {!push.supported ? (
+            <p className="evd-set-note">
+              This browser can't do background alerts. On iPhone, add Capsule to
+              your home screen first.
+            </p>
+          ) : push.needsHomeScreen ? (
+            <p className="evd-set-note">
+              On iPhone, add Capsule to your home screen first, then turn
+              background alerts on.
+            </p>
+          ) : (
+            <>
+              <SettingToggle
+                label="Phone alerts when the app is closed"
+                hint={pushStatusHint}
+                on={push.accountEnabled}
+                onToggle={() => {
+                  void (push.accountEnabled
+                    ? turnOffBackground()
+                    : turnOnBackground());
+                }}
+              />
+              {push.deviceNeedsSetup ? (
+                <button
+                  type="button"
+                  className="evd-set-seg-btn evd-set-try"
+                  onClick={() => void push.activateThisDevice()}
+                >
+                  Allow on this phone
+                </button>
+              ) : null}
+              {push.error ? <p className="evd-set-note">{push.error}</p> : null}
+              <p className="evd-set-note">
+                Background alerts call the next task out on this phone even when
+                Capsule is closed — 5 minutes before, at the start, and once
+                when a task runs late. They also switch on message alerts.
+              </p>
+            </>
+          )}
           <button
             type="button"
             className="evd-run-btn evd-set-try"
