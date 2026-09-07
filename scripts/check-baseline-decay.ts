@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 72; // 70 at the keep-signed-in release + 2 for the Ralph loop roots that landed on main (274e3795). .mcp.json is machine-local tool config and is excluded below.
+const ROOT_CAP = 70; // 70 at the keep-signed-in release; .mcp.json and other machine-local tool files are excluded below and never appear in a clean CI checkout.
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
@@ -71,6 +71,10 @@ class BaselineDecayCheck {
       // Machine-local MCP tool config (points at a localhost server) — never
       // part of a clean CI checkout; gitignored alongside .env.local.
       ".mcp.json",
+      // Machine-local tool state: the production-env snapshot pulled for
+      // release config checks and the Playwright CLI session file.
+      ".env.production",
+      ".playwright-cli",
     ]);
     const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {
