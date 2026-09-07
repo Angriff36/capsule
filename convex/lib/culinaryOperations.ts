@@ -482,6 +482,21 @@ export const createComponentImportReview = mutation({
       }
       lineIds.push(String(staged.docId));
     }
+    // Same ledger recompute the save transaction performs: the staged
+    // decisions above already resolve lines, so the header's
+    // resolvedLineCount must reflect them or a create-then-finalize flow can
+    // never satisfy approveReview's resolved === parsed guard.
+    const stagedAll = await ctx.db
+      .query("componentImportLines")
+      .withIndex("by_importId", (q) => q.eq("importId", uploaded.docId))
+      .collect();
+    const stagedResolved = stagedAll.filter(
+      (line) => line.deletedAt != null || line.resolvedAt != null,
+    ).length;
+    await ctx.runMutation(api.mutations.ComponentImport_recordResolutionProgress, {
+      docId: uploaded.docId,
+      resolvedLineCount: stagedResolved,
+    });
     return { importId: String(uploaded.docId), reviewRevision: 0, lineIds };
   },
 });

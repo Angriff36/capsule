@@ -8,6 +8,7 @@ import {
   useListComponentImport,
   useListComponentImportLine,
   useListIngredient,
+  useComponentImportApproveReview,
 } from "../../../lib/manifest-convex-react";
 import {
   useCreateComponentImportReview,
@@ -71,6 +72,7 @@ export function ComponentImportPage() {
   const importComponent = useImportComponentSafely();
   const createReviewMutation = useCreateComponentImportReview();
   const saveReviewMutation = useSaveComponentImportReview();
+  const approveReviewMutation = useComponentImportApproveReview();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const importIdParam = searchParams.get("importId");
@@ -142,6 +144,8 @@ export function ComponentImportPage() {
         saveReviewMutation(request as never) as Promise<{
           reviewRevision: number;
         }>,
+      approveReview: (importId) =>
+        approveReviewMutation({ docId: importId }) as Promise<unknown>,
       getImport: async () => {
         throw new Error("Workbench loads imports reactively; not callable");
       },

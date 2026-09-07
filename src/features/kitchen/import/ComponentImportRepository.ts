@@ -14,6 +14,7 @@ import type {
   IngredientMatchStatus,
   ReviewIngredientLine,
 } from "./ComponentImportTypes";
+import { reviewIsReady } from "./ComponentImportTypes";
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
 import { SourceFingerprint } from "./SourceFingerprint";
 
@@ -327,6 +328,14 @@ export interface ComponentImportRepositoryPorts {
   saveReview: (
     request: SaveComponentImportReviewRequest,
   ) => Promise<{ reviewRevision: number }>;
+  /**
+   * Promotes a fully resolved review to `ready`
+   * (ComponentImport.approveReview). The save transaction itself deliberately
+   * stops at the resolution ledger — proofs pin save→approve as separate
+   * governed steps — so the workbench layer owns this "operator finished"
+   * promotion after its save lands.
+   */
+  approveReview?: (importId: string) => Promise<unknown>;
   getImport: (importId: string) => Promise<StoredComponentImportRow | null>;
   listLinesByImportId: (
     importId: string,
@@ -355,6 +364,12 @@ export class ComponentImportRepository {
         importLineId: result.lineIds[index],
       })),
     };
+    // The operator may correct and decide everything before the first save;
+    // that first save must also promote the fresh review to ready or the
+    // follow-up finalize dead-ends in "reviewing".
+    if (reviewIsReady(review)) {
+      await this.ports.approveReview?.(result.importId);
+    }
     return result;
   }
 
@@ -392,6 +407,13 @@ export class ComponentImportRepository {
       ...review,
       reviewRevision: result.reviewRevision,
     };
+    // A save that leaves every line decided and measured completes the
+    // review; without this promotion the durable finalize refuses with
+    // "component import is reviewing" and the normal paste→save→finalize
+    // flow dead-ends (found by the RR-5 browser qualification).
+    if (review.importId != null && reviewIsReady(review)) {
+      await this.ports.approveReview?.(review.importId);
+    }
     return result;
   }
 }
