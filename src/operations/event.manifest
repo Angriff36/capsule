@@ -598,6 +598,27 @@ entity Event mixin TenantScoped, SoftDeletable {
   property recurrenceCompletedAt: datetime?
   property recurrenceTemplateEventId: uuid?
   property recurrenceSequence: int?
+  // Battle board day sheet — responsibility badges + buffet plate order, one
+  // free-text value each ("Mangia", "Client", "Third party", "Full clear",
+  // "Prefill only", "Yes", "No", "Confirm on site", or any wording the board
+  // should print). Empty = not answered; the board omits it.
+  property barService: string?
+  property cocktailHourFood: string?
+  property dessertService: string?
+  property bussing: string?
+  property placeSettings: string?
+  property passedApps: string?
+  property stationaryApps: string?
+  property beveragesOnMenu: string?
+  property tablesideWater: string?
+  property mangiaDisposables: string?
+  property eventRentals: string?
+  property scullery: string?
+  property powerOnsite: string?
+  property waterOnsite: string?
+  // Buffet line order, comma-separated plate names.
+  property buffetColdPlates: string?
+  property buffetHotPlates: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -912,6 +933,52 @@ entity Event mixin TenantScoped, SoftDeletable {
       accessibilityNeeds: accessibilityNeeds != null ? accessibilityNeeds : []
       serviceRequirements: serviceRequirements
       operationalRequirements: operationalRequirements
+    }
+  }
+
+  // Day-sheet save for the battle board. Deliberately NOT stage-gated: the
+  // board is a day-of document and live ops must stay correctable during the
+  // event (docs/architecture/domain-gating-restraint.md). The editor sends
+  // the full set every save; the UI clears a badge by writing an empty
+  // string.
+  command updateDaySheet(
+    optional barService: string,
+    optional cocktailHourFood: string,
+    optional dessertService: string,
+    optional bussing: string,
+    optional placeSettings: string,
+    optional passedApps: string,
+    optional stationaryApps: string,
+    optional beveragesOnMenu: string,
+    optional tablesideWater: string,
+    optional mangiaDisposables: string,
+    optional eventRentals: string,
+    optional scullery: string,
+    optional powerOnsite: string,
+    optional waterOnsite: string,
+    optional buffetColdPlates: string,
+    optional buffetHotPlates: string
+  ) {
+    guard self.deletedAt == null
+    mutate barService = barService
+    mutate cocktailHourFood = cocktailHourFood
+    mutate dessertService = dessertService
+    mutate bussing = bussing
+    mutate placeSettings = placeSettings
+    mutate passedApps = passedApps
+    mutate stationaryApps = stationaryApps
+    mutate beveragesOnMenu = beveragesOnMenu
+    mutate tablesideWater = tablesideWater
+    mutate mangiaDisposables = mangiaDisposables
+    mutate eventRentals = eventRentals
+    mutate scullery = scullery
+    mutate powerOnsite = powerOnsite
+    mutate waterOnsite = waterOnsite
+    mutate buffetColdPlates = buffetColdPlates
+    mutate buffetHotPlates = buffetHotPlates
+    emit EventDaySheetUpdated {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -1273,6 +1340,10 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   // Optional so older timeline rows without the field still load.
   property sortOrder: int = 0
   property scheduledAt: datetime?
+  // Run-of-show completion (event-day tracker): the crew marks the block
+  // done during the event; null = still open.
+  property completedAt: datetime?
+  property completedByPersonId: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
@@ -1350,6 +1421,29 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     mutate assigneeTeams = assigneeTeams != null ? assigneeTeams : self.assigneeTeams
     mutate assigneePersonIds = assigneePersonIds != null ? assigneePersonIds : self.assigneePersonIds
     emit EventTimelineActivityAdjusted {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Event-day tracker: mark a run-of-show block done (and undo it).
+  command complete(optional completedByPersonId: string) {
+    guard self.deletedAt == null
+    mutate completedAt = now()
+    mutate completedByPersonId = completedByPersonId
+    emit EventTimelineActivityCompleted {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command reopen() {
+    guard self.deletedAt == null
+    mutate completedAt = null
+    mutate completedByPersonId = null
+    emit EventTimelineActivityReopened {
       activityId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
@@ -1793,6 +1887,23 @@ event EventTimelineActivityRemoved: "event_timeline_activity.removed" {
   activityId: string
   tenantId: string
   eventId: string
+}
+
+event EventTimelineActivityCompleted: "event_timeline_activity.completed" {
+  activityId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTimelineActivityReopened: "event_timeline_activity.reopened" {
+  activityId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventDaySheetUpdated: "event_day_sheet.updated" {
+  eventId: string
+  tenantId: string
 }
 
 event EventTimelineCommentPosted: "event_timeline_comment.posted" {

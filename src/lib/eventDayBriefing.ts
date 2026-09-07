@@ -31,6 +31,24 @@ export type EventDayEvent = {
   venueId: string | null;
   venueName: string | null;
   venueAddress: string | null;
+  serviceStyleName: string | null;
+  /** Battle board day sheet — responsibility badges + buffet plate order. */
+  barService: string | null;
+  cocktailHourFood: string | null;
+  dessertService: string | null;
+  bussing: string | null;
+  placeSettings: string | null;
+  passedApps: string | null;
+  stationaryApps: string | null;
+  beveragesOnMenu: string | null;
+  tablesideWater: string | null;
+  mangiaDisposables: string | null;
+  eventRentals: string | null;
+  scullery: string | null;
+  powerOnsite: string | null;
+  waterOnsite: string | null;
+  buffetColdPlates: string | null;
+  buffetHotPlates: string | null;
   clientId: string | null;
   primaryContactName: string | null;
   primaryContactEmail: string | null;
@@ -85,16 +103,22 @@ export type EventDayStaffNeed = {
 
 export type EventDayActivity = {
   _id: string;
+  version: number | null;
   eventId: string;
   deletedAt: number | null;
   scheduledAt: number | null;
   startsAt: number | null;
+  endsAt: number | null;
   sortOrder: number | null;
   name: string | null;
+  category: string | null;
+  notes: string | null;
   siteNotes: string | null;
   assigneeTeams: string[];
   assigneePersonIds: string[];
   responsibleParty: string | null;
+  completedAt: number | null;
+  completedByPersonId: string | null;
 };
 
 export type EventDayEventDish = {
@@ -212,6 +236,12 @@ export type EventDayPerson = {
   familyName: string | null;
 };
 
+/** The signed-in member, from the same link that resolved tenant + role. */
+export type EventDayMe = {
+  personId: string | null;
+  role: string;
+};
+
 export type EventDayBriefing = {
   event: EventDayEvent;
   venue: EventDayVenue | null;
@@ -232,6 +262,7 @@ export type EventDayBriefing = {
   packLists: EventDayPackList[];
   packListItems: EventDayPackListItem[];
   people: EventDayPerson[];
+  me: EventDayMe;
 };
 
 /** undefined = loading; null = signed out / no role / no tenant. */

@@ -68,3 +68,11 @@ cap in `scripts/check-baseline-decay.ts` now matches. The gitignored
 per-machine Ralph state files (`.ralph-checkpoint`, `.ralph-telemetry.jsonl`,
 `.ralph-failures.md`) joined the local-only exclusion list so local runs
 count the same clean checkout CI sees.
+
+**Correction (2026-09-07, battle-board release prep):** Cap stays ≤70 — the
+Ralph loop roots named in an earlier draft were already inside main's 70.
+The battle-board release moves its `ui-design/` design file into
+`docs/design/` and excludes machine-local tool files from the count
+(gitignored: `.mcp.json` localhost tool config, `.env.production` release
+scratch, `.playwright-cli` session state), so local runs count the same
+clean checkout CI sees. Cap in `scripts/check-baseline-decay.ts` matches.

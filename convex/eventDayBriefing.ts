@@ -209,6 +209,11 @@ export const getBriefing = query({
         : [];
 
     const venueRaw: any = await tenantDoc(ctx, tenantId, event.venueId);
+    const serviceStyleRaw: any = await tenantDoc(
+      ctx,
+      tenantId,
+      event.serviceStyleId,
+    );
 
     // Dish catalog + recipe graph for the menu's dishes only.
     const dishIds = [
@@ -349,6 +354,23 @@ export const getBriefing = query({
         venueId: event.venueId ?? null,
         venueName: event.venueName ?? null,
         venueAddress: event.venueAddress ?? null,
+        serviceStyleName: serviceStyleRaw?.name ?? null,
+        barService: event.barService ?? null,
+        cocktailHourFood: event.cocktailHourFood ?? null,
+        dessertService: event.dessertService ?? null,
+        bussing: event.bussing ?? null,
+        placeSettings: event.placeSettings ?? null,
+        passedApps: event.passedApps ?? null,
+        stationaryApps: event.stationaryApps ?? null,
+        beveragesOnMenu: event.beveragesOnMenu ?? null,
+        tablesideWater: event.tablesideWater ?? null,
+        mangiaDisposables: event.mangiaDisposables ?? null,
+        eventRentals: event.eventRentals ?? null,
+        scullery: event.scullery ?? null,
+        powerOnsite: event.powerOnsite ?? null,
+        waterOnsite: event.waterOnsite ?? null,
+        buffetColdPlates: event.buffetColdPlates ?? null,
+        buffetHotPlates: event.buffetHotPlates ?? null,
         clientId: event.clientId ?? null,
         primaryContactName: await decryptField(
           ctx,
@@ -447,16 +469,22 @@ export const getBriefing = query({
       })),
       activities: (activities as any[]).map((row) => ({
         _id: row._id,
+        version: row.version ?? null,
         eventId: row.eventId,
         deletedAt: row.deletedAt ?? null,
         scheduledAt: row.scheduledAt ?? null,
         startsAt: row.startsAt ?? null,
+        endsAt: row.endsAt ?? null,
         sortOrder: row.sortOrder ?? null,
         name: row.name ?? null,
+        category: row.category ?? null,
+        notes: row.notes ?? null,
         siteNotes: row.siteNotes ?? null,
         assigneeTeams: row.assigneeTeams ?? [],
         assigneePersonIds: row.assigneePersonIds ?? [],
         responsibleParty: row.responsibleParty ?? null,
+        completedAt: row.completedAt ?? null,
+        completedByPersonId: row.completedByPersonId ?? null,
       })),
       eventDishes: (eventDishes as any[]).map((row) => ({
         _id: row._id,
@@ -545,6 +573,10 @@ export const getBriefing = query({
         unit: row.unit ?? null,
       })),
       people,
+      me: {
+        personId: auth.personId ?? null,
+        role: auth.role,
+      },
     };
   },
 });

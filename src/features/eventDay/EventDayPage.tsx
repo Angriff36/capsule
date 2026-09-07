@@ -3,48 +3,13 @@ import { Link, useParams } from "react-router-dom";
 import "./EventDay.css";
 import { useEventDayBriefing } from "../../lib/eventDayBriefing";
 import { formatCount, formatDate } from "../../lib/format";
-import { eventDetailPath } from "../events/eventRoutes";
 import { deriveEventDay, type EventDaySectionKey } from "./eventDayModel";
 import { EventDayMap } from "./EventDayMap";
+import { EventDayNav } from "./EventDayNav";
 import { EventDayReadinessRing } from "./EventDayReadinessRing";
 import { EventDaySheet } from "./EventDaySheet";
 import type { EventDayDetailData } from "./EventDaySheetSections";
 import { EventDayTray } from "./EventDayTray";
-
-function NavGlyph({ shape }: { shape: "map" | "shield" | "person" | "grid" }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" aria-hidden>
-      {shape === "map" ? (
-        <path
-          d="M3 5.5l4.5-2 5 2L17 3.5v11l-4.5 2-5-2-4.5 2v-11zM7.5 3.5v11m5-9v11"
-          strokeWidth="1.4"
-          strokeLinejoin="round"
-        />
-      ) : null}
-      {shape === "shield" ? (
-        <path
-          d="M10 2.5l6 2.2v4.6c0 3.8-2.6 6.6-6 8.2-3.4-1.6-6-4.4-6-8.2V4.7l6-2.2zM7.5 10l1.8 1.8 3.4-3.6"
-          strokeWidth="1.4"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-        />
-      ) : null}
-      {shape === "person" ? (
-        <path
-          d="M10 9.5a3.25 3.25 0 100-6.5 3.25 3.25 0 000 6.5zM3.5 17c.8-3 3.4-4.7 6.5-4.7s5.7 1.7 6.5 4.7"
-          strokeWidth="1.4"
-          strokeLinecap="round"
-        />
-      ) : null}
-      {shape === "grid" ? (
-        <path
-          d="M3.5 3.5h5v5h-5v-5zm8 0h5v5h-5v-5zm-8 8h5v5h-5v-5zm8 0h5v5h-5v-5z"
-          strokeWidth="1.4"
-        />
-      ) : null}
-    </svg>
-  );
-}
 
 function CenteredNote({ children }: { children: React.ReactNode }) {
   return (
@@ -163,30 +128,7 @@ export function EventDayPage() {
           blockers={summary.blockers}
           onOpen={setOpen}
         />
-        <nav className="evd-nav">
-          <span className="evd-nav-item evd-nav-on">
-            <NavGlyph shape="map" />
-            Event map
-          </span>
-          <Link
-            className="evd-nav-item"
-            to={`/events/${event._id}/allergen-briefing`}
-          >
-            <NavGlyph shape="shield" />
-            Briefing
-          </Link>
-          <Link className="evd-nav-item" to="/my">
-            <NavGlyph shape="person" />
-            My day
-          </Link>
-          <Link
-            className="evd-nav-item"
-            to={eventDetailPath(String(event._id))}
-          >
-            <NavGlyph shape="grid" />
-            Capsule
-          </Link>
-        </nav>
+        <EventDayNav eventId={String(event._id)} active="map" />
       </div>
       {active ? (
         <EventDaySheet
