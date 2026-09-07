@@ -6,6 +6,8 @@ import {
   useCreateTimeRecord,
   useListAvailabilityWindow,
   useListDelivery,
+  useListDish,
+  useListEventDish,
   useListEvent,
   useListEventCloseout,
   useListPackList,
@@ -55,6 +57,7 @@ import { WeeklyAvailabilityCard } from "./WeeklyAvailabilityCard";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 import { MyDayCalendar, MyDaySection as Section } from "./MyDayDashboard";
+import { MyDayPrepList } from "./MyDayPrepList";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
 
 const dayLabel = (ms?: number | null) =>
@@ -99,6 +102,12 @@ export function MyDayPage() {
     offlineScope,
   );
   const tasks = useCachedRead("prepTasks", useListPrepTask(), offlineScope);
+  const dishes = useCachedRead("prepDishes", useListDish(), offlineScope);
+  const eventDishes = useCachedRead(
+    "prepEventDishes",
+    useListEventDish(),
+    offlineScope,
+  );
   const deliveries = useCachedRead(
     "deliveries",
     useListDelivery(),
@@ -344,7 +353,9 @@ export function MyDayPage() {
     .filter(
       (task) =>
         task.deletedAt == null &&
-        ["pending", "claimed", "in_progress"].includes(String(task.status)) &&
+        ["pending", "claimed", "in_progress", "blocked"].includes(
+          String(task.status),
+        ) &&
         (task.dueAt == null || task.dueAt <= endOfToday.getTime()),
     )
     .sort(
@@ -709,60 +720,15 @@ export function MyDayPage() {
                     hint="Tasks the kitchen assigns for today land here."
                   />
                 ) : (
-                  <ul className="my-day-prep-grid">
-                    {myTasks.map((task) => {
-                      const status = String(task.status);
-                      const key = `task:${task._id}`;
-                      const next =
-                        status === "pending"
-                          ? { label: "Claim", runKey: "task-claim" }
-                          : status === "claimed"
-                            ? { label: "Start", runKey: "task-start" }
-                            : { label: "Done", runKey: "task-complete" };
-                      return (
-                        <li key={task._id} className="my-day-prep-task">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-lg font-semibold">
-                              {task.name?.trim() || "Prep task"}
-                            </p>
-                            <p className="text-sm text-ink-2">
-                              {task.station ? `${task.station} · ` : ""}
-                              due {task.dueAt ? timeLabel(task.dueAt) : "today"}
-                            </p>
-                          </div>
-                          <StatusChip status={status} />
-                          <button
-                            className={ROW_BTN}
-                            disabled={busy != null}
-                            onClick={() =>
-                              perform(key, next.runKey, next.label, {
-                                docId: task._id,
-                                version: task.version,
-                              })
-                            }
-                          >
-                            {busy === key ? "…" : next.label}
-                          </button>
-                          {status === "claimed" ? (
-                            <button
-                              className={ROW_BTN}
-                              disabled={busy != null}
-                              onClick={() =>
-                                perform(
-                                  `${key}:release`,
-                                  "task-release",
-                                  "Release task",
-                                  { docId: task._id, version: task.version },
-                                )
-                              }
-                            >
-                              Release
-                            </button>
-                          ) : null}
-                        </li>
-                      );
-                    })}
-                  </ul>
+                  <MyDayPrepList
+                    tasks={myTasks}
+                    allTasks={tasks ?? []}
+                    dishes={dishes}
+                    eventDishes={eventDishes}
+                    events={events}
+                    busy={busy}
+                    perform={perform}
+                  />
                 )}
               </Section>
             </div>
