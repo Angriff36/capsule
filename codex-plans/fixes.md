@@ -359,3 +359,5 @@
 - Fixed the browser-only staff picker/nickname veto by consuming the server-selected account/tenant-bound Person. Missing associations use existing verified-email linking and specific recovery without another sign-in.
 - Scoped offline reads and queued writes to account, tenant and staff record; replay stops between writes on account changes. Legacy unowned queues are retained unless the user explicitly confirms discarding them.
 - Full local check passed 162 files / 1,385 tests. Issue #282 tracks the production symptom. Live account mapping was not guessed or changed; no deployment. Final independent GLM review pending at initial commit after the Codex reviewer hit its usage limit.
+
+- Final GLM-5.3 review APPROVE; code 30036258 pushed with regeneration gate green. Cold-offline gate concern was traced to unchanged outer AuthGate behavior, not a new My Day regression. No guessed data correction or auth bypass was used.
