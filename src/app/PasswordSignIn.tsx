@@ -1,9 +1,14 @@
 import { SignIn, useSignIn } from "@clerk/react";
 import { useState, type FormEvent } from "react";
+import {
+  bindSignInPersistence,
+  prepareSignInPersistence,
+} from "./SessionPersistenceBoundary";
 
 /** Password first; invitation tickets and additional factors remain Clerk-owned. */
 export function PasswordSignIn() {
   const { signIn } = useSignIn();
+  const [remember, setRemember] = useState(true);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
@@ -27,6 +32,7 @@ export function PasswordSignIn() {
       check(
         await signIn.finalize({
           navigate: ({ session }) => {
+            bindSignInPersistence(session.id);
             // A verified credential can create a pending session (for example,
             // an existing account requiring a password change or workspace).
             // Clerk's widget owns completion of those session tasks.
@@ -47,6 +53,7 @@ export function PasswordSignIn() {
     setError("");
     try {
       if (step === "login") {
+        prepareSignInPersistence(remember);
         check(
           await signIn.password({ identifier: identifier.trim(), password }),
         );
@@ -63,6 +70,7 @@ export function PasswordSignIn() {
         setCode("");
         setStep("new-password");
       } else {
+        prepareSignInPersistence(remember);
         check(await signIn.resetPasswordEmailCode.submitPassword({ password }));
         setPassword("");
         await finish();
@@ -216,6 +224,19 @@ export function PasswordSignIn() {
             />
           </label>
         )}
+        {(step === "login" || step === "new-password") && (
+          <label className="flex min-h-[44px] cursor-pointer items-center gap-3 text-base text-ink">
+            <input
+              type="checkbox"
+              name="remember"
+              checked={remember}
+              disabled={busy}
+              onChange={(event) => setRemember(event.target.checked)}
+              className="h-5 w-5 accent-brand"
+            />
+            Keep me signed in
+          </label>
+        )}
         {error && (
           <p role="alert" className="text-base text-danger">
             {error}
@@ -257,8 +278,17 @@ export function PasswordSignIn() {
               className="text-link min-h-[44px] text-left"
               disabled={busy}
               onClick={() => {
-                setPassword("");
-                setProvider(true);
+                try {
+                  prepareSignInPersistence(remember);
+                  setPassword("");
+                  setProvider(true);
+                } catch (cause) {
+                  setError(
+                    cause instanceof Error
+                      ? cause.message
+                      : "Could not save your sign-in preference.",
+                  );
+                }
               }}
             >
               Other sign-in options
