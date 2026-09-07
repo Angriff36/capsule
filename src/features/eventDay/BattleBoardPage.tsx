@@ -18,6 +18,7 @@ import {
 } from "../kitchen/dishAllergens";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import "./BattleBoardPage.css";
+import "./EventDay.css";
 import { EventDayNav } from "./EventDayNav";
 import { categoryLabel } from "./runOfShowModel";
 
