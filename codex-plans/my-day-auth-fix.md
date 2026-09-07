@@ -20,6 +20,8 @@ Expanded GLM review initially rejected the unchecked IdP role cast and conflict 
 
 Re-review required preserving genuine non-imported hires even when the sign-in has org claims, plus excluding imports from the older email-link released scan. Both were corrected. Runtime verification confirms that an org-member hire retains the same Person id, kitchen-manager role and contractor status, while an unclaimed imported-null row reports no match rather than removed access. Final independent verdict is in `.artifacts/account-final-review.txt`.
 
+Final expanded-flow result: GLM-5.3 independently APPROVED code through `1faa85d3`, confirming both blockers resolved, no new defects found, tedium check passed and prior DESIGN.md approval retained. Fresh `bun run check` completed with exit 0: 162 files / 1,385 tests, typecheck, formatting, ownership/integration/secret/proof checks, local Vite build and baseline decay. Account bootstrap runtime checks also pass. Code is ready for the guarded release workflow; it has not been deployed or verified with a production account in this task.
+
 Tracked production symptom: https://github.com/Angriff36/capsule/issues/282.
 
 Independent review found a related existing global offline queue/cache boundary. Corrected it by scoping both to subject/tenant/person, withholding replay until canonical identity resolves, and cancelling subsequent replay writes on account change. Legacy unowned queues are retained with an explicit confirmed-discard action; no real user's local data was deleted by this development task. Focused regressions demonstrated the original cross-scope replay and mid-drain failure before correction.
