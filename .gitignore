@@ -64,3 +64,7 @@ storybook-static/
 .ralph-checkpoint
 .ralph-telemetry.jsonl
 .ralph-failures.md
+
+# Machine-local MCP tool config (points at a localhost server; never part of
+# a clean CI checkout)
+.mcp.json

@@ -68,3 +68,12 @@ cap in `scripts/check-baseline-decay.ts` now matches. The gitignored
 per-machine Ralph state files (`.ralph-checkpoint`, `.ralph-telemetry.jsonl`,
 `.ralph-failures.md`) joined the local-only exclusion list so local runs
 count the same clean checkout CI sees.
+
+**Correction (2026-09-07, battle-board release prep):** Aim ≤72 — the Ralph
+loop-setup release landed seven committed workflow roots on main
+(`ACCEPTANCE_TESTS.md`, `AUDIENCE_JTBD.md`, `PROMPT_plan_work.md`,
+`SPEC_TEMPLATE.md`, `check_done.sh`, `lint_specs.sh`, `rollback.sh`,
+`.ralph.env`). The battle-board release moves its `ui-design/` design file
+into `docs/design/` and excludes the machine-local `.mcp.json` from the
+count (gitignored; points at a localhost tool server). Cap in
+`scripts/check-baseline-decay.ts` matches.

@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 70; // 68 at release 1 + Ralph verified-preview harness (ralph-preview.ps1) and worktree sync (ralph-sync.sh).
+const ROOT_CAP = 72; // 70 at the keep-signed-in release + 2 for the Ralph loop roots that landed on main (274e3795). .mcp.json is machine-local tool config and is excluded below.
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
@@ -68,6 +68,9 @@ class BaselineDecayCheck {
       "test-results",
       "work",
       "output",
+      // Machine-local MCP tool config (points at a localhost server) — never
+      // part of a clean CI checkout; gitignored alongside .env.local.
+      ".mcp.json",
     ]);
     const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {
