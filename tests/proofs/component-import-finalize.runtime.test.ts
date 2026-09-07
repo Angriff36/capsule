@@ -287,18 +287,12 @@ describe("runtime proof: component import finalize", () => {
       ).parsedYieldQuantity,
     ).toBe(2.5);
 
-    await proof.executeCommand(
-      kitchen,
-      api.mutations.ComponentImport_recordResolutionProgress,
-      { docId: created.importId, resolvedLineCount: parsed.lines.length },
-    );
-    await proof.executeCommand(
-      kitchen,
-      api.mutations.ComponentImport_approveReview,
-      {
-        docId: created.importId,
-      },
-    );
+    // Repository saves now include approval in the same transaction; no
+    // follow-up client mutation may be needed before durable finalization.
+    expect(storedRow).toMatchObject({
+      status: "ready",
+      resolvedLineCount: parsed.lines.length,
+    });
 
     // Finalize through the finalizer's atomic port against the real mutation.
     let captured: Record<string, unknown> | undefined;

@@ -8,6 +8,7 @@ import { buildComponentSnapshotData } from "../../src/features/kitchen/component
 import { ComponentImportCoordinator } from "../../src/features/kitchen/import/ComponentImportCoordinator";
 import { ComponentImportFinalizer } from "../../src/features/kitchen/import/ComponentImportFinalizer";
 import {
+  ComponentImportRepository,
   buildCreateReviewRequest,
   buildSaveReviewRequest,
   mapStoredReview,
@@ -26,6 +27,175 @@ beforeAll(() => {
 });
 
 describe("runtime proof: safe culinary operations", () => {
+  it("saves automatic exact matches as a ready review atomically without a second approval", async () => {
+    const proof = harness();
+    const kitchen = proof.asRole({
+      subject: "exact-chef",
+      role: "kitchen_manager",
+      tenantId: "exact-tenant",
+    });
+    const ingredient = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Olive Oil", unit: "cup", costPerUnit: 1, allergens: [] },
+    )) as { docId: string };
+    const repository = new ComponentImportRepository({
+      createReview: async (request) =>
+        (await proof.executeCommand(
+          kitchen,
+          (api.lib as any).culinaryOperations.createComponentImportReview,
+          request as never,
+        )) as never,
+      saveReview: async (request) =>
+        (await proof.executeCommand(
+          kitchen,
+          (api.lib as any).culinaryOperations.saveComponentImportReview,
+          request as never,
+        )) as never,
+      getImport: async (id) =>
+        (await kitchen.query(api.queries.getComponentImport, {
+          id: id as never,
+        })) as never,
+      listLinesByImportId: async (id) =>
+        (await kitchen.query(api.queries.listComponentImportLineByImportId, {
+          importId: id as never,
+        })) as never,
+    });
+    const source =
+      "House Oil\n\nYield: 2 cups\n\nIngredients:\n2 cups olive oil";
+    const review = new ComponentImportCoordinator().parseText(source, [
+      { id: ingredient.docId, name: "Olive Oil", unit: "cup" },
+    ]);
+    expect(review.lines[0].matchStatus).toBe("exact");
+    const created = await repository.create(review, {
+      kind: "pasted_text",
+      rawText: source,
+    });
+    expect(
+      await kitchen.query(api.queries.getComponentImport, {
+        id: created.importId as never,
+      }),
+    ).toMatchObject({ status: "ready", resolvedLineCount: 1 });
+    const loaded = await repository.load(created.importId);
+    await repository.save({ ...loaded, name: "House Oil revised" }, 0);
+    expect(
+      await kitchen.query(api.queries.getComponentImport, {
+        id: created.importId as never,
+      }),
+    ).toMatchObject({ status: "ready", reviewRevision: 1 });
+    const finalized = await proof.executeCommand(
+      kitchen,
+      (api.lib as any).culinaryOperations.importComponent,
+      {
+        operationKey: "exact-finalize",
+        review: { importId: created.importId, expectedRevision: 1 },
+        projection: {
+          name: "House Oil revised",
+          yieldQuantity: 2,
+          yieldUnit: "cup",
+          lines: [
+            {
+              name: "olive oil",
+              ingredientId: ingredient.docId,
+              quantity: 2,
+              unit: "cup",
+              sortOrder: 1,
+            },
+          ],
+        },
+      },
+    );
+    expect(finalized).toHaveProperty("componentId");
+    expect(
+      await kitchen.query(api.queries.getComponentImport, {
+        id: created.importId as never,
+      }),
+    ).toMatchObject({ status: "completed" });
+  });
+
+  it("rolls back rejected review approval and promotes stored exact matches on a header-only save", async () => {
+    const proof = harness();
+    const kitchen = proof.asRole({
+      subject: "draft-chef",
+      role: "kitchen_manager",
+      tenantId: "draft-tenant",
+    });
+    const ingredient = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      { name: "Olive Oil", unit: "cup", costPerUnit: 1, allergens: [] },
+    )) as { docId: string };
+    const source =
+      "Draft Oil\n\nYield: 2 cups\n\nIngredients:\n2 cups olive oil";
+    const review = new ComponentImportCoordinator().parseText(source, [
+      { id: ingredient.docId, name: "Olive Oil", unit: "cup" },
+    ]);
+    const request = buildCreateReviewRequest(review, {
+      kind: "pasted_text",
+      rawText: source,
+    });
+    const create = (args: unknown) =>
+      proof.executeCommand(
+        kitchen,
+        (api.lib as any).culinaryOperations.createComponentImportReview,
+        args as never,
+      );
+    await expect(
+      create({
+        ...request,
+        parsed: { ...request.parsed, yieldQuantity: undefined },
+        approveWhenReady: true,
+      }),
+    ).rejects.toThrow("Review needs");
+    expect(
+      await kitchen.query(api.queries.listComponentImport, {}),
+    ).toHaveLength(0);
+    expect(
+      await kitchen.query(api.queries.listComponentImportLine, {}),
+    ).toHaveLength(0);
+    // Incomplete drafts are still saveable. The later header-only correction
+    // must confirm exact lines already in storage, not only changed lines.
+    const created = (await create({
+      ...request,
+      parsed: { ...request.parsed, yieldQuantity: undefined },
+    })) as { importId: string };
+    const save = (header: unknown) =>
+      proof.executeCommand(
+        kitchen,
+        (api.lib as any).culinaryOperations.saveComponentImportReview,
+        {
+          importId: created.importId,
+          expectedReviewRevision: 0,
+          header,
+          lines: [],
+          approveWhenReady: true,
+        } as never,
+      );
+    await expect(save({ name: "Draft Oil" })).rejects.toThrow("Review needs");
+    expect(
+      await kitchen.query(api.queries.getComponentImport, {
+        id: created.importId as never,
+      }),
+    ).toMatchObject({
+      status: "reviewing",
+      reviewRevision: 0,
+      resolvedLineCount: 0,
+    });
+    await save({ name: "Draft Oil", yieldQuantity: 2 });
+    expect(
+      await kitchen.query(api.queries.getComponentImport, {
+        id: created.importId as never,
+      }),
+    ).toMatchObject({
+      status: "ready",
+      reviewRevision: 1,
+      resolvedLineCount: 1,
+    });
+    expect(
+      await kitchen.query(api.queries.listComponentImport, {}),
+    ).toHaveLength(1);
+  });
+
   it("rolls back an invalid menu clone and replays a confirmed clone without source drift", async () => {
     const proof = harness();
     const kitchen = proof.asRole({

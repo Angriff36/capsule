@@ -5,9 +5,9 @@
 
 # Implementation plan — capsule
 
-## Active Ralph delivery — honest, resumable recipe review
+## Closed Ralph delivery — honest, resumable recipe review
 
-Owner selected Ralph loops on 2026-09-06. Branch: `ralph/recipe-review`, based on the pushed readiness audit. Execute one of RR-1 through RR-5 per iteration, in dependency order. Read `codex-plans/production-readiness-next/recipe-review-plan.md` for exact owners, interfaces and test cases, and `data-audit.md` beside it for current source evidence. Recheck source before implementing. All sections below this active delivery are preserved history, not the next task queue.
+Owner selected Ralph loops on 2026-09-06. RR-1 through RR-5 finished on `ralph/recipe-review` at `b300922b`; all current delivery checkboxes below are complete. Do not restart this delivery. Integration and production release are tracked in `docs/task-plans/2026-09-06-endstage-cleanup/status.md`. The detailed recipe plan and audit remain historical evidence. Sections below this closed delivery are preserved history, not the next task queue.
 
 Current completion contract: AC-042 through AC-046. Historical AC-001 through AC-041 retain their requirements and statuses; AC-006/013 still lack required J receipts. Completing this delivery does not certify them, all PR03, full production readiness or deployment. Never clear a checkbox while its required evidence is absent.
 

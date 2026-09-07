@@ -408,6 +408,29 @@ const stagedLineInput = v.object({
   match: v.optional(lineMatchInput),
 });
 
+/** Accept zero-click exact matches inside the save transaction, not after it.
+ * A rejected approval must roll back the draft/revision as well as its lines.
+ * Incomplete drafts skip this step and remain saveable.
+ */
+async function prepareReviewApproval(ctx: MutationCtx, importId: Id<"componentImports">) {
+  const row = await ctx.db.get(importId);
+  const lines = await ctx.db.query("componentImportLines")
+    .withIndex("by_importId", (q) => q.eq("importId", importId)).collect();
+  const live = lines.filter((line) => line.deletedAt == null);
+  const positive = (value: number | null | undefined) => value != null && Number.isFinite(value) && value > 0;
+  if (!row?.parsedName?.trim() || !positive(row.parsedYieldQuantity) || !row.parsedYieldUnit ||
+      live.length === 0 || live.some((line) => !positive(line.parsedQuantity) || !line.parsedUnit)) {
+    throw new Error("Review needs a name, yield and measured ingredient lines before approval");
+  }
+  for (const line of live) {
+    if (line.matchStatus === "exact" && line.matchedIngredientId != null) {
+      await ctx.runMutation(api.mutations.ComponentImportLine_confirmExisting, {
+        docId: line._id, matchedIngredientId: line.matchedIngredientId,
+      });
+    }
+  }
+}
+
 const parsedHeaderInput = v.object({
   name: v.string(),
   lineCount: v.number(),
@@ -430,6 +453,7 @@ export const createComponentImportReview = mutation({
     source: reviewSourceInput,
     parsed: parsedHeaderInput,
     lines: v.array(stagedLineInput),
+    approveWhenReady: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<{ importId: string; reviewRevision: number; lineIds: string[] }> => {
     await authorize(ctx);
@@ -486,6 +510,7 @@ export const createComponentImportReview = mutation({
     // decisions above already resolve lines, so the header's
     // resolvedLineCount must reflect them or a create-then-finalize flow can
     // never satisfy approveReview's resolved === parsed guard.
+    if (args.approveWhenReady) await prepareReviewApproval(ctx, uploaded.docId);
     const stagedAll = await ctx.db
       .query("componentImportLines")
       .withIndex("by_importId", (q) => q.eq("importId", uploaded.docId))
@@ -497,6 +522,9 @@ export const createComponentImportReview = mutation({
       docId: uploaded.docId,
       resolvedLineCount: stagedResolved,
     });
+    if (args.approveWhenReady) {
+      await ctx.runMutation(api.mutations.ComponentImport_approveReview, { docId: uploaded.docId });
+    }
     return { importId: String(uploaded.docId), reviewRevision: 0, lineIds };
   },
 });
@@ -540,6 +568,7 @@ export const saveComponentImportReview = mutation({
     header: saveHeaderInput,
     lines: v.array(saveLineInput),
     discardedLines: v.optional(v.array(discardedLineInput)),
+    approveWhenReady: v.optional(v.boolean()),
   },
   handler: async (ctx, args): Promise<{ reviewRevision: number }> => {
     const tenantId = await authorize(ctx);
@@ -611,6 +640,7 @@ export const saveComponentImportReview = mutation({
     // resolution ledger is recomputed from storage: every line that is
     // resolved or discarded counts, and approval stays blocked while any
     // live line still lacks a disposition.
+    if (args.approveWhenReady) await prepareReviewApproval(ctx, args.importId);
     const allLines = await ctx.db
       .query("componentImportLines")
       .withIndex("by_importId", (q) => q.eq("importId", args.importId))
@@ -622,6 +652,9 @@ export const saveComponentImportReview = mutation({
       docId: args.importId,
       resolvedLineCount: resolvedCount,
     });
+    if (args.approveWhenReady) {
+      await ctx.runMutation(api.mutations.ComponentImport_approveReview, { docId: args.importId });
+    }
     return { reviewRevision: nextRevision };
   },
 });

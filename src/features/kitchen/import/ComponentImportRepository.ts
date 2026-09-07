@@ -29,6 +29,7 @@ export interface ComponentImportSourceInput {
 }
 
 export interface CreateComponentImportReviewRequest {
+  approveWhenReady?: boolean;
   source: {
     kind: ComponentImportSourceKind;
     filename?: string;
@@ -210,6 +211,7 @@ export function mapStoredReview(
 }
 
 export interface SaveComponentImportReviewRequest {
+  approveWhenReady?: boolean;
   importId: string;
   expectedReviewRevision: number;
   header: {
@@ -328,14 +330,6 @@ export interface ComponentImportRepositoryPorts {
   saveReview: (
     request: SaveComponentImportReviewRequest,
   ) => Promise<{ reviewRevision: number }>;
-  /**
-   * Promotes a fully resolved review to `ready`
-   * (ComponentImport.approveReview). The save transaction itself deliberately
-   * stops at the resolution ledger — proofs pin save→approve as separate
-   * governed steps — so the workbench layer owns this "operator finished"
-   * promotion after its save lands.
-   */
-  approveReview?: (importId: string) => Promise<unknown>;
   getImport: (importId: string) => Promise<StoredComponentImportRow | null>;
   listLinesByImportId: (
     importId: string,
@@ -352,9 +346,10 @@ export class ComponentImportRepository {
     review: ComponentImportReviewState,
     source: ComponentImportSourceInput,
   ): Promise<{ importId: string; reviewRevision: number; lineIds: string[] }> {
-    const result = await this.ports.createReview(
-      buildCreateReviewRequest(review, source),
-    );
+    const result = await this.ports.createReview({
+      ...buildCreateReviewRequest(review, source),
+      approveWhenReady: reviewIsReady(review),
+    });
     this.baseline = {
       ...review,
       importId: result.importId,
@@ -364,12 +359,6 @@ export class ComponentImportRepository {
         importLineId: result.lineIds[index],
       })),
     };
-    // The operator may correct and decide everything before the first save;
-    // that first save must also promote the fresh review to ready or the
-    // follow-up finalize dead-ends in "reviewing".
-    if (reviewIsReady(review)) {
-      await this.ports.approveReview?.(result.importId);
-    }
     return result;
   }
 
@@ -402,18 +391,14 @@ export class ComponentImportRepository {
       review,
       expectedRevision,
     );
-    const result = await this.ports.saveReview(request);
+    const result = await this.ports.saveReview({
+      ...request,
+      approveWhenReady: reviewIsReady(review),
+    });
     this.baseline = {
       ...review,
       reviewRevision: result.reviewRevision,
     };
-    // A save that leaves every line decided and measured completes the
-    // review; without this promotion the durable finalize refuses with
-    // "component import is reviewing" and the normal paste→save→finalize
-    // flow dead-ends (found by the RR-5 browser qualification).
-    if (review.importId != null && reviewIsReady(review)) {
-      await this.ports.approveReview?.(review.importId);
-    }
     return result;
   }
 }
