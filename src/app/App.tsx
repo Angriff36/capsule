@@ -491,6 +491,16 @@ const EventDayPickerPage = lazy(() =>
     default: module.EventDayPickerPage,
   })),
 );
+const RunOfShowPage = lazy(() =>
+  import("../features/eventDay/RunOfShowPage").then((module) => ({
+    default: module.RunOfShowPage,
+  })),
+);
+const BattleBoardPage = lazy(() =>
+  import("../features/eventDay/BattleBoardPage").then((module) => ({
+    default: module.BattleBoardPage,
+  })),
+);
 const EmailNotificationSettingsPage = lazy(() =>
   import("../features/notifications/EmailNotificationSettingsPage").then(
     (module) => ({ default: module.EmailNotificationSettingsPage }),
@@ -603,6 +613,24 @@ export function App() {
             element={
               <SupplyRoute>
                 <EventDayPage />
+              </SupplyRoute>
+            }
+          />
+          {/* Run-of-show tracker: the minute-by-minute crew view. */}
+          <Route
+            path="/event-day/:id/run"
+            element={
+              <SupplyRoute>
+                <RunOfShowPage />
+              </SupplyRoute>
+            }
+          />
+          {/* Battle board: auto-built day-of one-pager, print to PDF. */}
+          <Route
+            path="/event-day/:id/battle-board"
+            element={
+              <SupplyRoute>
+                <BattleBoardPage />
               </SupplyRoute>
             }
           />
