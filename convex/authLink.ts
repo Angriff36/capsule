@@ -135,16 +135,38 @@ export const createAccountProfile = internalMutation({
       .first();
     if (previous) return { linked: false, reason: "released" };
     // Explicitly removed account access is not a first-login bootstrap.
-    const released = ctx.db
+    const unbound = ctx.db
       .query("people")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
-      .filter((q) => q.eq(q.field("authSubjectId"), null));
-    for await (const row of released) {
+      .filter((q) =>
+        q.or(
+          q.eq(q.field("authSubjectId"), null),
+          q.eq(q.field("authSubjectId"), undefined),
+        ),
+      );
+    let hired: Doc<"people"> | null = null;
+    let multipleHires = false;
+    for await (const row of unbound) {
       if ((await readEmail(ctx, row.email)) === profile.email) {
         // Imports can carry null by default; that is not account revocation.
         if (await isImportedPerson(ctx, row)) continue;
-        return { linked: false, reason: "released" };
+        if (row.authSubjectId === null)
+          return { linked: false, reason: "released" };
+        if (row.status === "active" && row.deletedAt == null) {
+          if (hired) multipleHires = true;
+          else hired = row;
+        }
       }
+    }
+    // Preserve a genuine manager-created invitation and its assigned work.
+    // Ambiguous contact records never choose the account's identity or role.
+    if (hired && !multipleHires) {
+      await ctx.db.patch(hired._id, {
+        authSubjectId: identity.subject,
+        updatedAt: Date.now(),
+        version: hired.version + 1,
+      });
+      return { linked: true, reason: "matched" };
     }
     const sealed = await encrypt(profile.email, {
       ctx,
@@ -294,6 +316,7 @@ export const linkBySubjectEmail = internalMutation({
         .collect();
       for (const person of active(released)) {
         if ((await readEmail(ctx, person.email)) === email) {
+          if (await isImportedPerson(ctx, person)) continue;
           return { linked: false, reason: "released" };
         }
       }

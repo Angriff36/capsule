@@ -24,6 +24,8 @@ Hiring on Admin → Permissions → Team roles creates the identity-provider acc
 
 Person email is contact data, not a unique account key. Imported staff may share an email with a Capsule account without becoming that account. The former tenant/email uniqueness declaration was removed at its Manifest source and regenerated. Bootstrap preserves recognized Capsule roles; Clerk `member` and custom roles default to `staff`, not elevated access.
 
+A single active, never-linked, non-imported hire with the account's verified email in the same workspace is reused automatically, including for org-member sign-ins. This preserves its assigned role, employment information and work. Multiple contact matches do not select an identity; imported records are excluded from both hire matching and released-account checks.
+
 ## My Day staff identity
 
 My Day uses `authStatus.personId` and its tenant together with the signed-in subject and active Person record. A Clerk nickname does not invalidate a persisted staff link. Browser-local name selections are not authentication or account linking and are no longer used by this page.

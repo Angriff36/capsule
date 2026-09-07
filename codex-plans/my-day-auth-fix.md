@@ -18,6 +18,8 @@ Backend scratch verification (`.artifacts/verify-account-bootstrap.ts`, convex-t
 
 Expanded GLM review initially rejected the unchecked IdP role cast and conflict with Person's unique tenant/email declaration. Corrected known-role mapping with safe staff fallback, removed email-as-identity uniqueness at the Manifest source and regenerated, excluded imported null defaults from account-revocation checks, and matched chat's active-profile check and touch-target sizing. The suggested imported-email login denial was not used because it conflicts with the owner's explicit no-linking flow. Scratch runtime checks additionally pass Clerk member/custom-role setup and the public first-use/repeat-use action.
 
+Re-review required preserving genuine non-imported hires even when the sign-in has org claims, plus excluding imports from the older email-link released scan. Both were corrected. Runtime verification confirms that an org-member hire retains the same Person id, kitchen-manager role and contractor status, while an unclaimed imported-null row reports no match rather than removed access. Final independent verdict is in `.artifacts/account-final-review.txt`.
+
 Tracked production symptom: https://github.com/Angriff36/capsule/issues/282.
 
 Independent review found a related existing global offline queue/cache boundary. Corrected it by scoping both to subject/tenant/person, withholding replay until canonical identity resolves, and cancelling subsequent replay writes on account change. Legacy unowned queues are retained with an explicit confirmed-discard action; no real user's local data was deleted by this development task. Focused regressions demonstrated the original cross-scope replay and mid-drain failure before correction.
