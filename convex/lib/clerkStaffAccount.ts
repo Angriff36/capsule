@@ -75,6 +75,9 @@ export class ClerkStaffAccountDirectory {
         method: "POST",
         body: JSON.stringify({
           email_address: [input.email],
+          // This instance requires a username. Keep that provider detail out
+          // of hiring: staff still use their email/link, never choose an id.
+          username: `staff_${crypto.randomUUID().replaceAll("-", "")}`,
           first_name: input.givenName,
           last_name: input.familyName,
           password: input.password,
