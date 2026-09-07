@@ -1,6 +1,5 @@
 import {
   OrganizationSwitcher,
-  SignIn,
   SignOutButton,
   useOrganization,
   useOrganizationList,
@@ -17,6 +16,7 @@ import {
 } from "convex/react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api";
+import { PasswordSignIn } from "./auth/PasswordSignIn";
 import { PushRevokeOnSignout } from "./PushRevokeOnSignout";
 import {
   type AuthStatusSnapshot,
@@ -122,15 +122,7 @@ function SignInScreen() {
     <div className="grid min-h-dvh place-items-center bg-canvas px-6 py-10">
       <div className="flex flex-col items-center gap-6">
         <CapsuleWordmark />
-        <SignIn
-          withSignUp={false}
-          fallbackRedirectUrl="/"
-          forceRedirectUrl="/"
-        />
-        <p className="max-w-90 text-center text-xs leading-relaxed text-ink-3">
-          Use the sign-in email you received when you were hired. Ask your
-          manager to send another one if you need it.
-        </p>
+        <PasswordSignIn />
       </div>
     </div>
   );
