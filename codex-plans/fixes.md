@@ -369,3 +369,9 @@
 - Full local check passed again: 162 files / 1,385 tests. Scratch Convex runtime checks passed repeated/concurrent creation, account isolation, imported-record preservation, disabled-account handling and the real public setup action. Independent expanded GLM review is pending; no deployment or production data changes claimed.
 
 - Final expanded-flow GLM-5.3 review APPROVE through `1faa85d3`. Review corrections preserve normal-member access and genuine invited workers' identities, remove the Manifest email-as-identity uniqueness conflict, and exclude imports from both revoked-account scans. Generated wiring/proof metadata regenerated from source. Fresh full check passes 162 files / 1,385 tests; no production deployment or account-data change performed.
+## 2026-09-06: Production-readiness continuation plan
+
+- Compared all 132 PR01–14 criteria against released source cf23268; four evidence ledgers distinguish missing behavior, existing implementation and incomplete qualification.
+- Added a delivery sequence and the first honest/resumable recipe-review plan under codex-plans/production-readiness-next; preserved the sole product roadmap and historical acceptance IDs.
+- Corrected stale roadmap deferrals and culinary durable-import claims. No product implementation, private import, provider operation or deployment occurred.
+- Fresh local full check passed 161 files / 1,376 tests; spec lint passed 19 specs. Missing-criterion scan returned zero. Local source/test proof is not authenticated production qualification.

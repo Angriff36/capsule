@@ -117,7 +117,30 @@ const ALIASES: Record<string, UnitOfMeasure> = {
   bottles: "bottle",
 };
 
+/**
+ * Strict alias dictionary for import parsing: only aliases whose unit
+ * dimension is actually known. Size adjectives ("small", "medium",
+ * "large") describe the item, not a unit, so they are excluded — an
+ * unrecognized source measurement must stay a review correction, never
+ * fall back to "each" (PR03-03).
+ */
+const UNIT_ALIASES: Record<string, UnitOfMeasure> = Object.fromEntries(
+  Object.entries(ALIASES).filter(
+    ([alias]) => !["small", "medium", "large"].includes(alias),
+  ),
+) as Record<string, UnitOfMeasure>;
+
 export class UnitOfMeasureMapper {
+  /**
+   * Strict import resolution: unknown is a review issue, not a fallback
+   * unit. Returns null when the token is empty or unrecognized.
+   */
+  resolve(raw: string): UnitOfMeasure | null {
+    const key = raw.trim().toLowerCase().replace(/\.$/, "");
+    if (!key) return null;
+    return UNIT_ALIASES[key] ?? null;
+  }
+
   map(raw: string | undefined | null): UnitOfMeasure {
     const key = String(raw ?? "")
       .trim()

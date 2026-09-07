@@ -2,6 +2,7 @@ import { ComponentImportCoordinator } from "../features/kitchen/import/Component
 import { ComponentImportFinalizer } from "../features/kitchen/import/ComponentImportFinalizer";
 import {
   countUnresolvedLines,
+  reviewMeasurementIssues,
   type CatalogIngredient,
   type ComponentImportReviewState,
 } from "../features/kitchen/import/ComponentImportTypes";
@@ -85,6 +86,7 @@ export class CapsuleDocumentEnterCoordinator {
       safeToEnterWithoutApproval: unresolvedLineCount === 0,
       warnings: [
         ...review.warnings,
+        ...reviewMeasurementIssues(review).map((issue) => issue.message),
         ...(unresolvedLineCount > 0
           ? [
               `${unresolvedLineCount} ingredient line(s) need review. ` +
@@ -193,12 +195,20 @@ export class CapsuleDocumentEnterCoordinator {
     let dishId: string | undefined;
 
     if (introduceDish) {
+      const portionSize = options.dishPortionSize ?? ready.yieldQuantity;
+      const portionUnit = options.dishPortionUnit ?? ready.yieldUnit;
+      if (portionSize == null || portionUnit == null) {
+        throw new Error(
+          "Refuse to enter: dish portion needs a measured yield. " +
+            "Fix the document yield, or pass dishPortionSize and dishPortionUnit.",
+        );
+      }
       const dishResult = await this.executor.execute({
         capabilityId: "Dish.introduce",
         args: {
           name: ready.name.trim(),
-          portionSize: options.dishPortionSize ?? ready.yieldQuantity,
-          portionUnit: options.dishPortionUnit ?? ready.yieldUnit,
+          portionSize,
+          portionUnit,
           description: ready.description?.trim() || undefined,
           category: ready.category?.trim() || undefined,
         },
@@ -210,7 +220,7 @@ export class CapsuleDocumentEnterCoordinator {
         args: {
           dishId,
           componentId: saved.componentId,
-          yieldQuantity: ready.yieldQuantity,
+          yieldQuantity: portionSize,
           batchMultiplier: ready.batchMultiplier ?? 1,
           sortOrder: 0,
         },

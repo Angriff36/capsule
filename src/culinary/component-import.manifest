@@ -38,6 +38,8 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   property required rawSourceText: string = ""
   property required sourceByteCount: int = 0
   property required sourceFingerprint: string = ""
+  property csvSheetText: string?
+  property csvLinesText: string?
   property parsedName: string?
   property parsedDescription: string?
   property parsedCategory: string?
@@ -48,6 +50,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   property parsedBatchMultiplier: decimal(10, 4)?
   property required parsedLineCount: int = 0
   property required resolvedLineCount: int = 0
+  property required reviewRevision: int = 0
   property required status: ComponentImportStatus = "uploaded"
   property parsingFailureDetail: string?
   property finalizationFailureDetail: string?
@@ -89,7 +92,9 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     rawSourceText: string,
     sourceByteCount: int,
     sourceFingerprint: string,
-    optional sourceFilename: string
+    optional sourceFilename: string,
+    optional csvSheetText: string,
+    optional csvLinesText: string
   ) {
     guard self.uploadedAt == null
     guard self.deletedAt == null
@@ -98,6 +103,8 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "Source fingerprint is required"
     mutate sourceKind = sourceKind
     mutate sourceFilename = sourceFilename
+    mutate csvSheetText = csvSheetText
+    mutate csvLinesText = csvLinesText
     mutate rawSourceText = rawSourceText
     mutate sourceByteCount = sourceByteCount
     mutate sourceFingerprint = sourceFingerprint
@@ -162,6 +169,44 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Reviewed header correction. Legal while the review is editable (status
+  // "reviewing"; failed/finalizing/ready recover through resumeReview).
+  // rawSourceText and the other source fields are never touched: corrections
+  // replace the interpreted values only, so the original source stays intact.
+  command reviseReview(
+    expectedReviewRevision: int,
+    parsedName: string,
+    optional parsedDescription: string,
+    optional parsedCategory: string,
+    optional parsedCuisine: string,
+    optional parsedInstructions: string,
+    optional parsedYieldQuantity: decimal(10, 2),
+    optional parsedYieldUnit: UnitOfMeasure,
+    optional parsedBatchMultiplier: decimal(10, 4)
+  ) {
+    guard self.status == "reviewing"
+    guard self.reviewStartedAt != null
+    guard self.reviewRevision == expectedReviewRevision
+    guard self.deletedAt == null
+    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed component name is required"
+    constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "Reviewed yield quantity must be positive when present"
+    constraint reviseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Reviewed batch multiplier must be positive when present"
+    mutate parsedName = parsedName
+    mutate parsedDescription = parsedDescription
+    mutate parsedCategory = parsedCategory
+    mutate parsedCuisine = parsedCuisine
+    mutate parsedInstructions = parsedInstructions
+    mutate parsedYieldQuantity = parsedYieldQuantity
+    mutate parsedYieldUnit = parsedYieldUnit
+    mutate parsedBatchMultiplier = parsedBatchMultiplier
+    mutate reviewRevision = self.reviewRevision + 1
+    emit ComponentImportReviewRevised {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      reviewRevision: expectedReviewRevision + 1
+    }
+  }
+
   command recordResolutionProgress(resolvedLineCount: int) {
     guard self.status == "reviewing"
     guard self.reviewStartedAt != null
@@ -192,9 +237,10 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command beginFinalization() {
+  command beginFinalization(expectedReviewRevision: int) {
     guard self.status == "ready"
     guard self.readyAt != null
+    guard self.reviewRevision == expectedReviewRevision
     guard self.deletedAt == null
     mutate status = "finalizing"
     mutate finalizationStartedAt = now()
@@ -204,11 +250,15 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The resulting component link is stored here and validated at complete():
+  // the old guard dereferenced the previous stored foreign key before the
+  // assignment, so a first link could never pass. The supplied component is
+  // created by the same tenant's finalizer; complete() refuses to finish when
+  // the stored link does not resolve to a live component in this tenant.
   command recordComponent(resultingComponentId: uuid) {
     guard self.status == "finalizing"
     guard self.finalizationStartedAt != null
     guard self.deletedAt == null
-    guard self.resultingComponent != null
     mutate resultingComponentId = resultingComponentId
     emit ComponentImportComponentRecorded {
       componentImportId: self.id
@@ -235,10 +285,15 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Resume is also the demotion path from "ready": an approved review whose
+  // measurements must change goes back to reviewing, is corrected, and is
+  // re-approved before finalization. Completed and cancelled imports stay
+  // immutable (terminal transitions).
   command resumeReview() {
-    guard self.status == "failed" or self.status == "finalizing"
+    guard self.status == "failed" or self.status == "finalizing" or self.status == "ready"
     guard self.deletedAt == null
     mutate status = "reviewing"
+    mutate readyAt = null
     mutate failedAt = null
     mutate finalizationStartedAt = null
     mutate finalizationFailureDetail = null
@@ -248,10 +303,17 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Completion validates every stored link through the tenant-scoped relations:
+  // the recorded component must resolve to a live Component in this tenant, and
+  // every line that carries an ingredient link must resolve to a live
+  // Ingredient in this tenant. A foreign-tenant or deleted target therefore
+  // fails here, before any completion write.
   command complete() {
     guard self.status == "finalizing"
     guard self.finalizationStartedAt != null
     guard self.resultingComponentId != null
+    guard self.resultingComponent != null and self.resultingComponent.deletedAt == null
+    guard count_of(filter(self.lines, (line) => line.matchedIngredientId != null and (line.matchedIngredient == null or line.matchedIngredient.deletedAt != null or line.matchedIngredient.tenantId != self.tenantId))) == 0
     guard self.deletedAt == null
     mutate status = "completed"
     mutate completedAt = now()
@@ -296,12 +358,13 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
   property matchedIngredientId: uuid?
   property possibleMatchIngredientIds: list<string> = []
   property resolvedAt: datetime?
+  property revisedAt: datetime?
 
   belongsTo import: ComponentImport fields [tenantId, importId] references [tenantId, id]
   belongsTo matchedIngredient: Ingredient fields [tenantId, matchedIngredientId] references [tenantId, id]
 
-  constraint lineMatchedIngredientAllowed: self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchedIngredientId == null "Only exact or confirmed existing lines may carry a matched ingredient id"
-  constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null "Confirmed new lines remain unmatched until ingredient creation succeeds"
+  constraint lineMatchedIngredientAllowed: self.matchedIngredientId == null or self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchStatus == "confirmed_new" "Only exact, confirmed existing, or attached confirmed-new lines may carry a matched ingredient id"
+  constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null or self.resolvedAt != null "Confirmed new lines link their created ingredient only after resolution"
 
   default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component import lines"
   default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component import lines through commands"
@@ -338,10 +401,14 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Suggestion stores the candidate id; the tenant/active/deleted validation
+  // happens at confirmExisting, which resolves the stored candidate through
+  // the tenant-scoped belongsTo relation. (The previous relation guard here
+  // dereferenced the old stored foreign key before this assignment, so no new
+  // candidate could ever be suggested.)
   command suggestExactMatch(matchedIngredientId: uuid) {
     guard self.resolvedAt == null
     guard self.deletedAt == null
-    guard self.matchedIngredient != null and self.matchedIngredient.status == "active"
     mutate matchStatus = "exact"
     mutate matchedIngredientId = matchedIngredientId
     mutate possibleMatchIngredientIds = []
@@ -380,10 +447,15 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Confirmation validates the SUPPLIED target through the stored candidate:
+  // the supplied id must equal the suggested one, and the tenant-scoped
+  // relation must resolve it to a live, active ingredient in this tenant. A
+  // foreign-tenant, missing, or retired target fails here without any write.
   command confirmExisting(matchedIngredientId: uuid) {
     guard self.resolvedAt == null
     guard self.deletedAt == null
-    guard self.matchedIngredient != null and self.matchedIngredient.status == "active"
+    guard matchedIngredientId == self.matchedIngredientId
+    guard self.matchedIngredient != null and self.matchedIngredient.status == "active" and self.matchedIngredient.deletedAt == null
     mutate matchStatus = "confirmed_existing"
     mutate matchedIngredientId = matchedIngredientId
     mutate resolvedAt = now()
@@ -408,17 +480,48 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The created ingredient is produced by the same tenant's finalizer, so the
+  // link is stored here and validated at ComponentImport.complete(): the old
+  // relation guard dereferenced the previous stored foreign key (null for a
+  // confirmed-new line) and could never pass.
   command attachCreatedIngredient(matchedIngredientId: uuid) {
     guard self.matchStatus == "confirmed_new"
     guard self.resolvedAt != null
     guard self.deletedAt == null
-    guard self.matchedIngredient != null and self.matchedIngredient.status == "active"
     mutate matchedIngredientId = matchedIngredientId
     emit ComponentImportLineCreatedIngredientAttached {
       componentImportLineId: self.id
       tenantId: self.tenantId
       importId: self.importId
       matchedIngredientId: matchedIngredientId
+    }
+  }
+
+  // Reviewed measurement correction for one line. The import must still be in
+  // its editable review (a ready import is resumed first), and the editor must
+  // hold the import's current reviewRevision. sourceLine is never touched, so
+  // the original line text stays readable beside the corrected values.
+  command reviseMeasurements(
+    expectedReviewRevision: int,
+    optional parsedQuantity: decimal(10, 4),
+    optional parsedUnit: UnitOfMeasure,
+    optional preparationNote: string,
+    optional parsedIngredientName: string
+  ) {
+    guard self.import != null
+    guard self.import.status == "reviewing"
+    guard self.import.reviewRevision == expectedReviewRevision
+    guard self.deletedAt == null
+    mutate parsedQuantity = parsedQuantity
+    mutate parsedUnit = parsedUnit
+    mutate preparationNote = preparationNote
+    mutate parsedIngredientName = parsedIngredientName
+    mutate revisedAt = now()
+    emit ComponentImportLineMeasurementsRevised {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      reviewRevision: expectedReviewRevision
     }
   }
 
@@ -468,6 +571,12 @@ event ComponentImportParsed: "component_import.parsed" {
 event ComponentImportReviewStarted: "component_import.review_started" {
   componentImportId: string
   tenantId: string
+}
+
+event ComponentImportReviewRevised: "component_import.review_revised" {
+  componentImportId: string
+  tenantId: string
+  reviewRevision: int
 }
 
 event ComponentImportResolutionProgressRecorded: "component_import.resolution_progress_recorded" {
@@ -570,6 +679,13 @@ event ComponentImportLineResolutionReset: "component_import_line.resolution_rese
   componentImportLineId: string
   tenantId: string
   importId: string
+}
+
+event ComponentImportLineMeasurementsRevised: "component_import_line.measurements_revised" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  reviewRevision: int
 }
 
 event ComponentImportLineDiscarded: "component_import_line.discarded" {

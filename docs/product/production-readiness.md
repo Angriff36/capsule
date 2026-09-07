@@ -4,6 +4,8 @@ Status: **draft requirements, not a readiness certification**. Audited 2026-09-0
 
 This is the entry point and evidence ledger for fourteen additional [Ralph specs](../../specs/ralph/). [The product implementation plan](implementation-plan.md) remains the sole product roadmap. These requirements do not start Ralph, authorize a deployment/import, or regenerate its task plan.
 
+Current source comparison: [2026-09-06 criterion audit and delivery sequence](../../codex-plans/production-readiness-next/delivery-sequence.md), against released source `cf23268`. It credits the intervening import and wiring fixes, separates implementation from qualification, and provides the first recipe-review implementation plan. The baseline notes below remain historical, not a current completion ledger.
+
 ## Outcome and approach
 
 Capsule must support a real event from inquiry through booking, preparation, purchasing, staffing, delivery, payment, and management reporting. Imported TPP history must remain useful without fabricated recipes, stock, or accounting facts. Routine source synchronization, deployment verification, and retry work must not require Ryan to operate Git or paste JSON.
