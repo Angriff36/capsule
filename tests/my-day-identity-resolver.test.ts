@@ -394,22 +394,15 @@ describe("My Day signed-in identity paint", () => {
     );
   });
 
-  it("bound view uses Switch only for an unlinked explicit pick", () => {
-    expect(pageSource).toMatch(
-      /onSwitchPerson=\{linkedToSignIn \? undefined : switchPerson\}/,
-    );
+  it("bound view uses server identity without an unlinked Switch fallback", () => {
+    expect(pageSource).not.toMatch(/onSwitchPerson=/);
+    expect(pageSource).toMatch(/resolveMyDayAccount\(/);
     expect(pageSource).toMatch(/linkedPersonName=\{linkedPersonName\}/);
-    expect(pageSource).toMatch(
-      /linkedToSignIn && me \? `\${me\.givenName} \${me\.familyName}`/,
-    );
     expect(pageSource).toMatch(/md:grid-cols-2/);
   });
 
   it("does not auto-store a person id on load", () => {
-    expect(pageSource.match(/storePersonId/g)?.length).toBe(1);
-    expect(pageSource).toMatch(
-      /const choosePerson = \(id: string\) => \{\s*myDayIdentityResolver\.storePersonId/,
-    );
+    expect(pageSource).not.toMatch(/storePersonId|readStoredPersonId/);
   });
 
   it("wide two-column layout stays on the bound frame", () => {

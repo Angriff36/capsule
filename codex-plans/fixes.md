@@ -353,3 +353,9 @@
 - `bun run check` exits0:161files1376tests/all repository gates including unchanged baseline cap and local build. Regen-check green; spec lint19pass; command scan326directcalls0missingdocId. Source branch pushed; no deployment.
 - Historical AC006/013 required manual receipts absent: combined statuses honestly PENDING, programmatic passes retained; independent gpt-5.6-terra approves correction.
 - Plan/findings/progress and unique review evidence archived at docs/task-plans/2026-09-06-full-wiring-audit. Only reproducible review diffs/empty task folders removed; user worktrees untouched.
+
+## 2026-09-06: My Day authenticated staff identity
+
+- Fixed the browser-only staff picker/nickname veto by consuming the server-selected account/tenant-bound Person. Missing associations use existing verified-email linking and specific recovery without another sign-in.
+- Scoped offline reads and queued writes to account, tenant and staff record; replay stops between writes on account changes. Legacy unowned queues are retained unless the user explicitly confirms discarding them.
+- Full local check passed 162 files / 1,385 tests. Issue #282 tracks the production symptom. Live account mapping was not guessed or changed; no deployment. Final independent GLM review pending at initial commit after the Codex reviewer hit its usage limit.

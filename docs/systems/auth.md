@@ -21,6 +21,16 @@ Hiring on Admin → Permissions → Team roles creates the identity-provider acc
 4. If several live Person rows share that email (or the same `authSubjectId`), pick one instead of failing closed: hinted workspace (active Clerk org), then a row already linked to this sign-in, then Admin/owner/system, then the oldest live row. Do not persist a cross-tenant pick when there is no tenant hint — ClaimGate stays not-ready and workspace buttons remain the recovery. Opening a workspace button awaits `setActive` until the session JWT tenant claim matches, then retries the link. A hint that does not match the already-linked pick rematches onto the live never-linked row in that tenant (previous `authSubjectId` cleared). Team roles is not the only recovery.
 5. Ready → children (AppShell + routes).
 
+## My Day staff identity
+
+My Day uses `authStatus.personId` and its tenant together with the signed-in subject and active Person record. A Clerk nickname does not invalidate a persisted staff link. Browser-local name selections are not authentication or account linking and are no longer used by this page.
+
+For a workspace member without a staff link, My Day attempts the existing server-verified primary-email link automatically. A missing match, deliberately released link, missing configuration or provider error is shown as a staff-association issue; existing full-app access stays available. Retry does not sign the user out or create a new account. Wrong persisted associations still require an authorized correction to the actual Person account link; the UI must not guess another person's identity.
+
+Regression evidence: `tests/my-day-account-identity.test.ts` covers the real My Day route with a nickname, account-switch rejection, server/tenant/subject selection, and mounted link recovery. This local proof does not certify an individual production account's mapping or deployment.
+
+My Day offline snapshots and queued writes are scoped to the signed-in subject, workspace and linked staff record. Replay starts only after that identity resolves and stops between writes if it changes. Older unowned browser queues are not migrated to the next account; they remain stored with an explicit, confirmed discard option. No account change deletes them. Storage failures while queuing are shown instead of claiming the action was saved.
+
 ## Role source of truth
 
 1. Sign-in proves **who** (`identity.subject`) and **which org/tenant** (`tenantId` / `org.id`).
