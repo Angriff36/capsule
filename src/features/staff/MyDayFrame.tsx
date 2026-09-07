@@ -1,4 +1,3 @@
-import { useClerk } from "@clerk/react";
 import { Link, useLocation } from "react-router-dom";
 import { formatDate } from "../../lib/format";
 import {
@@ -38,7 +37,6 @@ export function MyDayFrame({
   shiftCount?: number;
   children: React.ReactNode;
 }) {
-  const { signOut } = useClerk();
   const { hash } = useLocation();
   const identityLabel =
     signedInName && linkedPersonName && linkedPersonName !== signedInName
@@ -125,12 +123,6 @@ export function MyDayFrame({
           <Link to="/">
             Full app <span aria-hidden="true">↗</span>
           </Link>
-          <button
-            type="button"
-            onClick={() => void signOut({ redirectUrl: "/" })}
-          >
-            Sign out
-          </button>
         </div>
       </aside>
       <main
