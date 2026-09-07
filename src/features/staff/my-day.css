@@ -421,31 +421,104 @@
 .my-day-prep-panel {
   grid-column: 1 / -1;
 }
-.my-day-prep-grid {
+.my-day-prep-dishes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  align-items: start;
+  gap: 20px;
   padding: 4px 20px 20px;
 }
-.my-day-prep-task {
+.my-day-prep-dish {
+  min-width: 0;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ledger);
+  overflow: hidden;
+  background: var(--color-panel);
+}
+.my-day-prep-dish-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px;
+  background: var(--color-inset);
+  border-bottom: 1px solid var(--color-line);
+}
+.my-day-prep-dish-heading h3 {
+  margin: 4px 0;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.my-day-prep-event {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-brand);
+  overflow-wrap: anywhere;
+}
+.my-day-prep-dish-meta,
+.my-day-prep-progress,
+.my-day-prep-task-meta {
+  font-size: 13px;
+  color: var(--color-ink-2);
+}
+.my-day-prep-progress {
+  display: grid;
+  gap: 6px;
+}
+.my-day-prep-progress progress {
+  width: 140px;
+  height: 6px;
+  accent-color: var(--color-brand);
+  appearance: none;
+  border: 0;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--color-line);
+}
+.my-day-prep-rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.my-day-prep-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
-  padding: 18px;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
+  gap: 10px 16px;
+  padding: 14px 20px;
 }
-.my-day-prep-task > div {
-  flex-basis: 100%;
+.my-day-prep-row + .my-day-prep-row {
+  border-top: 1px solid var(--color-line);
 }
-.my-day-prep-task p:first-child {
-  font-size: 16px;
+.my-day-prep-instruction {
+  flex: 1 1 240px;
+  min-width: 0;
   overflow-wrap: anywhere;
 }
-.my-day-prep-task p + p {
+.my-day-prep-task-name {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.my-day-prep-task-meta {
+  margin-top: 4px;
+}
+.my-day-prep-note {
   margin-top: 6px;
-  font-size: 13px;
+  font-size: 15px;
+  color: var(--color-ink-2);
+}
+.my-day-prep-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.my-day-prep-row-actions .btn {
+  min-height: 44px;
 }
 .my-day-secondary-grid {
   display: grid;
@@ -480,11 +553,6 @@
 .my-day-skip:focus {
   top: 16px;
 }
-@media (min-width: 1600px) {
-  .my-day-prep-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 @media (max-width: 1230px) {
   .my-day-main {
     padding: 24px;
@@ -496,9 +564,9 @@
     grid-column: 1;
   }
   .my-day-prep-panel {
-    grid-column: 2;
+    grid-column: 1 / -1;
   }
-  .my-day-prep-grid {
+  .my-day-prep-dishes {
     grid-template-columns: 1fr;
   }
 }
@@ -600,4 +668,14 @@
     transition: none;
     animation: none;
   }
+}
+
+.my-day-prep-progress progress::-webkit-progress-bar {
+  background: var(--color-line);
+}
+.my-day-prep-progress progress::-webkit-progress-value {
+  background: var(--color-brand);
+}
+.my-day-prep-progress progress::-moz-progress-bar {
+  background: var(--color-brand);
 }
