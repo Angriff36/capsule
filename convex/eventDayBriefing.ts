@@ -209,6 +209,11 @@ export const getBriefing = query({
         : [];
 
     const venueRaw: any = await tenantDoc(ctx, tenantId, event.venueId);
+    const serviceStyleRaw: any = await tenantDoc(
+      ctx,
+      tenantId,
+      event.serviceStyleId,
+    );
 
     // Dish catalog + recipe graph for the menu's dishes only.
     const dishIds = [
@@ -349,6 +354,7 @@ export const getBriefing = query({
         venueId: event.venueId ?? null,
         venueName: event.venueName ?? null,
         venueAddress: event.venueAddress ?? null,
+        serviceStyleName: serviceStyleRaw?.name ?? null,
         clientId: event.clientId ?? null,
         primaryContactName: await decryptField(
           ctx,
@@ -447,16 +453,22 @@ export const getBriefing = query({
       })),
       activities: (activities as any[]).map((row) => ({
         _id: row._id,
+        version: row.version ?? null,
         eventId: row.eventId,
         deletedAt: row.deletedAt ?? null,
         scheduledAt: row.scheduledAt ?? null,
         startsAt: row.startsAt ?? null,
+        endsAt: row.endsAt ?? null,
         sortOrder: row.sortOrder ?? null,
         name: row.name ?? null,
+        category: row.category ?? null,
+        notes: row.notes ?? null,
         siteNotes: row.siteNotes ?? null,
         assigneeTeams: row.assigneeTeams ?? [],
         assigneePersonIds: row.assigneePersonIds ?? [],
         responsibleParty: row.responsibleParty ?? null,
+        completedAt: row.completedAt ?? null,
+        completedByPersonId: row.completedByPersonId ?? null,
       })),
       eventDishes: (eventDishes as any[]).map((row) => ({
         _id: row._id,
@@ -545,6 +557,10 @@ export const getBriefing = query({
         unit: row.unit ?? null,
       })),
       people,
+      me: {
+        personId: auth.personId ?? null,
+        role: auth.role,
+      },
     };
   },
 });
