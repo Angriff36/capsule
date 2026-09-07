@@ -54,7 +54,10 @@ export function useChatIdentity() {
     const role = status?.role ?? "";
     const roster = (people ?? []).filter((person) => person.deletedAt == null);
     const me = personId
-      ? (status?.profile ??
+      ? ((status?.profile?.status === "active" &&
+        status.profile.deletedAt == null
+          ? status.profile
+          : undefined) ??
         roster.find((person) => person._id === personId) ??
         null)
       : null;

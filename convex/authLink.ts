@@ -22,6 +22,31 @@ import {
 /** Roles that carry adminAccess in src/foundation/base.manifest. */
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 
+const ACCOUNT_ROLES: readonly Doc<"people">["role"][] = [
+  "staff",
+  "kitchen_staff",
+  "kitchen_lead",
+  "sales_staff",
+  "event_staff",
+  "inventory_staff",
+  "procurement_staff",
+  "logistics_staff",
+  "driver",
+  "workforce_staff",
+  "finance_staff",
+  "manager",
+  "kitchen_manager",
+  "sales_manager",
+  "event_manager",
+  "inventory_manager",
+  "logistics_manager",
+  "workforce_manager",
+  "finance_manager",
+  "admin",
+  "owner",
+  "system",
+];
+
 async function isImportedPerson(ctx: MutationCtx, person: Doc<"people">) {
   return Boolean(
     await ctx.db
@@ -133,8 +158,8 @@ export const createAccountProfile = internalMutation({
       givenName: profile.givenName,
       familyName: profile.familyName,
       email: JSON.stringify({ v: 1, kid: sealed.keyId, ct: sealed.ciphertext }),
-      // The schema validates this closed vocabulary; no client role is accepted.
-      role: auth.role as Doc<"people">["role"],
+      // Preserve Capsule roles; Clerk member/custom roles get staff access.
+      role: ACCOUNT_ROLES.find((role) => role === auth.role) ?? "staff",
       status: "active",
       employmentType: "full_time",
       deletedAt: null,

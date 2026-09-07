@@ -106,7 +106,7 @@ function AccountProfileSetup() {
       </p>
       {failed && (
         <button
-          className="btn btn-primary mt-4"
+          className="btn btn-primary mt-4 min-h-11"
           type="button"
           onClick={() => setAttempt((value) => value + 1)}
         >

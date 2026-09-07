@@ -22,6 +22,8 @@ Hiring on Admin → Permissions → Team roles creates the identity-provider acc
 5. Workspace membership without a profile → `ensureAccountProfile` automatically creates the signed-in account's Person-backed Capsule profile, using provider profile details and the session's existing tenant/role. It does not select or modify imported people. Creation is transactional and idempotent; disabled or explicitly released accounts are not recreated.
 6. Ready → children (AppShell + routes), only after `authStatus.accountId` matches the current sign-in and `personId` exists. The same status includes a minimal own-profile projection, so My Day and chat do not depend on finding the account in a paginated roster. Legacy email-based invitation recovery excludes externally imported people.
 
+Person email is contact data, not a unique account key. Imported staff may share an email with a Capsule account without becoming that account. The former tenant/email uniqueness declaration was removed at its Manifest source and regenerated. Bootstrap preserves recognized Capsule roles; Clerk `member` and custom roles default to `staff`, not elevated access.
+
 ## My Day staff identity
 
 My Day uses `authStatus.personId` and its tenant together with the signed-in subject and active Person record. A Clerk nickname does not invalidate a persisted staff link. Browser-local name selections are not authentication or account linking and are no longer used by this page.

@@ -16,6 +16,8 @@ Account bootstrap extends the initial correction: the shared AuthGate waits for 
 
 Backend scratch verification (`.artifacts/verify-account-bootstrap.ts`, convex-test) passed anonymous denial, simultaneous/repeated setup idempotency, imported-row preservation and exclusion, trusted role preservation, account isolation, and inactive-account recreation denial. Expanded local gate and independent GLM review are recorded separately below when complete.
 
+Expanded GLM review initially rejected the unchecked IdP role cast and conflict with Person's unique tenant/email declaration. Corrected known-role mapping with safe staff fallback, removed email-as-identity uniqueness at the Manifest source and regenerated, excluded imported null defaults from account-revocation checks, and matched chat's active-profile check and touch-target sizing. The suggested imported-email login denial was not used because it conflicts with the owner's explicit no-linking flow. Scratch runtime checks additionally pass Clerk member/custom-role setup and the public first-use/repeat-use action.
+
 Tracked production symptom: https://github.com/Angriff36/capsule/issues/282.
 
 Independent review found a related existing global offline queue/cache boundary. Corrected it by scoping both to subject/tenant/person, withholding replay until canonical identity resolves, and cancelling subsequent replay writes on account change. Legacy unowned queues are retained with an explicit confirmed-discard action; no real user's local data was deleted by this development task. Focused regressions demonstrated the original cross-scope replay and mid-drain failure before correction.
