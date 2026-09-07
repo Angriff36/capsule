@@ -24,7 +24,16 @@ export function PasswordSignIn() {
   };
   const finish = async () => {
     if (signIn.status === "complete") {
-      check(await signIn.finalize());
+      check(
+        await signIn.finalize({
+          navigate: ({ session }) => {
+            // A verified credential can create a pending session (for example,
+            // an existing account requiring a password change or workspace).
+            // Clerk's widget owns completion of those session tasks.
+            if (session.currentTask) setProvider(true);
+          },
+        }),
+      );
     } else {
       // MFA, device trust, and any provider-required recovery stay in the
       // provider flow. A successful password is never treated as a session.
@@ -105,7 +114,7 @@ export function PasswordSignIn() {
         />
         <button
           type="button"
-          className="btn btn-ghost min-h-11"
+          className="btn btn-ghost min-h-[44px]"
           disabled={busy}
           onClick={() => void back()}
         >
@@ -161,7 +170,7 @@ export function PasswordSignIn() {
               required
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              className="min-h-11 w-full border border-line-2 bg-panel px-3 text-base font-normal text-ink"
+              className="input min-h-[32px] text-base font-normal max-sm:min-h-[44px]"
               disabled={busy}
             />
           </label>
@@ -182,7 +191,7 @@ export function PasswordSignIn() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="min-h-11 w-full border border-line-2 bg-panel px-3 text-base font-normal text-ink"
+              className="input min-h-[32px] text-base font-normal max-sm:min-h-[44px]"
               disabled={busy}
             />
           </label>
@@ -202,7 +211,7 @@ export function PasswordSignIn() {
               required
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              className="min-h-11 w-full border border-line-2 bg-panel px-3 text-base font-normal text-ink"
+              className="input min-h-[32px] text-base font-normal max-sm:min-h-[44px]"
               disabled={busy}
             />
           </label>
@@ -214,7 +223,7 @@ export function PasswordSignIn() {
         )}
         <button
           type="submit"
-          className="btn btn-primary min-h-11 w-full"
+          className="btn btn-primary min-h-[44px] w-full"
           disabled={busy}
         >
           {busy
@@ -233,7 +242,7 @@ export function PasswordSignIn() {
           <>
             <button
               type="button"
-              className="min-h-11 text-left text-base text-brand underline"
+              className="text-link min-h-[44px] text-left"
               disabled={busy}
               onClick={() => {
                 setError("");
@@ -245,7 +254,7 @@ export function PasswordSignIn() {
             </button>
             <button
               type="button"
-              className="min-h-11 text-left text-base text-ink-2 underline"
+              className="text-link min-h-[44px] text-left"
               disabled={busy}
               onClick={() => {
                 setPassword("");
@@ -258,7 +267,7 @@ export function PasswordSignIn() {
         ) : (
           <button
             type="button"
-            className="min-h-11 text-left text-base text-brand underline"
+            className="text-link min-h-[44px] text-left"
             disabled={busy}
             onClick={() => void back()}
           >
