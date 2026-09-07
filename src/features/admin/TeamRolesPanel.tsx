@@ -49,9 +49,11 @@ export function TeamRolesPanel({
   async function sendSignIn(personId: string, name: string): Promise<void> {
     const result = await provisionSignIn({ personId: personId as never });
     setNotice(
-      result.passwordIssued
-        ? `Emailed ${name} a sign-in link and a password at ${result.email}.`
-        : `Emailed ${name} a sign-in link at ${result.email}.`,
+      !result.emailed
+        ? `${name} already has access. No new invitation was sent. They can sign in at ${result.appUrl} using ${result.email}, or use Forgot password on that screen.`
+        : result.passwordIssued
+          ? `Emailed ${name} a sign-in link and a password at ${result.email}.`
+          : `Emailed ${name} a sign-in link at ${result.email}.`,
     );
   }
 

@@ -1,28 +1,21 @@
 // AUTHOR-OWNED — hire-time Capsule sign-in. Creates the identity-provider
-// account, links it to the Person, and emails a one-click app link plus a
-// password when the person does not already have one.
-import { v } from "convex/values";
+// account, links it to the Person, and asks Clerk to email the invitation.
+// No custom sending domain or plaintext password email is required.
+import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
-import {
-  ClerkSignInTicketIssuer,
-  capsuleSignInUrl,
-} from "./lib/clerkSignInTicket";
 import { ClerkStaffAccountDirectory } from "./lib/clerkStaffAccount";
 import { decrypt } from "./lib/encryption";
-import {
-  StaffSignInMailer,
-  readStaffSignInMailEnvironment,
-} from "./lib/staffSignInMailer";
 import { StaffSignInPasswordFactory } from "./lib/staffSignInPassword";
 
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 const CAN_PROVISION = new Set([...ADMIN_ROLES, "workforce_manager"]);
 
 export type StaffSignInProvisionResult = {
-  emailed: true;
+  emailed: boolean;
   email: string;
+  appUrl: string;
   passwordIssued: boolean;
 };
 
@@ -128,24 +121,20 @@ export const provisionStaffSignIn = action({
       throw new Error("Only an admin can send a sign-in for an admin.");
     }
 
+    const appUrl = process.env.CAPSULE_PUBLIC_APP_URL?.trim();
+    if (!appUrl)
+      throw new Error("CAPSULE_PUBLIC_APP_URL is missing on this deployment.");
     const directory = new ClerkStaffAccountDirectory(secret);
     const existing = await directory.findByEmail(person.email);
     const passwords = new StaffSignInPasswordFactory();
     let account = existing;
-    let issuedPassword: string | undefined;
     if (!account) {
-      issuedPassword = passwords.next();
       account = await directory.createWithPassword({
         email: person.email,
         givenName: person.givenName,
         familyName: person.familyName,
-        password: issuedPassword,
+        password: passwords.next(),
       });
-    } else if (!account.passwordEnabled || !account.hasSignedIn) {
-      // Re-issue until they have actually opened the app so a failed first
-      // email does not leave a password nobody knows.
-      issuedPassword = passwords.next();
-      await directory.setPassword(account.userId, issuedPassword);
     }
 
     await ctx.runMutation(internal.authProvision.linkProvisionedSubject, {
@@ -153,26 +142,26 @@ export const provisionStaffSignIn = action({
       authSubjectId: account.userId,
     });
 
-    const mailer = new StaffSignInMailer(readStaffSignInMailEnvironment());
-    const ticket = await new ClerkSignInTicketIssuer(secret).issue(
-      account.userId,
-    );
-    const companyName: string = await ctx.runQuery(
-      internal.authProvision.companyNameForProvision,
-      {},
-    );
-    await mailer.send({
-      companyName,
-      givenName: person.givenName,
-      email: person.email,
-      signInUrl: capsuleSignInUrl(mailer.appOrigin(), ticket.token),
-      ...(issuedPassword ? { password: issuedPassword } : {}),
-    });
+    let emailed: boolean;
+    try {
+      emailed = await directory.sendOrganizationInvitation({
+        organizationId: person.tenantId,
+        email: person.email,
+        appUrl,
+      });
+    } catch (error) {
+      throw new ConvexError(
+        error instanceof Error
+          ? error.message
+          : "The sign-in invitation could not be sent. Try again.",
+      );
+    }
 
     return {
-      emailed: true,
+      emailed,
       email: person.email,
-      passwordIssued: Boolean(issuedPassword),
+      appUrl,
+      passwordIssued: false,
     };
   },
 });

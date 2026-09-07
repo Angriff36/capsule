@@ -11,6 +11,12 @@ export type ClerkStaffAccount = {
   hasSignedIn: boolean;
 };
 
+export class ClerkStaffAccountError extends Error {
+  constructor(message: string, readonly code?: string) {
+    super(message);
+  }
+}
+
 type ClerkEmailAddress = {
   id?: string;
   email_address?: string;
@@ -110,6 +116,42 @@ export class ClerkStaffAccountDirectory {
     );
   }
 
+  /** Clerk owns delivery; the hired account already exists, so its invitation
+   * enters the app's existing SignIn ticket flow rather than a second signup.
+   * Capsule's Person role remains authoritative, not the provider member role.
+   */
+  async sendOrganizationInvitation(input: { organizationId: string; email: string; appUrl: string }): Promise<boolean> {
+    const url = `https://api.clerk.com/v1/organizations/${encodeURIComponent(input.organizationId)}/invitations`;
+    const send = () => this.request<{ id?: string; status?: string }>(url,
+      { method: "POST", body: JSON.stringify({ email_address: input.email, role: "org:member", redirect_url: input.appUrl }) });
+    let invitation;
+    try {
+      invitation = await send();
+    } catch (error) {
+      if (!(error instanceof ClerkStaffAccountError)) throw error;
+      // An accepted invitation is not a reusable login email. Preserve the
+      // account, membership and password; tell the manager to use normal login.
+      if (error.code === "already_a_member_in_organization") return false;
+      if (error.code !== "organization_invitation_not_unique") throw error;
+      // Resend replaces only this recipient's pending invitation, never a
+      // membership or another employee's invitation.
+      for (let offset = 0; ; offset += 100) {
+        const page = await this.request<{ data: Array<{ id: string; email_address: string; status: string }>; total_count: number }>(`${url}?status=pending&limit=100&offset=${offset}`);
+        const pending = page.data.find(row => row.status === "pending" && row.email_address.toLowerCase() === input.email.toLowerCase());
+        if (pending) {
+          await this.request(`${url}/${encodeURIComponent(pending.id)}/revoke`, { method: "POST" });
+          break;
+        }
+        if (offset + page.data.length >= page.total_count || page.data.length === 0) throw error;
+      }
+      invitation = await send();
+    }
+    if (!invitation.id || invitation.status !== "pending") {
+      throw new Error("The sign-in service did not confirm the invitation.");
+    }
+    return true;
+  }
+
   private async request<T>(url: string, init?: RequestInit): Promise<T> {
     let response: Response;
     try {
@@ -126,7 +168,7 @@ export class ClerkStaffAccountDirectory {
     }
     if (!response.ok) {
       const detail = await readClerkError(response);
-      throw new Error(detail);
+      throw detail;
     }
     return (await response.json()) as T;
   }
@@ -164,20 +206,20 @@ function toVerifiedAccount(
   };
 }
 
-async function readClerkError(response: Response): Promise<string> {
+async function readClerkError(response: Response): Promise<ClerkStaffAccountError> {
   try {
     const body = (await response.json()) as {
-      errors?: Array<{ message?: string; long_message?: string }>;
+      errors?: Array<{ message?: string; long_message?: string; code?: string }>;
       message?: string;
     };
     const first = body.errors?.[0];
-    return (
+    return new ClerkStaffAccountError(
       first?.long_message ||
       first?.message ||
       body.message ||
-      "The sign-in service rejected the request."
+      "The sign-in service rejected the request.", first?.code
     );
   } catch {
-    return "The sign-in service rejected the request.";
+    return new ClerkStaffAccountError("The sign-in service rejected the request.");
   }
 }
