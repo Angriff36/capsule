@@ -255,6 +255,34 @@ components:
     typography: "{typography.body}"
 ---
 
+## My Day composition (owner approved 2026-09-07)
+
+Ryan requested replacing `/my` with the supplied Banani staff dashboard layout,
+approved a My Day-specific design amendment, then clarified: keep the app's
+colors and use only the design, without following the export's color layout.
+
+For `/my` only, use a 240px staff profile sidebar and a spacious dashboard:
+time clock, upcoming shifts, and a month calendar across the desktop top row;
+prep task panels across the next row; existing schedule, packing, delivery,
+closeout, and availability actions below. White panels with the existing 12px
+ledger radius and 8px grouped-control radius are permitted inside this route.
+This is a scoped exception to the navigation-rail, workspace-sheet-only rounded
+surface, and rule-only section compositions described below. Do not add it to
+`design-contract-exceptions.json`.
+
+Retain the front-matter palette, orange primary action, DM Sans typography,
+semantic status colors, and accessible contrast. Do not import the export's
+cream/green palette, PT Serif, sample identity, events, hours, or recipe tasks.
+Use actual staff records and existing commands. Recorded-hour summaries use
+the existing workforce calculation for closed/corrected records, net of breaks;
+they do not imply payroll approval or include the currently open clock session.
+
+Below 1230px, use two dashboard columns. Below 900px, the sidebar becomes an
+in-flow identity header with horizontally scrollable navigation. Below 600px,
+stack clock, shifts, calendar, prep, and secondary workflows. Preserve keyboard
+focus, named calendar controls, a skip link, 40–44px mobile targets, and offline
+feedback. All other routes retain their existing presentation contract.
+
 ## Overview
 
 CapsuleX is the operating system for organizations that plan, produce, staff, deliver, and execute catered events. It should feel like a beautifully maintained service book rather than a generic administration dashboard. The application sits inside a pale botanical frame. Its working surfaces are warm white, its primary ink is a deep culinary green, and its hierarchy comes from editorial serif type, fine rules, measured negative space, and dense operational lists.
