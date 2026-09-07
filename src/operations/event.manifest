@@ -1273,6 +1273,10 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   // Optional so older timeline rows without the field still load.
   property sortOrder: int = 0
   property scheduledAt: datetime?
+  // Run-of-show completion (event-day tracker): the crew marks the block
+  // done during the event; null = still open.
+  property completedAt: datetime?
+  property completedByPersonId: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
@@ -1350,6 +1354,29 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     mutate assigneeTeams = assigneeTeams != null ? assigneeTeams : self.assigneeTeams
     mutate assigneePersonIds = assigneePersonIds != null ? assigneePersonIds : self.assigneePersonIds
     emit EventTimelineActivityAdjusted {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Event-day tracker: mark a run-of-show block done (and undo it).
+  command complete(optional completedByPersonId: string) {
+    guard self.deletedAt == null
+    mutate completedAt = now()
+    mutate completedByPersonId = completedByPersonId
+    emit EventTimelineActivityCompleted {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command reopen() {
+    guard self.deletedAt == null
+    mutate completedAt = null
+    mutate completedByPersonId = null
+    emit EventTimelineActivityReopened {
       activityId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
@@ -1790,6 +1817,18 @@ event EventTimelineActivityAdjusted: "event_timeline_activity.adjusted" {
 }
 
 event EventTimelineActivityRemoved: "event_timeline_activity.removed" {
+  activityId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTimelineActivityCompleted: "event_timeline_activity.completed" {
+  activityId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTimelineActivityReopened: "event_timeline_activity.reopened" {
   activityId: string
   tenantId: string
   eventId: string

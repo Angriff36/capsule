@@ -268,8 +268,6 @@ export const ComponentImportSchema = z.object({
   rawSourceText: z.string().default(""),
   sourceByteCount: z.number().int().default(0),
   sourceFingerprint: z.string().default(""),
-  csvSheetText: z.string().nullable().optional(),
-  csvLinesText: z.string().nullable().optional(),
   parsedName: z.string().nullable().optional(),
   parsedDescription: z.string().nullable().optional(),
   parsedCategory: z.string().nullable().optional(),
@@ -280,7 +278,6 @@ export const ComponentImportSchema = z.object({
   parsedBatchMultiplier: z.number().nullable().optional(),
   parsedLineCount: z.number().int().default(0),
   resolvedLineCount: z.number().int().default(0),
-  reviewRevision: z.number().int().default(0),
   status: z.enum(["uploaded", "parsed", "reviewing", "ready", "finalizing", "completed", "failed", "cancelled"]).default("uploaded"),
   parsingFailureDetail: z.string().nullable().optional(),
   finalizationFailureDetail: z.string().nullable().optional(),
@@ -315,7 +312,6 @@ export const ComponentImportLineSchema = z.object({
   matchedIngredientId: z.string().uuid().nullable().optional(),
   possibleMatchIngredientIds: z.array(z.string()).optional().default([]),
   resolvedAt: z.coerce.date().nullable().optional(),
-  revisedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1133,28 +1129,6 @@ export const ExternalRecordLinkSchema = z.object({
 
 export type ExternalRecordLink = z.infer<typeof ExternalRecordLinkSchema>;
 
-// Entity: ImportArtifact
-export const ImportArtifactSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  importRunId: z.string().default(""),
-  name: z.string().default(""),
-  storageId: z.string().nullable().optional(),
-  checksum: z.string().nullable().optional(),
-  byteSize: z.number().int().min(0).default(0),
-  entryCount: z.number().int().min(0).default(0),
-  provenance: z.string().default("{}"),
-  disposition: z.enum(["pending", "normalized", "linked_reference", "duplicate_view", "needs_mapping", "unsupported", "invalid"]).default("pending"),
-  parseStatus: z.enum(["pending", "parsed", "failed"]).default("pending"),
-  totalRowCount: z.number().int().default(0),
-  rowOutcomeCounts: z.string().default("{}"),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type ImportArtifact = z.infer<typeof ImportArtifactSchema>;
-
 // Entity: ImportDataset
 export const ImportDatasetSchema = z.object({
   id: z.string().uuid(),
@@ -1199,16 +1173,6 @@ export const ImportRunSchema = z.object({
   checksum: z.string().nullable().optional(),
   actorId: z.string().default(""),
   failureDetails: z.string().nullable().optional(),
-  archiveStorageId: z.string().nullable().optional(),
-  archiveChecksum: z.string().nullable().optional(),
-  archiveWorkbookCount: z.number().int().nullable().optional(),
-  indexWorkbookCount: z.number().int().nullable().optional(),
-  discrepancyExplained: z.boolean().nullable().optional(),
-  discrepancyNote: z.string().nullable().optional(),
-  dispositionCounts: z.string().nullable().optional(),
-  unaccountedRecordCount: z.number().int().nullable().optional(),
-  commitCheckpoint: z.string().nullable().optional(),
-  indexNameMismatch: z.boolean().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1554,20 +1518,6 @@ export const LeadComputedSchema = LeadSchema.extend({
 
 export type Lead = z.infer<typeof LeadSchema>;
 export type LeadWithComputed = z.infer<typeof LeadComputedSchema>;
-
-// Entity: MaterializationReceipt
-export const MaterializationReceiptSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  receiptKey: z.string().nullable().optional(),
-  family: z.string().nullable().optional(),
-  operationKey: z.string().nullable().optional(),
-  output: z.unknown().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type MaterializationReceipt = z.infer<typeof MaterializationReceiptSchema>;
 
 // Entity: Menu
 export const MenuSchema = z.object({
@@ -2085,7 +2035,6 @@ export const ProposalSchema = z.object({
   proposalNumber: z.string().nullable().optional(),
   title: z.string().default(""),
   eventDate: z.coerce.date().nullable().optional(),
-  eventEndDate: z.coerce.date().nullable().optional(),
   eventType: z.string().nullable().optional(),
   guestCount: z.number().int().default(0),
   venueName: z.string().nullable().optional(),
@@ -2097,7 +2046,6 @@ export const ProposalSchema = z.object({
   expiresAt: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
   terms: z.string().nullable().optional(),
-  visibleSections: z.array(z.string()).nullable().optional(),
   status: z.enum(["draft", "sent", "viewed", "accepted", "declined", "expired", "superseded"]).default("draft"),
   draftedAt: z.coerce.date().nullable().optional(),
   sentAt: z.coerce.date().nullable().optional(),
@@ -2210,13 +2158,8 @@ export const ProposalTemplateSchema = z.object({
   validityDays: z.number().int().nullable().optional(),
   status: z.enum(["active", "archived"]).default("active"),
   definedAt: z.coerce.date().nullable().optional(),
-  definedById: z.string().uuid().nullable().optional(),
-  updatedById: z.string().uuid().nullable().optional(),
   archivedAt: z.coerce.date().nullable().optional(),
-  archivedById: z.string().uuid().nullable().optional(),
   archiveReason: z.string().nullable().optional(),
-  reactivatedAt: z.coerce.date().nullable().optional(),
-  reactivatedById: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2321,7 +2264,7 @@ export const QuoteSubmissionSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   dedupKey: z.string().optional(),
-  status: z.enum(["pending", "processing", "completed", "failed", "dismissed"]).optional().default("pending"),
+  status: z.enum(["pending", "processing", "completed", "failed"]).optional().default("pending"),
   submittedAt: z.coerce.date().optional(),
   clientName: z.string().optional(),
   email: z.string().optional(),
@@ -2331,8 +2274,6 @@ export const QuoteSubmissionSchema = z.object({
   guestCount: z.number().int().min(1).optional().default(0),
   serviceStyleId: z.string().uuid().nullable().optional(),
   occasionId: z.string().uuid().nullable().optional(),
-  serviceStyleText: z.string().nullable().optional(),
-  occasionText: z.string().nullable().optional(),
   venueName: z.string().nullable().optional(),
   venueAddress: z.string().nullable().optional(),
   menuPreferences: z.string().nullable().optional(),
@@ -3745,9 +3686,7 @@ export const ComponentImportApproveReviewParamsSchema = z.object({});
 export type ComponentImportApproveReviewParams = z.infer<typeof ComponentImportApproveReviewParamsSchema>;
 
 // Command: beginFinalization on ComponentImport
-export const ComponentImportBeginFinalizationParamsSchema = z.object({
-  expectedReviewRevision: z.number().int(),
-});
+export const ComponentImportBeginFinalizationParamsSchema = z.object({});
 
 export type ComponentImportBeginFinalizationParams = z.infer<typeof ComponentImportBeginFinalizationParamsSchema>;
 
@@ -3810,21 +3749,6 @@ export const ComponentImportResumeReviewParamsSchema = z.object({});
 
 export type ComponentImportResumeReviewParams = z.infer<typeof ComponentImportResumeReviewParamsSchema>;
 
-// Command: reviseReview on ComponentImport
-export const ComponentImportReviseReviewParamsSchema = z.object({
-  expectedReviewRevision: z.number().int(),
-  parsedName: z.string(),
-  parsedDescription: z.string().optional(),
-  parsedCategory: z.string().optional(),
-  parsedCuisine: z.string().optional(),
-  parsedInstructions: z.string().optional(),
-  parsedYieldQuantity: z.number().optional(),
-  parsedYieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
-  parsedBatchMultiplier: z.number().optional(),
-});
-
-export type ComponentImportReviseReviewParams = z.infer<typeof ComponentImportReviseReviewParamsSchema>;
-
 // Command: upload on ComponentImport
 export const ComponentImportUploadParamsSchema = z.object({
   sourceKind: z.enum(["pasted_text", "text_file", "csv_bundle"]),
@@ -3832,8 +3756,6 @@ export const ComponentImportUploadParamsSchema = z.object({
   sourceByteCount: z.number().int(),
   sourceFingerprint: z.string(),
   sourceFilename: z.string().optional(),
-  csvSheetText: z.string().optional(),
-  csvLinesText: z.string().optional(),
 });
 
 export type ComponentImportUploadParams = z.infer<typeof ComponentImportUploadParamsSchema>;
@@ -3873,17 +3795,6 @@ export type ComponentImportLineMarkNewParams = z.infer<typeof ComponentImportLin
 export const ComponentImportLineResetResolutionParamsSchema = z.object({});
 
 export type ComponentImportLineResetResolutionParams = z.infer<typeof ComponentImportLineResetResolutionParamsSchema>;
-
-// Command: reviseMeasurements on ComponentImportLine
-export const ComponentImportLineReviseMeasurementsParamsSchema = z.object({
-  expectedReviewRevision: z.number().int(),
-  parsedQuantity: z.number().optional(),
-  parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
-  preparationNote: z.string().optional(),
-  parsedIngredientName: z.string().optional(),
-});
-
-export type ComponentImportLineReviseMeasurementsParams = z.infer<typeof ComponentImportLineReviseMeasurementsParamsSchema>;
 
 // Command: stage on ComponentImportLine
 export const ComponentImportLineStageParamsSchema = z.object({
@@ -5144,36 +5055,6 @@ export const ExternalRecordLinkVerifyLinkParamsSchema = z.object({
 
 export type ExternalRecordLinkVerifyLinkParams = z.infer<typeof ExternalRecordLinkVerifyLinkParamsSchema>;
 
-// Command: classify on ImportArtifact
-export const ImportArtifactClassifyParamsSchema = z.object({
-  disposition: z.enum(["pending", "normalized", "linked_reference", "duplicate_view", "needs_mapping", "unsupported", "invalid"]),
-  totalRowCount: z.number().int().optional(),
-  rowOutcomeCounts: z.string().optional(),
-});
-
-export type ImportArtifactClassifyParams = z.infer<typeof ImportArtifactClassifyParamsSchema>;
-
-// Command: recordParse on ImportArtifact
-export const ImportArtifactRecordParseParamsSchema = z.object({
-  parseStatus: z.enum(["pending", "parsed", "failed"]),
-  provenance: z.string().optional(),
-});
-
-export type ImportArtifactRecordParseParams = z.infer<typeof ImportArtifactRecordParseParamsSchema>;
-
-// Command: register on ImportArtifact
-export const ImportArtifactRegisterParamsSchema = z.object({
-  importRunId: z.string(),
-  name: z.string(),
-  byteSize: z.number().int(),
-  entryCount: z.number().int(),
-  checksum: z.string().optional(),
-  storageId: z.string().optional(),
-  provenance: z.string().optional(),
-});
-
-export type ImportArtifactRegisterParams = z.infer<typeof ImportArtifactRegisterParamsSchema>;
-
 // Command: activate on ImportDataset
 export const ImportDatasetActivateParamsSchema = z.object({});
 
@@ -5238,14 +5119,6 @@ export const ImportRunCommitParamsSchema = z.object({
 
 export type ImportRunCommitParams = z.infer<typeof ImportRunCommitParamsSchema>;
 
-// Command: explainArchiveDiscrepancy on ImportRun
-export const ImportRunExplainArchiveDiscrepancyParamsSchema = z.object({
-  note: z.string(),
-  actorId: z.string().optional(),
-});
-
-export type ImportRunExplainArchiveDiscrepancyParams = z.infer<typeof ImportRunExplainArchiveDiscrepancyParamsSchema>;
-
 // Command: markFailed on ImportRun
 export const ImportRunMarkFailedParamsSchema = z.object({
   failureDetails: z.string(),
@@ -5253,34 +5126,6 @@ export const ImportRunMarkFailedParamsSchema = z.object({
 });
 
 export type ImportRunMarkFailedParams = z.infer<typeof ImportRunMarkFailedParamsSchema>;
-
-// Command: recordArchiveInventory on ImportRun
-export const ImportRunRecordArchiveInventoryParamsSchema = z.object({
-  archiveWorkbookCount: z.number().int(),
-  archiveStorageId: z.string().optional(),
-  archiveChecksum: z.string().optional(),
-  indexWorkbookCount: z.number().int().optional(),
-  indexNameMismatch: z.boolean().optional(),
-});
-
-export type ImportRunRecordArchiveInventoryParams = z.infer<typeof ImportRunRecordArchiveInventoryParamsSchema>;
-
-// Command: recordCommitCheckpoint on ImportRun
-export const ImportRunRecordCommitCheckpointParamsSchema = z.object({
-  commitCheckpoint: z.string(),
-  actorId: z.string().optional(),
-});
-
-export type ImportRunRecordCommitCheckpointParams = z.infer<typeof ImportRunRecordCommitCheckpointParamsSchema>;
-
-// Command: recordDispositionSummary on ImportRun
-export const ImportRunRecordDispositionSummaryParamsSchema = z.object({
-  dispositionCounts: z.string(),
-  unaccountedRecordCount: z.number().int(),
-  actorId: z.string().optional(),
-});
-
-export type ImportRunRecordDispositionSummaryParams = z.infer<typeof ImportRunRecordDispositionSummaryParamsSchema>;
 
 // Command: recordParse on ImportRun
 export const ImportRunRecordParseParamsSchema = z.object({
@@ -6743,7 +6588,6 @@ export const ProposalDraftParamsSchema = z.object({
   total: z.number(),
   proposalNumber: z.string().optional(),
   eventDate: z.coerce.date().optional(),
-  eventEndDate: z.coerce.date().optional(),
   eventType: z.string().optional(),
   guestCount: z.number().optional(),
   venueName: z.string().optional(),
@@ -6751,7 +6595,6 @@ export const ProposalDraftParamsSchema = z.object({
   expiresAt: z.coerce.date().optional(),
   notes: z.string().optional(),
   terms: z.string().optional(),
-  visibleSections: z.array(z.string()).optional(),
   eventId: z.string().min(1).optional(),
 });
 
@@ -7088,8 +6931,6 @@ export const QuoteSubmissionCreateParamsSchema = z.object({
   guestCount: z.number(),
   serviceStyleId: z.string().min(1),
   occasionId: z.string().min(1),
-  serviceStyleText: z.string(),
-  occasionText: z.string(),
   venueName: z.string(),
   venueAddress: z.string(),
   menuPreferences: z.string(),
@@ -7099,13 +6940,6 @@ export const QuoteSubmissionCreateParamsSchema = z.object({
 
 export type QuoteSubmissionCreateParams = z.infer<typeof QuoteSubmissionCreateParamsSchema>;
 
-// Command: dismiss on QuoteSubmission
-export const QuoteSubmissionDismissParamsSchema = z.object({
-  reason: z.string(),
-});
-
-export type QuoteSubmissionDismissParams = z.infer<typeof QuoteSubmissionDismissParamsSchema>;
-
 // Command: fail on QuoteSubmission
 export const QuoteSubmissionFailParamsSchema = z.object({
   errorMessage: z.string(),
@@ -7113,11 +6947,6 @@ export const QuoteSubmissionFailParamsSchema = z.object({
 });
 
 export type QuoteSubmissionFailParams = z.infer<typeof QuoteSubmissionFailParamsSchema>;
-
-// Command: retry on QuoteSubmission
-export const QuoteSubmissionRetryParamsSchema = z.object({});
-
-export type QuoteSubmissionRetryParams = z.infer<typeof QuoteSubmissionRetryParamsSchema>;
 
 // Command: startProcessing on QuoteSubmission
 export const QuoteSubmissionStartProcessingParamsSchema = z.object({});
