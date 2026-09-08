@@ -18,8 +18,8 @@ Related: [local-dev.md](./local-dev.md), [manifest-builder.md](../generation/man
 | Requirement  | Version / note                                                     |
 | ------------ | ------------------------------------------------------------------ |
 | Bun          | **1.3.4** (`.bun-version`, `packageManager`)                       |
-| Node         | **>= 20** (`.nvmrc`)                                               |
-| Builder repo | Sibling checkout at `../builder` (devDependency `file:../builder`) |
+| Node         | **22.22.2** (`.nvmrc`); alternatives must satisfy `package.json` engines.node                                               |
+| Builder CLI | Committed `scripts/manifest-builder`; dependencies use the root lockfile |
 | Clerk        | Application + publishable key                                      |
 | Convex       | Dev deployment URL                                                 |
 
@@ -323,15 +323,14 @@ bun run dev                    # terminal 2
 
 ---
 
-## Builder repo commands (reference only)
+## Builder CLI
 
-Run from `../builder` when developing Builder itself — **not** required for normal Capsule work.
+The CLI lives in `scripts/manifest-builder/`. No sibling checkout or global Builder
+installation is needed. Use `bun run manifest:regen` and
+`bun run manifest:regen:check` from Capsule. See `scripts/manifest-builder/README.md`
+for upstream provenance and update instructions.
 
-```bash
-npm run builder -- --help
-npm run test
-npm run typecheck
-npm run lint
-```
-
-Capsule consumes Builder via `@angriff36/manifest-builder` (`file:../builder`). After changing Builder CLI code, run `bun install` in Capsule to refresh the link.
+`bun run build` builds the frontend only. `bun run deploy:production` is the
+explicit production entrypoint used by Vercel. `bun run release:receipt` uses
+the pinned local Vercel CLI. Deployment still requires configured credentials;
+the normal release remains `bash scripts/release.sh --reviewer <model>`.

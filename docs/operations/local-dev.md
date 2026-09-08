@@ -78,3 +78,11 @@ Full command reference (build from scratch, regen, maintenance, features): [comm
 - Frontend: delete `dist/`, restart Vite
 - Convex: dashboard / CLI against the **dev** deployment only
 - Env: recreate `.env.local` from `.env.example`
+
+## Build tool dependencies
+
+Run `bun install --frozen-lockfile`. Builder CLI source is committed under
+`scripts/manifest-builder`; no sibling checkout or `BUILDER_DIR` is used.
+`bun run build` is always frontend-only. Vercel CLI is installed locally for
+release receipts and authorized manual deployment work. Git Bash is required
+for the existing hooks and release shell scripts on Windows.

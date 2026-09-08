@@ -2,6 +2,8 @@
  * Fail early when Bun/Node do not match pinned repo versions.
  * Run via `bun scripts/check-toolchain.ts` (not part of tsc project graph).
  */
+import { spawnSync } from "node:child_process";
+import semver from "semver";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -32,18 +34,20 @@ class ToolchainGate {
 
   private assertNodeMajor(): void {
     const nvmrc = readFileSync(resolve(this.root, ".nvmrc"), "utf8").trim();
-    const requiredMajor = Number.parseInt(nvmrc, 10);
-    const nodeMajor = Number.parseInt(
-      process.versions.node.split(".")[0] ?? "",
-      10,
+    // Bun's process.versions.node describes Bun compatibility, not the Node
+    // executable used by Vite/Vitest/Vercel and their dependencies.
+    const result = spawnSync("node", ["--version"], { encoding: "utf8" });
+    const actual = result.stdout?.trim().replace(/^v/, "");
+    const { engines } = JSON.parse(
+      readFileSync(resolve(this.root, "package.json"), "utf8"),
     );
     if (
-      !Number.isFinite(requiredMajor) ||
-      !Number.isFinite(nodeMajor) ||
-      nodeMajor < requiredMajor
+      result.status !== 0 ||
+      !semver.valid(actual) ||
+      !semver.satisfies(actual, engines.node)
     ) {
       throw new Error(
-        `Node >= ${requiredMajor} required (see .nvmrc / engines.node); running ${process.versions.node}.`,
+        `Node ${engines.node} required (recommended ${nvmrc} from .nvmrc); running ${actual || "unavailable"}.`,
       );
     }
   }
@@ -51,5 +55,5 @@ class ToolchainGate {
 
 new ToolchainGate().enforce();
 console.log(
-  `toolchain: bun ${process.versions.bun}, node ${process.versions.node} (ok)`,
+  `toolchain: bun ${process.versions.bun}, external Node meets .nvmrc (ok)`,
 );

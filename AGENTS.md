@@ -19,20 +19,20 @@ main capsule checkout, which this loop never touches).
   ralph spec. Docs truth: `docs/architecture/*.md` still binds every iteration.
 - Validation commands (also in `.ralph.env`): tests `bun run test`; lint
   `bun run typecheck && bun run format:check`; build `bunx vite build`.
-  NEVER `bun run build` in this loop — it runs `scripts/vercel-build.sh`, which
-  deploys Convex. NEVER `npx convex deploy`. NEVER push `main` (this branch only).
+  `bun run build` is frontend-only. NEVER `bun run deploy:production` or
+  `npx convex deploy` in this loop. NEVER push `main` (this branch only).
 - Tests: capsule's "don't add tests unless the owner asks" rule is satisfied for
   this loop by the ACCEPTANCE_TESTS.md contract — add the focused test each
   `AC-###` requires, in capsule's existing style (`tests/*.test.ts`, proofs under
   `tests/proofs/` for runtime domain behavior). No other new tests.
 - Generated files are still never hand-edited: manifest changes go through
   `bun run manifest:regen` INSIDE this worktree so source + generated land in one
-  commit (`.builder/` and BUILDER_DIR are available here).
+  commit (`.builder/` and `scripts/manifest-builder/` are committed here).
 
 # Documentation (read this whenever you are making any changes)
 
 RYAN_APPROVED 7-23-2026 Created by Ryan
-C:/Projects/Manifest/mintlify/llms-full.txt
+docs/reference/manifest-llms-full.txt
 That is the full docuemntation for manifest, it will save you so many headaches if you read it.
 RYAN_APPROVED 7-23-2026 Created by Ryan
 
@@ -184,13 +184,12 @@ Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:bu
 
 `bun run check` verifies owned files still match the ownership ledger. Pre-commit rejects commits that touch owned paths without updating ownership.
 
-**Sibling Builder (`BUILDER_DIR`):** Capsule pre-push / `manifest:regen-check`
-runs that checkout’s working tree. If you fix a Builder bug that Capsule’s
-regen gate needs (e.g. skip `.loop-worktrees` in `ManifestSourceTree`),
-**commit it in Builder immediately** as its own atomic commit. Do not leave it
-uncommitted or bulk-stash it with unrelated Builder WIP — that removes the fix
-from disk and breaks Capsule `git push`. See
-`docs/generation/manifest-builder.md` § Pre-push circular dependency.
+**Repository-local Builder (owner-authorized build streamlining, 2026-09-08):**
+`scripts/manifest-builder/` contains the CLI source and upstream provenance.
+Regeneration and pre-push use it with Capsule's pinned dependencies. There is
+no sibling checkout, `BUILDER_DIR`, or cross-repository pin sync. Commit tooling
+fixes in Capsule and regenerate owned output in the same change. See
+`docs/generation/manifest-builder.md`.
 
 Import Convex API through `src/lib/api.ts`. Details: `docs/generation/manifest-builder.md`.
 

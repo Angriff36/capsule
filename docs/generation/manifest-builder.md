@@ -48,7 +48,7 @@ Capsule is a **live Manifest project**: editable `.manifest` sources and
 from those in-project files (no external `Manifest-source` IR after init).
 
 1. Edit domain meaning in `src/**/*.manifest` and/or `manifest.config.yaml`.
-2. `bun run manifest:regen` — syncs Capsule's exact `@angriff36/manifest` pin into the sibling Builder checkout (so projection code matches Capsule, no PAT), then Builder plans/applies when conflict-free and updates `.builder/ownership.json` in the same transaction. Preview only: `builder generate convex --dry-run`.
+2. `bun run manifest:regen` — runs the committed CLI in `scripts/manifest-builder` using Capsule's installed Manifest pin, applies a conflict-free plan, and updates `.builder/ownership.json` in the same transaction. Preview: `bun scripts/manifest-builder/scripts/builder.mts generate convex --dry-run`.
 3. `bun run codegen` / `bun run dev:convex` as needed.
 4. UI consumes APIs through generated hooks via `src/lib/api.ts`.
 
@@ -58,25 +58,24 @@ regen performs **safe ledger repair** automatically (no file rewrite, no
 of proven generated paths — never as a blind fix when the candidate differs
 from disk.
 
-### Pre-push “Circular dependency” mentioning `.loop-worktrees/…`
+### Self-contained toolchain (2026-09-08)
 
-`bun scripts/manifest-regen-check.ts` (`.githooks/pre-push`) compiles every
-`.manifest` under the Capsule tree via sibling Builder `ManifestSourceTree`.
-Agent worktrees live in gitignored `.loop-worktrees/` and must **not** be
-walked — otherwise duplicate graphs compile as one program and Manifest reports
-a false circular dependency.
+The owner requested that building and deploying no longer require external
+repository checkouts. Builder CLI source is committed in `scripts/manifest-builder`;
+`UPSTREAM.json` records its origin. Dependencies resolve from Capsule's
+package.json and bun.lock. `BUILDER_DIR` is no longer read. Regeneration never
+modifies another repository or installs another Manifest version.
 
-Builder owns the skip: `entry.name === '.loop-worktrees'` in
-`../builder/src/lib/manifest-project/manifestSourceTree.ts` (`listFiles`).
-If pre-push fails with paths under `.loop-worktrees/`, restore that skip in the
-local Builder checkout (do not delete worktrees as the “fix”).
+Pre-push uses this same CLI. Source discovery excludes `.artifacts`, `scripts`,
+and `.loop-worktrees`, keeping scratch checkouts out of the domain graph.
+Tooling fixes belong in this repository. Manifest remains a registry dependency;
+editable domain sources remain in `src`.
 
-**Commit that skip in Builder — do not leave it dirty or stash it.** Capsule’s
-regen/pre-push runs the sibling Builder working tree (`BUILDER_DIR`). An
-uncommitted fix disappears the moment an agent bulk-stashes “unrelated Builder
-WIP” for a clean Capsule `/commit`. Proven failure 2026-07-21: the skip existed
-only as a dirty `M` on a tracked file, got stashed with pin/ownership WIP, and
-blocked `git push` until re-committed as `d1c77d6`.
+`bun run build` always runs Vite and never deploys. Vercel explicitly runs
+`scripts/vercel-build.sh`, also available as `bun run deploy:production`; it
+requires production configuration before deploying Convex with the frontend
+build. The existing release script and review gate stay. Vercel CLI is pinned
+locally for release receipts and authorized manual work.
 
 ### Local Convex: “Could not find public function” after a schema reshape
 

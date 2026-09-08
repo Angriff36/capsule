@@ -31,6 +31,24 @@ bun run dev:convex   # terminal 1
 bun run dev          # terminal 2 → http://localhost:7811
 ```
 
+## Self-contained build tooling
+
+Only this repository is needed: Builder CLI source lives in
+`scripts/manifest-builder`, and Manifest, Convex, Vite, and Vercel CLI install from
+package.json and bun.lock. No sibling checkout or `BUILDER_DIR` is required.
+Prerequisites are Bun 1.3.4, Node 22.22.2 (or a version allowed by `engines.node`), and Git with Bash for hooks and
+release scripts. Deployment credentials remain in the environment, never Git.
+
+```bash
+bun install --frozen-lockfile
+bun run manifest:regen:check  # verify generated output
+bun run manifest:regen        # after changing domain sources or generators
+bun run build                 # frontend only; never deploys
+```
+
+Vercel uses the separate production entrypoint `scripts/vercel-build.sh`
+(`bun run deploy:production`). The reviewed release process below is unchanged.
+
 ## One local truth
 
 ```bash

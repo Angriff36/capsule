@@ -22,6 +22,7 @@
 // a linked project. Partial is the honest state; --strict turns it into
 // exit 1 for CI-style use. scripts/release.sh runs this in report mode.
 import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import {
   buildReleaseReceipt,
@@ -111,13 +112,15 @@ function run(
   args: readonly string[],
   timeoutMs: number,
 ): { stdout: string; status: number | null } | null {
-  // Windows: vercel is a .cmd shim that spawnSync cannot resolve without a
-  // shell. Args here are sha/url/token shaped — no spaces or quotes — so
-  // shell joining is safe for this use.
-  const result = spawnSync(command, args, {
+  const localVercel = command === "vercel";
+  const executable = localVercel ? "node" : command;
+  const commandArgs = localVercel
+    ? [createRequire(import.meta.url).resolve("vercel/dist/vc.js"), ...args]
+    : [...args];
+  const result = spawnSync(executable, commandArgs, {
     encoding: "utf8",
     timeout: timeoutMs,
-    shell: process.platform === "win32",
+    shell: false,
   });
   if (result.error || result.stdout == null) return null;
   return { stdout: result.stdout, status: result.status };

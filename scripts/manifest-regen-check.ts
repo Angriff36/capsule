@@ -1,21 +1,16 @@
-/**
- * Pre-push gate: generated Builder output must be current before code leaves
- * this machine (owner policy 2026-07-19 — regen is a LOCAL gate; CI has no
- * Builder). Runs the Builder plan in dry-run and fails if anything is
- * pending: run `bun run manifest:regen`, commit the result, push again.
- */
+/** Verify committed generated output with the repository-local Builder CLI. */
 import { spawnSync } from "node:child_process";
 import { builderEntrypoint } from "./manifest-regen.ts";
 
 const result = spawnSync(
-  "bun",
+  process.execPath,
   [builderEntrypoint(), "generate", "convex", "--json"],
   { encoding: "utf-8" },
 );
 
 const stdout = result.stdout ?? "";
 const jsonStart = stdout.indexOf("{");
-if (result.status === null || jsonStart < 0) {
+if ((result.status !== 0 && result.status !== 2) || jsonStart < 0) {
   console.error(
     result.stderr || "manifest-regen-check: Builder plan failed to run.",
   );
@@ -36,7 +31,15 @@ if (conflicts > 0) {
   for (const c of plan.conflicts) console.error(`  ${c.path}: ${c.message}`);
   process.exit(2);
 }
-if (pending > 0) {
+if (result.status !== 0) {
+  console.error("manifest-regen-check: Builder returned an unsuccessful plan.");
+  process.exit(1);
+}
+if (
+  pending > 0 ||
+  (plan.ledgerRepairs?.length ?? 0) > 0 ||
+  plan.dependencyRequirementsChanged
+) {
   console.error(
     `manifest-regen-check: generated output is stale (${pending} pending change(s)).`,
   );

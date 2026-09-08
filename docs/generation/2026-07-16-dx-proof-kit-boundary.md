@@ -44,3 +44,7 @@
 > ~~3.6.31/3.6.32 either omitted createVia routing or over-routed peer commands to phantom createVia* exports.~~
 
 > **Correction (2026-07-21):** Capsule pins exact registry **`3.6.37`** (fan-out foreach-create + `self.id`→`_id` in fanOut params + Event.approve → PurchaseNeed release). Exact pin required so `scripts/builder-manifest-pin.ts` syncs the sibling Builder checkout before `manifest:regen` (caret ranges are skipped and silently use a stale projection). Registry-only; no `file:` / `.tgz`. npm `3.6.35` was an empty cut; `3.6.36` foreach-create rendered `__row.id` (broken on Convex) — use **3.6.37+**.
+
+> **Update (2026-09-08):** Builder CLI now lives in `scripts/manifest-builder` and
+> uses Capsule's installed Manifest package directly. The sibling pin-sync
+> script has been removed. The registry-only requirement remains unchanged.

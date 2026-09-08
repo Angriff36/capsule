@@ -148,10 +148,12 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
   it("production build deploys Convex instead of a UI-only vite build", () => {
     // QA 191 leftover: frontend 3dd95bb1 on mule, search still hyphen-split.
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
-      scripts: { build: string };
+      scripts: { build: string; "deploy:production": string };
     };
-    expect(pkg.scripts.build).toBe("bash scripts/vercel-build.sh");
-    expect(pkg.scripts.build).not.toBe("vite build");
+    expect(pkg.scripts.build).toBe("vite build");
+    expect(pkg.scripts["deploy:production"]).toBe(
+      "bash scripts/vercel-build.sh",
+    );
     const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as {
       buildCommand: string;
     };
