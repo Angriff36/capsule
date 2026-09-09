@@ -36,7 +36,7 @@
       "sha256": "e57d8fbdc2dd5f44c7142a5fa6d5a2a5cadf8704ead481fddbe6c32e3b5499bb"
     },
     "PRESET.md": {
-      "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
+      "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
       "sha256": "37d05b184f4206b729ff66660af92c8ba791f194481abb7871a5dc6e7d696dd0"
@@ -52,9 +52,6 @@
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "f6e11a3b2a0bdbd294cf688e07b523d46ab910d37b2150a86cc71d2a2590db77"
-    },
-    "tests/manifest-convex.contract.test.ts": {
-      "sha256": "0b381b0024135108bdef36656bd4b6efd16779f19b3d1577fff7eb3bac122c1d"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"

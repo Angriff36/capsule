@@ -157,6 +157,7 @@ function manifestConvexOptions(
 ): Record<string, unknown> {
   const rest: Record<string, unknown> = { ...(options.convexOptions ?? {}) };
   delete rest.skipDocsDiagrams;
+  delete rest.skipContractTests;
   return rest;
 }
 
@@ -271,7 +272,10 @@ export function assembleConvexApplicationPreset(
     );
   }
 
-  if (available.has("contract-tests")) {
+  const contractTestsSkipped =
+    options.convexOptions?.skipContractTests === true;
+  const hasContractTests = available.has("contract-tests");
+  if (hasContractTests && !contractTestsSkipped) {
     collectGeneration(
       ir,
       "contract-tests",
@@ -317,7 +321,7 @@ export function assembleConvexApplicationPreset(
     const verifyArgs = {
       artifacts: assemblyArtifacts,
       ...(seedBinding ? { seedBinding } : {}),
-      requireContractTests: true as const,
+      requireContractTests: !contractTestsSkipped,
       ir,
     };
     assemblyVerification = verifyConvexApplicationAssembly(
@@ -347,7 +351,6 @@ export function assembleConvexApplicationPreset(
 
   const pkgName =
     projectName.toLowerCase().replace(/[^a-z0-9-]+/g, "-") || "convex-app";
-  const hasContractTests = available.has("contract-tests");
   files.push({
     path: "package.json",
     content: JSON.stringify(
@@ -465,7 +468,9 @@ export default defineConfig({
         const optedOut =
           r.id === "docs-diagrams" && diagramsSkipped
             ? " — Capsule opted out (`skipDocsDiagrams`; not emitted)"
-            : "";
+            : r.id === "contract-tests" && contractTestsSkipped
+              ? " — Capsule opted out (`skipContractTests`; export-only tests not emitted)"
+              : "";
         return (
           `- [${r.status === "available" ? "x" : " "}] **${r.title}** (${r.id})` +
           (r.status === "blocked" ? ` — blocked: ${r.missing}` : "") +
@@ -475,11 +480,16 @@ export default defineConfig({
       "",
       "## Required companions",
       ...CONVEX_ASSEMBLY_REQUIRED_COMPANIONS.map((c) => `- ${c}`),
-      ...(diagramsSkipped
+      ...(diagramsSkipped || contractTestsSkipped
         ? [
             "",
             "## Capsule opt-outs",
-            "- docs-diagrams / mermaid file emission (`skipDocsDiagrams`)",
+            ...(diagramsSkipped
+              ? ["- docs-diagrams / mermaid file emission (`skipDocsDiagrams`)"]
+              : []),
+            ...(contractTestsSkipped
+              ? ["- Export-only contract test emission (`skipContractTests`)"]
+              : []),
           ]
         : []),
       "",

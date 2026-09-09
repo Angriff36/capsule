@@ -25,6 +25,9 @@ projections:
       # Manifest still lists mermaid as a compatible companion; Capsule does not
       # want those files rebuilt (low product value / ownership noise).
       skipDocsDiagrams: true
+      # Keep behavioral tests; omit generated function-existence checks.
+      # Owner removed the 603 export-only smoke cases; do not regenerate them.
+      skipContractTests: true
       # Composite indexes the domain needs but the grammar cannot declare.
       # StaffChatReadCursor: one row per (channel, account) — the upsert seam
       # convex/teamChatCursor.ts and every cursor read look the caller's row up

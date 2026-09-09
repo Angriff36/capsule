@@ -16,7 +16,7 @@ Current preset: `convex-application` **v1.3.5** (`package.json` → `manifestPre
 
 | Tool                                                | Produces                                                                                                                                                                        |
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Manifest / `@angriff36/manifest` + Builder assemble | Convex surfaces, Zod companion (`schemas/**`), wiring, seed script, client wiring, contract tests (mermaid diagrams opted out via `skipDocsDiagrams` in `manifest.config.yaml`) |
+| Manifest / `@angriff36/manifest` + Builder assemble | Convex surfaces, Zod companion (`schemas/**`), wiring, seed script, client wiring, optional contract tests (Capsule opts out via `skipContractTests`; diagrams via `skipDocsDiagrams` in `manifest.config.yaml`) |
 | Convex codegen (`bun run codegen`)                  | `convex/_generated/**`                                                                                                                                                          |
 
 ## Generated — do not hand-edit
@@ -246,3 +246,13 @@ Edit the `.manifest` sources and regenerate owned projections; do not hand-edit
 Convex output. The current Manifest compiler does not support child-creating
 reactions, so the Capsule orchestrator owns generated-row reconciliation while
 the Manifest events and commands remain the domain contract.
+
+### Export-only test opt-out (2026-09-08)
+
+The owner removed the generated function-existence tests. Capsule sets
+`projections.convex.options.skipContractTests: true`. Builder omits the
+contract-test companion output, removes its previously owned file during
+regeneration, and calls assembly verification with `requireContractTests: false`.
+All other assembly checks remain active. The published companion registry is
+still verified; its presence does not claim behavioral coverage. Other consumers
+retain contract-test emission unless they explicitly opt out.
