@@ -154,3 +154,11 @@ Scratch reproduce-component-replacement.ts verifies exact corrected demand 1.565
 
 Independent gpt-5.6-sol review APPROVE. Full suite passed 165 files / 1436 tests before final nullable-optional argument normalization; final suite/typecheck running. No production writes. Source conflicts, broad migration planning, in-progress/completed-work quantity deltas and historical recipe/cost/report rendering remain part of the full goal, not solved by attachment replacement alone.
 - Final typecheck and final 165-file / 1436-test suite passed after optional argument normalization. Replacement runtime proof passed again.
+
+## Source-backed raspberry balsamic batch qualification
+
+Found and cross-checked the complete three-quart raspberry balsamic vinaigrette recipe in original Salad_Dressing.xlsx sheet1 rows336-352 (duplicated in Buffet_Style/Heart_City exports). Its eight ingredient amounts and method are present; no missing density/yield assumption needed. Ashley salad uses two fluid ounces per serving:167 servings=334floz=10.4375qt=3.4791666667 batches. Every ingredient agrees with the event costing rows260-274 to1e-8 in compatible units.
+
+Durable component candidate: recipes/raspberry-balsamic.json; source and ingredient comparison: raspberry-balsamic-source.md. Actual generated-runtime scratch reproduce-raspberry-source.ts creates one measured component, eight ingredient links, stored method and a PrepTask pointing to that component. It verifies10.4375qt prep and all eight event demands at167 servings, then20.875qt and double demand at334 servings. Evidence raspberry-source-runtime.log and raspberry-balsamic-verification.json under .artifacts/operations-source-study. This is a real source example, not an invented one-ingredient fixture.
+
+Only this dressing is reconstructed by the candidate. Salad gorgonzola identity/quantity conflict and other dish ingredients still require resolution. No production write, no rendered UI link verification yet, and no claim of full workflow completion. Existing code unchanged this checkpoint; source candidate and evidence added.
