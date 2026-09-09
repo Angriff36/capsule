@@ -592,3 +592,45 @@ export async function repairDishRecipe(
   );
   return result;
 }
+
+/** Backfill only catalog-routing keys; recipe facts and performed work stay intact. */
+export async function reconcileEventRecipeSync(
+  ctx: MutationCtx,
+  args: { eventId: Id<"events">; expectedEventVersion: number },
+): Promise<{ changed: number }> {
+  const auth = await getAuthContext(ctx);
+  const tenantId = requireTenant(auth);
+  if (!["owner", "admin", "system"].includes(auth.role))
+    throw new Error("Only an administrator may run historical recipe reconciliation");
+  const event = await ctx.db.get(args.eventId);
+  if (!event || event.tenantId !== tenantId || event.version !== args.expectedEventVersion)
+    throw new Error("Event changed since the reviewed repair snapshot");
+  const active = event.deletedAt == null && !["completed", "closed_out", "cancelled"].includes(event.stage);
+  let changed = 0;
+  const dishes = await ctx.db.query("eventDishes").withIndex("by_eventId", q => q.eq("eventId", args.eventId)).collect();
+  for (const row of dishes) {
+    if (row.tenantId !== tenantId) continue;
+    const target = active && row.deletedAt == null ? row.dishId : null;
+    if ((row.recipeSyncDishId ?? null) === target) continue;
+    await ctx.runMutation(api.mutations.EventDish_refreshRecipeSync, { docId: row._id });
+    changed++;
+  }
+  const seeds = await ctx.db.query("eventDishComponentSeeds").withIndex("by_eventId", q => q.eq("eventId", args.eventId)).collect();
+  for (const row of seeds) {
+    if (row.tenantId !== tenantId) continue;
+    const target = active && row.deletedAt == null ? row.componentId : null;
+    if ((row.recipeSyncComponentId ?? null) === target) continue;
+    await ctx.runMutation(api.mutations.EventDishComponentSeed_refreshRecipeSync, { docId: row._id });
+    changed++;
+  }
+  const contributions = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId", q => q.eq("eventId", args.eventId)).collect();
+  for (const row of contributions) {
+    if (row.tenantId !== tenantId) continue;
+    const component = active && row.deletedAt == null ? row.componentId ?? null : null;
+    const ingredient = active && row.deletedAt == null ? row.ingredientId : null;
+    if ((row.recipeSyncComponentId ?? null) === component && (row.recipeSyncIngredientId ?? null) === ingredient) continue;
+    await ctx.runMutation(api.mutations.EventIngredientContribution_refreshRecipeSync, { docId: row._id });
+    changed++;
+  }
+  return { changed };
+}

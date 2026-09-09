@@ -82,12 +82,14 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
   property indexed required eventDishId: uuid
   property required dishId: uuid
   property indexed required componentId: uuid
+  property indexed recipeSyncComponentId: uuid?
   property required servings: decimal(12, 4) = 0
   property required yieldQuantity: decimal(10, 2) = 1
   property required batchMultiplier: decimal(10, 4) = 1
   property purchasingWeekStart: datetime?
   property seededAt: datetime?
 
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
 
   command seed(
@@ -106,6 +108,7 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     mutate eventDishId = eventDishId
     mutate dishId = dishId
     mutate componentId = componentId
+    mutate recipeSyncComponentId = componentId
     mutate servings = servings
     mutate yieldQuantity = yieldQuantity
     mutate batchMultiplier = batchMultiplier
@@ -123,6 +126,10 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
       batchMultiplier: batchMultiplier
       purchasingWeekStart: purchasingWeekStart
     }
+  }
+
+  command refreshRecipeSync() {
+    mutate recipeSyncComponentId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.componentId : null
   }
 
   command retire() {
@@ -163,6 +170,8 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   // a component. A dish is the recipe; only hand-made sub-preparations have a
   // component behind them.
   property componentId: uuid?
+  property indexed recipeSyncComponentId: uuid?
+  property indexed recipeSyncIngredientId: uuid?
   property required ingredientId: uuid
   property required quantity: decimal(12, 4) = 0
   property quantityPerServing: decimal(12, 6)?
@@ -198,7 +207,9 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate eventDishId = eventDishId
     mutate dishId = dishId
     mutate componentId = componentId
+    mutate recipeSyncComponentId = componentId
     mutate ingredientId = ingredientId
+    mutate recipeSyncIngredientId = ingredientId
     mutate quantity = quantity
     mutate quantityPerServing = quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing)
     mutate unit = unit
@@ -215,6 +226,11 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       unit: unit
       purchasingWeekStart: purchasingWeekStart
     }
+  }
+
+  command refreshRecipeSync() {
+    mutate recipeSyncComponentId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.componentId : null
+    mutate recipeSyncIngredientId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.ingredientId : null
   }
 
   command revise(quantity: decimal(12, 4), servings: decimal(12, 4)) {
@@ -514,7 +530,7 @@ on EventDishConfirmedFromProposal fanOut DishIngredient where dishId = payload.s
 // cascade only ever fires on EventDishAdded, so adding an ingredient to a dish
 // already on an event changes nothing and the operator has to remove and re-add
 // it to see demand — which is exactly what made the chain look dead.
-on DishIngredientAdded fanOut EventDish where dishId = payload.dishId
+on DishIngredientAdded fanOut EventDish where recipeSyncDishId = payload.dishId
   run EventIngredientContribution.record
   match eventDishId = self.id, componentId = null, ingredientId = payload.ingredientId, unit = payload.unit
   else create
@@ -532,7 +548,7 @@ on DishIngredientAdded fanOut EventDish where dishId = payload.dishId
   }
 
 // Same for a corrected quantity — retyping 5 to 4 has to move demand.
-on DishIngredientQuantityAdjusted fanOut EventDish where dishId = payload.dishId
+on DishIngredientQuantityAdjusted fanOut EventDish where recipeSyncDishId = payload.dishId
   run EventIngredientContribution.record
   match eventDishId = self.id, componentId = null, ingredientId = payload.ingredientId, unit = payload.unit
   else create
@@ -553,7 +569,7 @@ on DishIngredientQuantityAdjusted fanOut EventDish where dishId = payload.dishId
 // This is the hole that made the purchasing chain look dead for a whole day:
 // a component was attached, nothing happened, and the only way to see demand
 // was to remove the dish from the event and add it back.
-on DishComponentAttached fanOut EventDish where dishId = payload.dishId
+on DishComponentAttached fanOut EventDish where recipeSyncDishId = payload.dishId
   run EventDishComponentSeed.seed
   match eventDishId = self.id, componentId = payload.componentId
   else create
@@ -569,36 +585,36 @@ on DishComponentAttached fanOut EventDish where dishId = payload.dishId
   }
 
 // Remove only this dish's contributions; other dishes may use the same component.
-on DishComponentDetached fanOut EventIngredientContribution where componentId = payload.componentId
+on DishComponentDetached fanOut EventIngredientContribution where recipeSyncComponentId = payload.componentId
   run retire
   match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = payload.componentId, ingredientId = self.ingredientId, unit = self.unit
   params { reason: payload.reason }
 
-on DishComponentDetached fanOut EventDishComponentSeed where componentId = payload.componentId
+on DishComponentDetached fanOut EventDishComponentSeed where recipeSyncComponentId = payload.componentId
   run retire
   match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = payload.componentId
 
-on DishIngredientRemoved fanOut EventIngredientContribution where ingredientId = payload.ingredientId
+on DishIngredientRemoved fanOut EventIngredientContribution where recipeSyncIngredientId = payload.ingredientId
   run retire
   match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = null, ingredientId = payload.ingredientId, unit = self.unit
   params { reason: payload.reason }
 
-on ComponentIngredientRemoved fanOut EventIngredientContribution where componentId = payload.componentId
+on ComponentIngredientRemoved fanOut EventIngredientContribution where recipeSyncComponentId = payload.componentId
   run retire
   match eventDishId = self.eventDishId, componentId = payload.componentId, ingredientId = payload.ingredientId, unit = payload.unit
   params { reason: payload.reason }
 
 // Remove the old measurement before re-driving the component's current lines.
 // This also handles a recipe edit that changes the ingredient's unit.
-on ComponentIngredientQuantityAdjusted fanOut EventIngredientContribution where componentId = payload.componentId
+on ComponentIngredientQuantityAdjusted fanOut EventIngredientContribution where recipeSyncComponentId = payload.componentId
   run retirePreviousUnit
   match eventDishId = self.eventDishId, componentId = payload.componentId, ingredientId = payload.ingredientId, unit = payload.previousUnit
   params { currentUnit: payload.unit }
 
-on ComponentIngredientQuantityAdjusted fanOut EventDishComponentSeed where componentId = payload.componentId
+on ComponentIngredientQuantityAdjusted fanOut EventDishComponentSeed where recipeSyncComponentId = payload.componentId
   run refresh
 
-on ComponentIngredientAdded fanOut EventDishComponentSeed where componentId = payload.componentId
+on ComponentIngredientAdded fanOut EventDishComponentSeed where recipeSyncComponentId = payload.componentId
   run refresh
 
 on VendorOrderSubmitted fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
@@ -614,3 +630,27 @@ on VendorOrderCancelled fanOut VendorOrderLine where vendorOrderId = payload.ven
 
 on VendorOrderChangesRequested fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
   run releaseSupply
+
+
+on EventCompleted fanOut EventDish where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCompleted fanOut EventDishComponentSeed where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCompleted fanOut EventIngredientContribution where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCancelled fanOut EventDish where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCancelled fanOut EventDishComponentSeed where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCancelled fanOut EventIngredientContribution where eventId = payload.eventId
+  run refreshRecipeSync

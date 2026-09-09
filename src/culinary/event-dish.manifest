@@ -17,6 +17,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
 
   property required eventId: uuid
   property required dishId: uuid
+  // Catalog edits follow active event work, never completed history.
+  property indexed recipeSyncDishId: uuid?
   // One serving quantity for prep, purchasing, containers and food cost.
   property required quantityServings: int = 1
   // Remember explicit counts so a later coincidentally matching headcount
@@ -95,6 +97,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     constraint addToEventHeadcountOverrideNonnegative: headcountOverride == null or headcountOverride >= 0 "Headcount override cannot be negative"
     mutate eventId = eventId
     mutate dishId = dishId
+    mutate recipeSyncDishId = dishId
     mutate quantityServings = quantityServings
     mutate followsEventHeadcount = quantityServings == self.event.expectedHeadcount and (headcountOverride == null or headcountOverride == 0)
     mutate headcountOverride = headcountOverride != null ? headcountOverride : 0
@@ -114,6 +117,10 @@ entity EventDish mixin TenantScoped, SoftDeletable {
       course: course
       serviceStyle: serviceStyle
     }
+  }
+
+  command refreshRecipeSync() {
+    mutate recipeSyncDishId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.dishId : null
   }
 
   command adjustServings(quantityServings: number) {
@@ -243,6 +250,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     compute wasExistingLine = self.addedAt != null
     mutate eventId = eventId
     mutate dishId = dishId
+    mutate recipeSyncDishId = dishId
     mutate quantityServings = self.addedAt != null ? self.quantityServings : quantityServings
     mutate followsEventHeadcount = wasExistingLine ? self.followsEventHeadcount : quantityServings == self.event.expectedHeadcount
     mutate purchasingWeekStart = self.event.purchasingWeekStart
