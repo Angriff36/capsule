@@ -2298,6 +2298,12 @@
   font-size: 9px;
 }
 
+.purchase-queue .purchase-stock-context {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--color-ink-2);
+}
+
 .purchase-queue div > span,
 .vendor-index div > span {
   margin-top: 3px;

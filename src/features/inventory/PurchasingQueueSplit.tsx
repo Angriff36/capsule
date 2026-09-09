@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import type { ReorderSuggestion } from "./reorderSuggestion";
+import type { PurchasingStockContext } from "./purchasingStockContext";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
 import {
@@ -12,8 +12,7 @@ import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import type { IngredientCatalogRow } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 
-const formatQty = (value: number): string =>
-  Number.isInteger(value) ? String(value) : value.toFixed(2);
+const formatQty = (value: number): string => String(Number(value.toFixed(4)));
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -66,7 +65,10 @@ export type PurchasingQueueSplitProps = {
   isNeedSelected: (id: string) => boolean;
   onToggleNeed: (id: string, on: boolean) => void;
   linkedLine: (need: PurchaseNeed) => VendorOrderLine | undefined;
-  reorderSuggestion: (need: PurchaseNeed) => ReorderSuggestion | undefined;
+  stockContext: (need: PurchaseNeed) => PurchasingStockContext | undefined;
+  linkedOrders: (
+    need: PurchaseNeed,
+  ) => { id: string; label: string }[] | undefined;
   ingredientName: (id: string) => string;
   ingredients?: readonly IngredientCatalogRow[];
   eventName: (id: string) => string;
@@ -87,7 +89,8 @@ export function PurchasingQueueSplit({
   isNeedSelected,
   onToggleNeed,
   linkedLine,
-  reorderSuggestion,
+  stockContext,
+  linkedOrders,
   ingredientName,
   ingredients,
   eventName,
@@ -129,52 +132,60 @@ export function PurchasingQueueSplit({
             <ul className="purchase-queue">
               {activeNeeds.map((need) => {
                 const line = linkedLine(need);
-                const suggestion = reorderSuggestion(need);
+                const stock = stockContext(need);
+                const needOrders = linkedOrders(need);
                 return (
                   <li key={need._id}>
-                    {canSelectNeed(need) ? (
-                      <label className="flex items-center gap-2 self-start">
-                        <input
-                          type="checkbox"
-                          aria-label={`Select ${ingredientName(need.ingredientId)}`}
-                          checked={isNeedSelected(need._id)}
-                          disabled={busy != null}
-                          onChange={(event) =>
-                            onToggleNeed(need._id, event.target.checked)
-                          }
-                        />
-                      </label>
-                    ) : null}
-                    <div>
-                      {ingredients ? (
-                        <IngredientCatalogLabel
-                          ingredientId={need.ingredientId}
-                          ingredients={ingredients}
-                          link
-                        />
-                      ) : (
-                        <strong>{ingredientName(need.ingredientId)}</strong>
-                      )}
-                      <span>
-                        {eventName(need.eventId)} · {need.requiredQuantity}{" "}
-                        {need.unit}
-                      </span>
-                      {suggestion && suggestion.suggestedQuantity > 0 ? (
-                        <small
-                          className="block text-ink-2"
-                          data-testid="reorder-suggestion"
-                          title={`Demand ${formatQty(suggestion.demand)} + par top-up ${formatQty(
-                            suggestion.parShortfall,
-                          )}${
-                            suggestion.bufferFraction > 0
-                              ? ` + ${Math.round(suggestion.bufferFraction * 100)}% variance buffer`
-                              : ""
-                          }`}
-                        >
-                          Suggest order:{" "}
-                          {formatQty(suggestion.suggestedQuantity)} {need.unit}
-                        </small>
+                    <div className="flex min-w-0 items-start gap-2">
+                      {canSelectNeed(need) ? (
+                        <label className="flex items-center gap-2 self-start">
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${ingredientName(need.ingredientId)}`}
+                            checked={isNeedSelected(need._id)}
+                            disabled={busy != null}
+                            onChange={(event) =>
+                              onToggleNeed(need._id, event.target.checked)
+                            }
+                          />
+                        </label>
                       ) : null}
+                      <div>
+                        {ingredients ? (
+                          <IngredientCatalogLabel
+                            ingredientId={need.ingredientId}
+                            ingredients={ingredients}
+                            link
+                          />
+                        ) : (
+                          <strong>{ingredientName(need.ingredientId)}</strong>
+                        )}
+                        <span>
+                          {eventName(need.eventId)} · {need.requiredQuantity}{" "}
+                          {need.unit}
+                        </span>
+                        <small className="purchase-stock-context">
+                          {stock === undefined ? (
+                            "Loading stock..."
+                          ) : (
+                            <>
+                              Recorded stock:{" "}
+                              {stock.onHand == null
+                                ? "unknown"
+                                : `${formatQty(stock.onHand)} ${need.unit}`}{" "}
+                              (shared across events)
+                              {stock.reserved == null
+                                ? " · Reservations unknown"
+                                : ` · Reserved: ${formatQty(stock.reserved)} ${need.unit}`}
+                              {stock.pastUseBy == null
+                                ? " · Use-by quantity unknown"
+                                : stock.pastUseBy > 0
+                                  ? ` · Past use-by: ${formatQty(stock.pastUseBy)} ${need.unit}`
+                                  : ""}
+                            </>
+                          )}
+                        </small>
+                      </div>
                     </div>
                     <StatusChip status={String(need.status)} />
                     <div className="supply-row-actions">
@@ -201,14 +212,22 @@ export function PurchasingQueueSplit({
                           </button>
                         ))}
                     </div>
-                    {line ? (
-                      <small>
-                        Line {line._id.slice(-8)} · order{" "}
-                        {line.vendorOrderId.slice(-8)}
-                      </small>
-                    ) : (
-                      <small>No linked order line</small>
-                    )}
+                    <small>
+                      {needOrders === undefined
+                        ? "Loading linked orders..."
+                        : needOrders.length > 0
+                          ? needOrders.map((order) => (
+                              <span key={order.id}>
+                                <Link
+                                  className="text-link"
+                                  to={`/inventory/orders/${order.id}`}
+                                >
+                                  {order.label}
+                                </Link>
+                              </span>
+                            ))
+                          : "No linked order line"}
+                    </small>
                   </li>
                 );
               })}

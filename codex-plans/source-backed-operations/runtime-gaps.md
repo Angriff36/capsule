@@ -66,3 +66,8 @@ The earlier tablespoon/quart adoption limitation is now fixed in authored client
 ### Batch reconstruction update
 
 The repair seam supports actual batch ingredient quantities with explicit measured component yield and amount per dish serving. The exact attachment ratio preserves existing demand/cost math (3 batches serving 640 guests for 5-gallon sauce at 3 fl oz/guest). RecipeRepairProjection exposes these fields; CLI --projected-recipes can preview reviewed photo/workbook projections. Existing attachment reuse prevents duplicate demand across new repair operations. Worked generated-runtime example passes at 167 and 200 servings. No complete live-source projection has been applied yet. Component cost panel already labels cost by yield unit via yieldCostLabel; the old Component.liveCostPerGuest property name/comment is misleading but not used by that panel. Nutrition semantics still need review for physical-yield recipes.
+
+
+### Purchasing queue unsupported recommendation (#333)
+
+The queue added up to 50% demand CV plus par shortfall and ignored stock when recommending purchases. Replaced on this branch with truthful shared stock/reservation/use-by facts and readable linked-order destinations; purchasing quantity computation still needs the separate #327/#328 domain corrections. Actual desktop/mobile fixture checked. No production verification yet.
