@@ -71,7 +71,8 @@ const plan = formulas.map((formula) => {
     (usedSourceDish ||
       sourceDish.deletedAt != null ||
       sourceDish.status !== "active" ||
-      sourceDish.recipeSourceFingerprint !== formula.key)
+      (sourceDish.recipeSourceFingerprint != null &&
+        sourceDish.recipeSourceFingerprint !== formula.key))
   )
     throw new Error("Source dish does not match the reviewed batch source");
   if (sourceDish) usedSourceDish = true;
@@ -83,7 +84,8 @@ const plan = formulas.map((formula) => {
           sourceDish: {
             dishId: sourceDish._id,
             expectedVersion: sourceDish.version,
-            expectedSourceFingerprint: sourceDish.recipeSourceFingerprint,
+            expectedSourceFingerprint:
+              sourceDish.recipeSourceFingerprint ?? null,
           },
         }
       : {}),

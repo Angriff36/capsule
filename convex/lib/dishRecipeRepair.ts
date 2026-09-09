@@ -25,7 +25,7 @@ export const componentRecipeRepairArgs = {
   sourceDish: v.optional(v.object({
     dishId: v.id("dishes"),
     expectedVersion: v.number(),
-    expectedSourceFingerprint: v.string(),
+    expectedSourceFingerprint: v.union(v.string(), v.null()),
   })),
   recipe: v.object({
     name: v.string(),
@@ -43,7 +43,7 @@ export async function repairComponentRecipe(
   args: {
     operationKey: string;
     source: string;
-    sourceDish?: { dishId: Id<"dishes">; expectedVersion: number; expectedSourceFingerprint: string };
+    sourceDish?: { dishId: Id<"dishes">; expectedVersion: number; expectedSourceFingerprint: string | null };
     recipe: Omit<Input["recipe"]["components"][number], "quantityPerServing"> & {
       yieldQuantity: number;
       yieldUnit: string;
@@ -62,8 +62,8 @@ export async function repairComponentRecipe(
     const expected = args.sourceDish;
     const dish = await ctx.db.get(expected.dishId);
     if (!dish || dish.tenantId !== tenantId || dish.deletedAt != null || dish.status !== "active" ||
-        dish.version !== expected.expectedVersion || !expected.expectedSourceFingerprint ||
-        dish.recipeSourceFingerprint !== expected.expectedSourceFingerprint ||
+        dish.version !== expected.expectedVersion ||
+        (dish.recipeSourceFingerprint ?? null) !== expected.expectedSourceFingerprint ||
         recipeNameKey(dish.name) !== recipeNameKey(recipe.name))
       throw new Error("Source dish differs from the reviewed classification snapshot");
     // This conversion preserves the imported row as a retired source record.
