@@ -114,6 +114,11 @@ Do **not** create, add, or expand tests unless the owner asks. Run existing
 `bun run test` / `bun run test:proofs` / `bun run check` gates when verifying.
 Never disable or delete failing tests to go green.
 
+Owner-requested testing guidance: read
+[docs/quality/testing-principles.md](docs/quality/testing-principles.md) when
+writing or auditing tests. Judge the real behavior and plausible defect caught,
+not the test count, coverage percentage, or presence of production imports.
+
 ## Design authority (agents)
 
 Applies to all authored UI work: screens, shell, theme, tokens, shared
