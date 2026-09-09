@@ -1,4 +1,5 @@
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
+import { recipeUnitRatio } from "../../lib/recipeUnitConversion";
 import type {
   EventPrepDemand,
   EventPrepDish,
@@ -55,6 +56,7 @@ type Ports = {
     docId: string;
     version?: number;
     quantity: number;
+    unit?: EventPrepUnit;
     specialInstructions?: string;
   }) => Promise<unknown>;
 };
@@ -134,16 +136,21 @@ export class EventPrepTaskSynchronizer {
       activeTemplates.length > 0
         ? activeTemplates.map((template) => {
             const existing = existingByTemplate.get(template.id);
-            const quantity = this.quantityFor(
+            const templateQuantity = this.quantityFor(
               template,
               input.eventDish.quantityServings,
             );
+            const templateUnit = template.defaultUnit ?? "portion";
+            const ratio = existing
+              ? recipeUnitRatio(templateUnit, existing.unit)
+              : null;
+            const quantity = templateQuantity * (ratio ?? 1);
             return {
               key: `template:${template.id}`,
               template,
               existing,
               quantity,
-              unit: template.defaultUnit ?? ("portion" as EventPrepUnit),
+              unit: existing && ratio != null ? existing.unit : templateUnit,
               name: template.name,
               ingredientId: template.ingredientId ?? undefined,
               componentId: template.componentId,
@@ -198,13 +205,15 @@ export class EventPrepTaskSynchronizer {
         if (
           item.existing.isGenerated &&
           item.existing.status === "pending" &&
-          item.existing.quantity !== item.quantity &&
+          (item.existing.quantity !== item.quantity ||
+            item.existing.unit !== item.unit) &&
           this.ports.refreshGeneratedTask
         ) {
           await this.ports.refreshGeneratedTask({
             docId: item.existing.id,
             version: item.existing.version,
             quantity: item.quantity,
+            ...(item.unit !== item.existing.unit ? { unit: item.unit } : {}),
             specialInstructions:
               item.existing.specialInstructions ??
               this.instructionsFor(

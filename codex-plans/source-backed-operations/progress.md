@@ -38,3 +38,14 @@ Source correction: original sauce photo says 4 quarts Gruyere and 1/4 cup cornst
 
 A real Smore Bar preview identifies nine source-matched imported rows, but three use quarts while templates use tablespoons. Current repair correctly rejects those links; units must be reconciled in both server and client scaling before applying. The preview is not an applicable migration yet. Also confirmed live Infused Water has 167 servings while original cost source has 334; preserve this discrepancy in the event repair plan rather than assuming the live menu already matches.
 - Final typecheck passed after method preservation. Extended scratch reproduction confirms a cook's edited dish method survives a new repair operation. CLI preview accepts a compatible four-link Smore subset and rejects the full candidate at the tablespoon/quart mismatch. This is validation evidence, not a live repair.
+
+## Unit-aware prep scaling checkpoint
+
+- Added exact compatible mass/volume conversion to server PrepTask.syncServings and client EventPrepTaskSynchronizer. Imported quarts remain quarts when a template uses tablespoons. No inferred density, batch size, or count conversion. Recipe changes to an incompatible unit update both quantity and unit together; completed work remains untouched.
+- PrepTask.refreshGenerated accepts an optional unit so client reconciliation cannot leave a new numeric quantity paired with an old unit.
+- Moved imported prep adoption from direct DB patch to generated PrepTask.linkRecipe after full-suite integration guards caught that violation in the preceding checkpoint. Did not weaken guards or tests.
+- Initially-zero event dishes with prep templates no longer roll back or generate a phantom single portion. Actual generated runtime proves zero -> 200 creates exactly one linked asparagus prep row at 37.5 lb.
+- Actual runtime proves 200 tbsp -> 3.125 retained quarts, receipt replay/preserved method/completed work, and changing the template to pounds updates number and unit together. Client scratch verifies the same volume result and rejects volume-to-weight inference.
+- All nine Smore Bar link candidates now pass preview unit validation. This is not a production repair; source formula reconstruction, broader workflow requirements and live verification remain outstanding.
+- Full existing suite: 165 files / 1426 tests passed (one additional generated contract case from the new domain command). Formatting passes. Final typecheck running; previous typecheck passed. Generated outputs regenerated only through isolated Builder and proof:emit.
+- Final typecheck completed successfully after the generated linkRecipe command. All checkpoint checks are now green; release gates and live proof are still pending for the full goal.

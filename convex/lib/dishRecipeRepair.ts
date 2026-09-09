@@ -9,6 +9,7 @@ import {
   writeMaterializationReceipt,
 } from "./materializationReceipt";
 import { recipeNameKey } from "../../src/lib/tppRecipeRepair";
+import { recipeUnitRatio } from "../../src/lib/recipeUnitConversion";
 
 const amount = v.object({
   name: v.string(),
@@ -438,7 +439,7 @@ export async function repairDishRecipe(
         (prep.dishTaskId && prep.dishTaskId !== template._id) ||
         (prep.dishId && prep.dishId !== dishId) ||
         (prep.componentId && prep.componentId !== template.componentId) ||
-        (template.defaultUnit ?? "portion") !== prep.unit
+        recipeUnitRatio(template.defaultUnit ?? "portion", prep.unit) == null
       ) {
         throw new Error(
           "Prep repair would replace a recipe link or change its quantity unit",
@@ -450,12 +451,11 @@ export async function repairDishRecipe(
         (prep.componentId ?? null) === (template.componentId ?? null)
       )
         continue;
-      await ctx.db.patch(prep._id, {
+      await ctx.runMutation(api.mutations.PrepTask_linkRecipe, {
+        docId: prep._id,
         dishTaskId: template._id,
         dishId,
         ...(template.componentId ? { componentId: template.componentId } : {}),
-        version: prep.version + 1,
-        updatedAt: Date.now(),
       });
       result.linkedPrepTasks++;
     }

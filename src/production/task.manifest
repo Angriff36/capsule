@@ -108,7 +108,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
     constraint openEventAlign: self.eventDish == null or eventId == self.eventDish.eventId "PrepTask eventId must match EventDish.eventId"
     constraint openNameRequired: length(trim(name)) > 0 "Prep task name is required"
-    constraint openQuantityPositive: quantity > 0 "Prep quantity must be positive"
+    constraint openQuantityPositive: quantity >= 0 "Prep quantity cannot be negative"
     mutate eventDishId = eventDishId
     mutate eventId = eventId
     mutate name = name
@@ -188,13 +188,15 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
 
   command refreshGenerated(
     quantity: decimal(12, 4),
+    optional unit: UnitOfMeasure,
     optional specialInstructions: string
   ) {
     guard self.status == "pending"
     guard self.deletedAt == null
     guard self.isGenerated == true
-    constraint refreshQuantityPositive: quantity > 0 "Generated prep task quantity must be positive"
+    constraint refreshQuantityPositive: quantity >= 0 "Generated prep task quantity cannot be negative"
     mutate quantity = quantity
+    mutate unit = unit != null ? unit : self.unit
     mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
     emit PrepTaskGeneratedRefreshed {
       prepTaskId: self.id
@@ -214,7 +216,17 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     constraint syncServingsNonnegative: quantityServings >= 0 "Prep servings cannot be negative"
     compute canRefresh = self.isGenerated and self.dishTask != null and self.status != "completed" and self.status != "cancelled"
     compute perServing = self.dishTask != null and self.dishTask.defaultQuantity != null ? self.dishTask.defaultQuantity : 1
-    mutate quantity = canRefresh ? perServing * quantityServings : self.quantity
+    // Exact dimensional conversion; preserve the work unit when compatible.
+    // Mirrors src/lib/recipeUnitConversion.ts; no density or batch-size guesses.
+    compute recipeUnit = self.dishTask != null and self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion"
+    compute sourceMass = recipeUnit == "gram" ? 1 : recipeUnit == "kilogram" ? 1000 : recipeUnit == "ounce" ? 28.349523125 : recipeUnit == "pound" ? 453.59237 : 0
+    compute sourceVolume = recipeUnit == "milliliter" ? 1 : recipeUnit == "liter" ? 1000 : recipeUnit == "teaspoon" ? 4.92892159375 : recipeUnit == "tablespoon" ? 14.78676478125 : recipeUnit == "cup" ? 236.5882365 : recipeUnit == "pint" ? 473.176473 : recipeUnit == "quart" ? 946.352946 : recipeUnit == "gallon" ? 3785.411784 : 0
+    compute targetMass = self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0
+    compute targetVolume = self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0
+    compute unitRatio = recipeUnit == self.unit ? 1 : (sourceMass > 0 and targetMass > 0 ? sourceMass / targetMass : (sourceVolume > 0 and targetVolume > 0 ? sourceVolume / targetVolume : 1))
+    compute compatibleUnit = recipeUnit == self.unit or (sourceMass > 0 and targetMass > 0) or (sourceVolume > 0 and targetVolume > 0)
+    mutate quantity = canRefresh ? perServing * quantityServings * unitRatio : self.quantity
+    mutate unit = canRefresh and not compatibleUnit ? recipeUnit : self.unit
     emit PrepTaskGeneratedRefreshed {
       prepTaskId: self.id
       tenantId: self.tenantId
@@ -224,6 +236,18 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       unit: self.unit
       specialInstructions: self.specialInstructions
     }
+  }
+
+  // Restore an imported work item's recipe identity without rewriting work.
+  command linkRecipe(dishTaskId: uuid, dishId: uuid, optional componentId: uuid) {
+    guard self.deletedAt == null
+    constraint linkRecipeTask: self.dishTaskId == null or self.dishTaskId == dishTaskId "Prep already belongs to a different recipe step"
+    constraint linkRecipeDish: self.dishId == null or self.dishId == dishId "Prep already belongs to a different dish"
+    constraint linkRecipeEventDish: self.eventDish == null or self.eventDish.dishId == dishId "Recipe dish must match the event menu line"
+    constraint linkRecipeComponent: self.componentId == null or self.componentId == componentId "Prep already belongs to a different component"
+    mutate dishTaskId = dishTaskId
+    mutate dishId = dishId
+    mutate componentId = componentId != null ? componentId : self.componentId
   }
 
   command claim() {
@@ -729,7 +753,7 @@ on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
     // defaultQuantity is PER GUEST (EventPrepTaskSynchronizer.quantityFor uses
     // the same rule); blank means one per guest. Both must agree or the client
     // reconcile would resize every generated task on the next sync.
-    quantity: self.defaultQuantity != null and self.defaultQuantity > 0 ? self.defaultQuantity * payload.quantityServings : (payload.quantityServings > 0 ? payload.quantityServings : 1)
+    quantity: self.defaultQuantity != null and self.defaultQuantity > 0 ? self.defaultQuantity * payload.quantityServings : payload.quantityServings
     unit: self.defaultUnit != null ? self.defaultUnit : "portion"
     dishTaskId: self.id
     dishId: payload.dishId

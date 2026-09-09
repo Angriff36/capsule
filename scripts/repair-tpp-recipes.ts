@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { ConvexHttpClient } from "convex/browser";
 import { CapsuleAgentAuthManager } from "../src/agent/CapsuleAgentAuthManager";
+import { recipeUnitRatio } from "../src/lib/recipeUnitConversion";
 import {
   projectTppRecipe,
   recipeNameKey,
@@ -76,7 +77,10 @@ const plan = recipes.map((r) => {
     );
     if (matchingTasks.length !== 1)
       throw new Error(`Prep link requires one source step: ${link.taskName}`);
-    if ((matchingTasks[0].unit ?? "portion") !== link.expectedUnit)
+    if (
+      recipeUnitRatio(matchingTasks[0].unit ?? "portion", link.expectedUnit) ==
+      null
+    )
       throw new Error(
         `Reconcile prep units before linking ${link.taskName}: work uses ${link.expectedUnit}, recipe uses ${matchingTasks[0].unit ?? "portion"}`,
       );

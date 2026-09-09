@@ -139,6 +139,7 @@ type Ports = {
     docId: string;
     version?: number;
     quantity: number;
+    unit?: EventPrepUnit;
     specialInstructions?: string;
   }) => Promise<unknown>;
 };
