@@ -64,17 +64,44 @@ const ALIASES: Record<string, CapsuleUnit> = {
 
 /**
  * Read a TPP unit word. Returns undefined when the unit has no Capsule
- * equivalent, for example the purchasing unit "Case".
+ * equivalent, for example the purchasing unit "Case". For measured amounts,
+ * use toCapsuleMeasure so quantity changes with the unit (fluid ounces to cups).
  */
 export function toCapsuleUnit(
   value: string | undefined,
 ): CapsuleUnit | undefined {
   if (value === undefined) return undefined;
-  // "Oz - Fld" and "tsp - dry" qualify the unit after a dash.
+  if (isFluidOunce(value)) return "cup";
+  // Dry qualifiers do not change the base unit's dimension.
   const base = value.split("-")[0]!.trim().toLowerCase().replace(/\.$/, "");
   if (base.length === 0) return undefined;
   if ((CAPSULE_UNITS as readonly string[]).includes(base)) {
     return base as CapsuleUnit;
   }
   return ALIASES[base];
+}
+
+function isFluidOunce(value: string): boolean {
+  return /^(?:oz\.?\s*-\s*(?:fld|fluid)|fl\.?\s*oz\.?|fluid\s+ounces?)$/i.test(
+    value.trim(),
+  );
+}
+
+/** Convert quantity and unit together; fluid ounces are volume, never mass. */
+export function toCapsuleMeasure(
+  quantity: number | undefined,
+  sourceUnit: string | undefined,
+): { quantity: number; unit: CapsuleUnit } | undefined {
+  const unit = toCapsuleUnit(sourceUnit);
+  if (
+    unit === undefined ||
+    quantity === undefined ||
+    !Number.isFinite(quantity) ||
+    quantity < 0
+  )
+    return undefined;
+  return {
+    quantity: sourceUnit && isFluidOunce(sourceUnit) ? quantity / 8 : quantity,
+    unit,
+  };
 }

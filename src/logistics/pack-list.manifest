@@ -233,6 +233,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property followsDishServings: boolean?
   property containerServings: int?
   property productionBatchId: uuid?
+  // Internal source evidence for a reviewed correction of imported unit labels.
+  property unitCorrectionSource: string?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -344,6 +346,27 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate eventDishId = eventDishId
     mutate followsDishServings = followsDishServings
     mutate containerServings = containerServings
+  }
+
+  // Legacy TPP Oz - Fld was imported as the mass unit ounce. This repair is
+  // deliberately separate from ordinary quantity edits: both planned and
+  // physically packed amounts must retain their original volume.
+  command correctImportedFluidOunces(sourceReference: string, expectedVersion: int) {
+    guard user.role == "owner" or user.role == "admin" or user.role == "system"
+    guard self.deletedAt == null and self.listedAt != null
+    // Apply the reviewed snapshot only; never overwrite later packing work.
+    guard self.version == expectedVersion
+    guard self.packList != null and self.packList.deletedAt == null and self.packList.event != null and self.packList.event.deletedAt == null
+    guard self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    // Template-driven lines must be repaired at their source instead.
+    guard self.dishContainerId == null and self.followsDishServings != true
+    guard self.unit == "ounce" and self.unitCorrectionSource == null
+    constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "The original fluid-ounce source is required"
+    mutate requiredQuantity = self.requiredQuantity / 8
+    mutate packedQuantity = self.packedQuantity / 8
+    mutate unit = "cup"
+    mutate unitCorrectionSource = sourceReference
   }
 
   command syncContainerServings(quantityServings: number) {

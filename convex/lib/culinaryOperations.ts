@@ -17,6 +17,53 @@ export const reconcileImportedEventRecipeSync = mutation({
 
 const unit = v.string();
 
+/** Correct reviewed TPP fluid-ounce labels without changing physical quantities. */
+export const reconcileImportedPackingFluidOunces = mutation({
+  args: {
+    packListId: v.id("packLists"),
+    expectedVersion: v.number(),
+    items: v.array(v.object({
+      itemId: v.id("packListItems"),
+      expectedVersion: v.number(),
+      sourceReference: v.string(),
+    })),
+  },
+  handler: async (ctx, args): Promise<{ changed: number }> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    if (!["owner", "admin", "system"].includes(auth.role))
+      throw new Error("Only an administrator may correct imported packing units");
+    const list = await ctx.db.get(args.packListId);
+    if (!list || list.tenantId !== tenantId || list.deletedAt != null)
+      throw new Error("Pack list not found");
+    const event = await ctx.db.get(list.eventId);
+    if (!event || event.tenantId !== tenantId || event.deletedAt != null)
+      throw new Error("Event not found");
+    if (["dispatched", "cancelled"].includes(list.status) || ["completed", "closed_out", "cancelled"].includes(event.stage))
+      throw new Error("Historical packing records must remain unchanged");
+    const selected = new Set<string>();
+    const pending: typeof args.items = [];
+    for (const input of args.items) {
+      if (selected.has(input.itemId)) throw new Error("Packing item selected twice");
+      selected.add(input.itemId);
+      if (!input.sourceReference.trim()) throw new Error("The original fluid-ounce source is required");
+      const item = await ctx.db.get(input.itemId);
+      if (!item || item.tenantId !== tenantId || item.deletedAt != null || item.packListId !== list._id)
+        throw new Error("Packing item not found in this list");
+      if (item.unitCorrectionSource === input.sourceReference && item.unit === "cup") continue;
+      if (list.version !== args.expectedVersion || item.version !== input.expectedVersion)
+        throw new Error("Packing record changed since the source review");
+      if (item.unit !== "ounce" || item.unitCorrectionSource != null || item.dishContainerId != null || item.followsDishServings === true)
+        throw new Error("Packing item is not an uncorrected imported fluid-ounce line");
+      pending.push(input);
+    }
+    for (const input of pending) await ctx.runMutation(api.mutations.PackListItem_correctImportedFluidOunces, {
+      docId: input.itemId, sourceReference: input.sourceReference, expectedVersion: input.expectedVersion,
+    });
+    return { changed: pending.length };
+  },
+});
+
 /** Adopt reviewed legacy container lines without recreating physical packing work. */
 export const reconcileImportedPackingLinks = mutation({
   args: {
