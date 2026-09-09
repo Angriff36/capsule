@@ -4,12 +4,16 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext, requireTenant } from "./authContext";
 import { requireKitchenAccess } from "./kitchenAccessGate";
+import { dishRecipeRepairArgs, repairDishRecipe } from "./dishRecipeRepair";
 import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
 
 const unit = v.string();
+
+/** Restore imported whole recipes onto their dishes in one retry-safe transaction. */
+export const repairImportedDishRecipe = mutation({ args: dishRecipeRepairArgs, handler: repairDishRecipe });
 
 async function ownedLive<Table extends "menus" | "dishes" | "ingredients" | "components" | "componentSnapshots">(
   ctx: MutationCtx,

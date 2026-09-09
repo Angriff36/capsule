@@ -17,6 +17,11 @@ entity Dish mixin TenantScoped, SoftDeletable {
 
   property required searchable name: string = ""
   property description: string?
+  // Kitchen recipe data is separate from the customer-facing description.
+  property recipeInstructions: string?
+  property recipeSourceText: string?
+  property recipeSourceYield: string?
+  property recipeSourceFingerprint: string?
   property category: string?
   property course: string?
   property serviceStyle: string?
@@ -120,6 +125,20 @@ entity Dish mixin TenantScoped, SoftDeletable {
       dishId: self.id
       tenantId: self.tenantId
       name: name
+    }
+  }
+
+  command saveRecipe(instructions: string, sourceText: string, sourceYield: string, sourceFingerprint: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate recipeInstructions = instructions
+    mutate recipeSourceText = sourceText
+    mutate recipeSourceYield = sourceYield
+    mutate recipeSourceFingerprint = sourceFingerprint
+    emit DishRecipeSaved {
+      dishId: self.id
+      tenantId: self.tenantId
+      sourceFingerprint: sourceFingerprint
     }
   }
 

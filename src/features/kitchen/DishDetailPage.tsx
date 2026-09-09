@@ -209,6 +209,33 @@ export function DishDetailPage() {
         </p>
       )}
 
+      {dish.recipeSourceText ? (
+        <section className="culinary-section">
+          <div className="flex flex-wrap items-center gap-3.5">
+            <h2 className="text-sm font-bold uppercase tracking-[0.09em] text-ink">
+              Recipe
+            </h2>
+            <i aria-hidden="true" className="h-px flex-1 bg-ink" />
+            <span className="text-sm text-ink-3">
+              Source yield: {dish.recipeSourceYield}
+            </span>
+          </div>
+          {dish.recipeInstructions ? (
+            <p className="whitespace-pre-wrap text-base text-ink-2">
+              {dish.recipeInstructions}
+            </p>
+          ) : null}
+          <details className="mt-3">
+            <summary className="cursor-pointer text-base text-accent">
+              Original recipe, quantities and subrecipes
+            </summary>
+            <p className="mt-3 whitespace-pre-wrap break-words text-sm text-ink-2">
+              {dish.recipeSourceText}
+            </p>
+          </details>
+        </section>
+      ) : null}
+
       <DishIngredientsPanel dishId={dish._id} />
 
       <DishComponentsPanel dishId={dish._id} />
