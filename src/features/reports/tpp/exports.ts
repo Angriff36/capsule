@@ -16,7 +16,11 @@ function tabular(result: TppReportResult): {
   columns: readonly TppColumn[];
   rows: readonly TppRow[];
 } | null {
-  return result.kind === "table" || result.kind === "financial" ? result : null;
+  return result.kind === "table" || result.kind === "financial"
+    ? result
+    : result.kind === "document"
+      ? (result.exportTable ?? null)
+      : null;
 }
 
 function save(content: BlobPart, mime: string, filename: string): void {

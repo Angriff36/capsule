@@ -1,3 +1,5 @@
+import { groupEventPrep } from "../../lib/eventPrepGroups";
+export { groupEventPrep } from "../../lib/eventPrepGroups";
 import type { ReactNode } from "react";
 import type {
   useListEventDish,
@@ -13,40 +15,6 @@ import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 
 type Selection = NonNullable<ReturnType<typeof useListEventDish>>[number];
 type Task = NonNullable<ReturnType<typeof useListPrepTask>>[number];
-type Group = { key: string; selection?: Selection; tasks: Task[] };
-
-/** An explicit menu-line reference must never fall through to another serving plan. */
-export function groupEventPrep(
-  selections: Selection[],
-  tasks: Task[],
-): Group[] {
-  const groups = new Map<string, Group>(
-    selections.map((selection) => [
-      selection._id,
-      { key: selection._id, selection, tasks: [] },
-    ]),
-  );
-  for (const task of tasks) {
-    let group = task.eventDishId ? groups.get(task.eventDishId) : undefined;
-    if (!task.eventDishId && task.dishId) {
-      const matches = selections.filter(
-        (selection) => selection.dishId === task.dishId,
-      );
-      if (matches.length === 1) group = groups.get(matches[0]._id);
-    }
-    if (!group) {
-      const key = task.eventDishId || `unlinked:${task.dishId || "event"}`;
-      group = groups.get(key);
-      if (!group) {
-        group = { key, tasks: [] };
-        groups.set(key, group);
-      }
-    }
-    group.tasks.push(task);
-  }
-  return [...groups.values()];
-}
-
 const labels: Record<string, string> = {
   finish_at_event: "Finish at event",
   from_recipe: "Recipe prep",

@@ -9,7 +9,7 @@ export function TppReportDocument({
   return (
     <div className="tpp-document">
       {sections.map((section) => (
-        <section key={section.id}>
+        <section key={section.id} className="print:break-inside-avoid">
           {section.heading ? (
             section.headingLevel === 4 ? (
               <h4 className="py-2 text-base font-semibold">
@@ -21,7 +21,10 @@ export function TppReportDocument({
           ) : null}
           <dl>
             {section.rows.map((row, index) => (
-              <div key={`${section.id}-${index}`}>
+              <div
+                key={`${section.id}-${index}`}
+                className="print:break-inside-avoid"
+              >
                 <dt>{row.label ?? ""}</dt>
                 <dd className="whitespace-pre-line">
                   {row.recipe ? (

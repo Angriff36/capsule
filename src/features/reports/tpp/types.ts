@@ -148,6 +148,7 @@ export type TppReportResult =
       title: string;
       template: string;
       sections: readonly TppDocumentSection[];
+      exportTable?: { columns: readonly TppColumn[]; rows: readonly TppRow[] };
     }
   | {
       kind: "labels";

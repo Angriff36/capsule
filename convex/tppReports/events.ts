@@ -1,4 +1,9 @@
-import { readableRecipeAmount } from "../../src/lib/recipeDisplay";
+import {
+  readableRecipeAmount,
+  recipeNoteLines,
+} from "../../src/lib/recipeDisplay";
+import { groupEventPrep } from "../../src/lib/eventPrepGroups";
+import { displayEventMenuNotes } from "../../src/features/events/eventMenuLineFields";
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
 import type {
@@ -115,6 +120,209 @@ async function eventMenu(
     const dish = dishes[index];
     return dish && isLiveTenantRow(dish, tenantId) ? [{ item, dish }] : [];
   });
+}
+
+async function productionWorksheet(
+  ctx: QueryCtx,
+  tenantId: string,
+  events: Doc<"events">[],
+  reportId: string,
+): Promise<TppReportResult> {
+  const sections: TppDocumentSection[] = [];
+  const rows: TppRow[] = [];
+  const human = (value: string) => value.replaceAll("_", " ");
+  for (const event of [...events].sort(
+    (a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0),
+  )) {
+    const [menu, tasks] = await Promise.all([
+      eventMenu(ctx, tenantId, event._id),
+      ctx.db
+        .query("prepTasks")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .take(REPORT_ROW_LIMIT),
+    ]);
+    sections.push({
+      id: event._id,
+      heading: event.title,
+      rows: [
+        { label: "Event date", value: dateText(event.startsAt) },
+        { label: "Guests", value: String(event.expectedHeadcount) },
+        {
+          label: "Venue",
+          value: [event.venueName, event.venueAddress]
+            .filter(Boolean)
+            .join("  /  "),
+        },
+      ],
+    });
+    const groups = groupEventPrep(
+      menu.map((entry) => entry.item),
+      tasks.filter(
+        (task) =>
+          isLiveTenantRow(task, tenantId) && task.status !== "cancelled",
+      ),
+    );
+    if (!groups.length)
+      sections.push({
+        id: `${event._id}-empty`,
+        rows: [{ value: "No menu items or prep steps recorded." }],
+      });
+    for (const group of groups) {
+      const selection = group.selection;
+      const dishId = selection?.dishId ?? group.tasks[0]?.dishId;
+      const dish = dishId ? await ctx.db.get(dishId) : null;
+      const dishName =
+        dish && isLiveTenantRow(dish, tenantId) ? dish.name : "Event prep";
+      const sectionRows: TppDocumentSection["rows"][number][] = [
+        {
+          label: "Servings",
+          value: selection
+            ? String(selection.quantityServings)
+            : "Not linked to a current menu line",
+        },
+      ];
+      if (dish && isLiveTenantRow(dish, tenantId))
+        sectionRows.push({
+          label: "Dish recipe",
+          value: dishName,
+          recipe: { kind: "dish", id: dish._id },
+        });
+      if (selection?.course)
+        sectionRows.push({ label: "Course", value: selection.course });
+      const menuNotes = recipeNoteLines(
+        displayEventMenuNotes(selection?.specialInstructions),
+      ).join("\n");
+      if (menuNotes)
+        sectionRows.push({ label: "Menu notes", value: menuNotes });
+      const base = {
+        event: event.title,
+        date: dateText(event.startsAt),
+        venue: [event.venueName, event.venueAddress]
+          .filter(Boolean)
+          .join("  /  "),
+        guests: event.expectedHeadcount,
+        dish: dishName,
+        servings: selection?.quantityServings ?? null,
+        course: selection?.course ?? "",
+        menuNotes,
+      };
+      if (!group.tasks.length) {
+        sectionRows.push({ value: "No prep steps recorded for this dish." });
+        rows.push({
+          id: group.key,
+          values: { ...base, task: "No prep steps recorded for this dish." },
+        });
+      }
+      for (const task of group.tasks) {
+        const [component, person] = await Promise.all([
+          task.componentId ? ctx.db.get(task.componentId) : null,
+          task.assignedToId ? ctx.db.get(task.assignedToId) : null,
+        ]);
+        const componentName =
+          component && isLiveTenantRow(component, tenantId)
+            ? component.name
+            : "";
+        const owner =
+          person && isLiveTenantRow(person, tenantId)
+            ? `${person.givenName} ${person.familyName}`.trim()
+            : task.assignedToId
+              ? "Assigned"
+              : "Unassigned";
+        const notes = [
+          ...new Set([
+            ...recipeNoteLines(
+              displayEventMenuNotes(task.specialInstructions),
+              task.name,
+            ),
+            ...recipeNoteLines(task.notes ?? "", task.name),
+          ]),
+        ].join("\n");
+        const quantity = readableRecipeAmount(task.quantity, task.unit);
+        const completed =
+          task.completedQuantity == null
+            ? ""
+            : `${readableRecipeAmount(task.completedQuantity, task.unit)} completed`;
+        const detail = [
+          quantity,
+          [human(task.category), task.station, human(task.status), owner]
+            .filter(Boolean)
+            .join("  /  "),
+          task.dueAt ? `Due ${dateText(task.dueAt)}` : "",
+          completed,
+          notes,
+          task.blockReason ? `Blocked: ${task.blockReason}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n");
+        sectionRows.push({ label: task.name, value: detail });
+        if (componentName && component)
+          sectionRows.push({
+            label: "Component recipe",
+            value: componentName,
+            recipe: { kind: "component", id: component._id },
+          });
+        else if (task.componentId)
+          sectionRows.push({
+            label: "Component recipe",
+            value: "Recipe unavailable",
+          });
+        rows.push({
+          id: task._id,
+          values: {
+            ...base,
+            task: task.name,
+            quantity: task.quantity,
+            unit: task.unit,
+            category: human(task.category),
+            station: task.station ?? "",
+            status: human(task.status),
+            owner,
+            due: dateText(task.dueAt),
+            completed: task.completedQuantity ?? null,
+            notes,
+            blocked: task.blockReason ?? "",
+            component:
+              componentName || (task.componentId ? "Recipe unavailable" : ""),
+          },
+        });
+      }
+      sections.push({
+        id: `${event._id}-${group.key}`,
+        heading: dishName,
+        headingLevel: 4,
+        rows: sectionRows,
+      });
+    }
+  }
+  const columns: TppColumn[] = [
+    { key: "event", label: "Event", kind: "text" },
+    { key: "date", label: "Event date", kind: "text" },
+    { key: "venue", label: "Venue", kind: "text" },
+    { key: "guests", label: "Guests", kind: "number" },
+    { key: "dish", label: "Dish", kind: "text" },
+    { key: "servings", label: "Dish servings", kind: "number" },
+    { key: "course", label: "Course", kind: "text" },
+    { key: "menuNotes", label: "Menu notes", kind: "text" },
+    { key: "task", label: "Prep step", kind: "text" },
+    { key: "quantity", label: "Quantity", kind: "quantity" },
+    { key: "unit", label: "Unit", kind: "text" },
+    { key: "category", label: "Category", kind: "text" },
+    { key: "component", label: "Component recipe", kind: "text" },
+    { key: "station", label: "Station", kind: "text" },
+    { key: "owner", label: "Assigned to", kind: "text" },
+    { key: "due", label: "Due", kind: "text" },
+    { key: "status", label: "Status", kind: "text" },
+    { key: "completed", label: "Completed quantity", kind: "quantity" },
+    { key: "notes", label: "Kitchen notes", kind: "text" },
+    { key: "blocked", label: "Blocked reason", kind: "text" },
+  ];
+  return {
+    kind: "document",
+    title: reportTitle(reportId),
+    template: reportId,
+    sections,
+    exportTable: { columns, rows },
+  };
 }
 
 function eventRows(events: Doc<"events">[]): TppRow[] {
@@ -363,6 +571,15 @@ export const run = query({
       );
     }
 
+    if (args.reportId === "master-food-production-worksheet") {
+      return productionWorksheet(
+        ctx,
+        tenantId,
+        await eventsInRange(ctx, tenantId, parameters),
+        args.reportId,
+      );
+    }
+
     if (
       [
         "beverage-order-list-by-vendor",
@@ -370,7 +587,6 @@ export const run = query({
         "other-inventory-order-list-by-vendor",
         "rental-order-list-by-vendor",
         "order-list",
-        "master-food-production-worksheet",
       ].includes(args.reportId)
     ) {
       const events = await eventsInRange(ctx, tenantId, parameters);
@@ -641,13 +857,11 @@ export const run = query({
       };
     }
 
-    if (
-      [
-        "event-menu-item-production",
-        "production-summary",
-        "kitchen-labor",
-      ].includes(args.reportId)
-    ) {
+    if (args.reportId === "event-menu-item-production") {
+      return productionWorksheet(ctx, tenantId, [event], args.reportId);
+    }
+
+    if (["production-summary", "kitchen-labor"].includes(args.reportId)) {
       const prep = await ctx.db
         .query("prepTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
