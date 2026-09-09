@@ -39,14 +39,22 @@ Client `eventMenuCost.servingsFor` differs again: override > 0, then quantitySer
 
 ## Newly recovered authoritative inputs
 
+Next repair input is now extracted as `.artifacts/operations-source-study/event-formulas.json` by `extract-event-formulas.py`: all 15 Ashley dishes, 71 step groups, exact event totals, and original worksheet row addresses. This is a source candidate, not an approved applied migration. Combine with actual batch photographs and heating/service methods; some steps have no ingredient children in this export, and previously noted unit conflicts remain. Do not default missing ingredient children to zero ingredient need.
+
 Original `Menu_Item_Cost_per_Event.xlsx`, worksheet sheet1:
 
 - A405/L405 Asparagus, 167 servings. G407/H407 prep 501 oz; G409/H409 actual asparagus 31.3125 lb. G417 butter 10.4375 lb; G421 sea salt 1.04375 lb. These agree with prep and shopping, contrasting the reference packing PDF's 41.75 lb asparagus.
 - G423/H423 parmesan prep 167 oz but G425/H425 ingredient 10.4375 **oz**, while prep PDF says 10.44 **lb**. This is a separate 16x source unit conflict; do not silently choose one.
-- A462/L462 Cougar Gold Gourmet Mac n Cheese, 167 servings. G464/H464 sauce 501 fluid oz (=3.9140625 gal). Actual batch ingredient rows 466-488 match 0.7828125 of the photographed 5-gallon formula: butter/flour 0.7828125 lb each, milk 1.565625 gal, cream 0.39140625 gal, Gruyere and Cougar Gold 3.13125 lb each, shredded Parmesan 3.13125 cups, Velveeta 1.95703125 lb, cornstarch 0.195703125 lb, plus seasonings. This supplies exact linkage and scaling without invented yield.
+- A462/L462 Cougar Gold Gourmet Mac n Cheese, 167 servings. G464/H464 sauce 501 fluid oz (=3.9140625 gal), or 0.7828125 of the photographed 5-gallon batch. Butter/flour, milk/cream, Cougar Gold, Parmesan and Velveeta agree at this scale. **Correction after rereading the original photo:** Gruyere is 4 quarts per batch in the kitchen photo but 4 pounds in TPP costing; cornstarch is 1/4 cup in the photo but 1/4 pound in costing. These are unresolved source-unit conflicts, not exact formula matches. Owner clarification requested; do not convert volume to weight without supported density or select a source silently.
 - G490/H490 pasta 167 oz; G492/H492 dry elbow pasta 10.4375 lb; olive oil 20.875 tbsp. Panko topping G496/H496 41.75 cups, child ingredients rows 498-510. Cooked bacon G512/H512 41.75 oz and G514/H514 bacon bits 2.609375 lb.
 - Mashed potatoes G529/H529 2.839 batches; ingredient rows 531-539 give butter 5.678 lb, evaporated milk 5.678 qt, salt 1.4195 cups, white pepper 17.034 tbsp, Yukon potatoes 56.78 lb. Need actual method and yield evidence before presenting as complete recipe.
 
 `Heating_and_Serving_Event_Menu.xlsx` provides actual service methods including asparagus, mac sauce/pasta, chicken roulade, dinner rolls. Preserve operational instructions without spreadsheet row dumps. This source is not covered by recipe-category JSON.
 
 Migration logs explicitly document missing category exports due to 504/blocked report pages. Therefore source archive completeness cannot be inferred from an import receipt. Event-specific costing and other supplied sources recover substantial information despite those gaps.
+
+## Prep adoption / unit reconciliation (current)
+
+`convex/lib/dishRecipeRepair.ts` and `scripts/repair-tpp-recipes.ts` now support explicit prepLinks with reviewed snapshot fields. Actual scratch Convex execution proves linking without duplicate work and preserves completed quantities on later resize. Do not apply the full candidate plan yet: Smore Bar has quart work rows but tablespoon templates (temper chocolate, Nutella, Reese's spread; verify all remaining matches), requiring compatible conversion in server `PrepTask.syncServings` and client `EventPrepTaskSynchronizer`. Both presently multiply template defaultQuantity without converting to the retained work unit. Same-unit links are supported; incompatible links reject before mutation. Recipe relationship changes must also preserve unit correctness.
+
+Live snapshot correction: Infused Water EventDish is 167 servings, whereas source cost recipe is 334. Its prep rows remain 20.88 gallons water / 83.5 lb ice / 4.18 kits. Resolve event serving intent and the kit-per-container source conflict together; do not infer a rate from the wrong denominator.

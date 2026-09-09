@@ -24,6 +24,23 @@ const snapshot = value(
 const out = value("--out", ".artifacts/tpp-recipe-repair-20260908");
 mkdirSync(out, { recursive: true });
 const data = JSON.parse(readFileSync(snapshot, "utf8"));
+// Explicit source-reviewed associations, never a name-only automatic merge.
+// Include the observed work fields so a concurrent kitchen edit is preserved.
+type PrepLink = {
+  prepTaskId: string;
+  dishId: string;
+  taskName: string;
+  expectedVersion: number;
+  expectedName: string;
+  expectedQuantity: number;
+  expectedUnit: string;
+};
+const prepLinksPath = value("--prep-links", "");
+const prepLinks: PrepLink[] = prepLinksPath
+  ? JSON.parse(readFileSync(prepLinksPath, "utf8"))
+  : [];
+if (!Array.isArray(prepLinks)) throw new Error("Prep links must be an array");
+const usedPrepLinks = new Set<string>();
 const recipes = JSON.parse(readFileSync(source, "utf8")) as TppSourceRecipe[];
 const plan = recipes.map((r) => {
   const recipe = projectTppRecipe(r);
@@ -45,16 +62,43 @@ const plan = recipes.map((r) => {
       c.category === "TPP imported recipes" &&
       c.name === `${r.name} — TPP recipe`,
   );
+  const links = prepLinks.filter((link) =>
+    dishes.some((dish: any) => dish._id === link.dishId),
+  );
+  for (const link of links) {
+    if (usedPrepLinks.has(link.prepTaskId))
+      throw new Error(
+        `Prep work appears in multiple repairs: ${link.prepTaskId}`,
+      );
+    usedPrepLinks.add(link.prepTaskId);
+    const matchingTasks = recipe.tasks.filter(
+      (task) => recipeNameKey(task.name) === recipeNameKey(link.taskName),
+    );
+    if (matchingTasks.length !== 1)
+      throw new Error(`Prep link requires one source step: ${link.taskName}`);
+    if ((matchingTasks[0].unit ?? "portion") !== link.expectedUnit)
+      throw new Error(
+        `Reconcile prep units before linking ${link.taskName}: work uses ${link.expectedUnit}, recipe uses ${matchingTasks[0].unit ?? "portion"}`,
+      );
+  }
+  const linkHash = links.length
+    ? createHash("sha256").update(JSON.stringify(links)).digest("hex")
+    : "";
   return {
-    operationKey: `${prepOnly ? "tpp-dish-prep-completion:v1" : "tpp-dish-repair:v2"}:${r.fingerprint}`,
+    operationKey: `${prepOnly ? "tpp-dish-prep-completion:v1" : "tpp-dish-repair:v2"}:${r.fingerprint}${linkHash ? `:prep-links:${linkHash}` : ""}`,
     dishIds: dishes.map((d: any) => d._id),
     expectedVersions: Object.fromEntries(
       dishes.map((d: any) => [d._id, d.version]),
     ),
     ...(draft && !prepOnly ? { sourceComponentId: draft._id } : {}),
+    ...(links.length ? { prepLinks: links } : {}),
     recipe,
   };
 });
+if (usedPrepLinks.size !== prepLinks.length)
+  throw new Error(
+    "Some prep links do not belong to a dish in this repair plan",
+  );
 writeFileSync(`${out}/plan.json`, JSON.stringify(plan, null, 2));
 const planHash = createHash("sha256")
   .update(JSON.stringify(plan))
@@ -70,6 +114,7 @@ console.log(
         .map((p) => p.recipe.name),
       misplacedDrafts: plan.filter((p) => p.sourceComponentId).length,
       tasks: plan.reduce((n, p) => n + p.recipe.tasks.length, 0),
+      linkedPrepTasks: usedPrepLinks.size,
       directIngredientLines: plan.reduce(
         (n, p) => n + p.recipe.ingredients.length,
         0,

@@ -22,6 +22,19 @@ export const dishRecipeRepairArgs = {
   dishIds: v.array(v.id("dishes")),
   expectedVersions: v.record(v.string(), v.number()),
   sourceComponentId: v.optional(v.id("components")),
+  prepLinks: v.optional(
+    v.array(
+      v.object({
+        prepTaskId: v.id("prepTasks"),
+        dishId: v.id("dishes"),
+        taskName: v.string(),
+        expectedVersion: v.number(),
+        expectedName: v.string(),
+        expectedQuantity: v.number(),
+        expectedUnit: v.string(),
+      }),
+    ),
+  ),
   recipe: v.object({
     name: v.string(),
     fingerprint: v.string(),
@@ -64,6 +77,15 @@ type Input = {
   dishIds: Id<"dishes">[];
   expectedVersions: Record<string, number>;
   sourceComponentId?: Id<"components">;
+  prepLinks?: {
+    prepTaskId: Id<"prepTasks">;
+    dishId: Id<"dishes">;
+    taskName: string;
+    expectedVersion: number;
+    expectedName: string;
+    expectedQuantity: number;
+    expectedUnit: string;
+  }[];
   recipe: {
     name: string;
     fingerprint: string;
@@ -100,6 +122,7 @@ export async function repairDishRecipe(
   ingredients: number;
   components: number;
   retiredSource: boolean;
+  linkedPrepTasks: number;
 }> {
   const auth = await getAuthContext(ctx);
   requireKitchenAccess(auth);
@@ -117,6 +140,7 @@ export async function repairDishRecipe(
     ingredients: 0,
     components: 0,
     retiredSource: false,
+    linkedPrepTasks: 0,
   };
   const owned = async (
     id: Id<"dishes"> | Id<"ingredients"> | Id<"components">,
@@ -127,6 +151,33 @@ export async function repairDishRecipe(
     return row;
   };
   const input = args.recipe;
+  const linkedIds = new Set<string>();
+  // Adoption is explicit in the reviewed plan. A matching label alone is not
+  // enough to merge work from separate steps or event-specific substitutions.
+  for (const link of args.prepLinks ?? []) {
+    if (linkedIds.has(link.prepTaskId))
+      throw new Error("Prep repair contains the same work item more than once");
+    linkedIds.add(link.prepTaskId);
+    const prep = await ctx.db.get(link.prepTaskId);
+    const eventDish = prep ? await ctx.db.get(prep.eventDishId) : null;
+    if (
+      !prep ||
+      prep.tenantId !== tenantId ||
+      prep.deletedAt != null ||
+      !eventDish ||
+      eventDish.tenantId !== tenantId ||
+      eventDish.dishId !== link.dishId ||
+      !args.dishIds.includes(link.dishId) ||
+      prep.version !== link.expectedVersion ||
+      prep.name !== link.expectedName ||
+      prep.quantity !== link.expectedQuantity ||
+      prep.unit !== link.expectedUnit
+    ) {
+      throw new Error(
+        "Imported prep changed since the reviewed repair snapshot",
+      );
+    }
+  }
   for (const id of args.dishIds) {
     const dish = await owned(id);
     if (
@@ -279,13 +330,19 @@ export async function repairDishRecipe(
       dish.recipeSourceFingerprint !== input.fingerprint
     )
       throw new Error("Dish already has a different source recipe");
-    await ctx.runMutation(api.mutations.Dish_saveRecipe, {
-      docId: dishId,
-      instructions: input.instructions,
-      sourceText: `${input.source}\n\n${input.raw}${input.notes.length ? "\n\nSource notes:\n" + input.notes.join("\n") : ""}`,
-      sourceYield: input.yieldText,
-      sourceFingerprint: input.fingerprint,
-    });
+    // Restoring links to a previously imported recipe must not overwrite a
+    // cook's subsequent edits to its method or resave an unchanged recipe.
+    if (dish.recipeSourceFingerprint !== input.fingerprint) {
+      await ctx.runMutation(api.mutations.Dish_saveRecipe, {
+        docId: dishId,
+        instructions: dish.recipeInstructions?.trim()
+          ? dish.recipeInstructions
+          : input.instructions,
+        sourceText: `${input.source}\n\n${input.raw}${input.notes.length ? "\n\nSource notes:\n" + input.notes.join("\n") : ""}`,
+        sourceYield: input.yieldText,
+        sourceFingerprint: input.fingerprint,
+      });
+    }
     const tasks = await ctx.db
       .query("dishTasks")
       .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
@@ -363,6 +420,45 @@ export async function repairDishRecipe(
       .query("dishTasks")
       .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
       .collect();
+    for (const link of (args.prepLinks ?? []).filter(
+      (l) => l.dishId === dishId,
+    )) {
+      const matches = templates.filter(
+        (t) =>
+          t.deletedAt == null &&
+          t.status === "active" &&
+          recipeNameKey(t.name) === recipeNameKey(link.taskName),
+      );
+      if (matches.length !== 1)
+        throw new Error("Prep repair requires one unambiguous recipe step");
+      const template = matches[0];
+      const prep = await ctx.db.get(link.prepTaskId);
+      if (
+        !prep ||
+        (prep.dishTaskId && prep.dishTaskId !== template._id) ||
+        (prep.dishId && prep.dishId !== dishId) ||
+        (prep.componentId && prep.componentId !== template.componentId) ||
+        (template.defaultUnit ?? "portion") !== prep.unit
+      ) {
+        throw new Error(
+          "Prep repair would replace a recipe link or change its quantity unit",
+        );
+      }
+      if (
+        prep.dishTaskId === template._id &&
+        prep.dishId === dishId &&
+        (prep.componentId ?? null) === (template.componentId ?? null)
+      )
+        continue;
+      await ctx.db.patch(prep._id, {
+        dishTaskId: template._id,
+        dishId,
+        ...(template.componentId ? { componentId: template.componentId } : {}),
+        version: prep.version + 1,
+        updatedAt: Date.now(),
+      });
+      result.linkedPrepTasks++;
+    }
     const eventDishes = await ctx.db
       .query("eventDishes")
       .withIndex("by_dishId", (q) => q.eq("dishId", dishId))

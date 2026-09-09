@@ -27,3 +27,14 @@ Implemented shared dish serving authority, remembered whole-event/fixed intent, 
 - Extracted 90 original migration XLSX files read-only with cell addresses; found exact Ashley ingredient/subrecipe amounts and service methods omitted by the older recipe JSON path.
 - New runtime-gaps.md records source unit conflicts, serving-count propagation and batch-yield semantics requiring connected fixes.
 - Subsequently reproduced instruction loss on serving resize and fixed EventPrepTaskSynchronizer to retain existing method/event notes. The failing scratch reproduction now passes. Ran 23 existing focused tests (all pass), full typecheck (pass) and targeted Prettier (pass). No new repository tests added. No production mutation or release. Goal remains active.
+
+## Explicit imported prep adoption checkpoint
+
+Implemented optional source-reviewed prep links in the recipe repair seam and CLI. Links retain original names, units, quantities, instructions, assignment/status/completion fields; only recipe references, version and updatedAt change. Snapshot checks reject concurrent changes, conflicting existing references, duplicate plan entries and incompatible units. Previously imported dish methods are preserved when reconnecting work. Receipt replay is nonduplicating.
+
+Actual Convex runtime scratch verification (`reproduce-prep-adoption.ts`) passes: two imported tasks become linked without duplication; pending asparagus scales 31.31 -> 37.5 lb for 200 servings; completed lemon work stays 41.75 each with its completion timestamp; repeat repair does not relink; a stale snapshot rolls back. Existing prep coordinator tests pass (6). Typecheck passed before the final method-preservation edit and is rerunning. No new repository tests or live writes.
+
+Source correction: original sauce photo says 4 quarts Gruyere and 1/4 cup cornstarch per 5 gallons; costing says 4 pounds and 1/4 pound. This contradicts the earlier claim that all formula ingredients match. Owner clarification requested for these and asparagus Parmesan (1 ounce versus 1/16 ounce per serving). Continue independently while unresolved.
+
+A real Smore Bar preview identifies nine source-matched imported rows, but three use quarts while templates use tablespoons. Current repair correctly rejects those links; units must be reconciled in both server and client scaling before applying. The preview is not an applicable migration yet. Also confirmed live Infused Water has 167 servings while original cost source has 334; preserve this discrepancy in the event repair plan rather than assuming the live menu already matches.
+- Final typecheck passed after method preservation. Extended scratch reproduction confirms a cook's edited dish method survives a new repair operation. CLI preview accepts a compatible four-link Smore subset and rejects the full candidate at the tablespoon/quart mismatch. This is validation evidence, not a live repair.
