@@ -5,10 +5,12 @@ import { createHash } from "node:crypto";
 import { ConvexHttpClient } from "convex/browser";
 import { CapsuleAgentAuthManager } from "../src/agent/CapsuleAgentAuthManager";
 import { recipeUnitRatio } from "../src/lib/recipeUnitConversion";
+import { componentBatchScale } from "../src/lib/componentBatchScale";
 import {
   projectTppRecipe,
   recipeNameKey,
   type TppSourceRecipe,
+  type RecipeRepairProjection,
 } from "../src/lib/tppRecipeRepair";
 const args = process.argv.slice(2);
 const prepOnly = args.includes("--prep-only");
@@ -42,15 +44,36 @@ const prepLinks: PrepLink[] = prepLinksPath
   : [];
 if (!Array.isArray(prepLinks)) throw new Error("Prep links must be an array");
 const usedPrepLinks = new Set<string>();
-const recipes = JSON.parse(readFileSync(source, "utf8")) as TppSourceRecipe[];
+const projected = args.includes("--projected-recipes");
+const sourceRecipes = JSON.parse(readFileSync(source, "utf8"));
+const recipes: RecipeRepairProjection[] = projected
+  ? sourceRecipes
+  : (sourceRecipes as TppSourceRecipe[]).map(projectTppRecipe);
 const plan = recipes.map((r) => {
-  const recipe = projectTppRecipe(r);
+  const recipe = structuredClone(r);
   if (prepOnly) {
     recipe.ingredients = [];
     recipe.components = [];
   }
-  for (const component of recipe.components)
+  for (const component of recipe.components) {
+    if (
+      component.yieldQuantity != null ||
+      component.yieldUnit != null ||
+      component.quantityPerServing != null
+    ) {
+      if (
+        component.yieldQuantity == null ||
+        !component.yieldUnit ||
+        component.quantityPerServing == null
+      )
+        throw new Error(`Incomplete measured batch: ${component.name}`);
+      componentBatchScale(
+        component.yieldQuantity,
+        component.quantityPerServing,
+      );
+    }
     component.key = createHash("sha256").update(component.key).digest("hex");
+  }
   const dishes = data.Dish.filter(
     (d: any) =>
       d.status === "active" &&
@@ -88,8 +111,11 @@ const plan = recipes.map((r) => {
   const linkHash = links.length
     ? createHash("sha256").update(JSON.stringify(links)).digest("hex")
     : "";
+  const projectionKey = projected
+    ? `:projection:${createHash("sha256").update(JSON.stringify(recipe)).digest("hex")}`
+    : "";
   return {
-    operationKey: `${prepOnly ? "tpp-dish-prep-completion:v1" : "tpp-dish-repair:v2"}:${r.fingerprint}${linkHash ? `:prep-links:${linkHash}` : ""}`,
+    operationKey: `${prepOnly ? "tpp-dish-prep-completion:v1" : "tpp-dish-repair:v2"}:${r.fingerprint}${projectionKey}${linkHash ? `:prep-links:${linkHash}` : ""}`,
     dishIds: dishes.map((d: any) => d._id),
     expectedVersions: Object.fromEntries(
       dishes.map((d: any) => [d._id, d.version]),

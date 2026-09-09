@@ -39,8 +39,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   computed targetHeadcount: int = self.quantityServings
   // Display helper: largest batch count across attached components (lemonade = one component).
   // Headcount uses self.targetHeadcount (sibling computed; Convex helpers assign in order).
-  computed requiredBatches: int = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.yieldQuantity > 0 ? ceil(self.targetHeadcount / line.yieldQuantity) : 0)
-  computed requiredYieldQuantity: decimal(10, 2) = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? ceil(self.targetHeadcount / line.yieldQuantity) : 0) * line.yieldQuantity)
+  computed requiredBatches: int = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0)
+  computed requiredYieldQuantity: decimal(10, 2) = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.yieldQuantity > 0 ? ceil(self.targetHeadcount * line.batchMultiplier / line.yieldQuantity) : 0) * line.yieldQuantity / line.batchMultiplier)
   // Sum of (servings / attachment yieldQuantity) × batchMultiplier × same-unit
   // ingredient batch cost per attached component (matches the demand engine and
   // menu board: cost/serving = batch cost × batchMultiplier ÷ attachment yield),

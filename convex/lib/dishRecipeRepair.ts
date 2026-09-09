@@ -10,6 +10,7 @@ import {
 } from "./materializationReceipt";
 import { recipeNameKey } from "../../src/lib/tppRecipeRepair";
 import { recipeUnitRatio } from "../../src/lib/recipeUnitConversion";
+import { componentBatchScale } from "../../src/lib/componentBatchScale";
 
 const amount = v.object({
   name: v.string(),
@@ -60,6 +61,9 @@ export const dishRecipeRepairArgs = {
         name: v.string(),
         key: v.string(),
         instructions: v.string(),
+        yieldQuantity: v.optional(v.number()),
+        yieldUnit: v.optional(v.string()),
+        quantityPerServing: v.optional(v.number()),
         ingredients: v.array(amount),
       }),
     ),
@@ -108,6 +112,9 @@ type Input = {
       name: string;
       key: string;
       instructions: string;
+      yieldQuantity?: number;
+      yieldUnit?: string;
+      quantityPerServing?: number;
       ingredients: Amount[];
     }[];
     notes: string[];
@@ -267,6 +274,21 @@ export async function repairDishRecipe(
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .collect();
   for (const formula of input.components) {
+    const measured =
+      formula.yieldQuantity != null ||
+      formula.yieldUnit != null ||
+      formula.quantityPerServing != null;
+    if (measured) {
+      if (
+        formula.yieldQuantity == null ||
+        !formula.yieldUnit ||
+        formula.quantityPerServing == null
+      )
+        throw new Error(
+          "A batch recipe needs its measured yield, yield unit and amount per serving in that unit",
+        );
+      componentBatchScale(formula.yieldQuantity, formula.quantityPerServing);
+    }
     const reused = existingComponents.find(
       (c) =>
         c.deletedAt == null &&
@@ -274,6 +296,13 @@ export async function repairDishRecipe(
         c.description?.includes(`[TPP subrecipe:${formula.key}]`),
     );
     if (reused) {
+      if (
+        reused.yieldQuantity !== (formula.yieldQuantity ?? 1) ||
+        reused.yieldUnit !== (formula.yieldUnit ?? "serving")
+      )
+        throw new Error(
+          "Existing subrecipe yield differs from the reviewed source",
+        );
       componentIds.push(reused._id);
       continue;
     }
@@ -281,11 +310,11 @@ export async function repairDishRecipe(
       api.mutations.Component_createViaDraft,
       {
         name: formula.name,
-        yieldQuantity: 1,
-        yieldUnit: "serving",
+        yieldQuantity: formula.yieldQuantity ?? 1,
+        yieldUnit: formula.yieldUnit ?? "serving",
         category: "TPP subrecipes",
         instructions: formula.instructions,
-        description: `Subrecipe amount for one serving of ${input.name}.\n[TPP subrecipe:${formula.key}]`,
+        description: `${measured ? "Kitchen batch recipe." : `Subrecipe amount for one serving of ${input.name}.`}\n[TPP subrecipe:${formula.key}]`,
       },
     );
     for (const line of formula.ingredients)
@@ -406,15 +435,41 @@ export async function repairDishRecipe(
       });
       result.ingredients++;
     }
-    for (const [i, componentId] of componentIds.entries())
+    const attached = await ctx.db
+      .query("dishComponents")
+      .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
+      .collect();
+    for (const [i, componentId] of componentIds.entries()) {
+      const formula = input.components[i];
+      const scale =
+        formula.yieldQuantity != null && formula.quantityPerServing != null
+          ? componentBatchScale(
+              formula.yieldQuantity,
+              formula.quantityPerServing,
+            )
+          : { yieldQuantity: 1, batchMultiplier: 1 };
+      const existing = attached.filter(
+        (line) => line.deletedAt == null && line.componentId === componentId,
+      );
+      if (existing.length) {
+        if (
+          existing.length !== 1 ||
+          existing[0].yieldQuantity !== scale.yieldQuantity ||
+          existing[0].batchMultiplier !== scale.batchMultiplier
+        )
+          throw new Error(
+            "Existing component portion differs from the reviewed source",
+          );
+        continue;
+      }
       await ctx.runMutation(api.mutations.DishComponent_createViaAttach, {
         dishId,
         componentId,
-        yieldQuantity: 1,
-        batchMultiplier: 1,
+        ...scale,
         sortOrder: i,
         role: input.components[i].name,
       });
+    }
     // Existing event menu lines need the newly restored templates too. Preserve
     // performed/manual work; matching names are not reopened or duplicated.
     const templates = await ctx.db

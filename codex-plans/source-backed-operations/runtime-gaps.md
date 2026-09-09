@@ -62,3 +62,7 @@ Live snapshot correction: Infused Water EventDish is 167 servings, whereas sourc
 ### Unit reconciliation update
 
 The earlier tablespoon/quart adoption limitation is now fixed in authored client calculation and Manifest server scaling. All nine Smore candidates pass preview. Initial-zero prep failure is also fixed and reproduced through the generated runtime. Prep adoption now uses generated PrepTask.linkRecipe, satisfying culinary/production integration guards. Full suite passes. Outstanding: completed-work increases need additional work tracking; source recipe batch identity/yields and unit conflicts; live repair; remaining requirements in this ledger. No production changes yet.
+
+### Batch reconstruction update
+
+The repair seam supports actual batch ingredient quantities with explicit measured component yield and amount per dish serving. The exact attachment ratio preserves existing demand/cost math (3 batches serving 640 guests for 5-gallon sauce at 3 fl oz/guest). RecipeRepairProjection exposes these fields; CLI --projected-recipes can preview reviewed photo/workbook projections. Existing attachment reuse prevents duplicate demand across new repair operations. Worked generated-runtime example passes at 167 and 200 servings. No complete live-source projection has been applied yet. Component cost panel already labels cost by yield unit via yieldCostLabel; the old Component.liveCostPerGuest property name/comment is misleading but not used by that panel. Nutrition semantics still need review for physical-yield recipes.

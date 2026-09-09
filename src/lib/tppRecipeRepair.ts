@@ -36,6 +36,11 @@ export type RecipeRepairProjection = {
     name: string;
     key: string;
     instructions: string;
+    /** When present, ingredients describe this actual kitchen batch. */
+    yieldQuantity?: number;
+    yieldUnit?: string;
+    /** Measured amount for one dish serving, in yieldUnit. */
+    quantityPerServing?: number;
     ingredients: RecipeAmount[];
   }[];
   notes: string[];
