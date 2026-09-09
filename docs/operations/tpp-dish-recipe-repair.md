@@ -14,11 +14,15 @@ Source exports that describe a physical batch without a serving yield retain the
 4. Apply the same source and snapshot with `--apply --expected-plan-sha256 <sha256> --url <Convex URL> --tenant <tenant ID>`.
 5. Inspect `receipt.json` and query the repaired dishes, prep, ingredients, components, and existing-event demand. Repeat the same command to resume an interrupted run; successful operations replay their durable receipt.
 
+For a later prep-coverage correction, `--prep-only` uses a separate operation key and restores task templates without reattaching components or ingredient lines. Preview and apply must both use that flag and the same fresh snapshot.
+
 The backend checks tenant ownership, source identity/text, and expected dish versions. It refuses conflicting ingredient/task quantities and ambiguous ingredient records. Never replace the reviewed snapshot during a partial run: reconcile any newly edited records before preparing another operation.
 
 ## September 2026 qualification
 
-The export contains 217 distinct recipe entries matching 222 existing dish records, including five duplicate service variants. 143 whole-recipe drafts were misplaced. The reviewed projection contains 785 prep templates, 373 direct ingredient lines, and 56 subrecipe instances before formula deduplication and duplicate-dish expansion.
+The export contains 217 distinct recipe entries matching 222 existing dish records, including five duplicate service variants. 143 whole-recipe drafts were misplaced. The complete projection contains 921 prep templates, 373 direct ingredient lines, and 56 subrecipe instances before formula deduplication and duplicate-dish expansion.
+
+A source-line audit expanded prep recognition to all named source subrecipes and the exported action verbs, including temper, soak, steam, bread, and julienne. Remaining non-task lines are raw ingredients or supply SKUs.
 
 Local qualification processed all 217 recipes and replayed every operation without duplication. An existing-dish fixture preserved its description and portioning, rejected a stale version, retired the source draft, and produced eight prep tasks plus two ingredient contributions/demands at 167 servings. Desktop and mobile browser verification covered the dish recipe section. These are qualification results, not a production completion receipt.
 
