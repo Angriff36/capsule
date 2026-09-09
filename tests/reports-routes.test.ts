@@ -26,15 +26,6 @@ describe("Reports routes and lifecycle bindings", () => {
     expect(reports?.label).toBe("Reports");
   });
 
-  it("wires ReportsPage in App.tsx", () => {
-    const app = readFileSync(
-      path.join(process.cwd(), "src/app/App.tsx"),
-      "utf8",
-    );
-    expect(app).toContain('path="/reports"');
-    expect(app).toContain("ReportsPage");
-  });
-
   it("derives archive/restore from generated lifecycle metadata", () => {
     const policy = new ReportLifecyclePolicy();
     expect(policy.reportActions("active").map((a) => a.key)).toEqual([

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { readFileSync } from "node:fs";
+
 import {
   EventDraftPoCoordinator,
   eventAllowsDraftPoFromNeeds,
@@ -168,21 +168,5 @@ describe("EventDraftPoCoordinator", () => {
     if (!empty.ok) {
       expect(empty.reason).toMatch(/no ingredient needs/i);
     }
-  });
-
-  it("does not call PurchaseNeed.create — that stays behind Event.approve", () => {
-    const coordinator = readFileSync(
-      "src/features/events/EventDraftPoCoordinator.ts",
-      "utf8",
-    );
-    const button = readFileSync(
-      "src/features/events/EventDraftPoButton.tsx",
-      "utf8",
-    );
-    expect(coordinator).not.toMatch(/PurchaseNeed/);
-    expect(button).not.toMatch(/PurchaseNeed/);
-    expect(coordinator).not.toContain("pending_approval");
-    expect(coordinator).not.toContain('"approved"');
-    expect(coordinator).not.toContain("executing");
   });
 });

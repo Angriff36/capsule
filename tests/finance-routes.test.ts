@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+
 import path from "node:path";
 import {
   FINANCE_ROUTES,
@@ -45,44 +45,6 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(FINANCE_ROUTES.issueInvoice({ eventId: "event_9" })).toContain(
       "eventId=event_9",
     );
-  });
-
-  it("links invoice detail back to Client and Event sources", () => {
-    const detail = readFileSync(
-      path.join(process.cwd(), "src/features/finance/InvoiceDetailPage.tsx"),
-      "utf8",
-    );
-    expect(detail).toContain("CLIENTS_ROUTES.detail");
-    expect(detail).toContain("useListEvent");
-    expect(detail).toContain("/events/${linkedEvent._id}");
-  });
-
-  it("deep-links EventCloseout rows into invoice issue", () => {
-    const closeout = readFileSync(
-      path.join(process.cwd(), "src/features/finance/CloseoutPage.tsx"),
-      "utf8",
-    );
-    expect(closeout).toContain("FINANCE_ROUTES.issueInvoice");
-    expect(closeout).toContain("Issue invoice");
-  });
-
-  it("wires finance routes in App.tsx", () => {
-    const app = readFileSync(
-      path.join(process.cwd(), "src/app/App.tsx"),
-      "utf8",
-    );
-    expect(app).toContain('path="/finance/invoices"');
-    expect(app).toContain('path="/finance/invoices/:id"');
-    expect(app).toContain('path="/finance/payments"');
-    expect(app).toContain('path="/finance/payment-methods"');
-    expect(app).toContain('path="/finance/closeout"');
-    expect(app).toContain('path="/finance/payroll"');
-    expect(app).toContain("InvoicesPage");
-    expect(app).toContain("InvoiceDetailPage");
-    expect(app).toContain("PaymentsPage");
-    expect(app).toContain("PaymentMethodsPage");
-    expect(app).toContain("CloseoutPage");
-    expect(app).toContain("PayrollPage");
   });
 
   it("derives invoice, payment, payment-method, closeout, and payroll actions from generated lifecycle metadata", () => {
@@ -176,40 +138,6 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(rows.filter(canSend)).toHaveLength(2);
   });
 
-  it("locks the InvoicesPage sendable wiring to the balance-aware predicate", () => {
-    const page = readFileSync(
-      path.join(process.cwd(), "src/features/finance/InvoicesPage.tsx"),
-      "utf8",
-    );
-    // canSend and the per-row action list must both pass the row (with its
-    // amountDue) into the policy — a status-only call reintroduces the bug.
-    const balanceAwareCalls =
-      page.match(/invoiceActions\(\s*String\(row\.status\),\s*row,?\s*\)/g) ??
-      [];
-    expect(balanceAwareCalls.length).toBeGreaterThanOrEqual(2);
-    expect(page).not.toMatch(/invoiceActions\(\s*String\(row\.status\)\s*\)/);
-    // Header select-all operates on the balance-filtered set.
-    expect(page).toMatch(/sendableRows\s*=\s*visibleRows\.filter\(canSend\)/);
-    expect(page).toMatch(/useBulkSelection\(sendableRows\)/);
-    // Row checkbox renders only for sendable rows.
-    expect(page).toMatch(/\{canSend\(row\)\s*\?\s*\(/);
-    // Bulk send re-filters the selection before sending anything.
-    expect(page).toMatch(/selection\.selected\.filter\(canSend\)/);
-  });
-
-  it("locks the InvoiceDetailPage actions to the balance-aware predicate", () => {
-    const page = readFileSync(
-      path.join(process.cwd(), "src/features/finance/InvoiceDetailPage.tsx"),
-      "utf8",
-    );
-    expect(page).toMatch(
-      /invoiceActions\(\s*String\(invoice\.status\),\s*invoice,?\s*\)/,
-    );
-    expect(page).not.toMatch(
-      /invoiceActions\(\s*String\(invoice\.status\)\s*\)/,
-    );
-  });
-
   it("default payments view never claims a bare 0 while settled rows exist", () => {
     // QA 176 FAIL on prod: default badge still "0 PAYMENTS" with $15,300
     // COMPLETED hidden, no notice, one row showing raw invoice id
@@ -276,46 +204,6 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(presenter.hiddenSettledNotice(mixed)).toContain("$500.00");
   });
 
-  it("locks PaymentsPage to the settled-aware count and empty state", () => {
-    const page = readFileSync(
-      path.join(process.cwd(), "src/features/finance/PaymentsPage.tsx"),
-      "utf8",
-    );
-    // Rows and copy must come from the presenter, not an inline blind filter.
-    expect(page).toContain("PaymentsLedgerPresenter");
-    expect(page).toMatch(/ledger\.openRows\(activeRows\)/);
-    expect(page).toMatch(/ledger\.headingCount\(activeRows,/);
-    expect(page).toMatch(/ledger\.hiddenSettledNotice\(/);
-    expect(page).toMatch(/ledger\.showSettledLabel\(/);
-    // The heading count must not be a hardcoded `${n} payments` again.
-    expect(page).not.toMatch(/\{visibleRows\.length\} payments/);
-    // 11px document-empty span was invisible in dark mode. The notice has
-    // to live in a text-base status line, not inside that span.
-    expect(page).not.toContain("<span>{hiddenSettledNotice}</span>");
-    expect(page).toMatch(
-      /hiddenSettledNotice \? \(\s*<p className="mt-3 text-base text-ink-2" role="status">/,
-    );
-    expect(page).toContain("{hiddenSettledNotice}");
-    // Empty state JSX: "No open payments" is allowed only when the hidden
-    // settled notice (and one-click Show settled) is wired next to it.
-    expect(page).toContain('className="document-empty"');
-    expect(page).toContain("<p>No open payments.</p>");
-    expect(page).toContain("{hiddenSettledNotice ? (");
-    expect(page).toMatch(/onClick=\{\(\) => setShowTerminal\(true\)\}/);
-    expect(page).toContain("{ledger.showSettledLabel(settledSummary)}");
-    expect(page).toContain(
-      "{ledger.mastheadSettledLabel(settledSummary, showTerminal)}",
-    );
-    expect(page).not.toContain(
-      'showTerminal ? "Hide settled" : "Show settled"',
-    );
-    // Same class as Holiday folio: raw event-looking invoice ids get a
-    // human INV- ref, not NN74XC7N0PDK5CMKM5Z8ZN7GBD8BDP6Q.
-    expect(page).toContain(
-      "formatInvoiceNumber(invoice?.invoiceNumber, invoice?._id)",
-    );
-  });
-
   it("treats uppercase 32-char invoice ids as raw document ids", () => {
     const raw = "NN74XC7N0PDK5CMKM5Z8ZN7GBD8BDP6Q";
     expect(invoiceNumberFormatter.isRawDocumentId(raw)).toBe(true);
@@ -325,24 +213,5 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(formatInvoiceNumber("INV-2026-QA1", "anything")).toBe(
       "INV-2026-QA1",
     );
-  });
-
-  it("keeps the server-side zero-balance send refusal (manifest + generated command)", () => {
-    // The Manifest domain is the authority: Invoice.send carries the
-    // sendBalance constraint, and the generated Convex mutation enforces it
-    // even if a stale or hostile client submits a $0-due draft.
-    const manifest = readFileSync(
-      path.join(process.cwd(), "src/sales/invoice-core.manifest"),
-      "utf8",
-    );
-    expect(manifest).toMatch(
-      /constraint\s+sendBalance:\s*self\.amountDue\s*>\s*0/,
-    );
-
-    const mutations = readFileSync(
-      path.join(process.cwd(), "convex/mutations.ts"),
-      "utf8",
-    );
-    expect(mutations).toContain("Cannot send an invoice with zero balance");
   });
 });

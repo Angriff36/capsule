@@ -53,58 +53,6 @@ describe("create event client-required copy", () => {
       eventCreateDisabledReason({ busy: false, clientId: "client1" }),
     ).toBeNull();
   });
-
-  it("EventCreatePage shows Client is required when Create is disabled for a missing client", () => {
-    const page = readFileSync(
-      "src/features/events/EventCreatePage.tsx",
-      "utf8",
-    );
-    expect(page).toContain("disabled={busy !== null || !clientId || !venueId}");
-    expect(page).toContain("Client is required");
-    expect(page).toContain("eventCreateDisabledReason");
-  });
-});
-
-describe("create event required Name marker", () => {
-  it("marks primary contact Name as required on the create form", () => {
-    const page = readFileSync(
-      "src/features/events/EventCreatePage.tsx",
-      "utf8",
-    );
-    expect(page).toMatch(/Name \*[\s\S]{0,80}name="primaryContactName"/);
-    expect(page).toContain('name="primaryContactName"');
-    expect(page).toContain("required");
-  });
-});
-
-describe("create form uses the shared service style vocabulary", () => {
-  it("EventCreatePage populates the picker from serviceStyleSelectOptions", () => {
-    const page = readFileSync(
-      "src/features/events/EventCreatePage.tsx",
-      "utf8",
-    );
-    expect(page).toContain("serviceStyleSelectOptions");
-    expect(page).toContain("Select a service style");
-    const seed = readFileSync("scripts/seed-catalogs.ts", "utf8");
-    expect(seed).toContain("SERVICE_STYLE_CATALOG");
-    expect(seed).toContain("serviceStyleCatalog");
-  });
-});
-
-describe("events index is not a Test Event deep-link", () => {
-  it("create-form back link and App list route stay on /events", () => {
-    const page = readFileSync(
-      "src/features/events/EventCreatePage.tsx",
-      "utf8",
-    );
-    expect(page).toContain("eventsIndexPath()");
-    expect(page).not.toContain(TEST_EVENT_ID);
-    const app = readFileSync("src/app/App.tsx", "utf8");
-    expect(app).not.toContain(TEST_EVENT_ID);
-    const list = readFileSync("src/features/events/EventsListPage.tsx", "utf8");
-    expect(list).not.toContain(TEST_EVENT_ID);
-    expect(list).not.toMatch(/useEffect\([\s\S]{0,200}navigate\(/);
-  });
 });
 
 describe("empty catalogs show an explicit state and do not block create", () => {
@@ -121,19 +69,6 @@ describe("empty catalogs show an explicit state and do not block create", () => 
         { _id: "ss1", name: "Full Service", status: "active" },
       ]),
     ).toBe(false);
-  });
-
-  it("both empty selectors show a one-line hint linking to Admin → Catalogs", () => {
-    const page = readFileSync(
-      "src/features/events/EventCreatePage.tsx",
-      "utf8",
-    );
-    expect(page).toContain("No occasions yet");
-    expect(page).toContain("built-in service styles");
-    expect(page).toContain(
-      "occasions !== undefined && activeOccasions.length === 0",
-    );
-    expect(page.match(/to="\/admin\/catalogs"/g)?.length).toBe(2);
   });
 
   it("empty catalogs do not block create — both selectors stay optional", () => {

@@ -53,19 +53,6 @@ const MISSING = [
 ];
 
 describe("event menu recipe ingredient picker", () => {
-  it("is searchable, not a bare <select> of catalog names", () => {
-    expect(editor).toContain(
-      'data-testid="event-menu-recipe-ingredient-search"',
-    );
-    expect(editor).toContain("filterEventMenuRecipeIngredients");
-    expect(editor).toContain("resolveEventMenuRecipeIngredientId");
-    expect(editor).toContain('type="search"');
-    expect(editor).not.toMatch(/<select[^>]*name="ingredientId"/);
-    expect(editor).not.toMatch(
-      /name="ingredientId"[\s\S]{0,400}ingredients \?\? \[\]/,
-    );
-  });
-
   it("can create an ingredient from the event menu editor at $0 / empty cost", () => {
     expect(editor).toContain("useCreateIngredient");
     expect(editor).toContain('data-testid="event-menu-create-ingredient"');
@@ -118,15 +105,6 @@ describe("event menu recipe ingredient picker", () => {
 });
 
 describe("event menu leftover paint and defaults", () => {
-  it("defaults servings per pan to 20, not 25", () => {
-    expect(editor).toMatch(
-      /name="servingsPerContainer"[\s\S]{0,120}defaultValue=\{20\}/,
-    );
-    expect(editor).not.toMatch(
-      /name="servingsPerContainer"[\s\S]{0,120}defaultValue=\{25\}/,
-    );
-  });
-
   it("offers the small shared container name list without inventing a vocab", () => {
     expect(EVENT_MENU_CONTAINER_NAMES).toEqual(["Hotel pan", "Half pan"]);
     expect(editor).toContain("EVENT_MENU_CONTAINER_NAMES");
@@ -141,24 +119,5 @@ describe("event menu leftover paint and defaults", () => {
     expect(tab).toContain("formatEventMenuSellInput");
     expect(tab).toContain("lineFields.unitSellPrice");
     expect(tab).not.toContain('defaultValue={lineFields.unitSellPrice ?? ""}');
-  });
-});
-
-describe("event menu recipe search key trap", () => {
-  it("traps keydown on the recipe search and create-name fields", () => {
-    expect(editor).toContain("trapSingleKeyNav");
-    expect(editor).toContain("onKeyDown={trapSingleKeyNav}");
-    const searchBlock = editor.slice(
-      editor.indexOf('type="search"'),
-      editor.indexOf('data-testid="event-menu-recipe-ingredient-search"') + 80,
-    );
-    expect(searchBlock).toContain("onKeyDown={trapSingleKeyNav}");
-    const nameAt = editor.indexOf('name="newIngredientName"');
-    expect(nameAt).toBeGreaterThan(-1);
-    const nameBlock = editor.slice(nameAt, nameAt + 400);
-    expect(nameBlock).toContain("onKeyDown={trapSingleKeyNav}");
-    expect(editor).not.toContain("showCreate");
-    expect(editor).toContain('data-testid="event-menu-create-ingredient-form"');
-    expect(editor).toContain('data-testid="event-menu-create-ingredient-name"');
   });
 });

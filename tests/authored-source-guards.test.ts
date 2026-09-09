@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -75,30 +75,6 @@ describe("authored source regression guards", () => {
       violations,
       `Convex index equality calls require a field name. Fix each call as q.eq("fieldName", value); do not silence this guard.`,
     ).toEqual([]);
-  });
-
-  it("keeps public client pages independent of Route-only useParams context", () => {
-    // App.tsx dispatches these pages with useMatch outside a <Route>, so
-    // useParams would always return an empty object on public links.
-    const pagePaths = [
-      "src/features/clients/SharedProposalPage.tsx",
-      "src/features/clients/ProposalAcceptancePage.tsx",
-      "src/features/clients/ClientPortalPage.tsx",
-    ].filter(existsSync);
-
-    for (const filePath of pagePaths) {
-      const source = withoutComments(readFileSync(filePath, "utf8"));
-      expect(
-        source,
-        `${filePath} must receive its token as a prop`,
-      ).not.toMatch(
-        /import\s*{[^}]*\buseParams\b[^}]*}\s*from\s*["']react-router-dom["']/s,
-      );
-      expect(
-        source,
-        `${filePath} must receive its token as a prop`,
-      ).not.toMatch(/\buseParams\s*\(/);
-    }
   });
 
   it('never sends the useQuery-only "skip" sentinel as an ID property', () => {

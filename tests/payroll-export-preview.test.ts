@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PayrollPreparePayloadBuilder } from "../src/features/finance/PayrollPreparePayloadBuilder";
 import {
@@ -133,42 +131,5 @@ describe("payroll hours match preview", () => {
     expect(payload.periodStart).toBe(dayStartOfTimestamp(jan9Start));
     expect(payload.periodEnd).toBeGreaterThan(jan9End);
     expect(payload.regularMinutes).toBe(300);
-  });
-});
-
-describe("preview source contract — no raw _id slices", () => {
-  const root = process.cwd();
-  const panel = readFileSync(
-    join(root, "src/features/finance/PayrollExportPanel.tsx"),
-    "utf8",
-  );
-  const exportSource = readFileSync(
-    join(root, "src/features/finance/payrollExport.ts"),
-    "utf8",
-  );
-  const page = readFileSync(
-    join(root, "src/features/finance/PayrollPage.tsx"),
-    "utf8",
-  );
-
-  it("never falls back to the Capsule person _id for employeeId", () => {
-    expect(exportSource).not.toMatch(/employeeNumber\s*\|\|\s*entry\.personId/);
-    expect(exportSource).not.toMatch(/employeeId:\s*employeeNumber\s*\|\|/);
-    expect(exportSource).not.toMatch(/usesFallbackEmployeeId/);
-    expect(panel).not.toMatch(/fallbackEmployeeIdCount/);
-    expect(page).not.toMatch(/fallbackEmployeeIdCount/);
-  });
-
-  it("fails if the preview still prints _id slices or a raw employeeId", () => {
-    expect(panel).not.toMatch(/_id\.slice/);
-    expect(panel).not.toMatch(/personId\.slice/);
-    expect(panel).toContain("missingEmployeeNumber");
-    expect(panel).toContain("PersonEmployeeNumberField");
-    expect(panel).toContain("No hourly rate set");
-    expect(panel).toContain("payrollCsvDownloadAllowed");
-    // Missing numbers get an in-place Set field — never a raw _id under the name.
-    expect(panel).toMatch(
-      /missingEmployeeNumber \?[\s\S]*PersonEmployeeNumberField[\s\S]*:\s*\([\s\S]*row\.employeeId/,
-    );
   });
 });

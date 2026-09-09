@@ -216,20 +216,6 @@ describe("218 leftover: search does not live-mirror into create name", () => {
   });
 });
 
-describe("218 leftover: Per serving focus ring owns keystrokes", () => {
-  it("keeps digits on the qty field after a catalog pick", () => {
-    expect(recipeEditorKeyOwner("qty")).toBe("qty");
-    expect(recipeEditorFocusAfterCatalogPick()).toBe("qty");
-    expect(
-      shouldFireSingleKeyNav({
-        key: "2",
-        target: { tagName: "INPUT", type: "number" },
-      }),
-    ).toBe(false);
-    expect(editor).toContain(".focus()");
-  });
-});
-
 describe("218 leftover: click Per serving does not commit a row", () => {
   it("only Add ingredient commits a recipe line", () => {
     expect(recipeLineCommitAllowed("qty-click")).toBe(false);

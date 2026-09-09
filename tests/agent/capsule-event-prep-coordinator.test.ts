@@ -6,17 +6,112 @@ import {
 import { CapsuleCommandCatalog } from "../../src/agent/CapsuleCommandCatalog";
 import { CapsuleLiveEventPrepStateLoader } from "../../src/agent/CapsuleLiveEventPrepStateLoader";
 import { CapsuleMcpToolRegistrar } from "../../src/agent/mcp/CapsuleMcpToolRegistrar";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { ConvexHttpClient } from "convex/browser";
+import { getFunctionName } from "convex/server";
+import { CapsuleAgentAuthManager } from "../../src/agent/CapsuleAgentAuthManager";
+import { McpToolCallResultParser } from "../../src/agent/mcp/McpToolCallResultParser";
 
 describe("CapsuleEventPrepCoordinator", () => {
-  it("registers the combined event dish and prep synchronization tool", () => {
-    const tool = vi.fn();
-    new CapsuleMcpToolRegistrar(new CapsuleCommandCatalog(), {
-      execute: vi.fn(),
-    }).register({ tool } as never);
-
-    expect(tool.mock.calls.map(([name]) => name)).toContain(
-      "add_event_dish_and_sync_prep",
+  it("adds a dish over MCP and builds prep only from that dish's live templates", async () => {
+    // Credential/network boundaries are doubled; tool dispatch, loader, filtering,
+    // quantity calculation and reconciliation all execute their production code.
+    vi.spyOn(CapsuleAgentAuthManager.prototype, "resolveJwt").mockResolvedValue(
+      "fixture-token",
     );
+    vi.spyOn(
+      CapsuleAgentAuthManager.prototype,
+      "resolveConvexUrl",
+    ).mockReturnValue("https://fixture.convex.cloud");
+    vi.spyOn(ConvexHttpClient.prototype, "query").mockImplementation(
+      async (reference, ..._args) => {
+        if (getFunctionName(reference) === "queries:listDishTask")
+          return [
+            {
+              _id: "selected-template",
+              dishId: "dish-a",
+              name: "Portion carrots",
+              status: "active",
+              defaultQuantity: 0.375,
+              defaultUnit: "pound",
+              instructions: "Weigh after cooking",
+            },
+            {
+              _id: "other-template",
+              dishId: "dish-b",
+              name: "Wrong dish",
+              status: "active",
+              defaultQuantity: 99,
+              defaultUnit: "each",
+            },
+          ];
+        return [];
+      },
+    );
+    const execute = vi
+      .fn()
+      .mockResolvedValueOnce({ docId: "event-dish-a" })
+      .mockResolvedValue({ docId: "prep-a" });
+    const server = new McpServer({ name: "prep-test", version: "1" });
+    new CapsuleMcpToolRegistrar(new CapsuleCommandCatalog(), {
+      execute,
+    }).register(server);
+    const client = new Client({ name: "prep-client", version: "1" });
+    const [clientTransport, serverTransport] =
+      InMemoryTransport.createLinkedPair();
+    try {
+      await server.connect(serverTransport);
+      await client.connect(clientTransport);
+      const result = await client.callTool({
+        name: "add_event_dish_and_sync_prep",
+        arguments: {
+          eventId: "event-a",
+          dishId: "dish-a",
+          quantityServings: 40,
+          course: "side",
+          idempotencyKey: "booking-a",
+        },
+      });
+      expect(
+        new McpToolCallResultParser().parseObject(
+          result as { content?: unknown; isError?: boolean },
+        ),
+      ).toEqual({
+        ok: true,
+        result: { eventDishId: "event-dish-a", taskCount: 1, demandCount: 0 },
+      });
+      expect(execute).toHaveBeenCalledTimes(2);
+      expect(execute.mock.calls[0][0]).toEqual({
+        capabilityId: "EventDish.addToEvent",
+        args: {
+          eventId: "event-a",
+          dishId: "dish-a",
+          quantityServings: 40,
+          course: "side",
+          serviceStyle: undefined,
+          specialInstructions: undefined,
+        },
+        idempotencyKey: "booking-a:event-dish",
+      });
+      expect(execute.mock.calls[1][0]).toMatchObject({
+        capabilityId: "PrepTask.open",
+        args: {
+          eventId: "event-a",
+          eventDishId: "event-dish-a",
+          dishTaskId: "selected-template",
+          name: "Portion carrots",
+          quantity: 15,
+          unit: "pound",
+          specialInstructions: "Weigh after cooking",
+        },
+      });
+    } finally {
+      await client.close();
+      await server.close();
+      vi.restoreAllMocks();
+    }
   });
 
   it("loads only the selected dish and event reconciliation state", async () => {

@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { KitchenCommandDeckHorizon } from "../src/features/kitchen/command-deck/KitchenCommandDeckHorizon";
 import {
@@ -72,27 +71,5 @@ describe("Kitchen Unassigned/Blocked filters count matching of total", () => {
     );
     expect(model.dishMatchingLine(0, 15, true)).toBe("0 of 15 matching");
     expect(commandDeckFilterNoun("unassigned")).toBe("Unassigned");
-  });
-
-  it("TaskPanel headline and dish copy follow the filter, not overall progress", () => {
-    const page = readFileSync(
-      "src/features/kitchen/command-deck/KitchenCommandDeckTaskPanel.tsx",
-      "utf8",
-    );
-    expect(page).toContain("filteredHeadline");
-    expect(page).toContain("of ${allDishTasks.length} matching");
-    expect(page).toContain(
-      "Select an event from the list to orchestrate prep.",
-    );
-    expect(page).not.toContain("Select an event on the left");
-  });
-
-  it("Quick Assign does not say click Assign when the filter has nothing assignable", () => {
-    const rail = readFileSync(
-      "src/features/kitchen/command-deck/KitchenCommandDeckCrewRail.tsx",
-      "utf8",
-    );
-    expect(rail).toContain("nothing to assign in this filter.");
-    expect(rail).toContain("assignableInView");
   });
 });

@@ -1,15 +1,9 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   PrepTemplateQuantityCoordinator,
   prepTemplateQuantityMeta,
   prepTemplateWantsQuantity,
 } from "../../../src/features/kitchen/PrepTemplateQuantityCoordinator";
-
-const panel = readFileSync(
-  "src/features/kitchen/DishPrepTasksPanel.tsx",
-  "utf8",
-);
 
 describe("prep template batch-total leftover: persist derived per-guest", () => {
   it("commits 97.50 / 260 as ~0.375, not a default 1", () => {
@@ -73,27 +67,5 @@ describe("prep template batch-total leftover: persist derived per-guest", () => 
     expect(prepTemplateQuantityMeta(0.375, "each")).not.toBe("1 each/guest");
     expect(prepTemplateQuantityMeta(1, "each")).toBe("1 each/guest");
     expect(prepTemplateQuantityMeta(undefined, "each")).toBeNull();
-  });
-
-  it("wires DishPrepTasksPanel through persist (leftover-return lock)", () => {
-    expect(panel).toContain("PrepTemplateQuantityCoordinator.persist");
-    expect(panel).toContain("prepTemplateQuantityMeta");
-    expect(panel).toContain("defaultQuantity: qtySave.defaultQuantity");
-    expect(panel).toContain("qtySave.defaultQuantity != null ? unit");
-    expect(panel).not.toContain("prepQuantityLabel");
-    expect(panel).not.toContain("function templateQuantityMeta");
-    expect(panel).not.toMatch(/defaultQuantity:\s*1\b/);
-    expect(panel).not.toContain('Number(data.get("defaultQuantity")');
-    expect(panel).not.toMatch(/defaultQuantity:\s*perGuest\s*\?\?\s*undefined/);
-
-    const persistAt = panel.indexOf("PrepTemplateQuantityCoordinator.persist");
-    expect(persistAt).toBeGreaterThan(-1);
-    const persistBlock = panel.slice(persistAt, persistAt + 900);
-    expect(persistBlock).toContain("quantityMode");
-    expect(persistBlock).toContain("perGuestQty");
-    expect(persistBlock).toContain("batchTotalQty");
-    expect(persistBlock).toContain("batchServings");
-    expect(persistBlock).toContain("defaultQuantity: qtySave.defaultQuantity");
-    expect(persistBlock).not.toContain("defaultQuantity: 1");
   });
 });

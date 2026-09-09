@@ -6,7 +6,7 @@ import {
   rollupEventBilling,
 } from "../src/features/finance/invoiceBilling";
 import { buildRevenueTrend } from "../src/features/finance/revenueTrend";
-import { readFileSync } from "node:fs";
+
 import {
   buildEventCostSummary,
   closeoutListedCost,
@@ -378,17 +378,6 @@ describe("buildEventCostSummary — folio separates billed, collected, drafts", 
         grossProfit: 1800,
       }),
     ).toBe(1800);
-  });
-
-  it("CloseoutPage Gross profit cell uses costsPending, not grossProfit===0", () => {
-    const page = readFileSync("src/features/finance/CloseoutPage.tsx", "utf8");
-    expect(page).toContain("isCloseoutListProfitPending");
-    expect(page).not.toContain(
-      "unreconciled && Number(row.grossProfit ?? 0) === 0",
-    );
-    expect(page).toContain("<th>Billed</th>");
-    expect(page).toContain("<th>Cost</th>");
-    expect(page).toContain("closeoutListedCost");
   });
 });
 

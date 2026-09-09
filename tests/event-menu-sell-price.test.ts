@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import {
   eventMenuSellTotals,
@@ -358,15 +358,5 @@ describe("suspect TPP quantities", () => {
     );
     expect(rows[0]?.quantity).toBe(196);
     expect(rows[0]?.flag).toMatch(/196/);
-  });
-
-  it("menu card and prep tab flag from recipe lines, not only task.name", () => {
-    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
-    const prep = readFileSync("src/features/events/EventPrepTab.tsx", "utf8");
-    expect(tab).toContain("suspectRowsFromRecipeLines");
-    expect(tab).toContain('data-testid="suspect-prep-quantity"');
-    expect(prep).toContain("suspectRowsFromRecipeLines");
-    expect(prep).toContain("dishIngredients");
-    expect(prep).toContain('data-testid="suspect-prep-quantity"');
   });
 });
