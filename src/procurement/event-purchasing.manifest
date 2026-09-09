@@ -462,7 +462,10 @@ on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
     vendorOrderId: payload.vendorOrderId
     ingredientId: payload.ingredientId
     weekNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "open", of requiredQuantity)
+    orderedNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "ordered", of requiredQuantity)
+    fulfilledNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "fulfilled", of requiredQuantity)
     onHand: sum(InventoryItem where ingredientId == payload.ingredientId, of quantityOnHand)
+    pendingSupply: sum(VendorOrderLine where ingredientId == payload.ingredientId, supplyWeekStart == payload.purchasingWeekStart, unit == payload.unit, of pendingSupplyQuantity)
     contributionQuantity: payload.requiredQuantity
     unit: payload.unit
     purchaseNeedId: payload.purchaseNeedId
@@ -597,3 +600,15 @@ on ComponentIngredientQuantityAdjusted fanOut EventDishComponentSeed where compo
 
 on ComponentIngredientAdded fanOut EventDishComponentSeed where componentId = payload.componentId
   run refresh
+
+on VendorOrderSubmitted fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run commitSupply
+
+on VendorOrderApprovalRequested fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run commitSupply
+
+on VendorOrderCancelled fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run releaseSupply
+
+on VendorOrderChangesRequested fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run releaseSupply

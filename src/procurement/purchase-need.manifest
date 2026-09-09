@@ -50,8 +50,8 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
 
   transition status from "open" to ["ordered", "cancelled"]
-  transition status from "ordered" to ["fulfilled", "cancelled"]
-  transition status from "fulfilled" to []
+  transition status from "ordered" to ["open", "fulfilled", "cancelled"]
+  transition status from "fulfilled" to ["open"]
   transition status from "cancelled" to []
 
   // manageAccess: Event.approve (event_manager) foreach-creates PurchaseNeed;
@@ -122,9 +122,10 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open"
     guard self.openedAt != null
     guard self.deletedAt == null
-    // Idempotent: same draft line re-assign is a no-op; different line is blocked.
-    guard self.vendorOrderId == null or (self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId)
-    guard self.vendorOrderLineId == null or self.vendorOrderLineId == vendorOrderLineId
+    // Keep one editable draft link; a submitted order remains in the demand
+    // link history while a later shortage can link to a new draft.
+    guard self.vendorOrderId == null or (self.vendorOrder != null and self.vendorOrder.status != "draft") or (self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId)
+    guard self.vendorOrderLineId == null or (self.vendorOrder != null and self.vendorOrder.status != "draft") or self.vendorOrderLineId == vendorOrderLineId
     mutate vendorOrderId = vendorOrderId
     mutate vendorOrderLineId = vendorOrderLineId
     emit PurchaseNeedDraftAssigned {
@@ -139,9 +140,9 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Post-approve demand reconcile: revise open need quantity; weekly line re-ensures.
+  // Reconcile current need without rewriting previously submitted order lines.
   command reviseRequired(requiredQuantity: decimal(12, 4), optional unit: UnitOfMeasure) {
-    guard self.status == "open"
+    guard self.status == "open" or self.status == "ordered" or self.status == "fulfilled"
     guard self.openedAt != null
     guard self.deletedAt == null
     constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "Required quantity cannot be negative"
@@ -156,6 +157,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     compute unitRatio = incomingUnit == self.unit ? 1 : (sourceMass > 0 and targetMass > 0 ? sourceMass / targetMass : (sourceVolume > 0 and targetVolume > 0 ? sourceVolume / targetVolume : 1))
     mutate requiredQuantity = requiredQuantity * unitRatio
     mutate unit = compatibleUnit ? self.unit : incomingUnit
+    mutate status = "open"
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -192,8 +194,8 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Receiving automation stays deferred (OD019); fulfilment is an explicit
-  // procurement acknowledgement until line-received targeting is product-defined.
+  // Fulfilment is an explicit procurement acknowledgement. Receipt lots already
+  // update stock; a later demand increase can reopen purchasing work.
   command markFulfilled() {
     guard self.status == "ordered"
     guard self.orderedAt != null

@@ -50,9 +50,9 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   constraint stockReorderNonnegative: self.reorderThreshold >= 0 "Reorder threshold cannot be negative"
   constraint stockCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
 
-  default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock items"
-  default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write stock items through commands"
-  default policy inventoryItemExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute stock item commands"
+  default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may read stock items"
+  default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may write stock items through commands"
+  default policy inventoryItemExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may execute stock item commands"
 
   command open(
     ingredientId: uuid,
@@ -95,6 +95,39 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
       quantityOnHand: quantityOnHand != null ? quantityOnHand : 0
       unit: unit
       unitCost: unitCost != null ? unitCost : 0
+    }
+  }
+
+  // Receipt lots supply a delta once; repeated lot materialization sends zero.
+  command receiveDelivery(ingredientId: uuid, locationId: uuid, quantity: decimal(12, 4), unit: UnitOfMeasure, unitCost: money(12, 2)) {
+    guard self.deletedAt == null
+    constraint deliveryIngredientMatch: ingredientId == self.ingredientId "Receipt ingredient must match stock"
+    constraint deliveryLocationMatch: locationId == self.locationId "Receipt location must match stock"
+    constraint deliveryNonnegative: quantity >= 0 and unitCost >= 0 "Receipt quantity and price cannot be negative"
+    compute stockUnit = self.stockedAt != null ? self.unit : self.ingredient.unit
+    compute sourceMass = unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0
+    compute sourceVolume = unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0
+    compute targetMass = stockUnit == "gram" ? 1 : stockUnit == "kilogram" ? 1000 : stockUnit == "ounce" ? 28.349523125 : stockUnit == "pound" ? 453.59237 : 0
+    compute targetVolume = stockUnit == "milliliter" ? 1 : stockUnit == "liter" ? 1000 : stockUnit == "teaspoon" ? 4.92892159375 : stockUnit == "tablespoon" ? 14.78676478125 : stockUnit == "cup" ? 236.5882365 : stockUnit == "pint" ? 473.176473 : stockUnit == "quart" ? 946.352946 : stockUnit == "gallon" ? 3785.411784 : 0
+    constraint deliveryUnitCompatible: unit == (self.stockedAt != null ? self.unit : self.ingredient.unit) or ((unit == "gram" or unit == "kilogram" or unit == "ounce" or unit == "pound") and ((self.stockedAt != null ? self.unit : self.ingredient.unit) == "gram" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "kilogram" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "ounce" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "pound")) or ((unit == "milliliter" or unit == "liter" or unit == "teaspoon" or unit == "tablespoon" or unit == "cup" or unit == "pint" or unit == "quart" or unit == "gallon") and ((self.stockedAt != null ? self.unit : self.ingredient.unit) == "milliliter" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "liter" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "teaspoon" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "tablespoon" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "cup" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "pint" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "quart" or (self.stockedAt != null ? self.unit : self.ingredient.unit) == "gallon")) "Receipt unit needs a measured conversion to the stock unit"
+    compute unitRatio = unit == stockUnit ? 1 : (targetMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
+    compute previousQuantity = self.quantityOnHand
+    compute receivedQuantity = quantity * unitRatio
+    mutate quantityOnHand = self.quantityOnHand + receivedQuantity
+    mutate unit = stockUnit
+    mutate unitCost = quantity > 0 ? unitCost / unitRatio : self.unitCost
+    mutate stockedAt = self.stockedAt != null ? self.stockedAt : now()
+    emit InventoryStockReceived {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      ingredientId: ingredientId
+      locationId: locationId
+      previousQuantity: previousQuantity
+      quantityOnHand: self.quantityOnHand
+      receivedQuantity: receivedQuantity
+      unit: self.unit
+      unitCost: self.unitCost
     }
   }
 

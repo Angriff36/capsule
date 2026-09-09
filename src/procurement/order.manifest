@@ -25,7 +25,7 @@ enum VendorOrderLineStatus {
 }
 
 // Order to one Vendor (capsule-pro PurchaseOrder). Totals are money facts;
-// line receiving emits stock-update payloads for a later InventoryItem reaction.
+// receipt lots update on-hand stock in the same transaction as line receiving.
 entity VendorOrder mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -401,6 +401,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   property locationId: uuid?
   property required orderedQuantity: decimal(12, 4) = 0
   property required receivedQuantity: decimal(12, 4) = 0
+  // Outstanding supply already committed outside the editable weekly draft.
+  property supplyWeekStart: datetime?
+  property pendingSupplyQuantity: decimal(12, 4)?
   property required unit: UnitOfMeasure = "each"
   property required unitCost: money(12, 2) = 0
   // Stored orderedQuantity * unitCost fact so header rollups can sum it
@@ -498,13 +501,16 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     contributionQuantity: decimal(12, 4),
     unit: UnitOfMeasure,
     purchaseNeedId: uuid,
-    ingredientDemandId: uuid
+    ingredientDemandId: uuid,
+    optional pendingSupply: decimal(12, 4),
+    optional orderedNeed: decimal(12, 4),
+    optional fulfilledNeed: decimal(12, 4)
   ) {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.ingredient != null and self.ingredient.status == "active"
     constraint ensureContributionPositive: contributionQuantity >= 0 "Contribution quantity cannot be negative"
-    compute orderQty = max(0, weekNeed - onHand)
+    compute orderQty = max(0, weekNeed + (orderedNeed != null ? orderedNeed : 0) + (fulfilledNeed != null ? fulfilledNeed : 0) - onHand - (pendingSupply != null ? pendingSupply : 0))
     compute effectiveUnitCost = self.unitCost > 0 ? self.unitCost : self.ingredient.costPerUnit
     mutate vendorOrderId = vendorOrderId
     mutate ingredientId = ingredientId
@@ -526,6 +532,18 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       contributionQuantity: contributionQuantity
       unit: unit
     }
+  }
+
+  command commitSupply() {
+    guard self.deletedAt == null
+    // An editable draft is not supply we can rely on for another draft.
+    guard self.vendorOrder != null and self.vendorOrder.status != "draft" and self.vendorOrder.status != "cancelled"
+    mutate supplyWeekStart = self.vendorOrder.sourceRangeStart
+    mutate pendingSupplyQuantity = self.status == "cancelled" ? 0 : max(0, self.orderedQuantity - self.receivedQuantity)
+  }
+
+  command releaseSupply() {
+    mutate pendingSupplyQuantity = 0
   }
 
   command reviseQuantity(
@@ -575,6 +593,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     compute nextStatus = nextReceived == self.orderedQuantity ? "complete" : "receiving"
     mutate locationId = locationId
     mutate receivedQuantity = nextReceived
+    mutate pendingSupplyQuantity = self.pendingSupplyQuantity != null ? max(0, self.orderedQuantity - nextReceived) : self.pendingSupplyQuantity
     mutate unitCost = unitPrice
     mutate lineTotalAmount = self.orderedQuantity * unitPrice
     mutate discrepancyQuantity = discrepancyQuantity != null ? discrepancyQuantity : self.discrepancyQuantity
@@ -613,6 +632,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     mutate status = "cancelled"
     mutate cancelledAt = now()
     mutate deletedAt = now()
+    mutate pendingSupplyQuantity = 0
     emit VendorOrderLineCancelled {
       vendorOrderLineId: self.id
       tenantId: self.tenantId
@@ -688,6 +708,7 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
     constraint recordInventoryLotReceiptPositive: receiptQuantity > 0 "Inventory lot receipt quantity must be positive"
     constraint recordInventoryLotCumulativePositive: cumulativeReceivedQuantity > 0 "Inventory lot cumulative quantity must be positive"
     constraint recordInventoryLotCostNonnegative: unitCost >= 0 "Inventory lot unit cost cannot be negative"
+    compute stockDelta = self.receivedAt == null ? receiptQuantity : 0
     mutate supplierLotNumber = supplierLotNumber
     mutate vendorOrderLineId = vendorOrderLineId
     mutate vendorOrderId = vendorOrderId
@@ -701,10 +722,38 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
     mutate unit = unit
     mutate unitCost = unitCost
     mutate receivedAt = self.receivedAt == null ? now() : self.receivedAt
+    emit InventoryLotStockRecorded {
+      tenantId: self.tenantId
+      ingredientId: ingredientId
+      locationId: locationId
+      quantity: stockDelta
+      unit: unit
+      unitCost: unitCost
+    }
   }
 
   store InventoryLot in durable
 }
+
+event InventoryLotStockRecorded: "inventory_lot.stock_recorded" {
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  quantity: number
+  unit: string
+  unitCost: number
+}
+
+on InventoryLotStockRecorded run InventoryItem.receiveDelivery
+  match ingredientId = payload.ingredientId, locationId = payload.locationId
+  else create
+  params {
+    ingredientId: payload.ingredientId
+    locationId: payload.locationId
+    quantity: payload.quantity
+    unit: payload.unit
+    unitCost: payload.unitCost
+  }
 
 // Immutable receipt-price fact. The cumulative received quantity identifies a
 // particular partial receipt on a line and makes reaction retries idempotent.
