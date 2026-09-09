@@ -71,3 +71,16 @@ The repair seam supports actual batch ingredient quantities with explicit measur
 ### Purchasing queue unsupported recommendation (#333)
 
 The queue added up to 50% demand CV plus par shortfall and ignored stock when recommending purchases. Replaced on this branch with truthful shared stock/reservation/use-by facts and readable linked-order destinations; purchasing quantity computation still needs the separate #327/#328 domain corrections. Actual desktop/mobile fixture checked. No production verification yet.
+
+
+### Reschedule reconciliation: shared and submitted order runtime matrix
+
+Actual generated-command evidence, 2026-09-09, branch 6df7addd. Issue #328.
+
+- Two events at the same start time each need 10 kg, with 5 kg recorded stock: one shared draft contains 15 kg and two demand links.
+- Reschedule one event from July 20 to July 27. EventDish, EventIngredientContribution, IngredientDemand, PurchaseNeed, vendor orders/lines, and demand links are all unchanged. A subsequent servings increase to 120 drives the old-date draft to 17 kg. With the original order submitted, the same edit creates a 2 kg draft on the old date.
+- Scratch-only candidate probe (NOT production or an implemented fix): update only the need date and invoke existing PurchaseNeed_reviseRequired. Shared-draft case fails `Guard 3 failed` at draft reassignment; the reaction transaction rolls back. Submitted case creates a 5 kg new-date draft while the original 15 kg pending supply remains on the old date. This is not a safe schedule-only fix or an established supply allocation.
+
+Evidence scripts: `.artifacts/operations-source-study/qualify-reschedule-purchasing.ts` (draft/submitted), `probe-reschedule-reroute.ts` (draft/submitted); JSON before/after evidence stored alongside. No authored tests added, no production writes.
+
+The repair needs coordinated current-date propagation through dish/seed/contribution/demand/need, editable draft contribution removal and both old/new draft reconciliation, and preserved submitted/received order history with explicit supply allocation. Existing reviseRequired also reopens ordered/fulfilled needs, so it cannot stand in for a date-only update that preserves completed work. Calendar boundary/timezone and cross-event stock allocation remain unresolved source/owner inputs tracked with #327.
