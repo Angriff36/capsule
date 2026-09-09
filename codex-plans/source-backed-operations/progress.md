@@ -498,3 +498,12 @@ Final formatted-source preview supersedes the pre-format hash above: bc873fabe27
 ## 2026-09-09: rescheduling shared and submitted purchasing evidence
 
 Previous turn was verified progress: purchasing stock checkpoint 6df7addd pushed. Re-read full goal and current sources. Executed generated-command draft/submitted reschedule matrix and scratch candidate probes; detailed evidence in runtime-gaps.md and issue #328. Confirmed all seven downstream collections remain unchanged on reschedule, a later servings edit drives the old date, naive draft rerouting fails the existing reassignment guard, and submitted rerouting ignores prior-date pending supply. This changes the implementation decision: a date-only handler is insufficient; date propagation, draft provenance removal/reconciliation, and supply allocation must be repaired together, preserving completed/history state. No application edits or production writes this turn; complete workflow/repair/release goal remains active.
+
+
+## 2026-09-09: source-reviewed packing fluid-unit repair CLI
+
+Re-read full objective and current command/generation owners. Previous turn's rescheduling evidence was progress. Coordinated purchasing still needs the buying-week/timezone and shared-stock priority answer; asked specifically while continuing independent source-confirmed work. Verified existing fluid-unit repair is already implemented; added the missing default-preview/exact-plan apply CLI and tracked five-row Ashley source selection instead of duplicating backend logic.
+
+CLI saved-snapshot preview produces 1.3125,10.4375,10.4375,20.875,1.3125 cups, preserving physically packed quantities by the same factor. Preview hash 8642dad9d4623636087daf7ad349be92899e32818807d0cec42119c6c480c7d4. Actual subprocess negative/replay qualification passed; existing generated-command fluid qualification passed; existing165files/1444tests and typecheck passed. Details and apply/readback workflow in packing-source-reconciliation.md. No authored tests added; no production writes or deployment. Full goal remains active, including actual affected-data repair after release.
+
+Independent gpt-5.6-sol final APPROVE after adding listedAt to readback preservation and synchronizing the new preview hash. Bounded CLI/source checkpoint only; authenticated apply remains unverified.

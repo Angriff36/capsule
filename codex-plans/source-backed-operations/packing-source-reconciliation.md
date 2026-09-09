@@ -55,3 +55,22 @@ Ignored scratch under `.artifacts/operations-source-study/`:
 - Input live snapshot: `live-packing-20260909.json`; Ashley list `qn74zdd566841ftstrnhy6f69s8dpsde`.
 
 Next implementation must connect these records through the correct food/equipment model, carry provenance internally, repair confirmed unit and association errors repeatably, and preserve physical work. Complete source conflicts, served app verification, full gates and production proof remain required by the original goal.
+
+
+## Repeatable fluid-unit repair command (2026-09-09)
+
+The atomic `lib/culinaryOperations:reconcileImportedPackingFluidOunces` seam and generated correction command already implement conversion and preserve packing state. The reviewed selection now lives at `codex-plans/source-backed-operations/recipes/ashley-packing-fluid-units.json`; it selects only the five source-confirmed item IDs, exact descriptions, original fluid-ounce quantities and worksheet-cell provenance.
+
+Preview with a freshly exported packing snapshot containing `PackList`, `PackListItem`, and `Event` arrays:
+
+```powershell
+bun scripts/repair-tpp-packing-units.ts --source codex-plans/source-backed-operations/recipes/ashley-packing-fluid-units.json --snapshot <packing-snapshot.json> --out .artifacts/tpp-packing-unit-repair
+```
+
+The preview writes plan.json and plan.sha256 with source/snapshot hashes, exact versions, quantities before/after, and preserved status/history/relationship facts. Preview is offline and performs no writes. A changed original quantity/description or template relationship needs a refreshed source review rather than guessing. Already-corrected rows preserve their current quantities and preview as no-ops.
+
+After the repository-authorized release makes the existing repair seam available on the target deployment, apply the same inputs with `--apply --expected-plan-sha256 <reviewed-hash> --url <explicit-Convex-URL> --tenant <matching-tenant>`. Authentication uses the existing agent session; credentials are not command arguments. The server applies the selected list atomically and checks versions and historical state. The CLI records mutation acknowledgement before readback, saves actual rows, and verifies quantities, correction provenance and preserved facts. A lost readback is not a claim that no write happened; inspect receipt.json and safely replay the exact plan.
+
+Current saved-snapshot preview hash: 8642dad9d4623636087daf7ad349be92899e32818807d0cec42119c6c480c7d4. This is not current production approval: refresh the snapshot and preview before application. No production repair has been applied.
+
+Qualification: actual CLI subprocess checks all five conversions, source/identity/unit/template/tenant/invalid-quantity rejection, incorrect apply hash before authentication, and corrected-snapshot no-op preview. Existing generated-command qualification independently passed conversion of required/packed volume, preserved physical facts, no-write replay, stale/duplicate/history/auth protection and future import paths. Authenticated CLI application/readback remains unverified until release and controlled live repair.
