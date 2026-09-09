@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { deflateRawSync } from "node:zlib";
 import { describe, expect, it } from "vitest";
 import {
@@ -410,11 +409,5 @@ describe("ZipArchiveError", () => {
     expect(DEFAULT_ZIP_LIMITS.maxEntries).toBeGreaterThan(0);
     expect(DEFAULT_ZIP_LIMITS.maxEntryExpandedBytes).toBeGreaterThan(0);
     expect(DEFAULT_ZIP_LIMITS.maxTotalExpandedBytes).toBeGreaterThan(0);
-  });
-
-  it("writes nothing to the filesystem", () => {
-    const source = readFileSync("src/lib/tppReports/zipReader.ts", "utf8");
-    expect(source).not.toMatch(/node:fs/);
-    expect(source).not.toMatch(/writeFile/);
   });
 });

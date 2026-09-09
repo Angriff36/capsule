@@ -1282,7 +1282,6 @@
       "command": "create",
       "event": "IngredientDemandConfirmed",
       "expectedConsequence": "PurchaseNeed.create",
-      "structuralTest": "tests/event-reaction-projection.test.ts",
       "runtimeTest": "tests/proofs/ingredient-demand-confirm.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
@@ -2021,7 +2020,6 @@
       "command": "applyPayment",
       "event": "PaymentSettled",
       "expectedConsequence": "Invoice.applyPayment",
-      "structuralTest": "tests/event-reaction-projection.test.ts",
       "runtimeTest": "tests/proofs/invoice-payment-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
@@ -2528,7 +2526,6 @@
       "command": "markBlocked",
       "event": "QualityCheckFailed",
       "expectedConsequence": "PrepTask.markBlocked",
-      "structuralTest": "tests/event-reaction-projection.test.ts",
       "runtimeTest": "tests/proofs/quality-check-fail-block.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {

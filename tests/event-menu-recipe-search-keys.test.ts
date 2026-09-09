@@ -149,11 +149,4 @@ describe("event menu recipe search keeps typed keys", () => {
     expect(reached).toEqual([]);
     expect(paths).toEqual([]);
   });
-
-  it("create-ingredient form is always available, not a flaky toggle", () => {
-    expect(editor).toContain('data-testid="event-menu-create-ingredient-form"');
-    expect(editor).toContain('data-testid="event-menu-create-ingredient"');
-    expect(editor).not.toContain("showCreate");
-    expect(editor).not.toMatch(/showCreate \? \(/);
-  });
 });

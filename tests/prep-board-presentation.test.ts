@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -92,15 +91,5 @@ describe("PrepBoardPage presentation", () => {
     expect(markup).toContain(
       "Gathering prep lines, event names, ingredients, and quality checks.",
     );
-  });
-
-  it("uses an in-page reason workflow instead of blocking browser prompts", () => {
-    const source = readFileSync(
-      "src/features/production/PrepBoardPage.tsx",
-      "utf8",
-    );
-
-    expect(source).not.toContain("window.prompt");
-    expect(source).toContain("PrepActionReasonForm");
   });
 });

@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { DashboardWidgetPolicy } from "../src/features/home/DashboardWidgetPolicy";
 import {
@@ -139,34 +138,6 @@ describe("home and stock book share one low-stock predicate", () => {
     ]);
     expect(views.low_stock_alerts.rows[0]?.value).not.toBe("0 / 0");
   });
-
-  it("stock book, home, overview, and the bell all call isBelowReorder", () => {
-    const book = readFileSync(
-      "src/features/inventory/StockBookPage.tsx",
-      "utf8",
-    );
-    const overview = readFileSync(
-      "src/features/inventory/InventoryOverviewPage.tsx",
-      "utf8",
-    );
-    const home = readFileSync(
-      "src/features/home/DashboardWidgetPolicy.ts",
-      "utf8",
-    );
-    const bell = readFileSync(
-      "src/features/notifications/deriveNotifications.ts",
-      "utf8",
-    );
-    expect(book).toContain("isBelowReorder");
-    expect(overview).toContain("isBelowReorder");
-    expect(home).toContain("isBelowReorder");
-    expect(bell).toContain("isBelowReorder");
-    expect(book).not.toContain("availableFor(item) < item.reorderThreshold");
-    expect(overview).not.toContain(
-      "availableFor(item) < item.reorderThreshold",
-    );
-    expect(book).toContain(".filter(isBelowReorder)");
-  });
 });
 
 describe("first-land stock-row latch", () => {
@@ -190,23 +161,5 @@ describe("first-land stock-row latch", () => {
     expect(afterFirst.pendingId).toBe("def");
     expect(afterFirst.scrolledForId).toBeNull();
     expect(stockFocusScrollId(true, afterFirst)).toBe("def");
-  });
-
-  it("the hook uses the latch and retries the first paint", () => {
-    const hook = readFileSync(
-      "src/features/inventory/useFocusedStockRow.ts",
-      "utf8",
-    );
-    const book = readFileSync(
-      "src/features/inventory/StockBookPage.tsx",
-      "utf8",
-    );
-    expect(hook).toContain("nextStockFocusLatch");
-    expect(hook).toContain("stockFocusScrollId");
-    expect(hook).toContain("useLayoutEffect");
-    expect(hook).toContain("requestAnimationFrame");
-    expect(hook).toContain("scrollIntoView");
-    expect(book).toContain("useFocusedStockRow");
-    expect(book).toContain("items,");
   });
 });

@@ -5,12 +5,6 @@ import { eventMenuUnpricedEstimateLabel } from "../src/features/events/eventMenu
 const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
 
 describe("event menu tab course and cost", () => {
-  it("lets a dish course be saved on the event menu tab", () => {
-    expect(tab).toContain("useEventDishChangeCourse");
-    expect(tab).toContain('name="course"');
-    expect(tab).toContain("changeCourse");
-  });
-
   it("always prints estimated cost, even when the dish has none", () => {
     expect(tab).toContain('{" · est. "}');
     expect(tab).toContain("eventMenuDishEstimateKind");

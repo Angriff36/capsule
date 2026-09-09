@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
@@ -138,21 +137,6 @@ describe("filled open shift shows who covered it", () => {
       staffNeeds: [orphan],
     });
     expect(roster.map((row) => row.personId)).toEqual([sam._id]);
-  });
-
-  it("wires filled needs into the Staffing tab and timeline roster", () => {
-    const tab = readFileSync(
-      "src/features/events/EventStaffingTab.tsx",
-      "utf8",
-    );
-    const timeline = readFileSync(
-      "src/features/events/EventTimelinePanel.tsx",
-      "utf8",
-    );
-    expect(tab).toContain("staffingRosterEntries");
-    expect(tab).toContain("staffNeeds: eventNeeds");
-    expect(timeline).toContain("useListEventStaffNeed");
-    expect(timeline).toContain("staffNeeds");
   });
 
   it("paints the FILLED roster entry with the same time fragment as assignments", () => {

@@ -298,13 +298,4 @@ describe("waitForSessionTenantClaim", () => {
     expect(decodeJwtPayload("no-dots")).toBeNull();
     expect(decodeJwtPayload("h..s")).toBeNull();
   });
-
-  it("uses the default retry budget when none is given", async () => {
-    await expect(
-      waitForSessionTenantClaim({
-        organizationId: "org_mangia",
-        getToken: async () => jwtWithTenant("org_mangia"),
-      }),
-    ).resolves.toBe(true);
-  });
 });

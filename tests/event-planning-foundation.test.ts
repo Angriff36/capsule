@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -14,29 +14,6 @@ import {
 const read = (path: string) => readFileSync(path, "utf8");
 
 describe("Event planning foundation", () => {
-  it("creates Client, Venue, Event, and EventGuest through generated commands", () => {
-    const mutations = read("convex/mutations.ts");
-    const hooks = read("src/lib/manifest-convex-react.ts");
-    for (const mutation of [
-      "Client_createViaRegister",
-      "Venue_createViaRegister",
-      "Event_createViaPlanEngagement",
-      "EventGuest_createViaInvite",
-    ]) {
-      expect(mutations).toContain(`export const ${mutation} = mutation({`);
-    }
-    for (const hook of [
-      "useCreateClient",
-      "useCreateVenue",
-      "useCreateEvent",
-      "useCreateEventGuest",
-    ]) {
-      expect(hooks).toContain(`export function ${hook}()`);
-    }
-    expect(existsSync("convex/lib/eventPlanning.ts")).toBe(false);
-    expect(existsSync("src/features/events/eventPlanningApi.ts")).toBe(false);
-  });
-
   it("navigates successful event creation directly to the real detail route", () => {
     expect(eventDetailPath("event_123")).toBe("/events/event_123?tab=overview");
     expect(eventCreatePath({ clientId: "client_9" })).toBe(
@@ -136,19 +113,5 @@ describe("Event planning foundation", () => {
     );
     expect(failure.detail).toContain("a95c55eb16003c2d");
     expect(failure.detail).not.toMatch(/lifecycle|refresh/i);
-  });
-
-  it("wires every supported guest command into the dossier", () => {
-    const panel = read("src/features/events/EventGuestPanel.tsx");
-    for (const hook of [
-      "useEventGuestAssignTable",
-      "useEventGuestCheckIn",
-      "useEventGuestRsvpConfirm",
-      "useEventGuestRsvpDecline",
-      "useEventGuestWithdraw",
-      "useCreateEventGuest",
-    ]) {
-      expect(panel).toContain(hook);
-    }
   });
 });

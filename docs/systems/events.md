@@ -192,6 +192,6 @@ An event manager can select the Northstar Events Client and Harborview Loft Venu
 | Failure classification     | `C:\projects\capsule\src\features\events\CommandFailure.ts`                    |
 | Focused foundation proof   | `C:\projects\capsule\tests\event-planning-foundation.test.ts`                  |
 | Auth/encryption proof      | `C:\projects\capsule\tests\event-seam-contract.test.ts` and `tests\event-seam` |
-| Reaction projection proof  | `C:\projects\capsule\tests\event-reaction-projection.test.ts`                  |
+| Reaction projection proof  | `tests/proofs/finance-cancellation-boundaries.runtime.test.ts`                  |
 
 The focused foundation suite covers generated create-command wiring, direct detail navigation, lifecycle offers, guest operations, and distinct failure rendering. The generated contract suite additionally protects the command surface.

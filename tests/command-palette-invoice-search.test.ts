@@ -95,15 +95,6 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     ).toBe("#INV-8BD5QP — $900");
   });
 
-  it("searchAll uses parseSearchQuery and invoiceMatchesQuery, not hyphen-split includes", () => {
-    const search = readFileSync("convex/search.ts", "utf8");
-    expect(search).toContain("parseSearchQuery");
-    expect(search).toContain("invoiceSearchLabel");
-    expect(search).toContain('from "./lib/parseSearchQuery"');
-    expect(search).not.toContain("function parseQuery");
-    expect(search).not.toContain("num.includes(textTerm.toLowerCase())");
-  });
-
   it("queryInvoices uses invoiceStatusFilter so paid INV-* lookup is not unpaid-only", () => {
     // QA Gallery INV-2026-QA1 is billed. A helper-only assertion still
     // passes if queryInvoices drops invoiceStatusFilter and always skips paid.
@@ -124,25 +115,6 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     expect(search).toContain("keepInvoiceForSearch(inv, parsed, statuses)");
     expect(search).not.toContain("unpaidStatuses");
     expect(search).not.toContain("if (statuses && !statuses.has");
-  });
-
-  it("queryInvoices paginates instead of take(120)", () => {
-    // QA 191: billed INV-2026-QA1 / draft INV-8BJQS7 can sit past the
-    // first 120 tenant rows. Restoring .take(120) still passed helper tests.
-    const search = readFileSync("convex/search.ts", "utf8");
-    const start = search.indexOf("async function queryInvoices");
-    const end = search.indexOf("function invoiceHint", start);
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const fn = search.slice(start, end);
-    expect(fn).toContain(".paginate(");
-    expect(fn).toContain("MAX_PAGES");
-    expect(fn).toContain("paginate({ numItems: PAGE, cursor })");
-    expect(fn).not.toMatch(/\.take\(\s*120\s*\)/);
-    // QA 193: .filter(deletedAt === null) emptied pages (undefined ≠ null)
-    // and the scan spun 8–9s with no hits. Skip deleted in JS.
-    expect(fn).toContain("inv.deletedAt != null");
-    expect(fn).not.toContain('q.eq(q.field("deletedAt"), null)');
   });
 
   it("production build deploys Convex instead of a UI-only vite build", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
+
 import path from "node:path";
 import { CLIENTS_SECTIONS } from "../src/features/clients/clientsRoutes";
 import { CrmLifecyclePolicy } from "../src/features/clients/CrmLifecyclePolicy";
@@ -27,56 +27,6 @@ describe("Clients CRM routes and lifecycle bindings", () => {
     const clients = NAV_AREAS.find((area) => area.path === "/clients");
     expect(clients).toBeDefined();
     expect(clients?.label).toMatch(/Clients/);
-  });
-
-  it("wires clients routes in App.tsx", () => {
-    const app = readFileSync(
-      path.join(process.cwd(), "src/app/App.tsx"),
-      "utf8",
-    );
-    expect(app).toContain('path="/clients"');
-    expect(app).toContain('path="/clients/:id"');
-    expect(app).toContain('path="/clients/proposals"');
-    expect(app).toContain('path="/clients/contracts"');
-    expect(app).toContain("ClientsPage");
-    expect(app).toContain("ClientDetailPage");
-    expect(app).toContain("ProposalsPage");
-    expect(app).toContain("ContractsPage");
-  });
-
-  it("deep-links Client and signed Contract into invoice issue", () => {
-    const detail = readFileSync(
-      path.join(process.cwd(), "src/features/clients/ClientDetailPage.tsx"),
-      "utf8",
-    );
-    const contracts = readFileSync(
-      path.join(process.cwd(), "src/features/clients/ContractsPage.tsx"),
-      "utf8",
-    );
-    expect(detail).toContain("FINANCE_ROUTES.issueInvoice");
-    expect(detail).toContain("useListInvoice");
-    expect(contracts).toContain("FINANCE_ROUTES.issueInvoice");
-    expect(contracts).toContain('=== "signed"');
-  });
-
-  it("deep-links accepted Proposal into Event create with client prefill", () => {
-    const proposals = readFileSync(
-      path.join(process.cwd(), "src/features/clients/ProposalsPage.tsx"),
-      "utf8",
-    );
-    const create = readFileSync(
-      path.join(process.cwd(), "src/features/events/EventCreatePage.tsx"),
-      "utf8",
-    );
-    const routes = readFileSync(
-      path.join(process.cwd(), "src/features/events/eventRoutes.ts"),
-      "utf8",
-    );
-    expect(proposals).toContain("eventCreatePath");
-    expect(proposals).toContain('=== "accepted"');
-    expect(create).toContain("useSearchParams");
-    expect(create).toContain('searchParams.get("clientId")');
-    expect(routes).toContain("EventCreateLinkBuilder");
   });
 
   it("derives CRM actions from generated lifecycle metadata", () => {

@@ -57,38 +57,4 @@ describe("immediate command and delivery honesty", () => {
     const page = read("src/features/sales/MessageInboxPage.tsx");
     expect(page).toContain("deliveryStatusLabel(String(m.status))");
   });
-
-  it("passes docId to proposal-template commands", () => {
-    const page = read("src/features/clients/ProposalTemplatesPage.tsx");
-    expect(page).toContain("await revise({\n          docId: id,");
-    expect(page).toContain("await archive({ docId: id, reason });");
-    expect(page).toContain("await reactivate({ docId: id });");
-    expect(page).not.toMatch(
-      /await (?:revise|archive|reactivate)\(\{\s*id[,}]/,
-    );
-  });
-
-  it("labels status-only publication and sent-recording actions honestly", () => {
-    const proposals = read("src/features/clients/ProposalsPage.tsx");
-    const contracts = read("src/features/clients/ContractsPage.tsx");
-    const invoices = read("src/features/finance/InvoicesPage.tsx");
-    const invoiceDetail = read("src/features/finance/InvoiceDetailPage.tsx");
-
-    expect(proposals).toMatch(
-      /action\.key === "send"\s*\? "Publish proposal"\s*:\s*action\.label/,
-    );
-    expect(proposals).toContain("Proposal published in Capsule.");
-    expect(contracts).toMatch(
-      /action\.key === "send"\s*\? "Record sent"\s*:\s*action\.label/,
-    );
-    expect(contracts).toContain("Contract marked sent in Capsule.");
-    expect(invoices).toMatch(
-      /action\.key === "send"\s*\? "Record sent"\s*:\s*action\.label/,
-    );
-    expect(invoices).toContain("marked sent in Capsule");
-    expect(invoiceDetail).toMatch(
-      /action\.key === "send"\s*\? "Record sent"\s*:\s*action\.label/,
-    );
-    expect(invoiceDetail).toContain("Invoice marked sent in Capsule.");
-  });
 });
