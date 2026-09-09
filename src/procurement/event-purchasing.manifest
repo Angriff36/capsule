@@ -125,6 +125,28 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command retire() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+  }
+
+  command refresh() {
+    guard self.deletedAt == null
+    mutate servings = self.eventDish != null ? self.eventDish.quantityServings : self.servings
+    emit EventDishComponentSeeded {
+      seedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      dishId: self.dishId
+      componentId: self.componentId
+      servings: self.servings
+      yieldQuantity: self.yieldQuantity
+      batchMultiplier: self.batchMultiplier
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
   store EventDishComponentSeed in durable
 }
 
@@ -228,6 +250,25 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       quantity: 0
       unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  // Reactions may be ordered by target entity. Keep same-unit updates intact
+  // whether reseeding runs before or after this cleanup.
+  command retirePreviousUnit(currentUnit: UnitOfMeasure) {
+    guard self.deletedAt == null
+    compute changedUnit = self.unit != currentUnit
+    mutate deletedAt = changedUnit ? now() : self.deletedAt
+    mutate quantity = changedUnit ? 0 : self.quantity
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
+      unit: currentUnit
       purchasingWeekStart: self.purchasingWeekStart
     }
   }
@@ -511,3 +552,36 @@ on DishComponentAttached fanOut EventDish where dishId = payload.dishId
     batchMultiplier: payload.batchMultiplier
     purchasingWeekStart: self.purchasingWeekStart
   }
+
+// Remove only this dish's contributions; other dishes may use the same component.
+on DishComponentDetached fanOut EventIngredientContribution where componentId = payload.componentId
+  run retire
+  match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = payload.componentId, ingredientId = self.ingredientId, unit = self.unit
+  params { reason: payload.reason }
+
+on DishComponentDetached fanOut EventDishComponentSeed where componentId = payload.componentId
+  run retire
+  match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = payload.componentId
+
+on DishIngredientRemoved fanOut EventIngredientContribution where ingredientId = payload.ingredientId
+  run retire
+  match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = null, ingredientId = payload.ingredientId, unit = self.unit
+  params { reason: payload.reason }
+
+on ComponentIngredientRemoved fanOut EventIngredientContribution where componentId = payload.componentId
+  run retire
+  match eventDishId = self.eventDishId, componentId = payload.componentId, ingredientId = payload.ingredientId, unit = payload.unit
+  params { reason: payload.reason }
+
+// Remove the old measurement before re-driving the component's current lines.
+// This also handles a recipe edit that changes the ingredient's unit.
+on ComponentIngredientQuantityAdjusted fanOut EventIngredientContribution where componentId = payload.componentId
+  run retirePreviousUnit
+  match eventDishId = self.eventDishId, componentId = payload.componentId, ingredientId = payload.ingredientId, unit = payload.previousUnit
+  params { currentUnit: payload.unit }
+
+on ComponentIngredientQuantityAdjusted fanOut EventDishComponentSeed where componentId = payload.componentId
+  run refresh
+
+on ComponentIngredientAdded fanOut EventDishComponentSeed where componentId = payload.componentId
+  run refresh
