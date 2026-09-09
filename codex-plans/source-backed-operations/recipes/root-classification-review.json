@@ -1,224 +1,251 @@
 {
   "source": ".artifacts/tpp-migration-20260905/recipes.json",
   "sourceSha256": "d25e270f2ce32df70d3b360d24c057ee13ef293887b148747f02d11aee026861",
-  "scope": "All 217 export roots remain in scope. Classification review is not approval to apply, proof of complete recipes, or authority to remove referenced historical records. Pending means not yet reviewed in this ledger, not owner-deferred.",
-  "reviewedCount": 24,
+  "scope": "All217 export roots received a first-pass root-classification review. Reviewed does not mean recipe-complete, apply-approved, or safe to retire existing references. Unresolved classifications and ingredient/method/quantity gaps remain required work, not owner deferrals. Full source relationships and live repairs must be qualified separately.",
+  "reviewedCount": 217,
   "entries": [
     {
       "name": "10\" Basic Cheese Pizza",
       "sourceFingerprint": "5c2a6680f92cc81c0d777f87e07aa919fc2d574c551d4e2fc1d6977ae247db71",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Red sauce, mozzarella, fontina, parmesan, and romano cheeses. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Description includes fontina/parmesan/romano but measured table lists mozzarella only; do not invent missing cheese quantities.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Basic Pepperoni",
       "sourceFingerprint": "3a8200801942ad0e5e4f67a1f853eb34ba78f11308e3db10c0f43a07d39942a6",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Red sauce, mozzarella, and pepperoni Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Main method describes fontina/parmesan/fried pepperoni absent from the measured table; retain as a source discrepancy.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" BBQ Pizza",
       "sourceFingerprint": "839bbbe146bf4dc6961824a4f1065875210e41acf8a9702977910a5b52afbe64",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Tangy bbq sauce, marinara, smoked gouda, mozzarella, crispy bacon, red onion, roasted red pepper, grilled chicken. Main table contains 10 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Breakfast Za",
       "sourceFingerprint": "6063b8b9c2ea8a6c91d8a8da0fba391272428e1fbdaa2b1a8557a06ad1228d88",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Blanco sauce, prosciutto, mozzarella, parmesan cheese, cracked eggs garnished with fresh cut herbs and shallots. Main table contains 11 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Heating instructions specify2oz garlic and1tsp salt/oregano, whereas table lists1oz garlic and1/4tsp each. Resolve quantities before full repair.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Chevre Pizza",
       "sourceFingerprint": "d867933733bb3dc1b79a9721a01c066bed513459ace235b187fc5e9ce3f91faa",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Red sauce, goat cheese, red onion, kalamata olive, capers, garnished with fresh basil. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Farmer's Market Pizza",
       "sourceFingerprint": "674e2fe14f8543c90a1e1d8641eac922378fdf181c3450d3bd13b234a13a6559",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Basil pesto, seasonal veggies, mozzarella, finished with a balsamic reduction. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Four Cheese Pizza",
       "sourceFingerprint": "442df09a152a5d63dce1f0d73599f127ab75f65aa1a73167843cc039384dff4f",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Red sauce, mozzarella, fontina, parmesan, and romano cheeses. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Idaho Pizza",
       "sourceFingerprint": "a3e8eae406b6163414a9be811635d01305984fcb8db2fdf85cee49a38270de2c",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Alfredo sauce, Idaho potato, hickory smoked bacon, green onion, cheddar and mozzarella cheese, garnished with fresh garlic sour cream. Main table contains 12 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Steam/slice potato steps act on the same potatoes. Alfredo and creamy garlic require their linked recipes; cooked bacon differs from raw purchase weight.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Kalua Pig Pizza",
       "sourceFingerprint": "19ee01bdbf768fb9c68eef35701ffa2a1f0c9c5692e4a5aed54d8ed38331f5e5",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Basil pesto, smoked pork, grilled pineapple, jalape\u00f1o, mozzarella cheese. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Meat Pie Pizza",
       "sourceFingerprint": "12fde96d02898971a817f0815b106d439a3d626a8ace5de052a712f2458be942",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Red sauce, mozzarella, pepperoni, salami, pancetta, Italian sausage. Main table contains 9 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Mushroom Pizza",
       "sourceFingerprint": "c064259c2583849be86f36527cb8d0b0810df56f504ae47e30d607df98b7d35a",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Blanco sauce, fresh crushed garlic, parmesan romano cheese topped with an assortment of wild mushrooms; finished with a drizzle of white truffle oil Main table contains 10 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Heating instructions specify2oz garlic and1tsp salt/oregano versus1oz and1/4tsp in table; do not choose silently.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Pepperoni Blast",
       "sourceFingerprint": "d0aeec9c66d67137230a0b80357a682326865c14ef05e3597e250426c8275f9e",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Red sauce, mozzarella, fontina, parmesan, Romano, pepperoni, garnished with crispy pepperoni. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Pesto Pizza",
       "sourceFingerprint": "b3f437feb34d09b29f572b3f4562559058d070acd751697146e68cc7a1b7ec85",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Basil pesto, artichoke heart, red onion, prosciutto, feta cheese, balsamic glaze. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Thai Pizza",
       "sourceFingerprint": "dad5fbb1754fac21521e1f0ee882dece02370f1e8f368370d9a0d07ef367ccf1",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Pizza. Service description: Peanut sauce, mozzarella, roasted red peppers, scallion, shredded carrots, grilled chicken, garnished with cilantro and chopped peanuts. Main table contains 10 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Artisan Bread - Vending",
       "sourceFingerprint": "8460266306d0a8bd4f791434cc7af56d7d1fdfe79bda877df2c83879a10bb55d",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Build Your Own Pizza",
       "sourceFingerprint": "9bb2953e554593ddd1acf04e89bad7b8547ecbedc6508cf6d89282dbf1e75d97",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cheeseburger Pizza",
       "sourceFingerprint": "c9fa6f63f934f2f0cecb186494a7dc7e97a93fd5e6958e8a143330861b0e05a7",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cheesy Bread",
       "sourceFingerprint": "5608f804a3c56bee70479aea119924df87019a3fe285e9ad5bbdf6a651395ca1",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Her Pizza",
       "sourceFingerprint": "20567cb54ec403263b08765159d9509af18ef2c34b76a68a6816ee9b1357806d",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "His Pizza",
       "sourceFingerprint": "580ba1cc203f5af790c291e7a9ec8fd3bf583b663401cd535b67a2f507dc8213",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Jalapeno Bacon",
       "sourceFingerprint": "8d6706da9af5e922892c0fe9ad1f9975a0eb247ce83b373da2e4a6f43e78ca7e",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Jamaican Jerk Pizza",
       "sourceFingerprint": "01cfaec7c5726fa689d9111082eba4ed9f684355f0cfbb74e931fb28af78c6b9",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Market Pie Special Pizza",
       "sourceFingerprint": "60636c69cc93a67a175f036a34c958c83a6dc7858ece0094ed9552fa5c544295",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Our Pizza",
       "sourceFingerprint": "622ee51631de55201ba326fc6f1f7b5ab7f4e4229dc524450f0ff76599ae9064",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pizza Menu TBD",
       "sourceFingerprint": "aedc736118390af08620e28abeb3fc7e6779247618cb7b70fc1cda641e8caa43",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "menu_selection",
+      "evidence": "Root yield: 1 Recipe. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Supreme Pizza",
       "sourceFingerprint": "337b7f73295b48452b8c7d413daec6c2c49479fc5259c0c6f7b4de74c66dae53",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Take and Bake Pizzas",
       "sourceFingerprint": "9bad4ac06ace6d7cd2247a3ec97c5eba8daebf5ddbbb77a8d4fb8224cfe5ee41",
       "sourceFiles": ["10_Pizzas.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "10\" Pizza Vending (Pizza Trailer)",
@@ -228,9 +255,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Pizza_Items.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "5 Layer Fudge Chocolate Cake",
@@ -240,9 +268,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 12 Serving. Service description: layer upon layer of dark moist chocolate cake, sandwiched with silky smooth chocolate filling, piled high with chunks of cake. 12 slices per cake Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source explicitly states12slices per cake; do not turn one cake into one guest serving.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "7 Layer Bar",
@@ -252,9 +281,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Air Culinaire",
@@ -263,9 +293,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Birdie's Mini Personal Pie",
@@ -275,9 +306,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Locally made individual pies from Birdies Pie Shop. Popular options include Chocolate Cream, Apple and Pumpkin. Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Order and pickup are two tasks for the same pie, not two pies to purchase.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Birdie's Standard Personal Pie",
@@ -287,9 +319,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Locally made individual pies from Birdies Pie Shop. Popular options include Chocolate Cream, Apple and Pumpkin. Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Order and pickup refer to the same pie; source pickup unit Serving versus Each needs consistent operational mapping.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Breakfast Burrito (1 PAX)",
@@ -298,9 +331,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cake by Just American Desserts - Delivered to Mangia",
@@ -310,9 +344,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Custom Wedding Cake by Just American Desserts, served by Mangia Catering Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Title says delivered to Mangia but task says pickup; preserve discrepancy and actual event transport choice.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cake by Just American Desserts - Delivered to Venue",
@@ -322,9 +357,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Custom Wedding Cake by Just American Desserts, served by Mangia Catering Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cake by Sweet Frostings",
@@ -334,9 +370,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Custom Wedding Cake and/or Dessert by Sweet Frostings Bakery Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chips",
@@ -345,9 +382,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Creme Brulee",
@@ -357,9 +395,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Rich, creamy, custard made in house. Topped with a caramelized sugar. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cupcakes - Delivered To Mangia",
@@ -369,9 +408,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Dessert Charcuterie",
@@ -381,9 +421,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: House-made Chocolate Salami, Shortbread Cookies, Chocolate Dipped Strawberries, Pomegranate Bark, local seasonal fruit, dried fruit and candied nuts. Main table contains 11 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Desserts (1 PAX)",
@@ -392,9 +433,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Fruit Tarts Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "DONT USE",
@@ -415,9 +457,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Large brownies baked, from scratch, in house. Served on a bulk platter. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Caesar Salad - B",
@@ -426,9 +469,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: 5oz romaine lettuce service with shaved parmesan, lemon, olives, tomatoes, croutons, and caesar dressing served in bulk packaging. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Charcuterie Display - B",
@@ -437,9 +481,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: https://secure3.totalpartyplannerweb.com/tppWebProd/tppMenuItem/MenuItemView2.aspx?ItemSak=121440#tabs- 3 Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Internal TPP hyperlink is not a food description; Custom Prep List Needed means component/ingredient detail must be recovered.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Chicken Salad Sandwich",
@@ -448,9 +493,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Individual Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Crudite Display - B",
@@ -459,9 +505,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: 9 oz. Prepared Seasonal Vegetables and 2 oz. Vegetable Dipping Sauce on the side. Assembled in a platter for bulk usage. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Fruit Display (1 PAX)",
@@ -470,9 +517,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Grilled Chicken Breast (sliced) - B",
@@ -481,9 +529,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: 8 oz Grilled chicken breast cut in slices in bulk packaging. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Kids Chicken Tenders (6)- B",
@@ -492,9 +541,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: 6 piece chicken strips with ketchup and BBQ sauce. Served in bulk container. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Large Cookie",
@@ -503,9 +553,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Fresh Baked Large (3oz) Cookie Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - OATMEAL COOKIE",
@@ -514,9 +565,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Fresh baked large oatmeal cookie. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Roll with Butterchip",
@@ -525,9 +577,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Fresh Baked Roll, served with butter chip. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Salmon Filet - B",
@@ -536,9 +589,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: 6oz wild caught Alaskan salmon filet in bulk packaging. Served with thyme sprig and lemon wedge. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Special Item - I",
@@ -547,9 +601,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish_selection",
+      "evidence": "Root yield: 1 Serving. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source explicitly calls this a one-off food item; resolve the actual event selection before ingredient generation.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "FBO - Turkey Avocado Wrap - B",
@@ -558,9 +613,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Turkey, avocado, cheese, lettuce served on a whole wheat tortilla - sliced in 1/2 with a side of ranch. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Fruit Tart From Just American Dessert",
@@ -570,9 +626,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Flaky pastry tart shell filled with creamy custard, topped with seasonal fruit. Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Gourmet Lunch Box (1 PAX)",
@@ -581,9 +638,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_package",
+      "evidence": "Root yield: 1 Serving. Service description: TBD Sandwich, pasta, cookie, chips Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. TBD sandwich plus pasta/cookie/chips describes a meal package with unresolved sandwich choice.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Just American Dessert Item",
@@ -593,9 +651,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Just American Dessert Special Order Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Macaroons",
@@ -605,9 +664,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Two Macaroons served in a clear box with a ribbon. Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source serves two macaroons in one box; ordering and receiving repeat the same goods, not four macaroons.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mangia Pizza Catering Experience (Pizza Trailer)",
@@ -617,9 +677,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Pizza_Items.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mangia Pizza Catering Experience (Pizzeria)",
@@ -629,9 +690,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Pizza_Items.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Chocolate Chip Cookie Shooters",
@@ -641,9 +703,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Bite Sized fresh baked chocolate chip cookies served with a mini carton of ice cold regular or chocolate milk! Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Donut Wall",
@@ -653,9 +716,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: We decorate a variety of donuts and fill our house-made donut wall. Main table contains 10 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pizza Box for 10\" Pizzas",
@@ -689,9 +753,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Pizza_Items.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "commercial_modifier",
+      "evidence": "Root yield: 1 Recipe. Service description: As the host, you would guarantee Mangia Catering our vending minimum, which is determined and agreed upon by host and caterer. This minimum can be met with guests paying indvidually or the host covering the entire service. We can also split the different if the guests didn't order enough pizza to meet the minimum and bill for the difference. Mangia provides a fully stocked and staffed mobile pizzeria! Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Description states a host-guaranteed vending minimum and possible shortfall bill; this is a commercial commitment, not food demand.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Salmon and Bagel Display (10 PAX)",
@@ -700,9 +765,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: SP16 Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Name states10PAX but yield1Each and referenceSP16 lack a full recipe; retain platter-versus-guest distinction.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Sliced Fruit Tray (1 PAX)",
@@ -711,9 +777,10 @@
         "Air_Catering.xlsx",
         "Apps_-_Passed_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: TBD Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Smore Bar",
@@ -723,9 +790,10 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Use our s'mores bar to build your 'mallow exactly how you want it; Then you cook it to your level of \"done\"! We bring the marshmallows, deluxe graham crackers, and all the candies and toppings to create the perfect s'more! Main table contains 9 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Sundae Station",
@@ -735,625 +803,703 @@
         "Apps_-_Passed_-_Finish_at_Event.xlsx",
         "Desserts_-_Finish_at_Event.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Three gourmet ice cream flavors, fresh baked cookie chunks, brownie bites and assorted gourmet toppings like house-made whipped cream, chocolate sauce, caramel sauces, sprinkles, chocolate chips, strawberries, coconut flakes, M&Ms and Reeses pieces! Main table contains 18 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Wild Mushroom Arancini - passed",
       "sourceFingerprint": "11ce5ebd9f56093a261452d17b54e90027b6fa9e4ed46d3a74236f27626363a5",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Wild mushroom Risotto with truffles topped with gran pardana parmesan, tomato jam, and micro herb. Two arancini balls per person. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Two balls per person; fryer oil is equipment capacity (53lb large/18lb small), not0.5lb per guest.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Ahi Tuna Wonton - passed",
       "sourceFingerprint": "9cdbcb3bf0ce2046f8cbf53629ef9417777e07ab1c88dce8b8f4cda9dfb92343",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Seared rare sesame crusted Ahi Tuna served on a crunchy wonton round topped with spicy aioli, togarashi, and micro greens. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Assorted Crostinis - passed",
       "sourceFingerprint": "29f2e670129ca3c60687cc91b39c3594f2fe4d80b172256c7ffdd6371f5e7d69",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Assorted cold crostini appetizers. Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Bacon Cups - passed",
       "sourceFingerprint": "b95da2d0ef205725125e64d3c170bbbf1a4c4c51cde7d3804c3b7c410539aed8",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Small bite sized cups made of bacon filled with gourmet baked beans. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Bacon Wrapped Shrimp Lollipop - passed",
       "sourceFingerprint": "04222ae9e37b51e1fe70f494dca994baf11b7ad45b312afbb97ecb140e8dbc97",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Large shrimp wrapped with thick cut applewood smoked bacon, served with a spicy tomato relish dipping sauce. Passed by event staff. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Bacon Wrapped Tiger Prawn - passed",
       "sourceFingerprint": "03c7971b12039d8ad86dde0b0d379fd6813f95fd8400e2ebd99ea0cd1370898f",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Large Tiger Prawns, wrapped in thick cut bacon, finished with spicy tomato relish. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Beef Satay - Balsamic Glazed - passed",
       "sourceFingerprint": "68945b549fa74bd654cce187474e7be0ef8a23bab6378e7a919745e550d89f69",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Marinated beef tenderloin finished with balsamic glaze. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Beef Satay - Gorgonzola - passed",
       "sourceFingerprint": "200ce7a30f089d07884003341524c639aa0b7221eaeb19f096141c7939e8d522",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Grilled tenderloin, drizzled with balsamic reduction, topped with gorgonzola crumbles. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Beef Satay - Traditional - passed",
       "sourceFingerprint": "f2112c54440ec9c25ea2501b5932d7ec7d46c3c18c88edd9cf35fe5301ac43ff",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Grilled tenderloin served with gorgonzola dipping sauce. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Beef Tenderloin Sliders - Passed",
       "sourceFingerprint": "aef90d53712965238c01d6b5103f483392fbca1ea038539a801fc33b5170cf64",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Rubbed and marinated beef tenderloin, grilled and served on mini toasted brioche bun, topped with gorgonzola dressing, crispy onion strings and fresh arugula. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Bruschetta Crostini - passed",
       "sourceFingerprint": "16bc404ee37eeadccc74cbb1b3f406411b2d803fb87fec08c880c28064b55b2d",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Crostini topped with a tomato-basil topping garnished with a balsamic glaze reduction. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Burrata Crostini - passed",
       "sourceFingerprint": "5ae2affc7b4a0fbedb6a1c70f3a886e6d55f64e0cfff198161c8060f76f8ed97",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Crostini topped with burrata cheese, cherry tomato, basil, fluer de sel, and extra virgin olive oil. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Caprese Crostini - passed",
       "sourceFingerprint": "3ff478410db3a0ee93b7b2665c41b1a649319d5433685c41db50c004cbfdd697",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Toasted baguette fresh mozzarella, fresh basil, grape tomato, and garnished with balsamic reduction sauce and extra virgin olive oil. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Caprese Skewer - passed",
       "sourceFingerprint": "0a038d7aed30d0e97c016f1cada563a1144c347d0d3116eb24262886ecf9f43a",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Fresh mozzarella, fresh basil, grape tomato, and garnished with balsamic reduction sauce and extra virgin olive oil. Served on a skewer. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Charcuterie Cones - passed",
       "sourceFingerprint": "fdc2981b9f24b3292d3fa4432b2383b9fc172db9fb9f15d69e9ce9b20d7ae9c3",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Italian meats, cheeses, veggies and grissini served in a stylish wooden cone. Main table contains 9 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cheese & Spinach Stuffed Mushrooms - Passed",
       "sourceFingerprint": "9c78e348177c11b0c788eddcde8c51ec995d99b2cc2872b929d9470dc478653c",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Button mushrooms filled with our signature cheese blend and saut\u00e9ed spinach topped with toasted panko bread crumbs, simmered in a garlic butter veggie broth. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cheeto Cup - passed",
       "sourceFingerprint": "b5fd03a43da03ca104fe917f58c71b20503dcf35fcc29a83da20de4f09834d61",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Cheeto filled ice cream cones. Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chef's Choice Appetizer - passed",
       "sourceFingerprint": "7328fd5690cc95f0ded1d39f68fe3a1adebca2666a77236ef78b2385487ddcff",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish_selection",
+      "evidence": "Root yield: 1 Serving. Service description: Guests enjoy chef\u2019s choice of seasonally inspired small bite hors d\u2019 oeuvres as they wait for the reception to begin. Passed by staff to guests. Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Chef-choice food is an event selection; do not publish the generic preparation label as a measured recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Parmesan Lollipop - passed",
       "sourceFingerprint": "a10cba57c5120ae4af12715c15741a1624b3c61d734591b782d3bfeaf60a9b51",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Hand breaded and fried chicken breast, garnished with marinara and microbasil. Main table contains 9 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Salad Crostini with Avocado - Passed",
       "sourceFingerprint": "c890bbee931899ed6ef86daca38c7cbeda9c90a2cab99f204d3cb143cda1501d",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Slow-roasted chicken breast salad topped with fresh avocado. Main table contains 3 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Satay - Greek - Passed",
       "sourceFingerprint": "e6d7b03e2777462952bdc135b734d1e056e5faadb52df3c799a8e9d14b4dcab9",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Grilled Greek chicken served with garnish and greek dipping sauce. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Satay - Rosemary and Garlic - Passed",
       "sourceFingerprint": "1cdc0a37f1bb583cebf3af44eaa9b6cfb065810e3e61b0cc9fb610bd483e4634",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Grilled tender chicken breast marinaded in garlic and fresh rosemary, finished with a spritz of lemon. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Satay - Teriyaki - passed",
       "sourceFingerprint": "031edccfd7f317858ed8c2d885bc05dd0bf7b3cc9513c09f7c83909189edb5e7",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Marinated chicken things, finished with teriyaki, scallions and toasted sesame seeds. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Satay - Thai Peanut - passed",
       "sourceFingerprint": "898831637a7c6cc633b4389d764f4f4badda6c4cb2ae2090a28c546054f112b1",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Grilled chicken satay served with our Thai peanut sauce and garnished with scallions, chopped peanuts, and sesame seeds. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Coconut Prawns - passed",
       "sourceFingerprint": "98df41110e34f54a957802ccfd2ad23ee61a831c8b229f6f68c01eab650d2489",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Shrimp, breaded with panko and coconut, fried and finished with cilantro and sweet chili dipping sauce. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Crab Cakes - passed",
       "sourceFingerprint": "ea1252a6f8234ed861987f010b8048afeb7fb6d55a4ecb90af63977e5f2a1b54",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Lump crab meat, hand formed crab cakes topped with a lemon aioli and fresh micro greens. Main table contains 3 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Crustless PB&J - passed",
       "sourceFingerprint": "14a52899e1c9541605ba2b197bae81db8ed1e1a8c1391dcd1c39386c97500dcb",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: House made crustless PB&J sandwiches. whole wheat bread, creamy organic peanut butter and locally made huckleberry jam. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Edamame-passed",
       "sourceFingerprint": "42af434923653cc27c815ba4ab64e37a5ec866e832db0ba8ef7b06e204b3c7b3",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Blanched and chilled, dusted with togarashi, sea salt Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "French Fry Boat - passed",
       "sourceFingerprint": "546f102164be3dd1e713941e4872920ed4a40c388ec3926699a9242f1c60a527",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Waffle or straight cut fries topped with white cheddar cheese + roasted garlic cloves + garlic sauce Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "French Fry Cones - passed",
       "sourceFingerprint": "a0143262213d06a729f84347999ff3973a7a65956b6dee455fc9551879c4fc76",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Waffle or straight cut fries topped with white cheddar cheese + roasted garlic cloves + garlic sauce Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Fried Gourmet Mac n Cheese Bites - passed",
       "sourceFingerprint": "1b083388fd1e67a2724ef01dba2ffcf297d4d82ccfcd0e9eb867f18c6d2efd45",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Gourmet Macaroni and Cheese, breaded and fried. Topped with bacon jam, parmesan Romano cheese and microgreens. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Grand Marnier Fruit Salad - passed",
       "sourceFingerprint": "8f3ee299099084858932e5170df458185d90ed96766d2e1a249a779db1a2db40",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Assortment of melon balls and diced fruit tossed with Grand Marnier Liquor and fresh mint. Passed on tray by an attendant. Main table contains 10 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Grilled Baby Street Corn - passed",
       "sourceFingerprint": "08342c3eb218f3e44ae8841565f364f3ce39d7fdd97559a83c8f44d9bc23e284",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Grilled Baby Street Corn. Grilled with garlic, lime butter, cjoita, and ancho Chile Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Grilled Peach Crostini - passed",
       "sourceFingerprint": "b817816f0878e0362ab5afe4c7c21419d4a0194d69e162f2dcd5b1a1b0b2e323",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Toasted baguette, local grilled peach, Ricotta, orange - basil gastrique Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Halibut Fish Taco - passed",
       "sourceFingerprint": "87426c5911df08d99db133bbdb57e0d309f1ed4f74462de34acb58086ba1cc34",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Locally made corn tortilla, citrus zested fresh halibut, mango-avocado salsa, lime crema, shredded cabbage, fresh cilantro. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Jumbo Shrimp Cocktail - passed",
       "sourceFingerprint": "dbd173bf7330e040604aafb7c3b0fee664eb5982f4818ba53347a4df3568ca5b",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Stationary Display of chilled Jumbo Shrimp, served with house made cocktail sauce and lemon wedges. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Jumbo Shrimp Cocktail Shotglass - passed",
       "sourceFingerprint": "5bb9af29b0b3cc587055035320d208bb7198235b12afff4c7c35cb4d5502e44a",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Shot glass filled with cocktail sauce and topped with a chilled jumbo shrimp. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Lamb Lollipop - passed",
       "sourceFingerprint": "b796b76e498ca43e7b7f1cb00a766959f953fe328b01bd2092c5fefe3f30b292",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: New Zealand lamb rubbed with a mint pesto, served with garlic dip. Main table contains 3 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Lamb Slider - passed",
       "sourceFingerprint": "10e7f5583db80f163869f786fc69ff77804bb54c5a779f8462d6f4254c8bea4f",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Slow roasted lamb, served on a toasted brioche bun topped with caramelized onions, feta cheese and sun-dried tomatoes Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Lobster Corn Dogs",
       "sourceFingerprint": "f17c6daa73922e567c4df12c4657327e2aaa5ff17039aa2628924cb627ed2584",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Hand battered and fried onsite, topped with lemon aioli, fresh chives and paprika. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Yield1Each conflicts with two lobster tails and2cups batter; reconcile before quantity repair.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Lobster Corn Dogs - passed",
       "sourceFingerprint": "03169f223093d7cf775fd9306ef66dd53486894ccedd1385fb3f7109d1dab747",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Hand battered and fried onsite, topped with lemon aioli, fresh chives and paprika. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Same formula as Lobster Corn Dogs appears under a passed label; do not merge historical records solely by similarity.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Lobster Deviled Eggs - passed",
       "sourceFingerprint": "4c5d11f5910e7f64db00c6e4b6c943ffc969b3304c0fb8267aef620bfc04ff7b",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Deviled eggs loaded with tender lobster meat. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Baked Potato Bites - passed",
       "sourceFingerprint": "7b741934d62c573bb4d6385b68136e6a443ac39b09345958169f9d05aa1bd064",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Mini potatoes filled with twice baked potato, sharp cheddar cheese, bacon and cream cheese topped with chives and creamy garlic sour cream. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Beef Sliders - passed",
       "sourceFingerprint": "c7a74199da206b2025bf0ee885a0803cd6c921b74c31632d0c0f88b290527189",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1.5 Each. Service description: Mini beef sliders, grilled on-site then topped with caramelized onions, bacon, and sharp cheddar cheese served on a mini brioche bun with a creamy garlic spread. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source portion is1.5sliders; do not round fractional portions into whole guest counts.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Chicken & Waffle - passed",
       "sourceFingerprint": "99577d89d21a5e018db4abfe081257b1c087b83690d8b1b318c8e2e75edb1676",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Buttermilk Waffle topped with crispy buttermilk marinated chicken, glazed with orange - thyme infused maple syrup. Main table contains 9 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Grilled Cheese with Tomato Bisque - passed",
       "sourceFingerprint": "697bfe0ad688164381fd47432fc18b8b0a3341782ce2a3c1820e48f682facc49",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Crisp, grilled, sourdough stuffed with gruyere cheese. Served with a shot of house made tomato bisque. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Lobster Roll - passed",
       "sourceFingerprint": "a9e79772f7c6b896fea8f6eb527ba4c67edb7d38efd5c367de74eb311f5aee5b",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: House made roll, tarragon, mayo, lemon juice. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Mini Spam Sandwich - passed",
       "sourceFingerprint": "018d83819025c30372b5a3e7e0da1b39fe872be347b158128176c5879064b4aa",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Mini Spam Sandwich, served on toasted Wonder White Bread, topped with grilled onions and brown mustard. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Montreal Beef Crostini - passed",
       "sourceFingerprint": "7c18ed014cc4e1f96c58022cd4dea0ed8f1279a041774220664bd99aa31a82ea",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Grilled sourdough topped with smoked tri tip and a chimichurri sauce! Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pesto Crostini - passed",
       "sourceFingerprint": "264858edff77cd363a57fe049b25b42fe59ab05e406aad95ede3ffe0af89b24a",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: House-made basil pesto, feta cheese, cherry tomato, pinenuts, balsamic glaze. Passed to guests by event staff. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Philly Cheesesteak Bao Bun Slider - passed",
       "sourceFingerprint": "a40a4f5365b7e675e6cb646ccdc93aa5be1214595d310db78ba0eb577192d43e",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Chinese Bun, steamed and filled with philly cheese steak, caramelized onions, provolone, and garlic mayo. Main table contains 10 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source lists3/5pound kosher salt alongside3/5gram pepper per serving; needs source quantity investigation.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Polenta Fritter - passed",
       "sourceFingerprint": "7565fc58999db170c64dd98dc1f22b750e1a8b6168e984fa70b0602fd2c71e77",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Mini Polenta fritter, served with ricotta and fried sage. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Popcorn Chicken Bites",
       "sourceFingerprint": "78f1682c376ff2f899455decf11a4f921d630a03bbc28912661f3e682a87ae5c",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Marinated chicken breast \"bites\" topped with pickled jalape\u00f1os, bacon and buttermilk dressing. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pork and Shrimp Dumplings - passed",
       "sourceFingerprint": "d034ce378b33279b5b9a48204d0e5ccd3bbbfb860d29117cbdf7ebf97638a297",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Steamed wontons, stuffed with shrimp & pork, served with sesame, soy ginger sauce, and sriracha aioli. Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pork Belly Bao Bun - passed",
       "sourceFingerprint": "95bcf2bcb91ddf648f982fd4f1e39c6c4fea7a69d73a619756260459f1d9df49",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Sous vide pork belly, glazed and seared on steamed bun, topped with house made cucumber kimchi, sriracha aioli, and micro cilantro. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pretzel and Mustard Slider - passed",
       "sourceFingerprint": "a03400c8ed11823a6799d4ae99031a29a594f57e8adb4a5f4271fc64bd7a7a99",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Crisp pretzel slider, pimento cheese, shaved pastrami, sweet & spicy mustard. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pulled Pork Arepa - passed",
       "sourceFingerprint": "8e89673d68226378656e8c1b5cca4e1e7a3055030661dd0e79aa7196d3c41324",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Mini Corn cake topped with pickled onion, mojo sauce, micro cilantro. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pulled Pork Slider - passed",
       "sourceFingerprint": "0c14dfc2b66846a83061a657ff360686901503ec5136a2482543a7611f4d456c",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Pulled pork sliders topped with our signature slaw and pickles Main table contains 9 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Making BBQ sauce then pouring it into bottles repeats the same sauce, not separate demand.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Roasted Brussel Sprout Bao Bun - passed",
       "sourceFingerprint": "29ce2d2cde0b9a18c919e5f23bae246a5115979a79d05d639028ecb5e85cdd59",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Roasted brussel sprouts, ginger, garlic, sambal aioli, pickled cucumber kimchi Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Salmon Canap\u00e9 - passed",
       "sourceFingerprint": "be03be8e15964b9003f766b3ddf12f9794d45af704e935378ea2dce080ac162d",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Cucumber rounds topped with smoked salmon mousse, garnished with fresh dill. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Short Rib Arepa - passed",
       "sourceFingerprint": "b81bc5d3c40c99894e9a29558826a140ad14a5f06fb6a481baedf1bbe01fecf3",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Mini Corn cake topped with pickled onion, mojo sauce, micro cilantro. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Short Rib Slider - passed",
       "sourceFingerprint": "b0cd75fd37a1195c7b628fd705ed8f725f2c4209c55d35a4f83c4e762d87bc95",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Beer Braised Beef Shortrib, served on toasted brioche bun, topped with creamy garlic sauce and crispy onion strings. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Shrimp Canape - passed",
       "sourceFingerprint": "6eef587d286ce90be32d3b2067b01b6ab33c9872ed0d87981cdf2887ad391499",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Fresh cucumber rounds topped with a chili-ginger seared shrimp, topped with lime aioli and micro cilantro. Passed to your guests by staff. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Shrimp Toast - passed",
       "sourceFingerprint": "e2b5c58031876f104dce94654e5fd0c058e947c361619e1640ac7f4f23ea5b41",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Hatch Chile, cream cheese, and bay shrimp on crispy crostini. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Southwest Crostini - passed",
       "sourceFingerprint": "c5ead74283530dd1bd6950d815a6e4072b605a8f091da4d11e760f804ff66413",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Avocado mousse, roasted corn, peppers, cotija, micro cilantro. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Strawberry Crostini - passed",
       "sourceFingerprint": "ac1c8fa6e225f82306eaadf44065ca017caa96bee078a2145a6b77999d03512b",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Grilled Crostini, Fresh Strawberry, Roquefort cheese, honeycomb, black pepper, balsamic reduction. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Street Taco - Passed",
       "sourceFingerprint": "993c723cf3f45042ba699f47d392712b70d45eabc3f2833389ae57a094cd5fa7",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Locally made street taco size corn tortillas topped with guest choice of protein, topped with cilantro, diced onion, cotija cheese and lime crema. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Stuffed Mushrooms - passed",
       "sourceFingerprint": "b72c707f48970c4100b324e9ab440f987263a6f3f2fe8dbc16129cb0625bd43d",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Filled with Italian cheeses and spinach simmered in a garlic butter broth topped with toasted panko breadcrumbs. Main table contains 5 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Summer Veggie Crostini - passed",
       "sourceFingerprint": "60787e8ec003d9297b2ee0febfd5717b258470a621e26e02fa26db782b30da82",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Roasted veggies, fine diced peppers, red onions, basil pesto, and balsamic glaze. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Vietnamese Banh Mi - passed",
       "sourceFingerprint": "16fcf43955bc28a7a991c110da14265b434b075206b52067a88ba5476efb36af",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Sandwich filled with pork, cilantro, fresh veggies and cilantro served on a crusty French roll Main table contains 11 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Waffle Fry Cones - Passed",
       "sourceFingerprint": "a0049016d92171cd9de0b2bbce3740cac700a21e157b65d9c6ee8632483175e5",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Waffle fries topped with white cheddar cheese, roasted garlic cloves, and a garlic sauce Main table contains 8 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Wagyu Mini Meatballs - passed",
       "sourceFingerprint": "339232b99fda16f0da8fcfa0fe4e05b7195be9b106e13f445d58642af97c5cc5",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Snake River Farms American Wagyu beef rolled into mini meatballs served with pomodoro and shaved parmesan. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Watermelon and Mint Lollipop - passed",
       "sourceFingerprint": "87314bdda0405548f47bac34031125bd4e3f4c4b6b1390a24b72e38f3cd879cf",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Refreshing bites of watermelon, soaked in orange liquor, finished with orange zest and fresh mint, served on a lollipop stick. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Zucchini Roll - passed",
       "sourceFingerprint": "7be3131ab8aa429949e6450895e6580eb69904d28a7a6aa939644ef1f1fd558a",
       "sourceFiles": ["Apps_-_Passed_-_Finish_at_Event.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 2 Each. Service description: Grilled Zucchini filled with herb goat cheese, roasted red pepper and fresh herbs. Main table contains 6 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Bacon Wrapped Dates",
       "sourceFingerprint": "664039cd256ee852b3a2915b17912b174b493ca76d5dff800083f7947914da7c",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Beef Tenderloin Wave Spoons",
       "sourceFingerprint": "0cb64b13619b38bb5208822fb2dc19210499cfef64f92d5856fc0d63c5dd5a97",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Candy",
       "sourceFingerprint": "bf36d479fe224d7da4e24e05421a0a7a5f54f6260d1babd9da8148b1ddb3c587",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chafer Lid",
@@ -1367,33 +1513,37 @@
       "name": "Chicken",
       "sourceFingerprint": "54ae701afa2b8019846380233952cc88bebc7a658ed2a4320645f82d2df13bbf",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Salad Wrap",
       "sourceFingerprint": "8acd06d16f9008f7a5e8117455b52ea654310e9b67acbc47005bc3f150d96329",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Wrap",
       "sourceFingerprint": "8df9925dc085ac956ff8755701ab16728176e73db6d997cf86b5b638077ed400",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish_selection",
+      "evidence": "Root yield: 1 Recipe. Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Custom Prep List Needed is a work reminder, not a usable wrap recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Coleslaw",
       "sourceFingerprint": "b04e100596fc15840181cd696f3df1fd60b721ed6bfa487d4091ebf808a91384",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Creamy Garlic Dressing For Salad",
@@ -1403,25 +1553,28 @@
         "Heart_City.xlsx",
         "Salad_Dressing.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Crudite Shots",
       "sourceFingerprint": "2a45983f17b6097119d3cdaf1c6978f4f94f7c72328fd2e77dc72e56335bfd37",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Deli Sandwich Bar",
       "sourceFingerprint": "5b58ce2c13b5fc33aca3f1ff9b8ded27cc260fc3f2cb6cc30533970acb25fdae",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Dressing TBD",
@@ -1431,17 +1584,19 @@
         "Heart_City.xlsx",
         "Salad_Dressing.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish_selection",
+      "evidence": "Root yield: 1 Recipe. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Gorgonzola Crostini",
       "sourceFingerprint": "be2ec1bdeab39f0ce2e6bdc1c16e59afa061161c708d9a387f1d34a464fe292b",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Gorgonzola Dressing for Salad",
@@ -1451,9 +1606,10 @@
         "Heart_City.xlsx",
         "Salad_Dressing.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Half Hotel Pans",
@@ -1471,9 +1627,10 @@
         "Heart_City.xlsx",
         "Salad_Dressing.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Make caesar salad dressing",
@@ -1483,25 +1640,28 @@
         "Heart_City.xlsx",
         "Salad_Dressing.xlsx"
       ],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "component",
+      "evidence": "Root yield: 2 Gallon. Service description: Made in house, from scratch. Main table contains 11 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Two separate Pepper2tablespoon rows occur in the measured2gallon batch. Investigate before summing or deleting either.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Make it a Platter",
       "sourceFingerprint": "45cc706c15bb1e075914b0a9712f5027ed368ce74d8c40af3f4dc1e780f7e97c",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "service_modifier",
+      "evidence": "Root yield: 1 Recipe. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Make it a Platter is a presentation modifier with no food formula or quantity.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Make it a Sandwich",
       "sourceFingerprint": "b75ba1c2417eb2636dba88442c07b9e6165b9f7fd72837619b564a58373a6f8b",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "service_modifier",
+      "evidence": "Root yield: 1 Recipe. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Make it a Sandwich is a presentation modifier with no food formula or quantity.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Make Sherry Vinaigrette salad dressing",
@@ -1519,9 +1679,10 @@
       "name": "Pretzels",
       "sourceFingerprint": "3df50117ae1e196218ba9d91f26d27efe6ac252f4fab70885f2f9509a3b08895",
       "sourceFiles": ["Buffet_Style.xlsx", "Heart_City.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Salad Dressing - Raspberry Balsamic Vinaigrette",
@@ -1563,81 +1724,91 @@
       "name": "Bag of Chips",
       "sourceFingerprint": "f60bc69fd7095d732cc8bcfc82e4517fcb161c7ba647a53c26d6e30fa72f066f",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Thick sliced salted kettle chip. Served in individual 1.38z bag Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Box Lunch - Vegetable Quinoa Bowl with Southwest Pasta Salad",
       "sourceFingerprint": "024e2343f811a1b11795747ade32dc7b38948d62e3e8a0e9583cc8ba92a6c45b",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Each. Service description: Roasted Vegetable Quinoa, power greens drizzled with lemon juice and extra virgin olive oil. Package includes cookie, southwest pasta salad, chips, and cutlery/napkin. Items are packaged, individually, in boxes for easy transport and serving. Main table contains 18 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source explicitly lists bowl plus cookie, pasta salad, chips and cutlery; preserve food members separately from packing supplies.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Box Lunch - Deluxe Turkey, Bacon, Avocado Croissant and Southwest Pasta Salad",
       "sourceFingerprint": "0308e92a9509cbb77c57a08d2fb4c57066be56f4fcffe6e6a4eaa3caf0a2a463",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Each. Service description: A croissant with turkey and bacon topped with cheese, avocado, pickle, onion, tomato, and lettuce. Package includes mayo, mustard, cookie, southwest pasta salad, chips, and cutlery/napkin. Items are packaged, individually, in boxes for easy transport and serving. Main table contains 21 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source explicitly lists sandwich plus cookie, pasta salad, chips and cutlery; preserve food members separately from packing supplies.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Cheese Bread",
       "sourceFingerprint": "f6736115c36e7c8aee1c4c50ecbc8ccdf1d7d4a4ee8c16e1ca3262ad8cdb1d82",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Chicken Carnitas Meal (individually packaged)",
       "sourceFingerprint": "a8dd84adbd72fa0d9cc125814c160e9eb9870744db36ffdf10922f5717812e73",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Chicken Carnitas served with cilantro lime rice, black beans, street corn tortilla, sour cream, and salsa. Main table contains 20 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Clean/marinate/cook6oz chicken and shred4oz are sequential states of one chicken amount; no fourfold ingredient demand.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Citrus Salad (serving of 12)",
       "sourceFingerprint": "36232f869c64484aa38da416029caa87500cb501b182fcfc3984b3918358efb2",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Recipe. Service description: \u2022 Citrus Salad: arugula, mandarin orange segments, shaved parmesan, croutons, pine nuts, roasted tomato tossed in a white wine vinaigrette. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Name says serving of12; yield1Recipe supplies no measured leaf recipe. Do not assume one guest.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Fresh Baked Cookies - Small - Box Item",
       "sourceFingerprint": "8882b19c85f31601466790987ea995257342b4c174994d6862ca0b0de2d5c717",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Each. Service description: Assorted cookies fresh baked in house. Main table contains 2 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Heart City BBQ Package 1",
       "sourceFingerprint": "37aed705b9d802e44b23ac7009bf10457476580bbcf34463b39c861579b79cc3",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_package",
+      "evidence": "Root yield: 1 Recipe. Service description: Choice of (2) meats: \u2022 Pulled Pork \u2022 Smoked Ham \u2022 Smoked Turkey \u2022 German Sausage Served with: \u2022 Gourmet Baked Beans \u2022 Two Salads \u2022 BBQ Sauce \u2022 Fresh Baked Rolls \u2022 Honey Cinnamon Butter \u2022 Relish Condiments \u2022 Sweet Tea or Huckleberry Lemonade Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Choose two meats plus named sides/beverage; this is a reusable selection package, not a single component recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Heart City BBQ Package 2",
       "sourceFingerprint": "96ed35aca6cddac92408a949701423218dd4a5ab32d879664cc6a93cae5e1ee3",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_package",
+      "evidence": "Root yield: 1 Recipe. Service description: MENU #2 Choice of (2) meats: \u2022 Ribs \u2022 Chicken Breast \u2022 Pulled Pork \u2022 Smoked Ham \u2022 Smoked Turkey \u2022 German Sausage \u2022 Beef Brisket \u2022 Tri Tip Steak \u2022 Pork Loin Served with Gourmet Baked Beans, two Salads huckleberry and original BBQ Sauce, Fresh Baked Rolls with Honey Cinnamon Butter \u2022 Relish Condiments and Sweet Tea or Huckleberry Lemonade Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Choose two meats from a wider list plus sides/beverage; retain choices, not all meats as compulsory ingredient demand.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Homemade Salsa",
       "sourceFingerprint": "cae70ce68947ff990a18962935cf77dbf8e8b8c5ef5c69d0a8d73993f01eefda",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Individual Packaging for Drop Off",
@@ -1651,89 +1822,100 @@
       "name": "Kids Chicken",
       "sourceFingerprint": "1cf3c589edf29d4e95fc412a15925bff800392186d1332e805e59ce8d1202c83",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Lasagna Meal (individually packaged)",
       "sourceFingerprint": "3b802b7c5f4f6fbf1204af7a950732c5156a7895dc60087bf8d2e27caff3c43d",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Lasagna, filled with meat ragu, creamy white sauce and our house-made cheese blend. Topped with melted mozzarella and served with caesar salad and garlic parmesan rolls. Main table contains 20 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Meat Manicotti Meal (individually packaged)",
       "sourceFingerprint": "5e598386f321dea273871645c604cbe3f91b10b935a0c1a00120a3203b4de2b1",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Meat manicotti served with green salad (creamy balsamic), and garlic parmesan roll. Main table contains 23 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Portobello Mushroom BBQ Sandwich Meal (individually packaged)",
       "sourceFingerprint": "8818b819b5dca3cf7bb13b67ea44195ae89763070ee31ab0f700a6907c5ff7cb",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Portobello Mushroom BBQ Sandwich served with baby red potato salad, huckleberry BBQ, buttered corn, apple cider slaw and a kaiser roll. Meal is vegetarian. Main table contains 14 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Roasted Fajita Veggie Quinoa Bowl Meal (individually packaged)",
       "sourceFingerprint": "77e1a0fe75f18bb7904988430304b70a31a59ceec22c77c6fec57c3b672150ce",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Roasted fajita veggie quinoa bowl served with cilantro lime rice, black beans, street corn, tortilla, sour cream, and salsa. Vegetarian Option. Main table contains 15 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Source lists1quart black beans for one meal and references rice despite no measured rice line; investigate before repair.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Roasted Veggie Quinoa Bowl - Box Item",
       "sourceFingerprint": "309c040d29ba4132193dc8d251e31bf5824df896a0bc43ebd5a29b88130f26fd",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Roasted Vegetable Quinoa, power greens drizzled with lemon juice and extra virgin olive oil. Main table contains 9 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Smoked BBQ Pulled Pork Meal (individually packaged)",
       "sourceFingerprint": "9c63a1a2515621adb7ef210e0f15ab35dddad5c505027d1115cf470e123b5170",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Smoked pulled pork served with baked beans, baby red potato salad, apple cider slaw, huckleberry BBQ, and a roll. Main table contains 11 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Southwest Pasta Salad - Box Item",
       "sourceFingerprint": "7294a93795b3cf97e74440ff85c094f4edd8423dbcf1204efbd71e2f8362ac2a",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Southwest Pasta Salad, cilantro lime dressing, roasted corn salsa, cojita cheese, pepitas. Main table contains 7 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Teriyaki Chicken Meal (individually packaged)",
       "sourceFingerprint": "5d7c91f5bf681dd0b584997827de181a4d06a3bfdb4040e5fc2e4049bd6c68f9",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Teriyaki Chicken served with Yakisoba Noodle Stir Fry, Asian Slaw with Sesame Ginger Dressing, and a Fortune Cookie Main table contains 26 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Repeated pull/marinate/cut chicken quantities are work stages; boxing rows use Minutes, not food quantities.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Teriyaki Tofu Meal (individually packaged)",
       "sourceFingerprint": "1e538ee98f6a1a086446df3548a22879902390986059ebcc0c73775a0f52778d",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Teriyaki Tofu served with Yakisoba Noodle Stir Fry, Asian Slaw with Sesame Ginger Dressing, and a Fortune Cookie. Meal is vegetarian. Main table contains 27 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Repeated portion/marinate/cut/grill tofu is one ingredient flow; boxing Minutes must not be purchased as ingredients.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Turkey Bacon Guacamole Croissant - Box Item",
       "sourceFingerprint": "12c1d0a81d8a2affa8f884d5d4c80f48041122710354a3a25d4389309ede81fa",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Packaged in a clamshell for individual use. Croissant with turkey, bacon, guacamole, lettuce, tomatoes, pickles, onions. Main table contains 14 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "White Box For Individual Packaging",
@@ -1747,25 +1929,28 @@
       "name": "Wild Mushroom Lasagna Individual Meal with Ranch Green Salad and Roll",
       "sourceFingerprint": "e71259e0240a0b9780a29a961869d08d9ec248c7bc6bfe43d9338c6e8417fdb9",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Creamy white sauce layered with cheese and saut\u00e9ed assortment of wild mushrooms. Served with ranch green salad and garlic parmesan roll. Main table contains 21 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Wild Mushroom Manicotti Meal (individually packaged)",
       "sourceFingerprint": "695d27e2cc923cfefec1d8883359829be32df01012c72183694cd77b7f121f19",
       "sourceFiles": ["Heart_City_Menu.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "meal_bundle",
+      "evidence": "Root yield: 1 Serving. Service description: Individually packaged. Mushroom manicotti served with green salad (creamy balsamic), and garlic parmesan roll. Vegetarian option. Main table contains 24 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Stationary Display of Hors d' oeuvres",
       "sourceFingerprint": "39070a72f00f771260fdbedb13f71432b6db9f6a440620d8c2d764fea1ef5ecc",
       "sourceFiles": ["Hors_d_oeuvres.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Additional Guests Per Package",
@@ -1779,41 +1964,46 @@
       "name": "Hawaiian Pizza - TPP",
       "sourceFingerprint": "b493089589ee199f7feab86b90a937d3b7f59dd5114bc2e4b2228aa939e06ad0",
       "sourceFiles": ["Pizza_Salad_Bread.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Marinara, mozzarella, grilled pineapple, sliced Canadian bacon topped with shredded parmesan. Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Pizza + Salad + Bread",
       "sourceFingerprint": "86db5654b04c12581c7f695f5b9bdedf08b6e8b71ab0cff21ae6a27871eba6e7",
       "sourceFiles": ["Pizza_Salad_Bread.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Fresh Watermelon - TPP",
       "sourceFingerprint": "c318aaf8b3e54d64719cdb02dc06b0f100c67001a3394f60168813a6153b6a60",
       "sourceFiles": ["Salad.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Service description: Fresh Cut Watermelon Slices Main table contains 0 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Make chicken cream sauce",
       "sourceFingerprint": "be0087261cdff7b4ef9044b3fc8e12853a5532bddd7823126b811e3b15834041",
       "sourceFiles": ["Sauces.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "component",
+      "evidence": "Root yield: 1 Gallon. Main table contains 4 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Four measured ingredients and sauce method establish a batch; final salt/pepper are unquantified in the method and cannot be invented.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Green Onions",
       "sourceFingerprint": "a831df2ac76133c2c492de3bae1fdb7f51ae3f66f3e70825b8e548fa5a0fe969",
       "sourceFiles": ["Side_Dish.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Bamboo Place Setting",
@@ -1899,17 +2089,19 @@
       "name": "Side: Shredded Sharp Cheddar Cheese",
       "sourceFingerprint": "bc540b37612c93188a9972c0c22c32d7eac3577c282335f3a116a8e673862e2e",
       "sourceFiles": ["Side_Items.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Tortilla Chips",
       "sourceFingerprint": "00beb407fc05599366cd3b21ae81ed01b79c740297447405102b26f3effab8cf",
       "sourceFiles": ["Side_Items.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "dish",
+      "evidence": "Root yield: 1 Serving. Main table contains 1 work/material lines. Classification is based on the served item or explicit package/service meaning; it does not establish a complete usable recipe. Table references freshly fried chips but child ingredient is already Tortilla Chips; distinguish making versus portioning from further source evidence.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     },
     {
       "name": "Whipped Butter",
@@ -1931,9 +2123,11 @@
       "name": "Soup - serves 10-12 people",
       "sourceFingerprint": "87637bec530f48cdf60b0c74edf6a05d3e6a7a4a9735a4bd2c46bddbf0a4a3f9",
       "sourceFiles": ["Soup.xlsx"],
-      "reviewStatus": "pending",
-      "classification": null,
-      "evidence": null
+      "reviewStatus": "reviewed",
+      "classification": "unresolved_catalog_entry",
+      "evidence": "Reviewed source root has insufficient description, formula, or event context to choose a final target entity. Retain current history and investigate; do not infer a complete recipe from its name or the generic 1 Recipe yield.",
+      "reviewScope": "Root classification from source main description/yield/work table; leaf quantities, method completeness and live associations require separate qualification."
     }
-  ]
+  ],
+  "unresolvedClassificationCount": 39
 }
