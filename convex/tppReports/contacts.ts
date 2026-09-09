@@ -11,6 +11,7 @@ import {
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
+  resolveReportEventVenue,
 } from "./shared";
 
 const REPORT_IDS = new Set(TPP_CONTACT_REPORTS.map((report) => report.id));
@@ -80,11 +81,15 @@ async function eventBundle(
   const eventRaw = await ctx.db.get(eventId);
   if (!eventRaw || !isLiveTenantRow(eventRaw, tenantId))
     throw new Error("Event not found");
-  const event = await decryptReportFields(
+  const event = await resolveReportEventVenue(
     ctx,
-    "Event",
-    ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
-    eventRaw,
+    tenantId,
+    await decryptReportFields(
+      ctx,
+      "Event",
+      ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+      eventRaw,
+    ),
   );
   const [client, invoices, proposals, contracts, eventDishes] =
     await Promise.all([
@@ -357,7 +362,12 @@ export const run = query({
       { label: "Event", value: bundle.event.title },
       { label: "Date", value: dateText(bundle.event.startsAt) },
       { label: "Contact", value: contact },
-      { label: "Venue", value: bundle.event.venueName ?? "" },
+      {
+        label: "Venue",
+        value: [bundle.event.venueName, bundle.event.venueAddress]
+          .filter(Boolean)
+          .join(" · "),
+      },
       { label: "Guests", value: String(bundle.event.expectedHeadcount) },
     ];
 

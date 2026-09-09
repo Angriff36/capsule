@@ -12,6 +12,7 @@ import {
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
+  resolveReportEventVenue,
 } from "./shared";
 
 const REPORT_IDS = new Set(TPP_GENERAL_REPORTS.map((report) => report.id));
@@ -149,15 +150,7 @@ export const run = query({
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT);
       const [start, end] = range(parameters);
-      return table(
-        args.reportId,
-        [
-          { key: "event", label: "Event", kind: "text" },
-          { key: "date", label: "Date", kind: "date" },
-          { key: "contact", label: "Contact", kind: "text" },
-          { key: "venue", label: "Venue", kind: "text" },
-          { key: "status", label: "Status", kind: "text" },
-        ],
+      const resolvedEvents = await Promise.all(
         events
           .filter(
             (row) =>
@@ -170,16 +163,39 @@ export const run = query({
               ].includes(row.stage) &&
               inDateRange(row.startsAt, start, end),
           )
-          .map((row) => ({
-            id: row._id,
-            values: {
-              event: row.title,
-              date: row.startsAt ?? null,
-              contact: row.primaryContactName ?? "",
-              venue: row.venueName ?? "",
-              status: row.stage,
-            },
-          })),
+          .map(async (event) =>
+            resolveReportEventVenue(
+              ctx,
+              tenantId,
+              await decryptReportFields(
+                ctx,
+                "Event",
+                ["primaryContactName"],
+                event,
+              ),
+              false,
+            ),
+          ),
+      );
+      return table(
+        args.reportId,
+        [
+          { key: "event", label: "Event", kind: "text" },
+          { key: "date", label: "Date", kind: "date" },
+          { key: "contact", label: "Contact", kind: "text" },
+          { key: "venue", label: "Venue", kind: "text" },
+          { key: "status", label: "Status", kind: "text" },
+        ],
+        resolvedEvents.map((row) => ({
+          id: row._id,
+          values: {
+            event: row.title,
+            date: row.startsAt ?? null,
+            contact: row.primaryContactName ?? "",
+            venue: row.venueName ?? "",
+            status: row.stage,
+          },
+        })),
       );
     }
 

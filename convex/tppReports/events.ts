@@ -20,6 +20,7 @@ import {
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
+  resolveReportEventVenue,
 } from "./shared";
 
 const REPORT_IDS = new Set(TPP_EVENT_REPORTS.map((report) => report.id));
@@ -71,12 +72,16 @@ async function eventsInRange(
       inDateRange(event.startsAt, start, end),
   );
   return await Promise.all(
-    events.map((event) =>
-      decryptReportFields(
+    events.map(async (event) =>
+      resolveReportEventVenue(
         ctx,
-        "Event",
-        ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
-        event,
+        tenantId,
+        await decryptReportFields(
+          ctx,
+          "Event",
+          ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+          event,
+        ),
       ),
     ),
   );
@@ -94,11 +99,15 @@ async function selectedEvent(
   const eventRaw = eventId ? await ctx.db.get(eventId) : null;
   if (!eventRaw || !isLiveTenantRow(eventRaw, tenantId))
     throw new Error("Choose an event");
-  return await decryptReportFields(
+  return resolveReportEventVenue(
     ctx,
-    "Event",
-    ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
-    eventRaw,
+    tenantId,
+    await decryptReportFields(
+      ctx,
+      "Event",
+      ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
+      eventRaw,
+    ),
   );
 }
 
@@ -737,7 +746,12 @@ export const run = query({
       { label: "Event", value: event.title },
       { label: "Date", value: dateText(event.startsAt) },
       { label: "Contact", value: event.primaryContactName ?? "" },
-      { label: "Venue", value: event.venueName ?? "" },
+      {
+        label: "Venue",
+        value: [event.venueName, event.venueAddress]
+          .filter(Boolean)
+          .join(" · "),
+      },
       { label: "Guests", value: String(event.expectedHeadcount) },
       { label: "Status", value: event.stage },
     ];
