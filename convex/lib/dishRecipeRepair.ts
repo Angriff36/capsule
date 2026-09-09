@@ -1,0 +1,436 @@
+import { v } from "convex/values";
+import { api } from "../_generated/api";
+import type { MutationCtx } from "../_generated/server";
+import type { Id } from "../_generated/dataModel";
+import { getAuthContext, requireTenant } from "./authContext";
+import { requireKitchenAccess } from "./kitchenAccessGate";
+import {
+  readMaterializationReceipt,
+  writeMaterializationReceipt,
+} from "./materializationReceipt";
+import { recipeNameKey } from "../../src/lib/tppRecipeRepair";
+
+const amount = v.object({
+  name: v.string(),
+  quantity: v.number(),
+  unit: v.string(),
+  source: v.string(),
+  ingredientId: v.optional(v.id("ingredients")),
+});
+export const dishRecipeRepairArgs = {
+  operationKey: v.string(),
+  dishIds: v.array(v.id("dishes")),
+  expectedVersions: v.record(v.string(), v.number()),
+  sourceComponentId: v.optional(v.id("components")),
+  recipe: v.object({
+    name: v.string(),
+    fingerprint: v.string(),
+    source: v.string(),
+    description: v.string(),
+    raw: v.string(),
+    instructions: v.string(),
+    yieldText: v.string(),
+    portionSize: v.number(),
+    portionUnit: v.string(),
+    tasks: v.array(
+      v.object({
+        name: v.string(),
+        quantity: v.optional(v.number()),
+        unit: v.optional(v.string()),
+        instructions: v.string(),
+      }),
+    ),
+    ingredients: v.array(amount),
+    components: v.array(
+      v.object({
+        name: v.string(),
+        key: v.string(),
+        instructions: v.string(),
+        ingredients: v.array(amount),
+      }),
+    ),
+    notes: v.array(v.string()),
+  }),
+};
+type Amount = {
+  name: string;
+  quantity: number;
+  unit: string;
+  source: string;
+  ingredientId?: Id<"ingredients">;
+};
+type Input = {
+  operationKey: string;
+  dishIds: Id<"dishes">[];
+  expectedVersions: Record<string, number>;
+  sourceComponentId?: Id<"components">;
+  recipe: {
+    name: string;
+    fingerprint: string;
+    source: string;
+    description: string;
+    raw: string;
+    instructions: string;
+    yieldText: string;
+    portionSize: number;
+    portionUnit: string;
+    tasks: {
+      name: string;
+      quantity?: number;
+      unit?: string;
+      instructions: string;
+    }[];
+    ingredients: Amount[];
+    components: {
+      name: string;
+      key: string;
+      instructions: string;
+      ingredients: Amount[];
+    }[];
+    notes: string[];
+  };
+};
+export async function repairDishRecipe(
+  ctx: MutationCtx,
+  args: Input,
+): Promise<{
+  dishIds: string[];
+  createdIngredients: { id: string; name: string; unit: string }[];
+  tasks: number;
+  ingredients: number;
+  components: number;
+  retiredSource: boolean;
+}> {
+  const auth = await getAuthContext(ctx);
+  requireKitchenAccess(auth);
+  const tenantId = requireTenant(auth);
+  if (!["owner", "admin", "system"].includes(auth.role))
+    throw new Error("Only an administrator may run a historical recipe repair");
+  const prior = await readMaterializationReceipt<
+    Awaited<ReturnType<typeof repairDishRecipe>>
+  >(ctx, tenantId, "dishRecipeRepair", args.operationKey, args);
+  if (prior) return prior;
+  const result = {
+    dishIds: [] as string[],
+    createdIngredients: [] as { id: string; name: string; unit: string }[],
+    tasks: 0,
+    ingredients: 0,
+    components: 0,
+    retiredSource: false,
+  };
+  const owned = async (
+    id: Id<"dishes"> | Id<"ingredients"> | Id<"components">,
+  ) => {
+    const row = await ctx.db.get(id);
+    if (!row || row.tenantId !== tenantId || row.deletedAt != null)
+      throw new Error("Recipe record not found");
+    return row;
+  };
+  const input = args.recipe;
+  for (const id of args.dishIds) {
+    const dish = await owned(id);
+    if (
+      recipeNameKey(dish.name) !== recipeNameKey(input.name) ||
+      dish.version !== args.expectedVersions[id]
+    )
+      throw new Error("Dish changed since the reviewed repair snapshot");
+  }
+  if (args.sourceComponentId) {
+    const source = await owned(args.sourceComponentId);
+    if (
+      !("instructions" in source) ||
+      source.name !== `${input.name} — TPP recipe` ||
+      source.instructions !== input.raw ||
+      source.category !== "TPP imported recipes"
+    )
+      throw new Error("Source is not the reviewed imported whole recipe");
+    const links = await ctx.db
+      .query("dishComponents")
+      .withIndex("by_componentId", (q) =>
+        q.eq("componentId", args.sourceComponentId!),
+      )
+      .collect();
+    if (links.some((l) => l.deletedAt == null))
+      throw new Error(
+        "Imported source is already used by a dish; preserve its references",
+      );
+  }
+  const ingredientCache = new Map<string, Id<"ingredients">>();
+  const existingIngredients = await ctx.db
+    .query("ingredients")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  const ingredient = async (line: Amount) => {
+    if (!(line.quantity > 0) || !Number.isFinite(line.quantity))
+      throw new Error("Recipe quantity must be positive");
+    if (line.ingredientId) {
+      const row = await owned(line.ingredientId);
+      if (
+        !("unit" in row) ||
+        row.unit !== line.unit ||
+        recipeNameKey(row.name) !== recipeNameKey(line.name)
+      )
+        throw new Error("Ingredient does not match the reviewed recipe");
+      return line.ingredientId;
+    }
+    const key = `${recipeNameKey(line.name)}:${line.unit}`;
+    const cached = ingredientCache.get(key);
+    if (cached) return cached;
+    const matches = existingIngredients.filter(
+      (i) =>
+        i.deletedAt == null &&
+        i.status === "active" &&
+        !i.mergedIntoIngredientId &&
+        recipeNameKey(i.name) === recipeNameKey(line.name) &&
+        i.unit === line.unit,
+    );
+    if (matches.length > 1)
+      throw new Error(
+        `Ambiguous existing ingredient: ${line.name} (${line.unit})`,
+      );
+    if (matches.length === 1) {
+      ingredientCache.set(key, matches[0]._id);
+      return matches[0]._id;
+    }
+    const created: { docId: Id<"ingredients"> } = await ctx.runMutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      {
+        name: line.name,
+        unit: line.unit,
+        costPerUnit: 0,
+        category: "TPP recipe ingredients",
+      },
+    );
+    ingredientCache.set(key, created.docId);
+    result.createdIngredients.push({
+      id: created.docId,
+      name: line.name,
+      unit: line.unit,
+    });
+    return created.docId;
+  };
+  const componentIds: Id<"components">[] = [];
+  const existingComponents = await ctx.db
+    .query("components")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  for (const formula of input.components) {
+    const reused = existingComponents.find(
+      (c) =>
+        c.deletedAt == null &&
+        c.status === "published" &&
+        c.description?.includes(`[TPP subrecipe:${formula.key}]`),
+    );
+    if (reused) {
+      componentIds.push(reused._id);
+      continue;
+    }
+    const created: { docId: Id<"components"> } = await ctx.runMutation(
+      api.mutations.Component_createViaDraft,
+      {
+        name: formula.name,
+        yieldQuantity: 1,
+        yieldUnit: "serving",
+        category: "TPP subrecipes",
+        instructions: formula.instructions,
+        description: `Subrecipe amount for one serving of ${input.name}.\n[TPP subrecipe:${formula.key}]`,
+      },
+    );
+    for (const line of formula.ingredients)
+      await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
+        componentId: created.docId,
+        ingredientId: await ingredient(line),
+        quantity: line.quantity,
+        unit: line.unit,
+        sortOrder: formula.ingredients.indexOf(line),
+      });
+    await ctx.runMutation(api.mutations.Component_publishVersion, {
+      docId: created.docId,
+    });
+    componentIds.push(created.docId);
+    result.components++;
+  }
+  const dishIds = [...new Set(args.dishIds)];
+  if (!dishIds.length) {
+    const created: { docId: Id<"dishes"> } = await ctx.runMutation(
+      api.mutations.Dish_createViaIntroduce,
+      {
+        name: input.name,
+        portionSize: input.portionSize,
+        portionUnit: input.portionUnit,
+        category: "TPP recipes",
+        description: input.description,
+      },
+    );
+    dishIds.push(created.docId);
+  }
+  for (const dishId of dishIds) {
+    const dish = await ctx.db.get(dishId);
+    if (
+      !dish ||
+      dish.tenantId !== tenantId ||
+      dish.deletedAt != null ||
+      dish.status !== "active"
+    )
+      throw new Error("Active recipe dish not found");
+    const marker = `[TPP dish recipe:${input.fingerprint}]`;
+    if (
+      dish.recipeSourceFingerprint &&
+      dish.recipeSourceFingerprint !== input.fingerprint
+    )
+      throw new Error("Dish already has a different source recipe");
+    await ctx.runMutation(api.mutations.Dish_saveRecipe, {
+      docId: dishId,
+      instructions: input.instructions,
+      sourceText: `${input.source}\n\n${input.raw}${input.notes.length ? "\n\nSource notes:\n" + input.notes.join("\n") : ""}`,
+      sourceYield: input.yieldText,
+      sourceFingerprint: input.fingerprint,
+    });
+    const tasks = await ctx.db
+      .query("dishTasks")
+      .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
+      .collect();
+    for (const [i, task] of input.tasks.entries()) {
+      const existing = tasks.find(
+        (t) =>
+          t.status === "active" &&
+          t.deletedAt == null &&
+          t.name.trim().toLowerCase() === task.name.trim().toLowerCase(),
+      );
+      if (existing) {
+        if (
+          existing.defaultQuantity !== task.quantity ||
+          existing.defaultUnit !== task.unit
+        )
+          throw new Error(`Existing prep quantity differs: ${task.name}`);
+        continue;
+      }
+      const componentIndex = input.components.findIndex(
+        (c) => recipeNameKey(c.name) === recipeNameKey(task.name),
+      );
+      await ctx.runMutation(api.mutations.DishTask_createViaAdd, {
+        dishId,
+        name: task.name,
+        category: dish.category ?? "Finish at Kitchen",
+        taskType: "manual",
+        defaultQuantity: task.quantity,
+        defaultUnit: task.unit,
+        componentId:
+          componentIndex >= 0 ? componentIds[componentIndex] : undefined,
+        station: dish.serviceStyle,
+        sortOrder: i,
+        instructions: `${task.instructions}\n${marker}`,
+      });
+      result.tasks++;
+    }
+    const lines = await ctx.db
+      .query("dishIngredients")
+      .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
+      .collect();
+    for (const [i, line] of input.ingredients.entries()) {
+      const id = await ingredient(line);
+      const existing = lines.find(
+        (l) =>
+          l.deletedAt == null && l.ingredientId === id && l.unit === line.unit,
+      );
+      if (existing) {
+        if (Math.abs(existing.quantity - line.quantity) > 0.000001)
+          throw new Error(`Existing ingredient quantity differs: ${line.name}`);
+        continue;
+      }
+      await ctx.runMutation(api.mutations.DishIngredient_createViaAdd, {
+        dishId,
+        ingredientId: id,
+        quantity: line.quantity,
+        unit: line.unit,
+        sortOrder: i,
+        prepNotes: `${line.source}\n${input.source}\n${marker}`,
+      });
+      result.ingredients++;
+    }
+    for (const [i, componentId] of componentIds.entries())
+      await ctx.runMutation(api.mutations.DishComponent_createViaAttach, {
+        dishId,
+        componentId,
+        yieldQuantity: 1,
+        batchMultiplier: 1,
+        sortOrder: i,
+        role: input.components[i].name,
+      });
+    // Existing event menu lines need the newly restored templates too. Preserve
+    // performed/manual work; matching names are not reopened or duplicated.
+    const templates = await ctx.db
+      .query("dishTasks")
+      .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
+      .collect();
+    const eventDishes = await ctx.db
+      .query("eventDishes")
+      .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
+      .collect();
+    for (const eventDish of eventDishes.filter(
+      (e) =>
+        e.tenantId === tenantId &&
+        e.deletedAt == null &&
+        e.quantityServings > 0,
+    )) {
+      const event = await ctx.db.get(eventDish.eventId);
+      if (
+        !event ||
+        event.deletedAt != null ||
+        ["completed", "closed_out", "cancelled"].includes(event.stage)
+      )
+        continue;
+      const prep = await ctx.db
+        .query("prepTasks")
+        .withIndex("by_eventDishId", (q) => q.eq("eventDishId", eventDish._id))
+        .collect();
+      for (const task of templates.filter(
+        (t) => t.status === "active" && t.deletedAt == null,
+      )) {
+        if (
+          prep.some(
+            (p) =>
+              p.deletedAt == null &&
+              (p.dishTaskId === task._id ||
+                recipeNameKey(p.name) === recipeNameKey(task.name)),
+          )
+        )
+          continue;
+        await ctx.runMutation(api.mutations.PrepTask_createViaOpen, {
+          eventDishId: eventDish._id,
+          eventId: eventDish.eventId,
+          dishId,
+          dishTaskId: task._id,
+          name: task.name,
+          quantity:
+            task.defaultQuantity != null
+              ? task.defaultQuantity * eventDish.quantityServings
+              : 1,
+          unit: task.defaultUnit ?? "each",
+          componentId: task.componentId ?? undefined,
+          category: task.category,
+          taskType: task.taskType,
+          isGenerated: task.defaultQuantity != null,
+          specialInstructions: task.instructions ?? undefined,
+        });
+      }
+    }
+    result.dishIds.push(dishId);
+  }
+  if (args.sourceComponentId) {
+    await ctx.runMutation(api.mutations.Component_retire, {
+      docId: args.sourceComponentId,
+      reason: `Whole recipe moved to dishes: ${result.dishIds.join(", ")}. Original source preserved on each dish.`,
+    });
+    result.retiredSource = true;
+  }
+  await writeMaterializationReceipt(
+    ctx,
+    tenantId,
+    "dishRecipeRepair",
+    args.operationKey,
+    args,
+    result,
+  );
+  return result;
+}

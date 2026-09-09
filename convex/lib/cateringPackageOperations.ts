@@ -3,6 +3,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { api } from "../_generated/api";
 import {
   cateringNameKey,
+  cateringRecipeNameKeys,
   cateringPackages,
   cateringRecipes,
   cateringSource,
@@ -83,11 +84,15 @@ export async function materializeCateringPackage(
     let dish: Doc<"dishes"> | undefined = liveDishes.find((row) => row.description?.includes(marker));
     if (!dish) {
       const matches = liveDishes.filter((row) =>
-        cateringNameKey(row.name) === cateringNameKey(recipe.name) &&
+        cateringRecipeNameKeys(recipe).includes(cateringNameKey(row.name)) &&
         (!row.description?.includes("[catering-recipe:") ||
           row.description.startsWith(`${recipe.description || recipe.name}\n\nSource:`)));
-      // Never silently pick between several different recipes with the same name.
-      if (matches.length === 1) dish = matches[0];
+      // Prefer the restored house recipe. Duplicate imported service variants
+      // must not cause another empty dish to be created.
+      matches.sort((a,b)=>Number(Boolean(b.recipeSourceFingerprint))-Number(Boolean(a.recipeSourceFingerprint)) ||
+        Number(b.serviceStyle===pack.serviceStyle)-Number(a.serviceStyle===pack.serviceStyle) ||
+        a._creationTime-b._creationTime);
+      dish = matches[0];
     }
     if (!dish) {
       const created: { docId: Id<"dishes"> } = await ctx.runMutation(api.mutations.Dish_createViaIntroduce, {
