@@ -4300,6 +4300,38 @@
   .print-sheet .supply-table-wrap {
     overflow: visible;
   }
+  body:has(.tpp-document--production),
+  .tpp-print-area:has(.tpp-document--production) {
+    page: production-worksheet;
+  }
+  .tpp-document--production {
+    max-width: none;
+    padding: 0;
+    gap: 0.6rem;
+    font-size: 10pt;
+    line-height: 1.25;
+  }
+  .tpp-document--production h3,
+  .tpp-document--production h4 {
+    padding: 0.25rem 0;
+    font-size: 11pt;
+  }
+  .tpp-document--production dl > div {
+    grid-template-columns: minmax(0, 0.45fr) minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.2rem 0;
+  }
+  .tpp-document--production dt {
+    font-size: inherit;
+  }
+  .tpp-document-print-context {
+    padding-top: 0.2rem;
+    font-size: 9pt;
+  }
+  @page production-worksheet {
+    size: letter portrait;
+    margin: 12mm;
+  }
   @page {
     size: landscape;
   }

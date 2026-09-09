@@ -189,6 +189,19 @@ async function productionWorksheet(
         });
       if (selection?.course)
         sectionRows.push({ label: "Course", value: selection.course });
+      const categories = [...new Set(group.tasks.map((task) => task.category))];
+      const sharedCategory = categories.length === 1;
+      if (sharedCategory)
+        sectionRows.push({ label: "Preparation", value: human(categories[0]) });
+      const firstTask = group.tasks[0];
+      const sharedWork =
+        firstTask &&
+        group.tasks.every(
+          (task) =>
+            task.status === firstTask.status &&
+            task.assignedToId === firstTask.assignedToId &&
+            task.station === firstTask.station,
+        );
       const menuNotes = recipeNoteLines(
         displayEventMenuNotes(selection?.specialInstructions),
       ).join("\n");
@@ -228,6 +241,13 @@ async function productionWorksheet(
             : task.assignedToId
               ? "Assigned"
               : "Unassigned";
+        if (sharedWork && task._id === firstTask._id)
+          sectionRows.push({
+            label: "Work status",
+            value: [task.station, human(task.status), owner]
+              .filter(Boolean)
+              .join(" / "),
+          });
         const notes = [
           ...new Set([
             ...recipeNoteLines(
@@ -244,7 +264,10 @@ async function productionWorksheet(
             : `${readableRecipeAmount(task.completedQuantity, task.unit)} completed`;
         const detail = [
           quantity,
-          [human(task.category), task.station, human(task.status), owner]
+          [
+            sharedCategory ? "" : human(task.category),
+            ...(sharedWork ? [] : [task.station, human(task.status), owner]),
+          ]
             .filter(Boolean)
             .join("  /  "),
           task.dueAt ? `Due ${dateText(task.dueAt)}` : "",
@@ -290,6 +313,7 @@ async function productionWorksheet(
         id: `${event._id}-${group.key}`,
         heading: dishName,
         headingLevel: 4,
+        printContext: `${event.title} / ${dateText(event.startsAt)} / ${event.expectedHeadcount} guests`,
         rows: sectionRows,
       });
     }

@@ -3,13 +3,25 @@ import type { TppDocumentSection } from "./types";
 
 export function TppReportDocument({
   sections,
+  template,
 }: {
   sections: readonly TppDocumentSection[];
+  template: string;
 }) {
+  const production =
+    template === "master-food-production-worksheet" ||
+    template === "event-menu-item-production";
   return (
-    <div className="tpp-document">
+    <div
+      className={`tpp-document${production ? " tpp-document--production" : ""}`}
+    >
       {sections.map((section) => (
         <section key={section.id} className="print:break-inside-avoid">
+          {section.printContext ? (
+            <p className="tpp-document-print-context hidden print:block">
+              {section.printContext}
+            </p>
+          ) : null}
           {section.heading ? (
             section.headingLevel === 4 ? (
               <h4 className="py-2 text-base font-semibold">

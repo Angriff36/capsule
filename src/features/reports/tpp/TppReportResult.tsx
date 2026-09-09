@@ -44,7 +44,10 @@ export function TppReportResult({ result }: { result: Result }) {
         />
       ) : null}
       {result.kind === "document" ? (
-        <TppReportDocument sections={result.sections} />
+        <TppReportDocument
+          sections={result.sections}
+          template={result.template}
+        />
       ) : null}
       {result.kind === "labels" ? (
         <TppReportLabels stock={result.stock} labels={result.labels} />

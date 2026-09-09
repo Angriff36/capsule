@@ -122,6 +122,7 @@ export interface TppDocumentSection {
   id: string;
   heading?: string;
   headingLevel?: 3 | 4;
+  printContext?: string;
   rows: readonly {
     label?: string;
     value: string;
