@@ -1,4 +1,8 @@
 import {
+  packingItemDescription,
+  packingAssociationMissing,
+} from "../../src/lib/packingDisplay";
+import {
   readableRecipeAmount,
   recipeNoteLines,
 } from "../../src/lib/recipeDisplay";
@@ -975,40 +979,85 @@ export const run = query({
     }
 
     if (args.reportId === "pack-list") {
-      const lists = await ctx.db
-        .query("packLists")
-        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-        .take(20);
-      const listIds = new Set(lists.map((list) => String(list._id)));
-      const items = await ctx.db
-        .query("packListItems")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
+      const lists = (
+        await ctx.db
+          .query("packLists")
+          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+          .collect()
+      ).filter((list) => isLiveTenantRow(list, tenantId));
+      const listNames = new Map(
+        lists.map((list) => [String(list._id), list.name]),
+      );
+      const items = (
+        await Promise.all(
+          lists.map((list) =>
+            ctx.db
+              .query("packListItems")
+              .withIndex("by_packListId", (q) => q.eq("packListId", list._id))
+              .collect(),
+          ),
+        )
+      )
+        .flat()
+        .filter((row) => isLiveTenantRow(row, tenantId));
+      const dishIds = [
+        ...new Set(items.flatMap((row) => (row.dishId ? [row.dishId] : []))),
+      ];
+      const dishes = await Promise.all(dishIds.map((id) => ctx.db.get(id)));
+      const dishNames = new Map(
+        dishes
+          .filter(
+            (dish): dish is Doc<"dishes"> =>
+              !!dish && isLiveTenantRow(dish, tenantId),
+          )
+          .map((dish) => [String(dish._id), dish.name]),
+      );
       return table(
         args.reportId,
         [
           { key: "item", label: "Item", kind: "text" },
+          { key: "association", label: "For", kind: "text" },
+          ...(lists.length > 1
+            ? [{ key: "loadSheet", label: "Load sheet", kind: "text" as const }]
+            : []),
           { key: "required", label: "Required", kind: "quantity" },
           { key: "packed", label: "Packed", kind: "quantity" },
           { key: "unit", label: "Unit", kind: "text" },
           { key: "status", label: "Status", kind: "text" },
         ],
-        items
-          .filter(
-            (row) =>
-              isLiveTenantRow(row, tenantId) &&
-              listIds.has(String(row.packListId)),
-          )
-          .map((row) => ({
+        items.map((row) => {
+          const dishName = row.dishId
+            ? dishNames.get(String(row.dishId))
+            : undefined;
+          return {
             id: row._id,
+            ...(dishName && row.dishId
+              ? {
+                  recipeLinks: {
+                    association: {
+                      kind: "dish" as const,
+                      id: String(row.dishId),
+                    },
+                  },
+                }
+              : {}),
             values: {
-              item: row.description,
+              item: packingItemDescription(row.description),
+              association:
+                dishName ??
+                (row.dishId
+                  ? "Dish unavailable"
+                  : packingAssociationMissing(row.description)
+                    ? "Association not recorded"
+                    : ""),
+              loadSheet: listNames.get(String(row.packListId)) ?? "",
               required: row.requiredQuantity,
               packed: row.packedQuantity,
               unit: row.unit,
               status: row.status,
             },
-          })),
+          };
+        }),
       );
     }
 

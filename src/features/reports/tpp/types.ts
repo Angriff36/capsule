@@ -98,6 +98,9 @@ export type TppCellValue = string | number | boolean | null;
 export interface TppRow {
   id: string;
   values: Readonly<Record<string, TppCellValue>>;
+  recipeLinks?: Readonly<
+    Record<string, { kind: "dish" | "component"; id: string }>
+  >;
 }
 
 export interface TppGroup {

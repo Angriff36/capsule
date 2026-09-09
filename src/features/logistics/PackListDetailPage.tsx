@@ -136,7 +136,8 @@ export function PackListDetailPage() {
     "Unknown event";
   const dishName = (dishId?: string | null) =>
     dishId
-      ? (dishes?.find((dish) => dish._id === dishId)?.name ?? "Unknown dish")
+      ? (dishes?.find((dish) => dish._id === dishId && dish.deletedAt == null)
+          ?.name ?? null)
       : null;
   const canAddItems =
     String(packList.status) === "draft" ||
@@ -550,7 +551,9 @@ export function PackListDetailPage() {
           <span>{formatCountNoun(listItems.length, "item")}</span>
         </div>
         <PackListItemTable
-          loading={items === undefined || events === undefined}
+          loading={
+            items === undefined || events === undefined || dishes === undefined
+          }
           items={listItems}
           canAddItems={canAddItems}
           busy={busy}

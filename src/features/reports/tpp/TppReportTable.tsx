@@ -5,6 +5,7 @@ import {
   displayCell,
 } from "./formatters";
 import type { TppColumn, TppRow, TppTotal } from "./types";
+import { CulinaryEntityLink } from "../../kitchen/CulinaryEntityLink";
 
 function cell(value: TppRow["values"][string], column: TppColumn): string {
   if (column.kind === "date" && typeof value === "number")
@@ -46,7 +47,13 @@ export function TppReportTable({
               <tr key={row.id}>
                 {columns.map((column) => (
                   <td key={column.key} data-kind={column.kind}>
-                    {cell(row.values[column.key] ?? null, column)}
+                    {row.recipeLinks?.[column.key] ? (
+                      <CulinaryEntityLink {...row.recipeLinks[column.key]}>
+                        {cell(row.values[column.key] ?? null, column)}
+                      </CulinaryEntityLink>
+                    ) : (
+                      cell(row.values[column.key] ?? null, column)
+                    )}
                   </td>
                 ))}
               </tr>
