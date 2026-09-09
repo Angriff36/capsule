@@ -95,6 +95,12 @@ export interface TppColumn {
 
 export type TppCellValue = string | number | boolean | null;
 
+export interface TppReportContext {
+  label: string;
+  value: TppCellValue;
+  kind?: TppColumn["kind"];
+}
+
 export interface TppRow {
   id: string;
   values: Readonly<Record<string, TppCellValue>>;
@@ -142,6 +148,7 @@ export type TppReportResult =
   | {
       kind: "table";
       title: string;
+      context?: readonly TppReportContext[];
       columns: readonly TppColumn[];
       rows: readonly TppRow[];
       groups: readonly TppGroup[];

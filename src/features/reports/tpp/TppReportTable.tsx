@@ -4,7 +4,7 @@ import {
   formatTppQuantity,
   displayCell,
 } from "./formatters";
-import type { TppColumn, TppRow, TppTotal } from "./types";
+import type { TppColumn, TppRow, TppTotal, TppReportContext } from "./types";
 import { CulinaryEntityLink } from "../../kitchen/CulinaryEntityLink";
 
 function cell(value: TppRow["values"][string], column: TppColumn): string {
@@ -24,16 +24,34 @@ export function TppReportTable({
   columns,
   rows,
   totals,
+  context,
 }: {
   columns: readonly TppColumn[];
   rows: readonly TppRow[];
   totals: readonly TppTotal[];
+  context?: readonly TppReportContext[];
 }) {
   return (
     <>
       <div className="tpp-result-scroll">
         <table className="data-table tpp-result-table">
           <thead>
+            {context?.length ? (
+              <tr>
+                <td colSpan={columns.length} className="tpp-report-context">
+                  {context.map((item, index) => (
+                    <span key={`${item.label}:${index}`}>
+                      <strong>{item.label}:</strong>{" "}
+                      {cell(item.value, {
+                        key: item.label,
+                        label: item.label,
+                        kind: item.kind ?? "text",
+                      })}
+                    </span>
+                  ))}
+                </td>
+              </tr>
+            ) : null}
             <tr>
               {columns.map((column) => (
                 <th key={column.key} scope="col">

@@ -2946,6 +2946,21 @@
   min-width: 720px;
 }
 
+.tpp-result-table .tpp-report-context {
+  color: var(--color-ink);
+  white-space: normal;
+  text-align: left;
+}
+
+.tpp-report-context > span {
+  display: inline-block;
+  margin-right: 1.25rem;
+}
+
+.tpp-report-context strong {
+  display: inline;
+}
+
 .tpp-result-table td[data-kind="money"],
 .tpp-result-table td[data-kind="number"],
 .tpp-result-table td[data-kind="quantity"] {
@@ -4306,6 +4321,23 @@
   .print-sheet .supply-table-wrap {
     overflow: visible;
   }
+  .tpp-result-table:has(.tpp-report-context) {
+    min-width: 0;
+    width: 100%;
+  }
+  body:has(.tpp-report-context),
+  .tpp-print-area:has(.tpp-report-context) {
+    page: contextual-table;
+  }
+  .tpp-result-table:has(.tpp-report-context) th,
+  .tpp-result-table:has(.tpp-report-context) td {
+    padding: 3pt 5pt;
+    font-size: 10pt;
+    line-height: 1.2;
+  }
+  .tpp-result-table:has(.tpp-report-context) tr {
+    break-inside: avoid;
+  }
   body:has(.tpp-document--production),
   .tpp-print-area:has(.tpp-document--production) {
     page: production-worksheet;
@@ -4337,6 +4369,10 @@
   @page production-worksheet {
     size: letter portrait;
     margin: 12mm;
+  }
+  @page contextual-table {
+    size: letter landscape;
+    margin: 10mm;
   }
   @page {
     size: landscape;

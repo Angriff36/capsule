@@ -41,6 +41,7 @@ export function TppReportResult({ result }: { result: Result }) {
           columns={result.columns}
           rows={result.rows}
           totals={result.totals}
+          context={result.kind === "table" ? result.context : undefined}
         />
       ) : null}
       {result.kind === "document" ? (

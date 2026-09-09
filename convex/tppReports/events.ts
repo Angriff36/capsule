@@ -39,7 +39,7 @@ function table(
   reportId: string,
   columns: TppColumn[],
   rows: TppRow[],
-): TppReportResult {
+): Extract<TppReportResult, { kind: "table" }> {
   return {
     kind: "table",
     title: reportTitle(reportId),
@@ -1012,7 +1012,7 @@ export const run = query({
           )
           .map((dish) => [String(dish._id), dish.name]),
       );
-      return table(
+      const result = table(
         args.reportId,
         [
           { key: "item", label: "Item", kind: "text" },
@@ -1059,6 +1059,28 @@ export const run = query({
           };
         }),
       );
+      return {
+        ...result,
+        context: [
+          { label: "Event", value: event.title },
+          {
+            label: "Date",
+            value: event.startsAt ?? null,
+            kind: "date" as const,
+          },
+          { label: "Guests", value: event.expectedHeadcount },
+          {
+            label: "Venue",
+            value:
+              [event.venueName, event.venueAddress]
+                .filter(Boolean)
+                .join(" - ") || "Not recorded",
+          },
+          ...(lists.length === 1
+            ? [{ label: "Load sheet", value: lists[0].name }]
+            : []),
+        ],
+      };
     }
 
     if (args.reportId === "shopping-list") {
