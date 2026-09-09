@@ -420,6 +420,9 @@ export async function repairDishRecipe(
       .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
       .collect();
     for (const [i, task] of input.tasks.entries()) {
+      const componentIndex = input.components.findIndex(
+        (c) => recipeNameKey(c.name) === recipeNameKey(task.name),
+      );
       const existing = tasks.find(
         (t) =>
           t.status === "active" &&
@@ -432,11 +435,24 @@ export async function repairDishRecipe(
           existing.defaultUnit !== task.unit
         )
           throw new Error(`Existing prep quantity differs: ${task.name}`);
+        if (existing.componentId == null && componentIndex >= 0) {
+          await ctx.runMutation(api.mutations.DishTask_revise, {
+            docId: existing._id,
+            version: existing.version,
+            name: existing.name,
+            category: existing.category,
+            taskType: existing.taskType,
+            defaultQuantity: existing.defaultQuantity ?? undefined,
+            defaultUnit: existing.defaultUnit ?? undefined,
+            station: existing.station ?? undefined,
+            sortOrder: existing.sortOrder,
+            componentId: componentIds[componentIndex],
+            ingredientId: existing.ingredientId ?? undefined,
+            instructions: existing.instructions ?? undefined,
+          });
+        }
         continue;
       }
-      const componentIndex = input.components.findIndex(
-        (c) => recipeNameKey(c.name) === recipeNameKey(task.name),
-      );
       await ctx.runMutation(api.mutations.DishTask_createViaAdd, {
         dishId,
         name: task.name,
