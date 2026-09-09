@@ -121,7 +121,12 @@ export interface TppMeasure extends TppTotal {
 export interface TppDocumentSection {
   id: string;
   heading?: string;
-  rows: readonly { label?: string; value: string }[];
+  headingLevel?: 3 | 4;
+  rows: readonly {
+    label?: string;
+    value: string;
+    recipe?: { kind: "dish" | "component"; id: string };
+  }[];
 }
 
 export interface TppLabel {

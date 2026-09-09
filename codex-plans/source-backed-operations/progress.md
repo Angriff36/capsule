@@ -417,3 +417,15 @@ Two-projection preview against point-in-time classification-live-20260909.json t
 
 Full goal remains active: no narrower completion around root review or ready portions. Purchasing calendar/shared-stock/date updates, all affected data/recipes/packing/outputs/staff workflows, authenticated rendered proof, fullcheck, finalreview/release and production data proof remain required.
 Independent gpt-5.6-sol APPROVE:217 source identities,39 unresolved targets, explicitly limited classification scope, meal/package distinctions, and green-onion source quantities/method/scaling verified. This is artifacts-only approval, not live application or whole-goal completion.
+
+## 2026-09-09 Recipe report connected methods and batch ingredients
+
+Re-read full objective. Fixed #330: Menu Item Recipes previously printed dish.description as Preparation and omitted linked component recipes. The authored report resolver now uses dish.recipeInstructions, direct ingredient quantities per serving and selected menu quantity, and each linked component's yield, batch-scaled ingredients and actual method. Missing source information remains explicit. Recipe links carry typed dish/component identities; component sections use subordinate semantic headings and methods preserve line breaks.
+
+Extracted existing pure kitchen recipeNoteLines/readableRecipeAmount helpers into src/lib/recipeDisplay.ts, retaining imports/re-exports through RecipeNotes.tsx. Backend and kitchen now use identical practical fraction/four-decimal formatting without changing calculations. No generated files changed; no new authored tests.
+
+Actual convex-test qualification .artifacts/operations-source-study/qualify-recipe-report.ts passed: ready butter/onion portions at167/334, raspberry balsamic3quart batch and8ingredients,167serving output10.4375quart, actual methods rather than descriptions, typed links and replay behavior. Existing165files/1444tests and typecheck passed after final extraction. Fresh actual-query JSON rendered through actual TppReportResult in isolated fixture on verified checkout Vite7813. Visually inspected output/playwright/recipe-report-component-mobile.png (390x844) and recipe-report-desktop.png (1366x900): readable quantities, component hierarchy and responsive rows. Initial screenshot caught stale ignored JSON; final captures use fresh v2 fixture/data. Fixture evidence does not prove authenticated app routes, link destinations, or print pagination.
+
+Independent gpt-5.6-sol APPROVE after reading DESIGN.md and mandatory design/tedium criteria. Initial bare h4 and overly precise quantities were corrected before approval. Approval covers this bounded checkpoint only.
+
+Opened #331 with actual reproduction: Master Food Production Worksheet is routed through purchasing needs/vendor rows and returns no rows for an event with prep tasks but no PurchaseNeed. This remains required report/prep work. No production mutation/deployment. Full source/data repair, purchasing/calendar/rescheduling, packing and staff outputs, authenticated desktop/mobile/link/print proof, fullcheck, finalreview/release and production evidence remain required.

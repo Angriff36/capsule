@@ -1,7 +1,9 @@
+import { readableRecipeAmount } from "../../src/lib/recipeDisplay";
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
 import type {
   TppColumn,
+  TppDocumentSection,
   TppReportResult,
   TppRow,
 } from "../../src/features/reports/tpp/types";
@@ -798,45 +800,157 @@ export const run = query({
     }
 
     if (args.reportId === "menu-item-recipes") {
-      const dishIds = new Set(menu.map(({ dish }) => String(dish._id)));
-      const lines = await ctx.db
-        .query("dishIngredients")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
-      const ingredients = await ctx.db
-        .query("ingredients")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT);
-      const ingredientById = new Map(
-        ingredients.map((item) => [String(item._id), item.name]),
-      );
-      const dishById = new Map(
-        menu.map(({ dish }) => [String(dish._id), dish]),
-      );
+      const amount = readableRecipeAmount;
+      const ingredientName = async (id: Id<"ingredients">) => {
+        const ingredient = await ctx.db.get(id);
+        return ingredient && isLiveTenantRow(ingredient, tenantId)
+          ? ingredient.name
+          : "Ingredient unavailable";
+      };
+      const sections: TppDocumentSection[] = [
+        {
+          id: "event-context",
+          heading: event.title,
+          rows: [
+            { label: "Event date", value: dateText(event.startsAt) },
+            { label: "Guests", value: String(event.expectedHeadcount) },
+          ],
+        },
+      ];
+      for (const { item, dish } of menu) {
+        const [direct, attachments] = await Promise.all([
+          ctx.db
+            .query("dishIngredients")
+            .withIndex("by_dishId", (q) => q.eq("dishId", dish._id))
+            .take(REPORT_ROW_LIMIT),
+          ctx.db
+            .query("dishComponents")
+            .withIndex("by_dishId", (q) => q.eq("dishId", dish._id))
+            .take(REPORT_ROW_LIMIT),
+        ]);
+        const rows: TppDocumentSection["rows"][number][] = [
+          {
+            label: "Recipe",
+            value: dish.name,
+            recipe: { kind: "dish", id: String(dish._id) },
+          },
+          {
+            label: "Servings for this menu item",
+            value: String(item.quantityServings),
+          },
+          {
+            label: "Portion",
+            value: amount(dish.portionSize, dish.portionUnit),
+          },
+        ];
+        for (const line of direct
+          .filter((x) => isLiveTenantRow(x, tenantId))
+          .sort((a, b) => a.sortOrder - b.sortOrder)) {
+          rows.push({
+            label: await ingredientName(line.ingredientId),
+            value: `${amount(line.quantity, line.unit)} per serving; ${amount(line.quantity * item.quantityServings, line.unit)} for this menu item`,
+          });
+        }
+        rows.push({
+          label: "Preparation",
+          value:
+            dish.recipeInstructions?.trim() ||
+            "Preparation method not recorded.",
+        });
+        sections.push({ id: String(item._id), heading: dish.name, rows });
+        for (const attachment of attachments
+          .filter((x) => isLiveTenantRow(x, tenantId) && x.removedAt == null)
+          .sort((a, b) => a.sortOrder - b.sortOrder)) {
+          const component = await ctx.db.get(attachment.componentId);
+          if (!component || !isLiveTenantRow(component, tenantId)) {
+            sections.push({
+              id: String(attachment._id),
+              heading: "Component recipe unavailable",
+              headingLevel: 4,
+              rows: [
+                {
+                  label: "Recipe",
+                  value: "The linked component could not be found.",
+                },
+              ],
+            });
+            continue;
+          }
+          const batchCount =
+            attachment.yieldQuantity > 0
+              ? (item.quantityServings * attachment.batchMultiplier) /
+                attachment.yieldQuantity
+              : null;
+          const ingredients = await ctx.db
+            .query("componentIngredients")
+            .withIndex("by_componentId", (q) =>
+              q.eq("componentId", component._id),
+            )
+            .take(REPORT_ROW_LIMIT);
+          const componentRows: TppDocumentSection["rows"][number][] = [
+            {
+              label: "Recipe",
+              value: component.name,
+              recipe: { kind: "component", id: String(component._id) },
+            },
+            {
+              label: "One batch makes",
+              value: amount(component.yieldQuantity, component.yieldUnit),
+            },
+            {
+              label: "For this menu item",
+              value:
+                batchCount == null
+                  ? "Serving ratio not recorded."
+                  : amount(
+                      batchCount * component.yieldQuantity,
+                      component.yieldUnit,
+                    ),
+            },
+          ];
+          for (const line of ingredients
+            .filter((x) => isLiveTenantRow(x, tenantId))
+            .sort((a, b) => a.sortOrder - b.sortOrder)) {
+            componentRows.push({
+              label: await ingredientName(line.ingredientId),
+              value: `${amount(line.quantity, line.unit)} per batch${batchCount == null ? "" : `; ${amount(line.quantity * batchCount, line.unit)} for this menu item`}`,
+            });
+          }
+          if (!ingredients.some((x) => isLiveTenantRow(x, tenantId)))
+            componentRows.push({
+              label: "Ingredients",
+              value: "Ingredient quantities not recorded.",
+            });
+          componentRows.push({
+            label: "Preparation",
+            value:
+              component.instructions?.trim() ||
+              "Preparation method not recorded.",
+          });
+          sections.push({
+            id: `${item._id}:${attachment._id}`,
+            heading: component.name,
+            headingLevel: 4,
+            rows: componentRows,
+          });
+        }
+        if (
+          !direct.some((x) => isLiveTenantRow(x, tenantId)) &&
+          !attachments.some(
+            (x) => isLiveTenantRow(x, tenantId) && x.removedAt == null,
+          )
+        ) {
+          rows.push({
+            label: "Ingredients",
+            value: "Ingredient quantities not recorded.",
+          });
+        }
+      }
       return {
         kind: "document",
         title: reportTitle(args.reportId),
         template: "menu_item_recipes",
-        sections: [...dishIds].map((dishId) => ({
-          id: dishId,
-          heading: dishById.get(dishId)?.name ?? "Recipe",
-          rows: [
-            ...lines
-              .filter(
-                (line) =>
-                  String(line.dishId) === dishId &&
-                  isLiveTenantRow(line, tenantId),
-              )
-              .map((line) => ({
-                label: ingredientById.get(String(line.ingredientId)) ?? "",
-                value: `${line.quantity} ${line.unit}`,
-              })),
-            {
-              label: "Preparation",
-              value: dishById.get(dishId)?.description ?? "",
-            },
-          ],
-        })),
+        sections,
       };
     }
     throw new Error(`No Event resolver for ${args.reportId}`);
