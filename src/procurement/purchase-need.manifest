@@ -332,6 +332,7 @@ on IngredientDemandConfirmed run PurchaseNeed.create
   resolve null
   params {
     eventId: payload.eventId,
+    purchasingWeekStart: payload.purchasingWeekStart,
     ingredientDemandId: payload.ingredientDemandId,
     ingredientId: payload.ingredientId,
     preferredVendorId: payload.preferredVendorId,

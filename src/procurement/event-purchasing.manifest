@@ -603,9 +603,11 @@ on ComponentIngredientAdded fanOut EventDishComponentSeed where componentId = pa
 
 on VendorOrderSubmitted fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
   run commitSupply
+  params { purchasingWeekStart: payload.purchasingWeekStart }
 
 on VendorOrderApprovalRequested fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
   run commitSupply
+  params { purchasingWeekStart: payload.purchasingWeekStart }
 
 on VendorOrderCancelled fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
   run releaseSupply

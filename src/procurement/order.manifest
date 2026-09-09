@@ -234,6 +234,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     mutate status = "submitted"
     mutate submittedAt = now()
     emit VendorOrderSubmitted {
+      purchasingWeekStart: self.sourceRangeStart != null ? self.sourceRangeStart : (self.event != null ? self.event.purchasingWeekStart : null)
       vendorOrderId: self.id
       tenantId: self.tenantId
       vendorId: self.vendorId
@@ -252,6 +253,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     mutate status = "pending_approval"
     mutate approvalRequestedAt = now()
     emit VendorOrderApprovalRequested {
+      purchasingWeekStart: self.sourceRangeStart != null ? self.sourceRangeStart : (self.event != null ? self.event.purchasingWeekStart : null)
       vendorOrderId: self.id
       tenantId: self.tenantId
       vendorId: self.vendorId
@@ -278,6 +280,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
       totalAmount: self.totalAmount
     }
     emit VendorOrderSubmitted {
+      purchasingWeekStart: self.sourceRangeStart != null ? self.sourceRangeStart : (self.event != null ? self.event.purchasingWeekStart : null)
       vendorOrderId: self.id
       tenantId: self.tenantId
       vendorId: self.vendorId
@@ -534,11 +537,11 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command commitSupply() {
+  command commitSupply(optional purchasingWeekStart: datetime) {
     guard self.deletedAt == null
     // An editable draft is not supply we can rely on for another draft.
     guard self.vendorOrder != null and self.vendorOrder.status != "draft" and self.vendorOrder.status != "cancelled"
-    mutate supplyWeekStart = self.vendorOrder.sourceRangeStart
+    mutate supplyWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.vendorOrder.sourceRangeStart
     mutate pendingSupplyQuantity = self.status == "cancelled" ? 0 : max(0, self.orderedQuantity - self.receivedQuantity)
   }
 
@@ -960,6 +963,7 @@ event VendorOrderTotalsUpdated: "vendor_order.totals_updated" {
 }
 
 event VendorOrderSubmitted: "vendor_order.submitted" {
+  purchasingWeekStart: datetime?
   vendorOrderId: string
   tenantId: string
   vendorId: string
@@ -970,6 +974,7 @@ event VendorOrderSubmitted: "vendor_order.submitted" {
 }
 
 event VendorOrderApprovalRequested: "vendor_order.approval_requested" {
+  purchasingWeekStart: datetime?
   vendorOrderId: string
   tenantId: string
   vendorId: string

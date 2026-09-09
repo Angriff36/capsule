@@ -203,6 +203,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate purchaseEligibleEventId = null
     mutate preferredVendorId = self.ingredient.preferredVendorId
     emit IngredientDemandConfirmed {
+      purchasingWeekStart: self.purchasingWeekStart
       ingredientDemandId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
@@ -429,6 +430,7 @@ event IngredientDemandCalculated: "ingredient_demand.calculated" {
 }
 
 event IngredientDemandConfirmed: "ingredient_demand.confirmed" {
+  purchasingWeekStart: datetime?
   ingredientDemandId: string
   tenantId: string
   eventId: string
