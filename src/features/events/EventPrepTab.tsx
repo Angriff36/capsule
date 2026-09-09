@@ -70,7 +70,7 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           id: row._id,
           eventId,
           dishId: row.dishId,
-          quantityServings: Number(row.quantityServings) || 1,
+          quantityServings: Number(row.quantityServings),
           specialInstructions: row.specialInstructions ?? undefined,
         });
         created += result.taskCount;

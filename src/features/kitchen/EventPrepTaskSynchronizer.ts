@@ -93,6 +93,13 @@ export class EventPrepTaskSynchronizer {
   constructor(private readonly ports: Ports) {}
 
   async sync(input: SyncInput): Promise<EventPrepSyncResult> {
+    if (input.eventDish.quantityServings === 0) {
+      return {
+        taskCount: 0,
+        demandCount: 0,
+        noOpReason: "This dish is not being served.",
+      };
+    }
     const activeTemplates = input.templates
       .filter(
         (template) =>
@@ -190,6 +197,7 @@ export class EventPrepTaskSynchronizer {
       if (item.existing) {
         if (
           item.existing.isGenerated &&
+          item.existing.status === "pending" &&
           item.existing.quantity !== item.quantity &&
           this.ports.refreshGeneratedTask
         ) {
