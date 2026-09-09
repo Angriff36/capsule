@@ -100,6 +100,7 @@ export function recipeMeasure(
     melon: ["melon", 1, "melon"],
     serving: ["serving", 1, "serving"],
     recipe: ["batch", 1, "batch"],
+    batch: ["batch", 1, "batch"],
   };
   const row = map[s];
   return row ? { unit: row[0], factor: row[1], family: row[2] } : undefined;

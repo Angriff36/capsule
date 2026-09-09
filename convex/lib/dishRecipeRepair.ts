@@ -293,7 +293,8 @@ export async function repairDishRecipe(
       (c) =>
         c.deletedAt == null &&
         c.status === "published" &&
-        c.description?.includes(`[TPP subrecipe:${formula.key}]`),
+        (c.recipeSourceFingerprint === formula.key ||
+          c.description?.includes(`[TPP subrecipe:${formula.key}]`)),
     );
     if (reused) {
       if (
@@ -314,7 +315,11 @@ export async function repairDishRecipe(
         yieldUnit: formula.yieldUnit ?? "serving",
         category: "TPP subrecipes",
         instructions: formula.instructions,
-        description: `${measured ? "Kitchen batch recipe." : `Subrecipe amount for one serving of ${input.name}.`}\n[TPP subrecipe:${formula.key}]`,
+        description: measured
+          ? "Kitchen batch recipe."
+          : `Subrecipe amount for one serving of ${input.name}.`,
+        sourceFingerprint: formula.key,
+        sourceText: `${input.source}\n${JSON.stringify(formula)}`,
       },
     );
     for (const line of formula.ingredients)
@@ -354,7 +359,6 @@ export async function repairDishRecipe(
       dish.status !== "active"
     )
       throw new Error("Active recipe dish not found");
-    const marker = `[TPP dish recipe:${input.fingerprint}]`;
     if (
       dish.recipeSourceFingerprint &&
       dish.recipeSourceFingerprint !== input.fingerprint
@@ -406,7 +410,7 @@ export async function repairDishRecipe(
           componentIndex >= 0 ? componentIds[componentIndex] : undefined,
         station: dish.serviceStyle,
         sortOrder: i,
-        instructions: `${task.instructions}\n${marker}`,
+        instructions: task.instructions,
       });
       result.tasks++;
     }
@@ -431,7 +435,6 @@ export async function repairDishRecipe(
         quantity: line.quantity,
         unit: line.unit,
         sortOrder: i,
-        prepNotes: `${line.source}\n${input.source}\n${marker}`,
       });
       result.ingredients++;
     }

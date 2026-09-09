@@ -25,6 +25,12 @@ const snapshot = value(
   ".artifacts/package-import/existing-catalog.json",
 );
 const out = value("--out", ".artifacts/tpp-recipe-repair-20260908");
+const selectedDishIds = new Set(
+  value("--dish-ids", "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean),
+);
 mkdirSync(out, { recursive: true });
 const data = JSON.parse(readFileSync(snapshot, "utf8"));
 // Explicit source-reviewed associations, never a name-only automatic merge.
@@ -79,8 +85,11 @@ const plan = recipes.map((r) => {
       d.status === "active" &&
       d.deletedAt == null &&
       !d.mergedIntoDishId &&
+      (!selectedDishIds.size || selectedDishIds.has(d._id)) &&
       recipeNameKey(d.name) === recipeNameKey(r.name),
   );
+  if (selectedDishIds.size && !dishes.length)
+    throw new Error(`No selected dish matches source recipe: ${r.name}`);
   const draft = data.Component.find(
     (c: any) =>
       c.category === "TPP imported recipes" &&
@@ -125,6 +134,11 @@ const plan = recipes.map((r) => {
     recipe,
   };
 });
+if (selectedDishIds.size) {
+  const matchedIds = new Set(plan.flatMap((item) => item.dishIds));
+  if ([...selectedDishIds].some((id) => !matchedIds.has(id)))
+    throw new Error("Some selected dishes have no source recipe in this plan");
+}
 if (usedPrepLinks.size !== prepLinks.length)
   throw new Error(
     "Some prep links do not belong to a dish in this repair plan",
