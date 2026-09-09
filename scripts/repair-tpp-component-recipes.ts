@@ -19,6 +19,7 @@ const value = (flag: string, fallback = "") => {
 const sourcePath = value("--source");
 const sourceReference = value("--source-reference");
 const snapshotPath = value("--snapshot");
+const reclassifyDishId = value("--reclassify-dish-id");
 if (!sourcePath || !sourceReference || !snapshotPath)
   throw new Error(
     "Provide --source (reviewed batch JSON), --source-reference and --snapshot",
@@ -32,6 +33,7 @@ const formulas: RecipeRepairProjection["components"] = Array.isArray(source)
   ? source
   : [source];
 const seen = new Set<string>();
+let usedSourceDish = false;
 const plan = formulas.map((formula) => {
   if (
     !formula.name?.trim() ||
@@ -57,9 +59,34 @@ const plan = formulas.map((formula) => {
     yieldUnit: formula.yieldUnit!,
     ingredients: formula.ingredients,
   };
+  const sourceDish = reclassifyDishId
+    ? (snapshot.Dish ?? []).find(
+        (dish: any) =>
+          dish._id === reclassifyDishId &&
+          recipeNameKey(dish.name) === recipeNameKey(formula.name),
+      )
+    : undefined;
+  if (
+    sourceDish &&
+    (usedSourceDish ||
+      sourceDish.deletedAt != null ||
+      sourceDish.status !== "active" ||
+      sourceDish.recipeSourceFingerprint !== formula.key)
+  )
+    throw new Error("Source dish does not match the reviewed batch source");
+  if (sourceDish) usedSourceDish = true;
   const payload = {
     source: sourceReference,
     recipe,
+    ...(sourceDish
+      ? {
+          sourceDish: {
+            dishId: sourceDish._id,
+            expectedVersion: sourceDish.version,
+            expectedSourceFingerprint: sourceDish.recipeSourceFingerprint,
+          },
+        }
+      : {}),
   };
   const payloadHash = createHash("sha256")
     .update(JSON.stringify(payload))
@@ -85,6 +112,8 @@ const plan = formulas.map((formula) => {
     })),
   };
 });
+if (reclassifyDishId && !usedSourceDish)
+  throw new Error("No reviewed batch matches the selected source dish");
 mkdirSync(out, { recursive: true });
 const document = {
   sourcePath,
@@ -93,7 +122,7 @@ const document = {
   snapshotSha256: createHash("sha256").update(snapshotText).digest("hex"),
   referenceCoverage: ["EventDish"],
   referenceNote:
-    "Existing dishes are not retired by this operation. Menu, proposal, recipe, packing and historical references still need reconciliation.",
+    "Only an explicit sourceDish is retired, in the same transaction as component materialization. Apply checks all domain dish references; referenced records require relationship reconciliation first.",
   plan,
 };
 const planHash = createHash("sha256")
@@ -104,6 +133,7 @@ writeFileSync(`${out}/plan.sha256`, planHash);
 console.log(
   JSON.stringify({
     batches: plan.length,
+    reclassifiedDishes: plan.filter((item) => item.args.sourceDish).length,
     existingDishRecords: plan.reduce(
       (sum, item) => sum + item.existingDishReferences.length,
       0,

@@ -22,6 +22,11 @@ const amount = v.object({
 export const componentRecipeRepairArgs = {
   operationKey: v.string(),
   source: v.string(),
+  sourceDish: v.optional(v.object({
+    dishId: v.id("dishes"),
+    expectedVersion: v.number(),
+    expectedSourceFingerprint: v.string(),
+  })),
   recipe: v.object({
     name: v.string(),
     key: v.string(),
@@ -38,12 +43,13 @@ export async function repairComponentRecipe(
   args: {
     operationKey: string;
     source: string;
+    sourceDish?: { dishId: Id<"dishes">; expectedVersion: number; expectedSourceFingerprint: string };
     recipe: Omit<Input["recipe"]["components"][number], "quantityPerServing"> & {
       yieldQuantity: number;
       yieldUnit: string;
     };
   },
-): Promise<{ componentId: string; created: boolean; createdIngredients: { id: string; name: string; unit: string }[] }> {
+): Promise<{ componentId: string; created: boolean; createdIngredients: { id: string; name: string; unit: string }[]; retiredDishId?: string }> {
   const auth = await getAuthContext(ctx);
   requireKitchenAccess(auth);
   const tenantId = requireTenant(auth);
@@ -52,6 +58,32 @@ export async function repairComponentRecipe(
   const prior = await readMaterializationReceipt<Awaited<ReturnType<typeof repairComponentRecipe>>>(ctx, tenantId, "componentRecipeRepair", args.operationKey, args);
   if (prior) return prior;
   const recipe = args.recipe;
+  if (args.sourceDish) {
+    const expected = args.sourceDish;
+    const dish = await ctx.db.get(expected.dishId);
+    if (!dish || dish.tenantId !== tenantId || dish.deletedAt != null || dish.status !== "active" ||
+        dish.version !== expected.expectedVersion || !expected.expectedSourceFingerprint ||
+        dish.recipeSourceFingerprint !== expected.expectedSourceFingerprint ||
+        recipeNameKey(dish.name) !== recipeNameKey(recipe.name))
+      throw new Error("Source dish differs from the reviewed classification snapshot");
+    // This conversion preserves the imported row as a retired source record.
+    // Referenced dishes need their relationships migrated, not a blind retirement.
+    const referenceTables = ["menuDishes", "proposalDishSelections", "eventDishes", "dishTasks", "dishIngredients", "dishComponents", "dishContainers", "prepTasks", "packListItems", "ingredientDemands", "eventAllergenChecks"] as const;
+    for (const table of referenceTables) {
+      const reference = await ctx.db.query(table).withIndex("by_dishId", q => q.eq("dishId", dish._id)).first();
+      if (reference) throw new Error(`Reconcile ${table} references before reclassifying this dish`);
+    }
+    for (const table of ["eventIngredientContributions", "eventDishComponentSeeds"] as const) {
+      const reference = await ctx.db.query(table)
+        .withIndex("by_tenantId", q => q.eq("tenantId", tenantId))
+        .filter(q => q.eq(q.field("dishId"), dish._id)).first();
+      if (reference) throw new Error(`Reconcile ${table} references before reclassifying this dish`);
+    }
+    const edition = await ctx.db.query("dishes").withIndex("by_canonicalDishId", q => q.eq("canonicalDishId", dish._id)).first();
+    const merged = await ctx.db.query("dishes").withIndex("by_mergedIntoDishId", q => q.eq("mergedIntoDishId", dish._id)).first();
+    if (edition || merged || dish.canonicalDishId || dish.mergedIntoDishId)
+      throw new Error("Reconcile dish editions and merges before reclassifying this dish");
+  }
   if (!recipe.name.trim() || !recipe.key.trim() || !args.source.trim() ||
       !recipe.instructions.trim() || !recipe.ingredients.length ||
       !Number.isFinite(recipe.yieldQuantity) || recipe.yieldQuantity <= 0 ||
@@ -62,7 +94,13 @@ export async function repairComponentRecipe(
     componentId: String(materialized.componentIds[0]),
     created: materialized.components > 0,
     createdIngredients: materialized.createdIngredients,
+    ...(args.sourceDish ? { retiredDishId: String(args.sourceDish.dishId) } : {}),
   };
+  if (args.sourceDish)
+    await ctx.runMutation(api.mutations.Dish_retire, {
+      docId: args.sourceDish.dishId,
+      reason: `Reclassified as component recipe: ${recipe.name}`,
+    });
   await writeMaterializationReceipt(ctx, tenantId, "componentRecipeRepair", args.operationKey, args, result);
   return result;
 }
