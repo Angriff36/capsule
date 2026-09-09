@@ -19,6 +19,53 @@ const amount = v.object({
   source: v.string(),
   ingredientId: v.optional(v.id("ingredients")),
 });
+export const componentRecipeRepairArgs = {
+  operationKey: v.string(),
+  source: v.string(),
+  recipe: v.object({
+    name: v.string(),
+    key: v.string(),
+    instructions: v.string(),
+    yieldQuantity: v.number(),
+    yieldUnit: v.string(),
+    ingredients: v.array(amount),
+  }),
+};
+
+/** A dressing or sauce is a batch recipe even when TPP exports it at the root. */
+export async function repairComponentRecipe(
+  ctx: MutationCtx,
+  args: {
+    operationKey: string;
+    source: string;
+    recipe: Omit<Input["recipe"]["components"][number], "quantityPerServing"> & {
+      yieldQuantity: number;
+      yieldUnit: string;
+    };
+  },
+): Promise<{ componentId: string; created: boolean; createdIngredients: { id: string; name: string; unit: string }[] }> {
+  const auth = await getAuthContext(ctx);
+  requireKitchenAccess(auth);
+  const tenantId = requireTenant(auth);
+  if (!["owner", "admin", "system"].includes(auth.role))
+    throw new Error("Only an administrator may run a historical recipe repair");
+  const prior = await readMaterializationReceipt<Awaited<ReturnType<typeof repairComponentRecipe>>>(ctx, tenantId, "componentRecipeRepair", args.operationKey, args);
+  if (prior) return prior;
+  const recipe = args.recipe;
+  if (!recipe.name.trim() || !recipe.key.trim() || !args.source.trim() ||
+      !recipe.instructions.trim() || !recipe.ingredients.length ||
+      !Number.isFinite(recipe.yieldQuantity) || recipe.yieldQuantity <= 0 ||
+      !recipe.yieldUnit.trim())
+    throw new Error("A source batch recipe needs its name, provenance, measured yield, ingredients and method");
+  const materialized = await materializeRecipeComponents(ctx, tenantId, [recipe], args.source, "");
+  const result = {
+    componentId: String(materialized.componentIds[0]),
+    created: materialized.components > 0,
+    createdIngredients: materialized.createdIngredients,
+  };
+  await writeMaterializationReceipt(ctx, tenantId, "componentRecipeRepair", args.operationKey, args, result);
+  return result;
+}
 export const dishRecipeRepairArgs = {
   operationKey: v.string(),
   dishIds: v.array(v.id("dishes")),
@@ -248,69 +295,6 @@ export async function repairDishRecipe(
     replacementIds.add(row._id);
     replacements.push({ row, replacementKey: replacement.replacementKey });
   }
-  const ingredientCache = new Map<string, Id<"ingredients">>();
-  const existingIngredients = await ctx.db
-    .query("ingredients")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
-  const ingredient = async (line: Amount) => {
-    if (!(line.quantity > 0) || !Number.isFinite(line.quantity))
-      throw new Error("Recipe quantity must be positive");
-    if (line.ingredientId) {
-      const row = await owned(line.ingredientId);
-      if (
-        !("unit" in row) ||
-        recipeUnitRatio(line.unit, row.unit) == null ||
-        recipeNameKey(row.name) !== recipeNameKey(line.name)
-      )
-        throw new Error("Ingredient does not match the reviewed recipe");
-      return line.ingredientId;
-    }
-    const key = `${recipeNameKey(line.name)}:${line.unit}`;
-    const cached = ingredientCache.get(key);
-    if (cached) return cached;
-    const compatible = existingIngredients.filter(
-      (i) =>
-        i.deletedAt == null &&
-        i.status === "active" &&
-        !i.mergedIntoIngredientId &&
-        recipeNameKey(i.name) === recipeNameKey(line.name) &&
-        recipeUnitRatio(line.unit, i.unit) != null,
-    );
-    const exact = compatible.filter((i) => i.unit === line.unit);
-    const matches = exact.length ? exact : compatible;
-    if (matches.length > 1)
-      throw new Error(
-        `Ambiguous existing ingredient: ${line.name} (${line.unit})`,
-      );
-    if (matches.length === 1) {
-      ingredientCache.set(key, matches[0]._id);
-      return matches[0]._id;
-    }
-    const created: { docId: Id<"ingredients"> } = await ctx.runMutation(
-      api.mutations.Ingredient_createViaIntroduce,
-      {
-        name: line.name,
-        unit: line.unit,
-        costPerUnit: 0,
-        category: "TPP recipe ingredients",
-      },
-    );
-    const createdIngredient = await ctx.db.get(created.docId);
-    if (createdIngredient) existingIngredients.push(createdIngredient);
-    ingredientCache.set(key, created.docId);
-    result.createdIngredients.push({
-      id: created.docId,
-      name: line.name,
-      unit: line.unit,
-    });
-    return created.docId;
-  };
-  const componentIds: Id<"components">[] = [];
-  const existingComponents = await ctx.db
-    .query("components")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
   for (const formula of input.components) {
     const measured =
       formula.yieldQuantity != null ||
@@ -327,53 +311,11 @@ export async function repairDishRecipe(
         );
       componentBatchScale(formula.yieldQuantity, formula.quantityPerServing);
     }
-    const reused = existingComponents.find(
-      (c) =>
-        c.deletedAt == null &&
-        c.status === "published" &&
-        (c.recipeSourceFingerprint === formula.key ||
-          c.description?.includes(`[TPP subrecipe:${formula.key}]`)),
-    );
-    if (reused) {
-      if (
-        reused.yieldQuantity !== (formula.yieldQuantity ?? 1) ||
-        reused.yieldUnit !== (formula.yieldUnit ?? "serving")
-      )
-        throw new Error(
-          "Existing subrecipe yield differs from the reviewed source",
-        );
-      componentIds.push(reused._id);
-      continue;
-    }
-    const created: { docId: Id<"components"> } = await ctx.runMutation(
-      api.mutations.Component_createViaDraft,
-      {
-        name: formula.name,
-        yieldQuantity: formula.yieldQuantity ?? 1,
-        yieldUnit: formula.yieldUnit ?? "serving",
-        category: "TPP subrecipes",
-        instructions: formula.instructions,
-        description: measured
-          ? "Kitchen batch recipe."
-          : `Subrecipe amount for one serving of ${input.name}.`,
-        sourceFingerprint: formula.key,
-        sourceText: `${input.source}\n${JSON.stringify(formula)}`,
-      },
-    );
-    for (const line of formula.ingredients)
-      await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
-        componentId: created.docId,
-        ingredientId: await ingredient(line),
-        quantity: line.quantity,
-        unit: line.unit,
-        sortOrder: formula.ingredients.indexOf(line),
-      });
-    await ctx.runMutation(api.mutations.Component_publishVersion, {
-      docId: created.docId,
-    });
-    componentIds.push(created.docId);
-    result.components++;
   }
+  const materialized = await materializeRecipeComponents(ctx, tenantId, input.components, input.source, input.name);
+  const { ingredient, componentIds } = materialized;
+  result.createdIngredients = materialized.createdIngredients;
+  result.components = materialized.components;
   const dishIds = [...new Set(args.dishIds)];
   if (!dishIds.length) {
     const created: { docId: Id<"dishes"> } = await ctx.runMutation(
@@ -798,4 +740,130 @@ export async function reconcileEventRecipeSync(
     changed++;
   }
   return { changed };
+}
+
+/** Shared materialization for genuine subrecipes, with or without a dish attachment. */
+async function materializeRecipeComponents(
+  ctx: MutationCtx,
+  tenantId: string,
+  formulas: Input["recipe"]["components"],
+  source: string,
+  dishName: string,
+) {
+  const result = { createdIngredients: [] as { id: string; name: string; unit: string }[], components: 0 };
+  const ingredientCache = new Map<string, Id<"ingredients">>();
+  const existingIngredients = await ctx.db
+    .query("ingredients")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  const ingredient = async (line: Amount) => {
+    if (!(line.quantity > 0) || !Number.isFinite(line.quantity))
+      throw new Error("Recipe quantity must be positive");
+    if (line.ingredientId) {
+      const row = await ctx.db.get(line.ingredientId);
+      if (!row || row.tenantId !== tenantId || row.deletedAt != null)
+        throw new Error("Recipe record not found");
+      if (
+        !("unit" in row) ||
+        recipeUnitRatio(line.unit, row.unit) == null ||
+        recipeNameKey(row.name) !== recipeNameKey(line.name)
+      )
+        throw new Error("Ingredient does not match the reviewed recipe");
+      return line.ingredientId;
+    }
+    const key = `${recipeNameKey(line.name)}:${line.unit}`;
+    const cached = ingredientCache.get(key);
+    if (cached) return cached;
+    const compatible = existingIngredients.filter(
+      (i) =>
+        i.deletedAt == null &&
+        i.status === "active" &&
+        !i.mergedIntoIngredientId &&
+        recipeNameKey(i.name) === recipeNameKey(line.name) &&
+        recipeUnitRatio(line.unit, i.unit) != null,
+    );
+    const exact = compatible.filter((i) => i.unit === line.unit);
+    const matches = exact.length ? exact : compatible;
+    if (matches.length > 1)
+      throw new Error(
+        `Ambiguous existing ingredient: ${line.name} (${line.unit})`,
+      );
+    if (matches.length === 1) {
+      ingredientCache.set(key, matches[0]._id);
+      return matches[0]._id;
+    }
+    const created: { docId: Id<"ingredients"> } = await ctx.runMutation(
+      api.mutations.Ingredient_createViaIntroduce,
+      {
+        name: line.name,
+        unit: line.unit,
+        costPerUnit: 0,
+        category: "TPP recipe ingredients",
+      },
+    );
+    const createdIngredient = await ctx.db.get(created.docId);
+    if (createdIngredient) existingIngredients.push(createdIngredient);
+    ingredientCache.set(key, created.docId);
+    result.createdIngredients.push({
+      id: created.docId,
+      name: line.name,
+      unit: line.unit,
+    });
+    return created.docId;
+  };
+  const componentIds: Id<"components">[] = [];
+  const existingComponents = await ctx.db
+    .query("components")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  for (const formula of formulas) {
+    const measured = formula.yieldQuantity != null;
+    const reused = existingComponents.find(
+      (c) =>
+        c.deletedAt == null &&
+        c.status === "published" &&
+        (c.recipeSourceFingerprint === formula.key ||
+          c.description?.includes(`[TPP subrecipe:${formula.key}]`)),
+    );
+    if (reused) {
+      if (
+        reused.yieldQuantity !== (formula.yieldQuantity ?? 1) ||
+        reused.yieldUnit !== (formula.yieldUnit ?? "serving")
+      )
+        throw new Error(
+          "Existing subrecipe yield differs from the reviewed source",
+        );
+      componentIds.push(reused._id);
+      continue;
+    }
+    const created: { docId: Id<"components"> } = await ctx.runMutation(
+      api.mutations.Component_createViaDraft,
+      {
+        name: formula.name,
+        yieldQuantity: formula.yieldQuantity ?? 1,
+        yieldUnit: formula.yieldUnit ?? "serving",
+        category: "TPP subrecipes",
+        instructions: formula.instructions,
+        description: measured
+          ? "Kitchen batch recipe."
+          : `Subrecipe amount for one serving of ${dishName}.`,
+        sourceFingerprint: formula.key,
+        sourceText: `${source}\n${JSON.stringify(formula)}`,
+      },
+    );
+    for (const line of formula.ingredients)
+      await ctx.runMutation(api.mutations.ComponentIngredient_createViaAdd, {
+        componentId: created.docId,
+        ingredientId: await ingredient(line),
+        quantity: line.quantity,
+        unit: line.unit,
+        sortOrder: formula.ingredients.indexOf(line),
+      });
+    await ctx.runMutation(api.mutations.Component_publishVersion, {
+      docId: created.docId,
+    });
+    componentIds.push(created.docId);
+    result.components++;
+  }
+  return { ...result, componentIds, ingredient };
 }

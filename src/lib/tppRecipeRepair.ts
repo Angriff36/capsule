@@ -1,5 +1,6 @@
-/** Source-only projection: whole TPP recipes become dishes; nested make formulas
- * remain components. Quantities on a dish are per serving, never per batch. */
+/** Projection for source-reviewed finished dishes, not classification of export
+ * roots (which also contain batch recipes and equipment). Dish quantities are
+ * per serving; separately prepared formulas remain components. */
 export type TppSourceRecipe = {
   name: string;
   yieldText: string;

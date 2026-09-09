@@ -63,6 +63,14 @@ if (!Array.isArray(componentReplacements))
 const usedReplacements = new Set<string>();
 const usedPrepLinks = new Set<string>();
 const projected = args.includes("--projected-recipes");
+if (args.includes("--apply") && !projected)
+  throw new Error(
+    "Raw TPP roots include dishes, subrecipes, equipment and packaging. Apply requires source-reviewed dish projections via --projected-recipes; use repair-tpp-component-recipes.ts for measured subrecipes.",
+  );
+if (!projected)
+  console.warn(
+    "Raw export preview only: root records have not been classified as finished dishes. Review subrecipes, equipment, packaging and menu/package entries before producing dish projections.",
+  );
 const sourceRecipes = JSON.parse(readFileSync(source, "utf8"));
 const recipes: RecipeRepairProjection[] = projected
   ? sourceRecipes

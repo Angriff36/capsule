@@ -4,7 +4,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext, requireTenant } from "./authContext";
 import { requireKitchenAccess } from "./kitchenAccessGate";
-import { dishRecipeRepairArgs, repairDishRecipe, reconcileEventRecipeSync } from "./dishRecipeRepair";
+import { dishRecipeRepairArgs, repairDishRecipe, reconcileEventRecipeSync, componentRecipeRepairArgs, repairComponentRecipe } from "./dishRecipeRepair";
 import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
@@ -13,6 +13,11 @@ import {
 export const reconcileImportedEventRecipeSync = mutation({
   args: { eventId: v.id("events"), expectedEventVersion: v.number() },
   handler: reconcileEventRecipeSync,
+});
+
+export const repairImportedComponentRecipe = mutation({
+  args: componentRecipeRepairArgs,
+  handler: repairComponentRecipe,
 });
 
 const unit = v.string();
