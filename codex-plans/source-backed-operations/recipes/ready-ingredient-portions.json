@@ -1,0 +1,31 @@
+[
+  {
+    "name": "Whipped Butter",
+    "fingerprint": "bb79c52600478a4675cd20d1bd2b0ffcea70367732316cd1708646d1ed319aad",
+    "source": "TPP Side_Items.xlsx sheet1 rows664-679; one dry ounce ready whipped butter per portion",
+    "description": "One-ounce portion of whipped butter.",
+    "raw": "Whipped Butter\nRecipe Yields: | 1 Oz - Dry\nDescription:\nQty | Measure | Preparation | Ingredient\n1 | Oz - Dry | Portion whipped butter\nSub Recipes(s)\nPortion whipped butter\nYields: 1 Oz - Dry\nQty | Measure | Preparation | Ingredient\n1/16 | Pound | Whipped Butter ***",
+    "instructions": "Portion whipped butter.",
+    "yieldText": "1 Oz - Dry",
+    "portionSize": 1,
+    "portionUnit": "ounce",
+    "tasks": [
+      {
+        "name": "Portion whipped butter",
+        "quantity": 1,
+        "unit": "ounce",
+        "instructions": "Portion whipped butter."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Whipped Butter",
+        "quantity": 0.0625,
+        "unit": "pound",
+        "source": "Side_Items.xlsx sheet1 A679=1/16, B679=Pound, E679=Whipped Butter ***; portion at A671=1, B671=Oz - Dry"
+      }
+    ],
+    "components": [],
+    "notes": []
+  }
+]
