@@ -548,3 +548,9 @@ Documented apply ordering: associations first, fresh snapshot and fluid-unit pre
 
 Typecheck and existing165files/1445tests passed. Independent gpt-5.6-sol review requested; pending at entry. No fullcheck, live repair or deployment. Full connected source/data/workflow/desktop/mobile/recipe-link/report/gates/release objective remains active and incomplete.
 Independent gpt-5.6-sol APPROVE for the bounded association CLI: snapshot/plan binding, pre-network checks, per-attempt acknowledgement/readback receipts and preservation of subsequent work verified in review. This is checkpoint approval, not evidence that production application or the full goal is complete.
+
+## 2026-09-09: completed-work balance runtime evidence
+
+Previous turn made verified progress:a19e35da repeatable packing repair pushed. Re-read objective and inspected remaining connected prep behavior. Generated-command and actual client reproduction establishes missing supplemental work using source asparagus rate0.1875lb/serving and actual30lb completed output:200servings require7.5lb more;240require15lb; decreases/86/restore/repeat keep open work at0. Completed timestamps/assignee/output survive, although versions change. Ingredient demand correctly follows the total requirement; it must not be multiplied by sequential prep steps.
+
+New evidence changes the next implementation: EventPrepTask client input omits completedQuantity and template matching stores only one task, so a server-only supplemental-row fix would remain inconsistent with client sync. Track cumulative compatible-unit completion and a distinct open balance across both paths. Exact reproduction and saved observations are in runtime-gaps.md and new bug https://github.com/Angriff36/capsule/issues/335. No workaround, production write, authored test or implementation change. This turn is progress through executable evidence that changes the repair boundary; the full goal remains active, not blocked or complete.
