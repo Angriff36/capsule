@@ -134,10 +134,10 @@ export function DishContainersPanel({ dishId }: Props) {
       {containers === undefined ? (
         <TableSkeleton rows={3} />
       ) : rows.length === 0 ? (
-        <div className="document-empty">
+        <div className="recipe-empty">
           <p>
-            No containers on this dish. Until one exists, this dish adds nothing
-            to the day-of pack list.
+            No serving containers recorded. Add one to include it on event pack
+            lists.
           </p>
         </div>
       ) : (
@@ -150,14 +150,14 @@ export function DishContainersPanel({ dishId }: Props) {
             >
               <div>
                 <p className="text-lg font-medium text-ink">{row.name}</p>
-                <p className="font-mono text-xs text-ink-3">
+                <p className="text-sm text-ink-3">
                   {SERVICE_LABEL[String(row.serviceMethod)] ??
                     String(row.serviceMethod)}{" "}
                   · holds {row.servingsPerContainer}
                   {row.baseQuantity ? ` · +${row.baseQuantity} always` : ""}
                 </p>
                 {row.equipmentNotes ? (
-                  <p className="text-xs text-ink-2">{row.equipmentNotes}</p>
+                  <p className="text-base text-ink-2">{row.equipmentNotes}</p>
                 ) : null}
               </div>
               <button
@@ -173,69 +173,72 @@ export function DishContainersPanel({ dishId }: Props) {
         </ul>
       )}
 
-      <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onDefine}>
-        <label className="block text-sm">
-          <span className="meta-term">Container</span>
-          <input
-            name="name"
-            className="input mt-1"
-            placeholder="Full hotel pan"
-            required
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Service method</span>
-          <select
-            name="serviceMethod"
-            className="input mt-1"
-            defaultValue="cooked_at_kitchen"
-          >
-            {SERVICE_METHODS.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Servings per container</span>
-          <input
-            name="servingsPerContainer"
-            type="number"
-            min={1}
-            defaultValue={25}
-            className="input mt-1"
-            required
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Always send (extra)</span>
-          <input
-            name="baseQuantity"
-            type="number"
-            min={0}
-            defaultValue={0}
-            className="input mt-1"
-          />
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Equipment / handling notes</span>
-          <input
-            name="equipmentNotes"
-            className="input mt-1"
-            placeholder="2 chafers, 1 induction burner"
-          />
-        </label>
-        <div className="sm:col-span-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={busy != null}
-          >
-            {busy === "define" ? "Adding…" : "Add container"}
-          </button>
-        </div>
-      </form>
+      <details className="recipe-add-editor">
+        <summary>Add container</summary>
+        <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onDefine}>
+          <label className="block text-sm">
+            <span className="meta-term">Container</span>
+            <input
+              name="name"
+              className="input mt-1"
+              placeholder="Full hotel pan"
+              required
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Service method</span>
+            <select
+              name="serviceMethod"
+              className="input mt-1"
+              defaultValue="cooked_at_kitchen"
+            >
+              {SERVICE_METHODS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Servings per container</span>
+            <input
+              name="servingsPerContainer"
+              type="number"
+              min={1}
+              defaultValue={25}
+              className="input mt-1"
+              required
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Always send (extra)</span>
+            <input
+              name="baseQuantity"
+              type="number"
+              min={0}
+              defaultValue={0}
+              className="input mt-1"
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Equipment / handling notes</span>
+            <input
+              name="equipmentNotes"
+              className="input mt-1"
+              placeholder="2 chafers, 1 induction burner"
+            />
+          </label>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={busy != null}
+            >
+              {busy === "define" ? "Adding…" : "Add container"}
+            </button>
+          </div>
+        </form>
+      </details>
     </section>
   );
 }

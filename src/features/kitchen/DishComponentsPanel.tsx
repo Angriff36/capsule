@@ -11,15 +11,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
-// DishComponent attach/detach — the first hop of the purchasing chain.
-//
-// Without a row here a dish contributes nothing downstream: EventDishAdded
-// fans out over DishComponent to seed EventDishComponentSeed, which drives
-// ComponentIngredient -> EventIngredientContribution -> IngredientDemand ->
-// PurchaseNeed -> VendorOrder. It is also what live food cost, the allergen
-// matrix and margin reporting read. DishComponent.attach existed but was only
-// reachable from the agent command bridge, so every dish in the app had zero
-// component lines and the whole chain read empty.
+// Optional made subrecipes supplement the dish’s own ingredients.
 
 type Props = {
   dishId: string;
@@ -126,7 +118,7 @@ export function DishComponentsPanel({ dishId }: Props) {
   return (
     <section className="culinary-section">
       <div className="culinary-section-heading">
-        <h2>Components in this dish</h2>
+        <h2>Subrecipes</h2>
         <span>{rows.length} attached</span>
       </div>
 
@@ -141,10 +133,10 @@ export function DishComponentsPanel({ dishId }: Props) {
       {dishComponents === undefined ? (
         <TableSkeleton rows={3} />
       ) : rows.length === 0 ? (
-        <div className="document-empty">
+        <div className="recipe-empty">
           <p>
-            No component attached. Until one is, this dish generates no
-            ingredient demand, no purchase needs, and no food cost.
+            No subrecipes attached. This dish’s own ingredients still contribute
+            to purchasing and food cost.
           </p>
         </div>
       ) : (
@@ -172,7 +164,7 @@ export function DishComponentsPanel({ dishId }: Props) {
                       Component unavailable
                     </p>
                   )}
-                  <p className="font-mono text-xs text-ink-3">
+                  <p className="text-sm text-ink-3">
                     yields {row.yieldQuantity}
                     {component?.yieldUnit
                       ? ` ${String(component.yieldUnit)}`
@@ -201,60 +193,63 @@ export function DishComponentsPanel({ dishId }: Props) {
         </ul>
       )}
 
-      <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAttach}>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Component</span>
-          <select name="componentId" className="input mt-1" defaultValue="">
-            <option value="">Select a component…</option>
-            {available.map((component) => (
-              <option key={component._id} value={component._id}>
-                {component.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">
-            Yield (0 = the component&apos;s own)
-          </span>
-          <input
-            name="yieldQuantity"
-            type="number"
-            min={0}
-            step="0.01"
-            defaultValue={0}
-            className="input mt-1"
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Batch multiplier</span>
-          <input
-            name="batchMultiplier"
-            type="number"
-            min={0.01}
-            step="0.01"
-            defaultValue={1}
-            className="input mt-1"
-          />
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Role (optional)</span>
-          <input
-            name="role"
-            className="input mt-1"
-            placeholder="base, sauce, garnish"
-          />
-        </label>
-        <div className="sm:col-span-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={busy != null || available.length === 0}
-          >
-            {busy === "attach" ? "Attaching…" : "Attach component"}
-          </button>
-        </div>
-      </form>
+      <details className="recipe-add-editor">
+        <summary>Add subrecipe</summary>
+        <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAttach}>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Component</span>
+            <select name="componentId" className="input mt-1" defaultValue="">
+              <option value="">Select a component…</option>
+              {available.map((component) => (
+                <option key={component._id} value={component._id}>
+                  {component.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">
+              Yield (0 = the component&apos;s own)
+            </span>
+            <input
+              name="yieldQuantity"
+              type="number"
+              min={0}
+              step="0.01"
+              defaultValue={0}
+              className="input mt-1"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Batch multiplier</span>
+            <input
+              name="batchMultiplier"
+              type="number"
+              min={0.01}
+              step="0.01"
+              defaultValue={1}
+              className="input mt-1"
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Role (optional)</span>
+            <input
+              name="role"
+              className="input mt-1"
+              placeholder="base, sauce, garnish"
+            />
+          </label>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={busy != null || available.length === 0}
+            >
+              {busy === "attach" ? "Attaching…" : "Attach component"}
+            </button>
+          </div>
+        </form>
+      </details>
     </section>
   );
 }

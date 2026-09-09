@@ -7,6 +7,7 @@ import {
   useListDishTask,
   useListComponent,
 } from "../../lib/manifest-convex-react";
+import { RecipeNotes } from "./RecipeNotes";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -185,7 +186,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   return (
     <section className="culinary-section">
       <div className="culinary-section-heading">
-        <h2>Prep task templates</h2>
+        <h2>Prep list</h2>
         <span>{formatCountNoun(rows.length, "task")}</span>
       </div>
 
@@ -207,7 +208,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-line">
+        <ol className="recipe-prep-list">
           {rows.map((task) => {
             const component = task.componentId
               ? components?.find((entry) => entry._id === task.componentId)
@@ -219,22 +220,15 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             return (
               <li
                 key={task._id}
-                className="flex flex-wrap items-center justify-between gap-2 py-3"
+                className="recipe-prep-row"
                 data-testid="dish-prep-template-row"
               >
                 <div>
                   <p className="text-lg font-medium text-ink">{task.name}</p>
-                  <p className="font-mono text-xs text-ink-3">
-                    {task.category} · {task.taskType}
-                    {task.station ? ` · ${task.station}` : ""}
-                    {qtyMeta ? ` · ${qtyMeta}` : ""}
+                  <p className="recipe-prep-meta">
+                    {qtyMeta || "See instructions"}
                   </p>
-                  {task.instructions ? (
-                    <p className="mt-1 text-sm text-ink-2">
-                      <span className="font-medium text-ink-3">Notes: </span>
-                      {task.instructions}
-                    </p>
-                  ) : null}
+                  <RecipeNotes text={task.instructions} />
                 </div>
                 <div className="flex items-center gap-3">
                   {component ? (
@@ -246,153 +240,161 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                     </Link>
                   ) : task.componentId ? (
                     <span className="text-sm text-ink-3">Component linked</span>
-                  ) : (
-                    <span className="text-sm text-ink-3">No component</span>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    disabled={busy != null}
-                    onClick={() =>
-                      void onRetire(task._id, task.version, task.name)
-                    }
-                  >
-                    {busy === task._id ? "Working…" : "Remove"}
-                  </button>
+                  ) : null}
+                  <details className="recipe-row-editor">
+                    <summary aria-label={`Manage ${task.name}`}>Manage</summary>
+                    <p className="recipe-note">
+                      {task.category}
+                      {task.station ? ` · ${task.station}` : ""}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() =>
+                        void onRetire(task._id, task.version, task.name)
+                      }
+                    >
+                      {busy === task._id ? "Working…" : "Remove"}
+                    </button>
+                  </details>
                 </div>
               </li>
             );
           })}
-        </ul>
+        </ol>
       )}
 
-      <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Task</span>
-          <input
-            name="name"
-            className="input mt-1"
-            placeholder="BRINE AIRLINE CHICKEN"
-            required
-            value={taskName}
-            onChange={(event) => setTaskName(event.target.value)}
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Category</span>
-          <select
-            className="input mt-1"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Station</span>
-          <input
-            name="station"
-            className="input mt-1"
-            placeholder="Apps - Passed - Finish at Event"
-            value={station}
-            onChange={(event) => setStation(event.target.value)}
-          />
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Quantity mode</span>
-          <select
-            className="input mt-1"
-            value={quantityMode}
-            onChange={(event) =>
-              setQuantityMode(event.target.value as PrepQuantityEntryMode)
-            }
-          >
-            {QUANTITY_MODES.map((mode) => (
-              <option key={mode.value} value={mode.value}>
-                {mode.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        {quantityMode === "per_guest" ? (
-          <label className="block text-sm">
-            <span className="meta-term">Per guest (0 = one each)</span>
+      <details className="recipe-add-editor">
+        <summary>Add prep step</summary>
+        <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Task</span>
             <input
-              name="defaultQuantity"
-              type="text"
-              inputMode="decimal"
-              placeholder="0.0313"
-              value={perGuestQty}
-              onChange={(event) => setPerGuestQty(event.target.value)}
+              name="name"
               className="input mt-1"
+              placeholder="BRINE AIRLINE CHICKEN"
+              required
+              value={taskName}
+              onChange={(event) => setTaskName(event.target.value)}
             />
           </label>
-        ) : (
-          <>
+          <label className="block text-sm">
+            <span className="meta-term">Category</span>
+            <select
+              className="input mt-1"
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Station</span>
+            <input
+              name="station"
+              className="input mt-1"
+              placeholder="Apps - Passed - Finish at Event"
+              value={station}
+              onChange={(event) => setStation(event.target.value)}
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Quantity mode</span>
+            <select
+              className="input mt-1"
+              value={quantityMode}
+              onChange={(event) =>
+                setQuantityMode(event.target.value as PrepQuantityEntryMode)
+              }
+            >
+              {QUANTITY_MODES.map((mode) => (
+                <option key={mode.value} value={mode.value}>
+                  {mode.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {quantityMode === "per_guest" ? (
             <label className="block text-sm">
-              <span className="meta-term">Total for batch</span>
+              <span className="meta-term">Per guest (0 = one each)</span>
               <input
-                name="batchTotal"
+                name="defaultQuantity"
                 type="text"
                 inputMode="decimal"
-                placeholder="97.50"
-                value={batchTotalQty}
-                onChange={(event) => setBatchTotalQty(event.target.value)}
+                placeholder="0.0313"
+                value={perGuestQty}
+                onChange={(event) => setPerGuestQty(event.target.value)}
                 className="input mt-1"
               />
             </label>
-            <label className="block text-sm">
-              <span className="meta-term">Servings on sheet</span>
-              <input
-                name="batchServings"
-                type="text"
-                inputMode="numeric"
-                placeholder="260"
-                value={batchServings}
-                onChange={(event) => setBatchServings(event.target.value)}
-                className="input mt-1"
-              />
-            </label>
-          </>
-        )}
-        <label className="block text-sm">
-          <span className="meta-term">Unit</span>
-          <select
-            className="input mt-1"
-            value={unit}
-            onChange={(event) => setUnit(event.target.value)}
-          >
-            {UNITS.map((u) => (
-              <option key={u} value={u}>
-                {u}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Notes</span>
-          <input
-            name="instructions"
-            className="input mt-1"
-            placeholder="Weight after cooked"
-            value={instructions}
-            onChange={(event) => setInstructions(event.target.value)}
-          />
-        </label>
-        <div className="sm:col-span-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={busy != null}
-          >
-            {busy === "add" ? "Adding…" : "Add prep template"}
-          </button>
-        </div>
-      </form>
+          ) : (
+            <>
+              <label className="block text-sm">
+                <span className="meta-term">Total for batch</span>
+                <input
+                  name="batchTotal"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="97.50"
+                  value={batchTotalQty}
+                  onChange={(event) => setBatchTotalQty(event.target.value)}
+                  className="input mt-1"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="meta-term">Servings on sheet</span>
+                <input
+                  name="batchServings"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="260"
+                  value={batchServings}
+                  onChange={(event) => setBatchServings(event.target.value)}
+                  className="input mt-1"
+                />
+              </label>
+            </>
+          )}
+          <label className="block text-sm">
+            <span className="meta-term">Unit</span>
+            <select
+              className="input mt-1"
+              value={unit}
+              onChange={(event) => setUnit(event.target.value)}
+            >
+              {UNITS.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Notes</span>
+            <input
+              name="instructions"
+              className="input mt-1"
+              placeholder="Weight after cooked"
+              value={instructions}
+              onChange={(event) => setInstructions(event.target.value)}
+            />
+          </label>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={busy != null}
+            >
+              {busy === "add" ? "Adding…" : "Add prep template"}
+            </button>
+          </div>
+        </form>
+      </details>
     </section>
   );
 }
