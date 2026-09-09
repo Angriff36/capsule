@@ -189,3 +189,14 @@ Follow-up to #323: proved a new EventDish added after a pack list opens produces
 Actual generated-runtime qualification: .artifacts/operations-source-study/reproduce-container-addition.ts and packing-addition-runtime.log pass automatic addition, serving scaling, manual override preservation, zero/restoration/removal, loaded-parent reopening, repacking without duplicate delivery, and no new lines or changed planned quantity on dispatched lists. Synthetic capacity remains a synchronization fixture only. Full existing suite165 files/1441 tests passes; typecheck passes. gpt-5.6-sol independently APPROVED this bounded diff, explicitly not release approval.
 
 Next packing work remains existing-row adoption/backfill without duplicates, active catalog changes (capacity, retirement, reinstatement) and source equipment quantity reconstruction, plus rendered flows. Full source-backed data/UI/report/release objective remains active and incomplete.
+
+## 2026-09-09 — container catalog changes reconcile packing
+
+Follow-up to #323: actual generated runtime proved changing a container capacity from50 to100 left an existing167-serving packing requirement at4 instead of2. Added template revise/retire/reinstate reactions using the packing line's retained containerServings. Retired templates yield zero automatic requirement; reinstating restores it. Manual quantities and dispatched/cancelled plans remain unchanged.
+
+Kitchen_staff qualification caught a policy rollback when catalog changes reached PackListItem and parent PackList. Shared packing policies now allow kitchenAccess. PackList.open retains its pre-existing logistics/manager authority via a command guard; the existing denial test exposed unintended header creation and passes after correction. No authored tests changed. gpt-5.6-sol independently APPROVED the final bounded diff including that guard.
+
+Evidence: ignored reproduce-container-catalog.ts, container-catalog-before.log, container-catalog-role-before.log, packing-catalog-runtime.log. Scratch proves capacity correction, retirement/reinstatement, kitchen_staff correction, manual override preservation and dispatched planned quantities. Existing suite165 files/1441 tests passes; typecheck final process pending at this entry.
+
+Remaining packing work: safe adoption of existing pre-metadata rows without duplication; new catalog template creation on already-planned events; source-backed capacities/fixed equipment quantities; catalog display details and historical records; rendered end-to-end verification. No production writes/release. The complete original workflow/data/UI/report goal remains active.
+`nPacking catalog final typecheck completed successfully (exit0).

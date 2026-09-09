@@ -58,9 +58,9 @@ entity PackList mixin TenantScoped, SoftDeletable {
 
   // manageAccess: Event.approve (event_manager) reaction-opens PackList;
   // logisticsAccess: packing staff. Same cascade pattern as PurchaseNeed.
-  default policy packListRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack lists"
-  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack lists through commands"
-  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list commands"
+  default policy packListRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may read pack lists"
+  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may write pack lists through commands"
+  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may execute pack list commands"
 
   // Idempotent open: Event.approve reaction may re-fire; do not fail or duplicate.
   command open(
@@ -69,6 +69,9 @@ entity PackList mixin TenantScoped, SoftDeletable {
     optional purpose: string,
     optional notes: string
   ) {
+    // Preserve the existing header-creation authority; kitchen access supports
+    // packing existing lists and automatic recipe-driven requirement updates.
+    guard roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess")
     guard self.deletedAt == null
     guard self.status != "cancelled" and self.status != "dispatched"
     guard self.event != null
@@ -254,10 +257,11 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   transition status from "packed" to ["listed"]
   transition status from "missing" to []
 
-  // Match the parent PackList: managers can compose package supply lists.
-  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack list items"
-  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack list items through commands"
-  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list item commands"
+  // Kitchen and logistics share physical packing; recipe corrections also
+  // reconcile container requirements through these same commands.
+  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may read pack list items"
+  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may write pack list items through commands"
+  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may execute pack list item commands"
 
   command addItem(
     packListId: uuid,
@@ -322,7 +326,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   command syncContainerServings(quantityServings: number) {
     compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
-    compute planned = quantityServings > 0 and self.dishContainer != null ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate requiredQuantity = eligible ? planned : self.requiredQuantity
     mutate containerServings = eligible ? quantityServings : self.containerServings
     mutate status = eligible and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status
@@ -543,6 +547,20 @@ on EventDishServingsAdjusted fanOut PackListItem where eventDishId = payload.eve
 on EventDishRemoved fanOut PackListItem where eventDishId = payload.eventDishId
   run syncContainerServings
   params { quantityServings: 0 }
+
+// Keep the last menu serving count when a template retires, so reinstatement
+// restores the requirement without replacing the packing record or staff edits.
+on DishContainerRevised fanOut PackListItem where dishContainerId = payload.dishContainerId
+  run syncContainerServings
+  params { quantityServings: self.containerServings != null ? self.containerServings : 0 }
+
+on DishContainerRetired fanOut PackListItem where dishContainerId = payload.dishContainerId
+  run syncContainerServings
+  params { quantityServings: self.containerServings != null ? self.containerServings : 0 }
+
+on DishContainerReinstated fanOut PackListItem where dishContainerId = payload.dishContainerId
+  run syncContainerServings
+  params { quantityServings: self.containerServings != null ? self.containerServings : 0 }
 
 on EventDishAdded fanOut PackList where activeEventId = payload.eventId
   run requestDishContainers
