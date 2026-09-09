@@ -17,6 +17,81 @@ export const reconcileImportedEventRecipeSync = mutation({
 
 const unit = v.string();
 
+/** Adopt reviewed legacy container lines without recreating physical packing work. */
+export const reconcileImportedPackingLinks = mutation({
+  args: {
+    packListId: v.id("packLists"),
+    expectedVersion: v.number(),
+    links: v.array(v.object({
+      itemId: v.id("packListItems"),
+      expectedVersion: v.number(),
+      eventDishId: v.id("eventDishes"),
+      expectedEventDishVersion: v.number(),
+      expectedContainerVersion: v.number(),
+      followsDishServings: v.boolean(),
+    })),
+  },
+  handler: async (ctx, args): Promise<{ changed: number }> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    if (!["owner", "admin", "system"].includes(auth.role))
+      throw new Error("Only an administrator may reconcile imported packing links");
+    const list = await ctx.db.get(args.packListId);
+    if (!list || list.tenantId !== tenantId || list.deletedAt != null)
+      throw new Error("Pack list not found");
+    const event = await ctx.db.get(list.eventId);
+    if (!event || event.tenantId !== tenantId || event.deletedAt != null ||
+      ["completed", "closed_out", "cancelled"].includes(event.stage) ||
+      ["dispatched", "cancelled"].includes(list.status))
+      throw new Error("Historical packing records must remain unchanged");
+    const items = await ctx.db.query("packListItems")
+      .withIndex("by_packListId", q => q.eq("packListId", list._id)).collect();
+    const seen = new Set<string>();
+    const targets = new Set<string>();
+    const pending: { itemId: Id<"packListItems">; eventDishId: Id<"eventDishes">; follows: boolean; servings: number; itemVersion: number; eventDishVersion: number; containerVersion: number }[] = [];
+    for (const link of args.links) {
+      if (seen.has(link.itemId)) throw new Error("Packing line selected twice");
+      seen.add(link.itemId);
+      const item = items.find(row => row._id === link.itemId && row.tenantId === tenantId && row.deletedAt == null);
+      const dish = await ctx.db.get(link.eventDishId);
+      const container = item?.dishContainerId ? await ctx.db.get(item.dishContainerId) : null;
+      if (!item || !dish || dish.tenantId !== tenantId || dish.deletedAt != null ||
+        dish.eventId !== event._id || !container || container.tenantId !== tenantId ||
+        container.deletedAt != null || container.dishId !== dish.dishId || item.dishId !== dish.dishId)
+        throw new Error("Packing line, container and event dish must refer to the same dish and event");
+      const target = `${container._id}:${dish._id}`;
+      if (targets.has(target) || items.some(row => row._id !== item._id && row.deletedAt == null &&
+        row.tenantId === tenantId && row.dishContainerId === container._id && row.eventDishId === dish._id))
+        throw new Error("Another packing line already represents this event dish and container");
+      targets.add(target);
+      if (item.eventDishId === dish._id && item.followsDishServings === link.followsDishServings) continue;
+      if (item.eventDishId != null || item.version !== link.expectedVersion ||
+        list.version !== args.expectedVersion || dish.version !== link.expectedEventDishVersion ||
+        container.version !== link.expectedContainerVersion)
+        throw new Error("Packing records changed since the reviewed repair snapshot");
+      if (link.followsDishServings && item.unit !== container.unit)
+        throw new Error("Packing unit differs from the container template; retain its manual quantity until reviewed");
+      pending.push({ itemId: item._id, eventDishId: dish._id, follows: link.followsDishServings, servings: dish.quantityServings, itemVersion: item.version, eventDishVersion: dish.version, containerVersion: container.version });
+    }
+    for (const link of pending) {
+      // Earlier automatic lines in this same transaction may reopen the parent.
+      // The reviewed parent version was checked for the entire batch above.
+      const currentList = await ctx.db.get(list._id);
+      if (!currentList) throw new Error("Pack list not found");
+      await ctx.runMutation(api.mutations.PackListItem_adoptContainerLink, {
+        docId: link.itemId, eventDishId: link.eventDishId,
+        followsDishServings: link.follows, containerServings: link.servings,
+        expectedItemVersion: link.itemVersion, expectedPackListVersion: currentList.version,
+        expectedEventDishVersion: link.eventDishVersion, expectedContainerVersion: link.containerVersion,
+      });
+      if (link.follows) await ctx.runMutation(api.mutations.PackListItem_syncContainerServings, {
+        docId: link.itemId, quantityServings: link.servings,
+      });
+    }
+    return { changed: pending.length };
+  },
+});
+
 /** Restore imported whole recipes onto their dishes in one retry-safe transaction. */
 export const repairImportedDishRecipe = mutation({ args: dishRecipeRepairArgs, handler: repairDishRecipe });
 

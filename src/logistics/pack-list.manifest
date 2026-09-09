@@ -324,6 +324,28 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command adoptContainerLink(eventDishId: uuid, followsDishServings: boolean, containerServings: int, expectedItemVersion: int, expectedPackListVersion: int, expectedEventDishVersion: int, expectedContainerVersion: int) {
+    guard user.role == "owner" or user.role == "admin" or user.role == "system"
+    guard self.deletedAt == null and self.packList != null and self.dishContainer != null
+    guard self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    // Repair active planning links without rewriting completed event history.
+    guard self.packList.deletedAt == null and self.packList.event != null and self.packList.event.deletedAt == null
+    guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    guard self.dishContainer.deletedAt == null
+    // Apply only the records reviewed for this repair, preserving intervening staff edits.
+    guard self.version == expectedItemVersion and self.packList.version == expectedPackListVersion and self.dishContainer.version == expectedContainerVersion
+    constraint adoptionKeepsEventDish: self.eventDishId == null or self.eventDishId == eventDishId "Packing line already belongs to a different event dish"
+    constraint adoptionServingsValid: containerServings >= 0 "Servings cannot be negative"
+    constraint adoptionDishMatches: self.dishContainer.dishId == self.dishId "Container must match the packing dish"
+    constraint adoptionUnitMatches: followsDishServings == false or self.unit == self.dishContainer.unit "Automatic packing requires the container template unit"
+    guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == self.dishId and item.deletedAt == null and item.quantityServings == containerServings and item.version == expectedEventDishVersion)) == 1
+    // One menu line and container must not become two packing requirements.
+    guard count_of(filter(self.packList.items, (item) => item.id != self.id and item.deletedAt == null and item.eventDishId == eventDishId and item.dishContainerId == self.dishContainerId)) == 0
+    mutate eventDishId = eventDishId
+    mutate followsDishServings = followsDishServings
+    mutate containerServings = containerServings
+  }
+
   command syncContainerServings(quantityServings: number) {
     compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
     compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
