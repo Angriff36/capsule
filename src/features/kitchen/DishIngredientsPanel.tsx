@@ -20,7 +20,8 @@ import {
   formatRecipeQuantity,
 } from "../events/eventMenuRecipeQuantity";
 import { applyDishIngredientRemoval } from "./dishIngredientRemoval";
-import { IngredientCatalogLabel } from "./IngredientCatalogLabel";
+import { CulinaryEntityLink } from "./CulinaryEntityLink";
+import { RecipeNotes } from "./RecipeNotes";
 import { IngredientOptionPicker } from "./IngredientOptionPicker";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
@@ -55,9 +56,6 @@ export function DishIngredientsPanel({ dishId }: Props) {
 
   const ingredientName = (id: string) =>
     ingredients?.find((row) => row._id === id)?.name ?? "Unknown ingredient";
-
-  const ingredientRow = (id: string) =>
-    ingredients?.find((row) => row._id === id);
 
   async function onAdd(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -177,7 +175,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
     <section className="culinary-section">
       <div className="culinary-section-heading">
         <h2>Ingredients</h2>
-        <span>{formatCountNoun(rows.length, "line")}</span>
+        <span>{formatCountNoun(rows.length, "ingredient")} · per serving</span>
       </div>
 
       {promptHost}
@@ -198,142 +196,154 @@ export function DishIngredientsPanel({ dishId }: Props) {
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-line">
+        <ul className="recipe-ingredient-list">
           {rows.map((line) => (
             <li
               key={line._id}
-              className="flex flex-wrap items-center justify-between gap-2 py-3"
+              className="recipe-ingredient-row"
               data-testid="dish-ingredient-row"
             >
-              <form
-                className="flex flex-wrap items-end gap-2"
-                onSubmit={(event) => void onSaveQty(event, line)}
-              >
-                <div>
-                  {ingredientRow(String(line.ingredientId)) ? (
-                    <IngredientCatalogLabel
-                      ingredientId={String(line.ingredientId)}
-                      ingredients={ingredients}
-                    />
-                  ) : (
-                    <p className="text-lg font-medium text-ink">
-                      {ingredientName(String(line.ingredientId))}
-                    </p>
-                  )}
-                  {line.prepNotes ? (
-                    <p className="font-mono text-xs text-ink-3">
-                      {line.prepNotes}
-                    </p>
-                  ) : null}
-                </div>
-                <label className="block text-sm">
-                  <span className="meta-term">Qty</span>
-                  <input
-                    className="input mt-1 w-24"
-                    name="quantity"
-                    type={RECIPE_QUANTITY_INPUT_TYPE}
-                    inputMode={RECIPE_QUANTITY_INPUT_MODE}
-                    autoComplete="off"
-                    spellCheck={false}
-                    defaultValue={formatRecipeQuantity(line.quantity)}
-                    data-testid="kitchen-dish-recipe-qty"
-                  />
-                </label>
-                <label className="block text-sm">
-                  <span className="meta-term">Unit</span>
-                  <select
-                    className="input mt-1 w-28"
-                    name="unit"
-                    defaultValue={String(line.unit)}
-                    data-testid="kitchen-dish-recipe-unit"
-                  >
-                    {SELECTABLE_UNITS.map((value) => (
-                      <option key={value} value={value}>
-                        {value}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button
-                  type="submit"
-                  className="btn btn-ghost btn-sm"
-                  disabled={busy != null}
+              <div className="recipe-ingredient-name">
+                <CulinaryEntityLink
+                  kind="ingredient"
+                  id={String(line.ingredientId)}
                 >
-                  {busy === `qty:${line._id}` ? "Saving…" : "Save qty"}
-                </button>
-              </form>
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                disabled={busy != null}
-                data-testid="kitchen-dish-remove-ingredient"
-                onClick={() =>
-                  void onRemove(
-                    line._id,
-                    line.version,
-                    ingredientName(String(line.ingredientId)),
-                  )
-                }
-              >
-                {busy === line._id ? "Working…" : "Remove"}
-              </button>
+                  {ingredientName(String(line.ingredientId))}
+                </CulinaryEntityLink>
+                <RecipeNotes text={line.prepNotes} label="Prep note & source" />
+              </div>
+              <span className="recipe-amount">
+                {formatRecipeQuantity(line.quantity)} {String(line.unit)}
+              </span>
+              <details className="recipe-row-editor">
+                <summary
+                  aria-label={`Edit ${ingredientName(String(line.ingredientId))}`}
+                >
+                  Edit
+                </summary>
+                <form
+                  className="recipe-inline-form"
+                  onSubmit={(event) => void onSaveQty(event, line)}
+                >
+                  <label className="block text-sm">
+                    <span className="meta-term">Quantity per serving</span>
+                    <input
+                      className="input mt-1"
+                      name="quantity"
+                      type={RECIPE_QUANTITY_INPUT_TYPE}
+                      inputMode={RECIPE_QUANTITY_INPUT_MODE}
+                      autoComplete="off"
+                      spellCheck={false}
+                      defaultValue={formatRecipeQuantity(line.quantity)}
+                      data-testid="kitchen-dish-recipe-qty"
+                    />
+                  </label>
+                  <label className="block text-sm">
+                    <span className="meta-term">Unit</span>
+                    <select
+                      className="input mt-1"
+                      name="unit"
+                      defaultValue={String(line.unit)}
+                      data-testid="kitchen-dish-recipe-unit"
+                    >
+                      {!SELECTABLE_UNITS.some(
+                        (value) => value === String(line.unit),
+                      ) ? (
+                        <option value={String(line.unit)}>
+                          {String(line.unit)}
+                        </option>
+                      ) : null}
+                      {SELECTABLE_UNITS.map((value) => (
+                        <option key={value} value={value}>
+                          {value}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <button
+                    type="submit"
+                    className="btn btn-ghost btn-sm"
+                    disabled={busy != null}
+                  >
+                    {busy === `qty:${line._id}` ? "Saving…" : "Save qty"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    disabled={busy != null}
+                    data-testid="kitchen-dish-remove-ingredient"
+                    onClick={() =>
+                      void onRemove(
+                        line._id,
+                        line.version,
+                        ingredientName(String(line.ingredientId)),
+                      )
+                    }
+                  >
+                    {busy === line._id ? "Working…" : "Remove"}
+                  </button>
+                </form>
+              </details>
             </li>
           ))}
         </ul>
       )}
 
-      <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Ingredient</span>
-          <div className="mt-1">
-            <IngredientOptionPicker ingredients={ingredients} required />
+      <details className="recipe-add-editor">
+        <summary>Add ingredient</summary>
+        <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Ingredient</span>
+            <div className="mt-1">
+              <IngredientOptionPicker ingredients={ingredients} required />
+            </div>
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Per serving</span>
+            <input
+              name="quantity"
+              type={RECIPE_QUANTITY_INPUT_TYPE}
+              inputMode={RECIPE_QUANTITY_INPUT_MODE}
+              autoComplete="off"
+              spellCheck={false}
+              defaultValue=""
+              className="input mt-1"
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Unit</span>
+            <select
+              name="unit"
+              className="input mt-1"
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+            >
+              {SELECTABLE_UNITS.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Prep note</span>
+            <input
+              name="prepNotes"
+              className="input mt-1"
+              placeholder="diced small"
+            />
+          </label>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={busy != null}
+            >
+              {busy === "add" ? "Adding…" : "Add ingredient"}
+            </button>
           </div>
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Per serving</span>
-          <input
-            name="quantity"
-            type={RECIPE_QUANTITY_INPUT_TYPE}
-            inputMode={RECIPE_QUANTITY_INPUT_MODE}
-            autoComplete="off"
-            spellCheck={false}
-            defaultValue=""
-            className="input mt-1"
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Unit</span>
-          <select
-            name="unit"
-            className="input mt-1"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-          >
-            {SELECTABLE_UNITS.map((u) => (
-              <option key={u} value={u}>
-                {u}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Prep note</span>
-          <input
-            name="prepNotes"
-            className="input mt-1"
-            placeholder="diced small"
-          />
-        </label>
-        <div className="sm:col-span-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={busy != null}
-          >
-            {busy === "add" ? "Adding…" : "Add ingredient"}
-          </button>
-        </div>
-      </form>
+        </form>
+      </details>
     </section>
   );
 }
