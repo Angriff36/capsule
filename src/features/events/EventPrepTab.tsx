@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  useListComponent,
+  useListPerson,
   useListDish,
   useListDishIngredient,
   useListEventDish,
@@ -12,10 +14,9 @@ import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import { runBulkItems } from "../../ui/bulk-select";
-import {
-  suspectPrepQuantityFlag,
-  suspectRowsFromRecipeLines,
-} from "./eventMenuSuspectQuantity";
+import { suspectRowsFromRecipeLines } from "./eventMenuSuspectQuantity";
+
+import { EventPrepList } from "./EventPrepList";
 
 type Props = {
   eventId: string;
@@ -25,6 +26,8 @@ type Props = {
 export function EventPrepTab({ eventId, eventStage }: Props) {
   const eventDishes = useListEventDish();
   const dishes = useListDish();
+  const components = useListComponent();
+  const people = useListPerson();
   const dishIngredients = useListDishIngredient();
   const ingredients = useListIngredient();
   const prepTasks = useListPrepTask();
@@ -50,6 +53,37 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
       ),
     [eventId, prepTasks],
   );
+
+  const recipeFlags = useMemo(() => {
+    const ingredientNames = new Map(
+      (ingredients ?? []).map((row) => [row._id, row.name]),
+    );
+    const linesByDish = new Map<string, NonNullable<typeof dishIngredients>>();
+    for (const line of dishIngredients ?? []) {
+      if (line.deletedAt != null) continue;
+      const lines = linesByDish.get(line.dishId) ?? [];
+      lines.push(line);
+      linesByDish.set(line.dishId, lines);
+    }
+    return new Map(
+      selections.map((selection) => [
+        selection._id,
+        [
+          ...new Set(
+            suspectRowsFromRecipeLines(
+              (linesByDish.get(selection.dishId) ?? []).map((line) => ({
+                name: ingredientNames.get(line.ingredientId) ?? "",
+                unit: String(line.unit),
+                quantity: Number(line.quantity),
+                prepNotes: line.prepNotes,
+              })),
+              Number(selection.quantityServings),
+            ).map((row) => row.flag),
+          ),
+        ],
+      ]),
+    );
+  }, [selections, dishIngredients, ingredients]);
 
   const dishName = (id: string) =>
     dishes?.find((row) => row._id === id)?.name ?? "Unknown dish";
@@ -100,7 +134,7 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
     <section className="space-y-4" data-testid="event-prep-tab">
       <EventTabIntro
         title="Prep"
-        description="Prep steps for this event's menu. Sync generates work from dish templates, or from recipe ingredients when a dish has no templates."
+        description="Work by dish, with servings, quantities, instructions and linked recipes."
       />
       <div className="flex flex-wrap items-center gap-2">
         <button
@@ -115,7 +149,11 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           Open command deck
         </Link>
       </div>
-      {error ? <p className="text-base text-danger">{error}</p> : null}
+      {error ? (
+        <p role="alert" className="text-base text-danger">
+          {error}
+        </p>
+      ) : null}
       {notice ? (
         <p
           className="text-base text-ink-2"
@@ -125,78 +163,36 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           {notice}
         </p>
       ) : null}
-      {tasks.length === 0 ? (
+      {eventDishes === undefined ||
+      prepTasks === undefined ||
+      dishes === undefined ? (
+        <p className="text-base text-ink-2" role="status">
+          Loading event prep…
+        </p>
+      ) : tasks.length === 0 && selections.length === 0 ? (
         <div className="document-empty">
-          <p>
-            No prep steps yet. Sync prep from the menu — dishes without
-            templates still generate steps from their ingredients. If sync does
-            nothing, it will say why.
-          </p>
+          <p>Add dishes to the event menu to plan prep.</p>
         </div>
       ) : (
-        <ul className="divide-y divide-line">
-          {tasks.map((task) => (
-            <li
-              key={task._id}
-              className="flex flex-wrap justify-between gap-2 py-2"
-            >
-              <div>
-                <p className="font-medium">{task.name}</p>
-                <p className="font-mono text-xs text-ink-3">
-                  {task.quantity} {String(task.unit)} · {String(task.status)}
-                  {task.dishId ? ` · ${dishName(String(task.dishId))}` : ""}
-                </p>
-                {(() => {
-                  const selection = selections.find(
-                    (row) =>
-                      row._id === task.eventDishId ||
-                      row.dishId === task.dishId,
-                  );
-                  const servings = Number(selection?.quantityServings ?? 0);
-                  const dishId = String(task.dishId ?? selection?.dishId ?? "");
-                  const recipeFlags = suspectRowsFromRecipeLines(
-                    (dishIngredients ?? [])
-                      .filter(
-                        (line) =>
-                          line.deletedAt == null && line.dishId === dishId,
-                      )
-                      .map((line) => ({
-                        name:
-                          ingredients?.find(
-                            (row) => row._id === line.ingredientId,
-                          )?.name ?? "",
-                        unit: String(line.unit),
-                        quantity: Number(line.quantity),
-                        prepNotes:
-                          (line as { prepNotes?: string | null }).prepNotes ??
-                          null,
-                      })),
-                    servings,
-                  );
-                  const taskFlag = suspectPrepQuantityFlag({
-                    name: task.name,
-                    unit: String(task.unit),
-                    quantity: Number(task.quantity),
-                    servings,
-                  });
-                  const flags = [
-                    ...recipeFlags.map((row) => row.flag),
-                    ...(taskFlag ? [taskFlag] : []),
-                  ].filter((flag, index, all) => all.indexOf(flag) === index);
-                  return flags.map((flag) => (
-                    <p
-                      key={flag}
-                      className="text-sm text-danger"
-                      data-testid="suspect-prep-quantity"
-                    >
-                      {flag}
-                    </p>
-                  ));
-                })()}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <EventPrepList
+          selections={selections}
+          tasks={tasks}
+          dishes={dishes}
+          components={components ?? []}
+          people={people ?? []}
+          recipeFlags={recipeFlags}
+          renderQuantityFlags={(flags) =>
+            flags.map((flag) => (
+              <p
+                key={flag}
+                className="text-sm text-danger"
+                data-testid="suspect-prep-quantity"
+              >
+                {flag}
+              </p>
+            ))
+          }
+        />
       )}
       <EventDraftPoButton eventId={eventId} eventStage={eventStage} />
     </section>
