@@ -10,6 +10,7 @@ import {
   type TppSourceRecipe,
 } from "../src/lib/tppRecipeRepair";
 const args = process.argv.slice(2);
+const prepOnly = args.includes("--prep-only");
 const value = (flag: string, fallback: string) =>
   args.includes(flag) ? args[args.indexOf(flag) + 1] : fallback;
 const source = value(
@@ -26,6 +27,10 @@ const data = JSON.parse(readFileSync(snapshot, "utf8"));
 const recipes = JSON.parse(readFileSync(source, "utf8")) as TppSourceRecipe[];
 const plan = recipes.map((r) => {
   const recipe = projectTppRecipe(r);
+  if (prepOnly) {
+    recipe.ingredients = [];
+    recipe.components = [];
+  }
   for (const component of recipe.components)
     component.key = createHash("sha256").update(component.key).digest("hex");
   const dishes = data.Dish.filter(
@@ -41,12 +46,12 @@ const plan = recipes.map((r) => {
       c.name === `${r.name} — TPP recipe`,
   );
   return {
-    operationKey: `tpp-dish-repair:v2:${r.fingerprint}`,
+    operationKey: `${prepOnly ? "tpp-dish-prep-completion:v1" : "tpp-dish-repair:v2"}:${r.fingerprint}`,
     dishIds: dishes.map((d: any) => d._id),
     expectedVersions: Object.fromEntries(
       dishes.map((d: any) => [d._id, d.version]),
     ),
-    ...(draft ? { sourceComponentId: draft._id } : {}),
+    ...(draft && !prepOnly ? { sourceComponentId: draft._id } : {}),
     recipe,
   };
 });

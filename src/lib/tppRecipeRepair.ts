@@ -283,8 +283,11 @@ export function projectTppRecipe(
     const a = amount(line.quantity, line.unit);
     const sub = subs.get(recipeNameKey(line.name));
     const perServing = /\b(Serving|Each|Pizza)$/.test(recipe.yieldText);
+    // A named TPP subrecipe is a prep item even when its label is a noun.
+    // Additional action verbs cover source steps such as tempering and soaking.
     const actionable =
-      /^(make|portion|prepare|cook|pack|check|cut|slice|dice|peel|rinse|assemble|ball|clean|chiffonade|heat|bake|grill|place|pull|proof|whip|mix|shred|chop|scoop|wash|par|order|pickup|pick up|receive|pour|crumble|roast|marinate|skewer|roll|fry|thaw|fill|drain|toast|remove|bring|serve|finish|lay|put|load|add)\b/i.test(
+      Boolean(sub) ||
+      /^(steam|mandolin|temper|panko bread|crust|sear|punch|rub|soak|flat bottom|prep|pound|bread|immersion blend|marinade|run|blanch|shave|citrus zest|poach|julienne|hydrate|layer|pipe|filet|seasoned flour|butter|thick slice|take|cube|egg wash|sous vide|day of event|trim|channel knife|melon ball|pickle|thinly slice|zest|season|bowl|bag|meat and cheese|veggies|assembly line|build|smoke|pan|package|mince|box|count|custom prep list|make|portion|prepare|cook|pack|check|cut|slice|dice|peel|rinse|assemble|ball|clean|chiffonade|heat|bake|grill|place|pull|proof|whip|mix|shred|chop|scoop|wash|par|order|pickup|pick up|receive|pour|crumble|roast|marinate|skewer|roll|fry|thaw|fill|drain|toast|remove|bring|serve|finish|lay|put|load|add)\b/i.test(
         line.name,
       );
     if (actionable)
