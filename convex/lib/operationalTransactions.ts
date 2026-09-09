@@ -8,6 +8,23 @@ import {
   writeMaterializationReceipt,
 } from "./materializationReceipt";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
+import { materializeCateringPackage, type CateringPackageResult } from "./cateringPackageOperations";
+
+export const applyCateringPackage = mutation({
+  args: {
+    eventId: v.id("events"),
+    packageId: v.string(),
+    operationKey: v.string(),
+    selections: v.array(v.object({ recipeId: v.string(), servings: v.number(), notes: v.string() })),
+    serviceStartsAt: v.optional(v.number()),
+  },
+  handler: async (ctx, args): Promise<CateringPackageResult> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    requireMenuAccess(auth);
+    return materializeCateringPackage(ctx, tenantId, args);
+  },
+});
 
 const MANAGE_ROLES = new Set([
   "admin",

@@ -42,6 +42,7 @@ import type * as laborSummary from "../laborSummary.js";
 import type * as lib_authContext from "../lib/authContext.js";
 import type * as lib_blobs from "../lib/blobs.js";
 import type * as lib_catalogUnitGrams from "../lib/catalogUnitGrams.js";
+import type * as lib_cateringPackageOperations from "../lib/cateringPackageOperations.js";
 import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
 import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
 import type * as lib_clientOutreach from "../lib/clientOutreach.js";
@@ -167,6 +168,7 @@ declare const fullApi: ApiFromModules<{
   "lib/authContext": typeof lib_authContext;
   "lib/blobs": typeof lib_blobs;
   "lib/catalogUnitGrams": typeof lib_catalogUnitGrams;
+  "lib/cateringPackageOperations": typeof lib_cateringPackageOperations;
   "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
   "lib/clerkStaffAccount": typeof lib_clerkStaffAccount;
   "lib/clientOutreach": typeof lib_clientOutreach;

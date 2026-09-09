@@ -22,7 +22,14 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import type { Id } from "../../lib/api";
-import { useMaterializeEventMenuTemplate } from "../../lib/operational-transactions";
+import {
+  CateringPackagePicker,
+  type CateringPackageInput,
+} from "./CateringPackagePicker";
+import {
+  useMaterializeEventMenuTemplate,
+  useApplyCateringPackage,
+} from "../../lib/operational-transactions";
 import {
   beginPendingOperation,
   confirmPendingOperation,
@@ -100,6 +107,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const inventoryItems = useListInventoryItem();
   const inventoryReservations = useListInventoryReservation();
   const materializeTemplate = useMaterializeEventMenuTemplate();
+  const applyPackage = useApplyCateringPackage();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
   const changeCourse = useEventDishChangeCourse();
@@ -332,6 +340,32 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     (line) => eventMenuDishEstimateKind(line) !== "priced",
   ).length;
 
+  const applyCateringPackage = async (input: CateringPackageInput) => {
+    setBusy(`package:${input.packageId}`);
+    try {
+      const result = await applyPackage({
+        ...input,
+        eventId: eventId as Id<"events">,
+      });
+      if (result.savedDishIds.length > 0) {
+        stockLifecycle.current.begin({
+          savedDishIds: result.savedDishIds,
+          savedDemandVersions: result.savedDemandVersions,
+        });
+        setMenuSyncStatus({
+          phase: "waiting",
+          savedCount: result.savedDishIds.length,
+          requestedCount: result.savedDishIds.length,
+          recovered: result.recovered,
+        });
+        setStockPhase((current) => current + 1);
+      }
+      return result;
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const materializeTemplateLines = async (
     template: MenuTemplate,
     lines: MenuTemplate["lines"],
@@ -460,6 +494,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           {showPicker ? "Hide picker" : "Add dish"}
         </button>
       </div>
+
+      <CateringPackagePicker
+        eventId={eventId}
+        headcount={expectedHeadcount}
+        startsAt={event?.startsAt ?? undefined}
+        busy={busy != null}
+        onApply={applyCateringPackage}
+      />
 
       {costRollup.mismatches.length > 0 ? (
         <div

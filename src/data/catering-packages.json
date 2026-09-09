@@ -1,0 +1,4420 @@
+{
+  "books": {
+    "wedding": "2026 Full Service Wedding Catering Book.pdf",
+    "hors": "2026 Full Service Horsd'oeuvres Menu.pdf",
+    "holiday": "Holiday Catering Book 2025.pdf",
+    "pizza": "2026 Wedding Pizza Book.pdf"
+  },
+  "recipes": [
+    {
+      "id": "wedding-7-all-seasons-wedding-salad",
+      "name": "All Seasons Wedding Salad",
+      "description": "local greens, organic baby spinach, dried cranberries, feta cheese, toasted walnuts, herb croutons, huckleberry or raspberry vinaigrette.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-7-mid-summer-salad",
+      "name": "Mid Summer Salad",
+      "description": "local greens, strawberries, shaved fennel, Gorgonzola, walnuts, raspberry balsamic vinaigrette.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-7-late-summer-salad",
+      "name": "Late Summer Salad",
+      "description": "local greens, grilled peaches, crisp pancetta, candied pecans, feta, sherry vinaigrette.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-7-autumn-salad",
+      "name": "Autumn Salad",
+      "description": "grilled pears or apples, artisan romaine wedge, Gorgonzola, candied walnut, roasted cherry tomato, thick cut hickory smoked bacon drizzled with a red wine vinaigrette.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-7-citrus-salad",
+      "name": "Citrus Salad",
+      "description": "arugula, mandarin orange segments, shaved Parmesan, croutons, pine nuts, roasted tomato tossed in a white wine vinaigrette.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-7-dinner-rolls",
+      "name": "Dinner Rolls",
+      "description": "fresh baked and served with butter chips.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-8-grilled-focaccia",
+      "name": "Grilled Focaccia",
+      "description": "Grilled focaccia.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-8-garlic-parmesan-rolls",
+      "name": "Garlic Parmesan Rolls",
+      "description": "Fresh baked rolls with garlic and Parmesan.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-8-garlic-french-bread",
+      "name": "Garlic French Bread",
+      "description": "Garlic French bread.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-8-pesto-gnocchi",
+      "name": "Pesto Gnocchi",
+      "description": "Simmered in a light cream sauce, finished with organic baby spinach, cherry tomato, and Parmesan cheese.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Pasta"
+    },
+    {
+      "id": "wedding-8-pesto-penne-pasta",
+      "name": "Pesto Penne Pasta",
+      "description": "Simmered in a light cream sauce, finished with organic baby spinach, cherry tomato, and Parmesan cheese.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Pasta"
+    },
+    {
+      "id": "wedding-8-whipped-yukon-potatoes",
+      "name": "Whipped Yukon Potatoes",
+      "description": "Whipped Yukon potatoes.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Starch"
+    },
+    {
+      "id": "wedding-8-four-cheese-au-gratin",
+      "name": "Four Cheese Au Gratin",
+      "description": "Four cheese potatoes au gratin.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Starch"
+    },
+    {
+      "id": "wedding-7-roulade",
+      "name": "Roulade",
+      "description": "tender chicken breast filled with our housemade basil pesto and cream cheese, wrapped with sliced prosciutto and topped with a light herb cream sauce.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-7-haricots-verts",
+      "name": "Haricots Verts",
+      "description": "tender French green beans sautéed with garlic and finished with butter.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Vegetable"
+    },
+    {
+      "id": "wedding-7-baby-red-potatoes",
+      "name": "Baby Red Potatoes",
+      "description": "tender young Washington-grown red potatoes, roasted, finished with caramelized onions, sea salt, and fresh cracked pepper (substitute - Idaho wild rice pilaf).",
+      "book": "wedding",
+      "page": 7,
+      "course": "Starch"
+    },
+    {
+      "id": "wedding-7-idaho-wild-rice-pilaf",
+      "name": "Idaho Wild Rice Pilaf",
+      "description": "Idaho wild rice pilaf; offered as a substitute for baby red potatoes.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Starch"
+    },
+    {
+      "id": "wedding-7-cougar-gold-mac-n-cheese",
+      "name": "Cougar Gold Mac n’ Cheese",
+      "description": "elbow pasta tossed with our house-made Cougar Gold cheese sauce and crumbled bacon, topped with a Parmesan breadcrumb topping.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Pasta"
+    },
+    {
+      "id": "wedding-8-mangia-signature-vegetable-medley",
+      "name": "Mangia Signature Vegetable Medley",
+      "description": "zucchini, squash, mixed bell peppers, asparagus, and red onion marinated in balsamic vinegar and extra virgin olive oil. Roasted or grilled.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Vegetable"
+    },
+    {
+      "id": "wedding-7-sirloin-steak",
+      "name": "Sirloin Steak",
+      "description": "grilled beef sliced into medallions, topped with a peppercorn cream sauce.",
+      "book": "wedding",
+      "page": 7,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-8-roasted-prime-rib-of-beef-prime-grade",
+      "name": "Roasted Prime Rib of Beef (Prime Grade)",
+      "description": "a carving station with horseradish and garlic crusted prime rib served with creamed horseradish.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-8-grilled-wild-alaskan-salmon",
+      "name": "Grilled Wild Alaskan Salmon",
+      "description": "local huckleberry relish.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-8-strawberry-spinach-salad",
+      "name": "Strawberry & Spinach Salad",
+      "description": "tossed with feta, candied walnuts, croutons and a balsamic raspberry vinaigrette.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-8-grand-marnier-fruit-salad",
+      "name": "Grand Marnier Fruit Salad",
+      "description": "assortment of melon balls and diced fruit tossed with Grand Marnier Liquor and fresh mint.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-8-dinner-rolls",
+      "name": "Dinner Rolls",
+      "description": "fresh baked and served with a honey-cinnamon whipped butter.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-8-tri-tip-steak",
+      "name": "Tri Tip Steak",
+      "description": "rubbed with spices and marinated in garlic.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-8-grilled-bbq-chicken-breast",
+      "name": "Grilled BBQ Chicken Breast",
+      "description": "brushed with a huckleberry BBQ sauce.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-8-baby-red-potato-salad",
+      "name": "Baby Red Potato Salad",
+      "description": "diced red onions, celery, and hard boiled eggs in our house-made potato salad dressing.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-8-fresh-grilled-corn-on-the-cob",
+      "name": "Fresh Grilled Corn on the Cob",
+      "description": "served with butter and Johnny’s seasoning.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-8-caesar-salad",
+      "name": "Caesar Salad",
+      "description": "crisp romaine, toasted pine nuts, imported Parmesan cheese, and garlic croutons tossed in our housemade Caesar dressing.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Salad"
+    },
+    {
+      "id": "wedding-8-airline-italian-chicken-breast",
+      "name": "Airline Italian Chicken Breast",
+      "description": "marinated in fresh herbs, garlic, and olive oil.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-8-balsamic-marinated-vegetables",
+      "name": "Balsamic Marinated Vegetables",
+      "description": "sautéed in olive oil, finished with butter.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Vegetable"
+    },
+    {
+      "id": "wedding-8-italian-rope-sausage",
+      "name": "Italian Rope Sausage",
+      "description": "Italian Rope Sausage; optional Italian Feast enhancement.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-8-giant-meatballs",
+      "name": "Giant Meatballs",
+      "description": "Giant Meatballs; optional Italian Feast enhancement.",
+      "book": "wedding",
+      "page": 8,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-9-mexican-grill-accoutrements",
+      "name": "Mexican Grill Accoutrements",
+      "description": "Fresh lime wedges, cojita cheese, pico de gallo and cilantro.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Accompaniments"
+    },
+    {
+      "id": "wedding-9-carne-asada",
+      "name": "Carne Asada",
+      "description": "skirt steak marinated in lime, garlic, and cumin, finished on the grill with our signature spices and seasoning.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-9-pork-carnitas",
+      "name": "Pork Carnitas",
+      "description": "braised pork simmered in tomatillos, onion, garlic and cumin.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-9-pollo-asado",
+      "name": "Pollo Asado",
+      "description": "chicken breast marinated in fresh citrus, cilantro, garlic and cumin.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-9-tequila-lime-shrimp",
+      "name": "Tequila Lime Shrimp",
+      "description": "baby shrimp marinated in garlic and lime.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-9-corn-tortillas",
+      "name": "Corn Tortillas",
+      "description": "locally sourced street-taco-size corn tortillas. Three double stacked tortillas per person.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-9-flour-tortillas",
+      "name": "Flour Tortillas",
+      "description": "locally made flour tortillas sourced from wheat grown on the Palouse. Two 4” tortillas per person.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-9-cilantro-lime-rice",
+      "name": "Cilantro Lime Rice",
+      "description": "steamed white rice finished with chopped cilantro, garlic and lime.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-9-black-beans",
+      "name": "Black Beans",
+      "description": "whole black beans roasted with our house blend of southwestern spices.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-9-elote-mexican-street-corn",
+      "name": "Elote Mexican Street Corn",
+      "description": "grilled “Elote” street corn finished in a creamy dip, coated with fresh cilantro, cojita, and ancho chile.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-9-southwest-salad",
+      "name": "Southwest Salad",
+      "description": "chopped greens, shredded cabbage, cilantro, toasted pepitas, cotija cheese, grilled corn medley, and tortilla strips tossed in our cilantro lime dressing.",
+      "book": "wedding",
+      "page": 9,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-6-classic-chicken",
+      "name": "Classic Chicken",
+      "description": "Prosciutto wrapped basil pesto cream cheese stuffed airline chicken breast, served with Yukon gold whipped potato and seasonal veggie.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-signature-wild-alaskan-salmon",
+      "name": "Signature Wild Alaskan Salmon",
+      "description": "Topped with huckleberry relish, served with Idaho wild rice pilaf and charred asparagus.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-signature-beer-braised-beef-short-rib",
+      "name": "Signature Beer Braised Beef Short Rib",
+      "description": "Served with parsnip potato puree, charred asparagus, crispy leeks and sweet lager reduction.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-vegetable-tower",
+      "name": "Vegetable Tower",
+      "description": "Fried polenta, grilled squash, red pepper, eggplant, micro green.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-feast-beef-tenderloin",
+      "name": "Feast Beef Tenderloin",
+      "description": "Topped with roasted garlic-caramelized onion pesto and shaved Parmesan.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-feast-wild-alaskan-salmon",
+      "name": "Feast Wild Alaskan Salmon",
+      "description": "Topped with lemon-dill compound butter, served with burrata whipped potato and seasonal vegetable.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-grand-roasted-halibut",
+      "name": "Grand Roasted Halibut",
+      "description": "Topped with smoked paprika butter and toasted almonds, served with romesco sauce and lemon zested asparagus.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-grand-beef-tenderloin",
+      "name": "Grand Beef Tenderloin",
+      "description": "Grilled, finished with house grill butter, served with sweet potato mash and seasonal corn succotash.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-6-seasonal-salad-with-bread-and-butter",
+      "name": "Seasonal Salad with Bread and Butter",
+      "description": "Served seasonal salad course with fresh baked bread and chilled butter.",
+      "book": "wedding",
+      "page": 6,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-6-classic-chicken",
+      "name": "Classic Chicken",
+      "description": "Prosciutto wrapped basil pesto cream cheese stuffed airline chicken breast, served with Yukon gold whipped potato and seasonal veggie.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-signature-wild-alaskan-salmon",
+      "name": "Signature Wild Alaskan Salmon",
+      "description": "Topped with huckleberry relish, served with Idaho wild rice pilaf and charred asparagus.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-signature-beer-braised-beef-short-rib",
+      "name": "Signature Beer Braised Beef Short Rib",
+      "description": "Served with parsnip potato puree, charred asparagus, crispy leeks and sweet lager reduction.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-vegetable-tower",
+      "name": "Vegetable Tower",
+      "description": "Fried polenta, grilled squash, red pepper, eggplant, micro green.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-feast-beef-tenderloin",
+      "name": "Feast Beef Tenderloin",
+      "description": "Topped with roasted garlic-caramelized onion pesto and shaved Parmesan.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-feast-wild-alaskan-salmon",
+      "name": "Feast Wild Alaskan Salmon",
+      "description": "Topped with lemon-dill compound butter, served with burrata whipped potato and seasonal vegetable.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-grand-roasted-halibut",
+      "name": "Grand Roasted Halibut",
+      "description": "Topped with smoked paprika butter and toasted almonds, served with romesco sauce and lemon zested asparagus.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-grand-beef-tenderloin",
+      "name": "Grand Beef Tenderloin",
+      "description": "Grilled, finished with house grill butter, served with sweet potato mash and seasonal corn succotash.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-6-seasonal-salad-with-bread-and-butter",
+      "name": "Seasonal Salad with Bread and Butter",
+      "description": "Served seasonal salad course with fresh baked bread and chilled butter.",
+      "book": "holiday",
+      "page": 6,
+      "course": "Salad"
+    },
+    {
+      "id": "hors-2-ahi-tuna",
+      "name": "Ahi Tuna",
+      "description": "seared rare sesame crusted Ahi Tuna served on a crunchy wonton round topped with spicy aioli, togarashi, and micro greens",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-bruschetta",
+      "name": "Bruschetta",
+      "description": "crostini topped with tomato-basil and garnished with a balsamic glaze reduction",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-burrata-crostini",
+      "name": "Burrata Crostini",
+      "description": "topped with basil, flaked sea salt, olive oil",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-charcuterie-cones",
+      "name": "Charcuterie Cones",
+      "description": "assorted cured meats, olives, cherry tomato, bread, imported cheeses",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-chicken-salad-crostini",
+      "name": "Chicken Salad Crostini",
+      "description": "slow roasted chicken breast salad topped with fresh avocado",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-edamame",
+      "name": "Edamame",
+      "description": "blanched and chilled, dusted with togarashi, sea salt",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-grilled-peach-crostini",
+      "name": "Grilled Peach Crostini",
+      "description": "ricotta, orange-basil gastrique",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-lobster-deviled-eggs",
+      "name": "Lobster Deviled Eggs",
+      "description": "hard boiled and filled with butter poached lobster garnished with fresh cut chives",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-mini-maine-lobster-roll",
+      "name": "Mini Maine Lobster Roll",
+      "description": "house made roll, tarragon, mayo, lemon juice",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-pesto-crostini",
+      "name": "Pesto Crostini",
+      "description": "house made basil pesto, feta cheese, cherry tomato, toasted pine nut",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-salmon-canape",
+      "name": "Salmon Canapé",
+      "description": "fresh cucumber rounds topped with dill cream cheese and smoked salmon",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-shrimp-canape",
+      "name": "Shrimp Canapé",
+      "description": "fresh cucumber rounds topped with a chili-ginger seared shrimp, topped with lime aioli and micro cilantro",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-southwest-crostini",
+      "name": "Southwest Crostini",
+      "description": "avocado mousse, roasted corn, peppers, cojita, micro cilantro",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-2-summer-veggie-crostini",
+      "name": "Summer Veggie Crostini",
+      "description": "basil pesto, balsamic glaze",
+      "book": "hors",
+      "page": 2,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-arancini",
+      "name": "Arancini",
+      "description": "wild mushroom Risotto, truffle topped with gran pardana,",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-coconut-shrimp",
+      "name": "Coconut Shrimp",
+      "description": "large shrimp, panko breaded and fried, served with",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-deep-fried-mac-n-cheese-bites",
+      "name": "Deep Fried Mac n’ Cheese Bites",
+      "description": "creamy white cheddar cheese",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-french-fry-cones",
+      "name": "French Fry Cones",
+      "description": "waffle or straight cut fries topped with your",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-fried-chicken",
+      "name": "Fried Chicken",
+      "description": "served on a mini crispy chicken cup, topped with a",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-grilled-street-corn",
+      "name": "Grilled Street Corn",
+      "description": "garlic, lime, cotija, ancho chile",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-grilled-lamb",
+      "name": "Grilled Lamb",
+      "description": "riblets, toasted garlic, greek yogurt dip",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-mini-baked-potato",
+      "name": "Mini Baked Potato",
+      "description": "baby red potato filled with bacon, cream cheese, sour",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-mini-chicken-waffle",
+      "name": "Mini Chicken + Waffle",
+      "description": "buttermilk marinated, panko breaded, mini liege",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-mini-fish-tacos",
+      "name": "Mini Fish Tacos",
+      "description": "locally made street corn tortilla topped with mango",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-montreal-beef",
+      "name": "Montreal Beef",
+      "description": "grilled sourdough point, smoked tri tip, chimichurri",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-popcorn-chicken-bites",
+      "name": "Popcorn Chicken Bites",
+      "description": "marinated chicken breast “bites” topped with",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-pork-shrimp-dumpling",
+      "name": "Pork + Shrimp Dumpling",
+      "description": "Served with sesame dipping sauce.",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-short-rib-or-pork-arepa",
+      "name": "Short Rib or Pork Arepa",
+      "description": "corn cake topped with pickled onion, mojo sauce, micro",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-stuffed-mushrooms",
+      "name": "Stuffed Mushrooms",
+      "description": "filled with Italian cheeses and spinach",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-wagyu-beef-meatballs",
+      "name": "Wagyu Beef Meatballs",
+      "description": "snack river farms beef, topped with house made",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-3-zucchini-roll",
+      "name": "Zucchini Roll",
+      "description": "filled with goat cheese and seasonal veggies",
+      "book": "hors",
+      "page": 3,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-bacon-wrapped-lollipop",
+      "name": "Bacon Wrapped Lollipop",
+      "description": "large prawn wrapped with thick cut apple wood smoked bacon served with spicy tomato relish",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-balsamic-glazed-beef-satay",
+      "name": "Balsamic Glazed Beef Satay",
+      "description": "beef tenderloin seasoned and grilled finished with a balsamic reduction",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-chicken-parmesan-lollipop",
+      "name": "Chicken Parmesan Lollipop",
+      "description": "fried chicken breast, garnished with marinara and micro basil",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-curry-chicken-satay",
+      "name": "Curry Chicken Satay",
+      "description": "marinated and grilled, served with a yogurt dipping sauce",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-gorgonzola-beef-satay",
+      "name": "Gorgonzola Beef Satay",
+      "description": "grilled beef tenderloin served with a Gorgonzola dipping sauce",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-greek-chicken",
+      "name": "Greek Chicken",
+      "description": "marinated in Greek yogurt, garlic, oregano, and served with a creamy dipping sauce",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-lamb-lollipop",
+      "name": "Lamb Lollipop",
+      "description": "New Zealand lamb rubbed with a mint pesto",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-lobster-corn-dog",
+      "name": "Lobster Corn Dog",
+      "description": "hand battered and fried, topped with lemon aioli, fresh chives and paprika",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-thai-peanut-chicken-satay",
+      "name": "Thai Peanut Chicken Satay",
+      "description": "grilled and finished with a house made Thai peanut sauce",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-5-watermelon-lollipop",
+      "name": "Watermelon Lollipop",
+      "description": "Grand Marnier soaked watermelon with fresh mint leaf",
+      "book": "hors",
+      "page": 5,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-american-slider",
+      "name": "American Slider",
+      "description": "mini beef slider topped with caramelized onion, bacon, sharp cheddar,",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-banh-mi-vietnamese",
+      "name": "Banh Mi Vietnamese",
+      "description": "sandwich filled with pork, cilantro, fresh veggies, and cilantro,",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-chicken-katsu-bao-bun",
+      "name": "Chicken Katsu Bao Bun",
+      "description": "panko crispy chicken, sambal aioli, cilantro, pickled cucumber",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-lamb-slider",
+      "name": "Lamb Slider",
+      "description": "caramelized onions, feta cheese, sun-dried tomatoes",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-mini-grilled-cheese",
+      "name": "Mini Grilled Cheese",
+      "description": "served with tomato soup",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-philly-cheesesteak-bao-bun",
+      "name": "Philly Cheesesteak Bao Bun",
+      "description": "Chinese bun filled with shaved steak, grilled onions,",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-pork-belly-bao-bun",
+      "name": "Pork Belly Bao Bun",
+      "description": "sous vide pork belly, glazed and seared on steamed bun, topped with",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-pork-slider",
+      "name": "Pork Slider",
+      "description": "smoked pulled pork topped with coleslaw and pickles",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-6-short-rib-slider",
+      "name": "Short Rib Slider",
+      "description": "beer braised, creamy horseradish, crispy leeks, mini brioche bun",
+      "book": "hors",
+      "page": 6,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-charcuterie",
+      "name": "Charcuterie",
+      "description": "marinated mozzarella, provolone, Parmesan wheel, Italian cured meats, artisan mustard, balsamic onion dip, basil pesto, grilled and chilled veggies, assorted olives, roasted peppers, marinated artichoke hearts, roasted garlic, assorted breads, nuts and dried fruit",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-crudite",
+      "name": "Crudité",
+      "description": "organic, fresh, blanched, and pickled veggies (locally and regionally grown), served with your choice of creamy garlic, creamy balsamic and Buttermilk ranch dipping sauces",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-fresh-seasonal-fruit",
+      "name": "Fresh Seasonal Fruit",
+      "description": "a beautiful array of seasonal fruit, served with huckleberry mousse dip",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-gourmet-cheese-display",
+      "name": "Gourmet Cheese Display",
+      "description": "imported and domestic cheeses, baked Brie topped with honey and toasted walnuts, assorted nuts, specialty crackers and breads garnished with fresh berries and grape clusters",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-hatch-chili-artichoke-dip",
+      "name": "Hatch Chili + Artichoke Dip",
+      "description": "served cold or hot with fresh fried potato chips.",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-mediterranean-display",
+      "name": "Mediterranean Display",
+      "description": "grilled pita points, hummus & marinated feta, olive tapenade, romesco sauce, accompanied with greek peppers, marinated artichoke hearts and assorted olives",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-baked-dungeness-crab",
+      "name": "Baked Dungeness Crab",
+      "description": "shrimp and artichoke dip, served with crispy wonton chips",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-mozzarella-buratta-bar",
+      "name": "Mozzarella + Buratta Bar",
+      "description": "heirloom tomato, cherry tomato, micro basil, micro arugula, flaked sea salt, basil oil, extra virgin olive oil, balsamic reduction, prosciutto di parma, basil pesto, salsa romesco,",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-roasted-corn-avocado-dip",
+      "name": "Roasted Corn + Avocado Dip",
+      "description": "served with fresh white corn chips",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "hors-7-smoked-alaskan-salmon-dip",
+      "name": "Smoked Alaskan Salmon Dip",
+      "description": "cream cheese, sour cream, spinach, served with toasted baguette. Served cold or hot.",
+      "book": "hors",
+      "page": 7,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "wedding-13-dessert-and-coffee",
+      "name": "Dessert and Coffee",
+      "description": "Dessert and coffee; confirm the dessert selection.",
+      "book": "wedding",
+      "page": 13,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-13-new-york-strip",
+      "name": "New York Strip",
+      "description": "served with corn succotash and parsnip potato puree.",
+      "book": "wedding",
+      "page": 13,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-13-alaskan-salmon",
+      "name": "Alaskan Salmon",
+      "description": "served with huckleberry relish and wild rice pilaf.",
+      "book": "wedding",
+      "page": 13,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-13-grilled-asparagus",
+      "name": "Grilled Asparagus",
+      "description": "",
+      "book": "wedding",
+      "page": 13,
+      "course": "Vegetable"
+    },
+    {
+      "id": "wedding-13-tender-chicken-breast",
+      "name": "Tender chicken breast",
+      "description": "filled with our house-made basil pesto and cream cheese, wrapped with sliced prosciutto and topped with a light herb cream sauce.",
+      "book": "wedding",
+      "page": 13,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-13-halibut",
+      "name": "Halibut",
+      "description": "Pacific Wild Caught Halibut, citrus marinated, pan seared place atop romesco sauce garnished with toasted almonds.",
+      "book": "wedding",
+      "page": 13,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-13-beef-filet",
+      "name": "Beef Filet",
+      "description": "sous vide with fresh thyme garlic and extra virgin olive oil, then seared medium rare, served with a zesty Calabrian herb sauce.",
+      "book": "wedding",
+      "page": 13,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-13-beef-short-rib",
+      "name": "Beef Short Rib",
+      "description": "beer braised, finished with a sweet onion lager reduction and crispy leeks.",
+      "book": "wedding",
+      "page": 13,
+      "course": "Entree"
+    },
+    {
+      "id": "wedding-13-burrata-whipped-mashed-potato",
+      "name": "Burrata Whipped Mashed Potato",
+      "description": "",
+      "book": "wedding",
+      "page": 13,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-13-wild-mushroom-risotto",
+      "name": "Wild Mushroom Risotto",
+      "description": "",
+      "book": "wedding",
+      "page": 13,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-13-seasonal-veggies",
+      "name": "Seasonal Veggies",
+      "description": "",
+      "book": "wedding",
+      "page": 13,
+      "course": "Side"
+    },
+    {
+      "id": "wedding-10-noodle-station",
+      "name": "Noodle Station",
+      "description": "Chef-prepared vegetable stir fry noodles with chile-ginger seared shrimp, teriyaki chicken, or Korean short rib.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-10-dumpling-station",
+      "name": "Dumpling Station",
+      "description": "Steamed and fried assorted dumplings served with sesame-soy ginger sauce and sriracha aioli.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-10-charcuterie-display",
+      "name": "Charcuterie Display",
+      "description": "Marinated mozzarella, provolone, Parmesan wheel, salami, grilled eggplant and zucchini, assorted olives, roasted peppers, marinated artichoke hearts, roasted elephant garlic, grissini, toasted ciabatta, balsamic vinegar and extra virgin olive oil.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-10-caprese-station",
+      "name": "Caprese Station",
+      "description": "Locally grown heirloom tomatoes and fresh mozzarella sliced and drizzled with a balsamic reduction and garnished with basil. Assorted infused oils and flavored salts.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-10-ultimate-pasta-bowl",
+      "name": "Ultimate Pasta Bowl",
+      "description": "Chef-tossed penne, bowtie, tortellini or fusilli; bacon, spinach, mushrooms, roasted garlic, tomatoes, olives, roasted red peppers. Parmesan Alfredo, basil pesto cream, pomodoro marinara or bolognese. Meatballs, chicken and Italian sausage cost extra.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-guacamole-station",
+      "name": "Guacamole Station",
+      "description": "Attendant-prepared guacamole with fresh jalapeño, lime, garlic, onions, salsa, cheese, olives and hand-cut white corn tortilla chips fried on site.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-salsa-bar",
+      "name": "Salsa Bar",
+      "description": "Fresh pico de gallo, handmade salsa and salsa verde.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-street-taco-station",
+      "name": "Street Taco Station",
+      "description": "Chef-attended tequila-lime grilled chicken breast, garlic-lime flank steak, garlic spiced baby shrimp and pork carnitas in DeLeon’s corn tortillas.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-taco-station-accompaniments",
+      "name": "Taco Station Accompaniments",
+      "description": "Shredded Monterey Jack cheese, grilled green onions, shredded lettuce or cabbage, lime wedges, sour cream, Spanish rice and refried beans.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-lemonade-station",
+      "name": "Lemonade Station",
+      "description": "Fresh lemons pressed for guests, sugar water and fruit purees: strawberry, watermelon, huckleberry or raspberry.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-mac-n-cheese-station",
+      "name": "Mac n Cheese Station",
+      "description": "White cheddar or pepper jack mac n cheese; bourbon brown sugared onions, bacon, green onions, panko Parmesan topping, truffle mushrooms, steamed broccoli, black olives, roasted corn, Gorgonzola and shaved Parmesan. Optional honey ham, smoked tri tip, shrimp scampi or blackened chicken at additional cost.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-french-fry-station",
+      "name": "French Fry Station",
+      "description": "On-site fryer; natural, shoestring, steak cut or crosscut fries. Garlic, Parmesan-Romano, chili cheese or spicy paprika; house-made ketchup, buttermilk ranch, creamy garlic or sriracha dips.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-popcorn-station",
+      "name": "Popcorn Station",
+      "description": "Corn popped on site. Sea salt, coarse cracked pepper, Johnny’s seasoning, ranch, white cheddar, kettle corn flavor, chocolate chips, caramel chips, peanuts and peanut butter cups.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-10-pork-belly-bao-bun",
+      "name": "Pork Belly Bao Bun",
+      "description": "sous vide pork belly, glazed and seared on steamed bun, topped with house made cucumber kimchi, sriracha aioli and micro cilantro.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-10-chicken-katsu-bao-bun",
+      "name": "Chicken Katsu Bao Bun",
+      "description": "panko crispy chicken, sambal aioli, cilantro, pickled cucumber kimchi.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-10-veggie-bao-bun",
+      "name": "Veggie Bao Bun",
+      "description": "roasted brussel sprouts, ginger, garlic, sambal aioli, pickled cucumber kimchi.",
+      "book": "wedding",
+      "page": 10,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-mini-beef-sliders",
+      "name": "Mini Beef Sliders",
+      "description": "grilled on-site then topped with caramelized onions, bacon, and sharp cheddar cheese.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "wedding-11-pulled-pork-sliders",
+      "name": "Pulled Pork Sliders",
+      "description": "topped with our signature slaw.",
+      "book": "wedding",
+      "page": 11,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-noodle-station",
+      "name": "Noodle Station",
+      "description": "Chef-prepared vegetable stir fry noodles with chile-ginger seared shrimp, teriyaki chicken, or Korean short rib.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-dumpling-station",
+      "name": "Dumpling Station",
+      "description": "Steamed and fried assorted dumplings served with sesame-soy ginger sauce and sriracha aioli.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-charcuterie-display",
+      "name": "Charcuterie Display",
+      "description": "Marinated mozzarella, provolone, Parmesan wheel, salami, grilled eggplant and zucchini, assorted olives, roasted peppers, marinated artichoke hearts, roasted elephant garlic, grissini, toasted ciabatta, balsamic vinegar and extra virgin olive oil.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-caprese-station",
+      "name": "Caprese Station",
+      "description": "Locally grown heirloom tomatoes and fresh mozzarella sliced and drizzled with a balsamic reduction and garnished with basil. Assorted infused oils and flavored salts.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-ultimate-pasta-bowl",
+      "name": "Ultimate Pasta Bowl",
+      "description": "Chef-tossed penne, bowtie, tortellini or fusilli; bacon, spinach, mushrooms, roasted garlic, tomatoes, olives, roasted red peppers. Parmesan Alfredo, basil pesto cream, pomodoro marinara or bolognese. Meatballs, chicken and Italian sausage cost extra.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-guacamole-station",
+      "name": "Guacamole Station",
+      "description": "Attendant-prepared guacamole with fresh jalapeño, lime, garlic, onions, salsa, cheese, olives and hand-cut white corn tortilla chips fried on site.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-salsa-bar",
+      "name": "Salsa Bar",
+      "description": "Fresh pico de gallo, handmade salsa and salsa verde.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-street-taco-station",
+      "name": "Street Taco Station",
+      "description": "Chef-attended tequila-lime grilled chicken breast, garlic-lime flank steak, garlic spiced baby shrimp and pork carnitas in DeLeon’s corn tortillas.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-taco-station-accompaniments",
+      "name": "Taco Station Accompaniments",
+      "description": "Shredded Monterey Jack cheese, grilled green onions, shredded lettuce or cabbage, lime wedges, sour cream, Spanish rice and refried beans.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-lemonade-station",
+      "name": "Lemonade Station",
+      "description": "Fresh lemons pressed for guests, sugar water and fruit purees: strawberry, watermelon, huckleberry or raspberry.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-mac-n-cheese-station",
+      "name": "Mac n Cheese Station",
+      "description": "White cheddar or pepper jack mac n cheese; bourbon brown sugared onions, bacon, green onions, panko Parmesan topping, truffle mushrooms, steamed broccoli, black olives, roasted corn, Gorgonzola and shaved Parmesan. Optional honey ham, smoked tri tip, shrimp scampi or blackened chicken at additional cost.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-french-fry-station",
+      "name": "French Fry Station",
+      "description": "On-site fryer; natural, shoestring, steak cut or crosscut fries. Garlic, Parmesan-Romano, chili cheese or spicy paprika; house-made ketchup, buttermilk ranch, creamy garlic or sriracha dips.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-popcorn-station",
+      "name": "Popcorn Station",
+      "description": "Corn popped on site. Sea salt, coarse cracked pepper, Johnny’s seasoning, ranch, white cheddar, kettle corn flavor, chocolate chips, caramel chips, peanuts and peanut butter cups.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-8-hot-cocoa-station",
+      "name": "Hot Cocoa Station",
+      "description": "House-made creamy cocoa base; toasted marshmallow whipped cream, chocolate shavings, crushed candy canes, rainbow sprinkles, locally made caramel sauce and chocolate wafer straw. Spiked cocoa available at additional cost.",
+      "book": "holiday",
+      "page": 8,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-pork-belly-bao-bun",
+      "name": "Pork Belly Bao Bun",
+      "description": "sous vide pork belly, glazed and seared on steamed bun, topped with house made cucumber kimchi, sriracha aioli and micro cilantro.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-chicken-katsu-bao-bun",
+      "name": "Chicken Katsu Bao Bun",
+      "description": "panko crispy chicken, sambal aioli, cilantro, pickled cucumber kimchi.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-7-veggie-bao-bun",
+      "name": "Veggie Bao Bun",
+      "description": "roasted brussel sprouts, ginger, garlic, sambal aioli, pickled cucumber kimchi.",
+      "book": "holiday",
+      "page": 7,
+      "course": "Station"
+    },
+    {
+      "id": "holiday-4-chicken-caesar-pasta-salad",
+      "name": "Chicken Caesar Pasta Salad",
+      "description": "mini penne salad, toasted pine nuts, imported parmesan cheese and roasted chicken tossed with our house made Caesar.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-hawaiian-macaroni-salad",
+      "name": "Hawaiian Macaroni Salad",
+      "description": "elbow pasta, creamy and tangy dressings shredded rainbow carrot, scallion, diced celery.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-baby-red-potato-salad",
+      "name": "Baby Red Potato Salad",
+      "description": "baby red potatoes, celery, red onion, hard boiled eggs in our house-made dressing.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-grand-marnier-fruit-salad",
+      "name": "Grand Marnier Fruit Salad",
+      "description": "assorted melons, strawberries, blackberries, pineapple and grapes dressed with Grand Marnier Liqueur and fresh mint.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-all-seasons-wedding-salad",
+      "name": "All Seasons Wedding Salad",
+      "description": "local greens, organic baby spinach, dried cranberries, feta cheese, toasted walnuts, herb croutons, huckleberry or raspberry vinaigrette.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-mid-summer-salad",
+      "name": "Mid Summer Salad",
+      "description": "local greens, strawberries, shaved fennel, Gorgonzola, walnuts, raspberry balsamic vinaigrette.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-late-summer-salad",
+      "name": "Late Summer Salad",
+      "description": "local greens, grilled peaches, crisp pancetta, candied pecans, feta, sherry vinaigrette.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-autumn-salad",
+      "name": "Autumn Salad",
+      "description": "grilled pears or apples, artisan romaine wedge, Gorgonzola, candied walnuts, roasted cherry tomato, thick cut hickory smoked bacon drizzled with a red wine vinaigrette.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-citrus-salad",
+      "name": "Citrus Salad",
+      "description": "arugula, mandarin orange segments, shaved Parmesan, croutons, pine nuts, roasted tomato tossed in a white wine vinaigrette.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-mixed-green-salad",
+      "name": "Mixed Green Salad",
+      "description": "chopped romaine, spring greens, roma tomato, cucumber, red onion, garlic croutons.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-caesar-salad",
+      "name": "Caesar Salad",
+      "description": "chopped romaine, spinach, toasted pine nuts, imported parmesan cheese tossed in our house made Caesar.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-strawberry-feta",
+      "name": "Strawberry & Feta",
+      "description": "baby organic spinach, feta cheese, toasted walnuts tossed with a strawberry balsamic",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-chilled-quinoa-salad",
+      "name": "Chilled Quinoa Salad",
+      "description": "vinaigrette. - lemon vinaigrette, seasonal fresh veggies, spring greens, cubed feta.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Salad"
+    },
+    {
+      "id": "holiday-4-baby-red-potatoes",
+      "name": "Baby Red Potatoes",
+      "description": "tender young Washington-grown red potatoes roasted, finished with caramelized onions, sea salt, and fresh cracked pepper.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-4-balsamic-marinated-vegetables",
+      "name": "Balsamic Marinated Vegetables",
+      "description": "sautéed in olive oil, finished with butter.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-4-corn-succotash",
+      "name": "Corn Succotash",
+      "description": "sweet corn, lima bean, onion, bell pepper, grape tomato and zucchini.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-4-cougar-gold-mac-n-cheese",
+      "name": "Cougar Gold Mac N’ Cheese",
+      "description": "elbow pasta tossed with our house-made Cougar Gold cheese sauce and crumbled bacon, topped with a Parmesan breadcrumb topping.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-4-cranberry-sauce",
+      "name": "Cranberry Sauce",
+      "description": "cranberries, cinnamon and orange zest.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-4-garlic-mashed-potatoes",
+      "name": "Garlic Mashed Potatoes",
+      "description": "Washington red potato, heavy cream, milk, butter, roasted garlic.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-4-green-bean-casserole",
+      "name": "Green Bean Casserole",
+      "description": "tender French green beans, cream of northwest mushroom sauce, fried onion strings.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-4-grilled-corn-on-the-cob",
+      "name": "Grilled Corn on the Cob",
+      "description": "grilled corn served with butter and Jonny’s seasoning.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-haricots-verts",
+      "name": "Haricots Verts",
+      "description": "tender French green beans sautéed with garlic and finished with butter.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-herbed-stuffing-balls",
+      "name": "Herbed Stuffing Balls",
+      "description": "choice of traditional or cornbread.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-house-made-stuffing",
+      "name": "House Made Stuffing",
+      "description": "diced bread, slow-roasted onions, carrots, and celery.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-mangia-signature-vegetable-medley",
+      "name": "Mangia Signature Vegetable Medley",
+      "description": "zucchini, squash, mixed bell peppers, asparagus, and red onion marinated in balsamic vinegar and extra virgin olive oil. Roasted or grilled.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-parsnip-potato-puree",
+      "name": "Parsnip-Potato Puree",
+      "description": "velvety parsnips and yukon gold potatoes finished with butter and cream.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-pesto-gnocchi-or-penne-pasta",
+      "name": "Pesto Gnocchi or Penne Pasta",
+      "description": "simmered in a light cream sauce, finished with organic baby spinach, cherry tomato, and Parmesan cheese.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-potatoes-au-gratin",
+      "name": "Potatoes Au Gratin",
+      "description": "chopped Idaho russet potato, cream cheese, sour cream and cheddar cheese baked to a golden brown perfection.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-rice-pilaf",
+      "name": "Rice Pilaf",
+      "description": "wild rice medley simmered with butter and herbs.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-slow-roasted-beans",
+      "name": "Slow Roasted Beans",
+      "description": "baked beans sautéed onions, dijon mustard, apple cider vinegar, brown sugar and bbq sauce.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-smoked-rainbow-carrots",
+      "name": "Smoked Rainbow Carrots",
+      "description": "spice rubbed and smoked, finished with a pomegranate-pistachio relish.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-sweet-potato-mash",
+      "name": "Sweet Potato Mash",
+      "description": "served with honey cinnamon butter.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-whipped-potatoes",
+      "name": "Whipped Potatoes",
+      "description": "Washington Yukon potatoes and buttermilk whipped to perfection.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-wild-mushroom-risotto",
+      "name": "Wild Mushroom Risotto",
+      "description": "creamy rice, simmered with white wine, garlic, wild mushroom, finished with aged Parmesan cheese and white truffle oil.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Side"
+    },
+    {
+      "id": "holiday-5-airline-italian-chicken-breast",
+      "name": "Airline Italian Chicken Breast",
+      "description": "Marinated in fresh herbs, garlic and olive oil.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-chicken-roulade",
+      "name": "Chicken Roulade",
+      "description": "Tender chicken breast filled with house-made basil pesto and cream cheese, wrapped with prosciutto and topped with light herb cream sauce.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-sirloin-steak",
+      "name": "Sirloin Steak",
+      "description": "Grilled beef sliced into medallions, topped with peppercorn cream sauce.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-grilled-wild-alaskan-salmon",
+      "name": "Grilled Wild Alaskan Salmon",
+      "description": "Grilled with lemon and lime zest and fresh thyme, topped with local huckleberry relish.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-carved-turkey-with-herbed-gravy",
+      "name": "Carved Turkey with Herbed Gravy",
+      "description": "Brined with brown sugar, salt, lemon peels, black peppercorn and juniper berries.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-glazed-ham",
+      "name": "Glazed Ham",
+      "description": "Finished with brown sugar-honey glaze.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-pork-loin",
+      "name": "Pork Loin",
+      "description": "Rubbed with rosemary and garlic and wrapped with pancetta.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-roasted-prime-rib-of-beef-prime-grade",
+      "name": "Roasted Prime Rib of Beef (Prime Grade)",
+      "description": "Carving station with horseradish and garlic crusted prime rib served with creamed horseradish.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-new-york-strip",
+      "name": "New York Strip",
+      "description": "Grilled and finished with house grill butter.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-5-beef-tenderloin",
+      "name": "Beef Tenderloin",
+      "description": "Topped with roasted garlic, dijon-caramelized onion pesto and Parmesan crust.",
+      "book": "holiday",
+      "page": 5,
+      "course": "Entree"
+    },
+    {
+      "id": "holiday-4-grilled-focaccia",
+      "name": "Grilled Focaccia",
+      "description": "Grilled Focaccia. Served with chilled butter chips or honey cinnamon whipped butter.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Bread"
+    },
+    {
+      "id": "holiday-4-garlic-parmesan-rolls",
+      "name": "Garlic Parmesan Rolls",
+      "description": "Garlic Parmesan Rolls. Served with chilled butter chips or honey cinnamon whipped butter.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Bread"
+    },
+    {
+      "id": "holiday-4-garlic-french-bread",
+      "name": "Garlic French Bread",
+      "description": "Garlic French Bread. Served with chilled butter chips or honey cinnamon whipped butter.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Bread"
+    },
+    {
+      "id": "holiday-4-cheddar-garlic-buttermilk-biscuits",
+      "name": "Cheddar Garlic Buttermilk Biscuits",
+      "description": "Cheddar Garlic Buttermilk Biscuits. Served with chilled butter chips or honey cinnamon whipped butter.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Bread"
+    },
+    {
+      "id": "holiday-4-baked-dinner-rolls",
+      "name": "Baked Dinner Rolls",
+      "description": "Baked Dinner Rolls. Served with chilled butter chips or honey cinnamon whipped butter.",
+      "book": "holiday",
+      "page": 4,
+      "course": "Bread"
+    },
+    {
+      "id": "wedding-14-mini-fruit-tart-with-lemon-custard",
+      "name": "Mini Fruit Tart with Lemon Custard",
+      "description": "Mini Fruit Tart with Lemon Custard.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-chocolate-dipped-strawberries",
+      "name": "Chocolate Dipped Strawberries",
+      "description": "Chocolate Dipped Strawberries.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-assorted-cookies",
+      "name": "Assorted Cookies",
+      "description": "Assorted Cookies.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-triple-chocolate-brownies",
+      "name": "Triple Chocolate Brownies",
+      "description": "Triple Chocolate Brownies.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-lemon-bars",
+      "name": "Lemon Bars",
+      "description": "Lemon Bars.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-assorted-mini-cakes",
+      "name": "Assorted Mini Cakes",
+      "description": "Assorted Mini Cakes.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-assorted-mini-tarts",
+      "name": "Assorted Mini Tarts",
+      "description": "Assorted Mini Tarts.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-assorted-mini-mousse-cups",
+      "name": "Assorted Mini Mousse Cups",
+      "description": "Assorted Mini Mousse Cups.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-mini-cupcakes",
+      "name": "Mini Cupcakes",
+      "description": "Mini Cupcakes.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-mini-cookies-with-chocolate-milk-shots",
+      "name": "Mini Cookies with Chocolate Milk Shots",
+      "description": "Mini Cookies with Chocolate Milk Shots.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-gourmet-macaroons",
+      "name": "Gourmet Macaroons",
+      "description": "Gourmet Macaroons.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-salted-caramel-panna-cotta",
+      "name": "Salted Caramel Panna Cotta",
+      "description": "Garnished with bourbon caramel sauce, salted peanuts and pretzel crumbs.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-fruit-tarts-with-mascarpone-whipped-cream",
+      "name": "Fruit Tarts with Mascarpone Whipped Cream",
+      "description": "Fruit Tarts with Mascarpone Whipped Cream.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-huckleberry-cobbler-and-ice-cream",
+      "name": "Huckleberry Cobbler and Ice Cream",
+      "description": "Huckleberry Cobbler and Ice Cream.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-white-chocolate-raspberry-cheesecake",
+      "name": "White Chocolate Raspberry Cheesecake",
+      "description": "White Chocolate Raspberry Cheesecake.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-creme-brulee-cheesecake",
+      "name": "Creme Brûlée Cheesecake",
+      "description": "Creme Brûlée Cheesecake.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-5-layer-fudge-chocolate-cake",
+      "name": "5 Layer Fudge Chocolate Cake",
+      "description": "5 Layer Fudge Chocolate Cake.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-tiramisu",
+      "name": "Tiramisu",
+      "description": "Tiramisu.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-creme-brulee",
+      "name": "Creme Brûlée",
+      "description": "Creme Brûlée.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-mini-donut-wall-and-coffee-bar",
+      "name": "Mini Donut Wall and Coffee Bar",
+      "description": "Mini Donut Wall and Coffee Bar.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-sugar-donuts-with-creme-en-glaze",
+      "name": "Sugar Donuts with Creme en’ Glaze",
+      "description": "Sugar Donuts with Creme en’ Glaze.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-flaming-donuts-station",
+      "name": "Flaming Donuts Station",
+      "description": "Flaming Donuts Station.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-smores-bar",
+      "name": "S’mores Bar",
+      "description": "S’mores Bar.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "wedding-14-gourmet-ice-cream-bar",
+      "name": "Gourmet Ice Cream Bar",
+      "description": "Gourmet Ice Cream Bar.",
+      "book": "wedding",
+      "page": 14,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-mini-fruit-tart-with-lemon-custard",
+      "name": "Mini Fruit Tart with Lemon Custard",
+      "description": "Mini Fruit Tart with Lemon Custard.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-chocolate-dipped-strawberries",
+      "name": "Chocolate Dipped Strawberries",
+      "description": "Chocolate Dipped Strawberries.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-assorted-cookies",
+      "name": "Assorted Cookies",
+      "description": "Assorted Cookies.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-triple-chocolate-brownies",
+      "name": "Triple Chocolate Brownies",
+      "description": "Triple Chocolate Brownies.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-lemon-bars",
+      "name": "Lemon Bars",
+      "description": "Lemon Bars.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-assorted-mini-cakes",
+      "name": "Assorted Mini Cakes",
+      "description": "Assorted Mini Cakes.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-assorted-mini-tarts",
+      "name": "Assorted Mini Tarts",
+      "description": "Assorted Mini Tarts.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-assorted-mini-mousse-cups",
+      "name": "Assorted Mini Mousse Cups",
+      "description": "Assorted Mini Mousse Cups.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-mini-cupcakes",
+      "name": "Mini Cupcakes",
+      "description": "Mini Cupcakes.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-mini-cookies-with-chocolate-milk-shots",
+      "name": "Mini Cookies with Chocolate Milk Shots",
+      "description": "Mini Cookies with Chocolate Milk Shots.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-gourmet-macaroons",
+      "name": "Gourmet Macaroons",
+      "description": "Gourmet Macaroons.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-salted-caramel-panna-cotta",
+      "name": "Salted Caramel Panna Cotta",
+      "description": "Garnished with bourbon caramel sauce, salted peanuts and pretzel crumbs.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-fruit-tarts-with-mascarpone-whipped-cream",
+      "name": "Fruit Tarts with Mascarpone Whipped Cream",
+      "description": "Fruit Tarts with Mascarpone Whipped Cream.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-huckleberry-cobbler-and-ice-cream",
+      "name": "Huckleberry Cobbler and Ice Cream",
+      "description": "Huckleberry Cobbler and Ice Cream.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-white-chocolate-raspberry-cheesecake",
+      "name": "White Chocolate Raspberry Cheesecake",
+      "description": "White Chocolate Raspberry Cheesecake.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-creme-brulee-cheesecake",
+      "name": "Creme Brûlée Cheesecake",
+      "description": "Creme Brûlée Cheesecake.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-5-layer-fudge-chocolate-cake",
+      "name": "5 Layer Fudge Chocolate Cake",
+      "description": "5 Layer Fudge Chocolate Cake.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-tiramisu",
+      "name": "Tiramisu",
+      "description": "Tiramisu.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-creme-brulee",
+      "name": "Creme Brûlée",
+      "description": "Creme Brûlée.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-chocolate-cream-pie",
+      "name": "Chocolate Cream Pie",
+      "description": "Chocolate Cream pie.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-pumpkin-pie",
+      "name": "Pumpkin Pie",
+      "description": "Pumpkin pie.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-apple-pie",
+      "name": "Apple Pie",
+      "description": "Apple pie.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-mixed-berry-pie",
+      "name": "Mixed Berry Pie",
+      "description": "Mixed Berry pie.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-mini-donut-wall-and-coffee-bar",
+      "name": "Mini Donut Wall and Coffee Bar",
+      "description": "Mini Donut Wall and Coffee Bar.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-sugar-donuts-with-creme-en-glaze",
+      "name": "Sugar Donuts with Creme en’ Glaze",
+      "description": "Sugar Donuts with Creme en’ Glaze.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-flaming-donuts-station",
+      "name": "Flaming Donuts Station",
+      "description": "Flaming Donuts Station.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-smores-bar",
+      "name": "S’mores Bar",
+      "description": "S’mores Bar.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "holiday-9-gourmet-ice-cream-bar",
+      "name": "Gourmet Ice Cream Bar",
+      "description": "Gourmet Ice Cream Bar.",
+      "book": "holiday",
+      "page": 9,
+      "course": "Dessert"
+    },
+    {
+      "id": "pizza-6-mushroom-pizza",
+      "name": "Mushroom Pizza",
+      "description": "Blanco sauce, fresh crushed garlic, Parmesan Romano cheese topped with an assortment of wild mushrooms, finished with a drizzle of white truffle oil",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-blanco-pizza",
+      "name": "Blanco Pizza",
+      "description": "White sauce, fresh crushed garlic, ricotta cheese, Parmesan and mozzarella",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-pepperoni-blast-pizza",
+      "name": "Pepperoni Blast Pizza",
+      "description": "Red sauce, mozzarella, fontina, Parmesan Romano, pepperoni, garnished with crispy pepperoni",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-chevre-pizza",
+      "name": "Chevre Pizza",
+      "description": "Red sauce, goat cheese, red onion, kalamata olive, capers, garnished with fresh basil",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-queen-m-pizza",
+      "name": "Queen M. Pizza",
+      "description": "Red sauce, fresh sliced roma tomato, extra virgin olive oil, fresh mozzarella, garnished with fresh basil",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-farmers-market-pizza",
+      "name": "Farmer’S Market Pizza",
+      "description": "Basil pesto, seasonal veggies, mozzarella, finished with a balsamic reduction",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-thai-pizza",
+      "name": "Thai Pizza",
+      "description": "Peanut sauce, mozzarella, roasted red peppers, scallion, shredded carrots, grilled chicken, garnished with cilantro and chopped peanuts",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-idaho-pizza",
+      "name": "Idaho Pizza",
+      "description": "Alfredo sauce, Idaho potato, hickory smoked bacon, green onion, cheddar and mozzarella cheese, garnished with fresh garlic sour cream",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-meat-pie-pizza",
+      "name": "Meat Pie Pizza",
+      "description": "Red sauce, mozzarella, salami, pepperoni, pancetta, Italian sausage",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-bbq-pizza",
+      "name": "Bbq Pizza",
+      "description": "BBQ sauce, marinara, smoked gouda, mozzarella, crispy bacon, red onion, bell pepper, grilled chicken",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-breakfast-za-pizza",
+      "name": "Breakfast Za Pizza",
+      "description": "Blanco sauce, prosciutto, mozzarella, Parmesan cheese, cracked eggs garnished with fresh cut herbs and shallots",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-pesto-pizza",
+      "name": "Pesto Pizza",
+      "description": "Basil pesto, artichoke heart, red onion, prosciutto, feta cheese, balsamic glaze",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-chicken-alfredo-pizza",
+      "name": "Chicken Alfredo Pizza",
+      "description": "Creamy alfredo sauce, roasted chicken, hickory smoked bacon, sautéed spinach, roasted red peppers, mozzarella, Parmesan Romano cheese",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-kalua-pig-pizza",
+      "name": "Kalua Pig Pizza",
+      "description": "Basil pesto, smoked pork, grilled pineapple, jalapeño, mozzarella",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-6-custom-pizza",
+      "name": "Custom Pizza",
+      "description": "Build your own pizza; record the chosen toppings in the event instructions.",
+      "book": "pizza",
+      "page": 6,
+      "course": "Pizza"
+    },
+    {
+      "id": "pizza-3-chopped-salad",
+      "name": "Chopped Salad",
+      "description": "Fresh greens, chopped romaine, diced tomato, sliced red onion, cucumbers, shredded carrots, herb croutons and feta cheese; choice of house-made dressing.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Salad"
+    },
+    {
+      "id": "pizza-3-gourmet-caesar",
+      "name": "Gourmet Caesar",
+      "description": "Crisp romaine, peppery arugula, Caesar dressing, imported Parmesan cheese, garlic croutons and toasted pine nut.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Salad"
+    },
+    {
+      "id": "pizza-3-garlic-flat-bread",
+      "name": "Garlic Flat Bread",
+      "description": "Fresh garlic, oregano, salt and extra virgin olive oil. Served with butter.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Bread"
+    },
+    {
+      "id": "pizza-3-wood-fired-french-baguette",
+      "name": "Wood Fired French Baguette",
+      "description": "Extra virgin olive oil and sea salt. Served with butter.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Bread"
+    },
+    {
+      "id": "pizza-3-garlic-parmesan-rolls",
+      "name": "Garlic Parmesan Rolls",
+      "description": "House baked, topped with Parmesan Romano cheese and garlic. Served with butter.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Bread"
+    },
+    {
+      "id": "pizza-3-wood-fired-pheasant-loaf",
+      "name": "Wood Fired Pheasant Loaf",
+      "description": "Sourdough bread with soft dense center and crusty outer shell. Served with butter.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Bread"
+    },
+    {
+      "id": "pizza-3-infused-water",
+      "name": "Infused Water",
+      "description": "Infused Water.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "pizza-3-strawberry-lemonade",
+      "name": "Strawberry Lemonade",
+      "description": "Strawberry Lemonade.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "pizza-3-fresh-brewed-ice-tea",
+      "name": "Fresh Brewed Ice Tea",
+      "description": "Fresh Brewed Ice Tea.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "pizza-3-sweet-tea",
+      "name": "Sweet Tea",
+      "description": "Sweet Tea.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "pizza-3-cravens-coffee",
+      "name": "Craven’s Coffee",
+      "description": "Craven’s Coffee.",
+      "book": "pizza",
+      "page": 3,
+      "course": "Beverage"
+    },
+    {
+      "id": "pizza-4-chefs-choice-cocktail-hour-hors-doeuvres",
+      "name": "Chef’s Choice Cocktail-Hour Hors d’oeuvres",
+      "description": "Seasonally inspired small-bite hors d’oeuvres for cocktail hour. Chef to choose the assortment; serve passed, stationary or a combination.",
+      "book": "pizza",
+      "page": 4,
+      "course": "Hors d’oeuvre"
+    },
+    {
+      "id": "holiday-13-grapefruit-cardamom-fizz",
+      "name": "Grapefruit Cardamom Fizz",
+      "description": "Cardamom infused gin, Prosecco, rosemary syrup, grapefruit juice.",
+      "book": "holiday",
+      "page": 13,
+      "course": "Beverage"
+    },
+    {
+      "id": "holiday-13-greenbluff-buttered-rum",
+      "name": "Greenbluff Buttered Rum",
+      "description": "Dark spiced rum, Greenbluff apples, cinnamon, fresh ground nutmeg.",
+      "book": "holiday",
+      "page": 13,
+      "course": "Beverage"
+    },
+    {
+      "id": "holiday-13-hot-mulle",
+      "name": "Hot Mulle",
+      "description": "Dark spiced rum, Greenbluff cider, harvest spices, cinnamon stick, blood orange.",
+      "book": "holiday",
+      "page": 13,
+      "course": "Beverage"
+    },
+    {
+      "id": "holiday-13-mexican-hot-chocolate",
+      "name": "Mexican Hot Chocolate",
+      "description": "Tequila, hot dark chocolate cocoa, cinnamon, cayenne.",
+      "book": "holiday",
+      "page": 13,
+      "course": "Beverage"
+    },
+    {
+      "id": "holiday-13-salted-caramel-white-russian",
+      "name": "Salted Caramel White Russian",
+      "description": "Vodka, Irish cream, salted caramel liquor, Amaretto.",
+      "book": "holiday",
+      "page": 13,
+      "course": "Beverage"
+    },
+    {
+      "id": "holiday-13-washington-margarita",
+      "name": "Washington Margarita",
+      "description": "Tequila, Grand Marnier, fresh lime juice, apple cider reduction, agave, cinnamon stick, rosemary, star anise.",
+      "book": "holiday",
+      "page": 13,
+      "course": "Beverage"
+    }
+  ],
+  "packages": [
+    {
+      "id": "wedding-traditional-buffet",
+      "name": "Traditional Buffet",
+      "book": "wedding",
+      "page": 7,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose one salad",
+          "recipeIds": [
+            "wedding-7-all-seasons-wedding-salad",
+            "wedding-7-mid-summer-salad",
+            "wedding-7-late-summer-salad",
+            "wedding-7-autumn-salad",
+            "wedding-7-citrus-salad"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Bread",
+          "recipeIds": ["wedding-7-dinner-rolls"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Entrees",
+          "recipeIds": ["wedding-7-roulade"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose a starch",
+          "recipeIds": [
+            "wedding-7-baby-red-potatoes",
+            "wedding-7-idaho-wild-rice-pilaf"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": ["wedding-7-haricots-verts"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-steak-dinner",
+      "name": "Steak Dinner",
+      "book": "wedding",
+      "page": 7,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose one salad",
+          "recipeIds": [
+            "wedding-7-all-seasons-wedding-salad",
+            "wedding-7-mid-summer-salad",
+            "wedding-7-late-summer-salad",
+            "wedding-7-autumn-salad",
+            "wedding-7-citrus-salad"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Bread",
+          "recipeIds": ["wedding-7-dinner-rolls"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Entrees",
+          "recipeIds": ["wedding-7-roulade", "wedding-7-sirloin-steak"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose a starch",
+          "recipeIds": [
+            "wedding-7-baby-red-potatoes",
+            "wedding-7-idaho-wild-rice-pilaf"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": [
+            "wedding-7-haricots-verts",
+            "wedding-7-cougar-gold-mac-n-cheese"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-mangia-signature-buffet",
+      "name": "Mangia Signature Buffet",
+      "book": "wedding",
+      "page": 8,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose one salad",
+          "recipeIds": [
+            "wedding-7-all-seasons-wedding-salad",
+            "wedding-7-mid-summer-salad",
+            "wedding-7-late-summer-salad",
+            "wedding-7-autumn-salad",
+            "wedding-7-citrus-salad"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Bread",
+          "recipeIds": ["wedding-7-dinner-rolls"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Entrees",
+          "recipeIds": [
+            "wedding-8-roasted-prime-rib-of-beef-prime-grade",
+            "wedding-8-grilled-wild-alaskan-salmon"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose potatoes",
+          "recipeIds": [
+            "wedding-8-whipped-yukon-potatoes",
+            "wedding-8-four-cheese-au-gratin"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": [
+            "wedding-8-mangia-signature-vegetable-medley",
+            "wedding-7-haricots-verts",
+            "wedding-7-cougar-gold-mac-n-cheese"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-summer-bbq-fest",
+      "name": "Summer BBQ Fest",
+      "book": "wedding",
+      "page": 8,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Salads",
+          "recipeIds": [
+            "wedding-8-strawberry-spinach-salad",
+            "wedding-8-grand-marnier-fruit-salad"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Bread",
+          "recipeIds": ["wedding-8-dinner-rolls"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Entrees",
+          "recipeIds": [
+            "wedding-8-tri-tip-steak",
+            "wedding-8-grilled-bbq-chicken-breast"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": [
+            "wedding-8-baby-red-potato-salad",
+            "wedding-8-fresh-grilled-corn-on-the-cob"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-italian-feast",
+      "name": "Italian Feast",
+      "book": "wedding",
+      "page": 8,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Salad",
+          "recipeIds": ["wedding-8-caesar-salad"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose bread",
+          "recipeIds": [
+            "wedding-8-grilled-focaccia",
+            "wedding-8-garlic-parmesan-rolls",
+            "wedding-8-garlic-french-bread"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Entree",
+          "recipeIds": ["wedding-8-airline-italian-chicken-breast"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose pasta",
+          "recipeIds": [
+            "wedding-8-pesto-gnocchi",
+            "wedding-8-pesto-penne-pasta"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Vegetables",
+          "recipeIds": ["wedding-8-balsamic-marinated-vegetables"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Optional enhancements",
+          "recipeIds": [
+            "wedding-8-italian-rope-sausage",
+            "wedding-8-giant-meatballs"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-mexican-grill",
+      "name": "Mexican Grill",
+      "book": "wedding",
+      "page": 9,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose from four meats",
+          "recipeIds": [
+            "wedding-9-carne-asada",
+            "wedding-9-pork-carnitas",
+            "wedding-9-pollo-asado",
+            "wedding-9-tequila-lime-shrimp"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Tortillas",
+          "recipeIds": [
+            "wedding-9-corn-tortillas",
+            "wedding-9-flour-tortillas"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Accompaniments",
+          "recipeIds": ["wedding-9-mexican-grill-accoutrements"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Sides",
+          "recipeIds": [
+            "wedding-9-cilantro-lime-rice",
+            "wedding-9-black-beans",
+            "wedding-9-elote-mexican-street-corn",
+            "wedding-9-southwest-salad"
+          ],
+          "defaultCount": 4,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional. Corn tortillas: three double-stacked tortillas per person; flour tortillas: two 4-inch tortillas per person. Guacamole and salsa bar available as an add-on."
+    },
+    {
+      "id": "wedding-seated-the-classic",
+      "name": "Seated The Classic",
+      "book": "wedding",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["wedding-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Entree",
+          "recipeIds": ["wedding-6-classic-chicken"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-seated-the-signature",
+      "name": "Seated The Signature",
+      "book": "wedding",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["wedding-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one entree",
+          "recipeIds": [
+            "wedding-6-signature-wild-alaskan-salmon",
+            "wedding-6-signature-beer-braised-beef-short-rib",
+            "wedding-6-vegetable-tower"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-seated-the-feast",
+      "name": "Seated The Feast",
+      "book": "wedding",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["wedding-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Duet entree",
+          "recipeIds": [
+            "wedding-6-feast-beef-tenderloin",
+            "wedding-6-feast-wild-alaskan-salmon"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-seated-the-grand",
+      "name": "Seated The Grand",
+      "book": "wedding",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["wedding-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Duet entree",
+          "recipeIds": [
+            "wedding-6-grand-roasted-halibut",
+            "wedding-6-grand-beef-tenderloin"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-seated-the-classic",
+      "name": "Seated The Classic",
+      "book": "holiday",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["holiday-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Entree",
+          "recipeIds": ["holiday-6-classic-chicken"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-seated-the-signature",
+      "name": "Seated The Signature",
+      "book": "holiday",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["holiday-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one entree",
+          "recipeIds": [
+            "holiday-6-signature-wild-alaskan-salmon",
+            "holiday-6-signature-beer-braised-beef-short-rib",
+            "holiday-6-vegetable-tower"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": true
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-seated-the-feast",
+      "name": "Seated The Feast",
+      "book": "holiday",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["holiday-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Duet entree",
+          "recipeIds": [
+            "holiday-6-feast-beef-tenderloin",
+            "holiday-6-feast-wild-alaskan-salmon"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-seated-the-grand",
+      "name": "Seated The Grand",
+      "book": "holiday",
+      "page": 6,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Salad course",
+          "recipeIds": ["holiday-6-seasonal-salad-with-bread-and-butter"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Duet entree",
+          "recipeIds": [
+            "holiday-6-grand-roasted-halibut",
+            "holiday-6-grand-beef-tenderloin"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "hors-cold-small-bites",
+      "name": "Cold Small Bites",
+      "book": "hors",
+      "page": 2,
+      "serviceStyle": "passed",
+      "groups": [
+        {
+          "label": "Choose your assortment",
+          "recipeIds": [
+            "hors-2-ahi-tuna",
+            "hors-2-bruschetta",
+            "hors-2-burrata-crostini",
+            "hors-2-charcuterie-cones",
+            "hors-2-chicken-salad-crostini",
+            "hors-2-edamame",
+            "hors-2-grilled-peach-crostini",
+            "hors-2-lobster-deviled-eggs",
+            "hors-2-mini-maine-lobster-roll",
+            "hors-2-pesto-crostini",
+            "hors-2-salmon-canape",
+            "hors-2-shrimp-canape",
+            "hors-2-southwest-crostini",
+            "hors-2-summer-veggie-crostini"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "hors-warm-small-bites",
+      "name": "Warm Small Bites",
+      "book": "hors",
+      "page": 3,
+      "serviceStyle": "passed",
+      "groups": [
+        {
+          "label": "Choose your assortment",
+          "recipeIds": [
+            "hors-3-arancini",
+            "hors-3-coconut-shrimp",
+            "hors-3-deep-fried-mac-n-cheese-bites",
+            "hors-3-french-fry-cones",
+            "hors-3-fried-chicken",
+            "hors-3-grilled-street-corn",
+            "hors-3-grilled-lamb",
+            "hors-3-mini-baked-potato",
+            "hors-3-mini-chicken-waffle",
+            "hors-3-mini-fish-tacos",
+            "hors-3-montreal-beef",
+            "hors-3-popcorn-chicken-bites",
+            "hors-3-pork-shrimp-dumpling",
+            "hors-3-short-rib-or-pork-arepa",
+            "hors-3-stuffed-mushrooms",
+            "hors-3-wagyu-beef-meatballs",
+            "hors-3-zucchini-roll"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "hors-things-on-a-stick",
+      "name": "Things on a Stick",
+      "book": "hors",
+      "page": 5,
+      "serviceStyle": "passed",
+      "groups": [
+        {
+          "label": "Choose your assortment",
+          "recipeIds": [
+            "hors-5-bacon-wrapped-lollipop",
+            "hors-5-balsamic-glazed-beef-satay",
+            "hors-5-chicken-parmesan-lollipop",
+            "hors-5-curry-chicken-satay",
+            "hors-5-gorgonzola-beef-satay",
+            "hors-5-greek-chicken",
+            "hors-5-lamb-lollipop",
+            "hors-5-lobster-corn-dog",
+            "hors-5-thai-peanut-chicken-satay",
+            "hors-5-watermelon-lollipop"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "hors-things-on-a-bun",
+      "name": "Things on a Bun",
+      "book": "hors",
+      "page": 6,
+      "serviceStyle": "passed",
+      "groups": [
+        {
+          "label": "Choose your assortment",
+          "recipeIds": [
+            "hors-6-american-slider",
+            "hors-6-banh-mi-vietnamese",
+            "hors-6-chicken-katsu-bao-bun",
+            "hors-6-lamb-slider",
+            "hors-6-mini-grilled-cheese",
+            "hors-6-philly-cheesesteak-bao-bun",
+            "hors-6-pork-belly-bao-bun",
+            "hors-6-pork-slider",
+            "hors-6-short-rib-slider"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "hors-dips-and-displays",
+      "name": "Dips and Displays",
+      "book": "hors",
+      "page": 7,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Choose your assortment",
+          "recipeIds": [
+            "hors-7-charcuterie",
+            "hors-7-crudite",
+            "hors-7-fresh-seasonal-fruit",
+            "hors-7-gourmet-cheese-display",
+            "hors-7-hatch-chili-artichoke-dip",
+            "hors-7-mediterranean-display",
+            "hors-7-baked-dungeness-crab",
+            "hors-7-mozzarella-buratta-bar",
+            "hors-7-roasted-corn-avocado-dip",
+            "hors-7-smoked-alaskan-salmon-dip"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-family-style-the-classic",
+      "name": "Family Style The Classic",
+      "book": "wedding",
+      "page": 13,
+      "serviceStyle": "family_style",
+      "groups": [
+        {
+          "label": "Choose three passed hors d’oeuvres",
+          "recipeIds": [
+            "hors-2-ahi-tuna",
+            "hors-2-bruschetta",
+            "hors-2-burrata-crostini",
+            "hors-2-charcuterie-cones",
+            "hors-2-chicken-salad-crostini",
+            "hors-2-edamame",
+            "hors-2-grilled-peach-crostini",
+            "hors-2-lobster-deviled-eggs",
+            "hors-2-mini-maine-lobster-roll",
+            "hors-2-pesto-crostini",
+            "hors-2-salmon-canape",
+            "hors-2-shrimp-canape",
+            "hors-2-southwest-crostini",
+            "hors-2-summer-veggie-crostini",
+            "hors-3-arancini",
+            "hors-3-coconut-shrimp",
+            "hors-3-deep-fried-mac-n-cheese-bites",
+            "hors-3-french-fry-cones",
+            "hors-3-fried-chicken",
+            "hors-3-grilled-street-corn",
+            "hors-3-grilled-lamb",
+            "hors-3-mini-baked-potato",
+            "hors-3-mini-chicken-waffle",
+            "hors-3-mini-fish-tacos",
+            "hors-3-montreal-beef",
+            "hors-3-popcorn-chicken-bites",
+            "hors-3-pork-shrimp-dumpling",
+            "hors-3-short-rib-or-pork-arepa",
+            "hors-3-stuffed-mushrooms",
+            "hors-3-wagyu-beef-meatballs",
+            "hors-3-zucchini-roll",
+            "hors-5-bacon-wrapped-lollipop",
+            "hors-5-balsamic-glazed-beef-satay",
+            "hors-5-chicken-parmesan-lollipop",
+            "hors-5-curry-chicken-satay",
+            "hors-5-gorgonzola-beef-satay",
+            "hors-5-greek-chicken",
+            "hors-5-lamb-lollipop",
+            "hors-5-lobster-corn-dog",
+            "hors-5-thai-peanut-chicken-satay",
+            "hors-5-watermelon-lollipop",
+            "hors-6-american-slider",
+            "hors-6-banh-mi-vietnamese",
+            "hors-6-chicken-katsu-bao-bun",
+            "hors-6-lamb-slider",
+            "hors-6-mini-grilled-cheese",
+            "hors-6-philly-cheesesteak-bao-bun",
+            "hors-6-pork-belly-bao-bun",
+            "hors-6-pork-slider",
+            "hors-6-short-rib-slider"
+          ],
+          "defaultCount": 3,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one stationary display",
+          "recipeIds": [
+            "hors-7-charcuterie",
+            "hors-7-crudite",
+            "hors-7-fresh-seasonal-fruit",
+            "hors-7-gourmet-cheese-display",
+            "hors-7-hatch-chili-artichoke-dip",
+            "hors-7-mediterranean-display",
+            "hors-7-baked-dungeness-crab",
+            "hors-7-mozzarella-buratta-bar",
+            "hors-7-roasted-corn-avocado-dip",
+            "hors-7-smoked-alaskan-salmon-dip"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Salad",
+          "recipeIds": ["wedding-8-caesar-salad"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose bread",
+          "recipeIds": [
+            "wedding-8-grilled-focaccia",
+            "wedding-8-garlic-parmesan-rolls",
+            "wedding-8-garlic-french-bread"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Entree",
+          "recipeIds": ["wedding-8-airline-italian-chicken-breast"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Choose pasta",
+          "recipeIds": [
+            "wedding-8-pesto-gnocchi",
+            "wedding-8-pesto-penne-pasta"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Vegetables",
+          "recipeIds": ["wedding-8-balsamic-marinated-vegetables"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional. Hors d’oeuvres and display are chef’s choice; selections are editable."
+    },
+    {
+      "id": "wedding-family-style-the-feast",
+      "name": "Family Style The Feast",
+      "book": "wedding",
+      "page": 13,
+      "serviceStyle": "family_style",
+      "groups": [
+        {
+          "label": "Choose three passed hors d’oeuvres",
+          "recipeIds": [
+            "hors-2-ahi-tuna",
+            "hors-2-bruschetta",
+            "hors-2-burrata-crostini",
+            "hors-2-charcuterie-cones",
+            "hors-2-chicken-salad-crostini",
+            "hors-2-edamame",
+            "hors-2-grilled-peach-crostini",
+            "hors-2-lobster-deviled-eggs",
+            "hors-2-mini-maine-lobster-roll",
+            "hors-2-pesto-crostini",
+            "hors-2-salmon-canape",
+            "hors-2-shrimp-canape",
+            "hors-2-southwest-crostini",
+            "hors-2-summer-veggie-crostini",
+            "hors-3-arancini",
+            "hors-3-coconut-shrimp",
+            "hors-3-deep-fried-mac-n-cheese-bites",
+            "hors-3-french-fry-cones",
+            "hors-3-fried-chicken",
+            "hors-3-grilled-street-corn",
+            "hors-3-grilled-lamb",
+            "hors-3-mini-baked-potato",
+            "hors-3-mini-chicken-waffle",
+            "hors-3-mini-fish-tacos",
+            "hors-3-montreal-beef",
+            "hors-3-popcorn-chicken-bites",
+            "hors-3-pork-shrimp-dumpling",
+            "hors-3-short-rib-or-pork-arepa",
+            "hors-3-stuffed-mushrooms",
+            "hors-3-wagyu-beef-meatballs",
+            "hors-3-zucchini-roll",
+            "hors-5-bacon-wrapped-lollipop",
+            "hors-5-balsamic-glazed-beef-satay",
+            "hors-5-chicken-parmesan-lollipop",
+            "hors-5-curry-chicken-satay",
+            "hors-5-gorgonzola-beef-satay",
+            "hors-5-greek-chicken",
+            "hors-5-lamb-lollipop",
+            "hors-5-lobster-corn-dog",
+            "hors-5-thai-peanut-chicken-satay",
+            "hors-5-watermelon-lollipop",
+            "hors-6-american-slider",
+            "hors-6-banh-mi-vietnamese",
+            "hors-6-chicken-katsu-bao-bun",
+            "hors-6-lamb-slider",
+            "hors-6-mini-grilled-cheese",
+            "hors-6-philly-cheesesteak-bao-bun",
+            "hors-6-pork-belly-bao-bun",
+            "hors-6-pork-slider",
+            "hors-6-short-rib-slider"
+          ],
+          "defaultCount": 3,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one stationary display",
+          "recipeIds": [
+            "hors-7-charcuterie",
+            "hors-7-crudite",
+            "hors-7-fresh-seasonal-fruit",
+            "hors-7-gourmet-cheese-display",
+            "hors-7-hatch-chili-artichoke-dip",
+            "hors-7-mediterranean-display",
+            "hors-7-baked-dungeness-crab",
+            "hors-7-mozzarella-buratta-bar",
+            "hors-7-roasted-corn-avocado-dip",
+            "hors-7-smoked-alaskan-salmon-dip"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one salad",
+          "recipeIds": [
+            "wedding-7-all-seasons-wedding-salad",
+            "wedding-7-mid-summer-salad",
+            "wedding-7-late-summer-salad",
+            "wedding-7-autumn-salad",
+            "wedding-7-citrus-salad"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Entrees",
+          "recipeIds": [
+            "wedding-13-new-york-strip",
+            "wedding-13-alaskan-salmon"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Vegetable",
+          "recipeIds": ["wedding-13-grilled-asparagus"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Dessert",
+          "recipeIds": ["wedding-13-dessert-and-coffee"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-family-style-the-grand",
+      "name": "Family Style The Grand",
+      "book": "wedding",
+      "page": 13,
+      "serviceStyle": "family_style",
+      "groups": [
+        {
+          "label": "Choose three passed hors d’oeuvres",
+          "recipeIds": [
+            "hors-2-ahi-tuna",
+            "hors-2-bruschetta",
+            "hors-2-burrata-crostini",
+            "hors-2-charcuterie-cones",
+            "hors-2-chicken-salad-crostini",
+            "hors-2-edamame",
+            "hors-2-grilled-peach-crostini",
+            "hors-2-lobster-deviled-eggs",
+            "hors-2-mini-maine-lobster-roll",
+            "hors-2-pesto-crostini",
+            "hors-2-salmon-canape",
+            "hors-2-shrimp-canape",
+            "hors-2-southwest-crostini",
+            "hors-2-summer-veggie-crostini",
+            "hors-3-arancini",
+            "hors-3-coconut-shrimp",
+            "hors-3-deep-fried-mac-n-cheese-bites",
+            "hors-3-french-fry-cones",
+            "hors-3-fried-chicken",
+            "hors-3-grilled-street-corn",
+            "hors-3-grilled-lamb",
+            "hors-3-mini-baked-potato",
+            "hors-3-mini-chicken-waffle",
+            "hors-3-mini-fish-tacos",
+            "hors-3-montreal-beef",
+            "hors-3-popcorn-chicken-bites",
+            "hors-3-pork-shrimp-dumpling",
+            "hors-3-short-rib-or-pork-arepa",
+            "hors-3-stuffed-mushrooms",
+            "hors-3-wagyu-beef-meatballs",
+            "hors-3-zucchini-roll",
+            "hors-5-bacon-wrapped-lollipop",
+            "hors-5-balsamic-glazed-beef-satay",
+            "hors-5-chicken-parmesan-lollipop",
+            "hors-5-curry-chicken-satay",
+            "hors-5-gorgonzola-beef-satay",
+            "hors-5-greek-chicken",
+            "hors-5-lamb-lollipop",
+            "hors-5-lobster-corn-dog",
+            "hors-5-thai-peanut-chicken-satay",
+            "hors-5-watermelon-lollipop",
+            "hors-6-american-slider",
+            "hors-6-banh-mi-vietnamese",
+            "hors-6-chicken-katsu-bao-bun",
+            "hors-6-lamb-slider",
+            "hors-6-mini-grilled-cheese",
+            "hors-6-philly-cheesesteak-bao-bun",
+            "hors-6-pork-belly-bao-bun",
+            "hors-6-pork-slider",
+            "hors-6-short-rib-slider"
+          ],
+          "defaultCount": 3,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one stationary display",
+          "recipeIds": [
+            "hors-7-charcuterie",
+            "hors-7-crudite",
+            "hors-7-fresh-seasonal-fruit",
+            "hors-7-gourmet-cheese-display",
+            "hors-7-hatch-chili-artichoke-dip",
+            "hors-7-mediterranean-display",
+            "hors-7-baked-dungeness-crab",
+            "hors-7-mozzarella-buratta-bar",
+            "hors-7-roasted-corn-avocado-dip",
+            "hors-7-smoked-alaskan-salmon-dip"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one salad",
+          "recipeIds": [
+            "wedding-7-all-seasons-wedding-salad",
+            "wedding-7-mid-summer-salad",
+            "wedding-7-late-summer-salad",
+            "wedding-7-autumn-salad",
+            "wedding-7-citrus-salad"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose two entrees",
+          "recipeIds": [
+            "wedding-13-tender-chicken-breast",
+            "wedding-13-halibut",
+            "wedding-13-beef-filet",
+            "wedding-13-beef-short-rib"
+          ],
+          "defaultCount": 2,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Artisan sides",
+          "recipeIds": [
+            "wedding-13-burrata-whipped-mashed-potato",
+            "wedding-13-wild-mushroom-risotto",
+            "wedding-13-seasonal-veggies",
+            "wedding-13-grilled-asparagus",
+            "wedding-7-cougar-gold-mac-n-cheese"
+          ],
+          "defaultCount": 5,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Dessert",
+          "recipeIds": ["wedding-13-dessert-and-coffee"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-asian-station",
+      "name": "Asian Station",
+      "book": "wedding",
+      "page": 10,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Bun station",
+          "recipeIds": [
+            "wedding-10-pork-belly-bao-bun",
+            "wedding-10-chicken-katsu-bao-bun",
+            "wedding-10-veggie-bao-bun"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "wedding-10-noodle-station",
+            "wedding-10-dumpling-station"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-italian-ultimate-feast",
+      "name": "Italian Ultimate Feast",
+      "book": "wedding",
+      "page": 10,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Salad and bread",
+          "recipeIds": ["wedding-8-caesar-salad", "wedding-8-grilled-focaccia"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "wedding-10-charcuterie-display",
+            "wedding-10-caprese-station",
+            "wedding-10-ultimate-pasta-bowl"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-south-of-the-border",
+      "name": "South of the Border",
+      "book": "wedding",
+      "page": 11,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "wedding-11-guacamole-station",
+            "wedding-11-salsa-bar",
+            "wedding-11-street-taco-station",
+            "wedding-11-taco-station-accompaniments"
+          ],
+          "defaultCount": 4,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-all-american",
+      "name": "All American",
+      "book": "wedding",
+      "page": 11,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Slider station",
+          "recipeIds": [
+            "wedding-11-mini-beef-sliders",
+            "wedding-11-pulled-pork-sliders"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "wedding-11-lemonade-station",
+            "wedding-11-mac-n-cheese-station",
+            "wedding-11-french-fry-station",
+            "wedding-11-popcorn-station"
+          ],
+          "defaultCount": 4,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-asian-station",
+      "name": "Asian Station",
+      "book": "holiday",
+      "page": 7,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Bun station",
+          "recipeIds": [
+            "holiday-7-pork-belly-bao-bun",
+            "holiday-7-chicken-katsu-bao-bun",
+            "holiday-7-veggie-bao-bun"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "holiday-7-noodle-station",
+            "holiday-7-dumpling-station"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-italian-ultimate-feast",
+      "name": "Italian Ultimate Feast",
+      "book": "holiday",
+      "page": 7,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Salad and bread",
+          "recipeIds": ["wedding-8-caesar-salad", "wedding-8-grilled-focaccia"],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "holiday-7-charcuterie-display",
+            "holiday-7-caprese-station",
+            "holiday-7-ultimate-pasta-bowl"
+          ],
+          "defaultCount": 3,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-south-of-the-border",
+      "name": "South of the Border",
+      "book": "holiday",
+      "page": 8,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "holiday-8-guacamole-station",
+            "holiday-8-salsa-bar",
+            "holiday-8-street-taco-station",
+            "holiday-8-taco-station-accompaniments"
+          ],
+          "defaultCount": 4,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-all-american",
+      "name": "All American",
+      "book": "holiday",
+      "page": 8,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Slider station",
+          "recipeIds": [
+            "wedding-11-mini-beef-sliders",
+            "wedding-11-pulled-pork-sliders"
+          ],
+          "defaultCount": 2,
+          "choice": false,
+          "splitServings": false
+        },
+        {
+          "label": "Stations",
+          "recipeIds": [
+            "holiday-8-lemonade-station",
+            "holiday-8-mac-n-cheese-station",
+            "holiday-8-french-fry-station",
+            "holiday-8-popcorn-station"
+          ],
+          "defaultCount": 4,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-hot-cocoa-station",
+      "name": "Hot Cocoa Station",
+      "book": "holiday",
+      "page": 8,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Cocoa",
+          "recipeIds": ["holiday-8-hot-cocoa-station"],
+          "defaultCount": 1,
+          "choice": false,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-build-your-own-holiday-dinner",
+      "name": "Build Your Own Holiday Dinner",
+      "book": "holiday",
+      "page": 4,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose bread",
+          "recipeIds": [
+            "holiday-4-grilled-focaccia",
+            "holiday-4-garlic-parmesan-rolls",
+            "holiday-4-garlic-french-bread",
+            "holiday-4-cheddar-garlic-buttermilk-biscuits",
+            "holiday-4-baked-dinner-rolls"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "One or two salads",
+          "recipeIds": [
+            "holiday-4-chicken-caesar-pasta-salad",
+            "holiday-4-hawaiian-macaroni-salad",
+            "holiday-4-baby-red-potato-salad",
+            "holiday-4-grand-marnier-fruit-salad",
+            "holiday-4-all-seasons-wedding-salad",
+            "holiday-4-mid-summer-salad",
+            "holiday-4-late-summer-salad",
+            "holiday-4-autumn-salad",
+            "holiday-4-citrus-salad",
+            "holiday-4-mixed-green-salad",
+            "holiday-4-caesar-salad",
+            "holiday-4-strawberry-feta",
+            "holiday-4-chilled-quinoa-salad"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Two or three sides",
+          "recipeIds": [
+            "holiday-4-baby-red-potatoes",
+            "holiday-4-balsamic-marinated-vegetables",
+            "holiday-4-corn-succotash",
+            "holiday-4-cougar-gold-mac-n-cheese",
+            "holiday-4-cranberry-sauce",
+            "holiday-4-garlic-mashed-potatoes",
+            "holiday-4-green-bean-casserole",
+            "holiday-4-grilled-corn-on-the-cob",
+            "holiday-5-haricots-verts",
+            "holiday-5-herbed-stuffing-balls",
+            "holiday-5-house-made-stuffing",
+            "holiday-5-mangia-signature-vegetable-medley",
+            "holiday-5-parsnip-potato-puree",
+            "holiday-5-pesto-gnocchi-or-penne-pasta",
+            "holiday-5-potatoes-au-gratin",
+            "holiday-5-rice-pilaf",
+            "holiday-5-slow-roasted-beans",
+            "holiday-5-smoked-rainbow-carrots",
+            "holiday-5-sweet-potato-mash",
+            "holiday-5-whipped-potatoes",
+            "holiday-5-wild-mushroom-risotto"
+          ],
+          "defaultCount": 2,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Two recommended entrees",
+          "recipeIds": [
+            "holiday-5-airline-italian-chicken-breast",
+            "holiday-5-chicken-roulade",
+            "holiday-5-sirloin-steak",
+            "holiday-5-grilled-wild-alaskan-salmon",
+            "holiday-5-carved-turkey-with-herbed-gravy",
+            "holiday-5-glazed-ham",
+            "holiday-5-pork-loin",
+            "holiday-5-roasted-prime-rib-of-beef-prime-grade",
+            "holiday-5-new-york-strip",
+            "holiday-5-beef-tenderloin"
+          ],
+          "defaultCount": 2,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional. Recommended counts are editable."
+    },
+    {
+      "id": "wedding-sweet-tooth-displayed",
+      "name": "Sweet Tooth - Displayed",
+      "book": "wedding",
+      "page": 14,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Choose desserts",
+          "recipeIds": [
+            "wedding-14-mini-fruit-tart-with-lemon-custard",
+            "wedding-14-chocolate-dipped-strawberries",
+            "wedding-14-assorted-cookies",
+            "wedding-14-triple-chocolate-brownies",
+            "wedding-14-lemon-bars",
+            "wedding-14-assorted-mini-cakes",
+            "wedding-14-assorted-mini-tarts",
+            "wedding-14-assorted-mini-mousse-cups",
+            "wedding-14-mini-cupcakes",
+            "wedding-14-mini-cookies-with-chocolate-milk-shots",
+            "wedding-14-gourmet-macaroons"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-sweet-tooth-served",
+      "name": "Sweet Tooth - Served",
+      "book": "wedding",
+      "page": 14,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Choose desserts",
+          "recipeIds": [
+            "wedding-14-salted-caramel-panna-cotta",
+            "wedding-14-fruit-tarts-with-mascarpone-whipped-cream",
+            "wedding-14-huckleberry-cobbler-and-ice-cream",
+            "wedding-14-white-chocolate-raspberry-cheesecake",
+            "wedding-14-creme-brulee-cheesecake",
+            "wedding-14-5-layer-fudge-chocolate-cake",
+            "wedding-14-tiramisu",
+            "wedding-14-creme-brulee"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "wedding-sweet-tooth-stations",
+      "name": "Sweet Tooth - Stations",
+      "book": "wedding",
+      "page": 14,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Choose desserts",
+          "recipeIds": [
+            "wedding-14-mini-donut-wall-and-coffee-bar",
+            "wedding-14-sugar-donuts-with-creme-en-glaze",
+            "wedding-14-flaming-donuts-station",
+            "wedding-14-smores-bar",
+            "wedding-14-gourmet-ice-cream-bar"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-holiday-treats-displayed",
+      "name": "Holiday Treats - Displayed",
+      "book": "holiday",
+      "page": 9,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Choose desserts",
+          "recipeIds": [
+            "holiday-9-mini-fruit-tart-with-lemon-custard",
+            "holiday-9-chocolate-dipped-strawberries",
+            "holiday-9-assorted-cookies",
+            "holiday-9-triple-chocolate-brownies",
+            "holiday-9-lemon-bars",
+            "holiday-9-assorted-mini-cakes",
+            "holiday-9-assorted-mini-tarts",
+            "holiday-9-assorted-mini-mousse-cups",
+            "holiday-9-mini-cupcakes",
+            "holiday-9-mini-cookies-with-chocolate-milk-shots",
+            "holiday-9-gourmet-macaroons"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-holiday-treats-served",
+      "name": "Holiday Treats - Served",
+      "book": "holiday",
+      "page": 9,
+      "serviceStyle": "plated",
+      "groups": [
+        {
+          "label": "Choose desserts",
+          "recipeIds": [
+            "holiday-9-salted-caramel-panna-cotta",
+            "holiday-9-fruit-tarts-with-mascarpone-whipped-cream",
+            "holiday-9-huckleberry-cobbler-and-ice-cream",
+            "holiday-9-white-chocolate-raspberry-cheesecake",
+            "holiday-9-creme-brulee-cheesecake",
+            "holiday-9-5-layer-fudge-chocolate-cake",
+            "holiday-9-tiramisu",
+            "holiday-9-creme-brulee",
+            "holiday-9-chocolate-cream-pie",
+            "holiday-9-pumpkin-pie",
+            "holiday-9-apple-pie",
+            "holiday-9-mixed-berry-pie"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "holiday-holiday-treats-stations",
+      "name": "Holiday Treats - Stations",
+      "book": "holiday",
+      "page": 9,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Choose desserts",
+          "recipeIds": [
+            "holiday-9-mini-donut-wall-and-coffee-bar",
+            "holiday-9-sugar-donuts-with-creme-en-glaze",
+            "holiday-9-flaming-donuts-station",
+            "holiday-9-smores-bar",
+            "holiday-9-gourmet-ice-cream-bar"
+          ],
+          "defaultCount": 0,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Pricing based on 100 guests; inquire for smaller counts. Staffing, 21% service charge and local sales tax are additional."
+    },
+    {
+      "id": "pizza-late-night-pizza-station",
+      "name": "Late Night Pizza Station",
+      "book": "pizza",
+      "page": 3,
+      "serviceStyle": "station",
+      "groups": [
+        {
+          "label": "Choose three pizza varieties",
+          "recipeIds": [
+            "pizza-6-mushroom-pizza",
+            "pizza-6-blanco-pizza",
+            "pizza-6-pepperoni-blast-pizza",
+            "pizza-6-chevre-pizza",
+            "pizza-6-queen-m-pizza",
+            "pizza-6-farmers-market-pizza",
+            "pizza-6-thai-pizza",
+            "pizza-6-idaho-pizza",
+            "pizza-6-meat-pie-pizza",
+            "pizza-6-bbq-pizza",
+            "pizza-6-breakfast-za-pizza",
+            "pizza-6-pesto-pizza",
+            "pizza-6-chicken-alfredo-pizza",
+            "pizza-6-kalua-pig-pizza",
+            "pizza-6-custom-pizza"
+          ],
+          "defaultCount": 3,
+          "choice": true,
+          "splitServings": true
+        }
+      ],
+      "notes": "Three pizza varieties. During peak season this is available as an add-on only. Packages for 30, 50, 100 and 150 guests can be combined. Staffing fee, 21% service charge and local sales tax are additional. Typical arrival is 2–3 hours before service; typical pizza crew is 2–3 staff. Servings below are guest portions, not whole pizzas."
+    },
+    {
+      "id": "pizza-the-rehearsal-dinner",
+      "name": "The Rehearsal Dinner",
+      "book": "pizza",
+      "page": 3,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Choose three pizza varieties",
+          "recipeIds": [
+            "pizza-6-mushroom-pizza",
+            "pizza-6-blanco-pizza",
+            "pizza-6-pepperoni-blast-pizza",
+            "pizza-6-chevre-pizza",
+            "pizza-6-queen-m-pizza",
+            "pizza-6-farmers-market-pizza",
+            "pizza-6-thai-pizza",
+            "pizza-6-idaho-pizza",
+            "pizza-6-meat-pie-pizza",
+            "pizza-6-bbq-pizza",
+            "pizza-6-breakfast-za-pizza",
+            "pizza-6-pesto-pizza",
+            "pizza-6-chicken-alfredo-pizza",
+            "pizza-6-kalua-pig-pizza",
+            "pizza-6-custom-pizza"
+          ],
+          "defaultCount": 3,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Choose one salad",
+          "recipeIds": [
+            "wedding-7-all-seasons-wedding-salad",
+            "wedding-7-mid-summer-salad",
+            "wedding-7-late-summer-salad",
+            "wedding-7-autumn-salad",
+            "wedding-7-citrus-salad",
+            "pizza-3-chopped-salad",
+            "pizza-3-gourmet-caesar"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one bread",
+          "recipeIds": [
+            "pizza-3-garlic-flat-bread",
+            "pizza-3-wood-fired-french-baguette",
+            "pizza-3-garlic-parmesan-rolls",
+            "pizza-3-wood-fired-pheasant-loaf"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose two beverages",
+          "recipeIds": [
+            "pizza-3-infused-water",
+            "pizza-3-strawberry-lemonade",
+            "pizza-3-fresh-brewed-ice-tea",
+            "pizza-3-sweet-tea",
+            "pizza-3-cravens-coffee"
+          ],
+          "defaultCount": 2,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Packages for 30, 50, 100 and 150 guests can be combined. Staffing fee, 21% service charge and local sales tax are additional. Typical arrival is 2–3 hours before service; typical pizza crew is 2–3 staff. Servings below are guest portions, not whole pizzas."
+    },
+    {
+      "id": "pizza-pizza-feast",
+      "name": "Pizza Feast",
+      "book": "pizza",
+      "page": 4,
+      "serviceStyle": "buffet",
+      "groups": [
+        {
+          "label": "Cocktail hour — chef’s choice or select dishes",
+          "recipeIds": [
+            "pizza-4-chefs-choice-cocktail-hour-hors-doeuvres",
+            "hors-2-ahi-tuna",
+            "hors-2-bruschetta",
+            "hors-2-burrata-crostini",
+            "hors-2-charcuterie-cones",
+            "hors-2-chicken-salad-crostini",
+            "hors-2-edamame",
+            "hors-2-grilled-peach-crostini",
+            "hors-2-lobster-deviled-eggs",
+            "hors-2-mini-maine-lobster-roll",
+            "hors-2-pesto-crostini",
+            "hors-2-salmon-canape",
+            "hors-2-shrimp-canape",
+            "hors-2-southwest-crostini",
+            "hors-2-summer-veggie-crostini",
+            "hors-3-arancini",
+            "hors-3-coconut-shrimp",
+            "hors-3-deep-fried-mac-n-cheese-bites",
+            "hors-3-french-fry-cones",
+            "hors-3-fried-chicken",
+            "hors-3-grilled-street-corn",
+            "hors-3-grilled-lamb",
+            "hors-3-mini-baked-potato",
+            "hors-3-mini-chicken-waffle",
+            "hors-3-mini-fish-tacos",
+            "hors-3-montreal-beef",
+            "hors-3-popcorn-chicken-bites",
+            "hors-3-pork-shrimp-dumpling",
+            "hors-3-short-rib-or-pork-arepa",
+            "hors-3-stuffed-mushrooms",
+            "hors-3-wagyu-beef-meatballs",
+            "hors-3-zucchini-roll",
+            "hors-5-bacon-wrapped-lollipop",
+            "hors-5-balsamic-glazed-beef-satay",
+            "hors-5-chicken-parmesan-lollipop",
+            "hors-5-curry-chicken-satay",
+            "hors-5-gorgonzola-beef-satay",
+            "hors-5-greek-chicken",
+            "hors-5-lamb-lollipop",
+            "hors-5-lobster-corn-dog",
+            "hors-5-thai-peanut-chicken-satay",
+            "hors-5-watermelon-lollipop",
+            "hors-6-american-slider",
+            "hors-6-banh-mi-vietnamese",
+            "hors-6-chicken-katsu-bao-bun",
+            "hors-6-lamb-slider",
+            "hors-6-mini-grilled-cheese",
+            "hors-6-philly-cheesesteak-bao-bun",
+            "hors-6-pork-belly-bao-bun",
+            "hors-6-pork-slider",
+            "hors-6-short-rib-slider",
+            "hors-7-charcuterie",
+            "hors-7-crudite",
+            "hors-7-fresh-seasonal-fruit",
+            "hors-7-gourmet-cheese-display",
+            "hors-7-hatch-chili-artichoke-dip",
+            "hors-7-mediterranean-display",
+            "hors-7-baked-dungeness-crab",
+            "hors-7-mozzarella-buratta-bar",
+            "hors-7-roasted-corn-avocado-dip",
+            "hors-7-smoked-alaskan-salmon-dip"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose three pizza varieties",
+          "recipeIds": [
+            "pizza-6-mushroom-pizza",
+            "pizza-6-blanco-pizza",
+            "pizza-6-pepperoni-blast-pizza",
+            "pizza-6-chevre-pizza",
+            "pizza-6-queen-m-pizza",
+            "pizza-6-farmers-market-pizza",
+            "pizza-6-thai-pizza",
+            "pizza-6-idaho-pizza",
+            "pizza-6-meat-pie-pizza",
+            "pizza-6-bbq-pizza",
+            "pizza-6-breakfast-za-pizza",
+            "pizza-6-pesto-pizza",
+            "pizza-6-chicken-alfredo-pizza",
+            "pizza-6-kalua-pig-pizza",
+            "pizza-6-custom-pizza"
+          ],
+          "defaultCount": 3,
+          "choice": true,
+          "splitServings": true
+        },
+        {
+          "label": "Choose one salad",
+          "recipeIds": [
+            "wedding-7-all-seasons-wedding-salad",
+            "wedding-7-mid-summer-salad",
+            "wedding-7-late-summer-salad",
+            "wedding-7-autumn-salad",
+            "wedding-7-citrus-salad",
+            "pizza-3-chopped-salad",
+            "pizza-3-gourmet-caesar"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose one bread",
+          "recipeIds": [
+            "pizza-3-garlic-flat-bread",
+            "pizza-3-wood-fired-french-baguette",
+            "pizza-3-garlic-parmesan-rolls",
+            "pizza-3-wood-fired-pheasant-loaf"
+          ],
+          "defaultCount": 1,
+          "choice": true,
+          "splitServings": false
+        },
+        {
+          "label": "Choose two beverages",
+          "recipeIds": [
+            "pizza-3-infused-water",
+            "pizza-3-strawberry-lemonade",
+            "pizza-3-fresh-brewed-ice-tea",
+            "pizza-3-sweet-tea",
+            "pizza-3-cravens-coffee"
+          ],
+          "defaultCount": 2,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Cocktail hour is included. Keep chef’s choice or replace it with named dishes below. Choose passed, stationary or a combination. Wedding cakes available through bakery partners. Packages for 30, 50, 100 and 150 guests can be combined. Staffing fee, 21% service charge and local sales tax are additional. Typical arrival is 2–3 hours before service; typical pizza crew is 2–3 staff. Servings below are guest portions, not whole pizzas."
+    },
+    {
+      "id": "wedding-open-bar",
+      "name": "Open Bar",
+      "book": "wedding",
+      "page": 15,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Prearranged, prepaid open bar for up to four hours. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "wedding-cash-bar",
+      "name": "Cash Bar",
+      "book": "wedding",
+      "page": 15,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Host pays bartender and setup; guests purchase beverages. Caterer selects beer and wine. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "wedding-hosted-bar",
+      "name": "Hosted Bar",
+      "book": "wedding",
+      "page": 15,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Host pays accumulated charges and sets the bar-tab limit. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "wedding-host-provided-bar",
+      "name": "Host Provided Bar",
+      "book": "wedding",
+      "page": 15,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Host provides all alcohol. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "wedding-elevated-bar",
+      "name": "Elevated Bar",
+      "book": "wedding",
+      "page": 16,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Two signature drinks; handcrafted ingredients, premium mixers, tonics and bitters, fresh garnishes and squeezed juices. Client provides liquor. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": [
+        "Prepare signature drinks and fresh garnishes",
+        "Set up specialty bar",
+        "Bar service",
+        "Take down bar"
+      ],
+      "packing": [
+        "Specialty bar kit: mixers, tonics, bitters, garnishes, juices, bar ice and linen-like cocktail napkins",
+        "Mixology tools: shakers, mixing glasses, dispensers, napkin holders, spoons, ice tools, drip trays, torches, vapor gun, cutting boards, knives, garnish tools, coolers, strainers, tongs, bottle openers, garnish display, trays and chilling buckets"
+      ]
+    },
+    {
+      "id": "holiday-open-bar",
+      "name": "Open Bar",
+      "book": "holiday",
+      "page": 10,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Prearranged, prepaid open bar for up to four hours. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "holiday-cash-bar",
+      "name": "Cash Bar",
+      "book": "holiday",
+      "page": 10,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Host pays bartender and setup; guests purchase beverages. Caterer selects beer and wine. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "holiday-hosted-bar",
+      "name": "Hosted Bar",
+      "book": "holiday",
+      "page": 10,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Host pays accumulated charges and sets the bar-tab limit. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "holiday-host-provided-bar",
+      "name": "Host Provided Bar",
+      "book": "holiday",
+      "page": 10,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Host provides all alcohol. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": ["Set up bar", "Bar service", "Take down bar"],
+      "packing": [
+        "Bar service supplies: ice, high quality disposable cups and cocktail napkins"
+      ]
+    },
+    {
+      "id": "holiday-elevated-bar",
+      "name": "Elevated Bar",
+      "book": "holiday",
+      "page": 11,
+      "serviceStyle": "bar",
+      "groups": [],
+      "notes": "Two signature drinks; handcrafted ingredients, premium mixers, tonics and bitters, fresh garnishes and squeezed juices. Client provides liquor. Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional.",
+      "serviceTasks": [
+        "Prepare signature drinks and fresh garnishes",
+        "Set up specialty bar",
+        "Bar service",
+        "Take down bar"
+      ],
+      "packing": [
+        "Specialty bar kit: mixers, tonics, bitters, garnishes, juices, bar ice and linen-like cocktail napkins",
+        "Mixology tools: shakers, mixing glasses, dispensers, napkin holders, spoons, ice tools, drip trays, torches, vapor gun, cutting boards, knives, garnish tools, coolers, strainers, tongs, bottle openers, garnish display, trays and chilling buckets"
+      ]
+    },
+    {
+      "id": "holiday-seasonal-cocktails",
+      "name": "Seasonal Cocktails",
+      "book": "holiday",
+      "page": 13,
+      "serviceStyle": "bar",
+      "groups": [
+        {
+          "label": "Choose signature drinks",
+          "recipeIds": [
+            "holiday-13-grapefruit-cardamom-fizz",
+            "holiday-13-greenbluff-buttered-rum",
+            "holiday-13-hot-mulle",
+            "holiday-13-mexican-hot-chocolate",
+            "holiday-13-salted-caramel-white-russian",
+            "holiday-13-washington-margarita"
+          ],
+          "defaultCount": 2,
+          "choice": true,
+          "splitServings": false
+        }
+      ],
+      "notes": "Full spirits, wine and beer in Washington; wine and beer in Idaho. Keep host-provided alcohol separate from caterer supplies. 21% service charge, staffing and local tax are additional."
+    }
+  ]
+}

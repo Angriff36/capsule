@@ -59,9 +59,10 @@ entity Dish mixin TenantScoped, SoftDeletable {
 
   // salesAccess: sales browses the published catalog for proposal menu
   // selection (sales/proposal-dish-selection.manifest).
-  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") "Kitchen and sales staff may read dishes"
-  default policy dishWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dishes through commands"
-  default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish commands"
+  // Event managers compose package recipes as well as their event menu lines.
+  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, sales and managers may read dishes"
+  default policy dishWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write dishes through commands"
+  default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute dish commands"
 
   command introduce(
     name: string,
@@ -490,9 +491,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish task templates"
-  default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish task templates through commands"
-  default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish task template commands"
+  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read dish task templates"
+  default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write dish task templates through commands"
+  default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute dish task template commands"
 
   command add(
     dishId: uuid,

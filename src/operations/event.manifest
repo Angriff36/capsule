@@ -1351,9 +1351,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
   constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
 
-  default policy eventTimelineActivityRead read: roleAllows(user.role, "eventAccess") "Event staff may read the event timeline"
-  default policy eventTimelineActivityWrite write: roleAllows(user.role, "eventAccess") "Event staff may write the event timeline through commands"
-  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute event timeline commands"
+  default policy eventTimelineActivityRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may read the event timeline"
+  default policy eventTimelineActivityWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may write the event timeline through commands"
+  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may execute event timeline commands"
 
   command schedule(
     eventId: uuid,
