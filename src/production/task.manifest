@@ -64,7 +64,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   hasMany incomingDependencies: PrepTaskDependency
 
   constraint prepNameComplete: self.claimedAt == null or length(trim(self.name)) > 0 "Prep tasks require a name once opened"
-  constraint prepQuantityPositive: self.claimedAt == null or self.quantity > 0 "Prep quantity must be positive once opened"
+  constraint prepQuantityPositive: self.claimedAt == null or self.quantity >= 0 "Prep quantity cannot be negative"
   constraint prepCompletedNonnegative: self.completedQuantity == null or self.completedQuantity >= 0 "Completed quantity cannot be negative"
 
   transition status from "pending" to ["claimed", "blocked", "cancelled"]
@@ -204,6 +204,25 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       quantity: quantity
       unit: self.unit
       specialInstructions: specialInstructions != null ? specialInstructions : self.specialInstructions
+    }
+  }
+
+  // Attendance/menu edits update uncompleted generated work in the same
+  // transaction as demand. Preserve assignments, progress and kitchen notes.
+  command syncServings(quantityServings: number) {
+    guard self.deletedAt == null
+    constraint syncServingsNonnegative: quantityServings >= 0 "Prep servings cannot be negative"
+    compute canRefresh = self.isGenerated and self.dishTask != null and self.status != "completed" and self.status != "cancelled"
+    compute perServing = self.dishTask != null and self.dishTask.defaultQuantity != null ? self.dishTask.defaultQuantity : 1
+    mutate quantity = canRefresh ? perServing * quantityServings : self.quantity
+    emit PrepTaskGeneratedRefreshed {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      quantity: self.quantity
+      unit: self.unit
+      specialInstructions: self.specialInstructions
     }
   }
 
@@ -678,6 +697,10 @@ on EventCancelled fanOut PrepTask where eventId = payload.eventId
 on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
   run standDown
   params { reason: payload.reason }
+
+on EventDishServingsAdjusted fanOut PrepTask where eventDishId = payload.eventDishId
+  run syncServings
+  params { quantityServings: payload.quantityServings }
 
 // ---------------------------------------------------------------------------
 // Adding a dish to an event builds its prep list.

@@ -511,6 +511,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation EventDish_setHeadcountOverride", () => {
     expect(typeof (mutations as any).EventDish_setHeadcountOverride).toBe("function");
   });
+  it("exports mutation EventDish_syncHeadcount", () => {
+    expect(typeof (mutations as any).EventDish_syncHeadcount).toBe("function");
+  });
   it("exports mutation EventDish_updateInstructions", () => {
     expect(typeof (mutations as any).EventDish_updateInstructions).toBe("function");
   });
@@ -1181,6 +1184,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation PrepTask_start", () => {
     expect(typeof (mutations as any).PrepTask_start).toBe("function");
   });
+  it("exports mutation PrepTask_syncServings", () => {
+    expect(typeof (mutations as any).PrepTask_syncServings).toBe("function");
+  });
   it("exports mutation PrepTask_unblock", () => {
     expect(typeof (mutations as any).PrepTask_unblock).toBe("function");
   });
@@ -1819,4 +1825,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 604 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 606 as const;

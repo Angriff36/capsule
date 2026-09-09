@@ -47,7 +47,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   ref vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
   ref vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
 
-  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity > 0 "Required quantity must be positive once opened"
+  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
 
   transition status from "open" to ["ordered", "cancelled"]
   transition status from "ordered" to ["fulfilled", "cancelled"]
@@ -144,7 +144,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open"
     guard self.openedAt != null
     guard self.deletedAt == null
-    constraint reviseNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "Required quantity cannot be negative"
     mutate requiredQuantity = requiredQuantity
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id

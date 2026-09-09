@@ -162,6 +162,7 @@ import {
   EventDishRemoveParamsSchema,
   EventDishRequestContainerPackParamsSchema,
   EventDishSetHeadcountOverrideParamsSchema,
+  EventDishSyncHeadcountParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
   EventFinalizeEventParamsSchema,
   EventGuestAssignTableParamsSchema,
@@ -397,6 +398,7 @@ import {
   PrepTaskReviseParamsSchema,
   PrepTaskStandDownParamsSchema,
   PrepTaskStartParamsSchema,
+  PrepTaskSyncServingsParamsSchema,
   PrepTaskUnblockParamsSchema,
   ProductionBatchCancelParamsSchema,
   ProductionBatchCompleteParamsSchema,
@@ -3034,6 +3036,16 @@ export function useEventDishSetHeadcountOverride() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventDishSetHeadcountOverrideParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventDish.syncHeadcount. */
+export function useEventDishSyncHeadcount() {
+  const mutate = useMutation(api.mutations.EventDish_syncHeadcount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishSyncHeadcountParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6081,6 +6093,16 @@ export function usePrepTaskStart() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PrepTaskStartParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PrepTask.syncServings. */
+export function usePrepTaskSyncServings() {
+  const mutate = useMutation(api.mutations.PrepTask_syncServings);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskSyncServingsParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9379,4 +9401,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1001 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1003 as const;

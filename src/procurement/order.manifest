@@ -426,7 +426,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   computed isFullyReceived: boolean = self.orderedQuantity > 0 and self.receivedQuantity >= self.orderedQuantity
   computed hasReceivingDiscrepancy: boolean = self.discrepancyQuantity != null and self.discrepancyQuantity > 0
 
-  constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity > 0 "Ordered quantity must be positive once added"
+  constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity >= 0 "Ordered quantity cannot be negative"
   constraint lineReceivedNonnegative: self.receivedQuantity >= 0 "Received quantity cannot be negative"
   constraint lineReceivedNotOver: self.receivedQuantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
   constraint lineCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
@@ -503,8 +503,8 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.ingredient != null and self.ingredient.status == "active"
-    constraint ensureContributionPositive: contributionQuantity > 0 "Contribution quantity must be positive"
-    compute orderQty = max(0.0001, weekNeed - onHand)
+    constraint ensureContributionPositive: contributionQuantity >= 0 "Contribution quantity cannot be negative"
+    compute orderQty = max(0, weekNeed - onHand)
     compute effectiveUnitCost = self.unitCost > 0 ? self.unitCost : self.ingredient.costPerUnit
     mutate vendorOrderId = vendorOrderId
     mutate ingredientId = ingredientId
@@ -788,7 +788,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
   belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
 
-  constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity > 0 "Demand link contribution must be positive"
+  constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity >= 0 "Demand link contribution cannot be negative"
 
   default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read order demand links"
   default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write order demand links through commands"
@@ -811,7 +811,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     constraint linkDemandMatch: self.linkedAt == null or ingredientDemandId == self.ingredientDemandId "Demand link ingredientDemandId must match the seeded demand reference"
     constraint linkOrderMatch: self.linkedAt == null or vendorOrderId == self.vendorOrderId "Demand link vendorOrderId must match the seeded order reference"
     constraint linkOrderOwnsLine: vendorOrderId == self.vendorOrderLine.vendorOrderId "Demand link vendorOrderId must own the vendor order line"
-    constraint linkQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
+    constraint linkQuantityPositive: contributionQuantity >= 0 "Demand link contribution cannot be negative"
     mutate vendorOrderLineId = vendorOrderLineId
     mutate ingredientDemandId = ingredientDemandId
     mutate vendorOrderId = vendorOrderId

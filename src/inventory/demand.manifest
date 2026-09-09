@@ -73,7 +73,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
-  constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity > 0 "Required quantity must be positive once calculated"
+  constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
 
   transition status from "pending" to ["calculated"]
   transition status from "calculated" to ["confirmed", "superseded"]
@@ -96,8 +96,8 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.status == "pending" or self.status == "calculated" or self.status == "confirmed"
-    // Floor tiny/zero aggregate so retire→resync and first-write races stay valid.
-    compute nextQuantity = max(0.0001, requiredQuantity)
+    // A removed/86'd dish leaves no demand, rather than a fictitious purchase.
+    compute nextQuantity = max(0, requiredQuantity)
     compute previousStatus = self.status
     mutate eventId = eventId
     mutate ingredientId = ingredientId
@@ -107,7 +107,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate purchasingWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.purchasingWeekStart
     mutate status = previousStatus == "pending" ? "calculated" : previousStatus
     mutate calculatedAt = self.calculatedAt == null ? now() : self.calculatedAt
-    mutate purchaseEligibleEventId = (previousStatus == "pending" or previousStatus == "calculated") ? eventId : self.purchaseEligibleEventId
+    mutate purchaseEligibleEventId = nextQuantity > 0 and (previousStatus == "pending" or previousStatus == "calculated") ? eventId : null
     emit IngredientDemandCalculated {
       ingredientDemandId: self.id
       tenantId: self.tenantId

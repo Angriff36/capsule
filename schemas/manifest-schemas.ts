@@ -919,6 +919,7 @@ export const EventDishSchema = z.object({
   eventId: z.string().uuid(),
   dishId: z.string().uuid(),
   quantityServings: z.number().int().default(1),
+  followsEventHeadcount: z.boolean().nullable().optional(),
   headcountOverride: z.number().int().nullable().optional().default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   course: z.string().nullable().optional(),
@@ -1003,6 +1004,7 @@ export const EventIngredientContributionSchema = z.object({
   componentId: z.string().uuid().nullable().optional(),
   ingredientId: z.string().uuid(),
   quantity: z.number().default(0),
+  quantityPerServing: z.number().nullable().optional(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
   servings: z.number().default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
@@ -4866,6 +4868,14 @@ export const EventDishSetHeadcountOverrideParamsSchema = z.object({
 
 export type EventDishSetHeadcountOverrideParams = z.infer<typeof EventDishSetHeadcountOverrideParamsSchema>;
 
+// Command: syncHeadcount on EventDish
+export const EventDishSyncHeadcountParamsSchema = z.object({
+  previousHeadcount: z.number(),
+  newHeadcount: z.number(),
+});
+
+export type EventDishSyncHeadcountParams = z.infer<typeof EventDishSyncHeadcountParamsSchema>;
+
 // Command: updateInstructions on EventDish
 export const EventDishUpdateInstructionsParamsSchema = z.object({
   specialInstructions: z.string().optional(),
@@ -4941,6 +4951,7 @@ export const EventIngredientContributionRecordParamsSchema = z.object({
   quantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
   servings: z.number(),
+  quantityPerServing: z.number().optional(),
   componentId: z.string().min(1).optional(),
   purchasingWeekStart: z.coerce.date().optional(),
 });
@@ -6702,6 +6713,13 @@ export type PrepTaskStandDownParams = z.infer<typeof PrepTaskStandDownParamsSche
 export const PrepTaskStartParamsSchema = z.object({});
 
 export type PrepTaskStartParams = z.infer<typeof PrepTaskStartParamsSchema>;
+
+// Command: syncServings on PrepTask
+export const PrepTaskSyncServingsParamsSchema = z.object({
+  quantityServings: z.number(),
+});
+
+export type PrepTaskSyncServingsParams = z.infer<typeof PrepTaskSyncServingsParamsSchema>;
 
 // Command: unblock on PrepTask
 export const PrepTaskUnblockParamsSchema = z.object({});

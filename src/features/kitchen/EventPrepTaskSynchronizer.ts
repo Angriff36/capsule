@@ -198,8 +198,11 @@ export class EventPrepTaskSynchronizer {
             version: item.existing.version,
             quantity: item.quantity,
             specialInstructions:
-              displayEventMenuNotes(input.eventDish.specialInstructions) ||
-              undefined,
+              item.existing.specialInstructions ??
+              this.instructionsFor(
+                item.instructions,
+                input.eventDish.specialInstructions,
+              ),
           });
         }
         continue;

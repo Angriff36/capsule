@@ -143,6 +143,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   property componentId: uuid?
   property required ingredientId: uuid
   property required quantity: decimal(12, 4) = 0
+  property quantityPerServing: decimal(12, 6)?
   property required unit: UnitOfMeasure = "each"
   property required servings: decimal(12, 4) = 0
   property purchasingWeekStart: datetime?
@@ -164,11 +165,12 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     quantity: decimal(12, 4),
     unit: UnitOfMeasure,
     servings: decimal(12, 4),
+    optional quantityPerServing: decimal(12, 6),
     optional componentId: uuid,
     optional purchasingWeekStart: datetime
   ) {
     guard self.deletedAt == null
-    constraint recordQuantityPositive: quantity > 0 "Contribution quantity must be positive"
+    constraint recordQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
     constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
     mutate eventId = eventId
     mutate eventDishId = eventDishId
@@ -176,6 +178,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate componentId = componentId
     mutate ingredientId = ingredientId
     mutate quantity = quantity
+    mutate quantityPerServing = quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing)
     mutate unit = unit
     mutate servings = servings
     mutate purchasingWeekStart = purchasingWeekStart
@@ -195,7 +198,8 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   command revise(quantity: decimal(12, 4), servings: decimal(12, 4)) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint reviseQuantityPositive: quantity > 0 "Contribution quantity must be positive"
+    constraint reviseQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
+    mutate quantityPerServing = self.quantityPerServing != null ? self.quantityPerServing : (self.servings > 0 ? self.quantity / self.servings : null)
     mutate quantity = quantity
     mutate servings = servings
     emit EventIngredientContributionRecorded {
@@ -314,6 +318,7 @@ on EventDishAdded fanOut DishIngredient where dishId = payload.dishId
     componentId: null
     ingredientId: self.ingredientId
     quantity: self.quantity * payload.quantityServings
+    quantityPerServing: self.quantity
     unit: self.unit
     servings: payload.quantityServings
     purchasingWeekStart: payload.purchasingWeekStart
@@ -330,6 +335,7 @@ on EventDishComponentSeeded fanOut ComponentIngredient where componentId = paylo
     componentId: payload.componentId
     ingredientId: self.ingredientId
     quantity: (self.quantity * payload.batchMultiplier * payload.servings) / payload.yieldQuantity
+    quantityPerServing: (self.quantity * payload.batchMultiplier) / payload.yieldQuantity
     unit: self.unit
     servings: payload.servings
     purchasingWeekStart: payload.purchasingWeekStart
@@ -338,13 +344,16 @@ on EventDishComponentSeeded fanOut ComponentIngredient where componentId = paylo
 on EventDishServingsAdjusted fanOut EventIngredientContribution where eventDishId = payload.eventDishId
   run revise
   params {
-    quantity: (self.quantity / self.servings) * payload.quantityServings
+    quantity: (self.quantityPerServing != null ? self.quantityPerServing : (self.servings > 0 ? self.quantity / self.servings : 0)) * payload.quantityServings
     servings: payload.quantityServings
   }
 
 on EventHeadcountChanged fanOut EventDish where eventId = payload.eventId
-  run adjustServings
-  params { quantityServings: payload.newHeadcount }
+  run syncHeadcount
+  params {
+    previousHeadcount: payload.previousHeadcount
+    newHeadcount: payload.newHeadcount
+  }
 
 on EventDishRemoved fanOut EventIngredientContribution where eventDishId = payload.eventDishId
   run retire
@@ -439,6 +448,7 @@ on EventDishConfirmedFromProposal fanOut DishIngredient where dishId = payload.s
     componentId: null
     ingredientId: self.ingredientId
     quantity: self.quantity * payload.quantityServings
+    quantityPerServing: self.quantity
     unit: self.unit
     servings: payload.quantityServings
     purchasingWeekStart: payload.purchasingWeekStart
@@ -459,6 +469,7 @@ on DishIngredientAdded fanOut EventDish where dishId = payload.dishId
     componentId: null
     ingredientId: payload.ingredientId
     quantity: payload.quantity * self.quantityServings
+    quantityPerServing: payload.quantity
     unit: payload.unit
     servings: self.quantityServings
     purchasingWeekStart: self.purchasingWeekStart
@@ -476,6 +487,7 @@ on DishIngredientQuantityAdjusted fanOut EventDish where dishId = payload.dishId
     componentId: null
     ingredientId: payload.ingredientId
     quantity: payload.quantity * self.quantityServings
+    quantityPerServing: payload.quantity
     unit: payload.unit
     servings: self.quantityServings
     purchasingWeekStart: self.purchasingWeekStart
