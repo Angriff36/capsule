@@ -477,10 +477,10 @@ on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
   params {
     vendorOrderId: payload.vendorOrderId
     ingredientId: payload.ingredientId
-    weekNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "open", of requiredQuantity)
-    orderedNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "ordered", of requiredQuantity)
-    fulfilledNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "fulfilled", of requiredQuantity)
-    onHand: sum(InventoryItem where ingredientId == payload.ingredientId, of quantityOnHand)
+    weekNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, unit == payload.unit, status == "open", of requiredQuantity)
+    orderedNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, unit == payload.unit, status == "ordered", of requiredQuantity)
+    fulfilledNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, unit == payload.unit, status == "fulfilled", of requiredQuantity)
+    onHand: sum(InventoryItem where ingredientId == payload.ingredientId, unit == payload.unit, of quantityOnHand)
     pendingSupply: sum(VendorOrderLine where ingredientId == payload.ingredientId, supplyWeekStart == payload.purchasingWeekStart, unit == payload.unit, of pendingSupplyQuantity)
     contributionQuantity: payload.requiredQuantity
     unit: payload.unit
