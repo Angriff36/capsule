@@ -1,0 +1,82 @@
+{
+  "name": "Mid Summer Wedding Salad",
+  "status": "source-qualified partial reconstruction; not an apply payload",
+  "servings": 167,
+  "directIngredientsPerServing": [
+    {
+      "name": "Spring Mix",
+      "quantity": 0.09375,
+      "unit": "pound",
+      "source": "Menu_Item_Cost_per_Event.xlsx sheet1 B232/G232/H232; 15.65625 lb /167 servings"
+    },
+    {
+      "name": "Strawberries",
+      "quantity": 0.09375,
+      "unit": "pound",
+      "source": "Menu_Item_Cost_per_Event.xlsx sheet1 B236/G236/H236; 15.65625 lb /167 servings"
+    },
+    {
+      "name": "Fennel - Fresh",
+      "quantity": 0.015625,
+      "unit": "pound",
+      "source": "Menu_Item_Cost_per_Event.xlsx sheet1 B240/G240/H240; 2.609375 lb /167 servings"
+    },
+    {
+      "name": "Gorgonzola Cheese Crumbs",
+      "quantity": 0.03125,
+      "unit": "pound",
+      "source": "Menu_Item_Cost_per_Event.xlsx sheet1 B242/G242/H242; 83.5 dry oz /16/167. Identity corroborated by menu and Pack_List G300; printed prep page1 confirms5.22lb. Corrects erroneous B244/H244 fennel/dry-ounce leaf."
+    }
+  ],
+  "linkedCompleteComponents": ["raspberry-balsamic.json"],
+  "serviceMethod": "Mix greens with dressing until lightly covered, starting light and adding more as needed. Layer dressed greens and toppings in a serving bowl; repeat, using a third layer for larger bowls. Give a quick toss when the buffet opens.",
+  "serviceMethodSource": "Heating_and_Serving_Event_Menu.xlsx sheet1 E72",
+  "gorgonzolaCorrection": {
+    "sourceRow": 244,
+    "originalName": "Fennel - Fresh",
+    "originalQuantity": 5.21875,
+    "originalUnit": "Oz - Dry",
+    "correctName": "Gorgonzola Cheese Crumbs",
+    "correctQuantity": 5.21875,
+    "correctUnit": "pound",
+    "evidence": [
+      "Menu_Item_Cost_per_Event.xlsx G242/H242:83.5 Oz - Dry",
+      "Event_Menu_Item_Production.xlsx C32/E32:5.22 pounds",
+      "menu-with-prep.pdf page1:5.22 pounds PORTION GORGONZOLA",
+      "Pack_List.xlsx G300:Gorgonzola Cheese Crumbs separately from A300 fennel"
+    ]
+  },
+  "remainingWalnutRecipe": {
+    "workQuantity": 5.21875,
+    "workUnit": "pound",
+    "source": "Menu_Item_Cost_per_Event.xlsx sheet1 rows246-256",
+    "ingredientsFor167Servings": [
+      {
+        "name": "Toasted Walnuts",
+        "quantity": 5.21875,
+        "unit": "pound"
+      },
+      {
+        "name": "Cooking Water",
+        "quantity": 0.521875,
+        "unit": "cup"
+      },
+      {
+        "name": "Spice - Cayenne Pepper",
+        "quantity": 0.521875,
+        "unit": "teaspoon"
+      },
+      {
+        "name": "Salt",
+        "quantity": 0.521875,
+        "unit": "teaspoon"
+      },
+      {
+        "name": "White Sugar",
+        "quantity": 1.565625,
+        "unit": "cup"
+      }
+    ],
+    "missing": "Candying method and confirmed finished batch yield; owner method question pending. Work quantity does not establish finished cooked yield."
+  }
+}
