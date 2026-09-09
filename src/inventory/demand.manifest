@@ -92,18 +92,42 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     ingredientId: uuid,
     requiredQuantity: decimal(12, 4),
     unit: UnitOfMeasure,
-    optional purchasingWeekStart: datetime
+    optional purchasingWeekStart: datetime,
+    optional total_gram: number,
+    optional total_kilogram: number,
+    optional total_ounce: number,
+    optional total_pound: number,
+    optional total_milliliter: number,
+    optional total_liter: number,
+    optional total_teaspoon: number,
+    optional total_tablespoon: number,
+    optional total_cup: number,
+    optional total_pint: number,
+    optional total_quart: number,
+    optional total_gallon: number
   ) {
     guard self.deletedAt == null
     guard self.status == "pending" or self.status == "calculated" or self.status == "confirmed"
     // A removed/86'd dish leaves no demand, rather than a fictitious purchase.
-    compute nextQuantity = max(0, requiredQuantity)
+    // Normalize compatible contributions before adding their quantities.
+    // Unknown cross-dimension amounts retain the existing unresolved unit path.
+    compute catalogUnit = self.ingredient != null ? self.ingredient.unit : unit
+    compute targetMass = catalogUnit == "gram" ? 1 : catalogUnit == "kilogram" ? 1000 : catalogUnit == "ounce" ? 28.349523125 : catalogUnit == "pound" ? 453.59237 : 0
+    compute targetVolume = catalogUnit == "milliliter" ? 1 : catalogUnit == "liter" ? 1000 : catalogUnit == "teaspoon" ? 4.92892159375 : catalogUnit == "tablespoon" ? 14.78676478125 : catalogUnit == "cup" ? 236.5882365 : catalogUnit == "pint" ? 473.176473 : catalogUnit == "quart" ? 946.352946 : catalogUnit == "gallon" ? 3785.411784 : 0
+    compute massRaw = (total_gram != null ? total_gram : 0) + (total_kilogram != null ? total_kilogram : 0) + (total_ounce != null ? total_ounce : 0) + (total_pound != null ? total_pound : 0)
+    compute massBase = (total_gram != null ? total_gram : 0) * 1 + (total_kilogram != null ? total_kilogram : 0) * 1000 + (total_ounce != null ? total_ounce : 0) * 28.349523125 + (total_pound != null ? total_pound : 0) * 453.59237
+    compute volumeRaw = (total_milliliter != null ? total_milliliter : 0) + (total_liter != null ? total_liter : 0) + (total_teaspoon != null ? total_teaspoon : 0) + (total_tablespoon != null ? total_tablespoon : 0) + (total_cup != null ? total_cup : 0) + (total_pint != null ? total_pint : 0) + (total_quart != null ? total_quart : 0) + (total_gallon != null ? total_gallon : 0)
+    compute volumeBase = (total_milliliter != null ? total_milliliter : 0) * 1 + (total_liter != null ? total_liter : 0) * 1000 + (total_teaspoon != null ? total_teaspoon : 0) * 4.92892159375 + (total_tablespoon != null ? total_tablespoon : 0) * 14.78676478125 + (total_cup != null ? total_cup : 0) * 236.5882365 + (total_pint != null ? total_pint : 0) * 473.176473 + (total_quart != null ? total_quart : 0) * 946.352946 + (total_gallon != null ? total_gallon : 0) * 3785.411784
+    compute compatibleMass = targetMass > 0 and abs(massRaw - requiredQuantity) < 0.00000001
+    compute compatibleVolume = targetVolume > 0 and abs(volumeRaw - requiredQuantity) < 0.00000001
+    compute demandUnit = compatibleMass or compatibleVolume ? catalogUnit : unit
+    compute nextQuantity = max(0, compatibleMass ? massBase / targetMass : (compatibleVolume ? volumeBase / targetVolume : requiredQuantity))
     compute previousStatus = self.status
     mutate eventId = eventId
     mutate ingredientId = ingredientId
     mutate preferredVendorId = self.ingredient.preferredVendorId
     mutate requiredQuantity = nextQuantity
-    mutate unit = unit
+    mutate unit = demandUnit
     mutate purchasingWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.purchasingWeekStart
     mutate status = previousStatus == "pending" ? "calculated" : previousStatus
     mutate calculatedAt = self.calculatedAt == null ? now() : self.calculatedAt
@@ -115,7 +139,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId
       dishId: self.dishId
       requiredQuantity: nextQuantity
-      unit: unit
+      unit: self.unit
       servings: self.servings
     }
   }

@@ -140,12 +140,22 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   }
 
   // Post-approve demand reconcile: revise open need quantity; weekly line re-ensures.
-  command reviseRequired(requiredQuantity: decimal(12, 4)) {
+  command reviseRequired(requiredQuantity: decimal(12, 4), optional unit: UnitOfMeasure) {
     guard self.status == "open"
     guard self.openedAt != null
     guard self.deletedAt == null
     constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "Required quantity cannot be negative"
-    mutate requiredQuantity = requiredQuantity
+    // Preserve the purchasing unit for compatible recipe measurements.
+    // Exact factors mirror src/lib/recipeUnitConversion.ts.
+    compute incomingUnit = unit != null ? unit : self.unit
+    compute sourceMass = incomingUnit == "gram" ? 1 : incomingUnit == "kilogram" ? 1000 : incomingUnit == "ounce" ? 28.349523125 : incomingUnit == "pound" ? 453.59237 : 0
+    compute sourceVolume = incomingUnit == "milliliter" ? 1 : incomingUnit == "liter" ? 1000 : incomingUnit == "teaspoon" ? 4.92892159375 : incomingUnit == "tablespoon" ? 14.78676478125 : incomingUnit == "cup" ? 236.5882365 : incomingUnit == "pint" ? 473.176473 : incomingUnit == "quart" ? 946.352946 : incomingUnit == "gallon" ? 3785.411784 : 0
+    compute targetMass = self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0
+    compute targetVolume = self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0
+    compute compatibleUnit = incomingUnit == self.unit or (sourceMass > 0 and targetMass > 0) or (sourceVolume > 0 and targetVolume > 0)
+    compute unitRatio = incomingUnit == self.unit ? 1 : (sourceMass > 0 and targetMass > 0 ? sourceMass / targetMass : (sourceVolume > 0 and targetVolume > 0 ? sourceVolume / targetVolume : 1))
+    mutate requiredQuantity = requiredQuantity * unitRatio
+    mutate unit = compatibleUnit ? self.unit : incomingUnit
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -153,7 +163,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
       ingredientDemandId: self.ingredientDemandId
       ingredientId: self.ingredientId
       preferredVendorId: self.preferredVendorId
-      requiredQuantity: requiredQuantity
+      requiredQuantity: self.requiredQuantity
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
       status: "open"

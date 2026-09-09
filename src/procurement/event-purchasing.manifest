@@ -407,13 +407,25 @@ on EventIngredientContributionRecorded run IngredientDemand.syncFromContribution
     eventId: payload.eventId
     ingredientId: payload.ingredientId
     requiredQuantity: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, of quantity)
+    total_gram: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "gram", of quantity)
+    total_kilogram: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "kilogram", of quantity)
+    total_ounce: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "ounce", of quantity)
+    total_pound: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "pound", of quantity)
+    total_milliliter: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "milliliter", of quantity)
+    total_liter: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "liter", of quantity)
+    total_teaspoon: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "teaspoon", of quantity)
+    total_tablespoon: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "tablespoon", of quantity)
+    total_cup: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "cup", of quantity)
+    total_pint: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "pint", of quantity)
+    total_quart: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "quart", of quantity)
+    total_gallon: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "gallon", of quantity)
     unit: payload.unit
     purchasingWeekStart: payload.purchasingWeekStart
   }
 
 on IngredientDemandCalculated fanOut PurchaseNeed where ingredientDemandId = payload.ingredientDemandId
   run reviseRequired
-  params { requiredQuantity: payload.requiredQuantity }
+  params { requiredQuantity: payload.requiredQuantity, unit: payload.unit }
 
 on PurchaseNeedOpened run WeeklyPurchasingConfig.routeNeed
   match tenantId = payload.tenantId

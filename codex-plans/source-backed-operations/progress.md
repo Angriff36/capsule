@@ -83,3 +83,16 @@ Actual generated-runtime scratch (`reproduce-component-detach.ts`) proves: detac
 
 Broader unit-flow reproduction (`reproduce-demand-unit-change.ts`) proves an outstanding defect: 0.9375 lb demand/need, then equivalent 16-oz batch ingredient update -> demand 15 oz but PurchaseNeed 15 lb. The existing reviseRequired command copies quantity and keeps its prior unit. Must fix compatible-unit normalization/propagation through needs and weekly lines; also audit mixed-unit contributions. Do not release or apply a broad repair while this is unresolved. No production writes. Explicit component replacement mapping, prep history/recipe relinking and the rest of the full goal remain required.
 - Final typecheck passed. Purchasing unit bug tracked separately as https://github.com/Angriff36/capsule/issues/314. Green tests do not cover or resolve that demonstrated defect.
+
+## Purchasing and mixed-unit contribution correction
+
+PurchaseNeed.reviseRequired now receives the incoming demand unit and preserves its existing purchasing unit for compatible mass/volume measurements. Equivalent 15 oz demand remains 0.9375 lb on the need and one weekly order line. Quantity and unit move together for an actual incompatible-unit replacement, but broader cross-dimension handling still needs source-supported conversion information.
+
+IngredientDemand.syncFromContributions now uses per-unit aggregate inputs from the reaction to add compatible contributions in the ingredient's catalog unit. Verified 1 lb + 15 oz = 1.9375 lb in demand and purchasing, and 1 cup + 16 tbsp = 0.125 gal through demand and weekly ordering. Existing source contribution units remain intact for traceability and later recipe edits. Aggregate arithmetic only normalizes when every positive contribution belongs to the compatible dimension; unresolved cross-dimension totals retain the prior path and still require an explicit product/data resolution. Do not claim density/count conversion is solved.
+
+Implementation evidence: .artifacts/operations-source-study/reproduce-weekly-unit-change.ts; purchase-unit-tests-final.log (165 files / 1429 tests pass). Final typecheck running. No new authored tests and no production writes. Issue #314 remains open until released/live verified and remaining unit handling is resolved.
+
+Generator limitation found and reported: #315 https://github.com/Angriff36/capsule/issues/315. Command-local AggregateSum compute expressions were silently omitted, leaving doc.total_... reads. Direct/inverse relation hydration in commands also cannot implement this aggregate. Current source uses the supported reaction-param aggregate path, then pure arithmetic in the command. No generated output edited by hand.
+
+Remaining full-goal work includes submitted/fulfilled purchasing changes without losing order history, source-backed existing-data reconstruction/replacement, historical event preservation, completed-work deltas, prep presentation and links, packing, staffing/timeline/forms, My Day, browser checks and release. Green unit-flow checks do not fulfill those requirements.
+- Final typecheck passed after the supported aggregate implementation. Compatible mass and volume end-to-end reproductions pass.
