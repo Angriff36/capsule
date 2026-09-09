@@ -226,7 +226,7 @@ export async function repairDishRecipe(
       const row = await owned(line.ingredientId);
       if (
         !("unit" in row) ||
-        row.unit !== line.unit ||
+        recipeUnitRatio(line.unit, row.unit) == null ||
         recipeNameKey(row.name) !== recipeNameKey(line.name)
       )
         throw new Error("Ingredient does not match the reviewed recipe");
@@ -235,14 +235,16 @@ export async function repairDishRecipe(
     const key = `${recipeNameKey(line.name)}:${line.unit}`;
     const cached = ingredientCache.get(key);
     if (cached) return cached;
-    const matches = existingIngredients.filter(
+    const compatible = existingIngredients.filter(
       (i) =>
         i.deletedAt == null &&
         i.status === "active" &&
         !i.mergedIntoIngredientId &&
         recipeNameKey(i.name) === recipeNameKey(line.name) &&
-        i.unit === line.unit,
+        recipeUnitRatio(line.unit, i.unit) != null,
     );
+    const exact = compatible.filter((i) => i.unit === line.unit);
+    const matches = exact.length ? exact : compatible;
     if (matches.length > 1)
       throw new Error(
         `Ambiguous existing ingredient: ${line.name} (${line.unit})`,
@@ -260,6 +262,8 @@ export async function repairDishRecipe(
         category: "TPP recipe ingredients",
       },
     );
+    const createdIngredient = await ctx.db.get(created.docId);
+    if (createdIngredient) existingIngredients.push(createdIngredient);
     ingredientCache.set(key, created.docId);
     result.createdIngredients.push({
       id: created.docId,

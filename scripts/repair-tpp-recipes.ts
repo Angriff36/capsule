@@ -192,14 +192,16 @@ for (const item of plan) {
     throw new Error("Authenticated tenant differs from repair target");
   client.setAuth(jwt);
   const resolve = (line: any) => {
-    const matches = ingredients.filter(
+    const compatible = ingredients.filter(
       (i: any) =>
         i.deletedAt == null &&
         i.status === "active" &&
         recipeNameKey(i.name) === recipeNameKey(line.name) &&
-        i.unit === line.unit &&
+        recipeUnitRatio(line.unit, i.unit) != null &&
         !i.mergedIntoIngredientId,
     );
+    const exact = compatible.filter((i: any) => i.unit === line.unit);
+    const matches = exact.length ? exact : compatible;
     return matches.length === 1
       ? { ...line, ingredientId: matches[0]._id }
       : line;
