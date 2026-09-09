@@ -27,8 +27,7 @@ export function recipeNoteLines(
         /^[\d\s./]+\s+.*\sper\s+[\d\s./]+\s/i.test(line)
       )
         continue;
-      if (index === 0 && ingredientNote)
-        line = line.replace(/:\s*[\d\s./]+\s+.*\sper\s+[\d\s./]+\s+.*$/i, "");
+      if (index === 0 && ingredientNote) continue;
       line = line.replace(/^(?:Recipe )?Yields?:\s*/i, "Makes ");
       if (line.toLowerCase() === title?.trim().toLowerCase()) continue;
       if (line.includes("|")) {
