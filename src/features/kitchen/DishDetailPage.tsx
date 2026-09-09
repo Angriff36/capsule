@@ -26,7 +26,7 @@ import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
 import { DishComponentsPanel } from "./DishComponentsPanel";
 import { DishIngredientsPanel } from "./DishIngredientsPanel";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
-import { recipeSourceCopy } from "./RecipeNotes";
+import { RecipeNotes } from "./RecipeNotes";
 import "./DishRecipe.css";
 import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -212,7 +212,7 @@ export function DishDetailPage() {
         />
       </details>
 
-      {dish.recipeSourceText ? (
+      {dish.recipeInstructions ? (
         <section className="culinary-section">
           <div className="flex flex-wrap items-center gap-3.5">
             <h2 className="text-sm font-bold uppercase tracking-[0.09em] text-ink">
@@ -220,22 +220,10 @@ export function DishDetailPage() {
             </h2>
             <i aria-hidden="true" className="h-px flex-1 bg-ink" />
             <span className="text-sm text-ink-3">
-              Source yield: {dish.recipeSourceYield}
+              Recipe yield: {dish.recipeSourceYield}
             </span>
           </div>
-          {dish.recipeInstructions ? (
-            <p className="whitespace-pre-wrap text-base text-ink-2">
-              {dish.recipeInstructions}
-            </p>
-          ) : null}
-          <details className="mt-3">
-            <summary className="cursor-pointer text-base text-accent">
-              Original recipe, quantities and subrecipes
-            </summary>
-            <p className="recipe-source-copy">
-              {recipeSourceCopy(dish.recipeSourceText)}
-            </p>
-          </details>
+          <RecipeNotes text={dish.recipeInstructions} />
         </section>
       ) : null}
 

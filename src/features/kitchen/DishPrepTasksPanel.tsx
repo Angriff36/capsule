@@ -7,7 +7,7 @@ import {
   useListDishTask,
   useListComponent,
 } from "../../lib/manifest-convex-react";
-import { RecipeNotes } from "./RecipeNotes";
+import { RecipeNotes, readableRecipeAmount } from "./RecipeNotes";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -226,9 +226,11 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                 <div>
                   <p className="text-lg font-medium text-ink">{task.name}</p>
                   <p className="recipe-prep-meta">
-                    {qtyMeta || "See instructions"}
+                    {qtyMeta
+                      ? `${readableRecipeAmount(task.defaultQuantity!, String(task.defaultUnit ?? ""))} per guest`
+                      : ""}
                   </p>
-                  <RecipeNotes text={task.instructions} />
+                  <RecipeNotes text={task.instructions} title={task.name} />
                 </div>
                 <div className="flex items-center gap-3">
                   {component ? (

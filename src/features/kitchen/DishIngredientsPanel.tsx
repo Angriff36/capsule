@@ -21,7 +21,7 @@ import {
 } from "../events/eventMenuRecipeQuantity";
 import { applyDishIngredientRemoval } from "./dishIngredientRemoval";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
-import { RecipeNotes } from "./RecipeNotes";
+import { RecipeNotes, readableRecipeAmount } from "./RecipeNotes";
 import { IngredientOptionPicker } from "./IngredientOptionPicker";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
@@ -210,10 +210,10 @@ export function DishIngredientsPanel({ dishId }: Props) {
                 >
                   {ingredientName(String(line.ingredientId))}
                 </CulinaryEntityLink>
-                <RecipeNotes text={line.prepNotes} label="Prep note & source" />
+                <RecipeNotes text={line.prepNotes} ingredientNote />
               </div>
               <span className="recipe-amount">
-                {formatRecipeQuantity(line.quantity)} {String(line.unit)}
+                {readableRecipeAmount(line.quantity, String(line.unit))}
               </span>
               <details className="recipe-row-editor">
                 <summary
