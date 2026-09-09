@@ -1,4 +1,6 @@
 import { useMutation } from "convex/react";
+export const useApplyCateringPackage = () =>
+  useMutation(api.lib.operationalTransactions.applyCateringPackage);
 import { api } from "./api";
 
 export const useIssueEventStock = () =>

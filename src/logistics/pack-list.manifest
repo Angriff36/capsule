@@ -230,9 +230,10 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   transition status from "packed" to []
   transition status from "missing" to []
 
-  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") "Logistics staff may read pack list items"
-  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") "Logistics staff may write pack list items through commands"
-  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") "Logistics staff may execute pack list item commands"
+  // Match the parent PackList: managers can compose package supply lists.
+  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack list items"
+  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack list items through commands"
+  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list item commands"
 
   command addItem(
     packListId: uuid,

@@ -15262,9 +15262,9 @@ async function __runEventTimelineActivityAdjust(ctx: MutationCtx, { docId, name,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may read the event timeline");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may write the event timeline through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may execute event timeline commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read the event timeline");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write the event timeline through commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event timeline commands");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((name == null) || (((name).trim()).length > 0)))) throw new Error("Activity name cannot be blanked");
@@ -15327,9 +15327,9 @@ async function __runEventTimelineActivityComplete(ctx: MutationCtx, { docId, com
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may read the event timeline");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may write the event timeline through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may execute event timeline commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read the event timeline");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write the event timeline through commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event timeline commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -15372,9 +15372,9 @@ async function __runEventTimelineActivityRemove(ctx: MutationCtx, { docId, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may read the event timeline");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may write the event timeline through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may execute event timeline commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read the event timeline");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write the event timeline through commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event timeline commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -15415,9 +15415,9 @@ async function __runEventTimelineActivityReopen(ctx: MutationCtx, { docId, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may read the event timeline");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may write the event timeline through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may execute event timeline commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read the event timeline");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write the event timeline through commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event timeline commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -15459,9 +15459,9 @@ async function __runEventTimelineActivitySchedule(ctx: MutationCtx, { docId, eve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may read the event timeline");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may write the event timeline through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may execute event timeline commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read the event timeline");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write the event timeline through commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event timeline commands");
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Activity name is required");
@@ -15561,9 +15561,9 @@ export const EventTimelineActivity_createViaSchedule = mutation({
       siteNotes: args.siteNotes,
       startsAt: args.startsAt
     };
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may read the event timeline");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may write the event timeline through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Event staff and managers may execute event timeline commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read the event timeline");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write the event timeline through commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event timeline commands");
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Activity name is required");
@@ -25077,9 +25077,9 @@ async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, d
       const __fk = ((doc as any) as any).packListId;
       ((doc as any) as any).packList = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list items");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may write pack list items through commands");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list item commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.listedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -25180,9 +25180,9 @@ export const PackListItem_createViaAddItem = mutation({
       unit: args.unit
     };
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, __draft.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list items");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may write pack list items through commands");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list item commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((__draft.listedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -25226,9 +25226,9 @@ async function __runPackListItemAdjustQuantity(ctx: MutationCtx, { docId, requir
       const __fk = ((doc as any) as any).packListId;
       ((doc as any) as any).packList = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list items");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may write pack list items through commands");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list item commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -25281,9 +25281,9 @@ async function __runPackListItemMarkMissing(ctx: MutationCtx, { docId, version }
       const __fk = ((doc as any) as any).packListId;
       ((doc as any) as any).packList = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list items");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may write pack list items through commands");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list item commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -25346,9 +25346,9 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
       const __fk = ((doc as any) as any).packListId;
       ((doc as any) as any).packList = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list items");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may write pack list items through commands");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list item commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
+    if (!(checkRole(user, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");

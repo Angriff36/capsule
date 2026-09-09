@@ -46,6 +46,39 @@ Use a **culinary book** rather than a dashboard:
 
 ## Core workflows
 
+### Catering book packages
+
+The event Menu tab offers **Add catering package** with 52 offerings from the
+2026 Full Service Wedding Catering Book, 2026 Full Service Hors d'oeuvres Menu,
+Holiday Catering Book 2025, and 2026 Wedding Pizza Book. The authored catalog is
+`src/data/catering-packages.json`; every dish and package retains its book/page.
+Package choices and servings are editable before adding. Pizza varieties share
+the selected guest portions; duet entrees each serve the selected headcount.
+Choice counts are starting points, not restrictions on the operator.
+
+`applyCateringPackage` in `convex/lib/operationalTransactions.ts` authenticates
+menu management and delegates to `cateringPackageOperations.ts`. One transaction
+reuses matching live dishes or creates them, supplies a preparation template if
+none exists, and adds EventDish records through generated commands. Existing
+reactions create PrepTask and ingredient-demand records. Explicit per-dish
+servings also set the headcount override used by costing and purchasing.
+Receipts recover a lost acknowledgement without repeating writes.
+
+Existing recipes retain their quantities and procedures. Brochure-only dishes
+receive their description and a preparation task without invented ingredient
+weights, cooking times, or food costs. The result and event instructions identify
+missing ingredient quantities so incomplete purchasing totals remain visible.
+Bar packages create timeline activities and supply-kit packing lists; operators
+adjust activity times and consumable quantities to the event. Pizza Feast includes
+a chef's-choice cocktail-hour dish by default, replaceable with named selections.
+
+Local qualification on 2026-09-08 applied all 52 offerings successfully, exercised
+food and bar packages as event_manager and manager, verified receipt retries, and
+created the eight-dish Signature Buffet through the authenticated browser. The
+isolated backend used port 3220; desktop and 390px browser evidence is under
+`.artifacts/package-import/`. This qualification does not claim production data
+was imported or a deployment occurred.
+
 - Introduce and maintain Ingredient identity, unit, allergen classification, and cost; discontinue/reinstate.
 - Price Components from the newest confirmed `IngredientPriceObservation` created by a vendor-line receipt, falling back to the Ingredient catalog cost until a receipt exists.
 - Draft/revise/publish/retract/retire Component versions; manage ComponentStep method lines and ComponentIngredient BOM lines.
