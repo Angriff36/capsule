@@ -143,3 +143,14 @@ Authored reconcileImportedEventRecipeSync provides an administrator per-event ba
 
 Evidence: reproduce-historical-recipe-edit.ts, historical-recipe-before.log, history-sync-runtime.log, history-sync-active-runtime.log under .artifacts/operations-source-study. Full suite 165 files / 1435 tests passed (three generated contract cases); final typecheck pending. Historical recipe displays/costs/reports still derive some live catalog data and need their own snapshot verification. This routing correction does not claim the whole history requirement is solved.
 - Final typecheck passed after the migration seam and deleted-event predicate. No authored tests added.
+
+## Explicit source component replacement
+
+Implemented optional componentReplacements in the administrative recipe repair: each mapping names one existing DishComponent, expected version and target source component key. Server validates tenant/dish/version/unique mapping; CLI --component-replacements validates snapshot and includes the mapping in operation identity and reviewed plan hash. No name-only automatic replacement.
+
+Repair initializes legacy routing for affected events, detaches the old contribution, reconnects matching active recipe templates, relinks pending/claimed prep through a generated command, and attaches the new measured recipe. Quantity, notes, status and assignment fields are preserved; started/completed prep and completed/cancelled event references stay on the prior component. The prior component remains available for historical work. Repeat request uses the existing materialization receipt.
+
+Scratch reproduce-component-replacement.ts verifies exact corrected demand 1.565625 lb (not old+new), one active attachment, pending quantity/chef note/claimed state unchanged, completed-event demand exact document equality and old recipe reference, and replay without duplication. CLI preview succeeds with the same scratch snapshot/source/mapping; replacement-preview/plan.json contains the hashed target and explicit old attachment. Issue #322 https://github.com/Angriff36/capsule/issues/322.
+
+Independent gpt-5.6-sol review APPROVE. Full suite passed 165 files / 1436 tests before final nullable-optional argument normalization; final suite/typecheck running. No production writes. Source conflicts, broad migration planning, in-progress/completed-work quantity deltas and historical recipe/cost/report rendering remain part of the full goal, not solved by attachment replacement alone.
+- Final typecheck and final 165-file / 1436-test suite passed after optional argument normalization. Replacement runtime proof passed again.

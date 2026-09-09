@@ -49,6 +49,18 @@ const prepLinks: PrepLink[] = prepLinksPath
   ? JSON.parse(readFileSync(prepLinksPath, "utf8"))
   : [];
 if (!Array.isArray(prepLinks)) throw new Error("Prep links must be an array");
+type ComponentReplacement = {
+  dishComponentId: string;
+  expectedVersion: number;
+  replacementKey: string;
+};
+const replacementsPath = value("--component-replacements", "");
+const componentReplacements: ComponentReplacement[] = replacementsPath
+  ? JSON.parse(readFileSync(replacementsPath, "utf8"))
+  : [];
+if (!Array.isArray(componentReplacements))
+  throw new Error("Component replacements must be an array");
+const usedReplacements = new Set<string>();
 const usedPrepLinks = new Set<string>();
 const projected = args.includes("--projected-recipes");
 const sourceRecipes = JSON.parse(readFileSync(source, "utf8"));
@@ -117,6 +129,36 @@ const plan = recipes.map((r) => {
         `Reconcile prep units before linking ${link.taskName}: work uses ${link.expectedUnit}, recipe uses ${matchingTasks[0].unit ?? "portion"}`,
       );
   }
+  const replacements = componentReplacements
+    .filter((replacement) => {
+      const attachment = data.DishComponent?.find(
+        (a: any) => a._id === replacement.dishComponentId,
+      );
+      return attachment && dishes.some((d: any) => d._id === attachment.dishId);
+    })
+    .map((replacement) => {
+      const attachment = data.DishComponent.find(
+        (a: any) => a._id === replacement.dishComponentId,
+      );
+      const replacementKey = createHash("sha256")
+        .update(replacement.replacementKey)
+        .digest("hex");
+      if (
+        prepOnly ||
+        attachment.deletedAt != null ||
+        attachment.version !== replacement.expectedVersion ||
+        usedReplacements.has(attachment._id) ||
+        recipe.components.filter((c) => c.key === replacementKey).length !== 1
+      )
+        throw new Error(
+          "Component replacement does not match the source and attachment snapshot",
+        );
+      usedReplacements.add(attachment._id);
+      return { ...replacement, replacementKey };
+    });
+  const replacementHash = replacements.length
+    ? createHash("sha256").update(JSON.stringify(replacements)).digest("hex")
+    : "";
   const linkHash = links.length
     ? createHash("sha256").update(JSON.stringify(links)).digest("hex")
     : "";
@@ -124,13 +166,14 @@ const plan = recipes.map((r) => {
     ? `:projection:${createHash("sha256").update(JSON.stringify(recipe)).digest("hex")}`
     : "";
   return {
-    operationKey: `${prepOnly ? "tpp-dish-prep-completion:v1" : "tpp-dish-repair:v2"}:${r.fingerprint}${projectionKey}${linkHash ? `:prep-links:${linkHash}` : ""}`,
+    operationKey: `${prepOnly ? "tpp-dish-prep-completion:v1" : "tpp-dish-repair:v2"}:${r.fingerprint}${projectionKey}${replacementHash ? `:replacements:${replacementHash}` : ""}${linkHash ? `:prep-links:${linkHash}` : ""}`,
     dishIds: dishes.map((d: any) => d._id),
     expectedVersions: Object.fromEntries(
       dishes.map((d: any) => [d._id, d.version]),
     ),
     ...(draft && !prepOnly ? { sourceComponentId: draft._id } : {}),
     ...(links.length ? { prepLinks: links } : {}),
+    ...(replacements.length ? { componentReplacements: replacements } : {}),
     recipe,
   };
 });
@@ -139,6 +182,10 @@ if (selectedDishIds.size) {
   if ([...selectedDishIds].some((id) => !matchedIds.has(id)))
     throw new Error("Some selected dishes have no source recipe in this plan");
 }
+if (usedReplacements.size !== componentReplacements.length)
+  throw new Error(
+    "Some replacements do not belong to a dish in this repair plan",
+  );
 if (usedPrepLinks.size !== prepLinks.length)
   throw new Error(
     "Some prep links do not belong to a dish in this repair plan",

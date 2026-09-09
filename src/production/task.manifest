@@ -250,6 +250,14 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate componentId = componentId != null ? componentId : self.componentId
   }
 
+  // Correct a reviewed recipe link before work starts; retain assignments and quantities.
+  command replaceRecipeComponent(previousComponentId: uuid, componentId: uuid) {
+    guard self.deletedAt == null
+    guard self.status == "pending" or self.status == "claimed"
+    constraint replacementMatchesRecipe: self.componentId == previousComponentId "Prep recipe changed since replacement was reviewed"
+    mutate componentId = componentId
+  }
+
   command claim() {
     guard self.status == "pending"
     guard self.deletedAt == null
