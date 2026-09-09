@@ -211,6 +211,26 @@ on PackListOpened fanOut EventDish where eventId = payload.eventId
     packListId: payload.packListId
   }
 
+// Catalog changes must reach events whose packing lists already exist.
+// The active recipe key is cleared at event completion/cancellation and is
+// explicitly backfilled for legacy events by the recipe reconciliation seam.
+on DishContainerDefined fanOut EventDish where recipeSyncDishId = payload.dishId
+  run requestCatalogPacking
+
+on DishContainerRevised fanOut EventDish where recipeSyncDishId = payload.dishId
+  run requestCatalogPacking
+
+on DishContainerReinstated fanOut EventDish where recipeSyncDishId = payload.dishId
+  run requestCatalogPacking
+
+on EventDishCatalogPackingRequested fanOut PackList where activeEventId = payload.eventId
+  run requestDishContainers
+  params {
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    quantityServings: payload.quantityServings
+  }
+
 on EventDishContainerPackRequested fanOut DishContainer where dishId = payload.dishId
   run refreshActiveKey
 

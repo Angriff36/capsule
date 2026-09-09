@@ -58,18 +58,15 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
   constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride == null or self.headcountOverride >= 0 "Headcount override cannot be negative"
 
-  // Read: any staff on this tenant. Write/execute policy admits managers AND
-  // sales ONLY because the accept/link menu cascades (ProposalAccepted /
-  // ProposalEventLinked → confirmFromProposal) run with the accepting
-  // operator's auth — manager-only policy meant a sales accept with a linked
-  // event threw mid-cascade. The language has no per-command policy override
-  // (guards-policies docs, Appendix E backlog), so every OTHER command below
-  // carries a manageAccess guard: composition edits (add/adjust/remove/
-  // course/notes/headcount/packing) stay manager-only exactly as before;
-  // sales gains only the proposal-confirmation path.
+  // Read: any staff on this tenant. Sales confirmation and kitchen catalog
+  // reconciliation run under the initiating operator's auth. The shared
+  // policy admits those paths; composition commands retain explicit manager
+  // checks, and proposal confirmation retains its manager/sales check.
   default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
-  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") "Managers and sales staff may write event dishes through commands"
-  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") "Managers and sales staff may execute event dish commands"
+  // Kitchen catalog edits may request packing refresh; composition commands
+  // retain their own manager/sales authority checks below.
+  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may write event dishes through commands"
+  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may execute event dish commands"
 
   // Add this dish to the event (create).
   command addToEvent(
@@ -243,6 +240,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     optional serviceStyle: string,
     optional specialInstructions: string
   ) {
+    // Preserve the proposal-confirmation authority when admitting kitchen
+    // catalog refreshes through the shared entity policy.
+    guard roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess")
     guard self.deletedAt == null
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
     constraint confirmFromProposalEventMatch: eventId == self.eventId "confirmFromProposal eventId must match the seeded event reference"
@@ -288,6 +288,21 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A catalog template can be added after the event's packing list was opened.
+  // Fan out through the event so every active list receives the requirement.
+  command requestCatalogPacking() {
+    guard self.deletedAt == null and self.addedAt != null
+    guard self.event != null and self.event.deletedAt == null
+    guard self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled"
+    emit EventDishCatalogPackingRequested {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      quantityServings: self.quantityServings
+    }
+  }
+
   command remove(reason: string) {
     // Pulling a dish off an event is a manager call — see policies.
     guard roleAllows(user.role, "manageAccess")
@@ -310,6 +325,14 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   }
 
   store EventDish in durable
+}
+
+event EventDishCatalogPackingRequested: "event_dish.catalog_packing_requested" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  quantityServings: number
 }
 
 event EventDishContainerPackRequested: "event_dish.container_pack_requested" {
