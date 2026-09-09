@@ -51,8 +51,8 @@ entity PackList mixin TenantScoped, SoftDeletable {
 
   transition status from "draft" to ["packing", "cancelled"]
   transition status from "packing" to ["packed", "cancelled"]
-  transition status from "packed" to ["loaded", "cancelled"]
-  transition status from "loaded" to ["dispatched", "cancelled"]
+  transition status from "packed" to ["packing", "loaded", "cancelled"]
+  transition status from "loaded" to ["packing", "dispatched", "cancelled"]
   transition status from "dispatched" to []
   transition status from "cancelled" to []
 
@@ -89,6 +89,24 @@ entity PackList mixin TenantScoped, SoftDeletable {
       purpose: purpose != null ? purpose : self.purpose
       status: self.status
     }
+  }
+
+  command requestDishContainers(eventDishId: uuid, dishId: uuid, quantityServings: number) {
+    // A dispatched list records what went out; new planning uses a live list.
+    guard self.deletedAt == null and self.status != "dispatched" and self.status != "cancelled"
+    emit EventDishContainerPackRequested {
+      eventDishId: eventDishId
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: dishId
+      packListId: self.id
+      quantityServings: quantityServings
+    }
+  }
+
+  // Earlier packing/loading timestamps are facts; new requirements reopen work.
+  command acknowledgePackingRequirement(additionalRequired: boolean) {
+    mutate status = self.deletedAt == null and additionalRequired and (self.status == "packed" or self.status == "loaded") ? "packing" : self.status
   }
 
   command startPacking() {
@@ -295,6 +313,11 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate containerServings = quantityServings
     mutate status = self.listedAt == null ? "listed" : (eligible and self.followsDishServings != false and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status)
     mutate listedAt = self.listedAt != null ? self.listedAt : now()
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
+    }
   }
 
   command syncContainerServings(quantityServings: number) {
@@ -303,6 +326,11 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate requiredQuantity = eligible ? planned : self.requiredQuantity
     mutate containerServings = eligible ? quantityServings : self.containerServings
     mutate status = eligible and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: eligible and self.requiredQuantity > self.packedQuantity
+    }
   }
 
   command markPacked(packedQuantity: decimal(12, 4)) {
@@ -515,3 +543,21 @@ on EventDishServingsAdjusted fanOut PackListItem where eventDishId = payload.eve
 on EventDishRemoved fanOut PackListItem where eventDishId = payload.eventDishId
   run syncContainerServings
   params { quantityServings: 0 }
+
+on EventDishAdded fanOut PackList where activeEventId = payload.eventId
+  run requestDishContainers
+  params {
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    quantityServings: payload.quantityServings
+  }
+
+event PackListItemRequirementSynced: "pack_list_item.requirement_synced" {
+  packListId: string
+  tenantId: string
+  additionalRequired: boolean
+}
+
+on PackListItemRequirementSynced run PackList.acknowledgePackingRequirement
+  resolve payload.packListId
+  params { additionalRequired: payload.additionalRequired }

@@ -181,3 +181,11 @@ Regeneration initially failed on ambiguous number property; containerServings no
 Continue before packaging this repair: qualify removal/zero and duplicate menu lines, preserve historical/dispatched records, migrate existing packing links without duplicates, complete additions/catalog-change propagation and parent readiness. Inspect retired-template behavior for existing lists and permission/cascade behavior for logistics roles. Full UI/output/data/release goal remains incomplete.
 
 Packing checkpoint follow-up: typecheck passed. Extended actual-runtime checks pass distinct event-dish lines for the same dish, zero servings, restoration and removal to zero. gpt-5.6-sol independently APPROVED the corrected bounded diff after verifying createViaAddItem restoration. This is not whole-branch/release approval. Evidence: packing-sync-runtime.log, packing-sync-tests.log and packing-sync-typecheck.log in ignored operations-source-study scratch.
+
+## 2026-09-09 — packing additions and readiness
+
+Follow-up to #323: proved a new EventDish added after a pack list opens produces no packing line unless an operator reopens the list. Added EventDishAdded -> active PackList -> container materialization. Generated requirement events now reopen packed/loaded parents to packing if a container shortage exists, preserving previous packing/loading timestamps and delivery identity. Terminal dispatched/cancelled lists are excluded from new-dish materialization.
+
+Actual generated-runtime qualification: .artifacts/operations-source-study/reproduce-container-addition.ts and packing-addition-runtime.log pass automatic addition, serving scaling, manual override preservation, zero/restoration/removal, loaded-parent reopening, repacking without duplicate delivery, and no new lines or changed planned quantity on dispatched lists. Synthetic capacity remains a synchronization fixture only. Full existing suite165 files/1441 tests passes; typecheck passes. gpt-5.6-sol independently APPROVED this bounded diff, explicitly not release approval.
+
+Next packing work remains existing-row adoption/backfill without duplicates, active catalog changes (capacity, retirement, reinstatement) and source equipment quantity reconstruction, plus rendered flows. Full source-backed data/UI/report/release objective remains active and incomplete.
