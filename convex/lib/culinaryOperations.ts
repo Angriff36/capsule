@@ -22,6 +22,81 @@ export const repairImportedComponentRecipe = mutation({
 
 const unit = v.string();
 
+/** Restore source-reviewed dish associations without inventing container capacity. */
+export const reconcileImportedPackingAssociations = mutation({
+  args: {
+    operationKey: v.string(),
+    packListId: v.id("packLists"),
+    expectedVersion: v.number(),
+    expectedEventVersion: v.number(),
+    links: v.array(v.object({
+      itemId: v.id("packListItems"),
+      expectedVersion: v.number(),
+      expectedDescription: v.string(),
+      eventDishId: v.id("eventDishes"),
+      expectedEventDishVersion: v.number(),
+      sourceReference: v.string(),
+    })),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    if (!["owner", "admin", "system"].includes(auth.role))
+      throw new Error("Only an administrator may repair imported packing associations");
+    if (!args.operationKey.trim() || !args.links.length)
+      throw new Error("A repair key and reviewed packing associations are required");
+    const payload = JSON.stringify({ packListId: args.packListId, expectedVersion: args.expectedVersion,
+      expectedEventVersion: args.expectedEventVersion, links: args.links.map(link => ({
+        itemId: link.itemId, expectedVersion: link.expectedVersion, expectedDescription: link.expectedDescription,
+        eventDishId: link.eventDishId, expectedEventDishVersion: link.expectedEventDishVersion, sourceReference: link.sourceReference,
+      })) });
+    type Receipt = { payload: string; changed: number; items: { itemId: string; eventDishId: string; dishId: string; sourceReference: string; before: unknown }[] };
+    const prior = await readMaterializationReceipt<Receipt>(ctx, tenantId, "packingAssociationRepair", args.operationKey, args);
+    if (prior) {
+      if (prior.payload !== payload) throw new Error("Repair key was already used for a different packing plan");
+      return { changed: prior.changed, recovered: true };
+    }
+    const list = await ctx.db.get(args.packListId);
+    const event = list ? await ctx.db.get(list.eventId) : null;
+    if (!list || list.tenantId !== tenantId || list.deletedAt != null || !event || event.tenantId !== tenantId || event.deletedAt != null)
+      throw new Error("Pack list and event not found");
+    if (["dispatched", "cancelled"].includes(list.status) || ["completed", "closed_out", "cancelled"].includes(event.stage))
+      throw new Error("Historical packing records must remain unchanged");
+    if (list.version !== args.expectedVersion || event.version !== args.expectedEventVersion)
+      throw new Error("Packing event changed since source review");
+    const seen = new Set<string>();
+    const receipt: Receipt = { payload, changed: 0, items: [] };
+    for (const link of args.links) {
+      if (seen.has(link.itemId) || !link.sourceReference.trim())
+        throw new Error("Each packing item needs one reviewed source association");
+      seen.add(link.itemId);
+      const item = await ctx.db.get(link.itemId);
+      const selection = await ctx.db.get(link.eventDishId);
+      const dish = selection ? await ctx.db.get(selection.dishId) : null;
+      if (!item || item.tenantId !== tenantId || item.deletedAt != null || item.packListId !== list._id ||
+        !selection || selection.tenantId !== tenantId || selection.deletedAt != null || selection.removedAt != null || selection.eventId !== event._id ||
+        !dish || dish.tenantId !== tenantId || dish.deletedAt != null)
+        throw new Error("Packing association must belong to this event and tenant");
+      if (item.version !== link.expectedVersion || item.description !== link.expectedDescription || selection.version !== link.expectedEventDishVersion)
+        throw new Error("Packing item or menu line changed since source review");
+      // Existing template ownership requires its own capacity/servings repair.
+      if (item.listedAt == null || item.dishContainerId != null || item.followsDishServings === true ||
+        item.eventDishId != null || item.dishId != null || item.associationSource != null)
+        throw new Error("Packing item already has a relationship or is not a listed import");
+      receipt.items.push({ itemId: item._id, eventDishId: selection._id, dishId: dish._id, sourceReference: link.sourceReference, before: item });
+      await ctx.runMutation(api.mutations.PackListItem_restoreImportedAssociation, {
+        docId: item._id, eventDishId: selection._id, dishId: dish._id,
+        expectedDescription: link.expectedDescription, expectedVersion: link.expectedVersion, expectedPackListVersion: args.expectedVersion,
+        expectedEventVersion: args.expectedEventVersion, expectedEventDishVersion: link.expectedEventDishVersion,
+        sourceReference: link.sourceReference,
+      });
+      receipt.changed++;
+    }
+    await writeMaterializationReceipt(ctx, tenantId, "packingAssociationRepair", args.operationKey, args, receipt);
+    return { changed: receipt.changed, recovered: false };
+  },
+});
+
 /** Correct reviewed TPP fluid-ounce labels without changing physical quantities. */
 export const reconcileImportedPackingFluidOunces = mutation({
   args: {

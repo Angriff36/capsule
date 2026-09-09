@@ -507,3 +507,12 @@ Re-read full objective and current command/generation owners. Previous turn's re
 CLI saved-snapshot preview produces 1.3125,10.4375,10.4375,20.875,1.3125 cups, preserving physically packed quantities by the same factor. Preview hash 8642dad9d4623636087daf7ad349be92899e32818807d0cec42119c6c480c7d4. Actual subprocess negative/replay qualification passed; existing generated-command fluid qualification passed; existing165files/1444tests and typecheck passed. Details and apply/readback workflow in packing-source-reconciliation.md. No authored tests added; no production writes or deployment. Full goal remains active, including actual affected-data repair after release.
 
 Independent gpt-5.6-sol final APPROVE after adding listedAt to readback preservation and synchronizing the new preview hash. Bounded CLI/source checkpoint only; authenticated apply remains unverified.
+
+
+## 2026-09-09: source-owned packing association restoration
+
+Previous turn was verified progress: b6247d17 packing-fluid CLI pushed. Re-read full goal/current owners. Joined source-qualified unique parent names to exact Ashley menu-line names: 141 packing rows across15 menu lines (initial verbal151 count corrected). Retained50 non-menu contexts,27 ambiguous,16 unmatched rows for their proper reconciliation; no array-order guessing.
+
+Added reviewed source/version/PDF-evidence payload in recipes/ashley-packing-associations.json and atomic replay-safe association repair. Initial raw write failed3 integration guards; moved writes to new Manifest restoreImportedAssociation command and regenerated via isolatedBuilder, preserving guard requirements. Independent review identified removed-menu lines and direct-command description/provenance protection; fixed both source and authored orchestration and qualified both access paths. The generated command changes relationships/provenance only, preserving physical quantities/history; receipts preserve original rows internally. Actual two-item safety matrix and full141-row/15-menu source-derived fixture passed, including no-write replay. No production writes or deployment; full goal remains active.
+
+Final verification:165 existing test files/1445 tests passed (one new generated command-contract check emitted by Builder), typecheck passed, ownership ledger check passed. Independent gpt-5.6-sol final APPROVE after source-owned command and review corrections. Bounded branch checkpoint only; live repair and full goal/release verification remain required.

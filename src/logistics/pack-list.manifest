@@ -235,6 +235,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property productionBatchId: uuid?
   // Internal source evidence for a reviewed correction of imported unit labels.
   property unitCorrectionSource: string?
+  property associationSource: string?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -346,6 +347,24 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     mutate eventDishId = eventDishId
     mutate followsDishServings = followsDishServings
     mutate containerServings = containerServings
+  }
+
+  // Restore a reviewed menu association without inventing container capacity.
+  command restoreImportedAssociation(dishId: uuid, eventDishId: uuid, expectedDescription: string, expectedVersion: int, expectedPackListVersion: int, expectedEventVersion: int, expectedEventDishVersion: int, sourceReference: string) {
+    guard user.role == "owner" or user.role == "admin" or user.role == "system"
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.version == expectedVersion
+    guard self.packList != null and self.packList.deletedAt == null and self.packList.version == expectedPackListVersion
+    guard self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    guard self.packList.event != null and self.packList.event.deletedAt == null and self.packList.event.version == expectedEventVersion
+    guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    guard self.dishId == null and self.eventDishId == null and self.dishContainerId == null and self.followsDishServings != true and self.associationSource == null
+    guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == dishId and item.deletedAt == null and item.removedAt == null and item.version == expectedEventDishVersion)) == 1
+    constraint associationSourceRequired: length(trim(sourceReference)) > 0 "The original packing association source is required"
+    constraint associationDescriptionMatches: self.description == expectedDescription "Packing description changed since source review"
+    mutate dishId = dishId
+    mutate eventDishId = eventDishId
+    mutate associationSource = sourceReference
   }
 
   // Legacy TPP Oz - Fld was imported as the mass unit ounce. This repair is
