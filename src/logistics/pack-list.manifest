@@ -208,6 +208,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // Set when the line was generated from a DishContainer, so re-opening or
   // re-running the pack cascade updates the same line instead of duplicating.
   property dishContainerId: uuid?
+  property eventDishId: uuid?
+  property followsDishServings: boolean?
+  property containerServings: int?
   property productionBatchId: uuid?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
@@ -219,15 +222,18 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo dishContainer: DishContainer fields [tenantId, dishContainerId] references [tenantId, id]
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
 
-  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity > 0) "Listed pack items require a description and positive required quantity"
+  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Listed pack items require a description and nonnegative required quantity"
   constraint itemPackedNonnegative: self.packedQuantity >= 0 "Packed quantity cannot be negative"
-  constraint itemPackedNotOver: self.packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+  // Packed is an observed fact; a later plan reduction can leave surplus.
+  computed surplusQuantity: decimal(12, 4) = max(0, self.packedQuantity - self.requiredQuantity)
 
   transition status from "pending" to ["listed"]
   transition status from "listed" to ["packed", "missing"]
-  transition status from "packed" to []
+  transition status from "packed" to ["listed"]
   transition status from "missing" to []
 
   // Match the parent PackList: managers can compose package supply lists.
@@ -272,6 +278,31 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
       unit: unit
       status: "listed"
     }
+  }
+
+  command ensureContainer(packListId: uuid, dishContainerId: uuid, eventDishId: uuid, dishId: uuid, description: string, quantityServings: number, unit: UnitOfMeasure) {
+    guard self.deletedAt == null
+    // Generated lines must retain their original event and container references.
+    constraint containerReferencesMatch: self.packListId == packListId and self.dishContainerId == dishContainerId and self.eventDishId == eventDishId and self.dishId == dishId "Container references must match the packing line"
+    guard self.packList != null and self.dishContainer != null and self.eventDish != null
+    constraint containerEventMatch: self.packList.eventId == self.eventDish.eventId and self.eventDish.dishId == dishId and self.dishContainer.dishId == dishId "Container and menu line must belong to this event and dish"
+    compute eligible = self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    compute planned = quantityServings > 0 ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    mutate description = self.listedAt == null ? description : self.description
+    mutate unit = self.listedAt == null ? unit : self.unit
+    mutate followsDishServings = self.followsDishServings != null ? self.followsDishServings : true
+    mutate requiredQuantity = eligible and self.followsDishServings != false ? planned : self.requiredQuantity
+    mutate containerServings = quantityServings
+    mutate status = self.listedAt == null ? "listed" : (eligible and self.followsDishServings != false and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status)
+    mutate listedAt = self.listedAt != null ? self.listedAt : now()
+  }
+
+  command syncContainerServings(quantityServings: number) {
+    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    compute planned = quantityServings > 0 and self.dishContainer != null ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    mutate requiredQuantity = eligible ? planned : self.requiredQuantity
+    mutate containerServings = eligible ? quantityServings : self.containerServings
+    mutate status = eligible and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status
   }
 
   command markPacked(packedQuantity: decimal(12, 4)) {
@@ -335,6 +366,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint adjustQuantityAbovePacked: requiredQuantity >= self.packedQuantity "Required quantity cannot be below packed quantity"
     compute previousRequired = self.requiredQuantity
     mutate requiredQuantity = requiredQuantity
+    mutate followsDishServings = false
     emit PackListItemQuantityAdjusted {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -474,3 +506,12 @@ on EventApproved run PackList.open
     eventId: payload.eventId
     name: "Event pack list"
   }
+
+
+on EventDishServingsAdjusted fanOut PackListItem where eventDishId = payload.eventDishId
+  run syncContainerServings
+  params { quantityServings: payload.quantityServings }
+
+on EventDishRemoved fanOut PackListItem where eventDishId = payload.eventDishId
+  run syncContainerServings
+  params { quantityServings: 0 }

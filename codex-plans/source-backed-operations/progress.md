@@ -169,3 +169,15 @@ Recipe repair previously skipped an existing matching DishTask after checking qu
 
 Real-source runtime reproduce-existing-template-link.ts starts with an unlinked raspberry dressing template plus an imported event prep row. Explicit prepLinks adopts that same row (one task, same ID), preserves both template and event chef notes, connects it to the measured component, and verifies all eight source ingredient totals and prep at167/334 servings. Evidence existing-template-link-runtime.log. Full suite passes; final typecheck/review pending. This closes another part of #310 without any production write or UI completion claim.
 - Final typecheck passed; independent gpt-5.6-sol review APPROVE. Full suite165 files/1436 tests passes. Resume section in task_plan.md refreshed to current source/implementation state and full remaining scope.
+
+## 2026-09-09 — container packing synchronization in progress
+
+Issue #323: https://github.com/Angriff36/capsule/issues/323. Generated container lines stayed at four after servings changed from167 to300 with a synthetic50-serving capacity (expected six). The capacity is a runtime fixture, not an operational recommendation.
+
+Uncommitted Manifest repair adds event-dish linkage, automatic/manual quantity intent, repeatable container materialization, serving/removal synchronization, retired-template filtering, and preserves physical packed quantities when plans shrink. A shortage reopens a packed item to listed. Focused scratch runtime proves four-to-six scaling, repeat reuse, packed-count preservation, reopening, manual override, and retired templates omitted on a new list.
+
+Regeneration initially failed on ambiguous number property; containerServings now uses int. Then full tests caught loss of createViaAddItem: Manifest initialization selection ranks required-field mutation footprint, not command order. Removing redundant FK mutations from ensureContainer restored the original generated API. Fresh suite passes165 files/1439 tests; typecheck running at this entry. Reviewer first REJECTed missing API and has been asked to re-review corrected tree. Nothing committed, applied to production or released in this packing slice.
+
+Continue before packaging this repair: qualify removal/zero and duplicate menu lines, preserve historical/dispatched records, migrate existing packing links without duplicates, complete additions/catalog-change propagation and parent readiness. Inspect retired-template behavior for existing lists and permission/cascade behavior for logistics roles. Full UI/output/data/release goal remains incomplete.
+
+Packing checkpoint follow-up: typecheck passed. Extended actual-runtime checks pass distinct event-dish lines for the same dish, zero servings, restoration and removal to zero. gpt-5.6-sol independently APPROVED the corrected bounded diff after verifying createViaAddItem restoration. This is not whole-branch/release approval. Evidence: packing-sync-runtime.log, packing-sync-tests.log and packing-sync-typecheck.log in ignored operations-source-study scratch.
