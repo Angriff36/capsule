@@ -33,6 +33,15 @@ Implemented checkpoints cover serving intent/zero quantities, compatible units, 
 
 ## Resume next
 
+Immediate integration checkpoint: Manifest3.6.51 is published with the reviewed
+transactional event-handler option (PR78, full local and remote gates, fresh
+registry-package proof). Capsule still uses3.6.50 and the old serving fan-out.
+Consume3.6.51 in Capsule and its isolated Builder, wire remaining-prep
+reconciliation automatically, and qualify generated serving/headcount commands
+without a separate follow-up mutation. Preserve historical prep and coordinate
+manual sync against the same backend calculations. See the latest progress.md
+entry for exact commits, proof, and the outstanding whole-goal boundaries.
+
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 
 Unresolved source conflicts include sauce Gruyere/cornstarch units, asparagus Parmesan quantity, chicken portion/yield, missing bruschetta tomato amounts, and equipment-dependent oil/infusion-kit quantities. Investigate corroborating material; do not invent measurements or classify every work step as a component. Owner clarification on sauce/Parmesan was requested; no answer recorded. Salad gorgonzola is now source-resolved as5.21875lb at167servings (see ashley-recipe-evidence.md); walnut candying method and confirmed finished yield remain missing, with owner method clarification pending. Four direct salad ingredients and all eight linked dressing ingredients pass actual runtime scaling at167/334; the full salad remains unapplied.
