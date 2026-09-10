@@ -74,9 +74,9 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   transition status from "no_show" to []
   transition status from "unassigned" to []
 
-  default policy eventAssignmentRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read event assignments"
-  default policy eventAssignmentWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write event assignments through commands"
-  default policy eventAssignmentExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute event assignment commands"
+  default policy eventAssignmentRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read event assignments"
+  default policy eventAssignmentWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write event assignments through commands"
+  default policy eventAssignmentExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute event assignment commands"
 
   command assign(
     eventId: uuid,
@@ -115,12 +115,14 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A linked Clerk subject and a Person ID are different identifiers.
+  // Only unlinked legacy identities retain the old Person-ID subject path.
   command confirm() {
     guard self.status == "assigned"
     guard self.assignedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "confirmed"
     mutate confirmedAt = now()
@@ -140,7 +142,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.assignedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "checked_in"
     mutate checkedInAt = now()
@@ -160,7 +162,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.checkedInAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "checked_out"
     mutate checkedOutAt = now()

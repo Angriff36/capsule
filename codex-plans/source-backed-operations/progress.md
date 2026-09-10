@@ -1,5 +1,42 @@
 # Progress
 
+## 2026-09-10 linked staff self-service
+
+The shared scheduling prerequisite is committed/pushed as
+631af4ce2541343dc0465aebdd3c7b8b785d6516, exact-range gpt-5.6-sol APPROVE.
+This continuation repairs #359's real Clerk identity failure and own-record
+policy denials in Shift, Assignment, TimeRecord, dated/recurring availability
+and schedule notices. Linked staff can perform their own work while existing
+workforce access and manager commands retain their boundaries. An unlinked
+legacy identity preserves its existing direct-ID path; a linked Person wins.
+The base staff role's workforceSelfAccess action keeps these own-record paths
+inside the existing organization workforce switch. A reproduced bypass through
+staffAccess was corrected before committing. Disabled-domain reads, lifecycle
+commands and governed creates now fail for all seven crew roles and admin,
+with no data/event writes; re-enabling restores access. The switch fixture is
+isolated because generated first registration remains broken in #360.
+
+Schedule acknowledgement now follows the current Person link. My Day removes
+its redundant publication-time subject gate, including its stale request to
+ask a manager for a link that already exists. No palette, type, radius or
+layout changes were made; DESIGN.md's My Day composition remains authoritative.
+
+Seven crew roles pass the actual generated-runtime qualification. Other-user
+writes, private reads, manager-only actions, foreign/unlinked identities,
+relinking, old-subject revocation and missing notice snapshots are covered.
+Actual MyDayPage/generated wrappers with runtime-snapshot transport pass at
+390/900/1440, including linked Person/Shift/Event clock-in arguments, lifecycle,
+schedule acknowledgement, conflict retry, keyboard activation and no overflow.
+See staff-self-service.md and staff-self-service-qualified.json/browser log.
+
+Final `bun run check` after the capability correction passed (exit 0;
+165 files/1,458 tests), recorded in check-staff-self-service-switch-final.log.
+Independent gpt-5.6-sol APPROVE covers the corrected code and My Day design;
+commit and branch push follow. This is not live Clerk/production proof.
+#358/#361 staffing and owner coordination, purchasing,
+source/data reconciliation, reports/print, release and affected-data proof all
+remain part of the full goal. No production writes or deployment occurred.
+
 ## 2026-09-10 shared shift scheduling transaction
 
 The timing checkpoint b33b79dde0bf80e032799cb0fdd2984db4f81adf remains

@@ -2,14 +2,18 @@
 
 ## Latest continuation (2026-09-10)
 
-The service/setup/travel/load/return/unload timing planner now persists its
-inputs on Event and calculates/materializes shared timeline milestones. The
-source worked example and preservation checks pass; see progress.md for the
-final gate/review/checkpoint state. Continue the connected staffing/shift and
-existing-data work next, including NLT/source label reconciliation. The full
-goal still includes purchasing, source/data repairs, print/reports, release and
-authenticated production verification. Do not treat calculated timeline blocks
-as proof that staffing assignments or shifts have the correct schedule.
+Linked staff attendance, time records, availability and schedule notices now
+use the trusted Person link, including current-link acknowledgement in My Day.
+The own-record capability preserves the existing organization workforce switch.
+See progress.md and staff-self-service.md for the final gate/review/checkpoint
+state and the limits of isolated runtime/browser qualification.
+
+Continue calculated crew-window propagation and owner-assignment reconciliation
+(#358/#361), then the connected purchasing and existing-data work. The full goal
+still includes source/data repairs, print/reports, release and authenticated
+production verification. Calculated timeline blocks do not prove assignments
+or shifts have the correct schedule. NLT means No Later Than in the training
+source; conflicting source timing and staff windows still need reconciliation.
 
 ## Goal and authority
 
@@ -147,3 +151,14 @@ typecheck pass. Full check passed (165 files/1,458 tests) and independent
 gpt-5.6-sol APPROVE received. Finish commit and branch push.
 Then continue #358's actual staffing/timing orchestration and #359's real-user
 My Day path. Preserve the full original goal, data repair and production proof.
+# Current continuation: linked staff attendance and availability
+
+Previous checkpoint 631af4ce was committed/pushed, full-check green and
+independently approved. Current source repairs #359 across own Shift,
+Assignment, TimeRecord, availability and schedule notice paths. Seven real
+linked crew roles and My Day's generated action wiring pass runtime/browser
+qualification, including current-link acknowledgement and preservation of the
+organization workforce switch through workforceSelfAccess. Final full check
+passed (165 files/1,458 tests, exit 0); independent gpt-5.6-sol APPROVE covers
+the correction and design. Commit/push, then continue #358/#361 crew-window and owner
+reconciliation. The full operations/data/release objective remains active.

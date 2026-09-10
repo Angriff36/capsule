@@ -774,9 +774,6 @@ export function MyDayPage() {
                       </p>
                       <ul className="mt-3 flex flex-col gap-3">
                         {myScheduleNotices.map((notice) => {
-                          const canAcknowledge =
-                            notice.recipientAuthSubjectId != null &&
-                            notice.recipientAuthSubjectId === user?.id;
                           return (
                             <li
                               key={notice._id}
@@ -811,7 +808,7 @@ export function MyDayPage() {
                                   Acknowledged {dayLabel(notice.acknowledgedAt)}{" "}
                                   at {timeLabel(notice.acknowledgedAt)}
                                 </p>
-                              ) : canAcknowledge ? (
+                              ) : (
                                 <button
                                   className={BLOCK_BTN}
                                   data-testid="acknowledge-schedule-action"
@@ -832,11 +829,6 @@ export function MyDayPage() {
                                     ? "Acknowledging…"
                                     : "Acknowledge schedule"}
                                 </button>
-                              ) : (
-                                <p className="schedule-notice-link-help">
-                                  Ask a manager to link this staff profile to
-                                  your sign-in before acknowledging.
-                                </p>
                               )}
                             </li>
                           );

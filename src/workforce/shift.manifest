@@ -57,9 +57,9 @@ entity Shift mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
   transition status from "no_show" to []
 
-  default policy shiftRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read shifts"
-  default policy shiftWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write shifts through commands"
-  default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute shift commands"
+  default policy shiftRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read shifts"
+  default policy shiftWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write shifts through commands"
+  default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute shift commands"
 
   command schedule(
     personId: uuid,
@@ -115,12 +115,14 @@ entity Shift mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Linked staff act through user.personId. Preserve the existing bootstrap
+  // identity convention only when no linked Person overrides that identity.
   command start() {
     guard self.status == "scheduled"
     guard self.scheduledAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "started"
     mutate startedAt = now()
@@ -141,7 +143,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.startedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "completed"
     mutate completedAt = now()
@@ -284,9 +286,9 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
   constraint weeklyScheduleHasShifts: self.publishedAt == null or self.shiftCount > 0 "Published schedules require at least one shift"
   constraint weeklyScheduleHasSummary: self.publishedAt == null or length(trim(self.shiftSummary)) > 0 "Published schedules require a staff summary"
 
-  default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read schedule notices"
-  default policy weeklyScheduleNoticeWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write schedule notices through commands"
-  default policy weeklyScheduleNoticeExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute schedule notice commands"
+  default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read schedule notices"
+  default policy weeklyScheduleNoticeWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write schedule notices through commands"
+  default policy weeklyScheduleNoticeExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute schedule notice commands"
 
   command publishSchedule(
     personId: uuid,
@@ -352,8 +354,7 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
     guard self.acknowledgedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.recipientAuthSubjectId != null
-    guard self.recipientAuthSubjectId == user.id
+    guard self.personId == user.personId or (user.personId == null and self.recipientAuthSubjectId != null and self.recipientAuthSubjectId == user.id)
     mutate acknowledgedAt = now()
     emit WeeklyScheduleAcknowledged {
       noticeId: self.id

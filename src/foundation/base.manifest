@@ -14,6 +14,9 @@ tenant tenantId : string from context.tenantId
 
 role staff {
   allow staffAccess
+  // Own workforce records remain subject to the organization's workforce switch.
+  // Each self-service policy also requires the authenticated Person link.
+  allow workforceSelfAccess
 }
 
 role kitchen_staff extends staff {

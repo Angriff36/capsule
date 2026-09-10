@@ -1,5 +1,12 @@
 # Runtime gaps and repair evidence
 
+Current checkpoint: linked staff self-service and the organization workforce
+switch correction. See progress.md and staff-self-service.md for current
+verification/review state; earlier checkpoint notes below retain their original
+pending statements. Staffing propagation (#358), owner reconciliation (#361),
+capability registration (#360), affected-data repairs and production proof
+remain open work.
+
 ## Latest timing checkpoint (2026-09-10, issue353)
 
 Persistent service/setup/load/checked-travel/cleanup/return/unload planning is
@@ -335,3 +342,18 @@ untimed-battle-print-page1.png under .artifacts/operations-source-study.
 - #360: first-time OrganizationCapabilitySetting_createViaRegister rejects
   its own required seeded capability with Guard 1 failed. The isolated shift
   capability-switch fixture does not qualify that broken registration path.
+# 2026-09-10 linked staff self-service repair
+
+#359 source guards and own-record policies are repaired for Shift,
+EventAssignment, TimeRecord, AvailabilityWindow, RecurringAvailability and
+WeeklyScheduleNotice. Seven linked crew roles pass actual generated-runtime
+flows. My Day's acknowledgement gate now follows the current Person link;
+rendered actions and generated argument wiring pass at 390/900/1440 with
+isolated runtime snapshots. The own-record action now uses workforceSelfAccess
+so the existing organization switch still applies; seven crew roles and admin
+pass disabled/read/write/rollback/re-enable runtime checks. The setting is an
+isolated raw fixture because #360's generated registration is still broken.
+The final capability-correction full check passed (165 files/1,458 tests,
+exit 0), with independent gpt-5.6-sol APPROVE. Branch checkpointing,
+release and authenticated production proof remain. #358 and #361 are still
+required for calculated timing to reach assignments/shifts idempotently.
