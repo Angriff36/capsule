@@ -48,6 +48,12 @@ export function readableRecipeAmount(quantity: number, unit: string): string {
   const scale = unit === "quart" && quantity < 1 ? 32 : 1;
   const amount = quantity * scale;
   let copy = String(Number(amount.toFixed(4)));
+  if (amount > 0 && copy === "0") {
+    copy = amount.toLocaleString("en-US", {
+      maximumSignificantDigits: 4,
+      useGrouping: false,
+    });
+  }
   for (const denominator of [1, 2, 3, 4, 8, 16, 32]) {
     const numerator = Math.round(amount * denominator);
     if (

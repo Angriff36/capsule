@@ -68,6 +68,15 @@ this branch repair; no production deployment or affected-data repair is claimed.
 Resume the coordinated rescheduling/week/stock work above, with explicit
 reservations and expiry in the allocation analysis.
 
+Component recipe links now render recorded method steps, distinguish loading
+from missing recipes, and preserve small scaled measurements. Full check passes
+(165 files/1455 tests), independent gpt-5.6-sol approves, and actual prep-link
+navigation plus component/ingredient pages pass isolated-data browser checks at
+390/900/1440px. Issues347/348 remain open through release/live verification.
+Continue the complete recipe/data flow, including event-quantity context and
+authenticated usable links; this does not resolve the remaining source conflicts,
+affected-data migration, purchasing calendar/allocation or final release work.
+
 
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 

@@ -4131,7 +4131,7 @@
 
 /* Collapse component line form/list by Composition column width, not viewport —
    the work grid is already 2-col from 960px while the form only stacked at 767. */
-@container culinary (max-width: 640px) {
+@container culinary (max-width: 800px) {
   .culinary-line-form {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }

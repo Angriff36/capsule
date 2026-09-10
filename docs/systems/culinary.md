@@ -116,6 +116,7 @@ All culinary entities have generated list/detail/index queries and command hooks
 - ordered preferred-vendor management on Ingredient detail, with the first vendor feeding automatic weekly purchasing and the tenant vendor as fallback;
 - a vendor-filterable confirmed purchase-price ledger on Ingredient detail, plus newest-receipt pricing in the live Component cost panel;
 - a compact Component working document for draft revision, lifecycle commands, ingredient lines, method, and Dish usage;
+- Component detail reads live `ComponentStep` records in method order as well as free-text instructions. Identical prose is not repeated over the same steps; distinct prose and recorded step durations remain visible. Ingredients and method have explicit loading states. Recipe scaling is a local preview, accepts fractional and zero yields, and uses readable measurements without turning a small positive quantity into zero. Prep-link navigation, loading/empty/prose/step variants, scaling/reset and sibling ingredient-detail layout are qualified with isolated generated-runtime data at 390/900/1440px; authenticated production behavior still needs verification.
 - generated-metadata lifecycle offers for Component, Ingredient, Dish, and Menu;
 - an Event menu composer that selects, adjusts, and removes EventDish records;
 - a component import workbench at `/kitchen/components/import` (paste/files → parse → review → finalize).

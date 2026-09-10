@@ -200,3 +200,15 @@ Qualification covers state/role matrices, tenant/deleted-row exclusion, repeated
 cleanup, live-event rejection, rollback and combined stock/purchasing/packing/
 payment records. See progress.md for final check/review/commit state. Reschedule
 and shared-stock/allocation defects remain unresolved. No production changes.
+
+### Component links hide methods and scaled amounts, 2026-09-10 (#347/#348)
+
+The actual component detail page ignored ComponentStep records and displayed
+"No method recorded" for a complete structured method. Two-decimal scaling
+also displayed small positive measurements and scale factors as zero. Both are
+reproduced with the source-qualified eight-ingredient Raspberry Balsamic recipe.
+Current authored UI renders live ordered steps plus distinct prose/durations,
+keeps loading separate from missing records, and formats positive amounts without
+zeroing them. See progress.md for browser/precision, independent-review and final
+gate evidence. Prep navigation and sibling ingredient detail pass isolated-data
+checks at390/900/1440px; authenticated live recipe/data verification remains.

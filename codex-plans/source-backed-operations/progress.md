@@ -908,3 +908,71 @@ No Capsule production writes or deployment. These repairs do not complete the
 goal or resolve purchasing week/
 timezone, allocation/expiry, rescheduling, affected-data repair, staffing,
 timeline, My Day, usable recipe links or reports.
+
+## 2026-09-10: usable component methods and scaled measurements (#347/#348)
+
+Previous goal turn made authoritative progress: eaf2c89c was committed/pushed,
+full check passed, and independent gpt-5.6-sol approved its exact range. Re-read
+the full goal and rechecked this clean branch. Rescheduling remains coupled to
+the unresolved buying-week/timezone and shared-stock priority choices; no new
+business rule or date-only purchasing repair was invented. Continued the required
+recipe-link workflow while those choices remain pending.
+
+Actual generated Component draft/ingredient/step commands created the source's
+three-quart Raspberry Balsamic Vinaigrette with eight measured ingredients and
+its two method sentences as ordered ComponentStep rows. Added steps in reverse
+insertion order and removed a third qualification step; a second component owns
+an unrelated method. Generated queries return the two live scoped steps, but
+the existing ComponentDetailPage only read Component.instructions and said
+"No method recorded" after actual EventPrepList keyboard navigation. Baseline
+at1440/390px proves issue347: https://github.com/Angriff36/capsule/issues/347.
+
+The page now reads and orders live component steps, preserves separately recorded
+prose/durations, and suppresses prose only when its complete whitespace-normalized
+text equals the ordered steps. Loading method/ingredient queries show loading,
+not absent data. Empty and prose-only components remain supported.
+
+Source-recipe scaling also exposed issue348:
+https://github.com/Angriff36/capsule/issues/348. At0.01quart of a3quart recipe,
+the one-tablespoon lemon juice line incorrectly read0.00tablespoon and the
+factor read0.00. Shared readable amounts and meaningful factor precision now
+show0.0033tbsp and0.003333. Fractional/zero yield previews and reset make no
+record writes. The shared formatter retains positive values below its usual
+four-decimal display threshold; eight exact examples and80 positive-value cases
+pass. This changes presentation only, not stored recipe quantities or methods.
+
+Desktop inspection found ingredient names spilling into preparation notes.
+The existing Composition-column collapse now applies below800px, and component
+ingredient labels wrap without changing the shared default truncation behavior.
+The sibling IngredientDetailPage uses the same list CSS and was inspected too.
+Actual-page browser checks pass at1440/900/390px: ordered source steps, exact
+prep link/keyboard navigation, missing/prose/duplicate/distinct/duration states,
+independent loading, scaled/zero/reset quantities, no writes, no intersecting
+ingredient-row regions and no horizontal overflow. Both pages' screenshots
+were captured. Fixtures use generated-runtime records with substituted hooks
+and a fixture-only provider; this is not authenticated production proof.
+
+Evidence under .artifacts/operations-source-study:
+
+- qualify-component-method-data.ts and component-method-fixture.json
+- qualify-component-method-browser.mjs and component-method-baseline/qualified.json
+- component-method-baseline/fixed-{1440,390}.png and fixed-900.png
+- component-method-ingredient-{1440,900,390}.png
+- component-scaling-baseline.json and qualify-recipe-display-precision.ts
+
+The first fixture bring-up needed its Convex provider, and Vite cached the ignored
+fixture module until its URL revision changed. An inline HTML proxy also failed;
+the fixture uses a versioned script URL. Those were qualification-fixture failures,
+not product regressions, and the final complete browser matrix passed.
+
+DESIGN.md (front matter authoritative), culinary system instructions, and stored
+recipe desktop/mobile references were read before UI changes. Independent
+gpt-5.6-sol read DESIGN.md and approved the four-file implementation, finding no
+new policy friction or visual-language replacement. Full `bun run check`
+passed with exit0:165 files/1455 tests, typecheck, formatting, secrets,
+ownership/generation, integration/design checks, coverage, Vite build and
+baseline decay. Log:check-component-method.log. Final sibling qualification
+at390/900/1440px passed; current component desktop and ingredient mobile
+screenshots were visually inspected after the layout change.
+No authored tests were added or expanded. No production writes, data repair,
+Capsule deployment or full-goal completion is claimed.
