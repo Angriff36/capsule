@@ -1,5 +1,37 @@
 # Progress
 
+## 2026-09-10 query-name correction published and regenerated
+
+Manifest PR83 passed Linux/Windows/security CI34535697506 and merged as5d9e9b6.
+Release34536182596 succeeded; registry3.6.55 and its gitHeadce7febbe are verified.
+Capsule pins3.6.55 exactly, its isolated Builder resolves the same version, and
+normal regeneration passed. The consumer diff has gpt-5.6-sol APPROVE and the
+My Day generated-runtime qualification passes against the renamed query. Full
+Capsule check36750 completed exit0:165 files /1,468 tests and all remaining gates
+passed (`check-query-name-limit-3.6.55.log`). The app worktree remains on11451fe8
+until the replacement checkpoint is saved, then its full backend registration
+and authenticated routes will be exercised. No Capsule production write/deploy.
+This supersedes the upstream-pending state in the following historical entry.
+
+## 2026-09-10 authenticated app bring-up exposes a native query-name limit
+
+My Day checkpoint11451fe8 is committed, pushed and verified on origin; issue364
+is closed with registry3.6.54 consumption/full-gate evidence. An isolated app
+worktree on that exact commit now owns local Convex3216/3217 and its development
+auth/encryption configuration. The first real function push fails because the
+new Qualification indexed-query name is66 characters while Convex permits64.
+This was invisible to the passing repository gate and snapshot browser harness.
+Issue365 records the actual backend error and source owner.
+
+The source fix in isolated Manifest worktree convex-index-query-names has four
+red/green regressions,4,523 passing tests, all local gates, native backend
+registration/query proof and independent gpt-5.6-sol APPROVE. Sourcea65cd42 and
+docs673d53d are pushed in Manifest PR83, awaiting CI34535697506. Registry
+publication and Capsule consumption are next. Four development fixture identities
+and an encrypted empty-backend bootstrap are prepared; authenticated application
+flows have not run. No Capsule production write or deployment. See
+authenticated-staffing-my-day.md for exact evidence and remaining full scope.
+
 ## 2026-09-10 My Day integrated checkpoint passes all required checks
 
 Manifest PR82 release run34532756346 succeeded and published3.6.54. Capsule pins
