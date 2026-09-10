@@ -97,3 +97,17 @@ Issue https://github.com/Angriff36/capsule/issues/335 records the distinct remai
 ### Completed-prep implementation update, 2026-09-10
 
 Client checkpoint4bebef5e now carries actual completed quantities, maintains one pending work balance per exact menu-line/recipe-step group, and keeps full ingredient demand separate. The subsequent server seam culinaryOperations.reconcileEventPrepWorkBalance and source-owned PrepTask.reconcileRemainingWork qualify the same arithmetic transactionally, preserve underway work, and handle recorded prerequisite dependencies. See the latest progress.md entry for runtime scenarios and review corrections. Both are partial integration checkpoints: normal generated serving reactions still need to invoke the balance path automatically, callers need to present unresolved steps, and real concurrency/cancellation/recipe-change/live-data qualification remains. No production repair or release has occurred;335 stays open.
+
+
+### Automatic prep integration update, 2026-09-10
+
+Commit74df2dc1 supersedes the missing-serving-handler/caller portions of the prior
+entry. Published Manifest3.6.51 now invokes the stored-state reconciler from
+actual generated serving/headcount commands. Manual UI sync shares it; a reactive
+planner query exposes unresolved steps on the event prep tab and both kitchen
+board layouts. MCP add retries preserve subsequent edits. Obsolete
+PrepTask.syncServings is removed. Full bun run check and independent gpt-5.6-sol
+review pass for this checkpoint. Actual command, rollback, stale-target/MCP replay,
+unit and dependency evidence is recorded in progress.md. This does not complete
+cancellation/substitution/recipe-change/affected-data/deployed qualification or
+issue335. No Capsule production write or release has occurred.
