@@ -3,6 +3,15 @@
 
 ## Latest staffing state (2026-09-10)
 
+Removal checkpoint ca44b95e is committed and pushed, with the full gate passing
+1,466 tests. Replacement/reopening is now implemented with runtime and three-width
+component browser proof; review caught and verified correction of lost training
+and certification requirements. The current bounded verdict is gpt-5.6-sol
+APPROVE, and full gate31977 passed all checks with 1,468 tests. See the newest progress.md
+entry and staffing-replacement.md for current evidence. This supersedes older
+statements below about staffing UI/removal still being unimplemented. Live-data
+repair, complete My Day eligibility, authenticated app proof and release remain.
+
 The computed-helper blocker below is repaired upstream, published as3.6.53,
 consumed in Capsule/isolated Builder and regenerated normally. Full check89321
 passed (1,463 tests) before subsequent swap/history changes. Manual source-group

@@ -4,6 +4,7 @@ import {
   useCreateEventStaffNeed,
   useEventAssignmentUnassign,
   useEventStaffNeedCancel,
+  useEventStaffNeedChangeCoverage,
   useEventStaffNeedClaim,
   useEventStaffNeedFill,
   useEventStaffNeedReleaseClaim,
@@ -68,11 +69,15 @@ export function EventStaffingTab({ eventId }: Props) {
   const fillNeed = useEventStaffNeedFill();
   const releaseClaim = useEventStaffNeedReleaseClaim();
   const cancelNeed = useEventStaffNeedCancel();
+  const changeCoverage = useEventStaffNeedChangeCoverage();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [needPersonIds, setNeedPersonIds] = useState<Record<string, string>>(
     {},
   );
+  const [coverageDrafts, setCoverageDrafts] = useState<
+    Record<string, Record<string, string>>
+  >({});
   const { prompt, host } = useActionPrompt(busy != null);
 
   const eventAssignments = useMemo(
@@ -445,6 +450,69 @@ export function EventStaffingTab({ eventId }: Props) {
                     reason,
                   }),
                 );
+              })();
+            }}
+            onChangeCoverage={(need) => {
+              void (async () => {
+                const draft = coverageDrafts[need._id];
+                const values = await prompt.askFields({
+                  title: `Change ${need.role} coverage`,
+                  description:
+                    "Choose another staff member or reopen for volunteers. The role and instructions carry over; recorded work stays with its original staff member.",
+                  fields: [
+                    {
+                      name: "personId",
+                      label: "Cover with",
+                      required: false,
+                      placeholder: "Reopen for volunteers",
+                      defaultValue: draft?.personId,
+                      options: activePeople.map((person) => ({
+                        value: person._id,
+                        label: personLabel(person),
+                      })),
+                    },
+                    {
+                      name: "startsAt",
+                      label: "New start (optional)",
+                      inputType: "datetime-local",
+                      required: false,
+                      defaultValue: draft?.startsAt,
+                      helper:
+                        "Leave both times blank to reuse the connected coverage windows, including split shifts.",
+                    },
+                    {
+                      name: "endsAt",
+                      label: "New end (optional)",
+                      inputType: "datetime-local",
+                      required: false,
+                      defaultValue: draft?.endsAt,
+                    },
+                  ],
+                  confirmLabel: "Save coverage",
+                });
+                if (!values) return;
+                setCoverageDrafts((current) => ({
+                  ...current,
+                  [need._id]: values,
+                }));
+                void run(`changeCoverage:${need._id}`, async () => {
+                  await changeCoverage({
+                    docId: need._id,
+                    version: need.version,
+                    personId: values.personId || undefined,
+                    startsAt: values.startsAt
+                      ? new Date(values.startsAt).getTime()
+                      : undefined,
+                    endsAt: values.endsAt
+                      ? new Date(values.endsAt).getTime()
+                      : undefined,
+                  });
+                  setCoverageDrafts((current) => {
+                    const next = { ...current };
+                    delete next[need._id];
+                    return next;
+                  });
+                });
               })();
             }}
             conflictsFor={conflictsFor}

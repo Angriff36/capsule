@@ -1,5 +1,45 @@
 # Progress
 
+## 2026-09-10 filled-request replacement and reopening after ca44b95e
+
+The removal checkpoint ca44b95e is committed and verified on origin. The next
+change is implemented: managers can replace covered staff or reopen the work
+for volunteers in one generated command. The previous request keeps its owner,
+notes, timestamps and cancellation history; linked new requests retain the
+original role, instructions and manual/split windows. Recorded work stays with
+its original person while default continuation starts at the change time.
+
+Review reproduced a requirement-loss defect in the draft: a qualified person's
+replacement Shift lost its shift type and credential links. The fix freezes the
+requirements per window, resolves the recipient's own valid certification and
+training records, and supplies those records to generated scheduling. Archived
+history retains the requirement; archived children cannot release a consumed
+continuation slot. Unsupported legacy training without a matching shift type
+fails atomically instead of becoming unrestricted work. Existing timing edits
+retain assigned evidence without introducing a new certification-expiry lock.
+
+Runtime replacement/credential qualification and the timing, manual-group, swap,
+shift-only-TimeRecord and removal regressions pass. The real staffing component
+and generated hooks pass replacement/reopening browser qualification at
+1440/900/390: keyboard operation, dismiss, failure/draft retention, exact command
+and time arguments, reopening, history, role controls and no horizontal overflow.
+The final phone prompt and desktop open-request screenshots were inspected.
+An initial browser selector used "Fill" instead of the actual "Fill shift";
+correcting the fixture resolved that timeout without a product change.
+
+Independent gpt-5.6-sol APPROVES the bounded source/UI diff after reading DESIGN.md
+and the required anti-tedium instructions. Full gate31977 completed exit0:
+`bun run check` passed 165 files / 1,468 tests, typecheck, formatting, secrets,
+ownership/proof/integration/design checks, coverage, local build and baseline
+decay. Log: `check-staffing-replacement-final.log`. Existing timing and removal
+browser regressions also pass after the final changes. Only the 12 newly
+referenced ownership baseline blobs belong in this checkpoint; other untracked
+baselines remain untouched. This checkpoint is ready for branch commit/push.
+No new authored tests, Capsule production writes or deployment occurred. Full
+My Day eligibility, affected live-data repair, purchasing allocation/date changes,
+packing/printed outputs, authenticated full-app proof and the authorized release
+remain required under the original active goal. See staffing-replacement.md.
+
 ## 2026-09-10 filled-request removal after checkpoint 8313caa5
 
 Final code gate12645 completed exit0: all of `bun run check` passed, including

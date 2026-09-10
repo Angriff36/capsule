@@ -266,10 +266,20 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   property filledAt: datetime?
   property cancelledAt: datetime?
   property cancellationReason: string?
+  // Continuations retain the old request and link each new coverage window to it.
+  property previousStaffNeedId: uuid?
+  property continuationSlot: int?
+  property coverageContinuedAt: datetime?
+  property coverageReplacementPersonId: uuid?
+  property coverageStartsAt: datetime?
+  property coverageEndsAt: datetime?
+  property coverageWindowsJson: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo claimedBy: Person fields [tenantId, claimedByPersonId] references [tenantId, id]
   belongsTo filledBy: Person fields [tenantId, filledByPersonId] references [tenantId, id]
+  ref previousStaffNeed: EventStaffNeed fields [tenantId, previousStaffNeedId] references [tenantId, id]
+  ref coverageReplacementPerson: Person fields [tenantId, coverageReplacementPersonId] references [tenantId, id]
 
   constraint staffNeedRole: self.postedAt == null or length(trim(self.role)) > 0 "Staff need role is required once posted"
   constraint staffNeedWindow: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "Staff need end must be after its start"
@@ -289,7 +299,10 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     optional description: string,
     optional startsAt: datetime,
     optional endsAt: datetime,
-    optional notes: string
+    optional notes: string,
+    optional previousStaffNeedId: uuid,
+    optional continuationSlot: int,
+    optional followsEventTiming: boolean
   ) {
     guard self.postedAt == null
     guard self.deletedAt == null
@@ -301,8 +314,10 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     mutate description = description
     mutate startsAt = startsAt
     mutate endsAt = endsAt
-    mutate followsEventTiming = startsAt == null and endsAt == null
+    mutate followsEventTiming = followsEventTiming != null ? followsEventTiming : (startsAt == null and endsAt == null)
     mutate notes = notes
+    mutate previousStaffNeedId = previousStaffNeedId
+    mutate continuationSlot = continuationSlot
     mutate status = "open"
     mutate postedAt = now()
     emit EventStaffNeedPosted {
@@ -392,6 +407,41 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     mutate claimedAt = null
     mutate status = "open"
     emit EventStaffNeedReleased {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command changeCoverage(optional personId: uuid, optional startsAt: datetime, optional endsAt: datetime) {
+    guard self.status == "filled" or self.status == "cancelled"
+    guard self.postedAt != null and self.deletedAt == null
+    // Replays must not create another replacement for the same request.
+    guard self.coverageContinuedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    constraint changedCoverageWindow: startsAt == null or endsAt == null or endsAt > startsAt "Coverage end must be after its start"
+    compute wasCancelled = self.status == "cancelled"
+    mutate coverageContinuedAt = now()
+    mutate coverageReplacementPersonId = personId
+    mutate coverageStartsAt = startsAt
+    mutate coverageEndsAt = endsAt
+    mutate status = "cancelled"
+    mutate cancelledAt = self.cancelledAt != null ? self.cancelledAt : now()
+    mutate cancellationReason = wasCancelled ? self.cancellationReason : (personId == null ? "Reopened for coverage" : "Staff member replaced")
+    emit EventStaffNeedCoverageChangeRequested {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command prepareCoverageContinuation(windowsJson: string) {
+    // The callback proves this snapshot matches the connected coverage windows.
+    guard self.status == "cancelled" and self.coverageContinuedAt != null
+    guard self.coverageWindowsJson == null and self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    mutate coverageWindowsJson = windowsJson
+    emit EventStaffNeedCoverageContinuationPrepared {
       staffNeedId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
@@ -546,4 +596,16 @@ event EventStaffNeedCancelled: "event_staff_need.cancelled" {
   tenantId: string
   eventId: string
   reason: string
+}
+
+event EventStaffNeedCoverageChangeRequested: "event_staff_need.coverage_change_requested" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventStaffNeedCoverageContinuationPrepared: "event_staff_need.coverage_continuation_prepared" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
 }

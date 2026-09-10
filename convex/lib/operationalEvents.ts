@@ -11,6 +11,8 @@ import {
   validateEventStaffingReferences, validateEventStaffingTiming,
   applyApprovedEventStaffingSwap, validateEventStaffingSwap,
   removeCancelledStaffNeedCoverage, validateStaffNeedCoverageRemoval,
+  prepareStaffNeedCoverageChange, validatePreparedStaffNeedCoverage, finishPostedStaffNeedContinuation,
+  validateFilledCoverageCredentials,
 } from "./eventStaffingOperations";
 import { validateScheduledShift, validateShiftWindow } from "./shiftSchedulingEvents";
 import {
@@ -25,6 +27,20 @@ export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageChangeRequested") {
+    await prepareStaffNeedCoverageChange(ctx, event.entityId as Id<"eventStaffNeeds">);
+    return;
+  }
+  if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCoverageContinuationPrepared") {
+    await validatePreparedStaffNeedCoverage(ctx, event.entityId as Id<"eventStaffNeeds">);
+    return;
+  }
+  if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedPosted") {
+    await finishPostedStaffNeedContinuation(ctx, event.entityId as Id<"eventStaffNeeds">);
+  }
+  if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedFilled") {
+    await validateFilledCoverageCredentials(ctx, event.entityId as Id<"eventStaffNeeds">);
+  }
   if (event.entity === "Shift" && event.type === "ShiftStaffNeedCoverageRemoved") {
     await validateStaffNeedCoverageRemoval(ctx, event.entityId as Id<"shifts">, event.payload);
     return;

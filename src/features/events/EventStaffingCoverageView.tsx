@@ -16,6 +16,8 @@ export type EventStaffNeedRow = StaffNeedRow & {
   readonly startsAt?: number | null;
   readonly notes?: string | null;
   readonly cancellationReason?: string | null;
+  readonly previousStaffNeedId?: string | null;
+  readonly coverageContinuedAt?: number | null;
 };
 
 export type StaffingConflictSummary = {
@@ -104,6 +106,7 @@ export function EventStaffingCoverageView({
   onFill,
   onReleaseClaim,
   onCancel,
+  onChangeCoverage,
   conflictsFor,
 }: {
   roster: readonly StaffingRosterEntry[];
@@ -121,6 +124,7 @@ export function EventStaffingCoverageView({
   onFill: (need: EventStaffNeedRow, personId: string) => void;
   onReleaseClaim?: (need: EventStaffNeedRow) => void;
   onCancel: (need: EventStaffNeedRow) => void;
+  onChangeCoverage?: (need: EventStaffNeedRow) => void;
   conflictsFor: (
     personId: string,
     windows?: readonly { startsAt?: number | null; endsAt?: number | null }[],
@@ -228,16 +232,31 @@ export function EventStaffingCoverageView({
                       ) : null}
                       {canManage
                         ? coveredNeeds.map((need) => (
-                            <button
+                            <div
                               key={need._id}
-                              type="button"
-                              className="btn btn-ghost btn-sm max-md:min-h-10"
-                              disabled={busy != null}
-                              aria-label={`Remove ${need.role} coverage for ${entry.label}${need.startsAt != null ? ` at ${formatTime(need.startsAt)}` : ""}`}
-                              onClick={() => onCancel(need)}
+                              className="flex flex-wrap justify-end gap-1"
                             >
-                              Remove {need.role} coverage
-                            </button>
+                              {onChangeCoverage ? (
+                                <button
+                                  type="button"
+                                  className="btn btn-ghost btn-sm max-md:min-h-10"
+                                  disabled={busy != null}
+                                  onClick={() => onChangeCoverage(need)}
+                                  aria-label={`Change ${need.role} coverage for ${entry.label}${need.startsAt != null ? ` at ${formatTime(need.startsAt)}` : ""}`}
+                                >
+                                  Change coverage
+                                </button>
+                              ) : null}
+                              <button
+                                type="button"
+                                className="btn btn-ghost btn-sm max-md:min-h-10"
+                                disabled={busy != null}
+                                aria-label={`Remove ${need.role} coverage for ${entry.label}${need.startsAt != null ? ` at ${formatTime(need.startsAt)}` : ""}`}
+                                onClick={() => onCancel(need)}
+                              >
+                                Remove {need.role} coverage
+                              </button>
+                            </div>
                           ))
                         : null}
                     </td>
@@ -439,6 +458,9 @@ export function EventStaffingCoverageView({
                   EventTimelineStaffRoster.personIdForNeed(need) ??
                   need.filledByPersonId;
                 const person = people?.find((row) => row._id === personId);
+                const continuations = eventNeeds.filter(
+                  (row) => row.previousStaffNeedId === need._id,
+                );
                 return (
                   <div
                     key={need._id}
@@ -472,11 +494,42 @@ export function EventStaffingCoverageView({
                         Cancelled: {need.cancellationReason}
                       </p>
                     ) : null}
+                    {continuations.length ? (
+                      <p className="mt-1 text-base text-ink-2">
+                        Replacement coverage:{" "}
+                        {continuations
+                          .map((row) => {
+                            const covering = people?.find(
+                              (person) =>
+                                person._id ===
+                                (EventTimelineStaffRoster.personIdForNeed(
+                                  row,
+                                ) ?? row.filledByPersonId),
+                            );
+                            return `${covering ? personLabel(covering) : row.status === "cancelled" ? "Unfilled request" : "Open for volunteers"}${row.startsAt != null ? ` · ${formatTime(row.startsAt)}${row.endsAt != null ? `–${formatTime(row.endsAt)}` : ""}` : ""} (${row.status})`;
+                          })
+                          .join("; ")}
+                      </p>
+                    ) : null}
                     <p className="mt-1 text-sm text-ink-3">
                       {need.startsAt != null
                         ? `${formatDate(need.startsAt)} ${formatTime(need.startsAt)}${need.endsAt != null ? ` – ${formatTime(need.endsAt)}` : " · End time needed"}`
                         : "Timing needed"}
                     </p>
+                    {canManage &&
+                    onChangeCoverage &&
+                    need.status === "cancelled" &&
+                    need.coverageContinuedAt == null ? (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm mt-2 max-md:min-h-10"
+                        disabled={busy != null}
+                        onClick={() => onChangeCoverage(need)}
+                        aria-label={`Reopen ${need.role} request${need.startsAt != null ? ` at ${formatTime(need.startsAt)}` : ""}`}
+                      >
+                        Reopen request
+                      </button>
+                    ) : null}
                   </div>
                 );
               })}
