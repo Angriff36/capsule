@@ -4,20 +4,23 @@
  * so feature roots stay free of direct convex/react imports.
  */
 import {
-  useCreateEventTimelineActivity,
   useEventTimelineActivityComplete,
   useEventTimelineActivityReopen,
 } from "./manifest-convex-react";
+import type { Id } from "./api";
+import { useScheduleEventTimeline } from "./operational-transactions";
 
 /** One planned run-of-show block, ready to schedule. */
 export type RunTaskPlan = {
   idempotencyKey: string;
   eventId: string;
   name: string;
-  startsAt: number;
+  startsAt?: number;
+  endsAt?: number;
   category?: string;
   notes?: string;
   responsibleParty?: string;
+  assigneeTeams?: string[];
   sortOrder?: number;
 };
 
@@ -42,24 +45,19 @@ export function useReopenRunTask() {
 }
 
 /**
- * Schedule a whole planned run of show in order. Deterministic
- * idempotency keys make a double tap a no-op instead of a duplicate
- * board.
+ * Schedule a selection atomically through the generated commands. Existing
+ * matching blocks keep their times, assignments, notes and performed work.
  */
 export function useCreateRunTasks() {
-  const create = useCreateEventTimelineActivity();
-  return async (plans: RunTaskPlan[]) => {
-    for (const plan of plans) {
-      await create({
-        idempotencyKey: plan.idempotencyKey,
-        eventId: plan.eventId,
-        name: plan.name,
-        startsAt: plan.startsAt,
-        category: plan.category,
-        notes: plan.notes,
-        responsibleParty: plan.responsibleParty,
-        sortOrder: plan.sortOrder,
-      });
-    }
+  const schedule = useScheduleEventTimeline();
+  return async (plans: RunTaskPlan[], operationKey: string) => {
+    if (plans.length === 0) return { created: 0, existing: 0 };
+    return schedule({
+      eventId: plans[0].eventId as Id<"events">,
+      operationKey,
+      plans: plans.map(
+        ({ eventId: _eventId, sortOrder: _sortOrder, ...plan }) => plan,
+      ),
+    });
   };
 }

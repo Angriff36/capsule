@@ -26,8 +26,8 @@ export function EventTimelineAddForm({ busy, onSubmit, onDismiss }: Props) {
         />
       </label>
       <label className="field-label">
-        <span>Starts</span>
-        <BoundedDateTimeLocalInput name="startsAt" className="input" required />
+        <span>Starts (when known)</span>
+        <BoundedDateTimeLocalInput name="startsAt" className="input" />
       </label>
       <label className="field-label">
         <span>Ends (optional)</span>

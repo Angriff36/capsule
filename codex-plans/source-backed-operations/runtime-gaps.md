@@ -265,3 +265,39 @@ partial-create/retry behavior as part of the repair; sequential creation and
 an empty-only build button are a potential trap, not yet runtime-qualified.
 Evidence: qualify-run-template-timing-baseline.ts and
 run-template-timing-baseline.json under .artifacts/operations-source-study.
+
+### Untimed work, atomic selection and editing, 2026-09-10 (#353-356)
+
+Further baseline qualification found three connected failures: generated create
+requires startsAt, the run tracker uses scheduledAt when startsAt is missing,
+and the browser's sequential creates leave one saved row when the second fails.
+Individual template adds also substitute event start or Date.now. Timeline edit
+inputs do not display their saved timestamps, and omitted updates cannot clear
+a stored start or end. The generated adjust helper at3cd7b232 does not enforce
+the declared entity window rule; an end-before-start edit succeeds.
+
+Current source allows unknown times and explicit clearing. The UI selects
+standard blocks, saves them atomically via generated commands, and reuses
+matching existing blocks without modifying their plan or performed history.
+Retry stays available on populated runs. Actual planned timestamps alone drive
+alerts and all changed operational projections. The editor pre-fills times,
+preserves exact values on unrelated changes, and validates changed windows;
+legacy notes/assignments remain editable. Mixed untimed/completed reordering
+keeps recorded times. See progress.md for final gates/review/browser/runtime
+evidence. This fixes the underlying false-time/retry paths; persistent source-
+backed service/travel/load calculation remains unfinished under issue353.
+
+Using computed nextStartsAt/nextEndsAt in the new command constraint exposed
+Manifest3.6.52 projection issue356: constraints emit before compute bindings
+and resolve them as doc fields. This command uses the equivalent direct
+argument/stored-value expression; the compiler is not repaired by that bridge.
+
+### Battle-board print width, 2026-09-10 (#357)
+
+The actual BattleBoardPage's isolated-data Letter PDF keeps the430px Event Day
+frame as its containing block. Width100% on the printed document therefore
+does not use the printable page. The three untimed labels are present (with
+line wrapping), but the one-page fixture is not complete binder or multipage
+proof. Repair the print containing blocks and qualify long real event output
+in the actual route shell. Evidence: untimed-battle-print.pdf and rendered
+untimed-battle-print-page1.png under .artifacts/operations-source-study.

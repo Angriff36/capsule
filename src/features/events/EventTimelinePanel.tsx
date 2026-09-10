@@ -35,13 +35,12 @@ import {
   isTimelineAssigneeTeam,
 } from "./timelineAssigneeOptions";
 import { TimelineSlotRemapper } from "./timelineSlotRemapper";
+import { localDateTime } from "./eventDetailFormHelpers";
 
 type TimelineActivity = Doc<"eventTimelineActivities">;
 
 type Props = {
   readonly eventId: Id<"events">;
-  /** Used when adding a template block before the user sets a real time. */
-  readonly defaultStartsAt?: number | null;
 };
 
 const optional = (value: string) => value.trim() || undefined;
@@ -86,7 +85,7 @@ export function compareActivities(
 const remapper = new TimelineSlotRemapper();
 
 /** Day-of timeline: templates, manual add, Gantt, and editable blocks. */
-export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
+export function EventTimelinePanel({ eventId }: Props) {
   const allRecords = useListEventTimelineActivity();
   const assignments = useListEventAssignment();
   const staffNeeds = useListEventStaffNeed();
@@ -183,7 +182,6 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
     ) + 1;
 
   const addFromTemplate = (template: BattleBoardTaskTemplate) => {
-    const startsAt = defaultStartsAt ?? Date.now();
     const team =
       template.defaultTeam && isTimelineAssigneeTeam(template.defaultTeam)
         ? template.defaultTeam
@@ -193,7 +191,6 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
         eventId,
         name: template.label,
         category: template.category,
-        startsAt,
         responsibleParty: team,
         assigneeTeams: team ? [team] : undefined,
         notes: templateNotes(template),
@@ -208,7 +205,6 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
     const form = event.currentTarget;
     const data = new FormData(form);
     const startsAt = parseWhen(formText(data, "startsAt"));
-    if (startsAt == null) return;
     void run("add", async () => {
       await schedule({
         eventId,
@@ -229,16 +225,26 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
   ) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const startText = formText(data, "startsAt");
+    const endText = formText(data, "endsAt");
     const version =
       typeof activity.version === "number" ? activity.version : undefined;
     void run(`adjust-${activity._id}`, async () => {
       await adjust({
         docId: activity._id,
         name: optional(formText(data, "name")),
-        startsAt: parseWhen(formText(data, "startsAt")),
-        endsAt: parseWhen(formText(data, "endsAt")),
-        notes: optional(formText(data, "notes")),
-        siteNotes: optional(formText(data, "siteNotes")),
+        startsAt:
+          startText === localDateTime(activity.startsAt)
+            ? undefined
+            : parseWhen(startText),
+        endsAt:
+          endText === localDateTime(activity.endsAt)
+            ? undefined
+            : parseWhen(endText),
+        clearStartsAt: activity.startsAt != null && !startText.trim(),
+        clearEndsAt: activity.endsAt != null && !endText.trim(),
+        notes: formText(data, "notes").trim(),
+        siteNotes: formText(data, "siteNotes").trim(),
         version,
       });
       setEditingId(null);

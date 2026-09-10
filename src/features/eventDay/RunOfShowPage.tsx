@@ -11,7 +11,8 @@ import {
   useCreateRunTasks,
   useReopenRunTask,
 } from "../../lib/eventTimelineRun";
-import { BATTLE_BOARD_TASK_TEMPLATES } from "../events/battleBoardTaskTemplates";
+import type { BattleBoardTaskTemplate } from "../events/battleBoardTaskTemplates";
+import { TimelineBlockPicker } from "../events/TimelineBlockPicker";
 import {
   classifyCommandFailure,
   type CommandFailure,
@@ -150,6 +151,10 @@ export function RunOfShowPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [generating, setGenerating] = useState(false);
+  const [showBuilder, setShowBuilder] = useState(false);
+  const buildKey = useRef("");
+  const buildButton = useRef<HTMLButtonElement>(null);
+  const builderWasOpen = useRef(false);
   const firedRef = useRef<Set<string>>(loadFired());
   const toneRef = useRef<AlarmTone | null>(null);
 
@@ -162,6 +167,11 @@ export function RunOfShowPage() {
     return () => window.clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    if (builderWasOpen.current && !showBuilder) buildButton.current?.focus();
+    builderWasOpen.current = showBuilder;
+  }, [showBuilder]);
+
   const setSettings = (next: RunSettings) => {
     setSettingsState(next);
     saveRunSettings(next);
@@ -170,7 +180,7 @@ export function RunOfShowPage() {
   const rows = useMemo(() => {
     const all = briefing?.activities ?? [];
     return all.filter(
-      (row) => row.deletedAt == null && effectiveStart(row) != null,
+      (row) => row.deletedAt == null && row.scheduledAt != null,
     );
   }, [briefing]);
 
@@ -280,18 +290,19 @@ export function RunOfShowPage() {
     setBusyId(null);
   };
 
-  const generate = async () => {
-    if (!briefing || typeof briefing.event.startsAt !== "number") return;
+  const closeBuilder = () => {
+    setShowBuilder(false);
+  };
+  const generate = async (templates: BattleBoardTaskTemplate[]) => {
+    if (!briefing || templates.length === 0) return;
     setGenerating(true);
     setFailure(null);
     try {
       await createTasks(
-        planFromTemplates(
-          BATTLE_BOARD_TASK_TEMPLATES,
-          String(briefing.event._id),
-          briefing.event.startsAt,
-        ),
+        planFromTemplates(templates, String(briefing.event._id)),
+        buildKey.current,
       );
+      closeBuilder();
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     }
@@ -321,7 +332,6 @@ export function RunOfShowPage() {
     );
 
   const event = briefing.event;
-  const started = typeof event.startsAt === "number";
   const allDone = rows.length > 0 && view.doneCount === view.total;
 
   return (
@@ -383,25 +393,40 @@ export function RunOfShowPage() {
         ) : null}
 
         <div className="evd-run-body">
-          {rows.length === 0 ? (
-            <div className="evd-run-card">
-              <p className="evd-run-empty">
-                No run of show yet.
-                {started
-                  ? " Build one from the standard blocks, then move times in Capsule."
-                  : " Set an event start time first."}
+          <div className="evd-run-plan-actions">
+            {rows.length === 0 ? (
+              <p>
+                No run of show yet. Choose standard blocks or add custom work in
+                the timeline.
               </p>
-              {started ? (
-                <button
-                  type="button"
-                  className="evd-run-btn"
-                  disabled={generating}
-                  onClick={() => void generate()}
-                >
-                  {generating ? "Building…" : "Build run of show"}
-                </button>
-              ) : null}
-            </div>
+            ) : null}
+            <button
+              type="button"
+              ref={buildButton}
+              className="evd-run-btn"
+              disabled={showBuilder}
+              onClick={() => {
+                buildKey.current = crypto.randomUUID();
+                setFailure(null);
+                setShowBuilder(true);
+              }}
+            >
+              Add standard blocks
+            </button>
+            <Link
+              className="evd-open-link"
+              to={`/events/${event._id}?tab=timeline`}
+            >
+              Plan times & custom work
+            </Link>
+          </div>
+          {showBuilder ? (
+            <TimelineBlockPicker
+              existing={rows}
+              busy={generating}
+              onAdd={(templates) => void generate(templates)}
+              onCancel={closeBuilder}
+            />
           ) : null}
 
           {allDone ? (
@@ -587,7 +612,7 @@ function TaskRow({
           ? `✓ ${formatTime(row.completedAt)}`
           : start != null
             ? formatTime(start)
-            : "—"}
+            : "Untimed"}
       </span>
       <span className="evd-run-row-main">
         <span className="evd-run-row-name">

@@ -100,6 +100,19 @@ with actual travel and load time; it does not support every template's current
 automatic timestamp. Purchasing/rescheduling, affected data, complete staffing,
 reports/mobile/print, release and authenticated production proof remain required.
 
+The untimed-work and atomic-selection foundation now replaces hard-coded
+template timestamps. Both individual and batch templates create usable work
+without guessed times; crew can complete/reopen it, and timeline/battle-board/
+mobile projections do not substitute audit stamps. The batch transaction and
+retry action fix issue354; explicit time edits/clearing and effective-window
+validation address issue355. Runtime and isolated-data browser qualifications
+are recorded in progress.md. This does not finish issue353: next implement
+persistent service/setup/travel/load/return/unload inputs and generated timing
+that reuse recorded facts and preserve manual/performed work through changes.
+Do not replace the original goal with an untimed checklist. Compiler issue356
+(computed bindings in command constraints) and print issue357 (phone-width
+battle-board PDF) are also open requirements, alongside all prior work below.
+
 
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 

@@ -6,6 +6,7 @@
 import type { EventDayActivity } from "../../lib/eventDayBriefing";
 import type { RunTaskPlan } from "../../lib/eventTimelineRun";
 import type { BattleBoardTaskTemplate } from "../events/battleBoardTaskTemplates";
+import { teamsFromResponsibleParty } from "../events/timelineAssigneeOptions";
 
 // ---------- alert settings (per device, localStorage) ----------
 
@@ -80,10 +81,9 @@ export function categoryLabel(category: string | null): string | null {
 
 // ---------- ordering + scoping ----------
 
-/** Guest-facing time: the planned start, falling back to the audit stamp. */
+/** Only an operational start is a time; scheduledAt records when the row was made. */
 export function effectiveStart(row: EventDayActivity): number | null {
   if (typeof row.startsAt === "number") return row.startsAt;
-  if (typeof row.scheduledAt === "number") return row.scheduledAt;
   return null;
 }
 
@@ -93,8 +93,8 @@ export function sortForRun(rows: EventDayActivity[]): EventDayActivity[] {
     const rightAt = effectiveStart(right);
     if (leftAt != null && rightAt != null && leftAt !== rightAt)
       return leftAt - rightAt;
-    if (leftAt != null) return -1;
-    if (rightAt != null) return 1;
+    if (leftAt != null && rightAt == null) return -1;
+    if (rightAt != null && leftAt == null) return 1;
     const leftOrder = left.sortOrder ?? 0;
     const rightOrder = right.sortOrder ?? 0;
     if (leftOrder !== rightOrder) return leftOrder - rightOrder;
@@ -242,61 +242,22 @@ export function alertSpeech(
   }`;
 }
 
-// ---------- template plan (auto-fill an empty run of show) ----------
+// ---------- selected standard blocks ----------
 
-/** Minute windows relative to the guest-facing event start, per group. */
-const GROUP_WINDOWS: Record<string, [number, number]> = {
-  "PREP / SETUP": [-180, -10],
-  "VENUE / ADMIN": [-30, 240],
-  SERVICE: [0, 150],
-  BAR: [45, 60],
-  "FLIP / DESSERT": [150, 185],
-  "BREAKDOWN / CLOSEOUT": [210, 300],
-};
-
-/**
- * Spread the curated run-of-show templates around the event start: setup
- * before, service during, breakdown after. Deterministic keys make a
- * double tap a no-op instead of a duplicate board.
- */
+/** Templates describe work, not an event-specific timetable. */
 export function planFromTemplates(
   templates: BattleBoardTaskTemplate[],
   eventId: string,
-  eventStartMs: number,
 ): RunTaskPlan[] {
-  const byGroup = new Map<string, BattleBoardTaskTemplate[]>();
-  for (const template of templates) {
-    byGroup.set(template.group, [
-      ...(byGroup.get(template.group) ?? []),
-      template,
-    ]);
-  }
-  const planned: RunTaskPlan[] = [];
-  let order = 0;
-  for (const [group, list] of byGroup) {
-    const [fromMin, toMin] = GROUP_WINDOWS[group] ?? [0, 60];
-    const span = toMin - fromMin;
-    const keyPart = group.replace(/\W+/g, "-").toLowerCase();
-    list.forEach((template, index) => {
-      const offset =
-        list.length === 1
-          ? fromMin
-          : fromMin + Math.round((span * index) / (list.length - 1));
-      planned.push({
-        idempotencyKey: `${eventId}:rost:${keyPart}:${index}`,
-        eventId,
-        name: template.label,
-        startsAt: eventStartMs + offset * 60_000,
-        category: template.category,
-        notes: [template.defaultLocation, template.notes]
-          .filter((part) => part.trim().length > 0)
-          .join(" — "),
-        responsibleParty: template.defaultTeam,
-        sortOrder: order++,
-      });
-    });
-  }
-  return planned
-    .sort((left, right) => left.startsAt - right.startsAt)
-    .map((plan, index) => ({ ...plan, sortOrder: index * 10 }));
+  return templates.map((template) => ({
+    idempotencyKey: `${eventId}:block:${encodeURIComponent(template.group)}:${encodeURIComponent(template.label)}`,
+    eventId,
+    name: template.label,
+    category: template.category,
+    notes: [template.defaultLocation, template.notes]
+      .filter((part) => part.trim().length > 0)
+      .join(" — "),
+    responsibleParty: template.defaultTeam,
+    assigneeTeams: teamsFromResponsibleParty(template.defaultTeam),
+  }));
 }

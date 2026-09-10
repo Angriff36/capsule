@@ -9,5 +9,8 @@ export const useIssueEventStock = () =>
 export const useReorderEventTimeline = () =>
   useMutation(api.lib.operationalTransactions.reorderEventTimeline);
 
+export const useScheduleEventTimeline = () =>
+  useMutation(api.lib.operationalTransactions.scheduleEventTimeline);
+
 export const useMaterializeEventMenuTemplate = () =>
   useMutation(api.lib.operationalTransactions.materializeEventMenuTemplate);

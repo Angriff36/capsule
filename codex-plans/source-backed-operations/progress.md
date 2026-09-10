@@ -1128,3 +1128,103 @@ timetable. Source-backed planning, existing/custom/performed-work preservation,
 and partial-create/retry qualification remain required. Full staffing, binder
 reports, purchasing/rescheduling/allocation, existing affected data and final
 release/live proof remain incomplete alongside the unresolved source choices.
+
+### 2026-09-10 — untimed work and atomic run-of-show selection
+
+The prior turn made concrete progress: crew timeline execution was committed,
+pushed and independently approved at3cd7b2321eca496c5e66425f1e78002b618c2128.
+This continuation re-read the full goal, verified that checkout, refreshed
+DESIGN.md and the relevant source evidence, and inspected training guide p4.
+The source requires actual service timing and measured travel. Its full-service
+example is07:00 staff call,08:00 departure,08:30 onsite and11:30 service; those
+facts do not authorize28 times spread across generic group windows.
+
+Additional runtime baseline failures were reproduced: create rejected a missing
+startsAt; the tracker treated the creation audit stamp as current work; and a
+failed second browser-style create left the first block saved. Individual
+templates also used event start or Date.now. Issue354 tracks partial creation
+and the disappearing retry action. The Timeline editor's start/end fields were
+blank even for timed records, while omitted updates could not clear a time.
+
+Current source permits untimed work and explicit start/end clearing. Templates
+no longer fabricate timestamps. Run of Show offers a selection of standard
+blocks on both empty and populated runs, plus the owning Timeline editor for
+times and custom work. The selected batch is one transaction invoking generated
+commands. Existing matching name/category records are reused without changing
+their times, notes, assignments or performed history. Operation keys survive a
+retry; repeated selections do not create duplicate matching blocks.
+Explicit removal followed by a new selection creates fresh work and preserves
+the deleted record. No generated files were hand-edited.
+
+Untimed rows stay visible and completable, but never drive current/next/late
+alerts. Battle board, Event Day timeline sheet and mobile event timeline also
+use only operational starts. The editor pre-fills saved times, preserves exact
+timestamps on unrelated edits, and can clear a time or note. Reordering mixed
+untimed/completed work preserves times. The transaction omits unchanged time
+arguments, so legacy invalid windows do not prevent order or note/assignment
+edits. Fully timed, uncompleted runs retain existing slot remapping.
+
+Runtime qualification exposed a separate baseline defect: adjust accepted an
+end before the stored start. The baseline generated helper does not enforce the
+declared entity window constraint; the initial assumption that it checked old
+state was corrected after inspecting the helper from HEAD, including issue355's
+body. Time edits now enforce the effective window; unknown starts/ends and
+unrelated edits on legacy records stay valid. A constraint expressed through
+preceding computes revealed Manifest3.6.52 issue356: those names become absent
+doc fields and are checked before their bindings. This command uses an equivalent
+direct argument/stored-value expression. That bridge is not a compiler fix.
+
+Fourteen actual generated-runtime qualification flags pass: untimed creation,
+stable template identity under reordering, atomic rollback, repeat/retry,
+existing-work preservation, untimed completion/reopen, no audit-stamp alerts,
+role/tenant boundaries, explicit time changes/clearing, mixed reorder,
+non-resurrection, legacy note edits, legacy reorder and end-only planning.
+All20 ownership hashes and seven newly referenced baselines verify.
+
+Actual authored UI and thin command wrappers pass isolated-runtime-data browser
+qualification at390/900/1440px: selection and failure retry retain the same
+payload, matching blocks are identified, keyboard completion/reopen works,
+times pre-fill and clear, unrelated edits omit timestamp changes, individual
+templates/manual work allow blank times, and all changed sibling projections
+show unknown timing honestly. No page errors or body overflow. Browser fixtures
+were corrected to use the real Edit block/Apply labels and wait for projection
+mounting; those fixture errors were not product failures. The first focus check
+did catch a product defect: focus ran while the opener was disabled. It now
+returns after rendering; initial focus enters the picker heading. Visual
+inspection also replaced viewport-based two-column squeezing inside the430px
+Event Day frame with container-fit columns, and put Add/Cancel/select-all in a
+sticky toolbar. Final phone/desktop picker and phone timeline images inspected.
+
+The actual battle-board PDF contains all three Time not set labels, normalized
+across line wrapping. It also exposed an existing narrow print containing block
+(issue357). The one-page isolated fixture is not full print/binder readiness;
+real populated/multipage output and print layout repair remain required.
+
+Evidence under .artifacts/operations-source-study:
+
+- qualify-untimed-timeline-baseline.ts and untimed-timeline-baseline.json/log
+- qualify-untimed-timeline-runtime.ts and untimed-timeline-qualified.json/log
+- untimed-timeline-browser-data.json and untimed-timeline-layout.html/tsx
+- qualify-untimed-timeline-browser.mjs and untimed-timeline-browser-qualified.json/log
+- untimed-{picker,run,timeline,projections,battle}-{390,900,1440}.png
+- untimed-battle-print.pdf, untimed-battle-print-page1.png and untimed-battle-print-qualified.json
+- regen-untimed-timeline.log, proof-untimed-timeline.log and untimed-timeline-new-baselines.json
+
+An initial full bun run check passed165 files/1455 tests. After final UI fixes,
+the explicit final gate stopped at tsc with exit5 and no compiler diagnostic.
+Direct node tsc and then the unchanged standard bun run typecheck both passed.
+The final full gate rerun then passed with exit0:165 files/1455 tests, typecheck,
+formatting, secrets, ownership/generation, proof/integration/design, coverage,
+local Vite build and baseline decay. Exact log:
+check-untimed-timeline-final-retry.log. The unexplained exit5 remains in the
+preceding failed log; it was not a reported TypeScript diagnostic. No authored
+tests were added or expanded. Independent gpt-5.6-sol APPROVED the final bounded
+source/UI diff, including legacy reorder, with DESIGN.md and the required
+tedium review. Exact committed-range confirmation follows the checkpoint.
+
+Source-backed service/setup/travel/load/return/unload inputs and calculation
+remain required under issue353. Untimed work is a foundation for that planner,
+not a replacement for the full workflow. Compiler356, print357, staffing,
+purchasing/rescheduling/allocation, affected live data, full reports and final
+release/authenticated production proof remain incomplete. No Capsule production
+write, deployment or whole-goal completion is claimed.

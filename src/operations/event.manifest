@@ -1311,7 +1311,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
 // ---------------------------------------------------------------------------
 // EventTimelineActivity — a named activity on an event's day-of timeline
 // (vendor arrival, kitchen production start, guest arrival, service, breakdown)
-// with a start time and responsible party. Rendered as a Gantt-style strip on
+// with an optional planned time and responsible party. Rendered as a Gantt-style strip on
 // the event detail page and exported to the BEO.
 // ---------------------------------------------------------------------------
 
@@ -1358,7 +1358,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   command schedule(
     eventId: uuid,
     name: string,
-    startsAt: datetime,
+    optional startsAt: datetime,
     optional endsAt: datetime,
     optional responsibleParty: string,
     optional notes: string,
@@ -1373,7 +1373,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     constraint scheduleActivityName: length(trim(name)) > 0 "Activity name is required"
     // Preserve the planning access boundary while crew can mark work done.
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may schedule the event timeline"
-    constraint scheduleActivityWindow: endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
+    constraint scheduleActivityWindow: startsAt == null or endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
     constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
     mutate eventId = eventId
     mutate name = name
@@ -1400,6 +1400,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     optional name: string,
     optional startsAt: datetime,
     optional endsAt: datetime,
+    optional clearStartsAt: boolean,
+    optional clearEndsAt: boolean,
     optional responsibleParty: string,
     optional notes: string,
     optional category: string,
@@ -1413,9 +1415,13 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     constraint adjustActivityName: name == null or length(trim(name)) > 0 "Activity name cannot be blanked"
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may adjust the event timeline"
     constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
+    compute nextStartsAt = clearStartsAt == true ? null : (startsAt != null ? startsAt : self.startsAt)
+    compute nextEndsAt = clearEndsAt == true ? null : (endsAt != null ? endsAt : self.endsAt)
+    // Validate time edits; unrelated notes/assignments can still repair legacy work.
+    constraint adjustActivityWindow: (startsAt == null and endsAt == null) or clearStartsAt == true or clearEndsAt == true or (startsAt == null and self.startsAt == null) or (endsAt == null and self.endsAt == null) or (endsAt != null ? endsAt : self.endsAt) >= (startsAt != null ? startsAt : self.startsAt) "Activity end must not precede its start"
     mutate name = name != null ? name : self.name
-    mutate startsAt = startsAt != null ? startsAt : self.startsAt
-    mutate endsAt = endsAt != null ? endsAt : self.endsAt
+    mutate startsAt = nextStartsAt
+    mutate endsAt = nextEndsAt
     mutate responsibleParty = responsibleParty != null ? responsibleParty : self.responsibleParty
     mutate notes = notes != null ? notes : self.notes
     mutate category = category != null ? category : self.category
@@ -1879,7 +1885,7 @@ event EventTimelineActivityScheduled: "event_timeline_activity.scheduled" {
   tenantId: string
   eventId: string
   name: string
-  startsAt: datetime
+  startsAt: datetime?
 }
 
 event EventTimelineActivityAdjusted: "event_timeline_activity.adjusted" {

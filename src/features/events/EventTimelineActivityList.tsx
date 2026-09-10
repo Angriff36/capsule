@@ -15,6 +15,7 @@ import {
   type TimelineAssigneeTeam,
 } from "./timelineAssigneeOptions";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { localDateTime } from "./eventDetailFormHelpers";
 
 type TimelineActivity = Doc<"eventTimelineActivities">;
 
@@ -177,7 +178,9 @@ export function EventTimelineActivityList({
 
                 <div className="w-24 shrink-0 text-right">
                   <p className="text-base font-semibold text-ink">
-                    {formatTime(activity.startsAt)}
+                    {activity.startsAt == null
+                      ? "Time not set"
+                      : formatTime(activity.startsAt)}
                     {activity.endsAt == null ? "" : " –"}
                   </p>
                   {activity.endsAt == null ? null : (
@@ -262,6 +265,7 @@ export function EventTimelineActivityList({
                     <BoundedDateTimeLocalInput
                       name="startsAt"
                       className="input"
+                      defaultValue={localDateTime(activity.startsAt)}
                     />
                   </label>
                   <label className="field-label">
@@ -269,6 +273,7 @@ export function EventTimelineActivityList({
                     <BoundedDateTimeLocalInput
                       name="endsAt"
                       className="input"
+                      defaultValue={localDateTime(activity.endsAt)}
                     />
                   </label>
                   <label className="field-label">
