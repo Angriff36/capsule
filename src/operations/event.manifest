@@ -1351,9 +1351,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
   constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
 
-  default policy eventTimelineActivityRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may read the event timeline"
-  default policy eventTimelineActivityWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may write the event timeline through commands"
-  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may execute event timeline commands"
+  default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may read the shared event timeline"
+  default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may record timeline work through commands"
+  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute timeline work commands"
 
   command schedule(
     eventId: uuid,
@@ -1371,6 +1371,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt == null
     guard self.deletedAt == null
     constraint scheduleActivityName: length(trim(name)) > 0 "Activity name is required"
+    // Preserve the planning access boundary while crew can mark work done.
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may schedule the event timeline"
     constraint scheduleActivityWindow: endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
     constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
     mutate eventId = eventId
@@ -1409,6 +1411,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt != null
     guard self.deletedAt == null
     constraint adjustActivityName: name == null or length(trim(name)) > 0 "Activity name cannot be blanked"
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may adjust the event timeline"
     constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
     mutate name = name != null ? name : self.name
     mutate startsAt = startsAt != null ? startsAt : self.startsAt
@@ -1431,7 +1434,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   command complete(optional completedByPersonId: string) {
     guard self.deletedAt == null
     mutate completedAt = now()
-    mutate completedByPersonId = completedByPersonId
+    // Keep the optional input for older callers; attribution comes from sign-in.
+    mutate completedByPersonId = user.personId
     emit EventTimelineActivityCompleted {
       activityId: self.id
       tenantId: self.tenantId
@@ -1452,6 +1456,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
 
   command remove() {
     guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may remove event timeline activities"
     mutate deletedAt = now()
     emit EventTimelineActivityRemoved {
       activityId: self.id

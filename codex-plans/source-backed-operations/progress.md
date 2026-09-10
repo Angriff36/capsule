@@ -1049,3 +1049,82 @@ Commit/push state is recorded by the following checkpoint; there is no Capsule
 production deployment, affected-data write, authenticated production proof, or
 whole-goal completion in this checkpoint. The broader unresolved workflows,
 source conflicts and pending operational choices remain in task_plan.md.
+
+### 2026-09-10 — crew timeline execution and trusted completion attribution
+
+The previous prep-context checkpoint is committed and pushed as
+c65e70e5407ceb42d880512e97cf8ddc1ca191e6. The next generated-runtime comparison
+found that kitchen, logistics, workforce and general staff saw four activities
+in the event-day briefing but no generated timeline rows, and could not complete
+the same work. Event staff could complete it while forging the recorded Person.
+Issues351 and352 record those failures:
+https://github.com/Angriff36/capsule/issues/351 and
+https://github.com/Angriff36/capsule/issues/352.
+
+EventTimelineActivity now uses staffAccess for shared reads and execution.
+Schedule/adjust/remove retain the prior event-staff/manager requirement on
+their commands; complete/reopen do not require a planning role. Completion
+uses the authenticated user.personId. The optional completedByPersonId input
+remains compatible with existing callers but cannot select the recorded actor.
+An unlinked staff account can complete work without a fabricated Person.
+Tenant/deletion filters, optimistic versions, and plan data remain intact.
+RunOfShowPage uses classifyCommandFailure and the existing FailureBanner;
+conflicts offer Refresh, denial messages are accurate, and Dismiss is keyboard
+accessible. The scoped existing danger-soft token makes the banner readable
+over the established photographic Event Day surface. DESIGN.md is unchanged.
+
+Regenerated with BUILDER_DIR=C:/Projects/builder-source-operations and
+bun run manifest:regen, then bun run proof:emit. No generated files were
+hand-edited. All20 owned file hashes and their baselines match; only the six
+newly referenced baseline files belong to this checkpoint. No authored tests
+were added or expanded.
+
+The runtime fixture creates its event, four source-example timeline blocks and
+Person-linked staff through generated commands. The training guide p4 example
+has07:00 staff call,08:00 departure,08:30 onsite and11:30 buffet service; the
+fixture's calendar date is illustrative and does not assert a live event time.
+All eight staff-role cases now read four activities and complete/reopen with
+trusted attribution. Planning permissions retain their original boundary.
+Schedule, end time, assignments, notes/site notes and order stay byte-equal
+through execution. Stale-version, foreign/anonymous and deleted-row attempts
+preserve stored work; an unlinked staff actor completes with no Person value.
+Fixture corrections used briefing.activities and nullish optional attribution;
+they did not change product behavior to satisfy an incorrect fixture.
+
+Browser qualification renders the actual RunOfShowPage and thin command
+wrappers using runtime-derived before/completed/reopened records and substituted
+hooks. At390/900/1440px, keyboard completion/reopen, current command versions,
+actor arguments, conflict refresh, denial classification, keyboard dismissal,
+no body overflow and no page errors pass. Final phone conflict and desktop
+timeline screenshots were inspected. A final fixture-only update uses the
+actual generated policy message; the complete browser qualification was rerun
+successfully afterwards. This is isolated-data browser evidence, not an
+authenticated production session.
+
+Evidence under .artifacts/operations-source-study:
+
+- qualify-crew-timeline-runtime.ts, crew-timeline-baseline.json/log and
+  crew-timeline-qualified.json/log
+- crew-timeline-browser-data.json, crew-timeline-layout.html/tsx and
+  crew-timeline-hook-fixture.ts
+- qualify-crew-timeline-browser.mjs, crew-timeline-browser-qualified.json/log
+  and crew-timeline-{fixed,conflict}-{390,900,1440}.png
+- regen-crew-timeline.log, proof-crew-timeline.log and check-crew-timeline.log
+
+Full bun run check passed, exit0:165 files/1455 tests, including typecheck,
+formatting, secrets, ownership/generation, proof/integration/design, coverage,
+local Vite build and baseline decay. Independent gpt-5.6-sol read DESIGN.md,
+source and generated output with the required presentation/tedium instructions
+and APPROVED this bounded diff from c65e70e5. The exact committed range and push
+are verified at the checkpoint boundary. No Capsule production write, deployment,
+affected-data repair or whole-goal completion is claimed.
+
+The next confirmed failure is issue353:
+https://github.com/Angriff36/capsule/issues/353. The standard run builder saves
+28 timestamps from hard-coded group windows. An11:30 service anchor puts
+Buffet Open at13:04. Training p4 calls for explicit service, measured travel,
+setup and load facts; its example does not authorize a guessed complete
+timetable. Source-backed planning, existing/custom/performed-work preservation,
+and partial-create/retry qualification remain required. Full staffing, binder
+reports, purchasing/rescheduling/allocation, existing affected data and final
+release/live proof remain incomplete alongside the unresolved source choices.

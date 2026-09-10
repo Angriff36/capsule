@@ -28,6 +28,10 @@ The index displays only real query results. Each row shows Event title, Venue, C
 
 Event reads use `staffAccess` so the shared plan is available across kitchen, logistics, workforce, inventory, and My Day, following the binding domain-gating restraint. Existing tenant/deletion filters and Event command/write/manager gates remain in force. This gives crew access to the Event's recorded operating facts; it does not grant permission to revise its schedule, contact, or pricing. The generated read path is qualified for kitchen staff/leads/managers, logistics staff, and workforce staff, with foreign-tenant, anonymous, and deleted records excluded and kitchen pricing changes denied. Production verification remains part of the source-backed operations release.
 
+Timeline activities also use `staffAccess` for shared reads and execution: crew can complete or reopen work they see in the event-day briefing. Scheduling, adjusting, and removing activities retain the existing event-staff/manager boundary as command guards. Completion records the signed-in user's linked Person; the optional legacy actor parameter does not choose attribution. A signed-in staff member without a linked Person can still complete work without inventing a Person attribution. Tenant/deletion filters and optimistic versions remain in force, and completing/reopening preserves schedule, assignments, notes, and ordering.
+
+Run of Show uses the shared command-failure banner, including conflict refresh and keyboard-accessible dismissal. Access and version failures are no longer described as connection failures. The automatic builder's hard-coded timing windows are still unresolved in issue353; these execution fixes do not establish source-backed automatic scheduling or production verification.
+
 ## Create an Event
 
 The create page requires an active registered Client and Venue. Existing records are selectable. If no suitable record exists, the user can create one without leaving the Events workspace.

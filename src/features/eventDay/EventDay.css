@@ -1031,12 +1031,9 @@
 }
 .evd-run-failure {
   margin: 0 1rem 0.5rem;
-  padding: 0.5rem 0.7rem;
-  border-radius: 0.6rem;
-  border: 1px solid rgba(242, 92, 92, 0.45);
-  background: rgba(242, 92, 92, 0.12);
-  font-size: 0.74rem;
-  color: var(--evd-blocked);
+}
+.evd-run-failure [role="alert"] {
+  background-color: var(--color-danger-soft);
 }
 
 /* alert settings sheet rows */

@@ -12,6 +12,11 @@ import {
   useReopenRunTask,
 } from "../../lib/eventTimelineRun";
 import { BATTLE_BOARD_TASK_TEMPLATES } from "../events/battleBoardTaskTemplates";
+import {
+  classifyCommandFailure,
+  type CommandFailure,
+} from "../events/CommandFailure";
+import { FailureBanner } from "../events/FailureBanner";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import "./EventDay.css";
 import { EventDayNav } from "./EventDayNav";
@@ -143,7 +148,7 @@ export function RunOfShowPage() {
   const [showSettings, setShowSettings] = useState(false);
   const [alarm, setAlarm] = useState<RunAlert | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [failure, setFailure] = useState<string | null>(null);
+  const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [generating, setGenerating] = useState(false);
   const firedRef = useRef<Set<string>>(loadFired());
   const toneRef = useRef<AlarmTone | null>(null);
@@ -258,8 +263,8 @@ export function RunOfShowPage() {
         version: row.version ?? undefined,
         completedByPersonId: meId ?? undefined,
       });
-    } catch {
-      setFailure("Could not save that. Check the connection and try again.");
+    } catch (error) {
+      setFailure(classifyCommandFailure(error));
     }
     setBusyId(null);
   };
@@ -269,8 +274,8 @@ export function RunOfShowPage() {
     setFailure(null);
     try {
       await reopen({ docId: row._id, version: row.version ?? undefined });
-    } catch {
-      setFailure("Could not reopen that. Check the connection and try again.");
+    } catch (error) {
+      setFailure(classifyCommandFailure(error));
     }
     setBusyId(null);
   };
@@ -287,8 +292,8 @@ export function RunOfShowPage() {
           briefing.event.startsAt,
         ),
       );
-    } catch {
-      setFailure("Could not build the run of show. Try again.");
+    } catch (error) {
+      setFailure(classifyCommandFailure(error));
     }
     setGenerating(false);
   };
@@ -353,9 +358,12 @@ export function RunOfShowPage() {
         </header>
 
         {failure ? (
-          <p className="evd-run-failure" onClick={() => setFailure(null)}>
-            {failure}
-          </p>
+          <div className="evd-run-failure">
+            <FailureBanner
+              failure={failure}
+              onDismiss={() => setFailure(null)}
+            />
+          </div>
         ) : null}
 
         {view.total > 0 ? (

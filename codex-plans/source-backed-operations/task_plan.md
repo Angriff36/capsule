@@ -86,6 +86,20 @@ Continue the affected live data and connected operational workflows; source
 ambiguities, purchasing/rescheduling/allocation, full reports/mobile/print,
 staffing/timeline/battleboard, release and authenticated production proof remain.
 
+Crew timeline execution and trusted actor attribution are now implemented for
+issues351/352. Full check passes with165 files/1455 tests; the independent
+gpt-5.6-sol review approves the bounded change. Runtime role/tenant/version/
+preservation checks and keyboard browser qualification at390/900/1440px pass.
+See progress.md for the checkpoint and release limits. Next, fix issue353:
+the automatic run builder spreads templates across hard-coded windows and
+places Buffet Open at13:04 for the training example's11:30 service. Reuse
+recorded event/timeline facts and explicit event-specific travel/load/service
+inputs, preserve existing/custom/completed work, and do not substitute another
+guessed timetable. Training guide p4 supports backwards planning from service,
+with actual travel and load time; it does not support every template's current
+automatic timestamp. Purchasing/rescheduling, affected data, complete staffing,
+reports/mobile/print, release and authenticated production proof remain required.
+
 
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 

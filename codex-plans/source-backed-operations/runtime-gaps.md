@@ -230,3 +230,38 @@ domain-gating-restraint requires for shared operational facts. The generated
 write/execute and manager gates remain. See progress.md for role, tenant,
 deletion, browser, review, and full-check evidence. No production change is
 claimed; issues349/350 remain open through release/live verification.
+
+### Crew timeline execution and actor attribution, 2026-09-10 (#351/#352)
+
+The briefing returned four activities to crew, but generated timeline reads
+returned none and completion failed at the old event-only read policy. The UI
+then misreported the denial as a connection failure. Event staff could complete
+work but the server accepted the caller's arbitrary completedByPersonId.
+
+Current source grants shared staff reads/complete/reopen, retains the original
+planning boundary on schedule/adjust/remove, and records user.personId instead
+of trusting the legacy optional actor input. Runtime qualification covers eight
+roles, original plan/assignment/note preservation, stale versions, foreign and
+anonymous callers, deleted rows, and a staff actor with no linked Person.
+Run of Show now renders classified failures through the existing accessible
+banner; actual authored UI and command wrappers pass isolated-data keyboard/
+desktop/mobile checks. See progress.md for evidence, review and gate results.
+Both issues remain open through release and affected live verification.
+
+### Automatic run builder invents timings, 2026-09-10 (#353)
+
+runOfShowModel.planFromTemplates spreads28 standard blocks evenly over fixed
+group windows using only eventId/eventStartMs and template order/count. With
+the training guide's11:30 service example it saves Staff Huddle at08:30 and
+Buffet Open at13:04. It has no measured route, loading, service-end, or unload
+inputs and no timing preview before persistence. The source guide p4 instead
+works backwards from11:30 service to08:30 onsite,08:00 departure,07:00 staff
+call using its stated full-service setup,30-minute journey and one-hour load.
+Those example facts are not universal defaults or actual Ashley timings.
+
+This remains unfixed. Reuse known operational facts and support explicit
+event-specific timing while preserving custom and performed work. Inspect
+partial-create/retry behavior as part of the repair; sequential creation and
+an empty-only build button are a potential trap, not yet runtime-qualified.
+Evidence: qualify-run-template-timing-baseline.ts and
+run-template-timing-baseline.json under .artifacts/operations-source-study.
