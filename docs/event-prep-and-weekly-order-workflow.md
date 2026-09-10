@@ -100,9 +100,10 @@ When the Event is **approved**:
 9. After the event is completed and **closed out**, Manifest seeds `EventCloseout.capture`
    (match `eventId`, else create): budget/headcount from the event, actuals zeroed
    for finance to re-capture before finalize
-10. If the event has an **owner** (`assignedToId` on plan or Assign owner), Manifest
-    seeds `EventAssignment.assign` as role `event_lead` (fanOut `Person` — no-op when
-    owner is unset; also on `EventOwnerAssigned`)
+10. Event **ownership** (`assignedToId`) records the salesperson. Approval and
+    owner changes do not assign that person to the field crew. Operational
+    captains and crew are recorded separately as EventAssignments and filled
+    EventStaffNeeds, as in the source worksheet's Sales Rep and Staffing sections.
 
 Headcount or dish changes revise contributions and reconcile the same draft (idempotent; no duplicate quantities).
 

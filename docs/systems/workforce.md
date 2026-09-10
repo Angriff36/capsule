@@ -111,6 +111,14 @@ Open decisions include assignment role vocabulary, offer/decline states, coverag
 
 ## Current status
 
+Event.assignedToId is sales ownership, not a field-captain assignment. The
+EventOwnerAssigned/EventApproved owner-to-event_lead reactions were removed
+after comparing the actual create form and source worksheet (pages 1 and 5).
+Ownership changes and approval preserve explicitly assigned crew, including
+salespeople who also have a real operational role. See
+`codex-plans/source-backed-operations/sales-owner-staffing.md` for runtime and
+affected-data evidence; calculated crew-to-shift propagation remains required.
+
 Shipped (Slice 5) on `@angriff36/manifest` ≥ 3.6.20:
 
 - **Routes:** `/staff` → `/staff/roster` (EventAssignment + weekly Shift schedule), `/staff/swaps` (accepted swap review and assignment approval), `/staff/time` (TimeRecord + AvailabilityWindow), `/staff/time-off` (manager request review), `/staff/utilization` (confirmed hours, billable utilization, under-scheduling, and shift-demand reporting), `/staff/qualifications` (Qualification ledger), `/staff/training` (training library, completion ledger, and shift-type gates), and `/my` (phone-first schedule acknowledgement, shift swaps, time-off requests, and field work).

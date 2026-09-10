@@ -4,33 +4,10 @@
 
 use "./shift.manifest"
 
-// Vision cascade: when an event has an owner (assignedToId), ensure one lead
-// EventAssignment. fanOut Person where id = assignedToId is a no-op when the
-// owner is unset — approve must not invent staff.
-on EventApproved fanOut Person where id = payload.assignedToId
-  run EventAssignment.assign
-  match eventId = payload.eventId, personId = self.id
-  else create
-  params {
-    eventId: payload.eventId
-    personId: self.id
-    role: "event_lead"
-    startsAt: payload.startsAt
-    endsAt: payload.endsAt
-  }
-
-// Same seed when the owner is set/changed via Event.assignOwner.
-on EventOwnerAssigned fanOut Person where id = payload.assignedToId
-  run EventAssignment.assign
-  match eventId = payload.eventId, personId = self.id
-  else create
-  params {
-    eventId: payload.eventId
-    personId: self.id
-    role: "event_lead"
-    startsAt: payload.startsAt
-    endsAt: payload.endsAt
-  }
+// Event.assignedToId records the salesperson, not an on-site captain.
+// Source: event-worksheet.pdf p1 names the Sales Rep; p5 separately assigns
+// captains and crew. Ownership and approval must not invent field staffing.
+// EventAssignment and filled EventStaffNeed records describe actual crew.
 
 enum EventAssignmentStatus {
   assigned

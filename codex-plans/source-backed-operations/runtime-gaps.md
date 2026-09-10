@@ -1,11 +1,14 @@
 # Runtime gaps and repair evidence
 
-Current checkpoint: linked staff self-service and the organization workforce
-switch correction. See progress.md and staff-self-service.md for current
+Current checkpoint: removal of the false salesperson-to-field-crew reaction
+(#361), after source worksheet and form-mapper verification. See progress.md,
+sales-owner-staffing.md and staff-self-service.md for current
 verification/review state; earlier checkpoint notes below retain their original
 pending statements. Staffing propagation (#358), owner reconciliation (#361),
 capability registration (#360), affected-data repairs and production proof
-remain open work.
+remain open work. The owner reaction no longer invents staffing; release and
+authenticated proof of the correction remain. Actual assignment/filled-need
+propagation, rather than owner propagation, is the next staffing dependency.
 
 ## Latest timing checkpoint (2026-09-10, issue353)
 

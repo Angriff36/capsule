@@ -1,5 +1,34 @@
 # Progress
 
+## 2026-09-10 sales ownership is separate from field staffing
+
+Previous checkpoint 205cd0a45bfeff32a6dbcc8e820088c8b2952762 is committed,
+pushed and exact-range gpt-5.6-sol APPROVE, with final full check passing
+165 files/1,458 tests. This was progress, not a wait or blocked turn.
+
+Tracing #361 against source changed the next implementation: the source
+worksheet's Sales Rep and field captains are different people, and Capsule's
+create form maps salespersonId to Event.assignedToId. The two owner/approval
+reactions wrongly invented an event_lead assignment for the salesperson. They
+are removed from Manifest source and regenerated. Explicit crew, attendance,
+notes and time records remain unchanged. Making the old cascade idempotent
+would have preserved the wrong operational relationship.
+
+Scratch actual-runtime before/after evidence passes for five sales/event/admin
+roles, repeated/changed/cleared owners, approval with an existing explicit
+salesperson assignment, preserved captain work and packing/invoice outputs.
+A fresh authenticated admin production READ confirms the known Ashley source
+workspace and zero undeleted event_lead candidates among 12 assignments.
+That finding concerns this defect only; it is not general roster qualification.
+See sales-owner-staffing.md and its evidence pointers. No production writes.
+
+Independent gpt-5.6-sol APPROVE covers the semantic correction and documentation.
+Final `bun run check` passed (165 files/1,458 tests, exit 0), recorded in
+check-sales-owner-staffing.log. Commit and branch push follow. #358's actual
+assignment/filled-need timing-to-shift connection, #360 registration, broader
+purchasing/source data/report repairs, release and deployed proof remain
+required by the full goal.
+
 ## 2026-09-10 linked staff self-service
 
 The shared scheduling prerequisite is committed/pushed as

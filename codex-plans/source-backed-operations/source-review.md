@@ -35,3 +35,12 @@ Revisited actual nested workbook source because prior notes/questions described 
 Creamy horseradish method IS present at Apps_-_Passed_-_Finish_at_Event.xlsx A8728-A8729: mix all ingredients together until smooth. A8717-A8727 declareshalf-fluidounce output with six rows each1/32 (pound sourcream; cup horseradish/garlic; tablespoon Worcestershire/pepper/thyme). This does not scale consistently to Ashley's exact167fluidounce ingredient costing at Menu_Item_Cost_per_Event rows641-653. The generic costing catalog also calls its batch3pounds (Menu_Item_Costing A5133/J5133), a different yield dimension. Printed small fractions may contribute, but the cause is not proven. Retain the method while investigating measured batch quantities; do not invent a mass/volume conversion.
 
 The photographed BBQ Chicken Brine and work/recipes/BBQ_Chicken_Brine.txt agree: batch for5pounds airline chicken,2quartswater,2tablespoonskosher salt,1/4cupbrown sugar,1tablespoonthyme,1tablespoonfreshwholegarliccloves. The method's2cupswater is part of the total2quarts, not an additional purchase. No final liquid volume or brining time is declared. recipes/bbq-chicken-brine.json therefore represents1batch with its5pound application basis stated in instructions, not a fabricated finished2quart yield. Cooking Water/Spice - Thyme/Garlic reuse existing catalog vocabulary; fresh whole cloves remain explicit in the method. The five quantities are unchanged.
+# 2026-09-10 sales ownership versus field crew
+
+Re-inspected the rendered binder event-worksheet.pdf pages 1 and 5. Page 1 names
+the Sales Rep; page 5 names different captains, describes early/late-team work,
+and lists FOH/BOH roles. Capsule's create form and form mapper confirm that
+Event.assignedToId means salesperson. The old owner-to-event_lead reaction was
+a modeling error, not merely a missing idempotent staffing update. Remove that
+reaction and preserve explicit crew. See sales-owner-staffing.md; the actual
+staffing/timing propagation work must start from assignments and filled needs.

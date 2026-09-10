@@ -2,14 +2,15 @@
 
 ## Latest continuation (2026-09-10)
 
-Linked staff attendance, time records, availability and schedule notices now
-use the trusted Person link, including current-link acknowledgement in My Day.
-The own-record capability preserves the existing organization workforce switch.
-See progress.md and staff-self-service.md for the final gate/review/checkpoint
-state and the limits of isolated runtime/browser qualification.
+The linked staff checkpoint is pushed as 205cd0a4. Source verification then
+showed that Event.assignedToId is sales ownership, distinct from field captains.
+The false owner/approval-to-event_lead reactions are removed and regenerated;
+explicit staffing and attendance remain intact. See progress.md and
+sales-owner-staffing.md for final gate/review/checkpoint state and evidence.
 
-Continue calculated crew-window propagation and owner-assignment reconciliation
-(#358/#361), then the connected purchasing and existing-data work. The full goal
+Continue calculated crew-window propagation from actual assignments and filled
+staff needs (#358), then the connected purchasing and existing-data work. #361
+now tracks the owner-reaction correction through release/proof. The full goal
 still includes source/data repairs, print/reports, release and authenticated
 production verification. Calculated timeline blocks do not prove assignments
 or shifts have the correct schedule. NLT means No Later Than in the training
