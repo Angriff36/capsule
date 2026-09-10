@@ -98,8 +98,21 @@ training or certification validation. Existing-shift lookup is a no-op and
 manual split shifts remain available. This callback bridges the projection's
 nested-collection gap in issue #75; it is not a compiler fix.
 
-Calculated Event crew windows are not yet connected to automatic Shift
-updates (#358). Linked staff attendance, time records, availability and schedule notices now use the trusted Person link (#359). Generated-runtime qualification covers seven crew roles; deployment and authenticated production proof remain. The older Person-ID-as-subject lifecycle fixture alone does not prove real staff behavior.
+The source-backed operations branch now connects EventAssignment and filled
+EventStaffNeed commands to generated Shift commands in the same transaction
+(#358). Calculated windows follow the crew timeline; manual plans, split days,
+recorded work and accepted swaps preserve their specific source groups. A
+TimeRecord linked only through shiftId is still treated as recorded history.
+Approved swaps move the connected assignment and filled-need owners, reuse the
+recipient's acceptance and retain earlier swap history. Generated-runtime proof
+covers normal and direct legacy-repair paths; full app qualification, affected
+production-data repair and deployment remain required.
+
+Linked staff attendance, time records, availability and schedule notices use the
+trusted Person link (#359). Generated-runtime qualification covers seven crew
+roles. Own swap requests now also accept linked non-workforce crew; complete
+recipient-eligibility reads in My Day still need qualification. The older
+Person-ID-as-subject lifecycle fixture alone does not prove real staff behavior.
 
 Events own service context; Person owns operator identity; staffing records feed readiness explanations and PayrollInput. Incidents may link to a Shift. Logistics Delivery may reference a Person as driver, but Vehicle is not currently modeled.
 
@@ -117,7 +130,9 @@ after comparing the actual create form and source worksheet (pages 1 and 5).
 Ownership changes and approval preserve explicitly assigned crew, including
 salespeople who also have a real operational role. See
 `codex-plans/source-backed-operations/sales-owner-staffing.md` for runtime and
-affected-data evidence; calculated crew-to-shift propagation remains required.
+affected-data evidence. Calculated crew-to-shift propagation is implemented and
+qualified in isolated runtime; the complete staffing UI, existing-data repair,
+release and authenticated production verification are still required.
 
 Shipped (Slice 5) on `@angriff36/manifest` ≥ 3.6.20:
 

@@ -10,6 +10,7 @@ import {
   useListEventTimelineActivity,
   useListEventTimelineComment,
   useListPerson,
+  useListShift,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, Skeleton } from "../../ui/primitives";
 import { PlusIcon } from "../../ui/icons";
@@ -89,6 +90,7 @@ export function EventTimelinePanel({ eventId }: Props) {
   const allRecords = useListEventTimelineActivity();
   const assignments = useListEventAssignment();
   const staffNeeds = useListEventStaffNeed();
+  const shifts = useListShift();
   const people = useListPerson();
   const comments = useListEventTimelineComment();
   const records = useMemo(
@@ -122,8 +124,9 @@ export function EventTimelinePanel({ eventId }: Props) {
         assignments,
         people,
         staffNeeds,
+        shifts,
       }),
-    [assignments, eventId, people, staffNeeds],
+    [assignments, eventId, people, staffNeeds, shifts],
   );
 
   const keyStaff: TimelineKeyStaff[] = useMemo(() => {
@@ -132,13 +135,14 @@ export function EventTimelinePanel({ eventId }: Props) {
       assignments,
       people,
       staffNeeds,
+      shifts,
     });
     return entries.map((entry) => ({
       key: entry.key,
       name: entry.label,
       role: entry.role,
     }));
-  }, [assignments, eventId, people, staffNeeds]);
+  }, [assignments, eventId, people, staffNeeds, shifts]);
 
   const personNameById = useMemo(() => {
     const map = new Map<string, string>();

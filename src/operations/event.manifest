@@ -664,6 +664,8 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
   computed timingCanRecalculate: boolean = self.deletedAt == null and self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled"
+  // Same authority as the staffing commands, evaluated for the current reader.
+  computed staffingCanManage: boolean = roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
   // Mangia Ops Final Lock Training p4. Unknown durations stay unknown.
   // Suggested setup is presented for explicit acceptance, never silently saved.
   computed timingSuggestedSetupMinutes: float? = self.serviceStyle != null and self.serviceStyle.name == "Full Service" ? 180 : (self.serviceStyle != null and self.serviceStyle.name == "Limited Service" ? 90 : null)

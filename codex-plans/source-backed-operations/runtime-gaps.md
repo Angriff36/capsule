@@ -1,5 +1,42 @@
 # Runtime gaps and repair evidence
 
+
+## Latest staffing state (2026-09-10)
+
+The computed-helper blocker below is repaired upstream, published as3.6.53,
+consumed in Capsule/isolated Builder and regenerated normally. Full check89321
+passed (1,463 tests) before subsequent swap/history changes. Manual source-group
+preservation and complete approved-swap source transfer now have bounded
+gpt-5.6-sol APPROVEs. Ordinary linked staff swap access also passes runtime.
+Shift-only TimeRecord preservation is fixed with red/green generated-command
+evidence; its additional review and the next full gate are tracked in progress.md.
+UI counts/filled-request behavior, full My Day eligibility, app/browser proof,
+existing affected-data repair and the complete purchasing/packing/reports/release
+scope still remain. No Capsule production write or deployment occurred.
+
+## Historical generator failure (issue362; repaired as described above)
+
+The #358 connected staffing draft and UI now pass expanded runtime and
+1440/900/390 component qualification, including same-role split need windows.
+Full `bun run check` still fails: Event.staffingCanManage compiles correctly in
+authenticated inline queries, while companion convex/computed.ts emits
+undefined checkRole/user (six TS2304 errors). Both isolated Builder and Capsule
+resolve registry3.6.52. No generated edits or production writes were made.
+
+Issue: https://github.com/Angriff36/capsule/issues/362. Generator owner:
+Manifest src/manifest/projections/convex/computed.ts, generateComputedHelpers.
+Isolated branch fix/convex-computed-auth-context at
+C:/Projects/Manifest/.worktrees/convex-computed-auth-context, base
+ db385089432f8067650d252898a6633510e56d03. Dependency install/build setup60038 completed exit0. The upstream
+computed-context fix is implemented and passes 4,513 local tests; it is not yet
+committed or published. See the newest progress entry for exact gate state. PR81 is now pushed/reviewed at
+c1a6d1f; exact-head CI and registry publication are pending. Same-person manual
+work now has a concrete failing reproduction covering missing new shifts, stale
+retiming and stale retirement; see staffing-manual-groups-gap.json and newest
+progress entry. Approved swaps also need connected source person ownership. See latest progress.md and
+staffing-timing.md for the exact draft state and remaining full-goal work.
+
+
 Current checkpoint: removal of the false salesperson-to-field-crew reaction
 (#361), after source worksheet and form-mapper verification. See progress.md,
 sales-owner-staffing.md and staff-self-service.md for current

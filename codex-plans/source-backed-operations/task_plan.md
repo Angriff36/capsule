@@ -2,6 +2,22 @@
 
 ## Latest continuation (2026-09-10)
 
+The #358 staffing checkpoint now connects Assignment/filled Need
+commands to Shifts, propagates crew times, preserves personal/worked windows,
+and replaces the UI's multiple writes with one backend command. Expanded
+runtime and three-width component checks pass. Manifest PR81 is merged and
+published as registry3.6.53, consumed by Capsule and isolated Builder. The
+generated-helper blocker is fixed; full check89321 passed 1,463 tests and all
+gates before the latest swap/history corrections. Manual source-group
+preservation and connected approved swaps have bounded independent APPROVEs.
+Shift-only TimeRecord preservation now passes a concrete before/after runtime
+reproduction. See the newest progress entry for current review/full-gate state,
+staffing UI/eligibility qualification, and remaining full-goal work. The corrected
+whole checkpoint now has gpt-5.6-sol APPROVE, including DESIGN.md review;
+post-UI full gate2320 passed165files/1,465tests and every required check. Existing
+live data is not yet repaired and Capsule has not been deployed. Manual-only Shift rows now remain visible in staffing and
+timeline choices; covered request details are retained below the open queue.
+
 The linked staff checkpoint is pushed as 205cd0a4. Source verification then
 showed that Event.assignedToId is sales ownership, distinct from field captains.
 The false owner/approval-to-event_lead reactions are removed and regenerated;

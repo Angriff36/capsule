@@ -38,6 +38,11 @@ entity Shift mixin TenantScoped, SoftDeletable {
   property cancelledAt: datetime?
   property cancellationReason: string?
   property noShowAt: datetime?
+  // Provenance for event staffing; manual shifts have no managed timestamp.
+  // Source links survive a manual edit or swap so sync cannot recreate work.
+  property eventStaffingManagedAt: datetime?
+  property eventStaffingPersonId: uuid?
+  property eventStaffingSourceIds: list<string> = []
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
@@ -57,9 +62,9 @@ entity Shift mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
   transition status from "no_show" to []
 
-  default policy shiftRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read shifts"
-  default policy shiftWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write shifts through commands"
-  default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute shift commands"
+  default policy shiftRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Workforce staff may read shifts; crew may read their own shifts and the shared event schedule"
+  default policy shiftWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may use commands to update their own shifts and the shared event schedule"
+  default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may use commands to update their own shifts and the shared event schedule"
 
   command schedule(
     personId: uuid,
@@ -70,13 +75,14 @@ entity Shift mixin TenantScoped, SoftDeletable {
     optional shiftTypeId: uuid,
     optional requiredQualificationId: uuid,
     optional requiredTrainingCompletionId: uuid,
-    optional notes: string
+    optional notes: string,
+    optional eventStaffingSourceIds: list<string>
   ) {
     guard self.scheduledAt == null
     guard self.status == "scheduled"
     guard self.deletedAt == null
     guard self.person != null and self.person.deletedAt == null and self.person.status == "active" "Select an active staff member in this workspace"
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (eventStaffingSourceIds != null and length(eventStaffingSourceIds) > 0 and self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess")))
     constraint schedulePersonMatch: personId == self.personId "Schedule personId must match the seeded person reference"
     constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Schedule eventId must match the seeded event reference when provided"
     constraint scheduleEventPresent: (eventId == null and self.eventId == null) or (self.event != null and self.event.deletedAt == null) "Select an event in this workspace"
@@ -99,6 +105,9 @@ entity Shift mixin TenantScoped, SoftDeletable {
     mutate requiredQualificationId = requiredQualificationId != null ? requiredQualificationId : self.requiredQualificationId
     mutate requiredTrainingCompletionId = requiredTrainingCompletionId != null ? requiredTrainingCompletionId : self.requiredTrainingCompletionId
     mutate notes = notes != null ? notes : self.notes
+    mutate eventStaffingSourceIds = eventStaffingSourceIds != null ? eventStaffingSourceIds : []
+    mutate eventStaffingManagedAt = eventStaffingSourceIds != null and length(eventStaffingSourceIds) > 0 ? now() : null
+    mutate eventStaffingPersonId = eventStaffingSourceIds != null and length(eventStaffingSourceIds) > 0 ? personId : null
     mutate scheduledAt = now()
     emit ShiftScheduled {
       shiftId: self.id
@@ -112,6 +121,58 @@ entity Shift mixin TenantScoped, SoftDeletable {
       requiredQualificationId: requiredQualificationId != null ? requiredQualificationId : self.requiredQualificationId
       requiredTrainingCompletionId: requiredTrainingCompletionId != null ? requiredTrainingCompletionId : self.requiredTrainingCompletionId
       status: "scheduled"
+    }
+  }
+
+  command planEventTiming(optional startsAt: datetime, optional endsAt: datetime, eventStaffingSourceIds: list<string>, role: string) {
+    // Recalculation must not change manual plans, swaps or recorded attendance.
+    guard self.eventStaffingManagedAt != null
+    guard self.status == "scheduled"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess")))
+    constraint planShiftDates: startsAt == null or endsAt == null or endsAt > startsAt "Shift end must be after its start"
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate scheduledAt = startsAt != null and endsAt != null ? (self.scheduledAt != null ? self.scheduledAt : now()) : null
+    mutate eventStaffingSourceIds = eventStaffingSourceIds
+    mutate role = role
+    emit ShiftEventTimingPlanned {
+      shiftId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command retireEventTiming(reason: string) {
+    // The callback proves this automatic plan is redundant or no longer needed.
+    guard self.status == "scheduled"
+    guard self.deletedAt == null
+    guard self.eventStaffingManagedAt != null and self.eventId != null
+    guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess")))
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit ShiftEventTimingRetired {
+      shiftId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command reschedule(startsAt: datetime, endsAt: datetime) {
+    guard self.status == "scheduled"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    constraint rescheduleShiftDates: endsAt > startsAt "Shift end must be after its start"
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate scheduledAt = self.scheduledAt != null ? self.scheduledAt : now()
+    mutate eventStaffingManagedAt = null
+    emit ShiftRescheduled {
+      shiftId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
     }
   }
 
@@ -162,7 +223,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
   command cancel(reason: string) {
     guard self.status == "scheduled" or self.status == "started"
     guard self.deletedAt == null
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (self.eventId != null and roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     constraint cancelShiftReason: length(trim(reason)) > 0 "Cancellation reason is required"
     compute previousStatus = self.status
     mutate status = "cancelled"
@@ -242,6 +303,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
     compute previousPersonId = self.personId
     compute shiftSwapRequestId = self.swapAuthorizationId
     mutate personId = self.swapTargetPersonId
+    mutate eventStaffingManagedAt = null
     mutate requiredQualificationId = self.swapTargetQualificationId
     mutate requiredTrainingCompletionId = self.swapTargetTrainingCompletionId
     mutate swapAuthorizationId = null
@@ -466,4 +528,22 @@ event WeeklyScheduleAcknowledged: "weekly_schedule.acknowledged" {
   personId: string
   weekStartsAt: datetime
   acknowledgedAt: datetime
+}
+
+event ShiftEventTimingPlanned: "shift.event_timing_planned" {
+  shiftId: string
+  tenantId: string
+  eventId: string?
+}
+
+event ShiftRescheduled: "shift.rescheduled" {
+  shiftId: string
+  tenantId: string
+  eventId: string?
+}
+
+event ShiftEventTimingRetired: "shift.event_timing_retired" {
+  shiftId: string
+  tenantId: string
+  eventId: string?
 }

@@ -15,23 +15,36 @@ export async function validateScheduledShift(
   ctx: MutationCtx,
   shiftId: Id<"shifts">,
 ): Promise<void> {
-  const shift = await ctx.db.get(shiftId);
-  if (!shift) throw new Error("Scheduled shift not found");
+  const shift = await validateShiftWindow(ctx, shiftId);
   const { personId, startsAt, endsAt } = shift;
-  if (
-    startsAt == null || endsAt == null ||
-    !Number.isFinite(startsAt) || !Number.isFinite(endsAt) || endsAt <= startsAt
-  ) {
-    throw new ConvexError("Shift end must be after its start.");
-  }
   const requests = await ctx.db.query("timeOffRequests")
     .withIndex("by_personId", (q) => q.eq("personId", personId)).collect();
   if (findApprovedTimeOffConflict(
     requests.filter((row) => row.tenantId === shift.tenantId),
-    { personId, startsAt, endsAt },
+    { personId, startsAt: startsAt!, endsAt: endsAt! },
   )) {
     throw new ConvexError(
       "This shift overlaps approved time off. Choose another staff member or adjust the shift.",
     );
   }
+}
+
+/** Unknown planning dates are allowed; non-finite or reversed dates are not. */
+export async function validateShiftWindow(
+  ctx: MutationCtx,
+  shiftId: Id<"shifts">,
+  allowIncomplete = false,
+) {
+  const shift = await ctx.db.get(shiftId);
+  if (!shift) throw new Error("Scheduled shift not found");
+  const { startsAt, endsAt } = shift;
+  if (
+    (!allowIncomplete && (startsAt == null || endsAt == null)) ||
+    (startsAt != null && !Number.isFinite(startsAt)) ||
+    (endsAt != null && !Number.isFinite(endsAt)) ||
+    (startsAt != null && endsAt != null && endsAt <= startsAt)
+  ) {
+    throw new ConvexError("Shift end must be after its start.");
+  }
+  return shift;
 }

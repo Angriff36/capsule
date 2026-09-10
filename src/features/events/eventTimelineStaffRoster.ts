@@ -12,6 +12,12 @@ type AssignmentRow = {
   readonly status?: string | null;
   readonly version?: number;
   readonly startsAt?: number | null;
+  readonly endsAt?: number | null;
+};
+
+type ShiftRow = AssignmentRow & {
+  readonly _id: string;
+  readonly eventStaffingSourceIds?: readonly string[] | null;
 };
 
 export type StaffNeedRow = {
@@ -23,6 +29,7 @@ export type StaffNeedRow = {
   readonly filledByPersonId?: string | null;
   readonly claimedByPersonId?: string | null;
   readonly startsAt?: number | null;
+  readonly endsAt?: number | null;
   readonly due?: number | null;
 };
 
@@ -39,9 +46,18 @@ export type StaffingRosterEntry = {
   readonly label: string;
   readonly role: string;
   readonly status: string;
-  readonly source: "assignment" | "filled_need";
+  readonly source: "assignment" | "filled_need" | "shift";
+  readonly sourceIds?: readonly string[];
+  readonly plannedWindows?: readonly {
+    startsAt?: number | null;
+    endsAt?: number | null;
+  }[];
   readonly startsAt?: number | null;
   readonly endsAt?: number | null;
+  readonly shiftWindows?: readonly {
+    startsAt?: number | null;
+    endsAt?: number | null;
+  }[];
   readonly unassign?: {
     readonly docId: string;
     readonly version: number;
@@ -65,6 +81,7 @@ export class EventTimelineStaffRoster {
     readonly assignments: readonly AssignmentRow[] | undefined;
     readonly people: readonly PersonRow[] | undefined;
     readonly staffNeeds?: readonly StaffNeedRow[] | undefined;
+    readonly shifts?: readonly ShiftRow[] | undefined;
   }): TimelineStaffOption[] {
     const seen = new Set<string>();
     const options: TimelineStaffOption[] = [];
@@ -88,6 +105,7 @@ export class EventTimelineStaffRoster {
     readonly assignments: readonly AssignmentRow[] | undefined;
     readonly people: readonly PersonRow[] | undefined;
     readonly staffNeeds?: readonly StaffNeedRow[] | undefined;
+    readonly shifts?: readonly ShiftRow[] | undefined;
   }): StaffingRosterEntry[] {
     const directory = peopleById(input.people);
     const entries: StaffingRosterEntry[] = [];
@@ -112,9 +130,14 @@ export class EventTimelineStaffRoster {
         role,
         status: String(row.status ?? "assigned"),
         source: "assignment",
+        sourceIds: row._id ? [row._id] : [],
+        plannedWindows: [{ startsAt: row.startsAt, endsAt: row.endsAt }],
         startsAt: row.startsAt,
+        endsAt: row.endsAt,
         unassign:
-          row._id != null && version != null
+          row._id != null &&
+          version != null &&
+          (row.status === "assigned" || row.status === "confirmed")
             ? { docId: row._id, version }
             : undefined,
       });
@@ -130,7 +153,26 @@ export class EventTimelineStaffRoster {
       if (person == null) continue;
       const role = (need.role ?? "").trim();
       const dupeKey = `${personId}::${role}`;
-      if (seenRole.has(dupeKey)) continue;
+      if (seenRole.has(dupeKey)) {
+        const index = entries.findIndex(
+          (entry) => entry.personId === personId && entry.role === role,
+        );
+        if (index >= 0) {
+          const entry = entries[index];
+          entries[index] = {
+            ...entry,
+            sourceIds: [
+              ...(entry.sourceIds ?? []),
+              ...(need._id ? [need._id] : []),
+            ],
+            plannedWindows: [
+              ...(entry.plannedWindows ?? []),
+              { startsAt: need.startsAt ?? need.due, endsAt: need.endsAt },
+            ],
+          };
+        }
+        continue;
+      }
       seenRole.add(dupeKey);
       entries.push({
         key: need._id ? `need:${need._id}` : dupeKey,
@@ -139,11 +181,67 @@ export class EventTimelineStaffRoster {
         role,
         status: "filled",
         source: "filled_need",
+        sourceIds: need._id ? [need._id] : [],
+        plannedWindows: [
+          { startsAt: need.startsAt ?? need.due, endsAt: need.endsAt },
+        ],
         startsAt: need.startsAt ?? need.due ?? null,
+        endsAt: need.endsAt,
       });
     }
 
-    return entries;
+    if (input.shifts === undefined) return entries;
+    const shifts = input.shifts.filter(
+      (shift) =>
+        shift.deletedAt == null &&
+        shift.eventId === input.eventId &&
+        shift.status !== "cancelled",
+    );
+    const represented = new Set<string>();
+    const scheduledEntries = entries.map((entry) => {
+      const windows = shifts
+        .filter(
+          (shift) =>
+            shift.personId === entry.personId &&
+            shift.eventStaffingSourceIds?.some((id) =>
+              entry.sourceIds?.includes(id),
+            ),
+        )
+        .sort(
+          (left, right) =>
+            Number(left.startsAt ?? 0) - Number(right.startsAt ?? 0),
+        );
+      for (const shift of windows) represented.add(shift._id);
+      return {
+        ...entry,
+        shiftWindows: windows,
+        startsAt: windows.length ? windows[0].startsAt : entry.startsAt,
+        endsAt: windows.length
+          ? windows[windows.length - 1].endsAt
+          : entry.endsAt,
+      };
+    });
+    // Manual-only and historical shifts are real work in their own right.
+    // They never supply an unrelated Assignment's role or window.
+    for (const shift of shifts) {
+      if (represented.has(shift._id) || !shift.personId) continue;
+      const person = directory.get(shift.personId);
+      if (!person) continue;
+      scheduledEntries.push({
+        key: `shift:${shift._id}`,
+        personId: shift.personId,
+        label: EventTimelineStaffRoster.labelFor(person),
+        role: shift.role?.trim() || "Shift",
+        status: String(shift.status ?? "scheduled"),
+        source: "shift",
+        sourceIds: [],
+        plannedWindows: [],
+        shiftWindows: [shift],
+        startsAt: shift.startsAt,
+        endsAt: shift.endsAt,
+      });
+    }
+    return scheduledEntries;
   }
 
   static labelFor(person: PersonRow): string {

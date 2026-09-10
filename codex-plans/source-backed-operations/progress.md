@@ -1,5 +1,222 @@
 # Progress
 
+## 2026-09-10 registry consumption, green gate, and connected staff swaps
+
+Final checkpoint gate: handle2320 completed exit0. The current source/UI passes
+all of bun run check, with165files/1,465tests. The complete checkpoint has
+independent gpt-5.6-sol APPROVE after DESIGN.md review and the corrections below.
+Source/generated output and only the14 newly referenced ownership baselines are
+ready for the branch checkpoint. The original goal remains substantially
+incomplete: filled-Need replacement/removal, complete My Day eligibility and
+authenticated app-shell proof, existing-data repairs, purchasing/stock, packing,
+print/reports, release and authenticated deployed verification remain required.
+No Capsule production writes or deployment occurred.
+
+Latest review: gpt-5.6-sol APPROVES the whole connected staffing checkpoint
+against73632202 after the manual-only roster correction. The shared projection
+matches Shift windows by source ID and person, then adds unrepresented event
+Shifts as separate Shift-owned rows. EventTimelinePanel uses the same source so
+manual-only crew appear in timeline choices and key staff. Actual generated
+fixtures/browser proof cover the separate10–11 pickup, early/late assigned roles,
+manual-only captain and unique-person counts at1440/900/390.
+
+Full check4785 exposed two existing tests requiring usable filled-request
+details. Covered/cancelled requests now retain name, person, description, status
+and planned window in a keyboard-accessible details section below the open queue;
+the nine existing tests pass unchanged. Typecheck91744 passed. The newest full
+gate is handle2320, log check-staffing-roster-final.log; poll it, do not restart
+because observation times out. Commit/push requires its successful completion.
+The whole-diff reviewer read DESIGN.md and found no presentation violations or
+new operational tedium. This is checkpoint approval, not full-goal/live completion.
+
+Follow-up checkpoint evidence: full check39707 passed 165 files / 1,465 tests and
+every required gate after swap/history changes. Subsequent UI fixes count unique
+people (including per-role counts), label confirmation counts as assignments,
+retain filled requests on the roster while limiting the open queue to open/held
+requests, and qualify availability findings to visible records. Rendered desktop
+inspection also found the unlayered `.sr-only` utility kept both table headings
+clipped despite `md:not-sr-only`; `max-md:sr-only` fixes that without global CSS
+changes. The browser reproduction first failed against the header's clipped box,
+then passed. Current component/hook checks pass1440/900/390 with screenshots.
+A fresh full gate and whole-diff gpt-5.6-sol review are running next; those UI
+changes are not covered by the earlier full-check result.
+
+Further complete-workflow qualification must include source-free manual Shifts
+in the event roster (the current fallback may attach an unrelated window to each
+role), manager replacement/removal of filled Needs, and My Day recipient
+eligibility reads for non-workforce staff. These are required product work, not
+owner-approved deferrals. Full authenticated app-shell proof remains required.
+
+The preceding status turn completed the specific in-flight full-check handle
+89321 (exit 0): 165 files / 1,463 tests, TypeScript, formatting, generation,
+design, build, and baseline checks passed. That is verification progress, not
+whole-goal completion. Subsequent changes below require a fresh full check.
+
+Manifest PR81 merged after exact-head cross-model APPROVE and green Linux,
+Windows and GitGuardian checks. Patch release run34516969776 succeeded; registry
+3.6.53 has gitHead882f1b016574163806de800bdf368826d10bb060 and matching release
+inventory. Capsule and isolated Builder now resolve3.6.53; normal regeneration
+passed. Issue363 is closed with publication/integrity evidence. Issue362's
+generated computed helper now compiles in Capsule.
+
+The person-wide manual-work freeze is fixed and independently APPROVED by
+gpt-5.6-sol. Source-linked manual/recorded groups remain unchanged while unrelated
+roles for the same person can be created, moved and retired. The scratch
+staffing-manual-groups-qualified.json/.log retain exact runtime evidence.
+
+Approved swaps now transfer their linked EventAssignments and filled/claimed
+EventStaffNeeds along with the Shift through generated commands in one
+transaction. Recipient acceptance supplies assignment confirmation; the original
+Shift staffing-person provenance and earlier swap requests survive. Ordinary
+linked event staff can propose/respond to their own requests. The first runtime
+attempt reproduced their former read-policy denial; workforce-role reproduction
+then proved the stale source owners. Both corrected paths now pass.
+
+Independent review initially REJECTED a partial legacy-repair public child path.
+Each validated child command now completes the remaining approved source group,
+rereading current versions and stopping at already-transferred rows. Re-review
+APPROVES the bounded swap correction. Expanded scratch proof passes direct legacy
+repair, twelve linked sources, second/repeated swaps, unlinked/forged child
+rollback, later timing preservation, and full approval rollback for recorded work
+or newly approved recipient time off. Evidence: qualify-staffing-swaps-runtime.ts
+and staffing-swaps-{gap,qualified}.json/.log under operations-source-study.
+
+A further actual runtime failure showed TimeRecords linked only by shiftId were
+missed by event-only reads: crew changes moved recorded work and unassignment
+cancelled its Shift. The shared reader now unions both indexed relationships;
+manual retiming/reconciliation/cancellation and public timing checks preserve that
+history. Red/green evidence: staffing-shift-only-time-{gap,qualified}.json/.log.
+Independent gpt-5.6-sol review APPROVES this additional history correction.
+
+The combined staffing draft remains uncommitted and lacks whole-diff approval.
+Next: full gate, staffing counts/filled-request usability, actual app browser
+qualification, and source-backed existing-data repair. My Day swap eligibility
+reads for non-workforce crew also need complete qualification. Purchasing,
+packing, print/reports, release and authenticated production proof remain in the
+full goal. No Capsule production write or deployment occurred.
+
+## 2026-09-10 upstream PR81 and concrete staffing preservation failures
+
+Manifest source commit9521ae61895e9573a4437d515a24f5f7b95e2c08 and documentation
+proof commits are pushed; final headc1a6d1f08f7f57973a8f300f7f786a2d9ce4ca99.
+PR https://github.com/Angriff36/Manifest/pull/81 is OPEN. Independent
+model gpt-5.6-sol APPROVES the exact db385089..c1a6d1f range. One intervening
+REJECT concerned only a missing proof-line range; it was corrected and
+re-reviewed. Full4513 tests, typecheck/lint/format/cycles/docs passed locally.
+Latest CI run34516255066 is live on that exact head (Windows typecheck and
+Linux cycles at last read). Do not merge until exact-head CI is green. Then
+merge upstream with ancestry preserved, run cut-release patch, verify npm
+version/gitHead and release inventory, and consume the registry version through
+aligned isolated Builder/Capsule regeneration. Registry remains3.6.52 at last read.
+
+The extra release-inventory defect is tracked separately in
+https://github.com/Angriff36/capsule/issues/363. Its one-step workflow fix is in
+PR81; close only after a new release proves matching inventory/package versions.
+
+A focused independent review of the remaining Capsule draft found an actual
+person-wide freeze. The new scratch generated-command reproduction
+qualify-staffing-manual-groups-runtime.ts independently confirms all three cases:
+manual morning Shift + new evening Assignment yields only1 live Shift (expected2,
+zero linked to the new Assignment); moving another evening Assignment leaves its
+old Shift timestamp; unassigning it leaves that Shift scheduled instead of retired.
+Evidence: staffing-manual-groups-gap.json/.log. This is an intentional failing
+qualification, not a gate pass. Preserve exact linked manual/performed source
+work, then reconcile unrelated source/interval groups for the same person.
+validateAutomaticEventShift currently repeats the person-wide restriction and
+must be corrected consistently with reconcileEventStaffing.
+
+Approved swaps are a second unqualified ownership path: Shift.personId changes
+while Assignment.personId/Need.filledByPersonId still name the prior person and
+there is no ShiftSwapped staffing callback. Choose a connected source-owned
+transfer/coverage representation, preserving original provenance and worked
+history, then prove the actual approved swap flow. No product/source fix for
+these two staffing problems has landed yet; the reviewer has not approved the
+Capsule draft. Latest connected390/1440 screenshots were visually inspected:
+split windows are visible and tables fit, but roster counts still count role
+rows and the Open/claimable section still lists filled requests. Full app/browser
+and product/data qualification remain ahead.
+
+No Capsule production writes/deployment. The full original goal remains active.
+
+## 2026-09-10 computed-context generator implementation and local proof
+
+The preceding status-only turn was no progress toward implementation. This
+continuation revalidated the active goal and worktrees, then reproduced and
+fixed issue362 in the isolated Manifest worktree
+C:/Projects/Manifest/.worktrees/convex-computed-auth-context.
+
+Initial setup60038 succeeded. Building the CLI as well as build:lib removed
+the one missing-dist baseline failure; the clean baseline passed 4,506 tests.
+Five generated-code regressions then reproduced missing user/context/checkRole
+in helpers, nested computed hydration, and inline queries with public, row-only,
+or context-only read policies. All now pass. Two more checks prove nested-only
+runtime dependencies and a loud failure when inline authContextImport is absent.
+The full updated suite passes 4,513 tests (315 files, 60 skipped); local
+TypeScript, lint and regenerated docs checks pass. Upstream source is still
+uncommitted. A bounded gpt-5.6-sol review approved the generator implementation;
+final review must include the latest test/doc/release-workflow changes.
+
+The standalone helper accepts explicit user/context bindings only when needed,
+child materialization uses the same bindings, and inline queries load required
+context independently of read policies. Role helper emission is shared with the
+existing query/mutation semantics. No language or IR meaning changed.
+
+A separate baseline release issue left FEATURE-LIST at 3.6.51 after the 3.6.52
+version bump. Regeneration clears docs:check. The workflow now regenerates it
+after install; the next published release must verify this repair. Local proof
+logs use prefix manifest-computed-auth- under .artifacts/operations-source-study.
+
+Capsule still resolves registry3.6.52 and still has its uncommitted staffing draft
+and failing generated helper. Registry publication, aligned Builder consumption,
+Capsule regeneration/full gate/full review, staffing edge cases, live repairs,
+purchasing/reports and final release/authenticated production proof remain.
+No Capsule production mutation or deployment occurred.
+
+## 2026-09-10 connected staffing draft and computed-auth projection gap
+
+This turn made concrete source/runtime/UI progress after pushed checkpoint
+73632202f2010c49656bb2508f42af4f7807c733. The new staffing draft is uncommitted.
+Assignments and filled needs now use transactional generated Shift commands;
+calculated timing follows the crew plan; personal/recorded windows survive;
+crew reads the event roster and volunteers/releases their own holds. Public
+automatic Shift commands check the canonical staffing group and retirement
+still needed by live sources rolls back. The separate browser assign/schedule,
+manual sync, and cancel-before-unassign cascade are removed.
+
+Expanded real generated-runtime checks pass, including three timeline-editor
+roles, manual Assignment/filled-Need preservation, approved-time-off rollback,
+unknown-first-fill, own claims, private time records and forged/duplicate Shift
+calls. Actual EventStaffingTab with generated hooks and those runtime snapshots
+passes 1440/900/390 interactions, failed-input retention, keyboard retry, crew
+volunteering/release, no overflow, missing-time messaging and same-role split
+Assignment/filled-Need windows. This is component/transport evidence, not an
+authenticated full-app backend or production claim.
+
+Independent Sol review found and we corrected lost same-role filled-Need source
+links in the roster and feature-local permission reconstruction. Manifest Event
+now exposes staffingCanManage to the UI. That revealed projection issue
+[#362](https://github.com/Angriff36/capsule/issues/362): authenticated inline
+queries evaluate the field correctly, but generated convex/computed.ts emits
+undefined checkRole/user in its doc-only helper. The latest full check is
+terminal at six TS2304 errors there. A separate TS7006 callback annotation was
+corrected afterward. Earlier full check ran 1,463 tests with two compatibility
+failures (permission message/time fragment), both corrected before this latest
+check. Do not report a passing current full gate or full-diff APPROVE.
+
+Both Capsule and isolated Builder resolve registry Manifest3.6.52. Fresh
+origin/main in Manifest is db385089432f8067650d252898a6633510e56d03. Generator
+work is isolated at C:/Projects/Manifest/.worktrees/convex-computed-auth-context,
+branch fix/convex-computed-auth-context, with no source edits yet. Initial
+dependency install/build:lib completed successfully (session60038 exit0); see
+the newer continuation entry above for the implemented generator fix. Log: manifest-computed-auth-setup.log.
+The dirty Manifest and Manifest-source primary checkouts were preserved.
+
+Next: repair/review/publish the computed-context projection, consume its registry
+release through isolated Builder regeneration, finish staffing qualification
+(including swaps/manual groups and affected real records), then the remaining
+connected purchasing/data/report work. No Capsule production write/deploy.
+The full original goal remains active. See staffing-timing.md and runtime-gaps.md.
+
 ## 2026-09-10 sales ownership is separate from field staffing
 
 Previous checkpoint 205cd0a45bfeff32a6dbcc8e820088c8b2952762 is committed,

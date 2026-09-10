@@ -88,6 +88,8 @@ function AvailabilityChips({
 
 export function EventStaffingCoverageView({
   roster,
+  canManage = false,
+  currentPersonId = null,
   eventNeeds,
   people,
   activePeople,
@@ -98,10 +100,13 @@ export function EventStaffingCoverageView({
   onUnassign,
   onClaim,
   onFill,
+  onReleaseClaim,
   onCancel,
   conflictsFor,
 }: {
   roster: readonly StaffingRosterEntry[];
+  canManage?: boolean;
+  currentPersonId?: string | null;
   eventNeeds: readonly EventStaffNeedRow[];
   people: readonly PersonRow[] | undefined;
   activePeople: readonly PersonRow[];
@@ -112,26 +117,34 @@ export function EventStaffingCoverageView({
   onUnassign: (entry: StaffingRosterEntry) => void;
   onClaim: (need: EventStaffNeedRow, personId: string) => void;
   onFill: (need: EventStaffNeedRow, personId: string) => void;
+  onReleaseClaim?: (need: EventStaffNeedRow) => void;
   onCancel: (need: EventStaffNeedRow) => void;
-  conflictsFor: (personId: string) => StaffingConflictSummary;
+  conflictsFor: (
+    personId: string,
+    windows?: readonly { startsAt?: number | null; endsAt?: number | null }[],
+  ) => StaffingConflictSummary;
 }) {
   const openNeeds = eventNeeds.filter(
     (need) => need.status === "open" || need.status === "claimed",
-  ).length;
+  );
+  const peopleCount = new Set(roster.map((entry) => entry.personId)).size;
+  const pastNeeds = eventNeeds.filter(
+    (need) => need.status === "filled" || need.status === "cancelled",
+  );
 
   return (
     <>
       <section className="card overflow-hidden">
         <CardHeader
           title="Assigned staff"
-          trailing={`${roster.length} on the roster`}
+          trailing={`${peopleCount} on the roster`}
         />
         <div className="overflow-x-auto">
           <table
-            className="w-full text-base"
+            className="block w-full text-base md:table"
             data-testid="event-staffing-roster"
           >
-            <thead>
+            <thead className="max-md:sr-only md:table-header-group">
               <tr>
                 <th className="th">Name &amp; role</th>
                 <th className="th">Shift</th>
@@ -140,16 +153,21 @@ export function EventStaffingCoverageView({
                 <th className="th text-right">Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block md:table-row-group">
               {roster.map((entry) => {
-                const conflict = conflictsFor(entry.personId);
+                const conflict = conflictsFor(
+                  entry.personId,
+                  entry.shiftWindows?.length
+                    ? entry.shiftWindows
+                    : (entry.plannedWindows ?? [entry]),
+                );
                 return (
                   <tr
                     key={entry.key}
-                    className="border-b border-line last:border-b-0"
+                    className="block border-b border-line py-2 last:border-b-0 md:table-row md:py-0"
                     data-testid="event-staffing-roster-row"
                   >
-                    <td className="px-3 py-2 align-top">
+                    <td className="block px-3 py-2 md:table-cell align-top">
                       <Link
                         to="/staff/roster"
                         className="font-medium underline-offset-2 hover:underline"
@@ -158,26 +176,38 @@ export function EventStaffingCoverageView({
                       </Link>
                       <p className="font-mono text-xs text-ink-3">
                         {entry.role}
-                        {entry.startsAt
+                        {entry.startsAt != null
                           ? ` · ${formatTime(entry.startsAt)}`
                           : ""}
                       </p>
                     </td>
-                    <td className="px-3 py-2 align-top font-mono text-xs whitespace-nowrap text-ink-2">
-                      {entry.startsAt
-                        ? entry.endsAt
-                          ? `${formatTime(entry.startsAt)} – ${formatTime(entry.endsAt)}`
-                          : formatTime(entry.startsAt)
-                        : "—"}
+                    <td className="block px-3 py-2 md:table-cell align-top font-mono text-xs whitespace-nowrap text-ink-2">
+                      <span className="mr-2 font-sans md:hidden">Shift:</span>
+                      {(entry.shiftWindows?.length
+                        ? entry.shiftWindows
+                        : (entry.plannedWindows ?? [entry])
+                      ).map((window, index) => (
+                        <span className="block" key={index}>
+                          {window.startsAt != null
+                            ? `${entry.shiftWindows?.length ? "" : "Planned: "}${formatTime(window.startsAt)} – ${window.endsAt != null ? formatTime(window.endsAt) : "End time needed"}`
+                            : window.endsAt != null
+                              ? `Start time needed – ${formatTime(window.endsAt)}`
+                              : "Timing needed"}
+                        </span>
+                      ))}
                     </td>
-                    <td className="px-3 py-2 align-top">
+                    <td
+                      className={`${conflict.available || conflict.overlappingShifts.length || conflict.approvedOff.length ? "block" : "hidden"} px-3 py-2 md:table-cell align-top`}
+                    >
                       <AvailabilityChips conflict={conflict} />
                     </td>
-                    <td className="px-3 py-2 align-top">
+                    <td className="block px-3 py-2 md:table-cell align-top">
                       <StatusChip status={String(entry.status)} />
                     </td>
-                    <td className="px-3 py-2 text-right align-top">
-                      {entry.unassign ? (
+                    <td
+                      className={`${canManage && entry.unassign ? "block" : "hidden"} px-3 py-2 md:table-cell text-right align-top`}
+                    >
+                      {canManage && entry.unassign ? (
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm"
@@ -204,13 +234,16 @@ export function EventStaffingCoverageView({
       <section className="card overflow-hidden">
         <CardHeader
           title="Open / claimable shifts"
-          trailing={`${openNeeds} awaiting cover`}
+          trailing={`${openNeeds.length} awaiting cover`}
         >
           {postForm ? <div className="mt-2.5">{postForm}</div> : null}
         </CardHeader>
         <div className="overflow-x-auto">
-          <table className="w-full text-base" data-testid="event-staff-needs">
-            <thead>
+          <table
+            className="block w-full text-base md:table"
+            data-testid="event-staff-needs"
+          >
+            <thead className="max-md:sr-only md:table-header-group">
               <tr>
                 <th className="th">Shift</th>
                 <th className="th">Status</th>
@@ -218,8 +251,8 @@ export function EventStaffingCoverageView({
                 <th className="th text-right">Action</th>
               </tr>
             </thead>
-            <tbody>
-              {eventNeeds.map((need) => {
+            <tbody className="block md:table-row-group">
+              {openNeeds.map((need) => {
                 const coveringId =
                   EventTimelineStaffRoster.personIdForNeed(need);
                 const covering = coveringId
@@ -234,10 +267,10 @@ export function EventStaffingCoverageView({
                 return (
                   <tr
                     key={need._id}
-                    className="border-b border-line last:border-b-0"
+                    className="block border-b border-line py-2 last:border-b-0 md:table-row md:py-0"
                     data-testid="event-staff-need-row"
                   >
-                    <td className="px-3 py-2 align-top">
+                    <td className="block px-3 py-2 md:table-cell align-top">
                       <p
                         className="font-medium"
                         data-testid="event-staff-need-title"
@@ -246,16 +279,18 @@ export function EventStaffingCoverageView({
                       </p>
                       <p className="text-sm text-ink-3">
                         {need.description || "No description"}
-                        {need.startsAt
-                          ? ` · ${formatDate(need.startsAt)} ${formatTime(need.startsAt)}`
-                          : ""}
+                        {need.startsAt != null
+                          ? ` · ${formatDate(need.startsAt)} ${formatTime(need.startsAt)}${need.endsAt != null ? ` – ${formatTime(need.endsAt)}` : " · End time needed"}`
+                          : " · Timing needed"}
                       </p>
                     </td>
-                    <td className="px-3 py-2 align-top">
+                    <td className="block px-3 py-2 md:table-cell align-top">
                       <StatusChip status={String(need.status)} />
                     </td>
-                    <td className="px-3 py-2 align-top">
-                      {claimable && activePeople.length > 0 ? (
+                    <td
+                      className={`${canManage && claimable ? "block" : "hidden"} px-3 py-2 md:table-cell align-top`}
+                    >
+                      {canManage && claimable && activePeople.length > 0 ? (
                         <label className="field-label">
                           <span className="sr-only">
                             Person for {need.role}
@@ -273,7 +308,7 @@ export function EventStaffingCoverageView({
                           >
                             <option value="">Choose person…</option>
                             {activePeople.map((person) => {
-                              const conflict = conflictsFor(person._id);
+                              const conflict = conflictsFor(person._id, [need]);
                               return (
                                 <option key={person._id} value={person._id}>
                                   {personLabel(person)}
@@ -292,9 +327,11 @@ export function EventStaffingCoverageView({
                         <span className="text-base text-ink-3">—</span>
                       )}
                     </td>
-                    <td className="px-3 py-2 align-top">
+                    <td
+                      className={`${claimable ? "block" : "hidden"} px-3 py-2 md:table-cell align-top`}
+                    >
                       <div className="flex flex-wrap items-center justify-end gap-1.5">
-                        {claimable && activePeople.length > 0 ? (
+                        {canManage && claimable && activePeople.length > 0 ? (
                           <>
                             {need.status === "open" ? (
                               <button
@@ -324,7 +361,32 @@ export function EventStaffingCoverageView({
                             </button>
                           </>
                         ) : null}
-                        {claimable ? (
+                        {!canManage &&
+                        need.status === "open" &&
+                        currentPersonId ? (
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => onClaim(need, currentPersonId)}
+                          >
+                            Volunteer
+                          </button>
+                        ) : null}
+                        {onReleaseClaim &&
+                        need.status === "claimed" &&
+                        (canManage ||
+                          need.claimedByPersonId === currentPersonId) ? (
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => onReleaseClaim(need)}
+                          >
+                            Release hold
+                          </button>
+                        ) : null}
+                        {canManage && claimable ? (
                           <button
                             type="button"
                             className="btn btn-ghost btn-sm"
@@ -333,9 +395,7 @@ export function EventStaffingCoverageView({
                           >
                             Cancel
                           </button>
-                        ) : (
-                          <span className="text-base text-ink-3">—</span>
-                        )}
+                        ) : null}
                       </div>
                     </td>
                   </tr>
@@ -344,10 +404,48 @@ export function EventStaffingCoverageView({
             </tbody>
           </table>
         </div>
-        {eventNeeds.length === 0 ? (
-          <p className="empty-state">
-            No open shifts posted. Post one so eligible staff can claim it.
-          </p>
+        {openNeeds.length === 0 ? (
+          <p className="empty-state">No shifts awaiting cover.</p>
+        ) : null}
+        {pastNeeds.length > 0 ? (
+          <details className="border-t border-line px-4 py-3">
+            <summary className="cursor-pointer text-sm font-medium text-ink-2">
+              Covered and cancelled requests ({pastNeeds.length})
+            </summary>
+            <div className="mt-3 divide-y divide-line">
+              {pastNeeds.map((need) => {
+                const personId = EventTimelineStaffRoster.personIdForNeed(need);
+                const person = people?.find((row) => row._id === personId);
+                return (
+                  <div
+                    key={need._id}
+                    className="py-3"
+                    data-testid="event-staff-need-row"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p
+                        className="text-base font-medium"
+                        data-testid="event-staff-need-title"
+                      >
+                        {EventTimelineStaffRoster.titleForNeed(need, person)}
+                      </p>
+                      <StatusChip status={String(need.status)} />
+                    </div>
+                    {need.description ? (
+                      <p className="mt-1 text-base text-ink-2">
+                        {need.description}
+                      </p>
+                    ) : null}
+                    <p className="mt-1 text-sm text-ink-3">
+                      {need.startsAt != null
+                        ? `${formatDate(need.startsAt)} ${formatTime(need.startsAt)}${need.endsAt != null ? ` – ${formatTime(need.endsAt)}` : " · End time needed"}`
+                        : "Timing needed"}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </details>
         ) : null}
       </section>
     </>
