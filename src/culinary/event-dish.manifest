@@ -37,6 +37,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  hasMany prepTasks: PrepTask
 
   computed targetHeadcount: int = self.quantityServings
   // Display helper: largest batch count across attached components (lemonade = one component).

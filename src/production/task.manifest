@@ -209,6 +209,43 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Derive the remaining work from this menu line and its recorded output.
+  // Updating its remaining quantity must not restart or reassign active work.
+  command reconcileRemainingWork(expectedVersion: int) {
+    guard self.deletedAt == null and self.isGenerated == true
+    guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
+    // Closed events and removed menu lines retain their recorded work.
+    guard self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled"
+    guard self.eventDish != null and self.eventDish.deletedAt == null and self.eventDish.removedAt == null
+    guard self.dishTask != null and self.dishTask.deletedAt == null and self.dishTask.status == "active"
+    guard self.version == expectedVersion
+    compute recipeUnit = self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion"
+    compute sourceMass = recipeUnit == "gram" ? 1 : recipeUnit == "kilogram" ? 1000 : recipeUnit == "ounce" ? 28.349523125 : recipeUnit == "pound" ? 453.59237 : 0
+    compute sourceVolume = recipeUnit == "milliliter" ? 1 : recipeUnit == "liter" ? 1000 : recipeUnit == "teaspoon" ? 4.92892159375 : recipeUnit == "tablespoon" ? 14.78676478125 : recipeUnit == "cup" ? 236.5882365 : recipeUnit == "pint" ? 473.176473 : recipeUnit == "quart" ? 946.352946 : recipeUnit == "gallon" ? 3785.411784 : 0
+    compute targetMass = self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0
+    compute targetVolume = self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0
+    // Never credit a different ingredient/component or convert across dimensions.
+    guard (self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion") == self.unit or ((self.dishTask.defaultUnit == "gram" or self.dishTask.defaultUnit == "kilogram" or self.dishTask.defaultUnit == "ounce" or self.dishTask.defaultUnit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((self.dishTask.defaultUnit == "milliliter" or self.dishTask.defaultUnit == "liter" or self.dishTask.defaultUnit == "teaspoon" or self.dishTask.defaultUnit == "tablespoon" or self.dishTask.defaultUnit == "cup" or self.dishTask.defaultUnit == "pint" or self.dishTask.defaultUnit == "quart" or self.dishTask.defaultUnit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon"))
+    guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and not (task.unit == self.unit or ((self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound") and (task.unit == "gram" or task.unit == "kilogram" or task.unit == "ounce" or task.unit == "pound")) or ((self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon") and (task.unit == "milliliter" or task.unit == "liter" or task.unit == "teaspoon" or task.unit == "tablespoon" or task.unit == "cup" or task.unit == "pint" or task.unit == "quart" or task.unit == "gallon")))) == 0
+    guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" and ((task.componentId != null ? task.componentId : null) != (self.dishTask.componentId != null ? self.dishTask.componentId : null) or (task.ingredientId != null ? task.ingredientId : null) != (self.dishTask.ingredientId != null ? self.dishTask.ingredientId : null))) == 0
+    compute unitRatio = recipeUnit == self.unit ? 1 : (sourceMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
+    compute requiredWork = (self.dishTask.defaultQuantity != null ? self.dishTask.defaultQuantity : 1) * self.eventDish.quantityServings * unitRatio
+    compute completedWork = sum(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" ? (task.completedQuantity != null ? task.completedQuantity : task.quantity) * (task.unit == self.unit ? 1 : (targetMass > 0 ? (task.unit == "gram" ? 1 : task.unit == "kilogram" ? 1000 : task.unit == "ounce" ? 28.349523125 : task.unit == "pound" ? 453.59237 : 0) / targetMass : (targetVolume > 0 ? (task.unit == "milliliter" ? 1 : task.unit == "liter" ? 1000 : task.unit == "teaspoon" ? 4.92892159375 : task.unit == "tablespoon" ? 14.78676478125 : task.unit == "cup" ? 236.5882365 : task.unit == "pint" ? 473.176473 : task.unit == "quart" ? 946.352946 : task.unit == "gallon" ? 3785.411784 : 0) / targetVolume : 0))) : 0)
+    compute otherOpenWork = sum(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status != "completed" ? task.quantity * (task.unit == self.unit ? 1 : (targetMass > 0 ? (task.unit == "gram" ? 1 : task.unit == "kilogram" ? 1000 : task.unit == "ounce" ? 28.349523125 : task.unit == "pound" ? 453.59237 : 0) / targetMass : (targetVolume > 0 ? (task.unit == "milliliter" ? 1 : task.unit == "liter" ? 1000 : task.unit == "teaspoon" ? 4.92892159375 : task.unit == "tablespoon" ? 14.78676478125 : task.unit == "cup" ? 236.5882365 : task.unit == "pint" ? 473.176473 : task.unit == "quart" ? 946.352946 : task.unit == "gallon" ? 3785.411784 : 0) / targetVolume : 0))) : 0) - self.quantity
+    compute remainingWork = requiredWork > completedWork + otherOpenWork ? requiredWork - completedWork - otherOpenWork : 0
+    mutate quantity = round(remainingWork * 10000) / 10000
+    emit PrepTaskGeneratedRefreshed {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      quantity: self.quantity
+      unit: self.unit
+      specialInstructions: self.specialInstructions
+    }
+  }
+
+
   // Attendance/menu edits update uncompleted generated work in the same
   // transaction as demand. Preserve assignments, progress and kitchen notes.
   command syncServings(quantityServings: number) {
