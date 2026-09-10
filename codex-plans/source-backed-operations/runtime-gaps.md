@@ -212,3 +212,21 @@ keeps loading separate from missing records, and formats positive amounts withou
 zeroing them. See progress.md for browser/precision, independent-review and final
 gate evidence. Prep navigation and sibling ingredient detail pass isolated-data
 checks at390/900/1440px; authenticated live recipe/data verification remains.
+
+### Prep recipe context and crew event reads, 2026-09-10 (#349/#350)
+
+Event prep and the kitchen deck previously opened the base component batch;
+My Day, mobile event prep, and the production board had no recipe links.
+Task-identity links now carry the actual prep amount and event to component
+detail. Compatible units convert exactly; incompatible portions/dimensions do
+not imply a recipe conversion. Preview edits stay local and route/unit-specific.
+Recorded completed/cancelled amounts are explicitly shown against the current
+recipe, not presented as a historical recipe snapshot.
+
+Runtime qualification also found that kitchen, logistics, and workforce staff
+could read their work but received no Event rows because eventRead required
+eventAccess or salesAccess. Event now uses staffAccess, as the binding
+domain-gating-restraint requires for shared operational facts. The generated
+write/execute and manager gates remain. See progress.md for role, tenant,
+deletion, browser, review, and full-check evidence. No production change is
+claimed; issues349/350 remain open through release/live verification.

@@ -77,6 +77,15 @@ Continue the complete recipe/data flow, including event-quantity context and
 authenticated usable links; this does not resolve the remaining source conflicts,
 affected-data migration, purchasing calendar/allocation or final release work.
 
+Prep-to-recipe event quantities and the five operational recipe-link surfaces
+are implemented and qualified at390/900/1440px. Event staff reads now follow
+the shared-operations staffAccess rule instead of hiding events from kitchen,
+logistics, and workforce. Full check passes with1455tests and independent
+gpt-5.6-sol approves. See progress.md for exact checkpoint/push evidence.
+Continue the affected live data and connected operational workflows; source
+ambiguities, purchasing/rescheduling/allocation, full reports/mobile/print,
+staffing/timeline/battleboard, release and authenticated production proof remain.
+
 
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 

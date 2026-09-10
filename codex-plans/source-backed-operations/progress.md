@@ -976,3 +976,76 @@ at390/900/1440px passed; current component desktop and ingredient mobile
 screenshots were visually inspected after the layout change.
 No authored tests were added or expanded. No production writes, data repair,
 Capsule deployment or full-goal completion is claimed.
+
+### 2026-09-10 — live prep amounts on usable recipe links
+
+The preceding status-only turn was no implementation progress. Re-read the full
+goal, confirmed d93ad60d on the working branch and origin, and resumed the owned
+unfinished prep-context changes. The full catering objective remains active.
+
+Event prep, My Day, mobile event prep, the production board, and the kitchen
+deck now link the component with its stored prep-task identity. The component
+page reads that task and event through generated hooks. The source's three-quart
+Raspberry Balsamic Vinaigrette produces generated prep amounts of10.4375 and20.875
+quarts for167/334 guests; each link opens the correct amount and event backlink.
+No quantity is copied into the URL, no new records are written by previewing,
+and no density or portion-to-volume conversion is invented.
+
+Live quantities update an untouched preview. A cook's deliberate preview stays
+local, with Use prep amount and Recipe batch controls. Overrides belong to the
+component/task/recipe unit so one event or unit cannot inherit another's amount.
+Malformed, unavailable, deleted, changed-component, and incompatible-unit states
+keep the recipe readable without scaling from unrelated data. Completed and
+cancelled work shows its recorded amount against the current recipe, not a
+historical edition claim. Ingredients and method now precede cost, nutrition,
+and import provenance. Raw event/dish identifiers were removed from the two
+changed prep fallbacks. Issue349 tracks the missing links/context:
+https://github.com/Angriff36/capsule/issues/349.
+
+Generated-runtime role checks exposed a connected access failure: kitchen staff,
+leads/managers, logistics staff and workforce staff received no Event records,
+although their operational views consume those reads. Event.read now uses
+staffAccess, following docs/architecture/domain-gating-restraint.md. Regenerated
+with BUILDER_DIR=C:/Projects/builder-source-operations and bun run manifest:regen,
+then proof:emit. All20 owned files and the6 changed baseline digests match.
+The same five roles now receive the two same-tenant fixture events. Foreign,
+anonymous and deleted records remain hidden; kitchen pricing changes are denied
+with the event unchanged. Event write/execute/manager guards remain intact.
+Issue350: https://github.com/Angriff36/capsule/issues/350.
+
+Browser qualification uses actual authored surfaces with isolated generated
+runtime records and substituted data hooks, at390/900/1440px. It verifies each
+surface's recipe link and keyboard/event return, both guest-count amounts,
+live updates, manual preview preservation/reset, route and unit changes, exact
+cup/quart conversion, zero/fractional previews, incompatible units, missing/
+loading/mismatched/settled contexts, method order, no writes and no body overflow.
+Final screenshots include all five surfaces and component detail. Phone recipe,
+phone My Day and desktop kitchen deck were visually inspected. The initial
+fixture captured a preceding route and omitted parent-owned CSS; it now waits
+for the committed route and imports the real My Day/kitchen styles. Those
+initial images are not final multi-surface proof. The completed-amount assertion
+also initially used qt instead of the formatter's quart; corrected fixture
+assertion passes. Convex-test synthetic IDs are normalized to lowercase only
+in the browser fixture so they satisfy the existing real-ID route check.
+
+Evidence under .artifacts/operations-source-study:
+
+- qualify-prep-recipe-context-data.ts and prep-recipe-context-fixture.json
+- prep-recipe-context-reads-baseline/qualified.json
+- prep-recipe-context-data-baseline/qualified.log
+- qualify-prep-recipe-context-browser.mjs and prep-recipe-context-qualified.json
+- prep-recipe-context-layout.tsx/html and prep-recipe-context-hook-fixture.ts
+- prep-recipe-{event-prep,my-day,mobile,production,kitchen,detail}-{390,900,1440}.png
+- regen-prep-event-context.log and check-prep-event-context.log
+
+Full bun run check passed with exit0:165 files/1455 tests, typecheck, formatting,
+secrets, ownership/generation, proof/integration/design checks, coverage, local
+Vite build and baseline decay. No authored tests were added or expanded.
+Independent gpt-5.6-sol reviewed the implementation and DESIGN.md and APPROVED.
+The reviewer initially objected to broad Event reads, then explicitly withdrew
+that rejection after checking the binding owner read-wide rule and the existing
+shared operational consumers. No new policy friction or design drift remained.
+Commit/push state is recorded by the following checkpoint; there is no Capsule
+production deployment, affected-data write, authenticated production proof, or
+whole-goal completion in this checkpoint. The broader unresolved workflows,
+source conflicts and pending operational choices remain in task_plan.md.

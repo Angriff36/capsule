@@ -153,6 +153,7 @@ export function EventPrepList({
                           <CulinaryEntityLink
                             kind="component"
                             id={task.componentId}
+                            prepTaskId={task._id}
                             className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
                           >
                             Recipe: {component?.name ?? task.name}

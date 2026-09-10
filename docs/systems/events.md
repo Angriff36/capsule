@@ -26,6 +26,8 @@ Manifest source owns business rules. Capsule provides the operator workflow thro
 
 The index displays only real query results. Each row shows Event title, Venue, Client, start date, headcount, budget, and lifecycle stage. Clicking a row opens its real dossier; there are no fake KPIs or placeholder records.
 
+Event reads use `staffAccess` so the shared plan is available across kitchen, logistics, workforce, inventory, and My Day, following the binding domain-gating restraint. Existing tenant/deletion filters and Event command/write/manager gates remain in force. This gives crew access to the Event's recorded operating facts; it does not grant permission to revise its schedule, contact, or pricing. The generated read path is qualified for kitchen staff/leads/managers, logistics staff, and workforce staff, with foreign-tenant, anonymous, and deleted records excluded and kitchen pricing changes denied. Production verification remains part of the source-backed operations release.
+
 ## Create an Event
 
 The create page requires an active registered Client and Venue. Existing records are selectable. If no suitable record exists, the user can create one without leaving the Events workspace.

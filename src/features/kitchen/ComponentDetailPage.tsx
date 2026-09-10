@@ -1,9 +1,11 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreateComponentIngredient,
   useGetComponent,
+  useGetPrepTask,
+  useGetEvent,
   useListComponentImport,
   useListDish,
   useListDishComponent,
@@ -61,6 +63,7 @@ import {
 } from "../../lib/pendingOperationKey";
 import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperations";
 import { componentRestoreOutcome } from "./culinaryRecovery";
+import { ComponentPrepContext, prepRecipeYield } from "./ComponentPrepContext";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -72,7 +75,14 @@ function optional(value: FormDataEntryValue | null) {
 
 export function ComponentDetailPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const prepTaskId = searchParams.get("prepTask") || undefined;
   const component = useRouteRecord(useGetComponent, id);
+  const prepTask = useRouteRecord(useGetPrepTask, prepTaskId);
+  const prepEvent = useRouteRecord(
+    useGetEvent,
+    prepTask?.componentId === id ? prepTask?.eventId : undefined,
+  );
   useTrackRecent("Component", component?.name);
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
@@ -120,7 +130,11 @@ export function ComponentDetailPage() {
       : null;
   }, [allImports, id]);
   const [editing, setEditing] = useState(false);
-  const [targetYield, setTargetYield] = useState("");
+  const previewKey = JSON.stringify([id, prepTaskId, component?.yieldUnit]);
+  const [yieldPreview, setYieldPreview] = useState<{
+    key: string;
+    value: string;
+  } | null>(null);
   const [showLineForm, setShowLineForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -182,6 +196,13 @@ export function ComponentDetailPage() {
     String(component.status),
     component.deletedAt,
   );
+  const prepYield = prepRecipeYield(component, prepTask);
+  const hasYieldPreview = yieldPreview?.key === previewKey;
+  const targetYield = hasYieldPreview
+    ? yieldPreview.value
+    : prepYield == null
+      ? ""
+      : String(prepYield);
   const targetYieldNumber = Number(targetYield);
   const baseYield = Number(component.yieldQuantity);
   const scaleFactor =
@@ -442,37 +463,14 @@ export function ComponentDetailPage() {
             <dd>{component.cuisine || "—"}</dd>
           </div>
         </dl>
+        {prepTaskId ? (
+          <ComponentPrepContext
+            recipe={component}
+            task={prepTask}
+            event={prepEvent}
+          />
+        ) : null}
       </header>
-
-      <ComponentCostPanel
-        summary={componentCost}
-        yieldUnit={component.yieldUnit}
-        loading={
-          ingredients === undefined ||
-          lines === undefined ||
-          priceObservations === undefined
-        }
-      />
-
-      <ComponentNutritionPanel
-        heading="Per-portion nutrition"
-        portionLabel={`per portion · serves ${servesPerYield}`}
-        totals={componentNutrition.perPortion}
-        coverageNote={nutritionCoverageNote}
-        loading={ingredients === undefined || lines === undefined}
-      />
-
-      {sourceImport ? (
-        <ComponentImportSourcePanel
-          kind={sourceImport.sourceKind}
-          filename={sourceImport.sourceFilename ?? undefined}
-          rawText={sourceImport.rawSourceText ?? ""}
-          csvSheetText={sourceImport.csvSheetText ?? undefined}
-          csvLinesText={sourceImport.csvLinesText ?? undefined}
-          importId={String(sourceImport._id)}
-          status={sourceImport.status}
-        />
-      ) : null}
 
       <div className="culinary-work-grid">
         <section className="culinary-section">
@@ -494,7 +492,12 @@ export function ComponentDetailPage() {
                 className="input"
                 placeholder={String(component.yieldQuantity)}
                 value={targetYield}
-                onChange={(event) => setTargetYield(event.target.value)}
+                onChange={(event) =>
+                  setYieldPreview({
+                    key: previewKey,
+                    value: event.target.value,
+                  })
+                }
                 aria-label="Scale to yield"
               />
             </label>
@@ -510,11 +513,22 @@ export function ComponentDetailPage() {
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
-                  onClick={() => setTargetYield("")}
+                  onClick={() =>
+                    setYieldPreview({ key: previewKey, value: "" })
+                  }
                 >
-                  Reset
+                  {prepTaskId ? "Recipe batch" : "Reset"}
                 </button>
               </>
+            ) : null}
+            {hasYieldPreview && prepYield != null ? (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setYieldPreview(null)}
+              >
+                Use prep amount
+              </button>
             ) : null}
           </div>
           {lines === undefined || ingredients === undefined ? (
@@ -739,6 +753,36 @@ export function ComponentDetailPage() {
             formRef={draftForm.formRef}
           />
         </>
+      ) : null}
+
+      <ComponentCostPanel
+        summary={componentCost}
+        yieldUnit={component.yieldUnit}
+        loading={
+          ingredients === undefined ||
+          lines === undefined ||
+          priceObservations === undefined
+        }
+      />
+
+      <ComponentNutritionPanel
+        heading="Per-portion nutrition"
+        portionLabel={`per portion · serves ${servesPerYield}`}
+        totals={componentNutrition.perPortion}
+        coverageNote={nutritionCoverageNote}
+        loading={ingredients === undefined || lines === undefined}
+      />
+
+      {sourceImport ? (
+        <ComponentImportSourcePanel
+          kind={sourceImport.sourceKind}
+          filename={sourceImport.sourceFilename ?? undefined}
+          rawText={sourceImport.rawSourceText ?? ""}
+          csvSheetText={sourceImport.csvSheetText ?? undefined}
+          csvLinesText={sourceImport.csvLinesText ?? undefined}
+          importId={String(sourceImport._id)}
+          status={sourceImport.status}
+        />
       ) : null}
 
       <ComponentVersionHistoryPanel

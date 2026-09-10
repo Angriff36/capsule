@@ -685,7 +685,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   transition stage from "cancelled" to []
   transition stage from "closed_out" to []
 
-  default policy eventRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read events"
+  default policy eventRead read: roleAllows(user.role, "staffAccess") "Staff may read shared event plans and operational context"
   // Write policies gate command mutation (see Client note); staff tier here,
   // manager-only commands (approve/cancel/changePricing/...) carry guards.
   default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write events through commands"
