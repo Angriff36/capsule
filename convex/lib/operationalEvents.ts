@@ -10,6 +10,7 @@ import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
   applyApprovedEventStaffingSwap, validateEventStaffingSwap,
+  removeCancelledStaffNeedCoverage, validateStaffNeedCoverageRemoval,
 } from "./eventStaffingOperations";
 import { validateScheduledShift, validateShiftWindow } from "./shiftSchedulingEvents";
 import {
@@ -24,6 +25,13 @@ export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  if (event.entity === "Shift" && event.type === "ShiftStaffNeedCoverageRemoved") {
+    await validateStaffNeedCoverageRemoval(ctx, event.entityId as Id<"shifts">, event.payload);
+    return;
+  }
+  if (event.entity === "EventStaffNeed" && event.type === "EventStaffNeedCancelled") {
+    await removeCancelledStaffNeedCoverage(ctx, event.entityId as Id<"eventStaffNeeds">);
+  }
   if (event.entity === "Shift" && event.type === "ShiftSwapped") {
     await validateScheduledShift(ctx, event.entityId as Id<"shifts">);
     await applyApprovedEventStaffingSwap(ctx, event.entityId as Id<"shifts">,

@@ -421,11 +421,20 @@ export function EventStaffingTab({ eventId }: Props) {
             onCancel={(need) => {
               void (async () => {
                 const reason = await prompt.askReason({
-                  title: "Cancel open shift",
-                  description: "Record why this open shift is coming down.",
+                  title:
+                    need.status === "filled"
+                      ? "Remove covered request"
+                      : "Cancel open shift",
+                  description:
+                    need.status === "filled"
+                      ? "Remove this staffing requirement and its future coverage. Other assigned roles and recorded work stay intact."
+                      : "Record why this open shift is coming down.",
                   label: "Cancellation reason",
                   placeholder: "e.g. Covered by a reassignment",
-                  confirmLabel: "Cancel shift",
+                  confirmLabel:
+                    need.status === "filled"
+                      ? "Remove coverage"
+                      : "Cancel shift",
                   tone: "danger",
                 });
                 if (!reason) return;

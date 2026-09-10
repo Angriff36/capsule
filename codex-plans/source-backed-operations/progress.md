@@ -1,5 +1,39 @@
 # Progress
 
+## 2026-09-10 filled-request removal after checkpoint 8313caa5
+
+Final code gate12645 completed exit0: all of `bun run check` passed, including
+165 files and 1,466 tests. It began after the last shared-prompt correction.
+The refreshed independent gpt-5.6-sol verdict is APPROVE. Removal and existing
+staffing browser flows pass at 1440/900/390; final screenshots were inspected.
+The added direct legacy-repair proof completes three sibling shifts, retains
+another active role and rejects destructive/replayed child calls without writes.
+Browser proof remains limited to actual components/generated hooks with isolated
+runtime snapshots, not the authenticated full application. Read-only runtime
+evidence confirms replacement through the existing fill command is still blocked
+(`staffing-replacement-gap.json`); that is the next staffing operation to build.
+
+The previous staffing checkpoint is committed and pushed as 8313caa5. A fresh
+generated-command reproduction confirms filled requests cannot be cancelled.
+The current change permits that explicit operation and stores its reason apart
+from service notes. Former ownership, claim/fill timestamps and original source
+details remain on the cancelled request. An authored callback invokes generated
+Shift commands to release only its unperformed coverage, including manual future
+plans; another active role retains its window and source links. Recorded Shift
+lifecycle, Assignment attendance and shift-only TimeRecords preserve actual work.
+
+The focused generated-runtime qualification passes removal, shared automatic
+roles, manual windows, split shifts, recorded-work protection, manager authority,
+ordinary-crew denial and unchanged replays. Evidence is in
+`.artifacts/operations-source-study/staffing-filled-removal-{gap,qualified}.json`
+and `qualify-staffing-filled-removal-runtime.ts`. Independent gpt-5.6-sol review
+APPROVES this bounded diff after reading DESIGN.md. A browser-discovered stale
+dismissal notice now clears when a new shared action prompt opens. No new
+authored tests, production writes or deployment occurred.
+Replacement/reopening, complete My Day eligibility, live repairs, purchasing,
+packing, printed outputs, release and authenticated deployed proof remain part
+of the original active goal.
+
 ## 2026-09-10 registry consumption, green gate, and connected staff swaps
 
 Final checkpoint gate: handle2320 completed exit0. The current source/UI passes

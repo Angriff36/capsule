@@ -14,6 +14,8 @@ export type EventStaffNeedRow = StaffNeedRow & {
   readonly version: number;
   readonly description?: string | null;
   readonly startsAt?: number | null;
+  readonly notes?: string | null;
+  readonly cancellationReason?: string | null;
 };
 
 export type StaffingConflictSummary = {
@@ -155,6 +157,11 @@ export function EventStaffingCoverageView({
             </thead>
             <tbody className="block md:table-row-group">
               {roster.map((entry) => {
+                const coveredNeeds = eventNeeds.filter(
+                  (need) =>
+                    need.status === "filled" &&
+                    entry.sourceIds?.includes(need._id),
+                );
                 const conflict = conflictsFor(
                   entry.personId,
                   entry.shiftWindows?.length
@@ -205,7 +212,7 @@ export function EventStaffingCoverageView({
                       <StatusChip status={String(entry.status)} />
                     </td>
                     <td
-                      className={`${canManage && entry.unassign ? "block" : "hidden"} px-3 py-2 md:table-cell text-right align-top`}
+                      className={`${canManage && (entry.unassign || coveredNeeds.length) ? "block" : "hidden"} px-3 py-2 md:table-cell text-right align-top`}
                     >
                       {canManage && entry.unassign ? (
                         <button
@@ -216,9 +223,23 @@ export function EventStaffingCoverageView({
                         >
                           Unassign
                         </button>
-                      ) : (
+                      ) : !canManage || coveredNeeds.length === 0 ? (
                         <span className="text-base text-ink-3">—</span>
-                      )}
+                      ) : null}
+                      {canManage
+                        ? coveredNeeds.map((need) => (
+                            <button
+                              key={need._id}
+                              type="button"
+                              className="btn btn-ghost btn-sm max-md:min-h-10"
+                              disabled={busy != null}
+                              aria-label={`Remove ${need.role} coverage for ${entry.label}${need.startsAt != null ? ` at ${formatTime(need.startsAt)}` : ""}`}
+                              onClick={() => onCancel(need)}
+                            >
+                              Remove {need.role} coverage
+                            </button>
+                          ))
+                        : null}
                     </td>
                   </tr>
                 );
@@ -414,7 +435,9 @@ export function EventStaffingCoverageView({
             </summary>
             <div className="mt-3 divide-y divide-line">
               {pastNeeds.map((need) => {
-                const personId = EventTimelineStaffRoster.personIdForNeed(need);
+                const personId =
+                  EventTimelineStaffRoster.personIdForNeed(need) ??
+                  need.filledByPersonId;
                 const person = people?.find((row) => row._id === personId);
                 return (
                   <div
@@ -434,6 +457,19 @@ export function EventStaffingCoverageView({
                     {need.description ? (
                       <p className="mt-1 text-base text-ink-2">
                         {need.description}
+                      </p>
+                    ) : null}
+                    {need.status === "cancelled" && person ? (
+                      <p className="mt-1 text-base text-ink-2">
+                        Previously covered by {personLabel(person)}
+                      </p>
+                    ) : null}
+                    {need.notes ? (
+                      <p className="mt-1 text-base text-ink-2">{need.notes}</p>
+                    ) : null}
+                    {need.cancellationReason ? (
+                      <p className="mt-1 text-base text-ink-2">
+                        Cancelled: {need.cancellationReason}
                       </p>
                     ) : null}
                     <p className="mt-1 text-sm text-ink-3">

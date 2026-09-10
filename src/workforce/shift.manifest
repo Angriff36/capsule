@@ -160,6 +160,30 @@ entity Shift mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command removeStaffNeedCoverage(staffNeedId: uuid, remainingSourceIds: list<string>, optional role: string) {
+    // Explicit removal may change a manual future shift, but never actual work.
+    // The callback validates the cancelled need and every remaining source.
+    guard self.status == "scheduled"
+    guard self.deletedAt == null
+    guard self.eventId != null
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    compute previousSourceIds = self.eventStaffingSourceIds
+    compute previousRole = self.role
+    mutate eventStaffingSourceIds = length(remainingSourceIds) > 0 ? remainingSourceIds : self.eventStaffingSourceIds
+    mutate role = length(remainingSourceIds) > 0 ? role : self.role
+    mutate status = length(remainingSourceIds) > 0 ? "scheduled" : "cancelled"
+    mutate cancelledAt = length(remainingSourceIds) > 0 ? self.cancelledAt : now()
+    mutate cancellationReason = length(remainingSourceIds) > 0 ? self.cancellationReason : "Staffing request cancelled"
+    emit ShiftStaffNeedCoverageRemoved {
+      shiftId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      staffNeedId: staffNeedId
+      previousSourceIds: previousSourceIds
+      previousRole: previousRole
+    }
+  }
+
   command reschedule(startsAt: datetime, endsAt: datetime) {
     guard self.status == "scheduled"
     guard self.deletedAt == null
@@ -322,6 +346,15 @@ entity Shift mixin TenantScoped, SoftDeletable {
   }
 
   store Shift in durable
+}
+
+event ShiftStaffNeedCoverageRemoved: "shift.staff_need_coverage_removed" {
+  shiftId: string
+  tenantId: string
+  eventId: string
+  staffNeedId: string
+  previousSourceIds: list<string>
+  previousRole: string?
 }
 
 // One durable in-app schedule notification per person and work week. The

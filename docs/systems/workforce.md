@@ -108,6 +108,15 @@ recipient's acceptance and retain earlier swap history. Generated-runtime proof
 covers normal and direct legacy-repair paths; full app qualification, affected
 production-data repair and deployment remain required.
 
+Filled staffing requests may be cancelled when the position is no longer
+required. The request retains its former staff member, service notes and
+claim/fill history, with a separate cancellation reason. Its generated command
+releases connected future coverage, including manually adjusted windows, while
+other active roles and all recorded work remain. The event roster exposes this
+operation and the cancelled-request history names the former staff member.
+Replacement/reopening and authenticated production qualification are still being
+completed on the source-backed operations branch.
+
 Linked staff attendance, time records, availability and schedule notices use the
 trusted Person link (#359). Generated-runtime qualification covers seven crew
 roles. Own swap requests now also accept linked non-workforce crew; complete

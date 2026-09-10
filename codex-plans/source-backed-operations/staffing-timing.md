@@ -5,6 +5,15 @@ remains active; this file records decisions and evidence as work proceeds.
 
 ## Latest verification (2026-09-10)
 
+Checkpoint 8313caa5 is pushed with full check (1,465 tests) and independent
+gpt-5.6-sol APPROVE. The subsequent filled-request cancellation change has
+focused runtime proof and bounded independent approval; final full gate12645
+passes 1,466 tests and three-width component browser proof passes. Cancelling a filled requirement retains its former
+owner and notes, removes only future coverage tied to it, and leaves recorded
+work and other roles intact. A direct generated child repair also finishes the
+remaining linked shifts using fresh versions. This is explicit request removal,
+not an automatic rewrite of manual plans. Replacement/reopening remains required.
+
 Registry Manifest3.6.53 fixes the computed-auth projection; both Capsule and
 isolated Builder consume it. Full check89321 passed 1,463 tests before the newest
 swap/history corrections. The manual source-group fix and connected approved

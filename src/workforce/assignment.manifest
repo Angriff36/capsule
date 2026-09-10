@@ -265,6 +265,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   property claimedAt: datetime?
   property filledAt: datetime?
   property cancelledAt: datetime?
+  property cancellationReason: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo claimedBy: Person fields [tenantId, claimedByPersonId] references [tenantId, id]
@@ -275,7 +276,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
 
   transition status from "open" to ["claimed", "filled", "cancelled"]
   transition status from "claimed" to ["filled", "open", "cancelled"]
-  transition status from "filled" to []
+  transition status from "filled" to ["cancelled"]
   transition status from "cancelled" to []
 
   default policy eventStaffNeedRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may read shared event staffing"
@@ -398,13 +399,15 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   }
 
   command cancel(reason: string) {
-    guard self.status == "open" or self.status == "claimed"
+    // Removing a staffing requirement must also work after it has been filled.
+    // The callback retires future coverage while keeping recorded work intact.
+    guard self.status == "open" or self.status == "claimed" or self.status == "filled"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     constraint cancelStaffNeedReason: length(trim(reason)) > 0 "Cancel reason is required"
     mutate status = "cancelled"
     mutate cancelledAt = now()
-    mutate notes = reason
+    mutate cancellationReason = reason
     emit EventStaffNeedCancelled {
       staffNeedId: self.id
       tenantId: self.tenantId

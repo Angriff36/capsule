@@ -324,6 +324,79 @@ export async function applyApprovedEventStaffingSwap(
   }
 }
 
+function shiftHasRecordedWork(shift: Doc<"shifts">, rows: Awaited<ReturnType<typeof readStaffingRows>>) {
+  return shift.startedAt != null || shift.completedAt != null || shift.noShowAt != null ||
+    rows.records.some((record) => record.shiftId === shift._id) ||
+    rows.assignments.some((row) => shift.eventStaffingSourceIds?.includes(row._id) &&
+      (row.checkedInAt != null || row.checkedOutAt != null || row.noShowAt != null));
+}
+
+function remainingNeedCoverage(
+  rows: Awaited<ReturnType<typeof readStaffingRows>>, shift: Doc<"shifts">,
+  need: Doc<"eventStaffNeeds">, previousIds: readonly string[], previousRole?: string | null,
+) {
+  const sources = storedStaffingSources(rows).filter((source) =>
+    source.personId === shift.personId && previousIds.includes(source.id));
+  const previousSources = [...sources, {
+    id: need._id, personId: need.filledByPersonId ?? null, role: need.role,
+    startsAt: time(need.startsAt), endsAt: time(need.endsAt), followsEventTiming: followsTiming(need), performed: false,
+  }];
+  return {
+    ids: sourceIds(sources),
+    // Keep a manager's custom Shift role; remove a role derived from this need.
+    role: previousRole === sourceRoles(previousSources) ? sourceRoles(sources) : previousRole,
+  };
+}
+
+/** A direct child command must prove the same coverage removal as its parent. */
+export async function validateStaffNeedCoverageRemoval(
+  ctx: MutationCtx, shiftId: Id<"shifts">, payload: Record<string, unknown>,
+): Promise<void> {
+  const auth = await getAuthContext(ctx);
+  const shift = await ctx.db.get(shiftId);
+  const need = await ctx.db.get(payload.staffNeedId as Id<"eventStaffNeeds">);
+  const previousIds = payload.previousSourceIds as string[];
+  if (!shift || !need || !shift.eventId || shift.tenantId !== auth.tenantId ||
+    need.tenantId !== auth.tenantId || shift.deletedAt != null || need.deletedAt != null ||
+    need.eventId !== shift.eventId || need.status !== "cancelled" ||
+    need.filledByPersonId !== shift.personId || !previousIds.includes(need._id))
+    throw new ConvexError("This shift must belong to the cancelled staffing request.");
+  const rows = await readStaffingRows(ctx, shift.eventId, shift.tenantId);
+  if (shiftHasRecordedWork({ ...shift, eventStaffingSourceIds: previousIds }, rows))
+    throw new ConvexError("Recorded work keeps its shift and staffing history.");
+  const remaining = remainingNeedCoverage(rows, shift, need, previousIds, payload.previousRole as string | null | undefined);
+  if (remaining.ids.length) {
+    if (shift.status !== "scheduled" || !sameIds(shift.eventStaffingSourceIds ?? [], remaining.ids) ||
+      (shift.role ?? null) !== (remaining.role ?? null))
+      throw new ConvexError("Other assigned work must keep its shift and roles.");
+  } else if (shift.status !== "cancelled" || !sameIds(shift.eventStaffingSourceIds ?? [], previousIds)) {
+    throw new ConvexError("A removed staffing request must retire its unused future shift.");
+  }
+  // A direct call repairing legacy cancelled coverage must finish its siblings.
+  await removeCancelledStaffNeedCoverage(ctx, need._id);
+  await reconcileEventStaffing(ctx, shift.eventId);
+}
+
+/** Explicit request removal also releases its manually adjusted future coverage. */
+export async function removeCancelledStaffNeedCoverage(ctx: MutationCtx, needId: Id<"eventStaffNeeds">): Promise<void> {
+  const auth = await getAuthContext(ctx);
+  const need = await ctx.db.get(needId);
+  if (!need || need.tenantId !== auth.tenantId || need.deletedAt != null ||
+    need.status !== "cancelled" || !need.filledByPersonId) return;
+  const rows = await readStaffingRows(ctx, need.eventId, need.tenantId);
+  for (const shift of rows.shifts) {
+    if (shift.status !== "scheduled" || shift.personId !== need.filledByPersonId ||
+      !shift.eventStaffingSourceIds?.includes(need._id) || shiftHasRecordedWork(shift, rows)) continue;
+    const remaining = remainingNeedCoverage(rows, shift, need, shift.eventStaffingSourceIds, shift.role);
+    await ctx.runMutation(api.mutations.Shift_removeStaffNeedCoverage, {
+      docId: shift._id, version: shift.version, staffNeedId: need._id,
+      remainingSourceIds: remaining.ids, role: remaining.role ?? undefined,
+    });
+    // Its callback completes the remaining group using fresh row versions.
+    return;
+  }
+}
+
 /** Every write uses the same generated command contract as UI/HTTP/MCP. */
 export async function reconcileEventStaffing(ctx: MutationCtx, eventId: Id<"events">) {
   const auth = await getAuthContext(ctx);
