@@ -1,5 +1,5 @@
 /** Exact US customary ratios; never infer density or a count/batch size.
- * Keep the dimensional factors in PrepTask.syncServings in step with this table.
+ * Keep the dimensional factors in PrepTask.reconcileRemainingWork in step with this table.
  */
 const units: Record<string, readonly [string, number]> = {
   gram: ["mass", 1],

@@ -9,7 +9,7 @@ import type { CapsuleEventPrepStateLoader } from "./CapsuleEventPrepCoordinator"
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
 
 type QueryClient = {
-  query(reference: unknown, args: Record<string, never>): Promise<unknown>;
+  query(reference: unknown, args: Record<string, unknown>): Promise<unknown>;
   setAuth?: (token: string) => void;
 };
 
@@ -18,8 +18,7 @@ function rows(value: unknown): Array<Record<string, unknown>> {
 }
 
 /**
- * Reads the same tenant-scoped state used by the Event menu before reconciling
- * an EventDish into generated prep tasks and ingredient demand.
+ * Reads the complete dish/event scope after generated prep and demand reactions.
  * Live path remints JWT on every load (Clerk session tokens expire in ~60s).
  */
 export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoader {
@@ -38,9 +37,13 @@ export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoa
   async load(input: { eventId: string; dishId: string }) {
     const client = await this.resolveClient();
     const [templateRows, taskRows, demandRows] = await Promise.all([
-      client.query(api.queries.listDishTask, {}),
-      client.query(api.queries.listPrepTask, {}),
-      client.query(api.queries.listIngredientDemand, {}),
+      client.query(api.queries.listDishTaskByDishId, { dishId: input.dishId }),
+      client.query(api.queries.listPrepTaskByEventId, {
+        eventId: input.eventId,
+      }),
+      client.query(api.queries.listIngredientDemandByEventId, {
+        eventId: input.eventId,
+      }),
     ]);
     const templates = rows(templateRows)
       .filter((row) => row.dishId === input.dishId)

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "manifest-integration-guard/v1",
   "versions": {
-    "manifestVersion": "3.6.50",
+    "manifestVersion": "3.6.51",
     "projection": "convex",
     "preset": {
       "id": "convex-application",

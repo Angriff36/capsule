@@ -17,6 +17,7 @@ import { runBulkItems } from "../../ui/bulk-select";
 import { suspectRowsFromRecipeLines } from "./eventMenuSuspectQuantity";
 
 import { EventPrepList } from "./EventPrepList";
+import { EventPrepWorkNotice } from "./EventPrepWorkNotice";
 
 type Props = {
   eventId: string;
@@ -120,7 +121,9 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
         );
       } else {
         setNotice(
-          `Prep list generated from the event menu (${created} step${created === 1 ? "" : "s"}).`,
+          created > 0
+            ? `Updated ${created} prep step${created === 1 ? "" : "s"} from the event menu.`
+            : "Prep already matches the event menu.",
         );
       }
     } catch (cause) {
@@ -163,6 +166,7 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           {notice}
         </p>
       ) : null}
+      <EventPrepWorkNotice eventId={eventId} />
       {eventDishes === undefined ||
       prepTasks === undefined ||
       dishes === undefined ? (

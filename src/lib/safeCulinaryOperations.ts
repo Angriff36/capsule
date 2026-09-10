@@ -1,5 +1,5 @@
-import { useMutation } from "convex/react";
-import { api } from "./api";
+import { useMutation, useQuery } from "convex/react";
+import { api, type Id } from "./api";
 
 export const useCloneMenuSafely = () =>
   useMutation(api.lib.culinaryOperations.cloneMenu);
@@ -16,3 +16,12 @@ export const useSaveComponentImportReview = () =>
 
 export const useRestoreComponentSnapshotSafely = () =>
   useMutation(api.lib.culinaryOperations.restoreComponentSnapshot);
+
+/** The server reconciles stored work groups through generated prep commands. */
+export const useReconcileEventPrepWork = () =>
+  useMutation(api.lib.culinaryOperations.reconcileEventPrepWorkBalance);
+
+export const useEventPrepWorkReview = (eventId: string) =>
+  useQuery(api.lib.culinaryOperations.eventPrepWorkReview, {
+    eventId: eventId as Id<"events">,
+  });

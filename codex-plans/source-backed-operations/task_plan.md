@@ -33,14 +33,19 @@ Implemented checkpoints cover serving intent/zero quantities, compatible units, 
 
 ## Resume next
 
-Immediate integration checkpoint: Manifest3.6.51 is published with the reviewed
-transactional event-handler option (PR78, full local and remote gates, fresh
-registry-package proof). Capsule still uses3.6.50 and the old serving fan-out.
-Consume3.6.51 in Capsule and its isolated Builder, wire remaining-prep
-reconciliation automatically, and qualify generated serving/headcount commands
-without a separate follow-up mutation. Preserve historical prep and coordinate
-manual sync against the same backend calculations. See the latest progress.md
-entry for exact commits, proof, and the outstanding whole-goal boundaries.
+Automatic serving/headcount prep reconciliation is now implemented with published
+Manifest3.6.51, source-owned generated commands, a transactional event handler,
+and a shared reactive review of unresolved work. Manual UI sync uses current
+backend state. MCP add retries no longer rescale prep from stale request values.
+The obsolete full-quantity PrepTask.syncServings command is removed from source
+and generated discovery. This checkpoint has independent gpt-5.6-sol APPROVE;
+see progress.md for final gates and exact commit/push state.
+
+Next required prep work: qualify and repair cancellation, removals/substitutions,
+recipe-template and component/ingredient identity changes across performed/manual
+work, stale/concurrent callers and existing affected records. Automatic serving
+integration alone does not complete issue335. Purchasing week/reschedule/shared
+stock and the full source/data/UI/report requirements below remain required.
 
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 

@@ -1,10 +1,10 @@
-import { mutation, type MutationCtx } from "../_generated/server";
+import { mutation, query, type MutationCtx } from "../_generated/server";
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
 import { getAuthContext, requireTenant } from "./authContext";
 import { requireKitchenAccess } from "./kitchenAccessGate";
-import { reconcileEventPrepWork } from "./prepWorkReconciliation";
+import { reconcileEventPrepWork, reviewEventPrepWork } from "./prepWorkReconciliation";
 import { dishRecipeRepairArgs, repairDishRecipe, reconcileEventRecipeSync, componentRecipeRepairArgs, repairComponentRecipe } from "./dishRecipeRepair";
 import {
   readMaterializationReceipt,
@@ -14,6 +14,11 @@ import {
 export const reconcileImportedEventRecipeSync = mutation({
   args: { eventId: v.id("events"), expectedEventVersion: v.number() },
   handler: reconcileEventRecipeSync,
+});
+
+export const eventPrepWorkReview = query({
+  args: { eventId: v.id("events") },
+  handler: reviewEventPrepWork,
 });
 
 export const reconcileEventPrepWorkBalance = mutation({

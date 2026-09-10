@@ -37,12 +37,44 @@ A Menu only groups Dishes. It does not own prep work.
 When a Dish is added to an Event:
 
 1. Capsule creates an EventDish for the selected Dish.
-2. Active DishTask templates are copied into editable PrepTask rows (host prep sync).
+2. The generated EventDishAdded reaction creates editable PrepTask rows from active DishTask templates in the same transaction.
 3. Manifest expands DishComponent → ComponentIngredient into `EventIngredientContribution` rows and aggregates `IngredientDemand` (`calculated`, `purchaseEligibleEventId = eventId`).
 4. The Event quantity (servings / headcount) drives those quantities.
 5. Event-specific instructions, dietary requirements, and one-off tasks are added to the Event work list.
 
 Runtime prep work is always owned by EventDish. A template row has a Dish reference but no EventDish reference; an instantiated event row must have EventDish as its parent.
+
+## Serving changes and performed prep work
+
+The 2026-09-10 integration consumes Manifest3.6.51's transactional
+`eventHandlerImport`. Generated EventDish serving/headcount commands first run
+their declared demand/packing reactions, then `convex/lib/operationalEvents.ts`
+reconciles the exact menu line's remaining prep work in the same transaction.
+A required generated prep command failure rolls the originating change back.
+
+Completed actual output (including an explicit zero) and manual/open work are
+credited before updating or creating generated remaining work. Completed rows,
+assignments, progress and recorded instructions remain. Full ingredient demand
+continues to describe the recipe requirement; it is not replaced by remaining
+prep quantity. Historical menu corrections preserve historical prep.
+
+Manual UI synchronization calls the same stored-state reconciler through
+`src/lib/safeCulinaryOperations.ts`. A read-only query uses that same planner to
+show named steps with incompatible quantities, changed completed recipe
+identities or unresolved prerequisite work. The notice remains visible on the
+event prep tab and desktop/mobile kitchen board without another sync click.
+Unrelated work remains usable.
+
+`PrepTask.syncServings` was removed because it scaled each row to the full recipe
+requirement. Call the canonical EventDish serving/headcount commands to change
+servings; generated `PrepTask.reconcileRemainingWork` derives work quantity from
+stored requirements and output. MCP `add_event_dish_and_sync_prep` runs the
+same generated add command and reads back linked prep. A cached add retry does
+not replay host prep writes using the old request quantity.
+
+These paths have isolated generated-runtime and notice-rendering qualification.
+Affected production data, full recipe-change/cancellation flows and authenticated
+deployed behavior remain unverified; the source-backed operations goal is active.
 
 ## Demand and the weekly order form
 

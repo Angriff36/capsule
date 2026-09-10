@@ -246,36 +246,6 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   }
 
 
-  // Attendance/menu edits update uncompleted generated work in the same
-  // transaction as demand. Preserve assignments, progress and kitchen notes.
-  command syncServings(quantityServings: number) {
-    guard self.deletedAt == null
-    constraint syncServingsNonnegative: quantityServings >= 0 "Prep servings cannot be negative"
-    compute canRefresh = self.isGenerated and self.dishTask != null and self.status != "completed" and self.status != "cancelled"
-    compute perServing = self.dishTask != null and self.dishTask.defaultQuantity != null ? self.dishTask.defaultQuantity : 1
-    // Exact dimensional conversion; preserve the work unit when compatible.
-    // Mirrors src/lib/recipeUnitConversion.ts; no density or batch-size guesses.
-    compute recipeUnit = self.dishTask != null and self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion"
-    compute sourceMass = recipeUnit == "gram" ? 1 : recipeUnit == "kilogram" ? 1000 : recipeUnit == "ounce" ? 28.349523125 : recipeUnit == "pound" ? 453.59237 : 0
-    compute sourceVolume = recipeUnit == "milliliter" ? 1 : recipeUnit == "liter" ? 1000 : recipeUnit == "teaspoon" ? 4.92892159375 : recipeUnit == "tablespoon" ? 14.78676478125 : recipeUnit == "cup" ? 236.5882365 : recipeUnit == "pint" ? 473.176473 : recipeUnit == "quart" ? 946.352946 : recipeUnit == "gallon" ? 3785.411784 : 0
-    compute targetMass = self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0
-    compute targetVolume = self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0
-    compute unitRatio = recipeUnit == self.unit ? 1 : (sourceMass > 0 and targetMass > 0 ? sourceMass / targetMass : (sourceVolume > 0 and targetVolume > 0 ? sourceVolume / targetVolume : 1))
-    compute compatibleUnit = recipeUnit == self.unit or (sourceMass > 0 and targetMass > 0) or (sourceVolume > 0 and targetVolume > 0)
-    mutate quantity = canRefresh ? perServing * quantityServings * unitRatio : self.quantity
-    mutate unit = canRefresh and not compatibleUnit ? recipeUnit : self.unit
-    emit PrepTaskGeneratedRefreshed {
-      prepTaskId: self.id
-      tenantId: self.tenantId
-      eventDishId: self.eventDishId
-      eventId: self.eventId
-      quantity: self.quantity
-      unit: self.unit
-      specialInstructions: self.specialInstructions
-    }
-  }
-
-  // Restore an imported work item's recipe identity without rewriting work.
   command linkRecipe(dishTaskId: uuid, dishId: uuid, optional componentId: uuid) {
     guard self.deletedAt == null
     constraint linkRecipeTask: self.dishTaskId == null or self.dishTaskId == dishTaskId "Prep already belongs to a different recipe step"
@@ -767,9 +737,9 @@ on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
   run standDown
   params { reason: payload.reason }
 
-on EventDishServingsAdjusted fanOut PrepTask where eventDishId = payload.eventDishId
-  run syncServings
-  params { quantityServings: payload.quantityServings }
+// EventDishServingsAdjusted is reconciled by convex/lib/operationalEvents.ts
+// in the originating transaction. Balance the entire recipe-step group so
+// completed output and manual work are credited before changing remaining work.
 
 // ---------------------------------------------------------------------------
 // Adding a dish to an event builds its prep list.

@@ -1,5 +1,4 @@
 import {
-  EventPrepCoordinator,
   type EventPrepDemand,
   type EventPrepDishTask,
   type EventPrepTask,
@@ -41,7 +40,7 @@ function invocationKey(base: string | undefined, suffix: string) {
 }
 
 /**
- * Agent: add EventDish (Manifest owns component→demand→weekly draft), then sync PrepTasks.
+ * Agent: add EventDish with its generated prep/demand reactions, then read the result.
  */
 export class CapsuleEventPrepCoordinator {
   constructor(
@@ -68,33 +67,17 @@ export class CapsuleEventPrepCoordinator {
       eventId: input.eventId,
       dishId: input.dishId,
     });
-    const coordinator = new EventPrepCoordinator({
-      createTask: async ({ idempotencyKey, ...args }) => ({
-        docId: asDocId(
-          await this.executor.execute({
-            capabilityId: "PrepTask.open",
-            args,
-            idempotencyKey,
-          }),
-        ),
-      }),
-      refreshGeneratedTask: (args) =>
-        this.executor.execute({
-          capabilityId: "PrepTask.refreshGenerated",
-          args,
-        }),
-    });
-    const result = await coordinator.sync({
-      eventDish: {
-        id: eventDishId,
-        eventId: input.eventId,
-        dishId: input.dishId,
-        quantityServings: input.quantityServings,
-        specialInstructions: input.specialInstructions,
-      },
-      ...state,
-      skipDemand: true,
-    });
-    return { eventDishId, ...result };
+    // The generated add command owns prep creation in its transaction. Replaying
+    // a cached add must never recalculate from the original request's servings:
+    // the operator may since have changed the menu or completed the work.
+    return {
+      eventDishId,
+      taskCount: state.tasks.filter(
+        (task) =>
+          task.eventDishId === eventDishId &&
+          task.deletedAt == null &&
+          task.status !== "cancelled",
+      ).length,
+    };
   }
 }

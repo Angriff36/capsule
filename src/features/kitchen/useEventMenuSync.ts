@@ -1,21 +1,13 @@
 import { useCallback, useMemo } from "react";
+import type { Id } from "../../lib/api";
+import { useReconcileEventPrepWork } from "../../lib/safeCulinaryOperations";
 import {
   useCreateInventoryReservation,
-  useCreatePrepTask,
   useInventoryReservationRelease,
-  useListDishComponent,
-  useListDishIngredient,
-  useListDishTask,
-  useListEventDish,
-  useListIngredient,
   useListIngredientDemand,
   useListInventoryItem,
   useListInventoryLot,
   useListInventoryReservation,
-  useListPrepTask,
-  useListComponent,
-  useListComponentIngredient,
-  usePrepTaskRefreshGenerated,
 } from "../../lib/manifest-convex-react";
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
 import { EventMenuSyncController } from "./EventMenuSyncController";
@@ -32,36 +24,19 @@ export type EventDishSyncTarget = {
  * Shared bridge so Event menu + Command deck both materialize DishTask → PrepTask.
  */
 export function useEventMenuSync() {
-  const dishTasks = useListDishTask();
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const components = useListComponent();
-  const componentIngredients = useListComponentIngredient();
-  const prepTasks = useListPrepTask();
-  const eventDishes = useListEventDish();
-  const ingredients = useListIngredient();
   const demands = useListIngredientDemand();
   const inventoryItems = useListInventoryItem();
   const inventoryLots = useListInventoryLot();
   const inventoryReservations = useListInventoryReservation();
-  const createPrepTask = useCreatePrepTask();
-  const refreshGeneratedTask = usePrepTaskRefreshGenerated();
+  const reconcilePrep = useReconcileEventPrepWork();
   const createReservation = useCreateInventoryReservation();
   const releaseReservation = useInventoryReservationRelease();
 
   const ready =
-    dishTasks !== undefined &&
-    prepTasks !== undefined &&
-    eventDishes !== undefined &&
-    ingredients !== undefined &&
     demands !== undefined &&
-    dishComponents !== undefined &&
-    components !== undefined &&
-    componentIngredients !== undefined &&
     inventoryItems !== undefined &&
     inventoryLots !== undefined &&
-    inventoryReservations !== undefined &&
-    dishIngredients !== undefined;
+    inventoryReservations !== undefined;
 
   const demandVersionsForEvent = useCallback(
     (eventId: string) =>
@@ -77,9 +52,8 @@ export function useEventMenuSync() {
     if (!ready) return null;
     return new EventMenuSyncController(
       {
-        createTask: ((input: never) => createPrepTask(input)) as never,
-        refreshGeneratedTask: ((input: never) =>
-          refreshGeneratedTask(input)) as never,
+        reconcilePrep: (eventDishId) =>
+          reconcilePrep({ eventDishId: eventDishId as Id<"eventDishes"> }),
         createReservation: async (input) => {
           const doc = (await createReservation(input)) as { docId: string };
           return { docId: doc.docId };
@@ -87,51 +61,31 @@ export function useEventMenuSync() {
         releaseReservation: (input) => releaseReservation(input),
       },
       EventMenuSyncController.requireCatalogs({
-        dishTasks: dishTasks as never,
-        prepTasks: prepTasks as never,
-        ingredients: ingredients as never,
         demands: demands as never,
-        dishComponents: dishComponents as never,
-        components: components as never,
-        componentIngredients: componentIngredients as never,
-        eventDishes: eventDishes as never,
         inventoryItems: inventoryItems as never,
         inventoryLots: inventoryLots as never,
         inventoryReservations: inventoryReservations as never,
-        dishIngredients: dishIngredients as never,
       }),
     );
   }, [
-    createPrepTask,
     createReservation,
     demands,
-    dishComponents,
-    dishIngredients,
-    dishTasks,
-    eventDishes,
-    ingredients,
     inventoryItems,
     inventoryLots,
     inventoryReservations,
-    prepTasks,
     ready,
-    componentIngredients,
-    components,
-    refreshGeneratedTask,
     releaseReservation,
+    reconcilePrep,
   ]);
 
   return {
     ready,
     demandVersionsForEvent,
-    // Reconcile prep tasks against the dish's templates. Only needed AFTER an
-    // event dish already exists — adding one generates its prep tasks
-    // server-side (EventDishAdded fanOut in production/task.manifest). Calling
-    // this straight after a create duplicates them, because the reactive
-    // catalogs have not seen the server's rows yet.
+    // Adding a dish and changing servings also reconcile on the server. Manual
+    // sync uses the same current-state transaction and is safe to repeat.
     syncPrepForDish: async (target: EventDishSyncTarget) => {
       if (!controller) {
-        throw new Error("Prep sync catalogs are still loading");
+        throw new Error("Stock sync catalogs are still loading");
       }
       return controller.syncPrepForDish(target);
     },
@@ -141,7 +95,7 @@ export function useEventMenuSync() {
       eventId: string,
     ): Promise<EventStockShortage[]> => {
       if (!controller) {
-        throw new Error("Prep sync catalogs are still loading");
+        throw new Error("Stock sync catalogs are still loading");
       }
       return controller.syncComponentDemands(eventId);
     },

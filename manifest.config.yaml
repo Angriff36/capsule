@@ -15,6 +15,7 @@ projections:
     options:
       authContextImport: ./lib/authContext
       encryptionImport: ./lib/encryption
+      eventHandlerImport: ./lib/operationalEvents
       policyMode: enforce
       includeTenantFilter: true
       # Fold resolved computeds into list/get returns (documented helpers|inline).

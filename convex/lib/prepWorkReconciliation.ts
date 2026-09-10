@@ -1,13 +1,19 @@
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
-import type { MutationCtx } from "../_generated/server";
+import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getAuthContext, requireTenant } from "./authContext";
 import { prepWorkBalance } from "../../src/lib/prepWorkBalance";
 
 export interface PrepWorkReconciliationResult {
   created: number;
   updated: number;
-  unresolved: { dishTaskId: string; name: string; taskIds: string[] }[];
+  unresolved: {
+    dishTaskId: string;
+    name: string;
+    taskIds: string[];
+    reason: string;
+  }[];
+  notice?: string;
 }
 
 interface WorkPlan {
@@ -22,11 +28,18 @@ interface WorkPlan {
   }[];
 }
 
-/** Read, balance and apply one exact menu line in the caller's transaction. */
-export async function reconcileEventPrepWork(
-  ctx: MutationCtx,
+interface ReconciliationPlan {
+  selection: Doc<"eventDishes">;
+  event: Doc<"events">;
+  result: PrepWorkReconciliationResult;
+  plans: WorkPlan[];
+}
+
+/** One read-only plan shared by automatic writes and the operator review. */
+async function planEventPrepWork(
+  ctx: QueryCtx,
   args: { eventDishId: Id<"eventDishes"> },
-): Promise<PrepWorkReconciliationResult> {
+): Promise<ReconciliationPlan> {
   const tenantId = requireTenant(await getAuthContext(ctx));
   const selection = await ctx.db.get(args.eventDishId);
   const event = selection ? await ctx.db.get(selection.eventId) : null;
@@ -41,7 +54,17 @@ export async function reconcileEventPrepWork(
   )
     throw new Error("Active event menu line not found");
   if (["completed", "closed_out", "cancelled"].includes(event.stage))
-    throw new Error("Historical event prep must remain unchanged");
+    return {
+      selection,
+      event,
+      plans: [],
+      result: {
+        created: 0,
+        updated: 0,
+        unresolved: [],
+        notice: "Historical prep has been preserved.",
+      },
+    };
 
   // Generated queries and commands retain the Manifest kitchen/manage policies.
   // Both indexed queries return this complete parent scope, not a tenant-wide cap.
@@ -95,6 +118,9 @@ export async function reconcileEventPrepWork(
       result.unresolved.push({
         dishTaskId: template._id,
         name: template.name,
+        reason: changedRecipe.length
+          ? "The recipe changed after work was completed. Check which prepared food can be used."
+          : "The work and recipe quantities cannot be compared. Check their units and quantities.",
         taskIds: [
           ...new Set([
             ...changedRecipe.map((task) => task._id),
@@ -192,6 +218,9 @@ export async function reconcileEventPrepWork(
       const item = {
         dishTaskId: plan.template._id,
         name: plan.template.name,
+        reason: blockedBy.length
+          ? "A prerequisite needs attention before this step can be updated."
+          : "This step is underway and needs additional prerequisite work. Check its sequencing.",
         taskIds: [
           ...new Set([
             ...plan.stepTasks.map((task) => task._id),
@@ -206,6 +235,56 @@ export async function reconcileEventPrepWork(
     }
   }
 
+  if (!plans.length && !result.unresolved.length)
+    result.notice = "This dish has no active prep instructions.";
+  return { selection, event, result, plans };
+}
+
+/** Read-only, reactive explanation of the same groups the writer leaves alone. */
+export async function reviewEventPrepWork(
+  ctx: QueryCtx,
+  args: { eventId: Id<"events"> },
+): Promise<
+  {
+    eventDishId: string;
+    dishId: string;
+    dishName: string;
+    steps: PrepWorkReconciliationResult["unresolved"];
+  }[]
+> {
+  const selections: Doc<"eventDishes">[] = await ctx.runQuery(
+    api.queries.listEventDishByEventId,
+    { eventId: args.eventId },
+  );
+  const review = [];
+  for (const selection of selections) {
+    if (selection.deletedAt != null || selection.removedAt != null) continue;
+    const { result } = await planEventPrepWork(ctx, {
+      eventDishId: selection._id,
+    });
+    if (!result.unresolved.length) continue;
+    const dish = await ctx.db.get(selection.dishId);
+    review.push({
+      eventDishId: selection._id,
+      dishId: selection.dishId,
+      dishName: dish?.name ?? "Dish",
+      steps: result.unresolved,
+    });
+  }
+  return review;
+}
+
+/** Read, balance and apply one exact menu line in the caller's transaction. */
+export async function reconcileEventPrepWork(
+  ctx: MutationCtx,
+  args: { eventDishId: Id<"eventDishes"> },
+): Promise<PrepWorkReconciliationResult> {
+  const { selection, event, result, plans } = await planEventPrepWork(
+    ctx,
+    args,
+  );
+  const tenantId = selection.tenantId;
+  const unresolved = new Set(result.unresolved.map((item) => item.dishTaskId));
   const balanceTasks = new Map<string, Id<"prepTasks">>();
   const outstandingTasks = new Map<string, Id<"prepTasks">[]>();
   for (const plan of plans) {
