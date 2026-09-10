@@ -3,6 +3,8 @@ import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
+import { releaseEventInventoryHolds } from "./inventoryEvents";
+import { standDownEventLogisticsAndBilling } from "./eventCancellation";
 import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
@@ -63,12 +65,21 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventCancelled") {
+    await releaseEventInventoryHolds(ctx, event.entityId as Id<"events">);
+    await standDownEventLogisticsAndBilling(
+      ctx,
+      event.entityId as Id<"events">,
+    );
     await standDownEventPurchasing(ctx, event.entityId as Id<"events">);
     await standDownEventPrep(
       ctx,
       { eventId: event.entityId as Id<"events"> },
       String(event.payload.reason),
     );
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventCompleted") {
+    await releaseEventInventoryHolds(ctx, event.entityId as Id<"events">);
     return;
   }
   if (

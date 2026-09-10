@@ -59,6 +59,15 @@ changes. Coordinate draft migration with committed supply and stock allocation;
 do not patch dates alone and silently double-buy. See progress.md for the
 checkpoint commit/push and current evidence.
 
+Event cancellation/completion now cleans up active stock reservations and
+unfinished logistics while preserving consumed stock, completed deliveries,
+paid/partial invoices and payment history. The full gate passes (165 files/1455
+tests); independent gpt-5.6-sol review APPROVE. Role/state, replay, exclusion and
+transaction rollback checks pass in the generated runtime. Issues344-346 track
+this branch repair; no production deployment or affected-data repair is claimed.
+Resume the coordinated rescheduling/week/stock work above, with explicit
+reservations and expiry in the allocation analysis.
+
 
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 

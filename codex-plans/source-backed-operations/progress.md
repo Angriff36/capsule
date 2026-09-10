@@ -832,3 +832,79 @@ record groups for draft and submitted orders; a later servings edit still uses
 the old date. Fresh evidence: qualify-reschedule-current.ts and
 reschedule-{draft,submitted}-shared-draft-checkpoint.json. This checkpoint does
 not solve that confirmed next defect. No Capsule production writes/deployment.
+
+## 2026-09-10: closing events preserves stock, logistics and billing history
+
+The shared purchasing checkpoint83b544eaa080ff668a602c8deadb857e3ef372e3 is
+committed/pushed and independently approved. Tracked state was clean at the
+start of this work. Reschedule tracing exposed unconditional terminal-record
+fan-outs in other event lifecycle paths; date/allocation work remains open.
+
+At83b544ea, Event_cancel/Event_complete failed on released or consumed stock
+reservations in8 of12 admin/event_manager cases. Completion fixtures start at
+the required final stage. Consuming2 of5 kg leaves3 kg, which must remain.
+Issue344: https://github.com/Angriff36/capsule/issues/344.
+
+The sibling audit reproduced22 failures of32 logistics/billing cancellation
+cases. Dispatched/cancelled pack lists and delivered/failed/cancelled deliveries
+hit active-only guards; event_manager also hit the extra logistics-manager
+gate on active work. Paid, partial and voided invoices failed Invoice.markVoided.
+Payments were actually recorded and settled through generated commands.
+Delivery states use generated lifecycle commands with a fixture-assigned real
+Person driver; delivery-only cases soft-delete the pack header to isolate that
+handler. Issues345/346:
+https://github.com/Angriff36/capsule/issues/345
+https://github.com/Angriff36/capsule/issues/346.
+
+The callback now selects active stock holds and eligible unpaid invoices before
+calling their existing generated commands. Source-owned PackList/Delivery
+standDownWithEvent commands require a cancelled parent and use its reason;
+human logistics cancellation permissions remain intact. Completed logistics,
+settled reservations, paid/partial invoices, payments, packed quantities and
+assignments remain recorded. Deleted and foreign-tenant rows are excluded.
+Event cancellation does not infer a refund or replenish consumed stock.
+
+All writes remain inside the originating event transaction. A failed later
+stock release rolls back the earlier release, parent change and audit events.
+Direct cleanup on a live event fails; new logistics commands likewise require
+a cancelled parent. Repeated cleanup makes no record/history writes. Source
+guards govern the actual changes; generated files came through Builder.
+
+Qualification passed:24 reservation role/lifecycle/state cases,2 reservation
+rollback/direct-call cases,32 logistics/invoice state cases,12 deleted/foreign
+logistics/invoice cases and12 connected cancellation cases with purchasing,
+consumed stock,2 of4 packed chafers, a loaded list/scheduled delivery, a paid
+invoice/payment and an unpaid invoice. Committed purchasing, receipt lots,
+stock, paid amounts, packed quantities and other event needs remain unchanged.
+Evidence under .artifacts/operations-source-study:
+
+- reproduce-event-reservation-lifecycle.ts and event-reservation-lifecycle-baseline.json
+- qualify-event-reservation-lifecycle.ts and event-reservation-lifecycle-qualified.json
+- qualify-event-reservation-rollback.ts
+- reproduce-event-logistics-invoice-cancellation.ts and event-logistics-invoice-cancellation-baseline.json
+- qualify-event-logistics-invoice-cancellation.ts and its qualified/foreign/deleted JSONs
+- qualify-event-connected-cancellation.ts and event-connected-cancellation-qualified.json/log
+
+Final full `bun run check` passed (165 files/1455 tests), including typecheck,
+formatting, secrets, ownership/generation, integration/design checks, coverage,
+Vite build and baseline decay. The first run found two stale assertions that
+expected inline generated cancellation effects; those existing assertions now
+verify the flat event's transactional callback without adding/removing cases or
+assertions. Final process exit was0. Independent gpt-5.6-sol review: APPROVE.
+The reviewer found no material implementation issue or disproportionate policy.
+
+Two additional admin/event_manager qualifications inject a mismatched draft
+contribution after creating active and consumed stock holds, loaded packing,
+delivery, paid/unpaid invoices and payment history. The existing purchasing
+consistency failure surfaces and rolls back all prior stock release, logistics,
+invoice, event, recipe and audit changes byte-for-byte. Evidence:
+qualify-event-connected-cancellation-rollback.ts and
+event-connected-cancellation-rollback.json. An earlier scratch attempt using a
+negative required quantity did not induce that failure; it is not rollback
+evidence and was replaced with the explicit contribution mismatch.
+
+No new authored tests or UI changes; command export contracts are regenerated.
+No Capsule production writes or deployment. These repairs do not complete the
+goal or resolve purchasing week/
+timezone, allocation/expiry, rescheduling, affected-data repair, staffing,
+timeline, My Day, usable recipe links or reports.

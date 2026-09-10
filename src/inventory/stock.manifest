@@ -1,6 +1,5 @@
 // Capsule inventory foundation — on-hand stock and per-event reservations.
-// ~~Demand Requirements, Waste, and procurement are later slices.~~
-// Demand + waste: `demand.manifest` (2026-07-15). Procurement is next.
+// Demand and waste live in demand.manifest; procurement owns purchase orders.
 // Compile entry for this file alone still reaches culinary + operations via location → menu.
 
 use "./location.manifest"
@@ -304,8 +303,8 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
 }
 
 // Quantity of an InventoryItem held for an Event. Capsule-pro only stored
-// aggregate quantityReserved; this entity is the durable per-event fact
-// cancellation-release flows will consume (reactions deferred).
+// aggregate quantityReserved; this entity records each event's hold, release
+// and consumption separately so closing an event preserves stock history.
 entity InventoryReservation mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -569,17 +568,9 @@ event InventoryReservationConsumed: "inventory_reservation.consumed" {
   quantity: decimal(12, 4)
 }
 
-// EventCancelled → release reservations for that event (fanOut matches eventId;
-// release guards keep non-active rows from mutating — failed reaction commands
-// do not fail the parent cancel).
-on EventCancelled fanOut InventoryReservation where eventId = payload.eventId
-  run release
-  params { reason: payload.reason }
-
-// Completing an event frees remaining active holds (same release command).
-on EventCompleted fanOut InventoryReservation where eventId = payload.eventId
-  run release
-  params { reason: "Event completed" }
+// Event cancellation/completion releases only active holds through the
+// transactional operational callback. Already released/consumed reservations
+// are historical facts; invoking release on them would reject the parent event.
 
 // Consuming a reservation decrements on-hand (release stays status-only).
 on InventoryReservationConsumed run InventoryItem.adjustQuantity

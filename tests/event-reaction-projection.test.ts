@@ -12,10 +12,12 @@ function runnerBlock(source: string, runner: string, exported: string): string {
 }
 
 describe("Event lifecycle reaction projection", () => {
-  it("keeps cancellation fan-out payload access flat", () => {
+  it("passes the flat cancellation event to the transactional callback", () => {
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     const cancel = runnerBlock(mutations, "__runEventCancel", "Event_cancel");
-    expect(cancel).toContain("payload.reason");
+    expect(cancel).toContain(
+      "await __handleManifestEvent(ctx, { ...__manifestEvent0",
+    );
     expect(cancel).not.toContain("payload.payload");
   });
 
@@ -47,7 +49,7 @@ describe("Event lifecycle reaction projection", () => {
   it("dispatches the known reaction paths through governed command runners", () => {
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     const paths = [
-      ["__runEventCancel", "Event_cancel", "__runInvoiceMarkVoided"],
+      ["__runEventCancel", "Event_cancel", "__handleManifestEvent"],
       ["__runPaymentSettle", "Payment_settle", "__runInvoiceApplyPayment"],
       [
         "__runQualityCheckFail",

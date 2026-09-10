@@ -208,13 +208,35 @@ entity PackList mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Automatic stand-down never changes completed logistics history.
+  command standDownWithEvent() {
+    guard self.status == "draft" or self.status == "packing" or self.status == "packed" or self.status == "loaded"
+    guard self.deletedAt == null
+    // The parent event cancellation supplies the authorization and reason.
+    guard self.event != null and self.event.stage == "cancelled"
+    compute reason = self.event.cancellationReason != null ? self.event.cancellationReason : "Event cancelled"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate activeEventId = null
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PackListCancelled {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      name: self.name
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
   store PackList in durable
 }
 
 // EventCancelled → cancel pending/active pack lists for that event.
-on EventCancelled fanOut PackList where eventId = payload.eventId
-  run cancel
-  params { reason: payload.reason }
+// The transactional operational callback selects unfinished records before
+// invoking PackList.standDownWithEvent. Settled history is not mutated.
 
 // Line on a PackList. Description covers equipment/containers; optional Dish /
 // ProductionBatch refs when packing produced culinary output (no Equipment entity).

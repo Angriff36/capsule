@@ -186,3 +186,17 @@ sibling vendor-contract layout checks pass with isolated fixture hooks.
 See progress.md for evidence and final full-check/reviewer/commit state.
 No live repair or deployment is claimed. Weekly normalization, stock allocation,
 rescheduling propagation and the complete source-backed goal remain required.
+
+### Settled stock/logistics/billing blocks lifecycle, 2026-09-10 (#344-346)
+
+Actual generated commands exposed8 of12 reservation and22 of32 logistics/
+billing failures at83b544ea. Unconditional fan-outs invoked active-only human
+commands on settled rows; event_manager also hit logistics manager guards.
+Current callbacks select active/eligible work; source-owned logistics stand-down
+requires a cancelled parent. Existing stock release/invoice void commands retain
+their rules. Paid money, consumed stock and completed logistics remain recorded.
+
+Qualification covers state/role matrices, tenant/deleted-row exclusion, repeated
+cleanup, live-event rejection, rollback and combined stock/purchasing/packing/
+payment records. See progress.md for final check/review/commit state. Reschedule
+and shared-stock/allocation defects remain unresolved. No production changes.
