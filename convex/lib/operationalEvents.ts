@@ -3,6 +3,7 @@ import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
+import { standDownEventPurchasing } from "./purchasingEvents";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -26,6 +27,7 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventCancelled") {
+    await standDownEventPurchasing(ctx, event.entityId as Id<"events">);
     await standDownEventPrep(
       ctx,
       { eventId: event.entityId as Id<"events"> },

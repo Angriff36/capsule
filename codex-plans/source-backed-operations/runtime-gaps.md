@@ -147,3 +147,23 @@ ownership, localVite build and baseline-decay. Current Capsule draft review is
 pending at this entry; see progress.md for final verdict/commit. No Capsule
 production writes or deployment. Live affected-data repair and the full
 purchasing/operations/report/UI/production requirements remain incomplete.
+
+### Event cancellation and purchase need history, 2026-09-10 (#342)
+
+The actual Event_cancel command at ee414406 rejects fulfilled/already-cancelled
+needs (Guard 0) and event_manager cancellation of open/ordered needs (Guard 2).
+The unconditional reaction calls the human PurchaseNeed.cancel command on every
+need. This is distinct from the previously qualified prep cancellation path,
+whose fixture had no purchase needs. Issue: https://github.com/Angriff36/capsule/issues/342.
+
+Current authored fix uses the transactional operational callback and the
+source-owned standDownWithEvent command, requiring a cancelled parent and
+preserving entire settled needs. Twelve isolated runtime scenarios now succeed
+for admin and event_manager, including actual receipt lots and stock changes.
+Repeated reconciliation makes no writes; committed purchasing history stays
+byte-for-byte. See progress.md for checks/review state and evidence locations.
+
+Editable draft reconciliation is still missing: cancelling one event leaves its
+live draft demand link and the original shared quantity. Submitted/received
+history must remain intact while current draft quantities and links are repaired.
+This is outstanding implementation work alongside327/328, not an owner deferral.

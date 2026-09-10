@@ -235,6 +235,30 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Event managers may cancel their event without acting as purchasing managers.
+  // The parent must already be cancelled; the transactional event handler skips
+  // fulfilled and previously cancelled needs so their whole history stays intact.
+  command standDownWithEvent() {
+    guard self.status == "open" or self.status == "ordered"
+    guard self.deletedAt == null
+    guard self.event != null and self.event.stage == "cancelled"
+    compute previousStatus = self.status
+    compute reason = self.event.cancellationReason != null ? self.event.cancellationReason : "Event cancelled"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PurchaseNeedCancelled {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
   store PurchaseNeed in durable
 }
 
@@ -345,8 +369,6 @@ on IngredientDemandConfirmed run PurchaseNeed.create
 on VendorOrderSubmitted fanOut PurchaseNeed where vendorOrderId = payload.vendorOrderId
   run markDraftOrdered
 
-// Event cancellation stops open purchasing work (product definition § 3 /
-// interconnection requirements: cancellation stops inappropriate downstream work).
-on EventCancelled fanOut PurchaseNeed where eventId = payload.eventId
-  run cancel
-  params { reason: payload.reason }
+// The transactional operational event handler stands down only unfinished
+// purchase needs. A blanket fan-out through the human cancel command rejects
+// settled needs and event managers, rolling back the entire event cancellation.

@@ -707,3 +707,47 @@ local/remote SHA and baseline hashes. Issues335/339/341 have progress comments;
 they do not claim production application. Tracked worktree was clean after the
 checkpoint. Overall goal stays active; the next work continues the remaining
 source-backed purchasing, affected-data and complete operational workflows.
+
+## 2026-09-10: purchasing cancellation failure reproduced and repaired locally
+
+At ee414406, actual generated Event_cancel failed in six of eight purchasing
+scenarios: fulfilled/already-cancelled needs failed Guard 0, and event_manager
+with open/ordered needs failed Guard 2. All failed transactions rolled back.
+The earlier prep-removal qualification had no purchase needs and therefore did
+not cover this failure. Issue342 records the reproduction and related draft
+allocation defect: https://github.com/Angriff36/capsule/issues/342.
+
+PurchaseNeed.standDownWithEvent now requires an already-cancelled parent and
+cancels only open/ordered needs, using the parent's recorded reason. The
+transactional operational handler skips deleted, fulfilled and previously
+cancelled needs entirely. The human purchasing cancel command retains its
+existing authorization. Source changes were regenerated through the isolated
+Builder; generated files were not edited by hand.
+
+Twelve isolated actual-runtime scenarios now pass: admin/event_manager crossed
+with open, ordered, fulfilled, previously cancelled, partial receipt and full
+receipt. Entire settled needs, committed orders/lines/demand links, receipt lots,
+stock and the other event's needs are unchanged; repeated stand-down performs
+no writes, and independent stand-down on an active event is rejected. Evidence:
+reproduce-purchasing-cancellation.ts, purchasing-cancellation-baseline.json,
+qualify-purchasing-cancellation.ts, purchasing-cancellation-qualified.json/log
+under .artifacts/operations-source-study. Full gates and independent review are
+pending at this entry.
+
+The shared draft remains wrong after cancellation: two 10 kg requirements and
+5 kg stock produce a 15 kg draft, which still contains both live links and 15 kg
+after one event is cancelled. Draft contribution/quantity reconciliation is
+still required; this checkpoint does not claim to fix it. The date propagation
+and cross-week stock defects in327/328 also remain. No Capsule production writes,
+deployment or full-goal completion.
+
+The purchasing cancellation checkpoint passed full bun run check:165files,
+1449tests, coverage, typecheck, format, secrets, generated ownership/proof and
+integration/design checks, localVite build and baseline-decay. Only the generated
+new-command export contract adds a case; no authored tests were added. Log:
+.artifacts/operations-source-study/check-purchasing-cancellation.log. The prior
+four prep-removal/history scenarios also pass with the combined callback.
+Independent gpt-5.6-sol APPROVE covers this bounded diff against ee414406 and
+explicitly excludes a claim that shared draft/date/stock reconciliation is
+finished. Nine new current Builder baselines are content-hash verified; older
+untracked baselines remain untouched.
