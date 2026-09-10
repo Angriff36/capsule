@@ -142,9 +142,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         sortOrder: rows.length,
       });
       clearAddFields();
-      setNotice(
-        "Template added. Every event this dish is added to now opens this prep task.",
-      );
+      setNotice("Prep step added to the recipe and current event plans.");
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Could not add the template.",
@@ -161,7 +159,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   ) {
     const ok = await prompt.askConfirm({
       title: "Retire prep template",
-      description: `Retire "${name}"? New events using this dish will no longer open this prep task.`,
+      description: `Retire "${name}"? Unedited prep that has not started will be canceled on current events. Edited, underway, and completed work will be kept.`,
       confirmLabel: "Retire",
       tone: "danger",
     });
@@ -171,7 +169,9 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     setNotice(null);
     try {
       await retireTask({ docId: id, version, reason: "Removed from dish" });
-      setNotice("Template retired — it will not generate prep tasks again.");
+      setNotice(
+        "Prep template retired. Check event prep for any edited or underway work kept.",
+      );
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -203,8 +203,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       ) : rows.length === 0 ? (
         <div className="document-empty">
           <p>
-            No prep templates on this dish yet. Event prep is generated from
-            these when a dish is added to an event.
+            Add the steps cooks should perform. Capsule uses them to plan prep
+            for this dish’s events.
           </p>
         </div>
       ) : (

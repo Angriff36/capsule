@@ -525,7 +525,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional sortOrder: number,
     optional componentId: uuid,
     optional ingredientId: uuid,
-    optional instructions: string
+    optional instructions: string,
+    // Batched source repair links existing work before materializing missing rows.
+    optional synchronizePrep: boolean
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -547,7 +549,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate ingredientId = ingredientId
     mutate instructions = instructions
     mutate activeAt = now()
+    compute syncPrepRequested = synchronizePrep != null ? synchronizePrep : true
     emit DishTaskAdded {
+      synchronizePrep: syncPrepRequested
       dishTaskId: self.id
       tenantId: self.tenantId
       dishId: dishId
@@ -572,7 +576,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional sortOrder: number,
     optional componentId: uuid,
     optional ingredientId: uuid,
-    optional instructions: string
+    optional instructions: string,
+    // Batched source repair links existing work before materializing missing rows.
+    optional synchronizePrep: boolean
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -590,7 +596,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate componentId = componentId
     mutate ingredientId = ingredientId
     mutate instructions = instructions
+    compute syncPrepRequested = synchronizePrep != null ? synchronizePrep : true
     emit DishTaskRevised {
+      synchronizePrep: syncPrepRequested
       dishTaskId: self.id
       tenantId: self.tenantId
       dishId: self.dishId

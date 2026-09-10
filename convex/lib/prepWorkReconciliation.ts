@@ -22,6 +22,7 @@ interface WorkPlan {
   balance: Extract<ReturnType<typeof prepWorkBalance>, { kind: "resolved" }>;
   target?: Doc<"prepTasks">;
   prior?: Doc<"prepTasks">;
+  refresh: Doc<"prepTasks">[];
   dependencies: {
     record: Doc<"prepTaskDependencies">;
     predecessor: Doc<"prepTasks"> | null;
@@ -33,6 +34,11 @@ interface ReconciliationPlan {
   event: Doc<"events">;
   result: PrepWorkReconciliationResult;
   plans: WorkPlan[];
+  retired: Doc<"prepTasks">[];
+}
+
+function retiredRecipeRequirement(task: Doc<"prepTasks"> | null) {
+  return task?.status === "cancelled" && task.templateRetiredAt != null;
 }
 
 /** One read-only plan shared by automatic writes and the operator review. */
@@ -58,6 +64,7 @@ async function planEventPrepWork(
       selection,
       event,
       plans: [],
+      retired: [],
       result: {
         created: 0,
         updated: 0,
@@ -82,13 +89,9 @@ async function planEventPrepWork(
     unresolved: [],
   };
   const plans: WorkPlan[] = [];
+  const retired: Doc<"prepTasks">[] = [];
   for (const template of templates) {
-    if (
-      template.tenantId !== tenantId ||
-      template.deletedAt != null ||
-      template.status !== "active"
-    )
-      continue;
+    if (template.tenantId !== tenantId || template.deletedAt != null) continue;
     const stepTasks = tasks.filter(
       (task) =>
         task.tenantId === tenantId &&
@@ -98,12 +101,44 @@ async function planEventPrepWork(
         task.deletedAt == null &&
         task.status !== "cancelled",
     );
-    // An old prepared component/ingredient is not automatically credit for a
-    // replacement recipe merely because its task name or unit stayed the same.
+    const canFollowTemplate = (task: Doc<"prepTasks">) =>
+      task.isGenerated &&
+      ["pending", "claimed"].includes(task.status) &&
+      task.startedAt == null;
+    if (template.status === "retired") {
+      retired.push(...stepTasks.filter(canFollowTemplate));
+      const preserved = stepTasks.filter(
+        (task) => task.status !== "completed" && !canFollowTemplate(task),
+      );
+      if (preserved.length)
+        result.unresolved.push({
+          dishTaskId: template._id,
+          name: template.name,
+          taskIds: preserved.map((task) => task._id),
+          reason:
+            "This recipe step was retired. Edited or underway work has been kept; check whether it is still needed for this event.",
+        });
+      continue;
+    }
+    // Planned generated work may follow a replacement; performed or edited food
+    // is not automatically credit for a different ingredient or component.
+    // An untyped recipe step may have richer ingredient provenance on recorded
+    // work. Only a specified recipe identity can establish a replacement.
     const changedRecipe = stepTasks.filter(
       (task) =>
-        task.status === "completed" &&
-        ((task.componentId ?? null) !== (template.componentId ?? null) ||
+        !canFollowTemplate(task) &&
+        ((template.componentId != null &&
+          task.componentId !== template.componentId) ||
+          (template.ingredientId != null &&
+            task.ingredientId !== template.ingredientId)),
+    );
+    const refresh = stepTasks.filter(
+      (task) =>
+        canFollowTemplate(task) &&
+        (task.recipeTemplateVersion !== template.version ||
+          task.category !== template.category ||
+          task.taskType !== template.taskType ||
+          (task.componentId ?? null) !== (template.componentId ?? null) ||
           (task.ingredientId ?? null) !== (template.ingredientId ?? null)),
     );
     const unit = template.defaultUnit ?? "portion";
@@ -119,7 +154,7 @@ async function planEventPrepWork(
         dishTaskId: template._id,
         name: template.name,
         reason: changedRecipe.length
-          ? "The recipe changed after work was completed. Check which prepared food can be used."
+          ? "The recipe differs from recorded or edited work. Check which food can be used before changing this step."
           : "The work and recipe quantities cannot be compared. Check their units and quantities.",
         taskIds: [
           ...new Set([
@@ -153,7 +188,15 @@ async function planEventPrepWork(
         dependencies.push({ record, predecessor });
       }
     }
-    plans.push({ template, stepTasks, balance, target, prior, dependencies });
+    plans.push({
+      template,
+      stepTasks,
+      balance,
+      target,
+      prior,
+      dependencies,
+      refresh,
+    });
   }
 
   // A completed old batch cannot satisfy an unresolved new prerequisite.
@@ -161,6 +204,7 @@ async function planEventPrepWork(
   const unresolved = new Map(
     result.unresolved.map((item) => [item.dishTaskId, item]),
   );
+  const retiringTaskIds = new Set(retired.map((task) => task._id));
   const plansByTemplate = new Map(
     plans.map((plan) => [plan.template._id, plan]),
   );
@@ -176,7 +220,9 @@ async function planEventPrepWork(
       const blockedBy = plan.dependencies.flatMap(({ predecessor }) => {
         if (
           predecessor?.eventDishId !== selection._id ||
-          !predecessor.dishTaskId
+          !predecessor.dishTaskId ||
+          retiringTaskIds.has(predecessor._id) ||
+          retiredRecipeRequirement(predecessor)
         )
           return [];
         const prerequisite = unresolved.get(predecessor.dishTaskId);
@@ -237,7 +283,7 @@ async function planEventPrepWork(
 
   if (!plans.length && !result.unresolved.length)
     result.notice = "This dish has no active prep instructions.";
-  return { selection, event, result, plans };
+  return { selection, event, result, plans, retired };
 }
 
 /** Read-only, reactive explanation of the same groups the writer leaves alone. */
@@ -279,17 +325,46 @@ export async function reconcileEventPrepWork(
   ctx: MutationCtx,
   args: { eventDishId: Id<"eventDishes"> },
 ): Promise<PrepWorkReconciliationResult> {
-  const { selection, event, result, plans } = await planEventPrepWork(
+  const { selection, event, result, plans, retired } = await planEventPrepWork(
     ctx,
     args,
   );
   const tenantId = selection.tenantId;
   const unresolved = new Set(result.unresolved.map((item) => item.dishTaskId));
+  const updatedTasks = new Set<string>();
+  const retiredTaskIds = new Set(retired.map((task) => task._id));
+  for (const task of retired) {
+    await ctx.runMutation(api.mutations.PrepTask_retireWithTemplate, {
+      docId: task._id,
+      expectedVersion: task.version,
+    });
+    updatedTasks.add(task._id);
+    const edges = await ctx.db
+      .query("prepTaskDependencies")
+      .withIndex("by_predecessorTaskId", (q) =>
+        q.eq("predecessorTaskId", task._id),
+      )
+      .collect();
+    for (const edge of edges) {
+      if (edge.tenantId !== tenantId || edge.isSatisfied) continue;
+      await ctx.runMutation(
+        api.mutations.PrepTaskDependency_releaseRetiredRequirement,
+        { docId: edge._id },
+      );
+    }
+  }
   const balanceTasks = new Map<string, Id<"prepTasks">>();
   const outstandingTasks = new Map<string, Id<"prepTasks">[]>();
   for (const plan of plans) {
     const { template, stepTasks, balance, target, prior } = plan;
     if (unresolved.has(template._id)) continue;
+    for (const task of plan.refresh) {
+      await ctx.runMutation(api.mutations.PrepTask_refreshRecipeTemplate, {
+        docId: task._id,
+        expectedVersion: task.version,
+      });
+      updatedTasks.add(task._id);
+    }
     const outstanding = stepTasks
       .filter(
         (task) =>
@@ -305,9 +380,9 @@ export async function reconcileEventPrepWork(
       if (target.quantity !== balance.targetQuantity) {
         await ctx.runMutation(api.mutations.PrepTask_reconcileRemainingWork, {
           docId: target._id,
-          expectedVersion: target.version,
+          expectedVersion: (await ctx.db.get(target._id))!.version,
         });
-        result.updated++;
+        updatedTasks.add(target._id);
       }
       continue;
     }
@@ -360,6 +435,11 @@ export async function reconcileEventPrepWork(
         .map((edge) => edge.predecessorTaskId),
     );
     for (const { record, predecessor } of plan.dependencies) {
+      if (
+        retiredTaskIds.has(record.predecessorTaskId) ||
+        retiredRecipeRequirement(predecessor)
+      )
+        continue;
       const outstanding =
         predecessor?.eventDishId === selection._id &&
         predecessor.dishTaskId &&
@@ -382,5 +462,6 @@ export async function reconcileEventPrepWork(
       }
     }
   }
+  result.updated = updatedTasks.size;
   return result;
 }

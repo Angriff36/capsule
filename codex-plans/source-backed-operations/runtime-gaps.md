@@ -111,3 +111,39 @@ review pass for this checkpoint. Actual command, rollback, stale-target/MCP repl
 unit and dependency evidence is recorded in progress.md. This does not complete
 cancellation/substitution/recipe-change/affected-data/deployed qualification or
 issue335. No Capsule production write or release has occurred.
+
+
+### Recipe changes, removal history and import adoption update, 2026-09-10
+
+Issue339 reproduced unchanged prep identity/instructions after template edits
+and pending prep after retirement. Source-owned template refresh/retirement now
+updates unstarted generated work, preserves assignment, keeps edited/underway/
+completed/historical records, and returns named review reasons for incompatible
+specified recipe identities. Missing template identity is not evidence of a
+replacement: richer provenance on an explicitly linked work row remains usable.
+Recipe-text snapshots support three-way refresh; legacy imported custom notes
+remain unchanged. Initial event prep now also receives the recipe station.
+
+A released retired prerequisite was being copied onto later supplemental prep.
+The helper now recognizes both just-retiring and already-retired requirements;
+the original edge and retirement/completion history remain intact. Actual
+admin/event_manager remove/cancel checks preserve completed and already-canceled
+rows byte-for-byte while canceling unfinished work with the parent reason.
+
+Internal recipe repair stages templates with synchronizePrep:false before
+linking reviewed imported work. Manifest3.6.51 lost this parameter/compute in
+createVia events, creating4 rows instead of2 (issue341). Owning source fix300f2ea,
+reviewed Manifest PR80, green Linux/Windows CI and successful cut-release run
+34470306158 published3.6.52 (registry gitHead db385089432f8067650d252898a6633510e56d03).
+Capsule's exact registry pin was installed and all generated files came through
+Builder. Reproduction now preserves2 rows, imported notes/quantities and completed
+work, supports later pending resize, repeats without duplicates and rolls back
+stale input. No generated hand edit or persisted throwaway flag was used.
+
+Ten actual runtime qualification scripts passed against regenerated3.6.52;
+logs end in -3652.log under .artifacts/operations-source-study. Full bun run check
+passed165files/1448tests with coverage, typecheck, format, secrets, design,
+ownership, localVite build and baseline-decay. Current Capsule draft review is
+pending at this entry; see progress.md for final verdict/commit. No Capsule
+production writes or deployment. Live affected-data repair and the full
+purchasing/operations/report/UI/production requirements remain incomplete.

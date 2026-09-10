@@ -33,19 +33,22 @@ Implemented checkpoints cover serving intent/zero quantities, compatible units, 
 
 ## Resume next
 
-Automatic serving/headcount prep reconciliation is now implemented with published
-Manifest3.6.51, source-owned generated commands, a transactional event handler,
-and a shared reactive review of unresolved work. Manual UI sync uses current
-backend state. MCP add retries no longer rescale prep from stale request values.
-The obsolete full-quantity PrepTask.syncServings command is removed from source
-and generated discovery. This checkpoint has independent gpt-5.6-sol APPROVE;
-see progress.md for final gates and exact commit/push state.
+Automatic serving/headcount reconciliation and recipe-template propagation now
+share the backend planner. Published Manifest3.6.52 fixes createVia parameter
+and compute bindings; Capsule consumed it through Builder regeneration. The
+current recipe checkpoint updates unstarted generated work, preserves custom
+notes and performed/manual work, reports incompatible replacements, retires
+unstarted requirements and keeps their dependency releases effective on later
+supplemental work. Removal/cancellation preserves entire completed/canceled
+rows. Imported-prep adoption again preserves two existing rows without duplicates.
+Full bun run check passes (165files/1448tests); final independent Capsule review
+and checkpoint commit/push status are recorded in progress.md.
 
-Next required prep work: qualify and repair cancellation, removals/substitutions,
-recipe-template and component/ingredient identity changes across performed/manual
-work, stale/concurrent callers and existing affected records. Automatic serving
-integration alone does not complete issue335. Purchasing week/reschedule/shared
-stock and the full source/data/UI/report requirements below remain required.
+Next required work includes source-backed substitution and component/ingredient
+relationship changes across affected data, production concurrency and real event
+records. Local recipe/removal proofs do not complete issue335 or the goal.
+Purchasing week/reschedule/shared-stock corrections (#327/#328), live repair and
+all source/data/UI/report requirements below remain required.
 
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 

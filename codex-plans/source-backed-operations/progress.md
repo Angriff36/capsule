@@ -15,6 +15,7 @@
 
 Large batched source reads exceeded output limits. Continue with bounded per-file/page reads rather than treating truncated output as reviewed.
 One targeted search included nonexistent convex/lib/tppRecipeRepair.ts (exit 1); actual seam re-exports repairDishRecipe from another owner. Resolve its import next.
+
 # Continuation: runtime and original workbook evidence
 
 ## Connected quantity checkpoint
@@ -37,6 +38,7 @@ Actual Convex runtime scratch verification (`reproduce-prep-adoption.ts`) passes
 Source correction: original sauce photo says 4 quarts Gruyere and 1/4 cup cornstarch per 5 gallons; costing says 4 pounds and 1/4 pound. This contradicts the earlier claim that all formula ingredients match. Owner clarification requested for these and asparagus Parmesan (1 ounce versus 1/16 ounce per serving). Continue independently while unresolved.
 
 A real Smore Bar preview identifies nine source-matched imported rows, but three use quarts while templates use tablespoons. Current repair correctly rejects those links; units must be reconciled in both server and client scaling before applying. The preview is not an applicable migration yet. Also confirmed live Infused Water has 167 servings while original cost source has 334; preserve this discrepancy in the event repair plan rather than assuming the live menu already matches.
+
 - Final typecheck passed after method preservation. Extended scratch reproduction confirms a cook's edited dish method survives a new repair operation. CLI preview accepts a compatible four-link Smore subset and rejects the full candidate at the tablespoon/quart mismatch. This is validation evidence, not a live repair.
 
 ## Unit-aware prep scaling checkpoint
@@ -59,6 +61,7 @@ The repair reuses an existing identical attachment instead of adding it again un
 Actual Convex runtime reproduction: a 5-gallon recipe with the photographed 1-pound butter batch line, at 3 fl oz sauce per guest, yields 3.9140625 gallons prep and 0.7828125 pounds butter demand for 167 servings. Changing to 200 yields 4.6875 gallons and 0.9375 pounds. Repeating with a new operation creates no extra attachment or ingredient demand. This is a single-ingredient scaling verification, not a claimed complete sauce recipe; disputed Gruyere/cornstarch remain unresolved.
 
 Full suite passed: 165 files / 1426 tests. Legacy and projected CLI preview paths pass. Final typecheck running after the CLI changes. No production mutation or release. Next: construct complete source projections and resolve outstanding source conflicts; audit component recipe links, methods, and all remaining requirement groups rather than treating scaling verification as end-to-end completion.
+
 - Also corrected EventDish.requiredBatches / requiredYieldQuantity to include the attachment batch multiplier before rounding. Generated query proof: 300 sauce portions require two whole batches; ingredient demand remains the exact 1.40625-batch quantity. Full suite rerun passes 165/1426 after regeneration. Final typecheck rerunning for the regenerated query code.
 - Final typecheck passed after the batch display regeneration. Source heating/serving workbook reread through mac, rolls, infused water and salad for the next reconstruction step.
 
@@ -73,6 +76,7 @@ Full suite passed: 165 files / 1426 tests. Legacy and projected CLI preview path
 - Actual batch runtime verification passes with separated provenance and unchanged calculations/replay. Full suite passes 165 files / 1426 tests. Typecheck running. No production writes, no release.
 
 Important remaining migration requirement: replacing an old per-serving component with a newly reconstructed batch must explicitly reconcile the old attachment/contributions, not merely attach another source key. Same-key replay is now safe, but replacement across different source identities still requires a reviewed migration path. Do not apply a broad reconstruction plan until this is handled.
+
 - Final typecheck and formatting checks passed. Checkpoint is ready for branch commit; overall release and deployed verification remain pending.
 
 ## Recipe removal and ingredient-edit propagation
@@ -82,6 +86,7 @@ Implemented Manifest reactions for DishComponentDetached and DishIngredientRemov
 Actual generated-runtime scratch (`reproduce-component-detach.ts`) proves: detached sauce demand becomes zero; reattachment restores it once; other dishes sharing the component retain demand; direct ingredient removal leaves component demand intact; later serving changes do not restore removed demand; changing component ingredient quantity uses the current 200 servings; removing/readding an ingredient clears/restores demand. Full suite passes 165 files / 1429 tests (generated contract additions). Typecheck running. Issue #313: https://github.com/Angriff36/capsule/issues/313.
 
 Broader unit-flow reproduction (`reproduce-demand-unit-change.ts`) proves an outstanding defect: 0.9375 lb demand/need, then equivalent 16-oz batch ingredient update -> demand 15 oz but PurchaseNeed 15 lb. The existing reviseRequired command copies quantity and keeps its prior unit. Must fix compatible-unit normalization/propagation through needs and weekly lines; also audit mixed-unit contributions. Do not release or apply a broad repair while this is unresolved. No production writes. Explicit component replacement mapping, prep history/recipe relinking and the rest of the full goal remain required.
+
 - Final typecheck passed. Purchasing unit bug tracked separately as https://github.com/Angriff36/capsule/issues/314. Green tests do not cover or resolve that demonstrated defect.
 
 ## Purchasing and mixed-unit contribution correction
@@ -95,6 +100,7 @@ Implementation evidence: .artifacts/operations-source-study/reproduce-weekly-uni
 Generator limitation found and reported: #315 https://github.com/Angriff36/capsule/issues/315. Command-local AggregateSum compute expressions were silently omitted, leaving doc.total_... reads. Direct/inverse relation hydration in commands also cannot implement this aggregate. Current source uses the supported reaction-param aggregate path, then pure arithmetic in the command. No generated output edited by hand.
 
 Remaining full-goal work includes submitted/fulfilled purchasing changes without losing order history, source-backed existing-data reconstruction/replacement, historical event preservation, completed-work deltas, prep presentation and links, packing, staffing/timeline/forms, My Day, browser checks and release. Green unit-flow checks do not fulfill those requirements.
+
 - Final typecheck passed after the supported aggregate implementation. Compatible mass and volume end-to-end reproductions pass.
 
 ## Changes after order submission and receipt-to-stock connection
@@ -107,6 +113,7 @@ Remaining full-goal work includes submitted/fulfilled purchasing changes without
 - Actual scratch script: .artifacts/operations-source-study/reproduce-submitted-order-change.ts; final runtime log submitted-runtime.log. Full suite passed 165 files / 1432 tests before the final draft-supply guard; final suite/typecheck running after it. No authored tests added and no production writes.
 
 Release blockers still to resolve: backfill committed supply for existing submitted/confirmed orders without changing facts; reconcile existing receipt lots versus stock edits before any backfill; verify/manual event orders without a weekly source range; avoid useless empty supplemental drafts on decreases/no change; show surplus or supplier adjustment work clearly; preserve closed event history. The demonstrated weekly-draft sequence is not proof of those cases. Remaining source/data/UI/report/full-goal requirements still apply.
+
 - Independent checkpoint review by gpt-5.6-sol initially REJECTED two gaps: returned approval drafts retained pending supply and generic managers could not finish the new stock reaction. Both are fixed: VendorOrderChangesRequested releases line supply; inventory stock commands allow managers already authorized to receive orders. Regenerated runtime scratch now receives as a generic manager and proves submit-for-approval -> return-to-draft -> unchanged servings retains 0.46875 lb shortage with no self-subtraction. Reviewer re-review APPROVE (bounded checkpoint only).
 - Final reviewed source: full suite 165 files / 1432 tests passed; typecheck passed. Evidence submitted-review-runtime.log, submitted-review-tests.log, submitted-review-typecheck.log. Broader release blockers above remain; no production writes.
 
@@ -123,6 +130,7 @@ Release blockers still to resolve: backfill committed supply for existing submit
 Repair no longer creates a second catalog ingredient solely because a source uses ounces where the catalog uses pounds (or another compatible mass/volume unit). It prefers exact units, otherwise requires one compatible same-name active ingredient. Explicit reviewed IDs also allow compatible units. Recipe line quantities/units remain source measurements. Newly created ingredients join the candidates immediately, so mixed units inside one repair also share one identity. No density/count conversion is inferred.
 
 Runtime scratch reproduce-repair-ingredient-units.ts verifies one existing pound Butter receives a 2-ounce dish line, one new Flour is reused across ounce/pound lines, and eight servings add exactly one pound to the existing Butter demand. Full suite 165 files / 1432 tests and typecheck passed; evidence repair-ingredient-units-runtime.log, repair-unit-tests.log, repair-unit-typecheck.log. Issue #319 https://github.com/Angriff36/capsule/issues/319. No production writes. Independent checkpoint review requested; full recipe replacement and affected data repair remain required.
+
 - Additional scratch checks passed for explicit compatible ingredient IDs and ambiguous same-name compatible catalog entries (no silent choice or duplicate creation). Reviewer found one duplicate import, now removed; no behavioral finding.
 
 ## Full Ashley ingredient evidence map
@@ -142,6 +150,7 @@ EventDish, EventDishComponentSeed and EventIngredientContribution now carry cata
 Authored reconcileImportedEventRecipeSync provides an administrator per-event backfill, verifies the reviewed event version/tenant, and invokes generated refresh commands only for mismatched keys. Scratch removes fields to simulate old active records: backfill changes3 rows without demand changes; replay changes0. Backfill MUST run for existing active records before production catalog reconstruction, otherwise their absent keys skip catalog reactions. No production migration has occurred. Independent gpt-5.6-sol review APPROVE covers source/generated routing plus migration seam; it is not a full release approval.
 
 Evidence: reproduce-historical-recipe-edit.ts, historical-recipe-before.log, history-sync-runtime.log, history-sync-active-runtime.log under .artifacts/operations-source-study. Full suite 165 files / 1435 tests passed (three generated contract cases); final typecheck pending. Historical recipe displays/costs/reports still derive some live catalog data and need their own snapshot verification. This routing correction does not claim the whole history requirement is solved.
+
 - Final typecheck passed after the migration seam and deleted-event predicate. No authored tests added.
 
 ## Explicit source component replacement
@@ -153,6 +162,7 @@ Repair initializes legacy routing for affected events, detaches the old contribu
 Scratch reproduce-component-replacement.ts verifies exact corrected demand 1.565625 lb (not old+new), one active attachment, pending quantity/chef note/claimed state unchanged, completed-event demand exact document equality and old recipe reference, and replay without duplication. CLI preview succeeds with the same scratch snapshot/source/mapping; replacement-preview/plan.json contains the hashed target and explicit old attachment. Issue #322 https://github.com/Angriff36/capsule/issues/322.
 
 Independent gpt-5.6-sol review APPROVE. Full suite passed 165 files / 1436 tests before final nullable-optional argument normalization; final suite/typecheck running. No production writes. Source conflicts, broad migration planning, in-progress/completed-work quantity deltas and historical recipe/cost/report rendering remain part of the full goal, not solved by attachment replacement alone.
+
 - Final typecheck and final 165-file / 1436-test suite passed after optional argument normalization. Replacement runtime proof passed again.
 
 ## Source-backed raspberry balsamic batch qualification
@@ -168,6 +178,7 @@ Only this dressing is reconstructed by the candidate. Salad gorgonzola identity/
 Recipe repair previously skipped an existing matching DishTask after checking quantity/unit, even when its componentId was absent. A restored component therefore remained disconnected from the existing template and adopted prep. The repair now fills only an absent template component reference through DishTask.revise, retaining the current name, quantity/unit, category, station, ordering, ingredient link and chef instructions. Existing non-null recipe links still require explicit replacement.
 
 Real-source runtime reproduce-existing-template-link.ts starts with an unlinked raspberry dressing template plus an imported event prep row. Explicit prepLinks adopts that same row (one task, same ID), preserves both template and event chef notes, connects it to the measured component, and verifies all eight source ingredient totals and prep at167/334 servings. Evidence existing-template-link-runtime.log. Full suite passes; final typecheck/review pending. This closes another part of #310 without any production write or UI completion claim.
+
 - Final typecheck passed; independent gpt-5.6-sol review APPROVE. Full suite165 files/1436 tests passes. Resume section in task_plan.md refreshed to current source/implementation state and full remaining scope.
 
 ## 2026-09-09 — container packing synchronization in progress
@@ -320,7 +331,6 @@ Current WIP: these source-data/docs changes and postcommitprogress. No running p
 Independentgpt-5.6-sol APPROVE for source-data checkpoint: reviewer independently inspected workbook extracts and rendered menu-with-prep.pdf page1, checked exact arithmetic and separation from packing rounding, and confirmed no invented walnut method/yield or misleading apply-ready claim. JSON formatting completed. No appcode changed; priorfullgatesremainlastappcodeevidence, new isolatedsaladruntimepasses.
 Source-data checkpoint9a7648c7 COMMITTED and PUSHED. Secret scan3147trackedfilesclean; branchprepushgenerationcurrent. Commit80325andpushterminalsuccess; revieweridle. No production data/application release. New source correction docs and JSON are durable; walnut method question remains pending. Next can continue independent prep hierarchy/linkedrecipe UI work (read DESIGN.md and applicable system docs first) while awaiting missingrecipeinstructions, alongside remaining full task_plan data/model requirements. Fullgoalunchanged. This paragraph is solepostcommittrackedWIP; preserve unrelatedbaselinecaches.
 
-
 ## 2026-09-09 Event prep hierarchy checkpoint
 
 Replaced EventPrepTab's flat task list with EventPrepList: exact EventDish groups show course/prep category, dish link, servings, event instructions, work quantities, human-readable task status, station, named assignment, blocking reason, task instructions/notes, completed quantity and actual component recipe links. Current menu lines without tasks remain visible. Explicit eventDishId never falls through to another selection of the same dish; only a missing reference with exactly one dish match gets the legacy fallback. Unmatched/removed-line work remains visible without attaching current servings. Existing recipe quantity warnings render once per dish, with individual task warnings retained. No domain mutations, policy additions, recipe inventions, token changes or production data writes.
@@ -333,7 +343,6 @@ Rendered qualification used this checkout's existing Vite process33836 on7813 (7
 
 Standalone bunx vite build passed in13.47s (existing large-chunk advisory). No deployment command ran. Whole-goal bun run check, final review, release and authenticated live-data proof remain outstanding.
 
-
 ## 2026-09-09 Root classification and standalone batch repair
 
 Previous turn was concrete progress: reviewed event prep UI dd632c28 committed/pushed, with actual captured-data layout evidence. This continuation re-read the full goal, traced the recipe repair path and found a separate classification failure: raw217-root TPP recipes include dishes, actual subrecipes, equipment, packaging and menu placeholders, but the default repair script projects every root into a Dish. The captured production catalog already contains active Raspberry Balsamic Vinaigrette, Half Hotel Pans and White Box For Individual Packaging Dish records. Raspberry has the same original source fingerprint as its source export and has no corresponding Component in the snapshot. This is not hypothetical future-import risk. Opened issue326: https://github.com/Angriff36/capsule/issues/326.
@@ -344,9 +353,7 @@ Added scripts/repair-tpp-component-recipes.ts: preview by default from reviewed 
 
 Verification: standalone source raspberry runtime creates1component/8ingredient links/3qtbatch with usable method and0dishes; exact replay changes no component/ingredient rows; new operation reuses the same source component; missing method rejects; subsequent dish repair attaches the existing component and every ingredient demand plus linked prep scales correctly167->334. Existing165testfiles/1444tests and typecheck pass after the refactor. Evidence: ignored reproduce-standalone-component.ts, standalone-component-runtime.log, standalone-component-tests.log, raspberry-component-repair/plan.json. The preview names the existing dressing Dish; no production write or retirement occurred. Source-method and other ingredient conflicts remain pending while independent repair work continues.
 
-
 Independent gpt-5.6-sol first rejected the new CLI because it lacked the existing dish tool's reviewed-plan hash boundary. Corrected: full planned document SHA is emitted to plan.sha256 and required by --expected-plan-sha256 before auth/network; operation identity includes the full source+recipe payload digest as well as canonical component key. Actual subprocess changed one ingredient quantity while retaining formula.key: old plan hash rejected before auth/network, and operation identity changed. Reviewer then returned APPROVE for the bounded code checkpoint. Legitimate raspberry preview hash: f59a3cf2e0370a6ba666e86c15872d1ce36d1861a0ce654a27e6e9fd24509c1e. Do not use this stale preview for later live-data work without refreshing/reviewing inputs. No production changes, full-goal release or completion claim.
-
 
 ## 2026-09-09 Existing recipe classification repair qualification
 
@@ -483,7 +490,6 @@ Full goal remains active: complete affected recipes/relationships/data, source c
 Independent gpt-5.6-sol APPROVE: source quantities/method/batch basis and explicit nullable-fingerprint snapshot comparison verified; existing reference protection remains. This is checkpoint review, not live-apply/full-goal proof. Classification repair remains under issue326.
 Final formatted-source preview supersedes the pre-format hash above: bc873fabe2743ead64b9ff59bf895a8969b1d4bf03091b17c054df33fcb8341b. Formatting changed source-file bytes; recipe quantities/method and selected record are unchanged.
 
-
 ## 2026-09-09: purchasing queue stock facts and readable orders
 
 - Traced and reproduced the unsupported purchasing recommendation: event demand 10 lb, recorded stock 100 lb, par 0, historical event sizes 1/100 lb produced a 15 lb suggestion. Historical event-size variation is not evidence of recipe loss or a buying buffer. Same-session issue: https://github.com/Angriff36/capsule/issues/333.
@@ -494,11 +500,9 @@ Final formatted-source preview supersedes the pre-format hash above: bc873fabe27
 - Independent gpt-5.6-sol reviewed final code/CSS and DESIGN.md: APPROVE, no actionable findings or new user tedium. This is a bounded branch checkpoint, not full goal/release approval.
 - Still required: backend shared-stock/week allocation (#327), event rescheduling propagation (#328), connected live-data repairs, full gate, authorized release, authenticated affected-data/runtime proof. No production writes or deployment performed.
 
-
 ## 2026-09-09: rescheduling shared and submitted purchasing evidence
 
 Previous turn was verified progress: purchasing stock checkpoint 6df7addd pushed. Re-read full goal and current sources. Executed generated-command draft/submitted reschedule matrix and scratch candidate probes; detailed evidence in runtime-gaps.md and issue #328. Confirmed all seven downstream collections remain unchanged on reschedule, a later servings edit drives the old date, naive draft rerouting fails the existing reassignment guard, and submitted rerouting ignores prior-date pending supply. This changes the implementation decision: a date-only handler is insufficient; date propagation, draft provenance removal/reconciliation, and supply allocation must be repaired together, preserving completed/history state. No application edits or production writes this turn; complete workflow/repair/release goal remains active.
-
 
 ## 2026-09-09: source-reviewed packing fluid-unit repair CLI
 
@@ -508,7 +512,6 @@ CLI saved-snapshot preview produces 1.3125,10.4375,10.4375,20.875,1.3125 cups, p
 
 Independent gpt-5.6-sol final APPROVE after adding listedAt to readback preservation and synchronizing the new preview hash. Bounded CLI/source checkpoint only; authenticated apply remains unverified.
 
-
 ## 2026-09-09: source-owned packing association restoration
 
 Previous turn was verified progress: b6247d17 packing-fluid CLI pushed. Re-read full goal/current owners. Joined source-qualified unique parent names to exact Ashley menu-line names: 141 packing rows across15 menu lines (initial verbal151 count corrected). Retained50 non-menu contexts,27 ambiguous,16 unmatched rows for their proper reconciliation; no array-order guessing.
@@ -516,7 +519,6 @@ Previous turn was verified progress: b6247d17 packing-fluid CLI pushed. Re-read 
 Added reviewed source/version/PDF-evidence payload in recipes/ashley-packing-associations.json and atomic replay-safe association repair. Initial raw write failed3 integration guards; moved writes to new Manifest restoreImportedAssociation command and regenerated via isolatedBuilder, preserving guard requirements. Independent review identified removed-menu lines and direct-command description/provenance protection; fixed both source and authored orchestration and qualified both access paths. The generated command changes relationships/provenance only, preserving physical quantities/history; receipts preserve original rows internally. Actual two-item safety matrix and full141-row/15-menu source-derived fixture passed, including no-write replay. No production writes or deployment; full goal remains active.
 
 Final verification:165 existing test files/1445 tests passed (one new generated command-contract check emitted by Builder), typecheck passed, ownership ledger check passed. Independent gpt-5.6-sol final APPROVE after source-owned command and review corrections. Bounded branch checkpoint only; live repair and full goal/release verification remain required.
-
 
 ## 2026-09-09: packing recipe association presentation and report completeness
 
@@ -575,7 +577,6 @@ Independent review initially rejected a mixed-unit demand error. Corrected by ke
 This is a partial integration checkpoint, NOT completion of335. Generated server-only serving reactions still do not create balances and still scale open rows to full recipe quantities; refreshGenerated is pending-only, so claimed/in-progress work needs a source-owned reconciliation command. Atomic coordination across UI/MCP/generated reactions, cancelled supplemental work/idempotency, dependencies, recipe changes, stale/concurrent callers and existing-data repair remain required. Current local code must not be released as the completed-work fix until those paths are integrated and qualified.
 Final typecheck and165files/1445tests passed. Independent gpt-5.6-sol APPROVE after the unit correction, explicitly limited to this client checkpoint; full335/server/atomic integration remains outstanding.
 
-
 ## 2026-09-10: transactional server remaining-prep reconciliation
 
 Added culinaryOperations.reconcileEventPrepWorkBalance and authored helper convex/lib/prepWorkReconciliation.ts. The seam reads the current stored event/menu line, complete indexed recipe-step/work groups, and recorded dependencies in one mutation. It credits actual completed quantities and manual/other open work; creates only a missing positive balance; updates the selected generated balance without resetting assignments, status, notes, dates or completion history. Generated query/command policies remain authoritative. Unresolved units/recipe identities propagate through recorded dependencies before writes, leaving unrelated groups usable.
@@ -610,7 +611,6 @@ Manifest release checkpoint: PR78 passed remote Linux and Windows CI, then merge
 
 The next required implementation is Capsule/isolated-Builder registry pin3.6.51, authored event handler plus replacement of the old serving reaction, regeneration, manual-sync coordination and generated-command full-flow proof. Capsule runtime remains480f22b2; subsequent branch commits only record progress. No production data writes or Capsule deployment occurred.
 
-
 ## 2026-09-10: automatic serving/headcount prep integration
 
 Previous goal turn was a status-only no-progress turn. Re-read the complete objective and current source, then consumed published Manifest3.6.51 in Capsule and its isolated Builder. Configured transactional eventHandlerImport with authored convex/lib/operationalEvents.ts. EventDishServingsAdjusted now invokes the reviewed group reconciler after generated demand/packing reactions inside the originating transaction. Removed the old full-requirement fan-out and the obsolete public PrepTask.syncServings command from authored Manifest and regenerated exports/discovery. PrepTask.reconcileRemainingWork remains the source-owned quantity command. No generated output was hand-edited.
@@ -630,3 +630,70 @@ Final bun run check passed with165files/1445tests, coverage ratchet, typecheck, 
 This is a substantial integration checkpoint, not whole issue335 or goal completion. Cancellation/removal/substitution and recipe relationship changes against performed/manual work, affected-data repair, purchasing normalization/reschedule/shared-stock, remaining source recipes, staffing/timeline/forms/battleboard/My Day, complete desktop/mobile/recipe navigation and print verification, final release and authenticated production proof remain required. No Capsule production writes or release occurred.
 
 Checkpoint74df2dc19661f905cd7022fcd4bab807eb849d61 committed and pushed to origin/fix/source-backed-catering-workflow; pre-push Builder regeneration check passed and remote SHA was checked. Final independent gpt-5.6-sol APPROVE coversbe59a970..74df2dc1 including docs and all10 current content-addressed Builder baselines; baseline filename/content hashes match. Existing unrelated/unreferenced untracked baselines remain untouched.
+
+## 2026-09-09: recipe-template propagation draft and compiler blocker
+
+After the reviewed/pushed automatic-serving checkpoint74df2dc1 and evidence13bc028d, actual runtime inspection found that DishTask revision leaves existing prep on its old ingredient/name/instructions even after quantity-only manual sync; retirement leaves pending generated prep. Issue339: https://github.com/Angriff36/capsule/issues/339. Current uncommitted draft adds template snapshots and guarded source commands for unstarted generated work, preserves edited/underway/completed rows, identifies unresolved identity changes, and releases dependencies of retired unstarted requirements without pretending that cooking was completed. Removal/cancellation callback work filters completed/cancelled rows to preserve their entire history. This draft is not reviewed or fully qualified.
+
+Recipe repair creates templates before linking reviewed imported prep. Its internal DishTask calls now request synchronizePrep:false so that existing repair coordination can preserve imported quantities and notes before creating genuinely missing rows. Actual import qualification still yields4 prep rows where2 are expected because Manifest3.6.51 createVia drops command computes and emits command-only bindings as doc fields. Generated DishTask_createViaAdd destructures the flag but emits doc.syncPrepRequested; the instance runner emits the correct local. Issue341: https://github.com/Angriff36/capsule/issues/341. Evidence: reproduce-prep-adoption.ts and recipe-events-adoption.log under .artifacts/operations-source-study. No generated file was edited by hand.
+
+Owning Manifest fix is isolated in C:/Projects/Manifest/.worktrees/convex-create-event-bindings, branchfix/convex-create-event-bindings, base7252a7f (3.6.51). Current source draft executes createVia compute/mutate actions in declaration order on one working copy and retains parameter/compute locals for emits/reactions. Actual generated-runtime checks pass false/true/omitted flags, same-named input versus post-action field, compute chains across mutation, stored/reaction/callback payloads, absence of persisted locals, and idempotent replay, with callback both enabled and disabled. All26 focused Convex test files/270cases passed. Full Manifest gates and independent gpt-5.6-sol review are in progress; no release/publication or Capsule consumption claim yet. Primary Manifest dirty checkout is untouched.
+
+Next: qualify/review/publish owning compiler fix, consume exact registry version through Capsule Builder regeneration, then rerun imported-prep adoption and the existing source-backed prep/repair qualifications. Resolve retirement dependency replay and preserve imported custom notes; update template UI wording for existing-event propagation. Full purchasing/calendar/shared-stock work, affected live data repair, unresolved source recipes, staffing/timeline/forms/battleboard/My Day, complete UI/recipe-link/print verification and final gated Capsule release remain required. No Capsule production data writes or deployment.
+
+
+## 2026-09-10: compiler released and recipe propagation runtime qualified
+
+Manifest source300f2ea and evidence88abe7a received independent gpt-5.6-sol
+APPROVE. PR https://github.com/Angriff36/Manifest/pull/80 passed Linux/Windows CI
+run34469788758 and merged as735aa917. Successful cut-release run34470306158
+published3.6.52; registry gitHead db385089432f8067650d252898a6633510e56d03 and
+GitHub v3.6.52 release were verified. Manifest full suite4506 passed/60 skipped,
+typecheck/lint/docs/root+CLI builds and generated-runtime matrix passed.
+Primary dirty Manifest checkout stayed untouched.
+
+Capsule installed exact3.6.52 and regenerated through isolated Builder; no
+hand-edited generated files. The previously failing import adoption now retains
+exactly2 existing prep records rather than4, preserves custom notes and original
+completed/planned amounts, replays without duplicates, scales pending work on
+later servings changes and rolls back stale reviewed input. Actual runtime
+recipe propagation verifies snapshots, pending/claimed automatic replacement,
+retained assignment, manual/underway/completed/historical byte-for-byte
+preservation, imported custom notes, named unresolved review and retirement.
+
+Additional actual-runtime evidence found and fixed two draft defects: initial
+EventDishAdded prep omitted the template station; and a retired prerequisite
+was copied onto newly created supplemental work. Source reaction now carries
+station, and reconciliation recognizes prior retirement across later runs.
+Released dependency history and completed/retired task rows remain byte-for-byte.
+A generic recipe step's missing ingredient identity no longer wrongly treats
+richer linked work provenance as a replacement. Explicit conflicting identities
+still require operational review; no fabricated food or cross-dimension unit
+conversion is used.
+
+Admin and event_manager remove/cancel both cancel unfinished work while
+preserving whole completed and already-canceled records. All six prior automatic
+serving/headcount/dependency qualification scripts pass against3.6.52, including
+completed output, manual allowance, incompatible units, active assignment,
+stale/foreign/history behavior, distinct same-dish menu lines, MCP replay, and
+whole-transaction rollback. Ten scripts/logs ending -3652 provide this evidence.
+UI copy now explains current-event propagation and preservation on retirement;
+no visual-language change.
+
+Full bun run check passed with165files/1448tests (three new generated export
+contract cases, no new authored cases), coverage, typecheck, format, secrets,
+integration/design/ownership checks, localVite build and baseline-decay. Log:
+.artifacts/operations-source-study/check-recipe-events.log. Git/bin PATH ensured
+local bash, and Vercel production environment was absent.11 current Builder
+baselines were hash-verified; only these will be included, leaving older
+untracked baselines intact. Capsule independent gpt-5.6-sol review is in progress
+at this entry. This is a bounded checkpoint: no Capsule production data writes
+or deployment, and live repair/purchasing/source/operations/UI/report/final
+release proof remain required for the full goal.
+
+Independent gpt-5.6-sol APPROVE for the bounded final diff against13bc028d,
+including direct DESIGN.md review. The reviewer confirmed template/retirement/
+removal paths preserve legitimate work, staged repair still materializes missing
+rows after links, and the copy changes introduce no design violation or new
+user tedium. This verdict does not claim live repair, deployment or whole-goal
+completion.

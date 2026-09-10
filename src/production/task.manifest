@@ -35,6 +35,11 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   property required taskType: string = "manual"
   property specialInstructions: string?
   property required isGenerated: boolean = true
+  // Last inherited recipe text. Three-way refresh preserves event-specific notes.
+  property recipeTemplateVersion: int?
+  property recipeTemplateName: string?
+  property recipeTemplateInstructions: string?
+  property recipeTemplateStation: string?
   property required quantity: decimal(12, 4) = 0
   property completedQuantity: decimal(12, 4)?
   property required unit: UnitOfMeasure = "each"
@@ -47,6 +52,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   property startedAt: datetime?
   property completedAt: datetime?
   property cancelledAt: datetime?
+  property templateRetiredAt: datetime?
   property cancellationReason: string?
   property blockedAt: datetime?
   property blockReason: string?
@@ -124,6 +130,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate quantity = quantity
     mutate unit = unit
     mutate station = station != null ? station : self.station
+    mutate recipeTemplateVersion = self.dishTask != null ? self.dishTask.version : null
+    mutate recipeTemplateName = self.dishTask != null ? self.dishTask.name : null
+    mutate recipeTemplateInstructions = self.dishTask != null ? self.dishTask.instructions : null
+    mutate recipeTemplateStation = self.dishTask != null ? self.dishTask.station : null
     mutate dueAt = dueAt != null ? dueAt : self.dueAt
     mutate notes = notes != null ? notes : self.notes
     emit PrepTaskOpened {
@@ -209,6 +219,41 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Only untouched work that has not started follows changed recipe details.
+  // Operator edits turn isGenerated off; performed work keeps its recorded recipe.
+  command refreshRecipeTemplate(expectedVersion: int) {
+    guard self.deletedAt == null and self.isGenerated == true
+    guard (self.status == "pending" or self.status == "claimed") and self.startedAt == null
+    guard self.version == expectedVersion
+    guard self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled"
+    guard self.eventDish != null and self.eventDish.deletedAt == null and self.eventDish.removedAt == null
+    guard self.dishTask != null and self.dishTask.deletedAt == null and self.dishTask.status == "active"
+    mutate name = self.recipeTemplateVersion != null and self.name == self.recipeTemplateName ? self.dishTask.name : self.name
+    mutate category = self.dishTask.category
+    mutate taskType = self.dishTask.taskType
+    mutate componentId = self.dishTask.componentId
+    mutate ingredientId = self.dishTask.ingredientId
+    mutate specialInstructions = self.recipeTemplateVersion != null and (self.specialInstructions != null ? self.specialInstructions : null) == (self.recipeTemplateInstructions != null ? self.recipeTemplateInstructions : null) ? self.dishTask.instructions : self.specialInstructions
+    mutate station = self.recipeTemplateVersion != null and (self.station != null ? self.station : null) == (self.recipeTemplateStation != null ? self.recipeTemplateStation : null) ? self.dishTask.station : self.station
+    mutate recipeTemplateVersion = self.dishTask.version
+    mutate recipeTemplateName = self.dishTask.name
+    mutate recipeTemplateInstructions = self.dishTask.instructions
+    mutate recipeTemplateStation = self.dishTask.station
+  }
+
+  // A retired template stops untouched, unstarted work on live events.
+  command retireWithTemplate(expectedVersion: int) {
+    guard self.deletedAt == null and self.isGenerated == true
+    guard (self.status == "pending" or self.status == "claimed") and self.startedAt == null
+    guard self.version == expectedVersion
+    guard self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled"
+    guard self.dishTask != null and self.dishTask.status == "retired"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate templateRetiredAt = now()
+    mutate cancellationReason = self.dishTask.retirementReason != null ? self.dishTask.retirementReason : "Recipe step retired"
+  }
+
   // Derive the remaining work from this menu line and its recorded output.
   // Updating its remaining quantity must not restart or reassign active work.
   command reconcileRemainingWork(expectedVersion: int) {
@@ -227,7 +272,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     // Never credit a different ingredient/component or convert across dimensions.
     guard (self.dishTask.defaultUnit != null ? self.dishTask.defaultUnit : "portion") == self.unit or ((self.dishTask.defaultUnit == "gram" or self.dishTask.defaultUnit == "kilogram" or self.dishTask.defaultUnit == "ounce" or self.dishTask.defaultUnit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((self.dishTask.defaultUnit == "milliliter" or self.dishTask.defaultUnit == "liter" or self.dishTask.defaultUnit == "teaspoon" or self.dishTask.defaultUnit == "tablespoon" or self.dishTask.defaultUnit == "cup" or self.dishTask.defaultUnit == "pint" or self.dishTask.defaultUnit == "quart" or self.dishTask.defaultUnit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon"))
     guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and not (task.unit == self.unit or ((self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound") and (task.unit == "gram" or task.unit == "kilogram" or task.unit == "ounce" or task.unit == "pound")) or ((self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon") and (task.unit == "milliliter" or task.unit == "liter" or task.unit == "teaspoon" or task.unit == "tablespoon" or task.unit == "cup" or task.unit == "pint" or task.unit == "quart" or task.unit == "gallon")))) == 0
-    guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" and ((task.componentId != null ? task.componentId : null) != (self.dishTask.componentId != null ? self.dishTask.componentId : null) or (task.ingredientId != null ? task.ingredientId : null) != (self.dishTask.ingredientId != null ? self.dishTask.ingredientId : null))) == 0
+    guard count_of(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" and ((self.dishTask.componentId != null and task.componentId != self.dishTask.componentId) or (self.dishTask.ingredientId != null and task.ingredientId != self.dishTask.ingredientId))) == 0
     compute unitRatio = recipeUnit == self.unit ? 1 : (sourceMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
     compute requiredWork = (self.dishTask.defaultQuantity != null ? self.dishTask.defaultQuantity : 1) * self.eventDish.quantityServings * unitRatio
     compute completedWork = sum(self.eventDish.prepTasks, (task) => task.deletedAt == null and task.status != "cancelled" and task.dishTaskId == self.dishTaskId and task.status == "completed" ? (task.completedQuantity != null ? task.completedQuantity : task.quantity) * (task.unit == self.unit ? 1 : (targetMass > 0 ? (task.unit == "gram" ? 1 : task.unit == "kilogram" ? 1000 : task.unit == "ounce" ? 28.349523125 : task.unit == "pound" ? 453.59237 : 0) / targetMass : (targetVolume > 0 ? (task.unit == "milliliter" ? 1 : task.unit == "liter" ? 1000 : task.unit == "teaspoon" ? 4.92892159375 : task.unit == "tablespoon" ? 14.78676478125 : task.unit == "cup" ? 236.5882365 : task.unit == "pint" ? 473.176473 : task.unit == "quart" ? 946.352946 : task.unit == "gallon" ? 3785.411784 : 0) / targetVolume : 0))) : 0)
@@ -353,7 +398,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.claimedAt != null
     guard self.assignedToId != null
     guard self.deletedAt == null
-    constraint startPredecessorsComplete: count_of(self.incomingDependencies, (dependency) => dependency.isSatisfied == false) == 0 "All predecessor prep tasks must be complete before this task can start"
+    constraint startPredecessorsComplete: count_of(self.incomingDependencies, (dependency) => dependency.isSatisfied == false) == 0 "Required predecessor prep tasks must be complete before this task can start"
     compute previousStatus = self.status
     mutate status = "in_progress"
     mutate startedAt = now()
@@ -513,6 +558,8 @@ entity PrepTaskDependency mixin TenantScoped {
   property required dependentTaskId: uuid
   property required predecessorTaskId: uuid
   property required isSatisfied: boolean = false
+  property requirementReleasedAt: datetime?
+  property requirementReleaseReason: string?
 
   // dependentTask must remain first: PrepTask.incomingDependencies resolves this
   // inverse edge when the generated start command hydrates its count_of constraint.
@@ -539,6 +586,16 @@ entity PrepTaskDependency mixin TenantScoped {
       predecessorTaskId: predecessorTaskId
       isSatisfied: self.predecessorTask.status == "completed"
     }
+  }
+
+  // The prerequisite was removed from the recipe, not falsely completed.
+  // Retain the edge and its release reason as history, without blocking work.
+  command releaseRetiredRequirement() {
+    guard self.isSatisfied == false
+    guard self.predecessorTask != null and self.predecessorTask.status == "cancelled" and self.predecessorTask.templateRetiredAt != null
+    mutate isSatisfied = true
+    mutate requirementReleasedAt = now()
+    mutate requirementReleaseReason = "Prerequisite retired from recipe"
   }
 
   command satisfy() {
@@ -726,16 +783,8 @@ event PrepTaskCancelled: "prep_task.cancelled" {
 on PrepTaskCompleted fanOut PrepTaskDependency where predecessorTaskId = payload.prepTaskId
   run satisfy
 
-// EventCancelled → stand down prep work for that event. standDown, not cancel:
-// these fan out over every task including completed ones. See PrepTask.standDown.
-on EventCancelled fanOut PrepTask where eventId = payload.eventId
-  run standDown
-  params { reason: payload.reason }
-
-// EventDishRemoved → stand down prep lines for that event dish.
-on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
-  run standDown
-  params { reason: payload.reason }
+// Event cancellation and menu removal stand down only unfinished tasks through
+// convex/lib/operationalEvents.ts; completed/cancelled rows are never invoked.
 
 // EventDishServingsAdjusted is reconciled by convex/lib/operationalEvents.ts
 // in the originating transaction. Balance the entire recipe-step group so
@@ -777,4 +826,5 @@ on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
     componentId: self.componentId
     ingredientId: self.ingredientId
     specialInstructions: self.instructions
+    station: self.station
   }

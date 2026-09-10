@@ -417,6 +417,7 @@ export async function repairDishRecipe(
           throw new Error(`Existing prep quantity differs: ${task.name}`);
         if (existing.componentId == null && componentIndex >= 0) {
           await ctx.runMutation(api.mutations.DishTask_revise, {
+            synchronizePrep: false,
             docId: existing._id,
             version: existing.version,
             name: existing.name,
@@ -434,6 +435,7 @@ export async function repairDishRecipe(
         continue;
       }
       await ctx.runMutation(api.mutations.DishTask_createViaAdd, {
+        synchronizePrep: false,
         dishId,
         name: task.name,
         category: dish.category ?? "Finish at Kitchen",
@@ -510,6 +512,7 @@ export async function repairDishRecipe(
           t.componentId === replacement.row.componentId,
       )) {
         await ctx.runMutation(api.mutations.DishTask_revise, {
+          synchronizePrep: false,
           docId: template._id,
           version: template.version,
           name: template.name,
