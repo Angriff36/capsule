@@ -89,6 +89,21 @@ clients. Every event carries the same channel as its **Team Chat** tab.
 
 ## Cross-system handoffs
 
+Shift creation uses the same generated `Shift.schedule` transaction from the
+UI scheduling compatibility seam and direct generated callers. Its
+`ShiftScheduled` callback reads approved time off and rejects overlapping
+half-open ranges atomically; pending, denied and deleted requests do not
+block scheduling. The seam no longer duplicates Shift insertion, encryption,
+training or certification validation. Existing-shift lookup is a no-op and
+manual split shifts remain available. This callback bridges the projection's
+nested-collection gap in issue #75; it is not a compiler fix.
+
+Calculated Event crew windows are not yet connected to automatic Shift
+updates (#358). Real linked staff identity guards on My Day also require
+repair (#359); the current generated Shift.start still compares a Person ID
+with the Clerk subject. Do not treat the generated lifecycle proof's
+Person-ID-as-subject fixture as evidence of authenticated staff behavior.
+
 Events own service context; Person owns operator identity; staffing records feed readiness explanations and PayrollInput. Incidents may link to a Shift. Logistics Delivery may reference a Person as driver, but Vehicle is not currently modeled.
 
 ## States and permissions

@@ -318,3 +318,20 @@ line wrapping), but the one-page fixture is not complete binder or multipage
 proof. Repair the print containing blocks and qualify long real event output
 in the actual route shell. Evidence: untimed-battle-print.pdf and rendered
 untimed-battle-print-page1.png under .artifacts/operations-source-study.
+# 2026-09-10 staffing command findings
+
+- #358 remains: assignments use guest times and browser-created shifts; later
+  calculated crew-window updates do not refresh existing shifts.
+- #75 reproduced through actual generated commands: approved time off blocks
+  the compatibility seam but not Shift_createViaSchedule at b33b79dd. The
+  current change attaches the existing overlap check to ShiftScheduled in the
+  originating transaction and delegates the seam to generated creation.
+  Runtime qualification and full check pass; independent gpt-5.6-sol APPROVE.
+  Branch checkpoint and release proof are separate; nothing is deployed.
+- #359: a Person linked to a real Clerk-shaped subject cannot start their
+  own shift because the source guard compares Person ID with user.id.
+  Assignment attendance, time records and availability contain the same
+  source pattern and need complete role/identity qualification.
+- #360: first-time OrganizationCapabilitySetting_createViaRegister rejects
+  its own required seeded capability with Guard 1 failed. The isolated shift
+  capability-switch fixture does not qualify that broken registration path.

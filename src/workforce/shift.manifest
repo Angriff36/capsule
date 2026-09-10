@@ -75,10 +75,11 @@ entity Shift mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt == null
     guard self.status == "scheduled"
     guard self.deletedAt == null
-    guard self.person != null
+    guard self.person != null and self.person.deletedAt == null and self.person.status == "active" "Select an active staff member in this workspace"
     guard roleAllows(user.role, "workforceManageAccess")
     constraint schedulePersonMatch: personId == self.personId "Schedule personId must match the seeded person reference"
     constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Schedule eventId must match the seeded event reference when provided"
+    constraint scheduleEventPresent: (eventId == null and self.eventId == null) or (self.event != null and self.event.deletedAt == null) "Select an event in this workspace"
     constraint scheduleDates: endsAt > startsAt "Shift end must be after its start"
     constraint scheduleShiftTypeActive: shiftTypeId == null or (self.shiftType != null and self.shiftType.deletedAt == null and self.shiftType.status == "active") "Selected shift type must be active"
     constraint scheduleTrainingProofRequired: shiftTypeId == null or self.shiftType == null or self.shiftType.requiredTrainingModuleId == null or requiredTrainingCompletionId != null "This shift type requires completed training before scheduling"
@@ -87,6 +88,8 @@ entity Shift mixin TenantScoped, SoftDeletable {
     constraint scheduleQualificationPersonMatch: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.personId == personId) "Required certification must belong to the selected person"
     constraint scheduleQualificationActive: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.deletedAt == null and self.requiredQualification.status == "active") "Required certification must be active"
     constraint scheduleQualificationValidity: requiredQualificationId == null or (self.requiredQualification != null and (self.requiredQualification.expiresAt == null or self.requiredQualification.expiresAt >= endsAt)) "Required certification must remain valid through the shift"
+    // Approved time-off overlap is read by the transactional ShiftScheduled
+    // callback for every generated command path (projection collection gap #75).
     mutate personId = personId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate startsAt = startsAt

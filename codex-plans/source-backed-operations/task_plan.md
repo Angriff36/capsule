@@ -136,3 +136,14 @@ Root classification issue326 must be handled in the existing-data repair: the ra
 Remaining connected work includes full affected-data migration preview/application, fixed/equipment quantity bases, performed-work deltas, purchasing week normalization/reschedule/shared-stock allocation and empty drafts, historical display/report snapshots, linked recipe presentation, prep hierarchy, packing/equipment, staffing/timeline/forms/battleboard/My Day, desktop/mobile inspection, full required checks, independent final review, authorized release and authenticated live verification. Preserve the full scope; do not narrow success to the finished checkpoints.
 
 Do not repeat completed source inspection without a specific reason. Before UI work, use DESIGN.md and its applicable design/system references. Only source-owned Manifest edits followed by `bun run manifest:regen`; set BUILDER_DIR to the isolated Builder. No authored tests beyond owner authorization; existing tests plus scratch actual-runtime checks are the current verification path.
+# Current continuation: shared shift scheduling before crew-window propagation
+
+The preceding status-only turn made no implementation progress. Current
+generated-runtime evidence reproduced #75 and #359. The shared ShiftScheduled
+callback now applies the existing time-off overlap rule to every generated
+creation entry; the compatibility seam delegates writes and prerequisite
+checks to generated Shift.schedule. Sixteen scratch runtime flags and
+typecheck pass. Full check passed (165 files/1,458 tests) and independent
+gpt-5.6-sol APPROVE received. Finish commit and branch push.
+Then continue #358's actual staffing/timing orchestration and #359's real-user
+My Day path. Preserve the full original goal, data repair and production proof.

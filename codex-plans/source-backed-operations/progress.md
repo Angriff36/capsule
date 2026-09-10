@@ -1,5 +1,39 @@
 # Progress
 
+## 2026-09-10 shared shift scheduling transaction
+
+The timing checkpoint b33b79dde0bf80e032799cb0fdd2984db4f81adf remains
+pushed and independently approved. Staffing investigation confirmed #358's
+browser-only assignment/shift handoff and found the generated schedule path
+bypasses approved time off. An actual generated-runtime reproduction
+confirmed existing issue #75; this checkpoint moves that check into the
+transactional ShiftScheduled callback and replaces the UI seam's raw writes
+and repeated validation with generated Shift_createViaSchedule.
+
+Active-Person and event-presence requirements now live in Manifest source.
+Sixteen runtime flags pass in shift-scheduling-qualified.json, including
+creation/receipt/idempotency rollback, enclosing-transaction rollback,
+boundaries, training/qualification parity, manual splits and preserved
+attendance. Typecheck and full `bun run check` passed (165 files/1,458 tests;
+check-shift-scheduling.log, exit 0). Independent gpt-5.6-sol APPROVE covers
+the implementation; final committed-range confirmation follows the checkpoint.
+See shift-scheduling.md for the exact implementation and qualification scope.
+
+The same baseline reproduced the real Clerk-subject/Person-ID guard failure
+in Shift.start (#359). The capability-switch qualification found a separate
+first-time registration failure (#360) and uses an explicitly marked isolated
+row fixture. Neither issue is fixed by this scheduling checkpoint. Event
+crew-window propagation, My Day repair, source-data repair, purchasing,
+reports/print, release and authenticated production verification remain
+required. No Capsule production writes or deployment occurred.
+
+The next-step generated-runtime baseline also confirms that assigning a
+Person without explicit times leaves the Assignment untimed despite a fully
+configured Event, and neither assignment nor filling a staff need creates a
+Shift. Event-manager assignOwner fails its child assignment's workforce
+policy; repeating assignOwner as admin fails the already-assigned child's
+initialization guard. See staffing-command-baseline.json and its script.
+
 ## 2026-09-10 source-backed timing planner (latest)
 
 The preceding untimed/atomic checkpoint is committed and pushed as
