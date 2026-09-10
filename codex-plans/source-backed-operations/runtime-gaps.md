@@ -1,5 +1,22 @@
 # Runtime gaps and repair evidence
 
+## Latest timing checkpoint (2026-09-10, issue353)
+
+Persistent service/setup/load/checked-travel/cleanup/return/unload planning is
+now implemented in Event and materializes eight shared timeline blocks. The
+training example, reschedule, missing values, retries, manual/performed/removed
+preservation, role/tenant/version exclusions and historical parent boundaries
+pass isolated generated-runtime qualification. Actual generated-wrapper UI
+checks pass at390/900/1440. See progress.md for exact gate/review evidence.
+
+Still required: use the staff-on/off windows in staffing/shift planning and
+shared/personal schedules; reconcile actual source labels and existing records
+without introducing duplicate operational work; resolve NLT and conflicting
+source staffing details. No live data repair or production deployment is proved.
+The prior hard-coded timestamps/partial-batch/window-edit checkpoint is pushed
+as b3be02e5; issues354/355 remain open through release/live qualification.
+Compiler356 and print357 remain unrepaired, alongside the full earlier gaps.
+
 ## Current implementation checkpoint
 
 The prior continuation made concrete progress (instruction preservation, original-workbook evidence, runtime reproductions); it was not blocked. This continuation implements the first connected quantity corrections, still short of the full goal:

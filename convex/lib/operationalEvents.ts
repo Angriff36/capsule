@@ -5,6 +5,7 @@ import { reconcileEventPrepWork } from "./prepWorkReconciliation";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
 import { releaseEventInventoryHolds } from "./inventoryEvents";
 import { standDownEventLogisticsAndBilling } from "./eventCancellation";
+import { reconcileEventTiming } from "./eventTimingOperations";
 import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
@@ -17,6 +18,16 @@ export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  if (event.entity === "Event" &&
+    ["EventTimingConfigured", "EventScheduleChanged"].includes(event.type)) {
+    await reconcileEventTiming(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "EventTimelineActivity" &&
+    event.type === "EventTimelineCalculatedTimingRequested") {
+    await reconcileEventTiming(ctx, event.payload.eventId as Id<"events">);
+    return;
+  }
   if (
     event.entity === "VendorOrderLine" &&
     event.type === "VendorOrderLineRequirementReconciled"

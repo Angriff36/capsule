@@ -1,5 +1,16 @@
 # Source-backed catering workflow
 
+## Latest continuation (2026-09-10)
+
+The service/setup/travel/load/return/unload timing planner now persists its
+inputs on Event and calculates/materializes shared timeline milestones. The
+source worked example and preservation checks pass; see progress.md for the
+final gate/review/checkpoint state. Continue the connected staffing/shift and
+existing-data work next, including NLT/source label reconciliation. The full
+goal still includes purchasing, source/data repairs, print/reports, release and
+authenticated production verification. Do not treat calculated timeline blocks
+as proof that staffing assignments or shifts have the correct schedule.
+
 ## Goal and authority
 
 Fulfill the complete request in attachment `6b4eed7c-f119-448b-b84b-b99ee7cb5560/pasted-text-1.txt`: study all relevant event, recipe, report and training sources; repair the connected application and existing affected live data; verify desktop/mobile, calculations, repeatability, preserved work, reports, review, gates, authorized release and deployed behavior. An audit or partial fix is not completion.

@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
-import { mutation } from "../_generated/server";
+import { mutation, query } from "../_generated/server";
+import { readEventTimingPlan } from "./eventTimingOperations";
 import { getAuthContext, requireTenant } from "./authContext";
 import {
   readMaterializationReceipt,
@@ -9,6 +10,11 @@ import {
 } from "./materializationReceipt";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import { materializeCateringPackage, type CateringPackageResult } from "./cateringPackageOperations";
+
+export const eventTimingPlan = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args) => readEventTimingPlan(ctx, args.eventId),
+});
 
 export const applyCateringPackage = mutation({
   args: {

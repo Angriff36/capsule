@@ -1,5 +1,53 @@
 # Progress
 
+## 2026-09-10 source-backed timing planner (latest)
+
+The preceding untimed/atomic checkpoint is committed and pushed as
+`b3be02e5939e7ed300e424e6e827661497e30234`, with exact-range gpt-5.6-sol APPROVE.
+This continuation builds persistent planning on that foundation. Event stores
+the explicit service anchor and six durations; Manifest computes onsite,
+departure, staff-on, cleanup/return and staff-off times. The same transactional
+event callback creates/reuses eight shared timeline milestones and updates
+calculated work on reschedule. Manual times, notes, assignments, custom work,
+performed/reopened work and removals stay intact. Returning a manual block to
+the calculated plan is an explicit action with restored keyboard focus.
+
+The generated runtime reproduces training p4's 11:30/08:30/08:00/07:00 example,
+limited-service setup, unknown travel, retry, explicit service-offset moves,
+invalid-input rollback, role/tenant/version exclusions and preserved work.
+Reviewer gpt-5.6-sol caught a historical-event bypass; source constraints now
+protect completed/closed-out/cancelled Event timing and both direct child
+commands, including missing/deleted parents. Planning/executing/final edits
+and ordinary individual timeline corrections remain available. Seventeen
+runtime flags pass in `.artifacts/operations-source-study/timing-planner-qualified.json`,
+including ambiguous existing-block selection, a final-child version fault
+that rolls back preceding child writes, and executing/final/sales-lock edits.
+
+Actual authored UI with generated command wrappers and isolated runtime
+snapshots passes keyboard/save-failure/retry/missing-time/preservation/history
+checks at390/900/1440; see `timing-planner-browser-qualified.json` and
+`timing-{form,plan,preserved}-*.png` in the same artifact directory. Phone and
+desktop images were inspected. The final phone refinement places the manual
+timing action below the recorded time so it cannot squeeze the time column.
+These are isolated-data browser checks, not authenticated production evidence.
+
+Both full `bun run check` runs exited0 with165 files/1458 tests, including
+generated contract additions (no new authored tests). The final run after
+UI refinements is `.artifacts/operations-source-study/check-timing-planner-final.log`.
+Independent gpt-5.6-sol approves the implementation and history fix; its final
+documentation count correction is now applied. Exact final working/committed
+range confirmation follows the checkpoint.
+Regeneration used only the isolated Builder with Manifest3.6.52; generated
+files and referenced baselines remain ownership-controlled.
+
+Issue353 remains open: connect these crew windows to staffing assignments and
+shifts, reconcile existing source-specific timeline labels and data, and resolve
+the recorded NLT/staffing conflicts from the sources. Eight timing milestones
+do not prove the complete staffing workflow. Purchasing/week/reschedule/shared
+stock, source recipe conflicts, affected-data application, compiler356,
+print357, all report/mobile/print outputs, release and authenticated production
+proof remain required. No Capsule production data write or deployment occurred.
+
 ## 2026-09-09 initial source study
 
 - Read original goal attachment before exploration.
