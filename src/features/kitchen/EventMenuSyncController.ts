@@ -25,6 +25,7 @@ type PrepTaskRow = {
   dishTaskId?: string | null;
   name: string;
   quantity: number;
+  completedQuantity?: number | null;
   unit: string;
   ingredientId?: string | null;
   ingredientDemandId?: string | null;
@@ -316,6 +317,7 @@ export class EventMenuSyncController {
         dishTaskId: task.dishTaskId,
         name: task.name,
         quantity: Number(task.quantity),
+        completedQuantity: task.completedQuantity,
         unit: task.unit as never,
         ingredientId: task.ingredientId,
         ingredientDemandId: task.ingredientDemandId,

@@ -73,6 +73,8 @@ export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoa
             dishTaskId: row.dishTaskId as string | null | undefined,
             name: String(row.name),
             quantity: Number(row.quantity),
+            completedQuantity: row.completedQuantity as
+              number | null | undefined,
             unit: row.unit as EventPrepTask["unit"],
             ingredientId: row.ingredientId as string | null | undefined,
             ingredientDemandId: row.ingredientDemandId as
