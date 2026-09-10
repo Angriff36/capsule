@@ -21,19 +21,19 @@
       "sha256": "becbea389ef292a93de0e41b3bb21108ab73333d282f255299d7fc59268665ce"
     },
     "convex/queries.ts": {
-      "sha256": "9cd5f7252e193931f17e39cfb0e8682086105b851bf48e221393e4ae58db9b64"
+      "sha256": "b1404c708be9703b6560ae78d9595fae8a18c5ad6312537d40560174b8584564"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "90c173257c9474e51bcb5b8416a2cf7e5a357fe13530492662b46c7af2982462"
+      "sha256": "cfe07f5c995c35bb01463b7c07605057202a135e48fa51f9dde9d50587033761"
     },
     "manifest-context-summary.json": {
-      "sha256": "4f93f002f446f812983a70f07374ea9f71ab1c6e1a388e40f02bcad3b8f50a65"
+      "sha256": "064557d079076b0672b08a45035c91a6dc7a84513f1cbc3c875a33900ec7346e"
     },
     "package.json": {
-      "sha256": "5c447cb43f1f94a2febb5c0b3c0bdf3f8193cd3faccaa36aabc049f265227e54"
+      "sha256": "1541ced02c8bf8975668ab896de5aed1d17fe6326e0f16e0cb2755549fe5cd20"
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
@@ -48,7 +48,7 @@
       "sha256": "7fb36dcd11ba2a343a2d743c9d0ea9b51cf3511c4d82726b9deebb3d81588efd"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "51a7d485eb672d77c59aa584b37f871e318a5379a97140920087527152e8134d"
+      "sha256": "b7152c5fdb1891d5bd9975da0126d311fc035f71caa9652f4db2bcd1e093a045"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "3ee8a1ecae7c55836212a40d1f6935d25fd6f23d64827b0ff7af67f658625ea8"
@@ -60,12 +60,12 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "76f3a8b0bee398f6620d3f5a42c894c6a23512d1d46f75e7c968303d2c7dfe0a"
+      "sha256": "c27976702b8ff0fac554a0f18a6bf4318ed58603593876543a98022fb51d777e"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "^3.6.53",
+      "@angriff36/manifest": "^3.6.54",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },

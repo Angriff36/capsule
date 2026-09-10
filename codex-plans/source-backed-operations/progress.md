@@ -1,5 +1,73 @@
 # Progress
 
+## 2026-09-10 My Day integrated checkpoint passes all required checks
+
+Manifest PR82 release run34532756346 succeeded and published3.6.54. Capsule pins
+that exact version; its isolated Builder also resolves3.6.54. Normal regeneration
+passed, and the final integrated diff has independent gpt-5.6-sol APPROVE.
+Full `bun run check` completed exit0 (handle22409): 165 files / 1,468 tests passed,
+with typecheck, formatting, secrets, ownership/proof/integration/design checks,
+coverage, local Vite build and baseline decay. Log:
+`check-my-day-swap-eligibility.log`. This supersedes the generator-blocked and
+publication-pending statements in the historical entries below.
+
+Final generated-runtime qualification verifies numeric indexed-query arguments,
+optional/nullable expiry, privacy, eligibility boundaries and the complete swap
+command sequence. Actual My Day browser qualification and its existing staff
+self-service regression pass at1440/900/390. Periodic refresh retains the selected
+coworker; phone input targets are44px. The scratch browser harness now injects
+fresh runtime snapshots before page startup, avoiding Vite's ignored-artifact
+module cache, and asserts the initial shift timestamp. Browser evidence remains
+isolated transport qualification, not authenticated full-app proof.
+
+This bounded My Day change is ready for commit and branch push. Only six newly
+referenced Builder baseline blobs belong to it; unrelated untracked work remains
+untouched. No new authored Capsule tests, production writes or deployment.
+Authenticated full-app checks, affected live-data repairs and the full remaining
+culinary/purchasing/packing/report/release scope remain required. See
+my-day-swap-eligibility.md for implementation and upstream evidence.
+
+## 2026-09-10 upstream timestamp index correction and My Day follow-ups
+
+Manifest issue #364 is fixed at source 47d1762 in an isolated worktree, with six
+focused regressions, 4,519 passing tests / 60 skipped, and all required local
+gates. Independent gpt-5.6-sol APPROVES source/tests and the matrix/TODO/inventory
+proof. PR82 passed Linux/Windows CI34532193788 and merged as 0dc6803. Registry
+release34532756346 is live; Capsule still needs the published version, normal
+regeneration and its full gate before this uncommitted checkpoint can land.
+
+My Day's periodic query reload lost the selected coworker; a controlled selection
+now preserves it while submission uses fresh eligibility/proofs. Mobile inputs
+in this route now meet the 44px documented target, consistently across sibling
+availability fields. Both changes are independently approved; the swap browser
+flow and existing clock/shift/schedule regression pass at1440/900/390. Additional
+runtime qualification passes no-expiry/exact-end certifications and malformed
+historical windows without hiding a real conflict. No Capsule production write
+or deployment. See my-day-swap-eligibility.md for source/CI/run references.
+
+## 2026-09-10 My Day eligible coworker projection after b7aa18a5
+
+Staffing replacement is committed and pushed as b7aa18a5, verified on origin;
+the receipt records gpt-5.6-sol APPROVE and all required checks passing (1,468
+tests). The current uncommitted change fixes ordinary staff being unable to
+choose a qualified coworker because the previous picker read private credential
+lists. It returns minimal eligible coworkers and incoming shift details through
+authored read seams, retaining generated writes and the established design.
+
+Independent review first rejected historical scans and cached wall-clock state.
+Generated compound indexes and explicit time refresh address those findings;
+gpt-5.6-sol now APPROVES the bounded diff. Isolated generated-runtime and actual
+My Day browser qualification at 1440/900/390 pass; final desktop picker and phone
+incoming screenshots were inspected. No production data was written or deployed.
+
+Typechecking exposed a generator defect in the new indexed list queries:
+datetime parameters use v.string() against numeric schema fields. Issue #364:
+https://github.com/Angriff36/capsule/issues/364. This checkpoint cannot pass its
+required gate until Manifest is fixed and normally regenerated. The primary
+Manifest checkout contains unrelated source edits and must remain untouched.
+See my-day-swap-eligibility.md for evidence, exact state and next steps. The full
+operations goal remains active, including live repairs and authenticated release.
+
 ## 2026-09-10 filled-request replacement and reopening after ca44b95e
 
 The removal checkpoint ca44b95e is committed and verified on origin. The next

@@ -1,5 +1,29 @@
 # Runtime gaps and repair evidence
 
+## Current My Day checkpoint: generator blocker resolved (2026-09-10)
+
+Manifest3.6.54 is published, pinned in Capsule, installed in its isolated Builder
+and regenerated normally. The integrated My Day diff has gpt-5.6-sol APPROVE;
+full `bun run check` passed165 files /1,468 tests, including the previously
+failing typecheck. Generated date-index queries now execute with numeric values
+and preserve optional/nullable expiry semantics. Runtime and1440/900/390 browser
+qualifications pass, including periodic selection retention and44px phone input
+targets. See my-day-swap-eligibility.md for exact evidence and proof limits.
+This supersedes the blocker below. The bounded change is ready for a branch
+checkpoint; authenticated full-app checks, affected live-data repairs, broader
+operations work and release remain. No Capsule production write or deployment.
+
+## Historical My Day generator failure (2026-09-10, after b7aa18a5)
+
+Staffing replacement/reopening is committed and pushed as b7aa18a5. The subsequent
+My Day eligible-coworker projection passes isolated runtime and three-width
+browser qualification, with independent gpt-5.6-sol APPROVE. It is uncommitted:
+new timestamp indexes expose Manifest's string-validator mismatch in generated
+indexed list queries, blocking typecheck. Issue #364 tracks the source fix:
+https://github.com/Angriff36/capsule/issues/364. See my-day-swap-eligibility.md for
+the implementation, proof limits and remaining checks. No Capsule production
+write or deployment occurred; the complete operations goal remains active.
+
 
 ## Latest staffing state (2026-09-10)
 

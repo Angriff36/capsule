@@ -31,6 +31,26 @@ projections:
       # convex/teamChatCursor.ts and every cursor read look the caller's row up
       # directly instead of filtering a channel-wide page.
       indexes:
+        # Personal swap lookup: current staff and matching evidence/windows,
+        # without scanning the tenant's historical schedule or private records.
+        Person:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Shift:
+          - fields: [tenantId, personId, status, endsAt]
+            name: by_staff_status_end
+        TimeOffRequest:
+          - fields: [tenantId, personId, status, endsAt]
+            name: by_staff_status_end
+        Qualification:
+          - fields: [tenantId, personId, status, name, expiresAt]
+            name: by_staff_certification_expiry
+        TrainingCompletion:
+          - fields: [tenantId, personId, trainingModuleId]
+            name: by_staff_training_module
+        ShiftSwapRequest:
+          - fields: [recipientPersonId, status]
+            name: by_recipientPersonId_and_status
         StaffChatReadCursor:
           - fields: [channelKey, authSubjectId]
             name: by_channelKey_and_authSubjectId
