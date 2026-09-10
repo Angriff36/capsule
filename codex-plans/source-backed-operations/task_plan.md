@@ -50,6 +50,16 @@ records. Local recipe/removal proofs do not complete issue335 or the goal.
 Purchasing week/reschedule/shared-stock corrections (#327/#328), live repair and
 all source/data/UI/report requirements below remain required.
 
+Shared draft cancellation and buyer quantity preservation now pass the full gate
+(165 files/1453 tests) and independent gpt-5.6-sol review. Empty automatic orders
+retire, manual choices remain, and order/contract desktop/mobile checks pass.
+The next purchasing defect is confirmed date propagation: rescheduling leaves
+seven downstream record groups on the old date, including subsequent serving
+changes. Coordinate draft migration with committed supply and stock allocation;
+do not patch dates alone and silently double-buy. See progress.md for the
+checkpoint commit/push and current evidence.
+
+
 Continue source-backed reconstruction with `ashley-recipe-evidence.md` (15 dishes,71 work steps,113 ingredient rows) and `raspberry-balsamic-source.md`. The dressing component in `recipes/raspberry-balsamic.json` has a complete source batch and all-eight-ingredient runtime verification at167/334 servings. Its remaining salad relationships are not complete. The prep-only Ashley candidates are NOT apply-ready recipes.
 
 Unresolved source conflicts include sauce Gruyere/cornstarch units, asparagus Parmesan quantity, chicken portion/yield, missing bruschetta tomato amounts, and equipment-dependent oil/infusion-kit quantities. Investigate corroborating material; do not invent measurements or classify every work step as a component. Owner clarification on sauce/Parmesan was requested; no answer recorded. Salad gorgonzola is now source-resolved as5.21875lb at167servings (see ashley-recipe-evidence.md); walnut candying method and confirmed finished yield remain missing, with owner method clarification pending. Four direct salad ingredients and all eight linked dressing ingredients pass actual runtime scaling at167/334; the full salad remains unapplied.

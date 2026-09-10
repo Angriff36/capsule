@@ -167,3 +167,22 @@ Editable draft reconciliation is still missing: cancelling one event leaves its
 live draft demand link and the original shared quantity. Submitted/received
 history must remain intact while current draft quantities and links are repaired.
 This is outstanding implementation work alongside327/328, not an owner deferral.
+
+
+### Shared draft reconciliation and buyer quantities, 2026-09-10 (#342/#343)
+
+The previous entry's editable-draft gap is now implemented locally. Cancellation
+retires the cancelled contribution, updates the current automatic calculation,
+preserves buyer quantities/prices and committed history, and releases active
+pointers that otherwise block submitting the remaining draft. Empty automatic
+lines and headers retire only after their live requirements are gone. Older
+quantity history is recovered when provable; uncertain history or incompatible
+units retain the existing quantity with a visible review note.
+
+Fifteen shared-draft scenarios, twelve event-cancellation lifecycle/receipt
+scenarios, and duplicate-link/incompatible-unit qualifications pass in the
+actual generated runtime. Order UI command/version/keyboard/layout checks and
+sibling vendor-contract layout checks pass with isolated fixture hooks.
+See progress.md for evidence and final full-check/reviewer/commit state.
+No live repair or deployment is claimed. Weekly normalization, stock allocation,
+rescheduling propagation and the complete source-backed goal remain required.

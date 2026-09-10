@@ -387,6 +387,25 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // An automatically emptied draft is no longer an order to send to the vendor.
+  command retireEmptyDraft() {
+    guard self.status == "draft" and self.deletedAt == null
+    guard self.sourceRangeStart != null
+    guard count_of(self.lines, (line) => line.deletedAt == null and line.status != "cancelled") == 0
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = "Event purchasing requirements removed"
+    emit VendorOrderCancelled {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousStatus: "draft"
+      status: "cancelled"
+      reason: self.cancellationReason
+    }
+  }
+
   store VendorOrder in durable
 }
 
@@ -403,6 +422,11 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   property ingredientDemandId: uuid?
   property locationId: uuid?
   property required orderedQuantity: decimal(12, 4) = 0
+  // The calculated draft requirement is separate from a buyer's chosen quantity.
+  // Null edit provenance identifies older lines until their event history is read.
+  property plannedQuantity: decimal(12, 4)?
+  property quantityIsManual: boolean?
+  property quantityReviewReason: string?
   property required receivedQuantity: decimal(12, 4) = 0
   // Outstanding supply already committed outside the editable weekly draft.
   property supplyWeekStart: datetime?
@@ -472,6 +496,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     mutate ingredientDemandId = ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
     mutate locationId = locationId != null ? locationId : self.locationId
     mutate orderedQuantity = orderedQuantity
+    mutate plannedQuantity = null
+    mutate quantityIsManual = true
+    mutate quantityReviewReason = null
     mutate unit = unit
     mutate unitCost = unitCost
     mutate lineTotalAmount = orderedQuantity * unitCost
@@ -515,13 +542,17 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     constraint ensureContributionPositive: contributionQuantity >= 0 "Contribution quantity cannot be negative"
     compute orderQty = max(0, weekNeed + (orderedNeed != null ? orderedNeed : 0) + (fulfilledNeed != null ? fulfilledNeed : 0) - onHand - (pendingSupply != null ? pendingSupply : 0))
     compute effectiveUnitCost = self.unitCost > 0 ? self.unitCost : self.ingredient.costPerUnit
+    compute nextQuantity = self.addedAt != null and self.quantityIsManual != false ? self.orderedQuantity : orderQty
     mutate vendorOrderId = vendorOrderId
     mutate ingredientId = ingredientId
     mutate ingredientDemandId = ingredientDemandId
-    mutate orderedQuantity = orderQty
+    mutate orderedQuantity = nextQuantity
+    mutate plannedQuantity = orderQty
+    mutate quantityIsManual = self.addedAt == null ? false : self.quantityIsManual
+    mutate quantityReviewReason = null
     mutate unit = unit
     mutate unitCost = effectiveUnitCost
-    mutate lineTotalAmount = orderQty * effectiveUnitCost
+    mutate lineTotalAmount = nextQuantity * effectiveUnitCost
     mutate status = self.addedAt == null ? "added" : self.status
     mutate addedAt = self.addedAt == null ? now() : self.addedAt
     emit VendorOrderLineWeeklyEnsured {
@@ -531,7 +562,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       purchaseNeedId: purchaseNeedId
       ingredientDemandId: ingredientDemandId
       ingredientId: ingredientId
-      orderedQuantity: orderQty
+      orderedQuantity: self.orderedQuantity
+      plannedQuantity: self.plannedQuantity
+      quantityIsManual: self.quantityIsManual
       contributionQuantity: contributionQuantity
       unit: unit
     }
@@ -559,6 +592,8 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     constraint reviseLineQuantityPositive: orderedQuantity > 0 "Ordered quantity must be positive"
     constraint reviseLineCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
     compute nextUnitCost = unitCost != null ? unitCost : self.unitCost
+    mutate quantityIsManual = orderedQuantity != self.orderedQuantity or self.quantityReviewReason != null ? true : self.quantityIsManual
+    mutate quantityReviewReason = null
     mutate orderedQuantity = orderedQuantity
     mutate unitCost = nextUnitCost
     mutate lineTotalAmount = orderedQuantity * nextUnitCost
@@ -570,6 +605,40 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       orderedQuantity: orderedQuantity
       unit: self.unit
       unitCost: nextUnitCost
+    }
+  }
+
+  // Current draft requirements may change after cancellation. Preserve buyer
+  // quantities and let the caller recover legacy provenance from recorded events.
+  // Submitted orders and receipts are historical facts, never reconciliation targets.
+  command reconcileDraftRequirement(
+    optional plannedQuantity: decimal(12, 4),
+    optional quantityIsManual: boolean,
+    optional quantityReviewReason: string,
+    optional ingredientDemandId: uuid
+  ) {
+    guard self.addedAt != null and self.status == "added"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    guard self.receivedQuantity == 0
+    constraint reconcilePlannedNonnegative: plannedQuantity == null or plannedQuantity >= 0 "Planned quantity cannot be negative"
+    constraint reconcileKnownAutomaticQuantity: quantityIsManual != false or plannedQuantity != null "An automatic draft needs a calculated quantity"
+    compute nextQuantity = quantityIsManual == false ? plannedQuantity : self.orderedQuantity
+    mutate plannedQuantity = plannedQuantity
+    mutate quantityIsManual = quantityIsManual
+    mutate quantityReviewReason = quantityReviewReason
+    mutate orderedQuantity = nextQuantity
+    mutate ingredientDemandId = ingredientDemandId
+    mutate lineTotalAmount = nextQuantity * self.unitCost
+    emit VendorOrderLineRequirementReconciled {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      ingredientId: self.ingredientId
+      orderedQuantity: self.orderedQuantity
+      plannedQuantity: self.plannedQuantity
+      unit: self.unit
+      unitCost: self.unitCost
     }
   }
 
@@ -647,6 +716,23 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       receivedQuantity: self.receivedQuantity
       unit: self.unit
       reason: reason
+    }
+  }
+
+  // No buyer quantity, receipt, or live requirement is removed by this cleanup.
+  command retireEmptyDraft() {
+    guard self.status == "added" and self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    guard self.quantityIsManual == false and self.plannedQuantity == 0 and self.orderedQuantity == 0
+    guard self.receivedQuantity == 0
+    guard count_of(self.demandLinks, (link) => link.deletedAt == null and link.removedAt == null) == 0
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate deletedAt = now()
+    emit VendorOrderLineDraftRetired {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
     }
   }
 
@@ -935,8 +1021,27 @@ event VendorOrderLineWeeklyEnsured: "vendor_order_line.weekly_ensured" {
   ingredientDemandId: string
   ingredientId: string
   orderedQuantity: number
+  plannedQuantity: number?
+  quantityIsManual: boolean?
   contributionQuantity: number
   unit: UnitOfMeasure
+}
+
+event VendorOrderLineRequirementReconciled: "vendor_order_line.requirement_reconciled" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  ingredientId: string
+  orderedQuantity: number
+  plannedQuantity: number?
+  unit: UnitOfMeasure
+  unitCost: number
+}
+
+event VendorOrderLineDraftRetired: "vendor_order_line.draft_retired" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
 }
 
 event VendorOrderOpened: "vendor_order.opened" {
@@ -1143,6 +1248,18 @@ on VendorOrderLineAdded run VendorOrder.syncLineTotals
   }
 
 on VendorOrderLineQuantityRevised run VendorOrder.syncLineTotals
+  resolve payload.vendorOrderId
+  params {
+    lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)
+  }
+
+on VendorOrderLineRequirementReconciled run VendorOrder.syncLineTotals
+  resolve payload.vendorOrderId
+  params {
+    lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)
+  }
+
+on VendorOrderLineDraftRetired run VendorOrder.syncLineTotals
   resolve payload.vendorOrderId
   params {
     lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)

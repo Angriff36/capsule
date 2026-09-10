@@ -30,10 +30,13 @@ Use a **purchase queue** beside an **order folio**:
 - Generate a draft VendorOrder from open prep-list PurchaseNeeds for the last seven days, upcoming seven days, or a custom inclusive Event date range; identical ingredient/unit quantities combine on one line.
 - Open, total, submit, confirm, partially receive, receive, or cancel VendorOrders.
 - Add lines, record receipts with required supplier lot numbers, and cancel lines.
+- Edit a draft line's quantity and price. Event requirement changes retain the buyer's chosen quantity; the order shows the current calculation and offers an explicit return to automatic quantities.
 
 ## Cross-system handoffs
 
-Canonical intent is Event approval → demand confirmation → PurchaseNeed creation → a buyer links needs to a VendorOrder draft → VendorOrder submission marks linked needs ordered. Receipt-to-stock remains an open product/projection decision. Event cancellation stops open purchase work.
+Demand confirmation creates PurchaseNeeds and can assemble a weekly draft. A buyer can also compose a range draft. VendorOrder submission marks its linked open needs ordered. Each line receipt creates an immutable supplier lot and records that delivery in stock; operators should not enter the same delivery again in the Stock book. Marking the order received is a lifecycle action, not an additional stock receipt.
+
+Event cancellation stops open or ordered needs while preserving fulfilled needs and submitted/received order history. For editable drafts, cancellation retires the event's demand links, reduces the existing calculated requirement, and releases cancelled needs from active draft pointers. Retired links and command events retain the prior association. Buyer quantities and prices remain intact. An automatic line with no remaining requirement and zero quantity is retired, and an empty automatic draft is cancelled.
 
 ## States and permissions
 
@@ -45,7 +48,9 @@ The authored Procurement subworkspace now ships at `/inventory/purchasing` and `
 
 Procurement and management roles remain generated policy. Order and PurchaseNeed actions are offered from generated lifecycle metadata. Receipt entry is always submitted to the generated command because its next line state depends on cumulative quantity rather than a static authored transition table. Every partial receipt requires a supplier lot number and creates an immutable `InventoryLot` linked to its VendorOrderLine, VendorOrder, vendor, ingredient, location, and available demand/Event provenance.
 
-The UI preserves IngredientDemand and Event provenance, shows recorded lots under their purchase-order line, and distinguishes explicit operator commands from unverified reactions. A generated range draft preserves every contributing PurchaseNeed beneath its combined order line; it remains editable and the needs remain open until submission. It does not claim automatic PurchaseNeed creation, cancellation fan-out, or receipt-to-stock updates. Money and quantity values retain the current projected-number limitation.
+The UI preserves IngredientDemand and Event provenance and shows recorded lots under their purchase-order line. A generated range draft preserves every contributing PurchaseNeed beneath its combined order line; it remains editable and the needs remain open until submission. Older drafts use their recorded quantity history to distinguish automatic calculations from buyer edits. When that history or a required unit conversion cannot be verified, the existing order quantity remains and the UI shows a review note without blocking ordinary purchasing. Money and quantity values retain the current projected-number limitation.
+
+These behaviors describe the current source branch. Isolated generated-runtime qualification covers shared draft cancellation, buyer quantity preservation, return to automatic calculation, receipt history, and repeated reconciliation. Weekly date normalization, cross-week stock allocation, rescheduling propagation, live-data repair, and authenticated production proof remain open; see [the source-backed workflow record](../../codex-plans/source-backed-operations/progress.md).
 
 Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and `bun run check:supply-manifest`.
 

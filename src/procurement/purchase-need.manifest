@@ -259,7 +259,32 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Retired demand links retain the draft's provenance; active pointers must no
+  // longer make submission try to mark a cancelled need as ordered.
+  command releaseCancelledDraft() {
+    guard self.status == "cancelled"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and (self.vendorOrder.status == "draft" or (self.vendorOrder.status == "cancelled" and self.vendorOrder.submittedAt == null))
+    compute previousOrderId = self.vendorOrderId
+    compute previousLineId = self.vendorOrderLineId
+    mutate vendorOrderId = null
+    mutate vendorOrderLineId = null
+    emit PurchaseNeedDraftReleased {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: previousOrderId
+      vendorOrderLineId: previousLineId
+    }
+  }
+
   store PurchaseNeed in durable
+}
+
+event PurchaseNeedDraftReleased: "purchase_need.draft_released" {
+  purchaseNeedId: string
+  tenantId: string
+  vendorOrderId: string?
+  vendorOrderLineId: string?
 }
 
 event PurchaseNeedOpened: "purchase_need.opened" {

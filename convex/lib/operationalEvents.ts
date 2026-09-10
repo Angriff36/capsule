@@ -3,13 +3,49 @@ import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
-import { standDownEventPurchasing } from "./purchasingEvents";
+import {
+  adoptLegacyDraftQuantity,
+  reconcileCancelledPurchaseDrafts,
+  retireUnusedAutomaticDraft,
+  standDownEventPurchasing,
+} from "./purchasingEvents";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
   ctx: MutationCtx,
   event: ConvexCommandEvent,
 ): Promise<void> {
+  if (
+    event.entity === "VendorOrderLine" &&
+    event.type === "VendorOrderLineRequirementReconciled"
+  ) {
+    await retireUnusedAutomaticDraft(
+      ctx,
+      event.entityId as Id<"vendorOrderLines">,
+    );
+    return;
+  }
+  if (
+    event.entity === "VendorOrderLine" &&
+    event.type === "VendorOrderLineWeeklyEnsured"
+  ) {
+    await adoptLegacyDraftQuantity(
+      ctx,
+      event.entityId as Id<"vendorOrderLines">,
+      event.eventId,
+    );
+    return;
+  }
+  if (
+    event.entity === "PurchaseNeed" &&
+    event.type === "PurchaseNeedCancelled"
+  ) {
+    await reconcileCancelledPurchaseDrafts(
+      ctx,
+      event.entityId as Id<"purchaseNeeds">,
+    );
+    return;
+  }
   if (
     event.entity === "DishTask" &&
     ["DishTaskAdded", "DishTaskRevised", "DishTaskRetired"].includes(event.type)

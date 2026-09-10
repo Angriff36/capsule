@@ -751,3 +751,84 @@ Independent gpt-5.6-sol APPROVE covers this bounded diff against ee414406 and
 explicitly excludes a claim that shared draft/date/stock reconciliation is
 finished. Nine new current Builder baselines are content-hash verified; older
 untracked baselines remain untouched.
+
+
+## 2026-09-10: shared purchasing drafts preserve buyer choices and cancel cleanly
+
+At 2c468d05, two 10 kg requirements and 5 kg stock produce a 15 kg draft.
+A buyer changes it to 20 kg at 2 per kg. Raising one event to 120 servings
+then overwrites the buyer quantity with 17 kg. Issue343 records this actual
+runtime reproduction: https://github.com/Angriff36/capsule/issues/343.
+
+The source now stores the calculated requirement separately from the ordered
+quantity. Buyer quantity changes stay manual through later event updates;
+price-only updates preserve the current quantity mode. Older lines recover
+provenance from recorded command events; absent history keeps the existing
+quantity and shows a review note. The purchase-order page offers Edit quantity
+and an explicit Use calculated quantity action with optimistic versions.
+
+Cancellation retires only the cancelled requirement's editable draft links,
+reduces the previous calculation by that requirement, and clears the cancelled
+need's active draft pointers. Historical links remain recorded. The other
+need and committed orders/receipts/stock stay intact. Duplicate links for one
+requirement are not subtracted twice; incompatible measurements retain the
+quantity and show a review note. This preserves existing stock coverage; it
+does not fix the separate weekly normalization/allocation issues327/328.
+
+An interim independent review correctly rejected leaving an empty automatic
+zero-quantity order available for submission. Source-owned retirement now
+removes such a line only when it has no live requirements, buyer quantity,
+or receipt, then cancels an empty automatic draft. Manual and committed orders
+remain intact. Final review is pending at this entry.
+
+All 15 shared-draft runtime scenarios passed against the final regenerated
+source: automatic, manual, legacy automatic, legacy manual and unknown history,
+each through remaining-order submission, all-event cancellation, and explicit
+return to automatic calculation followed by a servings change. Stale choices
+make no writes. The 12 admin/event_manager lifecycle/receipt scenarios also
+pass. Separate duplicate-link and incompatible-measurement qualifications pass.
+Evidence is under .artifacts/operations-source-study:
+qualify-shared-draft-cancellation.ts, shared-draft-{submit,all,use-plan}-*.json,
+qualify-shared-draft-edge-cases.ts, shared-draft-edge-*.json,
+qualify-purchasing-cancellation.ts and purchasing-cancellation-with-drafts-qualified.json.
+
+Actual VendorOrderPage rendering and command wiring passed at 1440/390 px;
+VendorContractsPage, which shares the row CSS, passed at 390/900/1440 px.
+Mobile content no longer overlaps, action targets are at least 40 px, and
+quantity editing supports keyboard opening and Escape. Screenshots were
+visually inspected. The sibling preview initially used a stale Vite transform
+of an ignored fixture; a revisioned module request proved and resolved that
+qualification failure. These previews use isolated runtime records with mocked
+hooks, not authenticated backend/deployment proof. The receipt banner now
+correctly says line receipts update stock, avoiding duplicate delivery entry.
+
+Full bun run check and final independent review are pending. No Capsule
+production writes or deployment have occurred. Existing affected-data repairs,
+remaining purchasing/date/stock work, staffing/timeline/battleboard/My Day,
+recipe links, reports, complete desktop/mobile/print workflows, release and
+production verification remain required by the full goal.
+
+
+The final full bun run check passed:165 files/1453 tests, coverage, typecheck,
+format, secrets, ownership/proof/registry/integration/design gates, local Vite
+build and baseline-decay. The first run found one stale receipt-copy assertion;
+its existing expectation now matches the verified line-receipt behavior. No
+new authored test cases or assertions were added or removed. The four additional
+cases are generated command export contracts. Final log:
+.artifacts/operations-source-study/check-shared-purchasing-drafts-final.log.
+
+Independent gpt-5.6-sol APPROVE covers this bounded diff against2c468d05,
+including direct DESIGN.md review, the corrected existing copy assertion and
+all10 new current Builder baselines. The reviewer verified guards/source,
+transactional cleanup, history and buyer preservation, mobile improvements,
+no new design violation and no disproportionate policy friction. All20 current
+ownership baseline hashes were verified; only the10 newly referenced files
+will be committed, leaving older untracked baselines untouched.
+
+Additional browser checks verify the unknown-history review message, conflict
+feedback with unchanged quantity, and successful retry clearing the message.
+Current reschedule reproduction still proves old dates on seven downstream
+record groups for draft and submitted orders; a later servings edit still uses
+the old date. Fresh evidence: qualify-reschedule-current.ts and
+reschedule-{draft,submitted}-shared-draft-checkpoint.json. This checkpoint does
+not solve that confirmed next defect. No Capsule production writes/deployment.
