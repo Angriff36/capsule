@@ -1,5 +1,31 @@
 # Progress
 
+## 2026-09-10 authenticated staffing and My Day paths pass
+
+Checkpoint e62fcffb is saved and verified on origin. Its complete function set
+registers on isolated native Convex 3216; source-map-proven Vite 7814 serves the
+same worktree. Four real development Clerk identities exercise manager and crew
+routes. Assignment/fill produces linked crew-timed Shifts; volunteer/release,
+credentialed proposal/acceptance/manager approval, both staff-role clocks, and
+My Day updates pass. Replacing worked event coverage preserves the exact original
+completed Shift/TimeRecord, another assigned role and service instructions.
+Reopening creates one vacancy and retires only its future replacement Shift.
+These local browser/real-backend receipts supersede the snapshot-only proof limit
+for those paths. The native identifier blocker #365 is closed.
+
+Phone inspection found clipped event-header actions (#366). The fix wraps the
+group, right-aligns its menu and stacks actions below 520px within DESIGN.md.
+Nine-width route/menu checks pass from 360 to 1440px. The first retry also exposed
+stale Vite modules: the global worktree ignore excludes the active checkout
+(#367). Anchoring that ignore to this checkout's child worktrees restores source
+updates; a controlled edit and exact restoration are verified without restart.
+The phone/preview follow-up is awaiting full checks and independent review.
+
+See authenticated-staffing-my-day.md and the receipts under
+`.artifacts/operations-source-study/authenticated/`. No Capsule production write
+or deployment. Existing affected-data repair, broader culinary/purchasing/packing
+and print/report work, authorized release and authenticated deployed proof remain.
+
 ## 2026-09-10 query-name correction published and regenerated
 
 Manifest PR83 passed Linux/Windows/security CI34535697506 and merged as5d9e9b6.

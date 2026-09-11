@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
-import { loadEnv, type Plugin } from "vite";
+import { loadEnv, normalizePath, type Plugin } from "vite";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -56,7 +56,8 @@ const watchIgnored = [
   "**/.builder/**",
   "**/.pw-verify/**",
   "**/.playwright-mcp/**",
-  "**/.loop-worktrees/**",
+  // Ignore child worktrees, not this checkout when it lives inside one.
+  `${normalizePath(fileURLToPath(new URL("./.loop-worktrees", import.meta.url)))}/**`,
   "**/docs/**",
   "**/diagrams/**",
   "**/output/**",

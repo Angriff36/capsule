@@ -1,6 +1,75 @@
 # Authenticated staffing and My Day qualification
 
-## Current state, 2026-09-10
+## Authenticated app qualification, 2026-09-10
+
+Checkpoint `e62fcffb2d98e6df0346a269cb60bbd75e675901` is saved and verified on
+origin. Its complete function set registered on the isolated native backend at
+3216/3217; source-map-proven Vite 7814 serves that worktree. Real browser sockets
+connect to backend 3216. Four development Clerk identities represent a manager,
+two event-staff coworkers and a workforce-staff member. Organization/admin
+bootstrap uses the authored encryption format and mixin fields; other fixture
+records were created through generated commands. These are synthetic identities
+and dates using the training timing pattern, not repaired production records.
+
+The real authenticated app now proves:
+
+- Manager assignment and vacancy fill create connected Shifts with the event's
+  calculated crew window. The example has eight generated timing milestones.
+- Crew volunteer and release their hold. My Day shows personal assignments;
+  shared event roster shifts remain readable and unrelated personal shifts stay
+  private.
+- A credentialed swap offers the eligible coworker without returning private
+  qualification/training rows. Proposal saves the correct recipient references;
+  recipient acceptance and manager approval transfer the unchanged shift window
+  and update both My Day lists.
+- Both event-staff and workforce-staff identities start their own Shift, clock
+  in/out and finish, with exactly one linked TimeRecord per sequence.
+- Current event work automatically receives Event and Shift attribution at
+  clock-in. Replacing its coverage preserves the completed Shift and TimeRecord
+  byte-for-byte, preserves another assigned role, and carries service instructions
+  into the remaining coverage window. The manager sees the original/replacement
+  history. Reopening creates one vacancy, retires its future replacement Shift
+  and removes that Shift from the recipient's My Day.
+
+Staffing and My Day were captured at 1440/900/390 pixels. Swap proposal/acceptance,
+clock actions and replacement prompts/history were inspected on phone. Successful
+flows had no page exceptions or HTTP error responses. Navigation-aborted image
+requests are recorded separately. Evidence under
+`.artifacts/operations-source-study/authenticated/`: `fixture-state.json`,
+`bootstrap-receipt.json`, `seed-session-token.log`, and
+`{staffing,swaps,clock,replacement}-receipt.json` with matching logs/screenshots.
+`replacement-fixture.json` stores the before snapshots for completed work.
+
+The ignored real-backend browser driver is `qualify-authenticated-staffing.mjs`.
+Its completed swap/replacement scenarios are stateful evidence; prepare separate
+fixtures before replaying them as fresh scenarios. No new authored Capsule tests
+were added. An initial scratch helper requested a nonexistent named JWT template;
+matching the installed Convex provider's session-JWT integration corrected it
+without any product auth change, Clerk setting change or invitation email.
+
+The published Manifest 3.6.55 correction and native full-app acceptance close
+issue #365. The e62fcffb full check passed 165 files / 1,468 tests and all other
+gates, with independent gpt-5.6-sol APPROVE and verified branch push. See
+`query-name-limit-checkpoint-receipt.json` and the issue's resolution comment.
+
+Phone inspection found clipped Event actions (#366). The local correction wraps
+the group, aligns its menu to the right and stacks actions below 520px as
+DESIGN.md requires. Real header/control/open-menu geometry passes at
+360/390/519/520/640/767/768/900/1440px. Existing tokens, shapes and commands stay.
+The first retry exposed stale preview modules (#367): Vite's global worktree
+ignore also excludes the active checkout. Anchoring it to this checkout's child
+worktrees restores source updates. A controlled edit and exact restoration both
+reach served modules without restart. Evidence: `event-actions-{baseline,fixed}.json`
+and `worktree-watch-receipt.json`. The verification worktree currently contains
+the same three authored phone/preview edits as the task branch over e62fcffb.
+Their full checks and independent review are being completed before checkpoint.
+
+Issues #358/#359 remain open for affected live-data repair and release/deployed
+proof. The broader culinary, purchasing, packing, reports/print and full original
+goal remain required. No Capsule production write or deployment has occurred.
+The historical bring-up notes below are superseded by this verified state.
+
+## Initial native backend bring-up, 2026-09-10 (historical)
 
 The My Day checkpoint `11451fe86ac0da8d02ad7723e1894fe85f60b86a` is committed and
 verified on origin/fix/source-backed-catering-workflow. Its full repository gate

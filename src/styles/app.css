@@ -1765,6 +1765,17 @@
   }
 }
 
+@media (max-width: 519px) {
+  .mobile-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mobile-actions > .action-menu > summary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Phone section picker: one button naming the current section; the menu
    lists every destination grouped by workflow. No sideways scrolling. */
 .event-section-picker {

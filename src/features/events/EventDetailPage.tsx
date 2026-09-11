@@ -464,7 +464,7 @@ export function EventDetailPage() {
             {formatMoney(event.budgetAmount, currencyCode)} /{" "}
             {formatMoney(event.quotedPrice, currencyCode)}
           </p>
-          <div className="mobile-actions mt-4 flex items-center gap-2">
+          <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
             {headerActions}
           </div>
         </section>

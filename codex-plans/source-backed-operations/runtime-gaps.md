@@ -1,5 +1,20 @@
 # Runtime gaps and repair evidence
 
+## Authenticated local staffing and My Day proof (2026-09-10)
+
+The e62fcffb checkpoint consumes Manifest 3.6.55 and registers its complete
+function set on native isolated Convex 3216. Issue #365 is closed. Real Clerk
+sessions and browser routes qualify assignment/fill, volunteer/release, private
+credential eligibility and full swap approval, both staff-role clock actions,
+event attribution, replacement/history preservation and reactive My Day updates.
+See authenticated-staffing-my-day.md for receipts, exact scope and fixture limits.
+
+This supersedes earlier authenticated-app-pending statements below for those
+specific paths. Phone event-header clipping (#366) and the active-worktree Vite
+ignore (#367) are corrected locally and undergoing final gates/review. Existing
+affected production data, the full connected catering workflow and release proof
+remain unfinished. No Capsule production write or deployment has occurred.
+
 ## Current My Day checkpoint: generator blocker resolved (2026-09-10)
 
 Manifest3.6.54 is published, pinned in Capsule, installed in its isolated Builder
