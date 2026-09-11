@@ -111,6 +111,7 @@ describe("governed creation mappings", () => {
       "TaxRate_createViaDefine",
       "TimeOffRequest_createViaSubmit",
       "TimeRecord_createViaClockIn",
+      "Trailer_createViaRegister",
       "TrainingCompletion_createViaRecord",
       "TrainingModule_createViaDefine",
       "VehicleFuelLog_createViaRecord",
