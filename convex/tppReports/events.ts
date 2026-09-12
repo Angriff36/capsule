@@ -257,30 +257,27 @@ function serviceMethodText(
   return "Service method not recorded.";
 }
 
-const SERVICE_LABEL_CHUNK_SIZE = 42;
+const SERVICE_LABEL_MAX_CHARS = 54;
 
-function serviceLabelParts(
+function serviceLabel(
   dishName: string,
   serviceText: string,
   id: string,
-): TppLabel[] {
-  const normalized = serviceText.replace(/\s+/g, " ").trim();
-  const chunks: string[] = [];
-  let remaining = normalized || "Service method not recorded.";
-  while (remaining.length > SERVICE_LABEL_CHUNK_SIZE) {
-    const boundary = remaining.lastIndexOf(" ", SERVICE_LABEL_CHUNK_SIZE + 1);
-    const splitAt = boundary > 0 ? boundary : SERVICE_LABEL_CHUNK_SIZE;
-    chunks.push(remaining.slice(0, splitAt).trim());
-    remaining = remaining.slice(splitAt).trim();
-  }
-  chunks.push(remaining);
-  return chunks.map((chunk, index) => ({
-    id: `${id}:service:${index}`,
-    lines: [
-      `${dishName}${chunks.length > 1 ? ` (${index + 1}/${chunks.length})` : ""}`,
-      chunk,
-    ],
-  }));
+): TppLabel {
+  const firstLine =
+    serviceText
+      .split(/\r?\n/)
+      .map((line) => line.replace(/\s+/g, " ").trim())
+      .find(Boolean) || "Service method not recorded.";
+  const boundary = firstLine.lastIndexOf(" ", SERVICE_LABEL_MAX_CHARS + 1);
+  const instruction =
+    firstLine.length <= SERVICE_LABEL_MAX_CHARS
+      ? firstLine
+      : `${firstLine.slice(
+          0,
+          boundary > 0 ? boundary : SERVICE_LABEL_MAX_CHARS,
+        )}…`;
+  return { id, lines: [dishName, instruction] };
 }
 
 async function productionWorksheet(
@@ -924,10 +921,10 @@ export const run = query({
             : args.reportId === "heating-serving-labels"
               ? "avery_5160"
               : "table_tent",
-        labels: menu.flatMap(({ item, dish }) => {
+        labels: menu.map(({ item, dish }) => {
           const menuNotes = displayEventMenuNotes(item.specialInstructions);
           if (args.reportId === "heating-serving-labels") {
-            return serviceLabelParts(
+            return serviceLabel(
               dish.name,
               [
                 serviceMethodText(

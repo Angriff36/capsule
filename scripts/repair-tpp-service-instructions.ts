@@ -224,14 +224,10 @@ if (normalizeTargetUrl(values.url) !== document.targetUrl)
 // must not erase the evidence from an earlier acknowledged attempt.
 const initialJwt = await auth.resolveJwt();
 validateTenantJwt(initialJwt, values.tenant);
-try {
-  unlinkSync(receiptPath);
-} catch (error: any) {
-  if (error?.code !== "ENOENT") throw error;
-}
 const client = new ConvexHttpClient(values.url);
 client.setAuth(initialJwt);
 const receipts: Array<Record<string, unknown>> = [];
+let receiptStarted = false;
 const writeReceipt = () =>
   writeFileSync(
     receiptPath,
@@ -241,7 +237,18 @@ const writeReceipt = () =>
       2,
     ),
   );
-writeReceipt();
+const startReceipt = () => {
+  if (receiptStarted) return;
+  // Keep the prior receipt until an authenticated backend read succeeds. An
+  // expired token or unavailable backend must not erase recovery evidence.
+  try {
+    unlinkSync(receiptPath);
+  } catch (error: any) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  receiptStarted = true;
+  writeReceipt();
+};
 for (const entry of planEntries) {
   const jwt = await auth.resolveJwt();
   validateTenantJwt(jwt, values.tenant);
@@ -255,6 +262,7 @@ for (const entry of planEntries) {
     current.deletedAt != null
   )
     throw new Error(`Dish disappeared or crossed tenants: ${entry.name}`);
+  startReceipt();
   const currentInstructions = String(current.serviceInstructions ?? "").trim();
   const currentSource = String(current.serviceInstructionsSource ?? "").trim();
   if (
@@ -345,7 +353,7 @@ for (const entry of planEntries) {
     throw error;
   }
 }
-writeReceipt();
+if (receiptStarted) writeReceipt();
 console.log(
   JSON.stringify(
     {
