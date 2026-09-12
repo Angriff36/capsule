@@ -137,17 +137,27 @@ type TurnMessage = {
 
 /**
  * Drop whole rounds from the FRONT (never an orphan tool result, which
- * providers reject) until the history fits the caps. Cheap approximation:
- * a round starts at a user message.
+ * providers reject) until the history fits the caps. A round starts at a
+ * user message; normal threads start with one, so trimming drops from the
+ * SECOND user message onward and always leaves a user message first.
  */
 function trimHistory(messages: TurnMessage[]): TurnMessage[] {
   let out = messages;
   const size = (ms: TurnMessage[]) =>
-    ms.reduce((n, m) => n + (m.content?.length ?? 0), 0);
+    ms.reduce(
+      (n, m) =>
+        n +
+        (m.content?.length ?? 0) +
+        (m.toolCalls?.reduce(
+          (k, c) => k + c.argumentsJson.length + c.name.length + c.id.length,
+          0,
+        ) ?? 0),
+      0,
+    );
   while (out.length > MAX_MESSAGES || size(out) > MAX_HISTORY_CHARS) {
-    const firstUser = out.findIndex((m) => m.role === "user");
-    if (firstUser <= 0) break; // nothing safe to drop
-    out = out.slice(firstUser + 1);
+    const secondUser = out.findIndex((m, i) => i > 0 && m.role === "user");
+    if (secondUser < 0) break; // single round left — nothing safe to drop
+    out = out.slice(secondUser);
   }
   return out;
 }
@@ -198,10 +208,14 @@ export const turn = action({
         }),
       });
     } catch (err) {
+      console.error(
+        `assistantTurn: could not reach model endpoint: ${String(err)}`,
+      );
       return {
-        content: `Could not reach the assistant model: ${String(err)}`,
+        content:
+          "Could not reach the assistant model. Check the endpoint under Administration → Assistant, or try again later.",
         toolCalls: [],
-        error: "network" as const,
+        error: "network",
       };
     }
     if (!response.ok) {

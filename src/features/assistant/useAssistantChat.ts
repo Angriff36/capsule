@@ -96,14 +96,37 @@ export function useAssistantChat() {
           }
           // Refuse, don't run, tool calls proposed by the last allowed round:
           // running them would apply writes the model can never report on.
+          // Record synthetic results so the history never ends with a
+          // dangling tool_calls block (providers reject that on "continue").
           if (round === MAX_ROUNDS) {
+            for (const call of res.toolCalls) {
+              const skipped = JSON.stringify({
+                skipped: true,
+                reason: "round limit reached",
+              });
+              convoRef.current = [
+                ...convoRef.current,
+                { role: "tool", content: skipped, toolCallId: call.id },
+              ];
+              setMessages((m) => [
+                ...m,
+                {
+                  id: newId(),
+                  role: "tool",
+                  content: skipped,
+                  toolCallId: call.id,
+                  toolName: call.name,
+                },
+              ]);
+            }
+            const note = `Stopped after ${MAX_ROUNDS} tool rounds without running the last step. Ask me to continue if the task is not done.`;
+            convoRef.current = [
+              ...convoRef.current,
+              { role: "assistant", content: note },
+            ];
             setMessages((m) => [
               ...m,
-              {
-                id: newId(),
-                role: "assistant",
-                content: `Stopped after ${MAX_ROUNDS} tool rounds without running the last step. Ask me to continue if the task is not done.`,
-              },
+              { id: newId(), role: "assistant", content: note },
             ]);
             break;
           }
