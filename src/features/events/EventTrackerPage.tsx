@@ -213,9 +213,12 @@ export function EventTrackerPage() {
       (event) =>
         event.lock !== "done" &&
         event.lock !== "cancelled" &&
+        // Still on the board: undated, starts today or later, still running,
+        // or an overnight job without an end time that started yesterday.
         (event.startsAt == null ||
           event.startsAt >= today ||
-          (event.endsAt != null && event.endsAt > today)) &&
+          (event.endsAt != null && event.endsAt > today) ||
+          (event.endsAt == null && event.startsAt >= today - DAY_MS)) &&
         (needle === "" ||
           [event.title, event.client, event.venue, event.eventNumber]
             .join(" ")

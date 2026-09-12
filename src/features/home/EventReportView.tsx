@@ -114,8 +114,12 @@ export function EventReportView({
     if (!autoPrint || !printable) return;
     const key = `${definition.id}:${event.id}`;
     if (printedFor.current === key) return;
-    printedFor.current = key;
-    const timer = window.setTimeout(() => window.print(), 80);
+    // Mark only when the dialog actually opens: Strict Mode runs effect,
+    // cleanup, effect, and a mark set up front would swallow the print.
+    const timer = window.setTimeout(() => {
+      printedFor.current = key;
+      window.print();
+    }, 80);
     return () => window.clearTimeout(timer);
   }, [autoPrint, definition.id, event.id, printable]);
 

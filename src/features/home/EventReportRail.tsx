@@ -39,7 +39,6 @@ const DEFAULT_REPORT_IDS = [
   "production-summary",
   "heating-serving-event-menu",
   "equipment-summary",
-  "staff-schedules",
   "shopping-list",
   "kitchen-labor",
 ].filter((id) => EVENT_REPORTS.some((definition) => definition.id === id));
