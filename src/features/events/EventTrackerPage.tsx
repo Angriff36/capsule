@@ -27,6 +27,7 @@ import {
   useListVehicle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { useSuccessToast } from "../../ui/useSuccessToast";
@@ -627,9 +628,8 @@ export function EventTrackerPage() {
                       <div className="tracker-card-fields">
                         <label>
                           <span>Date</span>
-                          <input
+                          <BoundedDateInput
                             key={`${event.startsAt ?? "none"}:${resetKey}`}
-                            type="date"
                             className="input"
                             defaultValue={dateInput(event.startsAt)}
                             disabled={!canReschedule(event) || busy}
