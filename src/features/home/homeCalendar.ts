@@ -1,4 +1,5 @@
 import type { Doc } from "../../lib/api";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { clientDisplayName } from "../events/clientName";
 import { STAGE_LABEL, type EventStage } from "../events/eventStatus";
 
@@ -136,7 +137,10 @@ export function buildCalendarFacts(
       const style = event.serviceStyleId
         ? styleById.get(event.serviceStyleId)
         : undefined;
-      const serviceType = [event.eventType, style?.name]
+      const serviceType = [
+        event.eventType ? formatStatusLabel(event.eventType) : "",
+        style?.name,
+      ]
         .filter((part): part is string => !!part && part.trim() !== "")
         .join(" · ");
       const venue = event.venueId ? venueById.get(event.venueId) : undefined;

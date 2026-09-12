@@ -228,7 +228,10 @@ export function HomeCalendarPage() {
         data-lock={event.lock}
         data-selected={selectedId === event.id || undefined}
         data-continues={continues || undefined}
-        onClick={() => setSelectedId(event.id)}
+        onClick={() => {
+          setSelectedId(event.id);
+          setHover(null);
+        }}
         onDoubleClick={() => navigate(eventDetailPath(event.id))}
         onMouseEnter={(domEvent) => showTooltip(event, domEvent)}
         onMouseLeave={hideTooltip}
