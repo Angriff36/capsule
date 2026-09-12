@@ -1,5 +1,6 @@
 import {
   formatTppDate,
+  formatTppDateTime,
   formatTppMoney,
   formatTppQuantity,
   displayCell,
@@ -10,6 +11,8 @@ import { CulinaryEntityLink } from "../../kitchen/CulinaryEntityLink";
 function cell(value: TppRow["values"][string], column: TppColumn): string {
   if (column.kind === "date" && typeof value === "number")
     return formatTppDate(value);
+  if (column.kind === "datetime" && typeof value === "number")
+    return formatTppDateTime(value);
   if (column.kind === "money" && typeof value === "number")
     return formatTppMoney(value);
   if (

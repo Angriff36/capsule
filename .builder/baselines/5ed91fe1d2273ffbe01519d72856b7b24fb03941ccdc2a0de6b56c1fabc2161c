@@ -495,6 +495,8 @@ export default defineSchema({
     recipeSourceText: v.optional(v.union(v.string(), v.null())),
     recipeSourceYield: v.optional(v.union(v.string(), v.null())),
     recipeSourceFingerprint: v.optional(v.union(v.string(), v.null())),
+    serviceInstructions: v.optional(v.union(v.string(), v.null())),
+    serviceInstructionsSource: v.optional(v.union(v.string(), v.null())),
     category: v.optional(v.union(v.string(), v.null())),
     course: v.optional(v.union(v.string(), v.null())),
     serviceStyle: v.optional(v.union(v.string(), v.null())),

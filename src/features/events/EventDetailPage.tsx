@@ -34,8 +34,10 @@ import {
   useListDish,
   useListEventAssignment,
   useListEventDish,
+  useListEventStaffNeed,
   useListEventTimelineActivity,
   useListPerson,
+  useListShift,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
@@ -87,6 +89,7 @@ import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
 import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
+import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
 import { MobileEventOverview } from "./mobile/MobileEventOverview";
 import { RecurringEventPanel } from "./RecurringEventPanel";
@@ -134,6 +137,8 @@ export function EventDetailPage() {
   }, [activeTab, event, id]);
   const dishes = useListDish();
   const eventAssignments = useListEventAssignment();
+  const staffNeeds = useListEventStaffNeed();
+  const shifts = useListShift();
   const eventDishes = useListEventDish();
   const timelineActivities = useListEventTimelineActivity();
   const people = useListPerson();
@@ -253,11 +258,20 @@ export function EventDetailPage() {
     (action) => action !== primaryAction && action.kind !== "danger",
   );
   const dangerActions = lifecycle.filter((action) => action.kind === "danger");
+  const staffingRoster = EventTimelineStaffRoster.staffingRosterEntries({
+    eventId: event._id,
+    assignments: eventAssignments,
+    staffNeeds,
+    shifts,
+    people,
+  });
   const beoReady =
     !busy &&
     clients !== undefined &&
     dishes !== undefined &&
     eventAssignments !== undefined &&
+    staffNeeds !== undefined &&
+    shifts !== undefined &&
     eventDishes !== undefined &&
     people !== undefined &&
     timelineActivities !== undefined;
@@ -295,17 +309,7 @@ export function EventDetailPage() {
           activity.scheduledAt != null &&
           activity.deletedAt == null,
       ),
-      staff: (eventAssignments ?? [])
-        .filter(
-          (assignment) =>
-            assignment.deletedAt == null &&
-            assignment.eventId === event._id &&
-            assignment.status !== "unassigned",
-        )
-        .map((assignment) => ({
-          assignment,
-          person: people?.find((person) => person._id === assignment.personId),
-        })),
+      staff: staffingRoster,
       branding,
     })
       .then(() => {
@@ -321,12 +325,8 @@ export function EventDetailPage() {
       selection.deletedAt == null &&
       selection.removedAt == null,
   ).length;
-  const staffCount = (eventAssignments ?? []).filter(
-    (assignment) =>
-      assignment.eventId === event._id &&
-      assignment.deletedAt == null &&
-      assignment.status !== "unassigned",
-  ).length;
+  const staffCount = new Set(staffingRoster.map((entry) => entry.personId))
+    .size;
   const timelineCount = (timelineActivities ?? []).filter(
     (activity) => activity.eventId === event._id && activity.deletedAt == null,
   ).length;
@@ -619,7 +619,7 @@ export function EventDetailPage() {
             dishes={dishes}
             eventDishes={eventDishes}
             activities={timelineActivities}
-            assignments={eventAssignments}
+            staffingRoster={staffingRoster}
             people={people}
           />
         </EventTabErrorBoundary>

@@ -115,6 +115,7 @@ import {
   DishRetireParamsSchema,
   DishReviseDetailsParamsSchema,
   DishSaveRecipeParamsSchema,
+  DishSaveServiceInstructionsParamsSchema,
   DishSetPrimaryImageParamsSchema,
   DishTaskAddParamsSchema,
   DishTaskBackfillActiveKeyParamsSchema,
@@ -2175,6 +2176,16 @@ export function useDishSaveRecipe() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DishSaveRecipeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.saveServiceInstructions. */
+export function useDishSaveServiceInstructions() {
+  const mutate = useMutation(api.mutations.Dish_saveServiceInstructions);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishSaveServiceInstructionsParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -10014,4 +10025,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1062 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1063 as const;

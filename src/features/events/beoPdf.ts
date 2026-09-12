@@ -7,6 +7,7 @@ import {
   type TenantBranding,
 } from "../admin/tenantBranding";
 import { displayEventMenuNotes } from "./eventMenuLineFields";
+import type { StaffingRosterEntry } from "./eventTimelineStaffRoster";
 
 export interface BeoEventRecord {
   _id: string;
@@ -68,7 +69,7 @@ export interface BeoPdfInput {
     responsibleParty?: string | null;
     notes?: string | null;
   }>;
-  staff: BeoStaffLine[];
+  staff: Array<BeoStaffLine | StaffingRosterEntry>;
   branding: TenantBranding;
 }
 
@@ -77,6 +78,10 @@ const PAGE_HEIGHT = 792;
 const MARGIN = 36;
 const RIGHT = PAGE_WIDTH - MARGIN;
 const FOOTER_Y = PAGE_HEIGHT - 28;
+// DESIGN.md's 15px body / 13px metadata floors, expressed in PDF points.
+const BODY_FONT_SIZE = 11.25;
+const DETAIL_FONT_SIZE = 9.75;
+const CONTENT_BOTTOM = FOOTER_Y - 24;
 
 interface BeoBlock {
   primary: string;
@@ -131,10 +136,54 @@ const clockRange = (startsAt: unknown, endsAt: unknown) =>
     ? clockTime(startsAt)
     : `${clockTime(startsAt)} - ${clockTime(endsAt)}`;
 
-const personName = (line: BeoStaffLine) =>
-  line.person
-    ? `${line.person.givenName} ${line.person.familyName}`.trim()
-    : "Unresolved staff member";
+// Client portal payloads still carry assignment/person pairs. Event detail
+// supplies the canonical roster, including filled requests and manual shifts.
+type BeoRosterEntry = Omit<StaffingRosterEntry, "key" | "personId">;
+
+const staffEntry = (
+  line: BeoStaffLine | StaffingRosterEntry,
+): BeoRosterEntry | null => {
+  if (!("assignment" in line)) return line;
+  if (
+    !line.person ||
+    line.assignment.status === "unassigned" ||
+    line.assignment.status === "cancelled"
+  )
+    return null;
+  return {
+    label: `${line.person.givenName} ${line.person.familyName}`.trim(),
+    role: line.assignment.role,
+    status: line.assignment.status,
+    source: "assignment",
+    plannedWindows: [line.assignment],
+    startsAt: line.assignment.startsAt,
+    endsAt: line.assignment.endsAt,
+    notes: line.assignment.notes ? [line.assignment.notes] : [],
+  };
+};
+
+const staffingSourceLabels: Record<StaffingRosterEntry["source"], string> = {
+  assignment: "Assignment",
+  filled_need: "Filled staffing request",
+  shift: "Shift",
+};
+
+const staffDetails = (entry: BeoRosterEntry) => {
+  const windows = entry.shiftWindows?.length
+    ? entry.shiftWindows
+    : (entry.plannedWindows ?? [entry]);
+  return joinDetails([
+    [...new Set(entry.sources ?? [entry.source])]
+      .map((source) => staffingSourceLabels[source])
+      .join(" + "),
+    ...windows.map(
+      (window) =>
+        `${entry.shiftWindows?.length ? "" : "Planned: "}${dateTime(window.startsAt)} - ${dateTime(window.endsAt)}`,
+    ),
+    statusLabel(entry.status),
+    ...new Set(entry.notes ?? []),
+  ]);
+};
 
 const statusLabel = (value: unknown) =>
   plain(value, "assigned").replaceAll("_", " ");
@@ -151,39 +200,6 @@ const wrappedLines = (
   return doc.splitTextToSize(text, width) as string[];
 };
 
-const blockHeight = (
-  doc: jsPDF,
-  block: BeoBlock,
-  width: number,
-  fontSize: number,
-) => {
-  const primary = wrappedLines(doc, block.primary, width, fontSize, "bold");
-  const secondary = block.secondary
-    ? wrappedLines(doc, block.secondary, width, fontSize * 0.88, "normal")
-    : [];
-  return (
-    primary.length * fontSize * 1.22 + secondary.length * fontSize * 1.08 + 7
-  );
-};
-
-const fittedFontSize = (
-  doc: jsPDF,
-  blocks: BeoBlock[],
-  width: number,
-  maxHeight: number,
-) => {
-  const totalAt = (fontSize: number) =>
-    blocks.reduce(
-      (total, block) => total + blockHeight(doc, block, width, fontSize),
-      0,
-    );
-  for (let size = 8.5; size >= 4; size -= 0.5) {
-    if (totalAt(size) <= maxHeight) return size;
-  }
-  const smallestHeight = totalAt(4);
-  return Math.max(2.75, 4 * (maxHeight / smallestHeight));
-};
-
 export function buildBeoPdf(input: BeoPdfInput): jsPDF {
   const { event, clientName, dishes, branding } = input;
   const primary = brandColorRgb(branding.primaryColor);
@@ -191,101 +207,164 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
   const address = documentAddressLines(branding);
   const doc = new jsPDF({ unit: "pt", format: "letter" });
 
-  doc.setFillColor(...primary);
-  doc.rect(0, 0, PAGE_WIDTH, 104, "F");
-  const hasLogo = addPdfLogo(doc, branding, {
-    x: MARGIN,
-    y: 20,
-    maxWidth: 96,
-    maxHeight: 28,
-  });
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(hasLogo ? 9 : 12);
-  doc.setTextColor(255, 255, 255);
-  doc.text(branding.displayName, MARGIN, hasLogo ? 63 : 34);
-  if (address.length > 0) {
+  // Leave room for differences between PDF readers' built-in font metrics.
+  const textWidth = RIGHT - MARGIN - 12;
+  const contentTop = 118;
+  let cursor = contentTop;
+
+  const drawPageHeader = () => {
+    doc.setFillColor(...primary);
+    doc.rect(0, 0, PAGE_WIDTH, 96, "F");
+    addPdfLogo(doc, branding, {
+      x: MARGIN,
+      y: 18,
+      maxWidth: 96,
+      maxHeight: 24,
+    });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(255, 255, 255);
+    doc.text("BANQUET EVENT ORDER", RIGHT, 36, { align: "right" });
+    // The full title is in Event details. Keep the repeated header bounded
+    // even when a title is longer than a page; the event ID stays unabridged.
+    const titleLines = wrappedLines(
+      doc,
+      plain(event.title, "Catering event"),
+      textWidth - 16,
+      BODY_FONT_SIZE,
+      "bold",
+    );
+    doc.text(
+      `${titleLines[0]}${titleLines.length > 1 ? "..." : ""}`,
+      MARGIN,
+      62,
+    );
     doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    doc.setTextColor(224, 230, 226);
-    doc.text(address.slice(0, 2), MARGIN, hasLogo ? 76 : 49);
-  }
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.setTextColor(255, 255, 255);
-  doc.text("BANQUET EVENT ORDER", RIGHT, 38, { align: "right" });
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7.5);
-  doc.setTextColor(224, 230, 226);
-  doc.text(
-    `${String(event.stage).replaceAll("_", " ").toUpperCase()} | ${event._id}`,
-    RIGHT,
-    55,
-    { align: "right" },
-  );
+    doc.setFontSize(DETAIL_FONT_SIZE);
+    doc.text(`Event ${event._id}`, MARGIN, 80);
+    cursor = contentTop;
+  };
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(14);
-  doc.setTextColor(255, 255, 255);
-  doc.text(plain(event.title, "Catering event"), RIGHT, 84, {
-    align: "right",
-    maxWidth: 360,
-  });
+  const nextPage = () => {
+    doc.addPage();
+    drawPageHeader();
+  };
 
-  const overviewY = 120;
-  const overviewWidth = RIGHT - MARGIN;
-  const overviewGap = 9;
-  const overviewColumnWidth = (overviewWidth - overviewGap * 3) / 4;
-  const overview = [
+  const drawSection = (title: string, blocks: BeoBlock[]) => {
+    const headingHeight = 26;
+    const drawHeading = (continued = false) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(BODY_FONT_SIZE);
+      doc.setTextColor(...primary);
+      doc.text(
+        `${title.toUpperCase()}${continued ? " (CONTINUED)" : ""}`,
+        MARGIN,
+        cursor,
+      );
+      doc.setDrawColor(...accent);
+      doc.setLineWidth(0.75);
+      doc.line(MARGIN, cursor + 7, RIGHT, cursor + 7);
+      cursor += headingHeight;
+    };
+    // Keep a heading with at least the beginning of its first entry.
+    if (cursor + headingHeight + BODY_FONT_SIZE * 2.6 > CONTENT_BOTTOM)
+      nextPage();
+    drawHeading();
+    blocks.forEach((block) => {
+      const lines = [
+        ...wrappedLines(
+          doc,
+          block.primary,
+          textWidth,
+          BODY_FONT_SIZE,
+          "bold",
+        ).map((text) => ({
+          text,
+          size: BODY_FONT_SIZE,
+          weight: "bold" as const,
+        })),
+        ...(block.secondary
+          ? wrappedLines(
+              doc,
+              block.secondary,
+              textWidth,
+              DETAIL_FONT_SIZE,
+              "normal",
+            ).map((text) => ({
+              text,
+              size: DETAIL_FONT_SIZE,
+              weight: "normal" as const,
+            }))
+          : []),
+      ];
+      const height = lines.reduce((sum, line) => sum + line.size * 1.3, 0);
+      // Keep normal entries together. An entry taller than a page is split
+      // line by line, so even a very long service note remains complete.
+      if (
+        height <= CONTENT_BOTTOM - contentTop - headingHeight &&
+        cursor + height > CONTENT_BOTTOM
+      ) {
+        nextPage();
+        drawHeading(true);
+      }
+      for (const [lineIndex, line] of lines.entries()) {
+        if (cursor + line.size * 1.3 > CONTENT_BOTTOM) {
+          nextPage();
+          drawHeading(true);
+          if (lineIndex > 0) {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(BODY_FONT_SIZE);
+            doc.setTextColor(15, 15, 17);
+            const continuation = wrappedLines(
+              doc,
+              `${block.primary} (continued)`,
+              textWidth,
+              BODY_FONT_SIZE,
+              "bold",
+            );
+            for (const text of continuation) {
+              doc.text(text, MARGIN, cursor);
+              cursor += BODY_FONT_SIZE * 1.3;
+            }
+            cursor += 2;
+          }
+        }
+        doc.setFont("helvetica", line.weight);
+        doc.setFontSize(line.size);
+        if (line.weight === "bold") doc.setTextColor(15, 15, 17);
+        else doc.setTextColor(59, 62, 69);
+        doc.text(line.text, MARGIN, cursor);
+        cursor += line.size * 1.3;
+      }
+      cursor += 9;
+    });
+    cursor += 12;
+  };
+
+  drawPageHeader();
+  drawSection("Event details", [
     {
-      label: "Client",
-      primary: plain(clientName),
+      primary: plain(event.title, "Catering event"),
+      secondary: statusLabel(event.stage),
+    },
+    { primary: branding.displayName, secondary: address.join("\n") },
+    {
+      primary: `Client: ${plain(clientName)}`,
       secondary: plain(event.primaryContactName, "No primary contact"),
     },
     {
-      label: "Date and time",
-      primary: dateTime(event.startsAt),
+      primary: `Date and time: ${dateTime(event.startsAt)}`,
       secondary: `Ends ${dateTime(event.endsAt)}`,
     },
     {
-      label: "Guest count",
       primary: formatCountNoun(event.expectedHeadcount ?? 0, "guest"),
       secondary: plain(event.eventType, "Event type not recorded"),
     },
     {
-      label: "Venue",
-      primary: plain(event.venueName, "Venue not assigned"),
+      primary: `Venue: ${plain(event.venueName, "Venue not assigned")}`,
       secondary: plain(event.venueAddress, "Address not recorded"),
     },
-  ];
-
-  overview.forEach((item, index) => {
-    const x = MARGIN + index * (overviewColumnWidth + overviewGap);
-    doc.setFillColor(245, 246, 243);
-    doc.roundedRect(x, overviewY, overviewColumnWidth, 92, 3, 3, "F");
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7);
-    doc.setTextColor(...accent);
-    doc.text(item.label.toUpperCase(), x + 10, overviewY + 16);
-    const mainLines = wrappedLines(
-      doc,
-      item.primary,
-      overviewColumnWidth - 20,
-      9,
-      "bold",
-    ).slice(0, 3);
-    doc.setTextColor(28, 32, 30);
-    doc.text(mainLines, x + 10, overviewY + 33);
-    const secondaryY = overviewY + 40 + mainLines.length * 10;
-    const secondaryLines = wrappedLines(
-      doc,
-      item.secondary,
-      overviewColumnWidth - 20,
-      6.5,
-      "normal",
-    ).slice(0, 3);
-    doc.setTextColor(103, 108, 105);
-    doc.text(secondaryLines, x + 10, secondaryY);
-  });
+  ]);
 
   const timeline = input.timeline
     .slice()
@@ -311,173 +390,58 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
           primary: `${clockRange(activity.startsAt, activity.endsAt)} - ${plain(activity.name, "Unnamed activity")}`,
           secondary: joinDetails([activity.responsibleParty, activity.notes]),
         }));
+  const staff = input.staff
+    .map(staffEntry)
+    .filter((entry): entry is BeoRosterEntry => entry !== null);
   const staffBlocks: BeoBlock[] =
-    input.staff.length === 0
-      ? [{ primary: "No staff assignments recorded" }]
-      : input.staff
-          .slice()
+    staff.length === 0
+      ? [{ primary: "No staff coverage recorded" }]
+      : staff
           .sort(
             (left, right) =>
-              Number(left.assignment.startsAt ?? 0) -
-                Number(right.assignment.startsAt ?? 0) ||
-              personName(left).localeCompare(personName(right)),
+              Number(left.startsAt ?? 0) - Number(right.startsAt ?? 0) ||
+              left.label.localeCompare(right.label),
           )
           .map((line) => ({
-            primary: `${personName(line)} - ${plain(line.assignment.role, "Role not set")}`,
-            secondary: joinDetails([
-              line.assignment.startsAt == null
-                ? null
-                : clockRange(line.assignment.startsAt, line.assignment.endsAt),
-              statusLabel(line.assignment.status),
-              line.assignment.notes,
-            ]),
+            primary: `${line.label} - ${plain(line.role, "Role not set")}`,
+            secondary: staffDetails(line),
           }));
 
-  const collectionY = 230;
-  const collectionHeight = 326;
-  const collectionGap = 12;
-  const collectionWidth = (RIGHT - MARGIN - collectionGap * 2) / 3;
-  const drawCollection = (x: number, title: string, blocks: BeoBlock[]) => {
-    doc.setFillColor(249, 249, 247);
-    doc.roundedRect(
-      x,
-      collectionY,
-      collectionWidth,
-      collectionHeight,
-      3,
-      3,
-      "F",
-    );
-    doc.setDrawColor(...accent);
-    doc.setLineWidth(2);
-    doc.line(x, collectionY, x + collectionWidth, collectionY);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(...primary);
-    doc.text(title.toUpperCase(), x + 10, collectionY + 19);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(6.5);
-    doc.setTextColor(112, 117, 114);
-    doc.text(
-      String(blocks.length),
-      x + collectionWidth - 10,
-      collectionY + 19,
-      {
-        align: "right",
-      },
-    );
-
-    const textX = x + 10;
-    const textWidth = collectionWidth - 20;
-    const textTop = collectionY + 32;
-    const textHeight = collectionHeight - 40;
-    const fontSize = fittedFontSize(doc, blocks, textWidth, textHeight);
-    let cursor = textTop;
-    blocks.forEach((block, index) => {
-      if (index > 0) {
-        doc.setDrawColor(225, 227, 223);
-        doc.setLineWidth(0.5);
-        doc.line(textX, cursor - 3.5, textX + textWidth, cursor - 3.5);
-      }
-      const primaryLines = wrappedLines(
-        doc,
-        block.primary,
-        textWidth,
-        fontSize,
-        "bold",
-      );
-      doc.setTextColor(31, 35, 33);
-      doc.text(primaryLines, textX, cursor);
-      cursor += primaryLines.length * fontSize * 1.22;
-      if (block.secondary) {
-        const secondarySize = fontSize * 0.88;
-        const secondaryLines = wrappedLines(
-          doc,
-          block.secondary,
-          textWidth,
-          secondarySize,
-          "normal",
-        );
-        doc.setTextColor(101, 106, 103);
-        doc.text(secondaryLines, textX, cursor + 1);
-        cursor += secondaryLines.length * fontSize * 1.08;
-      }
-      cursor += 7;
-    });
-  };
-
-  drawCollection(MARGIN, "Menu and service", menuBlocks);
-  drawCollection(
-    MARGIN + collectionWidth + collectionGap,
-    "Day-of timeline",
-    timelineBlocks,
-  );
-  drawCollection(
-    MARGIN + (collectionWidth + collectionGap) * 2,
-    "Staff assignments",
-    staffBlocks,
-  );
-
-  const notesY = 574;
-  const notesHeight = 160;
-  doc.setFillColor(...primary);
-  doc.roundedRect(MARGIN, notesY, RIGHT - MARGIN, notesHeight, 3, 3, "F");
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(8);
-  doc.setTextColor(255, 255, 255);
-  doc.text("SPECIAL INSTRUCTIONS", MARGIN + 12, notesY + 20);
-
-  const noteBlocks = [
+  drawSection("Menu and service", menuBlocks);
+  drawSection("Day-of timeline", timelineBlocks);
+  drawSection("Staff coverage", staffBlocks);
+  drawSection("Special instructions", [
     {
-      label: "Service",
-      value: plain(event.serviceRequirements, "No service notes recorded."),
+      primary: "Service",
+      secondary: plain(event.serviceRequirements, "No service notes recorded."),
     },
     {
-      label: "Operations",
-      value: plain(
+      primary: "Operations",
+      secondary: plain(
         event.operationalRequirements,
         "No operational notes recorded.",
       ),
     },
     {
-      label: "Accessibility",
-      value:
-        Array.isArray(event.accessibilityNeeds) &&
-        event.accessibilityNeeds.length > 0
-          ? event.accessibilityNeeds.join(", ")
-          : "No accessibility notes recorded.",
+      primary: "Accessibility",
+      secondary: event.accessibilityNeeds?.length
+        ? event.accessibilityNeeds.join(", ")
+        : "No accessibility notes recorded.",
     },
-  ];
-  const noteGap = 16;
-  const noteWidth = (RIGHT - MARGIN - 24 - noteGap * 2) / 3;
-  noteBlocks.forEach((note, index) => {
-    const x = MARGIN + 12 + index * (noteWidth + noteGap);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(6.5);
-    doc.setTextColor(205, 224, 210);
-    doc.text(note.label.toUpperCase(), x, notesY + 40);
-    const availableHeight = notesHeight - 55;
-    const block = { primary: note.value };
-    const fontSize = Math.min(
-      8,
-      fittedFontSize(doc, [block], noteWidth, availableHeight),
-    );
-    const lines = wrappedLines(doc, note.value, noteWidth, fontSize, "normal");
-    doc.setTextColor(255, 255, 255);
-    doc.text(lines, x, notesY + 55);
-  });
+  ]);
 
-  doc.setDrawColor(220, 221, 218);
-  doc.line(MARGIN, FOOTER_Y - 10, RIGHT, FOOTER_Y - 10);
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(7);
-  doc.setTextColor(110, 115, 112);
-  doc.text(
-    `${branding.displayName} | BEO | Live event record`,
-    MARGIN,
-    FOOTER_Y,
-  );
-  doc.text("1 / 1", RIGHT, FOOTER_Y, { align: "right" });
+  const pageCount = doc.getNumberOfPages();
+  for (let page = 1; page <= pageCount; page += 1) {
+    doc.setPage(page);
+    doc.setDrawColor(217, 220, 225);
+    doc.setLineWidth(0.5);
+    doc.line(MARGIN, FOOTER_Y - 14, RIGHT, FOOTER_Y - 14);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(DETAIL_FONT_SIZE);
+    doc.setTextColor(59, 62, 69);
+    doc.text("BEO | Live event record", MARGIN, FOOTER_Y);
+    doc.text(`${page} / ${pageCount}`, RIGHT, FOOTER_Y, { align: "right" });
+  }
   return doc;
 }
 

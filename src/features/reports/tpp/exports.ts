@@ -1,4 +1,4 @@
-import { displayCell, formatTppDate } from "./formatters";
+import { displayCell, formatTppDate, formatTppDateTime } from "./formatters";
 import type { TppColumn, TppReportResult, TppRow } from "./types";
 
 const FORMULA_PREFIX = /^[=+\-@]/;
@@ -32,7 +32,9 @@ function tabular(result: TppReportResult): {
         value:
           item.kind === "date" && typeof item.value === "number"
             ? formatTppDate(item.value)
-            : item.value,
+            : item.kind === "datetime" && typeof item.value === "number"
+              ? formatTppDateTime(item.value)
+              : item.value,
       };
     });
     return {
@@ -76,9 +78,16 @@ export function downloadTppCsv(
     data.columns.map((column) => escapeCsvCell(column.label)).join(","),
     ...data.rows.map((row) =>
       data.columns
-        .map((column) =>
-          escapeCsvCell(displayCell(row.values[column.key] ?? null)),
-        )
+        .map((column) => {
+          const value = row.values[column.key] ?? null;
+          const rendered =
+            column.kind === "date" && typeof value === "number"
+              ? formatTppDate(value)
+              : column.kind === "datetime" && typeof value === "number"
+                ? formatTppDateTime(value)
+                : displayCell(value);
+          return escapeCsvCell(rendered);
+        })
         .join(","),
     ),
   ];
@@ -105,11 +114,21 @@ export function downloadTppExcel(
   if (!data)
     throw new Error("Excel export is available only for tabular reports.");
   const cell = (value: unknown, kind: TppColumn["kind"] = "text") => {
-    const numeric = typeof value === "number" && kind !== "text";
+    const numeric =
+      typeof value === "number" &&
+      kind !== "text" &&
+      kind !== "date" &&
+      kind !== "datetime";
     const type = numeric ? "Number" : "String";
     const rendered = numeric
       ? String(value)
-      : spreadsheetSafeText(displayCell(value as never));
+      : spreadsheetSafeText(
+          kind === "date" && typeof value === "number"
+            ? formatTppDate(value)
+            : kind === "datetime" && typeof value === "number"
+              ? formatTppDateTime(value)
+              : displayCell(value as never),
+        );
     return `<Cell><Data ss:Type="${type}">${xml(rendered)}</Data></Cell>`;
   };
   const rows = [

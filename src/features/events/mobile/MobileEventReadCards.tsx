@@ -12,6 +12,7 @@ import { clientDisplayName } from "../clientName";
 import { eventDetailPath } from "../eventRoutes";
 import { compareActivities } from "../EventTimelinePanel";
 import { formatAssigneeLabel } from "../timelineAssigneeOptions";
+import type { StaffingRosterEntry } from "../eventTimelineStaffRoster";
 import {
   MobileEmpty,
   MobileMore,
@@ -155,23 +156,14 @@ export function MobileTimelineCard({
   );
 }
 
-type Assignment = Doc<"eventAssignments">;
-
 export function MobileStaffCard({
   eventId,
-  assignments,
-  people,
+  staffingRoster,
 }: {
   readonly eventId: string;
-  readonly assignments: readonly Assignment[] | undefined;
-  readonly people: readonly Person[] | undefined;
+  readonly staffingRoster: readonly StaffingRosterEntry[] | undefined;
 }) {
-  const rows = (assignments ?? []).filter(
-    (row) =>
-      row.deletedAt == null &&
-      row.eventId === eventId &&
-      row.status !== "unassigned",
-  );
+  const rows = staffingRoster ?? [];
   const shown = rows.slice(0, ROW_LIMIT);
   return (
     <MobileSectionCard
@@ -181,23 +173,23 @@ export function MobileStaffCard({
       seeAllTo={eventDetailPath(eventId, "staffing")}
     >
       {rows.length === 0 ? (
-        <MobileEmpty>No staff assigned yet.</MobileEmpty>
+        <MobileEmpty>No staff coverage recorded.</MobileEmpty>
       ) : (
         shown.map((row) => {
-          const person = people?.find((p) => p._id === row.personId);
           const window =
             row.startsAt != null
               ? `${formatTime(row.startsAt)}${row.endsAt != null ? `–${formatTime(row.endsAt)}` : ""}`
               : "";
           return (
-            <div key={row._id} className="mobile-row">
+            <div key={row.key} className="mobile-row">
               <span className="mobile-row-main">
                 <span className="block truncate">
-                  {personName(person) || "Staff"}
+                  {row.label || "Unresolved staff member"}
                 </span>
                 <span className="mobile-row-sub truncate">
-                  {[row.role, window].filter(Boolean).join(" · ") ||
-                    formatStatusLabel(String(row.status))}
+                  {[row.role, window, formatStatusLabel(row.status)]
+                    .filter(Boolean)
+                    .join(" · ")}
                 </span>
               </span>
             </div>

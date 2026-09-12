@@ -539,6 +539,8 @@ export const DishSchema = z.object({
   recipeSourceText: z.string().nullable().optional(),
   recipeSourceYield: z.string().nullable().optional(),
   recipeSourceFingerprint: z.string().nullable().optional(),
+  serviceInstructions: z.string().nullable().optional(),
+  serviceInstructionsSource: z.string().nullable().optional(),
   category: z.string().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
@@ -4407,6 +4409,14 @@ export const DishSaveRecipeParamsSchema = z.object({
 });
 
 export type DishSaveRecipeParams = z.infer<typeof DishSaveRecipeParamsSchema>;
+
+// Command: saveServiceInstructions on Dish
+export const DishSaveServiceInstructionsParamsSchema = z.object({
+  instructions: z.string(),
+  source: z.string(),
+});
+
+export type DishSaveServiceInstructionsParams = z.infer<typeof DishSaveServiceInstructionsParamsSchema>;
 
 // Command: setPrimaryImage on Dish
 export const DishSetPrimaryImageParamsSchema = z.object({

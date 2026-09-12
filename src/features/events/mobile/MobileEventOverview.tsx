@@ -15,6 +15,7 @@ import {
 import { EventSetupProgress } from "../EventSetupProgress";
 import { MobilePackListCard } from "./MobilePackListCard";
 import { MobilePrepCard } from "./MobilePrepCard";
+import type { StaffingRosterEntry } from "../eventTimelineStaffRoster";
 
 type SetupFlags = {
   hasAssignedClient?: boolean;
@@ -31,7 +32,7 @@ type Props = {
   readonly dishes: readonly Doc<"dishes">[] | undefined;
   readonly eventDishes: readonly Doc<"eventDishes">[] | undefined;
   readonly activities: readonly Doc<"eventTimelineActivities">[] | undefined;
-  readonly assignments: readonly Doc<"eventAssignments">[] | undefined;
+  readonly staffingRoster: readonly StaffingRosterEntry[] | undefined;
   readonly people: readonly Doc<"people">[] | undefined;
 };
 
@@ -46,7 +47,7 @@ export function MobileEventOverview({
   dishes,
   eventDishes,
   activities,
-  assignments,
+  staffingRoster,
   people,
 }: Props) {
   const organizations = useListOrganization();
@@ -68,11 +69,7 @@ export function MobileEventOverview({
         activities={activities}
         people={people}
       />
-      <MobileStaffCard
-        eventId={event._id}
-        assignments={assignments}
-        people={people}
-      />
+      <MobileStaffCard eventId={event._id} staffingRoster={staffingRoster} />
       <MobileEventChatCard eventId={event._id} />
       <MobilePrepCard eventId={event._id} />
       <MobilePackListCard eventId={event._id} />
