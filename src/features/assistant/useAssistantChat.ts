@@ -61,10 +61,26 @@ export function useAssistantChat() {
         { id: newId(), role: "user", content: trimmed },
       ]);
       try {
-        for (let round = 0; round < MAX_ROUNDS; round++) {
+        for (let round = 0; round <= MAX_ROUNDS; round++) {
           const res: AssistantTurnResult = await runTurn({
             messages: convoRef.current,
           });
+          // Every assistant turn — final answers included — enters the
+          // conversation, or multi-turn follow-ups lose what was said.
+          const serverToolCalls = res.toolCalls.map((c) => ({
+            id: c.id,
+            name: c.name,
+            argumentsJson: c.argumentsJson,
+          }));
+          convoRef.current = [
+            ...convoRef.current,
+            {
+              role: "assistant",
+              content: res.content,
+              toolCalls:
+                serverToolCalls.length > 0 ? serverToolCalls : undefined,
+            },
+          ];
           setMessages((m) => [
             ...m,
             {
@@ -78,18 +94,19 @@ export function useAssistantChat() {
             if (res.error != null) setError(res.error);
             break;
           }
-          convoRef.current = [
-            ...convoRef.current,
-            {
-              role: "assistant",
-              content: res.content,
-              toolCalls: res.toolCalls.map((c) => ({
-                id: c.id,
-                name: c.name,
-                argumentsJson: c.argumentsJson,
-              })),
-            },
-          ];
+          // Refuse, don't run, tool calls proposed by the last allowed round:
+          // running them would apply writes the model can never report on.
+          if (round === MAX_ROUNDS) {
+            setMessages((m) => [
+              ...m,
+              {
+                id: newId(),
+                role: "assistant",
+                content: `Stopped after ${MAX_ROUNDS} tool rounds without running the last step. Ask me to continue if the task is not done.`,
+              },
+            ]);
+            break;
+          }
           for (const call of res.toolCalls) {
             const result = await executeAssistantToolCall(convex, call);
             convoRef.current = [
@@ -104,16 +121,6 @@ export function useAssistantChat() {
                 content: result,
                 toolCallId: call.id,
                 toolName: call.name,
-              },
-            ]);
-          }
-          if (round === MAX_ROUNDS - 1) {
-            setMessages((m) => [
-              ...m,
-              {
-                id: newId(),
-                role: "assistant",
-                content: `Stopped after ${MAX_ROUNDS} tool rounds. Ask me to continue if the task is not done.`,
               },
             ]);
           }

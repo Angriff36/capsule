@@ -124,6 +124,34 @@ function endpoint(baseUrl: string): string {
   return `${root}/chat/completions`;
 }
 
+/** History caps — a runaway thread must not burn action time or LLM budget. */
+const MAX_MESSAGES = 60;
+const MAX_HISTORY_CHARS = 150_000;
+
+type TurnMessage = {
+  role: "user" | "assistant" | "tool";
+  content?: string;
+  toolCalls?: Array<{ id: string; name: string; argumentsJson: string }>;
+  toolCallId?: string;
+};
+
+/**
+ * Drop whole rounds from the FRONT (never an orphan tool result, which
+ * providers reject) until the history fits the caps. Cheap approximation:
+ * a round starts at a user message.
+ */
+function trimHistory(messages: TurnMessage[]): TurnMessage[] {
+  let out = messages;
+  const size = (ms: TurnMessage[]) =>
+    ms.reduce((n, m) => n + (m.content?.length ?? 0), 0);
+  while (out.length > MAX_MESSAGES || size(out) > MAX_HISTORY_CHARS) {
+    const firstUser = out.findIndex((m) => m.role === "user");
+    if (firstUser <= 0) break; // nothing safe to drop
+    out = out.slice(firstUser + 1);
+  }
+  return out;
+}
+
 export const turn = action({
   args: { messages: v.array(messageValidator) },
   handler: async (ctx, args): Promise<AssistantTurnResult> => {
@@ -152,7 +180,7 @@ export const turn = action({
 
     const wire: WireMessage[] = [
       { role: "system", content: systemPrompt() },
-      ...args.messages.map(toWire),
+      ...trimHistory(args.messages).map(toWire),
     ];
 
     let response: Response;
@@ -177,11 +205,16 @@ export const turn = action({
       };
     }
     if (!response.ok) {
+      // Log the body server-side only — provider error pages do not belong
+      // in a user's chat transcript.
       const body = await response.text().catch(() => "");
+      console.error(
+        `assistantTurn: model endpoint ${response.status}: ${body.slice(0, 500)}`,
+      );
       return {
-        content: `Assistant model request failed (${response.status}). ${body.slice(0, 300)}`,
+        content: `The assistant model request failed (${response.status}). Check the model endpoint configuration under Administration → Assistant.`,
         toolCalls: [],
-        error: "upstream" as const,
+        error: "upstream",
       };
     }
 
