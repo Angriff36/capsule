@@ -11,7 +11,6 @@
 import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import {
-  internalMutation,
   internalQuery,
   mutation,
   query,
@@ -19,6 +18,7 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { storageReferencedByTenant } from "./fileStorage";
+import { blobReferenced } from "./lib/blobs";
 
 async function personTenantId(
   ctx: QueryCtx,
@@ -84,6 +84,15 @@ export const registerUpload = mutation({
   handler: async (ctx, args) => {
     const { subject, tenantId } = await authContext(ctx);
     if (args.storageId.length === 0) throw new Error("Nothing was uploaded.");
+    // Registration is only valid for ORPHAN blobs — bytes the caller just
+    // uploaded and no record references anywhere. A blob any live row (any
+    // tenant) references is refused: own-tenant blobs already resolve through
+    // the tenant-reference check, and foreign blobs must never be claimable.
+    if (await blobReferenced(ctx, args.storageId)) {
+      throw new Error(
+        "This file already belongs to a record; it is available to the assistant without registering.",
+      );
+    }
     const existing = await ctx.db
       .query("assistantUploads")
       .withIndex("by_storageId", (q) => q.eq("storageId", args.storageId))

@@ -14,7 +14,7 @@
 "use node";
 
 import { v } from "convex/values";
-import { action, type ActionCtx } from "./_generated/server";
+import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
 import {
   assistantToolDefs,
@@ -118,7 +118,6 @@ function systemPrompt(): string {
 
 /** Images become inline data URLs; text files are inlined as text blocks. */
 async function buildUserContent(
-  ctx: ActionCtx,
   m: {
     content?: string;
     files?: AssistantFile[];
@@ -274,7 +273,7 @@ export const turn = action({
       if (m.role === "user") {
         wire.push({
           role: "user",
-          content: await buildUserContent(ctx, m, urlMap, i === lastUserIndex),
+          content: await buildUserContent(m, urlMap, i === lastUserIndex),
         });
       } else if (m.role === "assistant") {
         wire.push({
