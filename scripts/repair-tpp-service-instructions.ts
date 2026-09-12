@@ -7,7 +7,7 @@
  * hash, target tenant, and a live Convex URL.
  */
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
@@ -180,6 +180,12 @@ if (snapshot.Dish.some((dish: any) => dish.tenantId !== document.tenantId))
 
 const planHash = hash(JSON.stringify(document));
 mkdirSync(values.out, { recursive: true });
+const receiptPath = `${values.out}/receipt.json`;
+try {
+  unlinkSync(receiptPath);
+} catch (error: any) {
+  if (error?.code !== "ENOENT") throw error;
+}
 writeFileSync(`${values.out}/plan.json`, JSON.stringify(document, null, 2));
 writeFileSync(`${values.out}/plan.sha256`, planHash);
 console.log(
@@ -282,11 +288,22 @@ for (const entry of planEntries) {
     mutationResult: result,
   });
   writeFileSync(
-    `${values.out}/receipt.json`,
-    JSON.stringify(receipts, null, 2),
+    receiptPath,
+    JSON.stringify(
+      { planSha256: planHash, tenantId: document.tenantId, entries: receipts },
+      null,
+      2,
+    ),
   );
 }
-writeFileSync(`${values.out}/receipt.json`, JSON.stringify(receipts, null, 2));
+writeFileSync(
+  receiptPath,
+  JSON.stringify(
+    { planSha256: planHash, tenantId: document.tenantId, entries: receipts },
+    null,
+    2,
+  ),
+);
 console.log(
   JSON.stringify(
     {

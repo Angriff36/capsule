@@ -32,14 +32,16 @@ import {
   useListClient,
   useListOrganization,
   useListDish,
-  useListEventAssignment,
   useListEventDish,
-  useListEventStaffNeed,
   useListEventTimelineActivity,
   useListPerson,
-  useListShift,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import {
+  useEventAssignmentRows,
+  useEventShiftRows,
+  useEventStaffNeedRows,
+} from "../../lib/eventScopedQueries";
 import { useTrackRecent } from "../../lib/recents";
 import {
   ArrowLeftIcon,
@@ -99,6 +101,7 @@ import {
   parseEventDetailTab,
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
+import type { Doc } from "../../lib/api";
 
 function HeroFact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -115,9 +118,40 @@ function HeroFact({ label, children }: { label: string; children: ReactNode }) {
 
 export function EventDetailPage() {
   const { id } = useParams();
+  const event = useRouteRecord(useGetEvent, id);
+  const { loadingTooLong } = useSlowQuery(event);
+
+  if (event === undefined) {
+    return (
+      <QueryLoadState
+        title="Event data is not loading"
+        detail="The workspace did not return this event. Check the session or backend connection, then retry."
+        loadingTooLong={loadingTooLong}
+      />
+    );
+  }
+  if (event === null || event.deletedAt != null) {
+    return (
+      <ErrorState
+        title="Event unavailable"
+        detail="It may not exist, may have been deleted, or your role may not permit access."
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
+
+  return <EventDetailContent event={event} id={id} />;
+}
+
+function EventDetailContent({
+  event,
+  id,
+}: {
+  event: Doc<"events">;
+  id: string | undefined;
+}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
-  const event = useRouteRecord(useGetEvent, id);
   const mobile = useMobileViewport();
   // Phones get the nine-card overview; `full=1` opens the desktop overview
   // (edit panels, planning notes) on a phone via "Edit" / "See all".
@@ -136,9 +170,10 @@ export function EventDetailPage() {
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
   const dishes = useListDish();
-  const eventAssignments = useListEventAssignment();
-  const staffNeeds = useListEventStaffNeed();
-  const shifts = useListShift();
+  const eventId = event?._id ?? "skip";
+  const eventAssignments = useEventAssignmentRows(eventId);
+  const staffNeeds = useEventStaffNeedRows(eventId);
+  const shifts = useEventShiftRows(eventId);
   const eventDishes = useListEventDish();
   const timelineActivities = useListEventTimelineActivity();
   const people = useListPerson();
@@ -168,27 +203,6 @@ export function EventDetailPage() {
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
-  const { loadingTooLong } = useSlowQuery(event);
-
-  if (event === undefined) {
-    return (
-      <QueryLoadState
-        title="Event data is not loading"
-        detail="The workspace did not return this event. Check the session or backend connection, then retry."
-        loadingTooLong={loadingTooLong}
-      />
-    );
-  }
-  if (event === null || event.deletedAt != null) {
-    return (
-      <ErrorState
-        title="Event unavailable"
-        detail="It may not exist, may have been deleted, or your role may not permit access."
-        onRetry={() => window.location.reload()}
-      />
-    );
-  }
-
   const version = typeof event.version === "number" ? event.version : undefined;
   const canRevise = eventLifecyclePolicy.isEditableStage(String(event.stage));
   const canChangeHeadcount = eventLifecyclePolicy.canChangeHeadcount(

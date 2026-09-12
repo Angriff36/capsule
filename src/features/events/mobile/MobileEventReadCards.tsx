@@ -176,10 +176,17 @@ export function MobileStaffCard({
         <MobileEmpty>No staff coverage recorded.</MobileEmpty>
       ) : (
         shown.map((row) => {
-          const window =
-            row.startsAt != null
-              ? `${formatTime(row.startsAt)}${row.endsAt != null ? `–${formatTime(row.endsAt)}` : ""}`
-              : "";
+          const windows = (
+            row.shiftWindows?.length
+              ? row.shiftWindows
+              : [{ startsAt: row.startsAt, endsAt: row.endsAt }]
+          )
+            .map((shift) =>
+              shift.startsAt != null
+                ? `${formatTime(shift.startsAt)}${shift.endsAt != null ? `–${formatTime(shift.endsAt)}` : ""}`
+                : "",
+            )
+            .filter(Boolean);
           return (
             <div key={row.key} className="mobile-row">
               <span className="mobile-row-main">
@@ -187,7 +194,7 @@ export function MobileStaffCard({
                   {row.label || "Unresolved staff member"}
                 </span>
                 <span className="mobile-row-sub truncate">
-                  {[row.role, window, formatStatusLabel(row.status)]
+                  {[row.role, windows.join(", "), formatStatusLabel(row.status)]
                     .filter(Boolean)
                     .join(" · ")}
                 </span>

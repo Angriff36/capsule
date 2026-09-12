@@ -14,6 +14,7 @@ import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelin
 import type {
   TppColumn,
   TppDocumentSection,
+  TppLabel,
   TppReportResult,
   TppRow,
 } from "../../src/features/reports/tpp/types";
@@ -254,6 +255,32 @@ function serviceMethodText(
   if (/^Method\s*:/i.test(legacy))
     return "Service method not recorded. Preparation method is recorded separately.";
   return "Service method not recorded.";
+}
+
+const SERVICE_LABEL_CHUNK_SIZE = 42;
+
+function serviceLabelParts(
+  dishName: string,
+  serviceText: string,
+  id: string,
+): TppLabel[] {
+  const normalized = serviceText.replace(/\s+/g, " ").trim();
+  const chunks: string[] = [];
+  let remaining = normalized || "Service method not recorded.";
+  while (remaining.length > SERVICE_LABEL_CHUNK_SIZE) {
+    const boundary = remaining.lastIndexOf(" ", SERVICE_LABEL_CHUNK_SIZE + 1);
+    const splitAt = boundary > 0 ? boundary : SERVICE_LABEL_CHUNK_SIZE;
+    chunks.push(remaining.slice(0, splitAt).trim());
+    remaining = remaining.slice(splitAt).trim();
+  }
+  chunks.push(remaining);
+  return chunks.map((chunk, index) => ({
+    id: `${id}:service:${index}`,
+    lines: [
+      `${dishName}${chunks.length > 1 ? ` (${index + 1}/${chunks.length})` : ""}`,
+      chunk,
+    ],
+  }));
 }
 
 async function productionWorksheet(
@@ -897,8 +924,24 @@ export const run = query({
             : args.reportId === "heating-serving-labels"
               ? "avery_5160"
               : "table_tent",
-        labels: menu.map(({ item, dish }) => {
+        labels: menu.flatMap(({ item, dish }) => {
           const menuNotes = displayEventMenuNotes(item.specialInstructions);
+          if (args.reportId === "heating-serving-labels") {
+            return serviceLabelParts(
+              dish.name,
+              [
+                serviceMethodText(
+                  dish.serviceInstructions,
+                  dish.serviceInstructionsSource,
+                  dish.recipeInstructions,
+                ),
+                menuNotes ? `Event notes: ${menuNotes}` : "",
+              ]
+                .filter(Boolean)
+                .join("\n"),
+              String(item._id),
+            );
+          }
           return {
             id: item._id,
             lines:
@@ -909,17 +952,7 @@ export const run = query({
                     event.primaryContactName ?? "",
                     dish.name,
                   ]
-                : args.reportId === "heating-serving-labels"
-                  ? [
-                      dish.name,
-                      serviceMethodText(
-                        dish.serviceInstructions,
-                        dish.serviceInstructionsSource,
-                        dish.recipeInstructions,
-                      ),
-                      ...(menuNotes ? [`Event notes: ${menuNotes}`] : []),
-                    ]
-                  : [dish.name, dish.description ?? ""],
+                : [dish.name, dish.description ?? ""],
           };
         }),
       };
