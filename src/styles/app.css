@@ -3080,6 +3080,17 @@
   font-size: 13px;
 }
 
+/* Avery 5160 service labels have one inch of physical height. Keep each
+   bounded report line visible so a long dish or method cannot hide the event
+   note below it. */
+.tpp-label-avery_5160 article span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .tpp-label-table_tent article {
   place-content: center;
   text-align: center;

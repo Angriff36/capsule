@@ -264,6 +264,11 @@ function serviceMethodText(
   return "Service method not recorded.";
 }
 
+function serviceSourceText(source: string | null | undefined): string {
+  const normalized = String(source ?? "").trim();
+  return normalized ? `Source: ${normalized}` : "";
+}
+
 const SERVICE_LABEL_MAX_CHARS = 54;
 const SERVICE_LABEL_NOTE_MAX_CHARS = 36;
 
@@ -1028,6 +1033,7 @@ export const run = query({
                       dish.serviceInstructionsSource,
                       dish.recipeInstructions,
                     ),
+                    serviceSourceText(dish.serviceInstructionsSource),
                     menuNotes ? `Event notes: ${menuNotes}` : "",
                   ]
                     .filter(Boolean)
