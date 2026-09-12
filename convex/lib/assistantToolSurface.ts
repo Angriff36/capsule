@@ -299,6 +299,15 @@ export const ASSISTANT_READS: readonly AssistantReadSpec[] = [
     ],
   },
   {
+    toolName: "list_ingredient_demand",
+    queryName: "listIngredientDemandByTenantId",
+    description:
+      "List ingredient demand rows in the tenant (source of ingredientDemandId for purchase needs).",
+    params: [
+      { name: "tenantId", type: "string", description: "Any string; the caller's tenant is used." },
+    ],
+  },
+  {
     toolName: "list_vendor_orders",
     queryName: "listVendorOrderByTenantId",
     description: "List vendor orders in the tenant.",
@@ -458,7 +467,9 @@ function writeToolDefs(): AssistantToolDef[] {
       if (p.required && !p.nullable) required.push(p.name);
     }
     const mutationName = mutationNameForCapability(capabilityId);
-    const requiresDocumentId = !mutationName.includes("createVia");
+    // Creation paths take no docId — including direct-named ones such as
+    // PurchaseNeed_create.
+    const requiresDocumentId = !(capabilityId in CREATION_MUTATIONS);
     if (requiresDocumentId) {
       properties.docId = {
         type: "string",

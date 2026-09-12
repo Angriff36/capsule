@@ -15,7 +15,7 @@ One chat drawer, mounted app-wide (`Ctrl+J` or the topbar sparkle button).
   `docs/generation/2026-07-17-command-api-surface-boundary.md`.
 - **Tool surface** — `convex/lib/assistantToolSurface.ts`: ~69 curated write
   commands (events, kitchen, fleet, deliveries, pack lists, equipment,
-  purchasing, vendor orders, shifts, time off, saved report definitions) + 26
+  purchasing, vendor orders, shifts, time off, saved report definitions) + 29
   tenant-scoped reads. Money paths (invoices, payments, payroll) and staff
   administration (hire, terminate, pay rate, roles) are deliberately NOT on
   the surface.
