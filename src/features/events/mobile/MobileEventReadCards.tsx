@@ -179,7 +179,9 @@ export function MobileStaffCard({
           const windows = (
             row.shiftWindows?.length
               ? row.shiftWindows
-              : [{ startsAt: row.startsAt, endsAt: row.endsAt }]
+              : row.plannedWindows?.length
+                ? row.plannedWindows
+                : [{ startsAt: row.startsAt, endsAt: row.endsAt }]
           )
             .map((shift) =>
               shift.startsAt != null

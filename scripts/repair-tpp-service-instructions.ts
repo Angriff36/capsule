@@ -50,6 +50,14 @@ const parseJson = (bytes: Buffer) =>
   JSON.parse(bytes.toString("utf8").replace(/^\uFEFF/, ""));
 const auth = new CapsuleAgentAuthManager();
 
+const validateTenantJwt = (jwt: string, tenant: string) => {
+  const payload = jwt.split(".")[1];
+  if (!payload) throw new Error("Authenticated repair token is malformed");
+  const claims = JSON.parse(Buffer.from(payload, "base64url").toString());
+  if ((claims.tenantId ?? claims.org_id ?? claims.o?.id) !== tenant)
+    throw new Error("Authenticated tenant differs from repair target");
+};
+
 if (values.capture) {
   if (!values.url || !values.tenant)
     throw new Error("Capture requires --url and --tenant");
@@ -212,20 +220,31 @@ if (!document.targetUrl)
 if (normalizeTargetUrl(values.url) !== document.targetUrl)
   throw new Error("Apply URL differs from the reviewed backend URL");
 
+// Validate authentication before replacing any prior receipt. A rejected apply
+// must not erase the evidence from an earlier acknowledged attempt.
+const initialJwt = await auth.resolveJwt();
+validateTenantJwt(initialJwt, values.tenant);
 try {
   unlinkSync(receiptPath);
 } catch (error: any) {
   if (error?.code !== "ENOENT") throw error;
 }
 const client = new ConvexHttpClient(values.url);
+client.setAuth(initialJwt);
 const receipts: Array<Record<string, unknown>> = [];
+const writeReceipt = () =>
+  writeFileSync(
+    receiptPath,
+    JSON.stringify(
+      { planSha256: planHash, tenantId: document.tenantId, entries: receipts },
+      null,
+      2,
+    ),
+  );
+writeReceipt();
 for (const entry of planEntries) {
   const jwt = await auth.resolveJwt();
-  const claims = JSON.parse(
-    Buffer.from(jwt.split(".")[1], "base64url").toString(),
-  );
-  if ((claims.tenantId ?? claims.org_id ?? claims.o?.id) !== values.tenant)
-    throw new Error("Authenticated tenant differs from repair target");
+  validateTenantJwt(jwt, values.tenant);
   client.setAuth(jwt);
   const current: any = await client.query(api.queries.getDish, {
     id: entry.dishId as any,
@@ -247,6 +266,7 @@ for (const entry of planEntries) {
       result: "already-applied",
       version: current.version,
     });
+    writeReceipt();
     continue;
   }
   if (
@@ -259,51 +279,73 @@ for (const entry of planEntries) {
     throw new Error(
       `Dish changed after review; refresh the snapshot: ${entry.name}`,
     );
-  const result = await client.mutation(
-    api.mutations.Dish_saveServiceInstructions,
-    {
-      docId: entry.dishId as any,
-      instructions: entry.instructions,
-      source: entry.sourceReference,
-      version: entry.expectedVersion,
-      idempotencyKey: `tpp-service-instructions:v1:${entry.dishId}:${entry.instructionsCell}`,
-    },
-  );
-  const after: any = await client.query(api.queries.getDish, {
-    id: entry.dishId as any,
-  });
-  if (
-    !after ||
-    after.serviceInstructions !== entry.instructions ||
-    after.serviceInstructionsSource !== entry.sourceReference ||
-    after.version !== entry.expectedVersion + 1 ||
-    hash(String(after.recipeInstructions ?? "")) !==
-      entry.expectedRecipeInstructionsSha256
-  )
-    throw new Error(`Readback verification failed: ${entry.name}`);
-  receipts.push({
-    ...entry,
-    result: "saved",
-    version: after.version,
-    mutationResult: result,
-  });
-  writeFileSync(
-    receiptPath,
-    JSON.stringify(
-      { planSha256: planHash, tenantId: document.tenantId, entries: receipts },
-      null,
-      2,
-    ),
-  );
+  const receiptIndex =
+    receipts.push({
+      ...entry,
+      result: "mutation-pending",
+    }) - 1;
+  writeReceipt();
+  let mutationResult: unknown;
+  try {
+    // Do not pass idempotencyKey: the generated wrapper checks its cache before
+    // authentication. Version and current-state checks make this repair safe
+    // to retry without exposing its result through that cache.
+    mutationResult = await client.mutation(
+      api.mutations.Dish_saveServiceInstructions,
+      {
+        docId: entry.dishId as any,
+        instructions: entry.instructions,
+        source: entry.sourceReference,
+        version: entry.expectedVersion,
+      },
+    );
+  } catch (error) {
+    receipts[receiptIndex] = {
+      ...receipts[receiptIndex],
+      result: "mutation-not-acknowledged",
+      error: error instanceof Error ? error.message : String(error),
+    };
+    writeReceipt();
+    throw error;
+  }
+  receipts[receiptIndex] = {
+    ...receipts[receiptIndex],
+    result: "acknowledged-readback-pending",
+    version: entry.expectedVersion + 1,
+    mutationResult,
+  };
+  writeReceipt();
+  try {
+    const after: any = await client.query(api.queries.getDish, {
+      id: entry.dishId as any,
+    });
+    if (
+      !after ||
+      after.serviceInstructions !== entry.instructions ||
+      after.serviceInstructionsSource !== entry.sourceReference ||
+      after.version !== entry.expectedVersion + 1 ||
+      hash(String(after.recipeInstructions ?? "")) !==
+        entry.expectedRecipeInstructionsSha256
+    )
+      throw new Error(`Readback verification failed: ${entry.name}`);
+    receipts[receiptIndex] = {
+      ...receipts[receiptIndex],
+      result: "saved",
+      version: after.version,
+      after,
+    };
+    writeReceipt();
+  } catch (error) {
+    receipts[receiptIndex] = {
+      ...receipts[receiptIndex],
+      result: "acknowledged-readback-failed",
+      error: error instanceof Error ? error.message : String(error),
+    };
+    writeReceipt();
+    throw error;
+  }
 }
-writeFileSync(
-  receiptPath,
-  JSON.stringify(
-    { planSha256: planHash, tenantId: document.tenantId, entries: receipts },
-    null,
-    2,
-  ),
-);
+writeReceipt();
 console.log(
   JSON.stringify(
     {
