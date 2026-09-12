@@ -71,6 +71,8 @@ export interface CalendarEventFacts {
   ownerId: string | null;
   stage: EventStage;
   stageLabel: string;
+  /** planEngagement has run; submitForApproval needs it. */
+  planned: boolean;
   lock: LockStatus;
   lockLabel: string;
   version: number | undefined;
@@ -164,6 +166,7 @@ export function buildCalendarFacts(
         ownerId: event.assignedToId ?? null,
         stage,
         stageLabel: STAGE_LABEL[stage] ?? stage,
+        planned: event.plannedAt != null,
         lock,
         lockLabel: LOCK_LABEL[lock],
         version: typeof event.version === "number" ? event.version : undefined,

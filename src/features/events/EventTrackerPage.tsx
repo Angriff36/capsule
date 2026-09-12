@@ -311,20 +311,25 @@ export function EventTrackerPage() {
   const canChangeGuests = (event: CalendarEventFacts) =>
     canExecute && HEADCOUNT_STAGES.has(event.stage);
 
+  // Each button mirrors its command's own guards, so a role never sees a
+  // next step the server would refuse.
+  const canApprove = permissions.has("eventManageAccess");
+  const canLock = permissions.has("salesAccess");
   const stageMove = (event: CalendarEventFacts): StageMove | null => {
     if (!canExecute) return null;
     switch (event.stage) {
       case "planning":
-        return { label: "Submit for approval", run: submitForApproval };
+        return event.planned
+          ? { label: "Submit for approval", run: submitForApproval }
+          : null;
       case "pending_approval":
-        return { label: "Approve", run: approve };
+        return canApprove ? { label: "Approve", run: approve } : null;
       case "approved":
-        return { label: "Lock sales", run: lockForSales };
+        return canLock ? { label: "Lock sales", run: lockForSales } : null;
       case "sales_lock":
-        return {
-          label: "Confirm lock & start execution",
-          run: confirmSalesLock,
-        };
+        return canLock
+          ? { label: "Confirm lock & start execution", run: confirmSalesLock }
+          : null;
       default:
         return null;
     }
@@ -693,6 +698,14 @@ export function EventTrackerPage() {
                             <option value="">
                               {event.venueId ? "No venue" : event.venue}
                             </option>
+                            {event.venueId &&
+                            !activeVenues.some(
+                              (venue) => venue._id === event.venueId,
+                            ) ? (
+                              <option value={event.venueId} disabled>
+                                {event.venue} (inactive)
+                              </option>
+                            ) : null}
                             {activeVenues.map((venue) => (
                               <option key={venue._id} value={venue._id}>
                                 {venue.name}
@@ -711,6 +724,14 @@ export function EventTrackerPage() {
                             }
                           >
                             <option value="">Unassigned</option>
+                            {event.ownerId &&
+                            !roster.some(
+                              (person) => person._id === event.ownerId,
+                            ) ? (
+                              <option value={event.ownerId} disabled>
+                                {event.owner} (inactive)
+                              </option>
+                            ) : null}
                             {roster.map((person) => (
                               <option key={person._id} value={person._id}>
                                 {`${person.givenName ?? ""} ${person.familyName ?? ""}`.trim() ||

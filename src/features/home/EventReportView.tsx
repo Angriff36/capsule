@@ -41,6 +41,9 @@ export function eventReportRequest(
       );
     } else if (parameter.type === "date") {
       form.set(parameter.key, localDateInput(day));
+    } else if (parameter.type === "boolean" && parameter.default) {
+      // The parser reads booleans as "is the box ticked"; keep the catalog default.
+      form.set(parameter.key, "on");
     }
   }
   const parsed = parseTppReportRequest(definition, form, new Date(), event.id);
