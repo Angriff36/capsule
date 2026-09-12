@@ -32,3 +32,22 @@ entity AssistantLlmConfig mixin TenantScoped, SoftDeletable {
 
   store AssistantLlmConfig in durable
 }
+
+// Files a user attached to an assistant conversation. Uploads land in Convex
+// storage anonymously; this row is what binds the blob to the uploader so the
+// turn action only inlines bytes the caller owns (or that their tenant
+// references). Authored convex/assistantConfig.ts writes the rows.
+entity AssistantUpload mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+
+  property indexed required storageId: string
+  property indexed required uploadedByAuthSubjectId: string
+  property required name: string
+
+  default policy assistantUploadRead read: user.id != null "Staff may see assistant upload registrations"
+  default policy assistantUploadWrite write: user.id != null "Staff may register assistant uploads"
+  default policy assistantUploadExecute execute: user.id != null "Staff may execute assistant upload commands"
+
+  store AssistantUpload in durable
+}

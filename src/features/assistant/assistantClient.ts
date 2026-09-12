@@ -8,7 +8,10 @@
 import type { FunctionReference } from "convex/server";
 import type { ConvexReactClient } from "convex/react";
 import { api } from "../../lib/api";
-import type { AssistantToolCall } from "../../../convex/assistantTurn";
+import type {
+  AssistantFile,
+  AssistantToolCall,
+} from "../../../convex/assistantTurn";
 
 const mutationRefs = api.mutations as unknown as Record<
   string,
@@ -21,6 +24,84 @@ const queryRefs = api.queries as unknown as Record<
 
 /** Cap tool results sent back to the model — list reads can be large. */
 const MAX_RESULT_CHARS = 6000;
+
+/** Upload limits — the turn action re-checks byte size server-side. */
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+export const MAX_TEXT_BYTES = 200 * 1024;
+
+const TEXT_EXTENSIONS = new Set([
+  "txt",
+  "md",
+  "csv",
+  "json",
+  "tsv",
+  "log",
+  "yml",
+  "yaml",
+  "xml",
+  "html",
+]);
+
+export function classifyFile(
+  file: File,
+): { ok: true; kind: "image" | "text" } | { ok: false; reason: string } {
+  const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
+  if (file.type.startsWith("image/")) {
+    if (file.size > MAX_IMAGE_BYTES) {
+      return {
+        ok: false,
+        reason: `${file.name} is over 5 MB — screenshot it smaller or compress it.`,
+      };
+    }
+    return { ok: true, kind: "image" };
+  }
+  if (file.type.startsWith("text/") || TEXT_EXTENSIONS.has(extension)) {
+    if (file.size > MAX_TEXT_BYTES) {
+      return {
+        ok: false,
+        reason: `${file.name} is over 200 KB — trim it or split it.`,
+      };
+    }
+    return { ok: true, kind: "text" };
+  }
+  return {
+    ok: false,
+    reason: `${file.name}: unsupported. Images (≤5 MB) and text files (≤200 KB) work; PDFs are not supported yet.`,
+  };
+}
+
+/** Upload via the governed storage seam; returns what the turn action expects. */
+export async function uploadAssistantFile(
+  convex: ConvexReactClient,
+  file: File,
+  kind: "image" | "text",
+): Promise<AssistantFile> {
+  const uploadUrl = await convex.mutation(
+    // Authenticated upload URL from the authored file-storage seam.
+    api.fileStorage.generateUploadUrl,
+    {},
+  );
+  const response = await fetch(uploadUrl, {
+    method: "POST",
+    headers: { "Content-Type": file.type || "application/octet-stream" },
+    body: file,
+  });
+  if (!response.ok)
+    throw new Error(`Upload of ${file.name} failed (${response.status}).`);
+  const { storageId } = (await response.json()) as { storageId: string };
+  // Bind the blob to this uploader — the turn action only inlines files that
+  // the caller registered or that the caller's tenant references.
+  await convex.mutation(api.assistantConfig.registerUpload, {
+    storageId,
+    name: file.name,
+  });
+  return {
+    storageId,
+    name: file.name,
+    mime: file.type || "application/octet-stream",
+    kind,
+  };
+}
 
 function truncate(result: unknown): string {
   const json = JSON.stringify(result ?? null);

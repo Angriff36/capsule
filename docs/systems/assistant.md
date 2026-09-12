@@ -13,8 +13,12 @@ One chat drawer, mounted app-wide (`Ctrl+J` or the topbar sparkle button).
   uses (`api.mutations.*` / `api.queries.*`). Authz is therefore identical to
   the UI — no separate AI surface, per
   `docs/generation/2026-07-17-command-api-surface-boundary.md`.
-- **Tool surface** — `convex/lib/assistantToolSurface.ts`: 19 curated write
-  commands (Event, EventDish, Dish, PrepTask, Client) + 10 tenant-scoped reads.
+- **Tool surface** — `convex/lib/assistantToolSurface.ts`: ~69 curated write
+  commands (events, kitchen, fleet, deliveries, pack lists, equipment,
+  purchasing, vendor orders, shifts, time off, saved report definitions) + 29
+  tenant-scoped reads. Money paths (invoices, payments, payroll) and staff
+  administration (hire, terminate, pay rate, roles) are deliberately NOT on
+  the surface.
 - **Settings** — `src/features/admin/AssistantSettingsPage.tsx` at
   `/admin/assistant`, saved through the governed generated commands.
   Generated queries filter by the CALLER's tenant, so reads are bounded by the
@@ -24,6 +28,20 @@ One chat drawer, mounted app-wide (`Ctrl+J` or the topbar sparkle button).
 - **UI** — `src/features/assistant/AssistantPanel.tsx` + `useAssistantChat.ts`
   (browser-in-the-loop, max 8 tool rounds, conversation is session-local and
   not persisted).
+- **Attachments** — images (≤5 MB) and text files (≤200 KB) upload through the
+  governed storage seam (`api.fileStorage.generateUploadUrl` → storageId) and
+  are bound to the uploader via the `AssistantUpload` entity
+  (`assistantConfig.registerUpload`). The turn action resolves every referenced
+  storage id through `assistantConfig.resolveFiles` (internal), which allows
+  only blobs a live row in the caller's tenant references OR blobs the caller
+  registered — knowing a storage id grants nothing (PR12-05 model). Only the
+  newest user turn inlines files; older turns keep text placeholders. Images
+  become data URLs (vision-capable model required).
+- **Ops Final Lock** — the system prompt carries the Ops Final Lock checklist
+  (INFO / MENU / TIMELINE back-out math / SETUP NOTES amplify / PACKLIST
+  checks / EQUIP / WRAP UP with explicit-confirm finalize), so "run an ops
+  final lock on <event>" walks the sections and reports PASS/FLAG per section.
+  Source: `work/training docs/Ops-training/Mangia_Ops_Final_Lock_Training.pdf`.
 
 ## Configuration
 

@@ -771,6 +771,16 @@ export function useCreateAssistantLlmConfig() {
   };
 }
 
+/** Reactive list for AssistantUpload. */
+export function useListAssistantUpload() {
+  return useQuery(api.queries.listAssistantUpload);
+}
+
+/** Reactive get-by-id for AssistantUpload. Pass "skip" to suspend. */
+export function useGetAssistantUpload(id: string | "skip") {
+  return useQuery(api.queries.getAssistantUpload, id === "skip" ? "skip" : { id: id as any });
+}
+
 /** Reactive list for Attachment. */
 export function useListAttachment() {
   return useQuery(api.queries.listAttachment);
@@ -10004,4 +10014,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1060 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1062 as const;

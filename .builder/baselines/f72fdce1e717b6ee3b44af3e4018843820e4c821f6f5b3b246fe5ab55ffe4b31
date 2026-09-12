@@ -46,6 +46,19 @@ export const AssistantLlmConfigSchema = z.object({
 
 export type AssistantLlmConfig = z.infer<typeof AssistantLlmConfigSchema>;
 
+// Entity: AssistantUpload
+export const AssistantUploadSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  storageId: z.string(),
+  uploadedByAuthSubjectId: z.string(),
+  name: z.string(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type AssistantUpload = z.infer<typeof AssistantUploadSchema>;
+
 // Entity: Attachment
 export const AttachmentSchema = z.object({
   id: z.string().uuid(),
