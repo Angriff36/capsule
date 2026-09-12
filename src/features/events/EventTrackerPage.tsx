@@ -39,11 +39,15 @@ import {
 import "../home/HomeCalendar.css";
 import "./EventTracker.css";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
-import { eventLifecyclePolicy } from "./EventLifecyclePolicy";
 import { eventDetailPath, eventsIndexPath } from "./eventRoutes";
 import { FailureBanner } from "./FailureBanner";
 
 const LANE_DAYS = 14;
+// Mirrors the Event command guards in src/operations/event.manifest so a card
+// never offers an edit the command would refuse: reschedule / changeVenue /
+// assignOwner stop at approved; changeHeadcount also runs while executing.
+const RESCHEDULE_STAGES = new Set(["planning", "pending_approval", "approved"]);
+const HEADCOUNT_STAGES = new Set([...RESCHEDULE_STAGES, "executing"]);
 const DEFAULT_START_OFFSET = 10 * 60 * 60 * 1000;
 const DEFAULT_DURATION = 4 * 60 * 60 * 1000;
 
@@ -288,9 +292,9 @@ export function EventTrackerPage() {
   };
 
   const canReschedule = (event: CalendarEventFacts) =>
-    eventLifecyclePolicy.isEditableStage(event.stage);
+    RESCHEDULE_STAGES.has(event.stage);
   const canChangeGuests = (event: CalendarEventFacts) =>
-    eventLifecyclePolicy.canChangeHeadcount(event.stage);
+    HEADCOUNT_STAGES.has(event.stage);
 
   const stageMove = (event: CalendarEventFacts): StageMove | null => {
     switch (event.stage) {
@@ -612,7 +616,16 @@ export function EventTrackerPage() {
                             type="time"
                             className="input"
                             defaultValue={timeInput(event.startsAt)}
-                            disabled={!canReschedule(event) || busy}
+                            disabled={
+                              !canReschedule(event) ||
+                              busy ||
+                              event.startsAt == null
+                            }
+                            title={
+                              event.startsAt == null
+                                ? "Set a date first"
+                                : undefined
+                            }
                             onBlur={(domEvent: FocusEvent<HTMLInputElement>) =>
                               commitTime(event, domEvent.currentTarget.value)
                             }
