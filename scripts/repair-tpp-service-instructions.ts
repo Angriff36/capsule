@@ -181,11 +181,6 @@ if (snapshot.Dish.some((dish: any) => dish.tenantId !== document.tenantId))
 const planHash = hash(JSON.stringify(document));
 mkdirSync(values.out, { recursive: true });
 const receiptPath = `${values.out}/receipt.json`;
-try {
-  unlinkSync(receiptPath);
-} catch (error: any) {
-  if (error?.code !== "ENOENT") throw error;
-}
 writeFileSync(`${values.out}/plan.json`, JSON.stringify(document, null, 2));
 writeFileSync(`${values.out}/plan.sha256`, planHash);
 console.log(
@@ -217,6 +212,11 @@ if (!document.targetUrl)
 if (normalizeTargetUrl(values.url) !== document.targetUrl)
   throw new Error("Apply URL differs from the reviewed backend URL");
 
+try {
+  unlinkSync(receiptPath);
+} catch (error: any) {
+  if (error?.code !== "ENOENT") throw error;
+}
 const client = new ConvexHttpClient(values.url);
 const receipts: Array<Record<string, unknown>> = [];
 for (const entry of planEntries) {
