@@ -723,7 +723,7 @@ function EventDetailContent({
             primaryContactName={event.primaryContactName}
             primaryContactEmail={event.primaryContactEmail}
             primaryContactPhone={event.primaryContactPhone}
-            accessibilityNeeds={event.accessibilityNeeds}
+            accessibilityNeeds={event.accessibilityNeeds?.join(", ")}
             serviceRequirements={event.serviceRequirements}
             operationalRequirements={event.operationalRequirements}
           />
@@ -771,7 +771,7 @@ function EventDetailContent({
             recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
             recurrenceNextStartsAt={event.recurrenceNextStartsAt}
             recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-            recurrenceActive={event.recurrenceActive}
+            recurrenceActive={event.recurrenceActive ?? undefined}
             recurrenceStoppedAt={event.recurrenceStoppedAt}
             recurrenceCompletedAt={event.recurrenceCompletedAt}
             recurrenceTemplateEventId={event.recurrenceTemplateEventId}
