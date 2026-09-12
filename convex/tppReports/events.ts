@@ -232,11 +232,22 @@ function serviceMethodText(
     return "Service method not recorded.";
   const legacy = String(recipeInstructions ?? "").trim();
   if (!legacy) return "Service method not recorded.";
-  const heating = legacy.match(
-    /(?:^|\n)\s*Heating\s*&\s*Serving:\s*([\s\S]*?)(?=\n\s*(?:Method|Preparation|Ingredients|Recipe|Notes)\s*:|$)/i,
-  )?.[1];
-  if (heating !== undefined)
-    return heating.trim() || "Service method not recorded.";
+  const lines = legacy.split(/\r?\n/);
+  const heatingIndex = lines.findIndex((line) =>
+    /^\s*Heating\s*&\s*Serving\s*:/i.test(line),
+  );
+  if (heatingIndex >= 0) {
+    const heading = lines[heatingIndex].match(
+      /^\s*Heating\s*&\s*Serving\s*:\s*(.*)$/i,
+    );
+    const section = heading?.[1]?.trim() ? [heading[1].trim()] : [];
+    for (const line of lines.slice(heatingIndex + 1)) {
+      if (/^\s*(?:Method|Preparation|Ingredients|Recipe|Notes)\s*:/i.test(line))
+        break;
+      section.push(line);
+    }
+    return section.join("\n").trim() || "Service method not recorded.";
+  }
   if (/^Method\s*:/i.test(legacy))
     return "Service method not recorded. Preparation method is recorded separately.";
   return "Service method not recorded.";

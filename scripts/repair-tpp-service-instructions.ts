@@ -39,6 +39,13 @@ if (values.help) {
 
 const hash = (value: string | Uint8Array) =>
   createHash("sha256").update(value).digest("hex");
+const normalizeTargetUrl = (value: string) => {
+  const url = new URL(value);
+  url.hash = "";
+  url.search = "";
+  url.pathname = url.pathname.replace(/\/+$/, "");
+  return url.toString().replace(/\/+$/, "");
+};
 const parseJson = (bytes: Buffer) =>
   JSON.parse(bytes.toString("utf8").replace(/^\uFEFF/, ""));
 const auth = new CapsuleAgentAuthManager();
@@ -149,6 +156,10 @@ const planEntries = supported.map((row: any) => {
 const document = {
   sourceSha256: hash(sourceBytes),
   snapshotSha256: hash(snapshotBytes),
+  targetUrl:
+    typeof snapshot.targetUrl === "string"
+      ? normalizeTargetUrl(snapshot.targetUrl)
+      : null,
   tenantId:
     values.tenant ?? snapshot.tenantId ?? snapshot.Dish[0]?.tenantId ?? null,
   supportedCount: supported.length,
@@ -188,6 +199,10 @@ if (!values.url || !values.tenant)
   throw new Error("Apply requires --url and --tenant");
 if (values.tenant !== document.tenantId)
   throw new Error("Authenticated repair tenant differs from the reviewed plan");
+if (!document.targetUrl)
+  throw new Error("Reviewed snapshot is missing its target Convex URL");
+if (normalizeTargetUrl(values.url) !== document.targetUrl)
+  throw new Error("Apply URL differs from the reviewed backend URL");
 
 const client = new ConvexHttpClient(values.url);
 const receipts: Array<Record<string, unknown>> = [];
