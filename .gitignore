@@ -68,3 +68,4 @@ storybook-static/
 # Machine-local MCP tool config (points at a localhost server; never part of
 # a clean CI checkout)
 .mcp.json
+.playwright-cli/
