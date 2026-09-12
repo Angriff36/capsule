@@ -31,6 +31,21 @@ export const AnnouncementDismissalSchema = z.object({
 
 export type AnnouncementDismissal = z.infer<typeof AnnouncementDismissalSchema>;
 
+// Entity: AssistantLlmConfig
+export const AssistantLlmConfigSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  baseUrl: z.string(),
+  apiKey: z.string(),
+  model: z.string(),
+  configuredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type AssistantLlmConfig = z.infer<typeof AssistantLlmConfigSchema>;
+
 // Entity: Attachment
 export const AttachmentSchema = z.object({
   id: z.string().uuid(),
@@ -3512,6 +3527,15 @@ export const AnnouncementDismissalDismissParamsSchema = z.object({
 });
 
 export type AnnouncementDismissalDismissParams = z.infer<typeof AnnouncementDismissalDismissParamsSchema>;
+
+// Command: configure on AssistantLlmConfig
+export const AssistantLlmConfigConfigureParamsSchema = z.object({
+  baseUrl: z.string(),
+  apiKey: z.string(),
+  model: z.string(),
+});
+
+export type AssistantLlmConfigConfigureParams = z.infer<typeof AssistantLlmConfigConfigureParamsSchema>;
 
 // Command: attach on Attachment
 export const AttachmentAttachParamsSchema = z.object({

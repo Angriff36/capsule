@@ -5,6 +5,7 @@ const sections = [
   { label: "Announcements", path: "/admin/announcements" },
   { label: "Branding", path: "/admin/branding" },
   { label: "Catalogs", path: "/admin/catalogs" },
+  { label: "Assistant", path: "/admin/assistant" },
   { label: "API keys", path: "/admin/api-keys" },
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },

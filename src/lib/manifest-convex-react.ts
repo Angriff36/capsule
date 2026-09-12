@@ -5,6 +5,7 @@ import {
   AnnouncementDismissalDismissParamsSchema,
   AnnouncementPostParamsSchema,
   AnnouncementRemoveParamsSchema,
+  AssistantLlmConfigConfigureParamsSchema,
   AttachmentAttachParamsSchema,
   AttachmentRemoveParamsSchema,
   AttachmentSetSurveySelectionParamsSchema,
@@ -727,6 +728,37 @@ export function useCreateAnnouncementDismissal() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = AnnouncementDismissalDismissParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for AssistantLlmConfig. */
+export function useListAssistantLlmConfig() {
+  return useQuery(api.queries.listAssistantLlmConfig);
+}
+
+/** Reactive get-by-id for AssistantLlmConfig. Pass "skip" to suspend. */
+export function useGetAssistantLlmConfig(id: string | "skip") {
+  return useQuery(api.queries.getAssistantLlmConfig, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for AssistantLlmConfig.configure. */
+export function useAssistantLlmConfigConfigure() {
+  const mutate = useMutation(api.mutations.AssistantLlmConfig_configure);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AssistantLlmConfigConfigureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for AssistantLlmConfig.configure. */
+export function useCreateAssistantLlmConfig() {
+  const mutate = useMutation(api.mutations.AssistantLlmConfig_createViaConfigure);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = AssistantLlmConfigConfigureParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -9874,4 +9906,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1046 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1050 as const;

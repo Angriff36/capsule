@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
 import { AnnouncementBanner } from "../../features/announcements/AnnouncementBanner";
+import { AssistantPanel } from "../../features/assistant/AssistantPanel";
 import { ActionResultHost } from "../../ui/action-result";
 import { CommandPalette } from "./CommandPalette";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
@@ -30,6 +31,7 @@ function useOnline() {
 export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const online = useOnline();
 
   useEffect(() => {
@@ -38,6 +40,11 @@ export function AppShell() {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPaletteOpen((v) => !v);
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "j") {
+        e.preventDefault();
+        setAssistantOpen((v) => !v);
         return;
       }
       if (e.key === "?" && shouldFireSingleKeyNav(e) && !paletteOpen) {
@@ -63,7 +70,10 @@ export function AppShell() {
       <div className="app-sheet flex min-w-0 flex-1 overflow-clip">
         <Sidebar />
         <div className="relative flex min-w-0 flex-1 flex-col">
-          <Topbar onOpenPalette={() => setPaletteOpen(true)} />
+          <Topbar
+            onOpenPalette={() => setPaletteOpen(true)}
+            onOpenAssistant={() => setAssistantOpen(true)}
+          />
           {!online && (
             <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-sm font-medium text-warn">
               <WifiOffIcon width={13} height={13} />
@@ -91,6 +101,10 @@ export function AppShell() {
       <ShortcutReferenceOverlay
         open={shortcutsOpen}
         onClose={() => setShortcutsOpen(false)}
+      />
+      <AssistantPanel
+        open={assistantOpen}
+        onClose={() => setAssistantOpen(false)}
       />
     </div>
   );
