@@ -28,6 +28,16 @@ One chat drawer, mounted app-wide (`Ctrl+J` or the topbar sparkle button).
 - **UI** — `src/features/assistant/AssistantPanel.tsx` + `useAssistantChat.ts`
   (browser-in-the-loop, max 8 tool rounds, conversation is session-local and
   not persisted).
+- **Attachments** — images (≤5 MB) and text files (≤200 KB) upload through the
+  governed storage seam (`api.fileStorage.generateUploadUrl` → storageId) and
+  ride on the user message. The turn action inlines images as data URLs
+  (vision-capable model required) and text files as truncated text blocks.
+  Files live in Convex storage; nothing is parsed or stored per-tenant yet.
+- **Ops Final Lock** — the system prompt carries the Ops Final Lock checklist
+  (INFO / MENU / TIMELINE back-out math / SETUP NOTES amplify / PACKLIST
+  checks / EQUIP / WRAP UP with explicit-confirm finalize), so "run an ops
+  final lock on <event>" walks the sections and reports PASS/FLAG per section.
+  Source: `work/training docs/Ops-training/Mangia_Ops_Final_Lock_Training.pdf`.
 
 ## Configuration
 

@@ -8,6 +8,7 @@ import { useCallback, useRef, useState } from "react";
 import { useAction, useConvex } from "convex/react";
 import { api } from "../../lib/api";
 import type {
+  AssistantFile,
   AssistantToolCall,
   AssistantTurnResult,
 } from "../../../convex/assistantTurn";
@@ -17,6 +18,7 @@ export interface AssistantUiMessage {
   id: string;
   role: "user" | "assistant" | "tool";
   content: string;
+  files?: AssistantFile[];
   toolCalls?: AssistantToolCall[];
   toolCallId?: string;
   toolName?: string;
@@ -25,6 +27,7 @@ export interface AssistantUiMessage {
 interface ServerMessage {
   role: "user" | "assistant" | "tool";
   content?: string;
+  files?: AssistantFile[];
   toolCalls?: Array<Pick<AssistantToolCall, "id" | "name" | "argumentsJson">>;
   toolCallId?: string;
 }
@@ -47,18 +50,28 @@ export function useAssistantChat() {
   const convoRef = useRef<ServerMessage[]>([]);
 
   const send = useCallback(
-    async (text: string) => {
+    async (text: string, files?: AssistantFile[]) => {
       const trimmed = text.trim();
-      if (busy || trimmed.length === 0) return;
+      const attached = files ?? [];
+      if (busy || (trimmed.length === 0 && attached.length === 0)) return;
       setError(null);
       setBusy(true);
       convoRef.current = [
         ...convoRef.current,
-        { role: "user", content: trimmed },
+        {
+          role: "user",
+          content: trimmed,
+          files: attached.length > 0 ? attached : undefined,
+        },
       ];
       setMessages((m) => [
         ...m,
-        { id: newId(), role: "user", content: trimmed },
+        {
+          id: newId(),
+          role: "user",
+          content: trimmed,
+          files: attached.length > 0 ? attached : undefined,
+        },
       ]);
       try {
         for (let round = 0; round <= MAX_ROUNDS; round++) {

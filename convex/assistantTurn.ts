@@ -27,12 +27,27 @@ const toolCallValidator = v.object({
   argumentsJson: v.string(),
 });
 
+const fileValidator = v.object({
+  storageId: v.string(),
+  name: v.string(),
+  mime: v.string(),
+  kind: v.union(v.literal("image"), v.literal("text")),
+});
+
 const messageValidator = v.object({
   role: v.union(v.literal("user"), v.literal("assistant"), v.literal("tool")),
   content: v.optional(v.string()),
   toolCalls: v.optional(v.array(toolCallValidator)),
   toolCallId: v.optional(v.string()),
+  files: v.optional(v.array(fileValidator)),
 });
+
+export interface AssistantFile {
+  storageId: string;
+  name: string;
+  mime: string;
+  kind: "image" | "text";
+}
 
 export interface AssistantToolCall {
   id: string;
@@ -58,9 +73,13 @@ export interface AssistantTurnResult {
   error?: "not-configured" | "network" | "upstream" | "unknown-tool";
 }
 
+type ContentPart =
+  | { type: "text"; text: string }
+  | { type: "image_url"; image_url: { url: string } };
+
 interface WireMessage {
   role: "system" | "user" | "assistant" | "tool";
-  content: string | null;
+  content: string | Array<ContentPart>;
   tool_calls?: Array<{
     id: string;
     type: "function";
@@ -84,38 +103,75 @@ function systemPrompt(): string {
     "- Mutations take effect immediately for the signed-in user. For retire/cancel/remove, confirm with the user first unless they clearly asked.",
     "- After acting, report exactly what succeeded and any error text you received.",
     "- Answer in the user's language.",
+    "",
+    "## Ops Final Lock procedure",
+    "When asked to run an Ops Final Lock on an event, work these sections in order and report a PASS/FLAG line for each. Read the event first (get_event), then its dishes (list_event_dishes), pack lists, and shifts.",
+    "1. INFO — service style and guest count present and consistent. If blank or contradictory, STOP and tell the user to raise it with sales; an event sales did not finish cannot be finished by ops.",
+    "2. MENU — correct order (mains, then sides, then dessert/place settings last); quantities sane for the guest count (500 linens on a 130-guest event is wrong); flag items with empty names/descriptions (empty shells — nothing gets packed or ordered for them); surface any line notes (e.g. 'served in cone, not tray') so packing knows.",
+    "3. TIMELINE — back out from serve time: full-service staff arrive 3 hours prior, limited 1.5 hours; subtract travel time for departure from shop; subtract 1 hour load time for schedule-ON (more for multi-vehicle events). Staff OFF ≈ event end + 1 hour cleanup/reload + travel. Propose Shift.schedule writes when asked.",
+    "4. SETUP NOTES — the notes field is the field team's north star. 'Edit to amplify': fill gaps, kill redundancy, add detail that affects packing (linen colors, dietary counts, rain plans, kit descriptions). Propose Event.changeRequirements with the amplified text for approval.",
+    "5. PACKLIST — flag quantity anomalies vs guest count, duplicated items, and placeholder/X items; verify tent, handwashing, tarp, flooring are present for on-site events.",
+    "6. EQUIP — rentals and coordinating serving items match the service style (trays + jacks for plated, station equipment for stations).",
+    "7. WRAP UP — if everything passes and the user confirms, offer Event.finalizeEvent to mark the event final. Never finalize without explicit confirmation.",
   ].join("\n");
 }
 
-function toWire(m: {
-  role: "user" | "assistant" | "tool";
-  content?: string;
-  toolCalls?: Array<{ id: string; name: string; argumentsJson: string }>;
-  toolCallId?: string;
-}): WireMessage {
-  if (m.role === "assistant") {
-    return {
-      role: "assistant",
-      content: m.content ?? null,
-      ...(m.toolCalls
-        ? {
-            tool_calls: m.toolCalls.map((c) => ({
-              id: c.id,
-              type: "function" as const,
-              function: { name: c.name, arguments: c.argumentsJson },
-            })),
-          }
-        : {}),
-    };
+/** Images become inline data URLs; text files are inlined as text blocks. */
+async function buildUserContent(
+  ctx: { storage: { getUrl: (id: string) => Promise<string | null> } },
+  m: {
+    content?: string;
+    files?: AssistantFile[];
+  },
+): Promise<string | Array<ContentPart>> {
+  const files = m.files ?? [];
+  if (files.length === 0) return m.content ?? "";
+  const parts: Array<ContentPart> = [];
+  if (m.content) parts.push({ type: "text", text: m.content });
+  for (const file of files) {
+    if (file.kind === "image") {
+      const url = await ctx.storage.getUrl(file.storageId);
+      if (!url) {
+        parts.push({
+          type: "text",
+          text: `[attached image ${file.name} is no longer available]`,
+        });
+        continue;
+      }
+      const response = await fetch(url);
+      const bytes = Buffer.from(await response.arrayBuffer());
+      if (bytes.length > 5 * 1024 * 1024) {
+        parts.push({
+          type: "text",
+          text: `[attached image ${file.name} is too large to read]`,
+        });
+        continue;
+      }
+      parts.push({
+        type: "image_url",
+        image_url: {
+          url: `data:${file.mime};base64,${bytes.toString("base64")}`,
+        },
+      });
+    } else {
+      const url = await ctx.storage.getUrl(file.storageId);
+      if (!url) {
+        parts.push({
+          type: "text",
+          text: `[attached file ${file.name} is no longer available]`,
+        });
+        continue;
+      }
+      const response = await fetch(url);
+      const bytes = Buffer.from(await response.arrayBuffer());
+      const text = bytes.subarray(0, 200_000).toString("utf8");
+      parts.push({
+        type: "text",
+        text: `Attached file "${file.name}":\n${text}${bytes.length > 200_000 ? "\n…(truncated)" : ""}`,
+      });
+    }
   }
-  if (m.role === "tool") {
-    return {
-      role: "tool",
-      content: m.content ?? "",
-      tool_call_id: m.toolCallId ?? "",
-    };
-  }
-  return { role: "user", content: m.content ?? "" };
+  return parts;
 }
 
 function endpoint(baseUrl: string): string {
@@ -188,10 +244,32 @@ export const turn = action({
       };
     }
 
-    const wire: WireMessage[] = [
-      { role: "system", content: systemPrompt() },
-      ...trimHistory(args.messages).map(toWire),
-    ];
+    const wire: WireMessage[] = [{ role: "system", content: systemPrompt() }];
+    for (const m of trimHistory(args.messages)) {
+      if (m.role === "user") {
+        wire.push({ role: "user", content: await buildUserContent(ctx, m) });
+      } else if (m.role === "assistant") {
+        wire.push({
+          role: "assistant",
+          content: m.content ?? "",
+          ...(m.toolCalls
+            ? {
+                tool_calls: m.toolCalls.map((c) => ({
+                  id: c.id,
+                  type: "function" as const,
+                  function: { name: c.name, arguments: c.argumentsJson },
+                })),
+              }
+            : {}),
+        });
+      } else {
+        wire.push({
+          role: "tool",
+          content: m.content ?? "",
+          tool_call_id: m.toolCallId ?? "",
+        });
+      }
+    }
 
     let response: Response;
     try {
