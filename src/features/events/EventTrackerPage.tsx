@@ -7,6 +7,8 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import { formatTime } from "../../lib/format";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import {
   useEventApprove,
   useEventAssignOwner,
@@ -136,6 +138,7 @@ type StageMove = {
  * guards are the same too — a locked event simply is not draggable.
  */
 export function EventTrackerPage() {
+  const authStatus = useAuthStatus();
   const events = useListEvent();
   const clients = useListClient();
   const venues = useListVenue();
@@ -164,6 +167,7 @@ export function EventTrackerPage() {
   const { notifySuccess, host: savedToast } = useSuccessToast();
 
   const loading = [
+    authStatus,
     events,
     clients,
     venues,
@@ -209,7 +213,9 @@ export function EventTrackerPage() {
       (event) =>
         event.lock !== "done" &&
         event.lock !== "cancelled" &&
-        (event.startsAt == null || event.startsAt >= today) &&
+        (event.startsAt == null ||
+          event.startsAt >= today ||
+          (event.endsAt != null && event.endsAt > today)) &&
         (needle === "" ||
           [event.title, event.client, event.venue, event.eventNumber]
             .join(" ")
@@ -225,9 +231,11 @@ export function EventTrackerPage() {
         label: laneLabel(dayStart, today),
         sublabel: laneDate(dayStart),
         dayStart,
+        // A job that started before today but is still running sits on Today.
         events: upcoming.filter(
           (event) =>
-            event.startsAt != null && startOfDay(event.startsAt) === dayStart,
+            event.startsAt != null &&
+            Math.max(startOfDay(event.startsAt), today) === dayStart,
         ),
       });
     }
@@ -263,6 +271,13 @@ export function EventTrackerPage() {
     );
   }
 
+  // Same truth as the Event execute policy (eventAccess or salesAccess): a
+  // role that cannot run the commands gets a read-only board, not a denial
+  // banner on every edit.
+  const permissions = new Set(resolveManifestPolicies(authStatus?.role ?? ""));
+  const canExecute =
+    permissions.has("eventAccess") || permissions.has("salesAccess");
+
   const activeVenues = (venues ?? []).filter(
     (venue) =>
       venue.status === "active" &&
@@ -292,11 +307,12 @@ export function EventTrackerPage() {
   };
 
   const canReschedule = (event: CalendarEventFacts) =>
-    RESCHEDULE_STAGES.has(event.stage);
+    canExecute && RESCHEDULE_STAGES.has(event.stage);
   const canChangeGuests = (event: CalendarEventFacts) =>
-    HEADCOUNT_STAGES.has(event.stage);
+    canExecute && HEADCOUNT_STAGES.has(event.stage);
 
   const stageMove = (event: CalendarEventFacts): StageMove | null => {
+    if (!canExecute) return null;
     switch (event.stage) {
       case "planning":
         return { label: "Submit for approval", run: submitForApproval };
@@ -453,8 +469,9 @@ export function EventTrackerPage() {
             Next two weeks
           </h1>
           <p className="mt-2 text-base text-ink-2">
-            Drag a card to another day to move it, or set the date on the card.
-            Edit time, guests, venue, owner, and the sales lock right there.
+            {canExecute
+              ? "Drag a card to another day to move it, or set the date on the card. Edit time, guests, venue, owner, and the sales lock right there."
+              : "Your role can view the board. Changing an event needs event or sales access."}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -550,10 +567,15 @@ export function EventTrackerPage() {
                       title={
                         draggable
                           ? "Drag to another day to move this event"
-                          : `Date is fixed while the event is ${event.stageLabel.toLowerCase()}`
+                          : canExecute
+                            ? `Date is fixed while the event is ${event.stageLabel.toLowerCase()}`
+                            : "View only for your role"
                       }
                       onDragStart={(domEvent) => {
-                        if (!draggable) {
+                        const fromField =
+                          domEvent.target instanceof Element &&
+                          domEvent.target.closest("input, select, button, a");
+                        if (!draggable || fromField) {
                           domEvent.preventDefault();
                           return;
                         }

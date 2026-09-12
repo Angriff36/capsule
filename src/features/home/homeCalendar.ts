@@ -92,9 +92,9 @@ function shortRef(id: string): string {
 }
 
 function personName(person: Doc<"people"> | undefined): string {
-  if (!person) return "Unassigned";
+  if (!person) return "—";
   const name = `${person.givenName ?? ""} ${person.familyName ?? ""}`.trim();
-  return name || "Unassigned";
+  return name || "—";
 }
 
 function vehicleLabel(vehicle: Doc<"vehicles">): string {
@@ -155,7 +155,7 @@ export function buildCalendarFacts(
         endsAt: event.endsAt ?? null,
         eventNumber: invoiceByEvent.get(event._id) ?? shortRef(event._id),
         guests: event.expectedHeadcount ?? 0,
-        vehicle: vehicles ? [...vehicles].join(", ") : "Not assigned",
+        vehicle: vehicles ? [...vehicles].join(", ") : "—",
         serviceType: serviceType || "Not set",
         venue: venue?.name || event.venueName || "Venue not set",
         venueId: event.venueId ?? null,
