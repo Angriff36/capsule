@@ -2964,6 +2964,38 @@ export const TppReportFavoriteSchema = z.object({
 
 export type TppReportFavorite = z.infer<typeof TppReportFavoriteSchema>;
 
+// Entity: Trailer
+export const TrailerSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  make: z.string().default(""),
+  model: z.string().default(""),
+  registration: z.string().default(""),
+  payloadCapacityKg: z.number().int().min(1).default(1),
+  operationalStatus: z.enum(["available", "in_use", "maintenance", "out_of_service", "retired"]).default("available"),
+  statusNote: z.string().nullable().optional(),
+  registeredAt: z.coerce.date().nullable().optional(),
+  statusChangedAt: z.coerce.date().nullable().optional(),
+  registrationNumber: z.string().nullable().optional(),
+  registrationExpiresAt: z.coerce.date().nullable().optional(),
+  insuranceProvider: z.string().nullable().optional(),
+  insurancePolicyNumber: z.string().nullable().optional(),
+  insuranceExpiresAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: Trailer
+export const TrailerComputedSchema = TrailerSchema.extend({
+  isOperational: z.boolean(),
+  registrationCurrent: z.boolean(),
+  insuranceCurrent: z.boolean(),
+});
+
+export type Trailer = z.infer<typeof TrailerSchema>;
+export type TrailerWithComputed = z.infer<typeof TrailerComputedSchema>;
+
 // Entity: TrainingCompletion
 export const TrainingCompletionSchema = z.object({
   id: z.string().uuid(),
@@ -3013,6 +3045,11 @@ export const VehicleSchema = z.object({
   statusNote: z.string().nullable().optional(),
   registeredAt: z.coerce.date().nullable().optional(),
   statusChangedAt: z.coerce.date().nullable().optional(),
+  registrationNumber: z.string().nullable().optional(),
+  registrationExpiresAt: z.coerce.date().nullable().optional(),
+  insuranceProvider: z.string().nullable().optional(),
+  insurancePolicyNumber: z.string().nullable().optional(),
+  insuranceExpiresAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -3020,6 +3057,8 @@ export const VehicleSchema = z.object({
 // Computed: Vehicle
 export const VehicleComputedSchema = VehicleSchema.extend({
   isOperational: z.boolean(),
+  registrationCurrent: z.boolean(),
+  insuranceCurrent: z.boolean(),
 });
 
 export type Vehicle = z.infer<typeof VehicleSchema>;
@@ -8221,6 +8260,53 @@ export const TimeRecordCorrectParamsSchema = z.object({
 
 export type TimeRecordCorrectParams = z.infer<typeof TimeRecordCorrectParamsSchema>;
 
+// Command: register on Trailer
+export const TrailerRegisterParamsSchema = z.object({
+  make: z.string(),
+  model: z.string(),
+  registration: z.string(),
+  payloadCapacityKg: z.number().int(),
+  operationalStatus: z.enum(["available", "in_use", "maintenance", "out_of_service", "retired"]),
+  statusNote: z.string().optional(),
+});
+
+export type TrailerRegisterParams = z.infer<typeof TrailerRegisterParamsSchema>;
+
+// Command: reviseDetails on Trailer
+export const TrailerReviseDetailsParamsSchema = z.object({
+  make: z.string(),
+  model: z.string(),
+  registration: z.string(),
+  payloadCapacityKg: z.number().int(),
+});
+
+export type TrailerReviseDetailsParams = z.infer<typeof TrailerReviseDetailsParamsSchema>;
+
+// Command: updateInsurance on Trailer
+export const TrailerUpdateInsuranceParamsSchema = z.object({
+  insuranceProvider: z.string(),
+  insurancePolicyNumber: z.string(),
+  insuranceExpiresAt: z.coerce.date(),
+});
+
+export type TrailerUpdateInsuranceParams = z.infer<typeof TrailerUpdateInsuranceParamsSchema>;
+
+// Command: updateOperationalStatus on Trailer
+export const TrailerUpdateOperationalStatusParamsSchema = z.object({
+  operationalStatus: z.enum(["available", "in_use", "maintenance", "out_of_service", "retired"]),
+  statusNote: z.string().optional(),
+});
+
+export type TrailerUpdateOperationalStatusParams = z.infer<typeof TrailerUpdateOperationalStatusParamsSchema>;
+
+// Command: updateRegistration on Trailer
+export const TrailerUpdateRegistrationParamsSchema = z.object({
+  registrationNumber: z.string(),
+  registrationExpiresAt: z.coerce.date(),
+});
+
+export type TrailerUpdateRegistrationParams = z.infer<typeof TrailerUpdateRegistrationParamsSchema>;
+
 // Command: record on TrainingCompletion
 export const TrainingCompletionRecordParamsSchema = z.object({
   personId: z.string().min(1),
@@ -8276,6 +8362,15 @@ export const VehicleReviseDetailsParamsSchema = z.object({
 
 export type VehicleReviseDetailsParams = z.infer<typeof VehicleReviseDetailsParamsSchema>;
 
+// Command: updateInsurance on Vehicle
+export const VehicleUpdateInsuranceParamsSchema = z.object({
+  insuranceProvider: z.string(),
+  insurancePolicyNumber: z.string(),
+  insuranceExpiresAt: z.coerce.date(),
+});
+
+export type VehicleUpdateInsuranceParams = z.infer<typeof VehicleUpdateInsuranceParamsSchema>;
+
 // Command: updateOperationalStatus on Vehicle
 export const VehicleUpdateOperationalStatusParamsSchema = z.object({
   operationalStatus: z.enum(["available", "in_use", "maintenance", "out_of_service", "retired"]),
@@ -8283,6 +8378,14 @@ export const VehicleUpdateOperationalStatusParamsSchema = z.object({
 });
 
 export type VehicleUpdateOperationalStatusParams = z.infer<typeof VehicleUpdateOperationalStatusParamsSchema>;
+
+// Command: updateRegistration on Vehicle
+export const VehicleUpdateRegistrationParamsSchema = z.object({
+  registrationNumber: z.string(),
+  registrationExpiresAt: z.coerce.date(),
+});
+
+export type VehicleUpdateRegistrationParams = z.infer<typeof VehicleUpdateRegistrationParamsSchema>;
 
 // Command: record on VehicleFuelLog
 export const VehicleFuelLogRecordParamsSchema = z.object({

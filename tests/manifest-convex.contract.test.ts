@@ -1703,6 +1703,21 @@ describe("Manifest Convex contract", () => {
   it("exports mutation TimeRecord_correct", () => {
     expect(typeof (mutations as any).TimeRecord_correct).toBe("function");
   });
+  it("exports mutation Trailer_register", () => {
+    expect(typeof (mutations as any).Trailer_register).toBe("function");
+  });
+  it("exports mutation Trailer_reviseDetails", () => {
+    expect(typeof (mutations as any).Trailer_reviseDetails).toBe("function");
+  });
+  it("exports mutation Trailer_updateInsurance", () => {
+    expect(typeof (mutations as any).Trailer_updateInsurance).toBe("function");
+  });
+  it("exports mutation Trailer_updateOperationalStatus", () => {
+    expect(typeof (mutations as any).Trailer_updateOperationalStatus).toBe("function");
+  });
+  it("exports mutation Trailer_updateRegistration", () => {
+    expect(typeof (mutations as any).Trailer_updateRegistration).toBe("function");
+  });
   it("exports mutation TrainingCompletion_record", () => {
     expect(typeof (mutations as any).TrainingCompletion_record).toBe("function");
   });
@@ -1721,8 +1736,14 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Vehicle_reviseDetails", () => {
     expect(typeof (mutations as any).Vehicle_reviseDetails).toBe("function");
   });
+  it("exports mutation Vehicle_updateInsurance", () => {
+    expect(typeof (mutations as any).Vehicle_updateInsurance).toBe("function");
+  });
   it("exports mutation Vehicle_updateOperationalStatus", () => {
     expect(typeof (mutations as any).Vehicle_updateOperationalStatus).toBe("function");
+  });
+  it("exports mutation Vehicle_updateRegistration", () => {
+    expect(typeof (mutations as any).Vehicle_updateRegistration).toBe("function");
   });
   it("exports mutation VehicleFuelLog_record", () => {
     expect(typeof (mutations as any).VehicleFuelLog_record).toBe("function");
@@ -1957,4 +1978,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 650 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 657 as const;

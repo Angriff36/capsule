@@ -597,6 +597,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   rowsAttempted += 1;
   await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-2", "shiftId": "shiftId-time-record-2", "eventId": "eventId-time-record-2", "notes": "demo-notes-2" } as any);
   // skip TppReportFavorite: no creation command in IR (2 rows unused)
+  // Trailer → api.mutations.Trailer_createViaRegister
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Trailer_createViaRegister, { "make": "demo-make-1", "model": "demo-model-1", "registration": "demo-registration-1", "payloadCapacityKg": 1, "operationalStatus": "demo-operationalStatus-1", "statusNote": "demo-statusNote-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Trailer_createViaRegister, { "make": "demo-make-2", "model": "demo-model-2", "registration": "demo-registration-2", "payloadCapacityKg": 2, "operationalStatus": "demo-operationalStatus-2", "statusNote": "demo-statusNote-2" } as any);
   // TrainingCompletion → api.mutations.TrainingCompletion_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.TrainingCompletion_createViaRecord, { "personId": "personId-training-completion-1", "trainingModuleId": "trainingModuleId-training-completion-1", "completedAt": 1767268800000, "assessmentScore": 1, "notes": "demo-notes-1" } as any);
@@ -1313,6 +1318,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "TppReportFavorite",
       "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "Trailer",
+      "createMutation": "Trailer_createViaRegister",
       "rowCount": 2
     },
     {

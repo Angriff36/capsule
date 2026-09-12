@@ -567,6 +567,11 @@ import {
   TimeRecordClockInParamsSchema,
   TimeRecordClockOutParamsSchema,
   TimeRecordCorrectParamsSchema,
+  TrailerRegisterParamsSchema,
+  TrailerReviseDetailsParamsSchema,
+  TrailerUpdateInsuranceParamsSchema,
+  TrailerUpdateOperationalStatusParamsSchema,
+  TrailerUpdateRegistrationParamsSchema,
   TrainingCompletionRecordParamsSchema,
   TrainingModuleDefineParamsSchema,
   TrainingModuleReactivateParamsSchema,
@@ -577,7 +582,9 @@ import {
   VehicleRegisterParamsSchema,
   VehicleReviseDetailsParamsSchema,
   VehicleServiceEntryRecordParamsSchema,
+  VehicleUpdateInsuranceParamsSchema,
   VehicleUpdateOperationalStatusParamsSchema,
+  VehicleUpdateRegistrationParamsSchema,
   VendorContactAddParamsSchema,
   VendorContactRemoveParamsSchema,
   VendorContactUpdateParamsSchema,
@@ -8604,6 +8611,77 @@ export function useGetTppReportFavorite(id: string | "skip") {
   return useQuery(api.queries.getTppReportFavorite, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Reactive list for Trailer. */
+export function useListTrailer() {
+  return useQuery(api.queries.listTrailer);
+}
+
+/** Reactive get-by-id for Trailer. Pass "skip" to suspend. */
+export function useGetTrailer(id: string | "skip") {
+  return useQuery(api.queries.getTrailer, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for Trailer.register. */
+export function useTrailerRegister() {
+  const mutate = useMutation(api.mutations.Trailer_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrailerRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Trailer.reviseDetails. */
+export function useTrailerReviseDetails() {
+  const mutate = useMutation(api.mutations.Trailer_reviseDetails);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrailerReviseDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Trailer.updateInsurance. */
+export function useTrailerUpdateInsurance() {
+  const mutate = useMutation(api.mutations.Trailer_updateInsurance);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrailerUpdateInsuranceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Trailer.updateOperationalStatus. */
+export function useTrailerUpdateOperationalStatus() {
+  const mutate = useMutation(api.mutations.Trailer_updateOperationalStatus);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrailerUpdateOperationalStatusParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Trailer.updateRegistration. */
+export function useTrailerUpdateRegistration() {
+  const mutate = useMutation(api.mutations.Trailer_updateRegistration);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrailerUpdateRegistrationParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for Trailer.register. */
+export function useCreateTrailer() {
+  const mutate = useMutation(api.mutations.Trailer_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = TrailerRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for TrainingCompletion. */
 export function useListTrainingCompletion() {
   return useQuery(api.queries.listTrainingCompletion);
@@ -8716,12 +8794,32 @@ export function useVehicleReviseDetails() {
   };
 }
 
+/** Mutation hook for Vehicle.updateInsurance. */
+export function useVehicleUpdateInsurance() {
+  const mutate = useMutation(api.mutations.Vehicle_updateInsurance);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VehicleUpdateInsuranceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Vehicle.updateOperationalStatus. */
 export function useVehicleUpdateOperationalStatus() {
   const mutate = useMutation(api.mutations.Vehicle_updateOperationalStatus);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = VehicleUpdateOperationalStatusParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Vehicle.updateRegistration. */
+export function useVehicleUpdateRegistration() {
+  const mutate = useMutation(api.mutations.Vehicle_updateRegistration);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VehicleUpdateRegistrationParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9906,4 +10004,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1050 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1060 as const;
