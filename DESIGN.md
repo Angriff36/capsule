@@ -561,7 +561,7 @@ A quiet, document-like closeout surface that compares governed planned and actua
 
 | System               | Primary artifact                      | Default archetype                   | Distinctive composition                                                 |
 | -------------------- | ------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------- |
-| Home                 | Today's operational attention         | Operational journal                 | One next service or exception ledger, then a ruled outlook              |
+| Home                 | The month's events                    | Calendar + report rail              | Events on their days, coloured by sales lock; hover facts; right-edge report rail. Today's journal lives at /today |
 | Events               | Governed event plan                   | Pipeline + event dossier            | Stage spine, service brief, readiness, linked work                      |
 | Culinary             | Recipe, dish, menu                    | Book + detail document              | Catalog index, full-width recipe sections, event menu composition       |
 | Inventory            | Demand and stock position             | Working ledger                      | Demand/available/reserved/shortage alignment by ingredient and location |

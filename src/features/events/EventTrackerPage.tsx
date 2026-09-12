@@ -74,34 +74,47 @@ function timeInput(ms: number | null): string {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-/** New start/end on `dayStart`, keeping the time of day and the duration. */
-function movedSchedule(event: CalendarEventFacts, dayStart: number) {
-  const offset =
-    event.startsAt != null
-      ? event.startsAt - startOfDay(event.startsAt)
-      : DEFAULT_START_OFFSET;
-  const duration =
-    event.startsAt != null &&
+function durationOf(event: CalendarEventFacts): number {
+  return event.startsAt != null &&
     event.endsAt != null &&
     event.endsAt > event.startsAt
-      ? event.endsAt - event.startsAt
-      : DEFAULT_DURATION;
-  const startsAt = dayStart + offset;
-  return { startsAt, endsAt: startsAt + duration };
+    ? event.endsAt - event.startsAt
+    : DEFAULT_DURATION;
+}
+
+/** Wall-clock start on `dayStart` at `hours:minutes`, DST-safe. */
+function scheduleAt(
+  event: CalendarEventFacts,
+  dayStart: number,
+  hours: number,
+  minutes: number,
+) {
+  const start = new Date(dayStart);
+  start.setHours(hours, minutes, 0, 0);
+  const startsAt = start.getTime();
+  return { startsAt, endsAt: startsAt + durationOf(event) };
+}
+
+/** New start/end on `dayStart`, keeping the wall-clock time and the duration. */
+function movedSchedule(event: CalendarEventFacts, dayStart: number) {
+  const current =
+    event.startsAt != null
+      ? new Date(event.startsAt)
+      : new Date(dayStart + DEFAULT_START_OFFSET);
+  return scheduleAt(event, dayStart, current.getHours(), current.getMinutes());
 }
 
 /** Same day, new clock time, same duration. */
 function retimedSchedule(event: CalendarEventFacts, hhmm: string) {
   const [hours, minutes] = hhmm.split(":").map(Number);
   const day = startOfDay(event.startsAt ?? Date.now());
-  const startsAt = day + (hours * 60 + minutes) * 60_000;
-  const duration =
-    event.startsAt != null &&
-    event.endsAt != null &&
-    event.endsAt > event.startsAt
-      ? event.endsAt - event.startsAt
-      : DEFAULT_DURATION;
-  return { startsAt, endsAt: startsAt + duration };
+  return scheduleAt(event, day, hours, minutes);
+}
+
+function dateInput(ms: number | null): string {
+  if (ms == null) return "";
+  const d = new Date(ms);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 type StageMove = {
@@ -142,6 +155,8 @@ export function EventTrackerPage() {
   const [overLane, setOverLane] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  // Bumped when an inline edit is rejected so the inputs fall back to the saved value.
+  const [resetKey, setResetKey] = useState(0);
   const { notifySuccess, host: savedToast } = useSuccessToast();
 
   const loading = [
@@ -250,7 +265,9 @@ export function EventTrackerPage() {
       venue.registeredAt != null &&
       venue.deletedAt == null,
   );
-  const roster = (people ?? []).filter((person) => person.deletedAt == null);
+  const roster = (people ?? []).filter(
+    (person) => person.deletedAt == null && person.status === "active",
+  );
 
   const run = async (
     event: CalendarEventFacts,
@@ -264,6 +281,7 @@ export function EventTrackerPage() {
       notifySuccess(okMessage);
     } catch (error) {
       setFailure(classifyCommandFailure(error));
+      setResetKey((key) => key + 1);
     } finally {
       setBusyId(null);
     }
@@ -283,7 +301,10 @@ export function EventTrackerPage() {
       case "approved":
         return { label: "Lock sales", run: lockForSales };
       case "sales_lock":
-        return { label: "Confirm lock", run: confirmSalesLock };
+        return {
+          label: "Confirm lock & start execution",
+          run: confirmSalesLock,
+        };
       default:
         return null;
     }
@@ -315,7 +336,11 @@ export function EventTrackerPage() {
 
   const commitGuests = (event: CalendarEventFacts, raw: string) => {
     const value = Number(raw);
-    if (!Number.isFinite(value) || value === event.guests || value < 1) return;
+    if (value === event.guests) return;
+    if (!Number.isFinite(value) || value < 1) {
+      setResetKey((key) => key + 1);
+      return;
+    }
     void run(
       event,
       () =>
@@ -328,8 +353,33 @@ export function EventTrackerPage() {
     );
   };
 
+  const commitDate = (event: CalendarEventFacts, value: string) => {
+    if (!value || value === dateInput(event.startsAt)) return;
+    const day = new Date(`${value}T00:00:00`).getTime();
+    if (Number.isNaN(day)) {
+      setResetKey((key) => key + 1);
+      return;
+    }
+    const next = movedSchedule(event, startOfDay(day));
+    void run(
+      event,
+      () =>
+        reschedule({
+          docId: event.id,
+          version: event.version,
+          startsAt: next.startsAt,
+          endsAt: next.endsAt,
+        }),
+      "Date saved",
+    );
+  };
+
   const commitTime = (event: CalendarEventFacts, hhmm: string) => {
-    if (!hhmm || hhmm === timeInput(event.startsAt)) return;
+    if (hhmm === timeInput(event.startsAt)) return;
+    if (!hhmm) {
+      setResetKey((key) => key + 1);
+      return;
+    }
     const next = retimedSchedule(event, hhmm);
     void run(
       event,
@@ -399,8 +449,8 @@ export function EventTrackerPage() {
             Next two weeks
           </h1>
           <p className="mt-2 text-base text-ink-2">
-            Drag a card to another day to move it. Edit time, guests, venue,
-            owner, and the sales lock on the card.
+            Drag a card to another day to move it, or set the date on the card.
+            Edit time, guests, venue, owner, and the sales lock right there.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -537,9 +587,28 @@ export function EventTrackerPage() {
 
                       <div className="tracker-card-fields">
                         <label>
+                          <span>Date</span>
+                          <input
+                            key={`${event.startsAt ?? "none"}:${resetKey}`}
+                            type="date"
+                            className="input"
+                            defaultValue={dateInput(event.startsAt)}
+                            disabled={!canReschedule(event) || busy}
+                            onBlur={(domEvent: FocusEvent<HTMLInputElement>) =>
+                              commitDate(event, domEvent.currentTarget.value)
+                            }
+                            onKeyDown={(
+                              domEvent: KeyboardEvent<HTMLInputElement>,
+                            ) => {
+                              if (domEvent.key === "Enter")
+                                domEvent.currentTarget.blur();
+                            }}
+                          />
+                        </label>
+                        <label>
                           <span>Time</span>
                           <input
-                            key={event.startsAt ?? "none"}
+                            key={`${event.startsAt ?? "none"}:${resetKey}`}
                             type="time"
                             className="input"
                             defaultValue={timeInput(event.startsAt)}
@@ -558,7 +627,7 @@ export function EventTrackerPage() {
                         <label>
                           <span>Guests</span>
                           <input
-                            key={event.guests}
+                            key={`${event.guests}:${resetKey}`}
                             type="number"
                             min={1}
                             step={1}

@@ -204,7 +204,6 @@
 .home-cal-chip:hover,
 .home-cal-chip:focus-visible {
   border-color: var(--lock);
-  outline: none;
 }
 .home-cal-chip[data-selected] {
   border-color: var(--lock);
@@ -487,6 +486,17 @@
   }
   .home-report-tab[data-open] {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-cal-chip,
+  .home-cal-legend-item,
+  .home-report-tab,
+  .home-report-rail,
+  .tracker-lane,
+  .tracker-card {
+    transition: none;
   }
 }
 

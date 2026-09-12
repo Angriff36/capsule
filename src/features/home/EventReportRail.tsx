@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { TPP_REPORT_CATALOG } from "../reports/tpp/catalog";
 import type { TppReportDefinition } from "../reports/tpp/types";
@@ -8,13 +8,27 @@ import type { CalendarEventFacts } from "./homeCalendar";
 
 const STORAGE_KEY = "capsule.eventReportRail.reports";
 
-/** Every catalog report that takes an event as a parameter. */
+/**
+ * Every catalog report the rail can run with nothing but the event: it takes
+ * the event as a parameter, and every other required parameter is a date the
+ * rail can pin to the event's day. A report that also needs an enum or text
+ * choice belongs in the Reports catalog, where the form asks for it.
+ */
 export const EVENT_REPORTS: readonly TppReportDefinition[] =
-  TPP_REPORT_CATALOG.filter((definition) =>
-    definition.parameters.some(
-      (parameter) =>
-        parameter.type === "entity" && parameter.entity === "event",
-    ),
+  TPP_REPORT_CATALOG.filter(
+    (definition) =>
+      definition.parameters.some(
+        (parameter) =>
+          parameter.type === "entity" && parameter.entity === "event",
+      ) &&
+      definition.parameters.every(
+        (parameter) =>
+          parameter.type === "boolean" ||
+          parameter.type === "date" ||
+          parameter.type === "date_range" ||
+          (parameter.type === "entity" && parameter.entity === "event") ||
+          !parameter.required,
+      ),
   );
 
 /** The starting list: what a coordinator prints on the way out the door. */
@@ -30,9 +44,13 @@ const DEFAULT_REPORT_IDS = [
   "kitchen-labor",
 ].filter((id) => EVENT_REPORTS.some((definition) => definition.id === id));
 
-function readStoredIds(): string[] | null {
+function storageKey(scope: string): string {
+  return `${STORAGE_KEY}:${scope}`;
+}
+
+function readStoredIds(scope: string): string[] | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(storageKey(scope));
     if (!raw) return null;
     const parsed: unknown = JSON.parse(raw);
     if (!Array.isArray(parsed)) return null;
@@ -42,9 +60,9 @@ function readStoredIds(): string[] | null {
   }
 }
 
-function writeStoredIds(ids: string[]) {
+function writeStoredIds(scope: string, ids: string[]) {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    window.localStorage.setItem(storageKey(scope), JSON.stringify(ids));
   } catch {
     // Browser storage is a convenience; the default list still works.
   }
@@ -60,15 +78,34 @@ type Active = { definition: TppReportDefinition; print: boolean };
  */
 export function EventReportRail({
   event,
+  storageScope,
 }: {
   event: CalendarEventFacts | null;
+  /** Who the list belongs to (person id); keeps operators on a shared machine apart. */
+  storageScope: string;
 }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [active, setActive] = useState<Active | null>(null);
   const [ids, setIds] = useState<string[]>(
-    () => readStoredIds() ?? DEFAULT_REPORT_IDS,
+    () => readStoredIds(storageScope) ?? DEFAULT_REPORT_IDS,
   );
+  const tabRef = useRef<HTMLButtonElement>(null);
+  const railRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    setIds(readStoredIds(storageScope) ?? DEFAULT_REPORT_IDS);
+  }, [storageScope]);
+
+  // A closed rail is off-screen; keep its controls out of the tab order too.
+  useEffect(() => {
+    railRef.current?.toggleAttribute("inert", !open);
+  }, [open]);
+
+  const close = () => {
+    setOpen(false);
+    tabRef.current?.focus();
+  };
 
   // A new selection resets the rail to its list and opens it.
   const eventId = event?.id ?? null;
@@ -80,7 +117,7 @@ export function EventReportRail({
   useEffect(() => {
     if (!open) return;
     const onKey = (keyEvent: KeyboardEvent) => {
-      if (keyEvent.key === "Escape") setOpen(false);
+      if (keyEvent.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -101,7 +138,7 @@ export function EventReportRail({
       const next = current.includes(id)
         ? current.filter((entry) => entry !== id)
         : [...current, id];
-      writeStoredIds(next);
+      writeStoredIds(storageScope, next);
       return next;
     });
   };
@@ -109,6 +146,7 @@ export function EventReportRail({
   return (
     <>
       <button
+        ref={tabRef}
         type="button"
         className="home-report-tab"
         data-open={open || undefined}
@@ -122,6 +160,7 @@ export function EventReportRail({
       </button>
 
       <aside
+        ref={railRef}
         id="home-report-rail"
         className="home-report-rail"
         data-open={open || undefined}
@@ -159,7 +198,7 @@ export function EventReportRail({
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              onClick={() => setOpen(false)}
+              onClick={close}
               aria-label="Close reports"
             >
               ✕

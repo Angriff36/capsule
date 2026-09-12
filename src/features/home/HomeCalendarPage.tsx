@@ -1,6 +1,7 @@
 import { useMemo, useState, type FocusEvent, type MouseEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatTime } from "../../lib/format";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   useListClient,
   useListDelivery,
@@ -110,6 +111,7 @@ function tooltipPosition(target: HTMLElement): { top: number; left: number } {
  */
 export function HomeCalendarPage() {
   const navigate = useNavigate();
+  const authStatus = useAuthStatus();
   const events = useListEvent();
   const clients = useListClient();
   const venues = useListVenue();
@@ -130,6 +132,7 @@ export function HomeCalendarPage() {
   const [lockFilter, setLockFilter] = useState<Set<string>>(new Set());
 
   const loading = [
+    authStatus,
     events,
     clients,
     venues,
@@ -180,10 +183,12 @@ export function HomeCalendarPage() {
   );
   const unscheduled = useMemo(() => unscheduledEvents(shown), [shown]);
   const selected = facts.find((event) => event.id === selectedId) ?? null;
-  const inMonth = weeks
-    .flat()
-    .filter((cell) => cell.inMonth)
-    .reduce((sum, cell) => sum + cell.events.length, 0);
+  const inMonth = new Set(
+    weeks
+      .flat()
+      .filter((cell) => cell.inMonth)
+      .flatMap((cell) => cell.events.map((event) => event.id)),
+  ).size;
 
   if (loading) {
     return (
@@ -417,7 +422,10 @@ export function HomeCalendarPage() {
       ) : null}
 
       {hover ? <EventTooltip hover={hover} /> : null}
-      <EventReportRail event={selected} />
+      <EventReportRail
+        event={selected}
+        storageScope={authStatus?.personId ?? "anonymous"}
+      />
     </div>
   );
 }

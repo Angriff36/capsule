@@ -96,15 +96,25 @@ export function EventReportView({
           : general
   ) as Result | undefined;
 
+  // An empty result renders outside `.print-sheet`, so printing it gives a
+  // blank page; only print when there is something on the sheet.
+  const printable =
+    result != null &&
+    (result.kind === "document"
+      ? result.sections.length
+      : result.kind === "labels"
+        ? result.labels.length
+        : result.rows.length) > 0;
+
   const printedFor = useRef<string | null>(null);
   useEffect(() => {
-    if (!autoPrint || !result) return;
+    if (!autoPrint || !printable) return;
     const key = `${definition.id}:${event.id}`;
     if (printedFor.current === key) return;
     printedFor.current = key;
     const timer = window.setTimeout(() => window.print(), 80);
     return () => window.clearTimeout(timer);
-  }, [autoPrint, definition.id, event.id, result]);
+  }, [autoPrint, definition.id, event.id, printable]);
 
   return (
     <div className="home-report-view">
@@ -116,7 +126,7 @@ export function EventReportView({
         <button
           type="button"
           className="btn btn-primary btn-sm"
-          disabled={!result}
+          disabled={!printable}
           onClick={() => window.print()}
         >
           Print
