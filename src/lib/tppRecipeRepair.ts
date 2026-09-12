@@ -1,5 +1,6 @@
-/** Source-only projection: whole TPP recipes become dishes; nested make formulas
- * remain components. Quantities on a dish are per serving, never per batch. */
+/** Projection for source-reviewed finished dishes, not classification of export
+ * roots (which also contain batch recipes and equipment). Dish quantities are
+ * per serving; separately prepared formulas remain components. */
 export type TppSourceRecipe = {
   name: string;
   yieldText: string;
@@ -36,6 +37,11 @@ export type RecipeRepairProjection = {
     name: string;
     key: string;
     instructions: string;
+    /** When present, ingredients describe this actual kitchen batch. */
+    yieldQuantity?: number;
+    yieldUnit?: string;
+    /** Measured amount for one dish serving, in yieldUnit. */
+    quantityPerServing?: number;
     ingredients: RecipeAmount[];
   }[];
   notes: string[];
@@ -95,6 +101,7 @@ export function recipeMeasure(
     melon: ["melon", 1, "melon"],
     serving: ["serving", 1, "serving"],
     recipe: ["batch", 1, "batch"],
+    batch: ["batch", 1, "batch"],
   };
   const row = map[s];
   return row ? { unit: row[0], factor: row[1], family: row[2] } : undefined;

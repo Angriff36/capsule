@@ -65,6 +65,7 @@ import { KitchenPrepAssignManager } from "./command-deck/KitchenPrepAssignManage
 import "./command-deck/KitchenCommandDeck.css";
 import "./command-deck/KitchenCommandDeckSurfaces.css";
 import { useEventMenuSync } from "./useEventMenuSync";
+import { EventPrepWorkNotice } from "../events/EventPrepWorkNotice";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
@@ -248,33 +249,33 @@ export function KitchenDashboardPage() {
 
   /** Build prep for one service from its event menu. */
   const onSyncPrepFor = (eventId: string) => {
-    void run(
-      `sync:${eventId}`,
-      async () => {
-        const rows = model.selections(eventId);
-        if (rows.length === 0) {
-          throw new Error(
-            "No dishes on this event, so Sync prep has nothing to create.",
-          );
-        }
-        const reasons: string[] = [];
-        let created = 0;
-        await runBulkItems(rows, async (row) => {
-          const result = await syncPrepForDish({
-            id: row._id,
-            eventId,
-            dishId: row.dishId,
-            quantityServings: Number(row.quantityServings) || 1,
-          });
-          created += result.taskCount;
-          if (result.noOpReason) reasons.push(result.noOpReason);
+    void run(`sync:${eventId}`, async () => {
+      const rows = model.selections(eventId);
+      if (rows.length === 0) {
+        throw new Error(
+          "No dishes on this event, so Sync prep has nothing to create.",
+        );
+      }
+      const reasons: string[] = [];
+      let created = 0;
+      await runBulkItems(rows, async (row) => {
+        const result = await syncPrepForDish({
+          id: row._id,
+          eventId,
+          dishId: row.dishId,
+          quantityServings: Number(row.quantityServings),
         });
-        if (created === 0 && reasons.length > 0) {
-          throw new Error(reasons[0] ?? "Sync prep did nothing.");
-        }
-      },
-      "Prep synced from the event menu",
-    );
+        created += result.taskCount;
+        if (result.noOpReason) reasons.push(result.noOpReason);
+      });
+      showToast(
+        reasons.length
+          ? `${created ? `Updated ${created} prep steps. ` : ""}${reasons.join(" ")}`
+          : created
+            ? `Updated ${created} prep steps from the event menu.`
+            : "Prep already matches the event menu.",
+      );
+    });
   };
   // ── Ledger ────────────────────────────────────────────────────────────
   // Prep across the whole horizon, not one event at a time. Every existing
@@ -1272,6 +1273,17 @@ export function KitchenDashboardPage() {
           </div>
         )}
 
+        {horizonEvents
+          .filter((event) => !selectedEventId || event._id === selectedEventId)
+          .map((event) => (
+            <div key={event._id} className="mt-4">
+              <EventPrepWorkNotice
+                eventId={event._id}
+                eventTitle={event.title}
+              />
+            </div>
+          ))}
+
         {loading ? (
           <div className="mt-6">
             <TableSkeleton rows={6} />
@@ -1759,6 +1771,17 @@ export function KitchenDashboardPage() {
             <CulinaryFailureBanner error={failure} />
           </div>
         ) : null}
+
+        {horizonEvents
+          .filter((event) => !selectedEventId || event._id === selectedEventId)
+          .map((event) => (
+            <div key={event._id} className="mt-4">
+              <EventPrepWorkNotice
+                eventId={event._id}
+                eventTitle={event.title}
+              />
+            </div>
+          ))}
 
         {loading ? (
           <div className="mt-6">

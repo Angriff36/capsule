@@ -1,4 +1,6 @@
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
+import { recipeUnitRatio } from "../../lib/recipeUnitConversion";
+import { prepWorkBalance } from "../../lib/prepWorkBalance";
 import type {
   EventPrepDemand,
   EventPrepDish,
@@ -55,6 +57,7 @@ type Ports = {
     docId: string;
     version?: number;
     quantity: number;
+    unit?: EventPrepUnit;
     specialInstructions?: string;
   }) => Promise<unknown>;
 };
@@ -78,6 +81,9 @@ type PlannedItem = {
   quantity: number;
   unit: EventPrepUnit;
   name: string;
+  demandQuantity?: number;
+  demandUnit?: EventPrepUnit;
+  retainedInstructions?: string | null;
   ingredientId?: string;
   componentId?: string | null;
   category?: string;
@@ -93,6 +99,13 @@ export class EventPrepTaskSynchronizer {
   constructor(private readonly ports: Ports) {}
 
   async sync(input: SyncInput): Promise<EventPrepSyncResult> {
+    if (input.eventDish.quantityServings === 0) {
+      return {
+        taskCount: 0,
+        demandCount: 0,
+        noOpReason: "This dish is not being served.",
+      };
+    }
     const activeTemplates = input.templates
       .filter(
         (template) =>
@@ -126,17 +139,65 @@ export class EventPrepTaskSynchronizer {
     const planned: PlannedItem[] =
       activeTemplates.length > 0
         ? activeTemplates.map((template) => {
-            const existing = existingByTemplate.get(template.id);
-            const quantity = this.quantityFor(
+            let existing = existingByTemplate.get(template.id);
+            const templateQuantity = this.quantityFor(
               template,
               input.eventDish.quantityServings,
             );
+            const templateUnit = template.defaultUnit ?? "portion";
+            const stepTasks = currentEventDishTasks.filter(
+              (task) => task.dishTaskId === template.id,
+            );
+            const completed = stepTasks.filter(
+              (task) => task.status === "completed",
+            );
+            if (completed.length) {
+              const balance = prepWorkBalance(
+                templateQuantity,
+                templateUnit,
+                stepTasks,
+              );
+              if (balance.kind === "unresolved") {
+                throw new Error(
+                  `Cannot reconcile remaining work for ${template.name}: recorded work has incompatible units or invalid quantities.`,
+                );
+              }
+              existing = balance.targetTaskId
+                ? stepTasks.find((task) => task.id === balance.targetTaskId)
+                : balance.targetQuantity === 0
+                  ? completed[0]
+                  : undefined;
+              const unit = balance.targetUnit as EventPrepUnit;
+              return {
+                key: `template:${template.id}:after:${balance.completedTaskIds.join(":")}`,
+                template,
+                existing,
+                quantity: balance.targetQuantity,
+                unit,
+                // Completed work changes remaining prep, never the total recipe demand.
+                demandQuantity: templateQuantity,
+                demandUnit: templateUnit,
+                name: template.name,
+                ingredientId: template.ingredientId ?? undefined,
+                componentId: template.componentId,
+                category: template.category ?? undefined,
+                taskType: template.taskType ?? undefined,
+                instructions: template.instructions ?? undefined,
+                retainedInstructions: [...completed].sort((a, b) =>
+                  a.id.localeCompare(b.id),
+                )[0].specialInstructions,
+              };
+            }
+            const ratio = existing
+              ? recipeUnitRatio(templateUnit, existing.unit)
+              : null;
+            const quantity = templateQuantity * (ratio ?? 1);
             return {
               key: `template:${template.id}`,
               template,
               existing,
               quantity,
-              unit: template.defaultUnit ?? ("portion" as EventPrepUnit),
+              unit: existing && ratio != null ? existing.unit : templateUnit,
               name: template.name,
               ingredientId: template.ingredientId ?? undefined,
               componentId: template.componentId,
@@ -190,16 +251,22 @@ export class EventPrepTaskSynchronizer {
       if (item.existing) {
         if (
           item.existing.isGenerated &&
-          item.existing.quantity !== item.quantity &&
+          item.existing.status === "pending" &&
+          (item.existing.quantity !== item.quantity ||
+            item.existing.unit !== item.unit) &&
           this.ports.refreshGeneratedTask
         ) {
           await this.ports.refreshGeneratedTask({
             docId: item.existing.id,
             version: item.existing.version,
             quantity: item.quantity,
+            ...(item.unit !== item.existing.unit ? { unit: item.unit } : {}),
             specialInstructions:
-              displayEventMenuNotes(input.eventDish.specialInstructions) ||
-              undefined,
+              item.existing.specialInstructions ??
+              this.instructionsFor(
+                item.instructions,
+                input.eventDish.specialInstructions,
+              ),
           });
         }
         continue;
@@ -227,10 +294,12 @@ export class EventPrepTaskSynchronizer {
         dishId: input.eventDish.dishId,
         category: item.category,
         taskType: item.taskType,
-        specialInstructions: this.instructionsFor(
-          item.instructions,
-          input.eventDish.specialInstructions,
-        ),
+        specialInstructions:
+          item.retainedInstructions ??
+          this.instructionsFor(
+            item.instructions,
+            input.eventDish.specialInstructions,
+          ),
         isGenerated: true,
         idempotencyKey: `event-prep:${input.eventDish.id}:${item.key}`,
       });
@@ -268,10 +337,15 @@ export class EventPrepTaskSynchronizer {
 
     for (const task of eventTasks) {
       if (!task.ingredientId || task.status === "completed") continue;
-      const plannedTask = task.dishTaskId
-        ? planned.find((item) => item.template?.id === task.dishTaskId)
-        : undefined;
-      if (task.isGenerated && plannedTask) continue;
+      const plannedTask =
+        task.eventDishId === input.eventDish.id && task.dishTaskId
+          ? planned.find((item) => item.template?.id === task.dishTaskId)
+          : undefined;
+      if (
+        plannedTask &&
+        (task.isGenerated || plannedTask.demandQuantity != null)
+      )
+        continue;
       this.addDemandContribution(groups, {
         eventId: input.eventDish.eventId,
         ingredientId: task.ingredientId,
@@ -287,8 +361,8 @@ export class EventPrepTaskSynchronizer {
       this.addDemandContribution(groups, {
         eventId: input.eventDish.eventId,
         ingredientId: item.ingredientId,
-        requiredQuantity: item.quantity,
-        unit: item.unit,
+        requiredQuantity: item.demandQuantity ?? item.quantity,
+        unit: item.demandUnit ?? item.unit,
         servings: input.eventDish.quantityServings,
         dishId: input.eventDish.dishId,
         taskIds: [],
@@ -300,6 +374,7 @@ export class EventPrepTaskSynchronizer {
         (demand) =>
           demand.eventId === group.eventId &&
           demand.ingredientId === group.ingredientId &&
+          demand.unit === group.unit &&
           demand.status !== "superseded",
       );
       if (existing) {

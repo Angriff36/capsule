@@ -1,0 +1,34 @@
+// Tenant configuration for the in-app AI assistant (docs/systems/assistant.md).
+// One row per tenant. The API key is private: generated reads never return it,
+// so it only ever moves server-side (convex/assistantTurn.ts reads the row via
+// an internal seam query keyed on the verified caller subject).
+entity AssistantLlmConfig mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId]
+  timestamps
+  versionProperty version: number
+
+  property required baseUrl: string
+  property private required apiKey: string
+  property required model: string
+  property configuredAt: datetime?
+
+  default policy assistantLlmConfigRead read: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may read assistant configuration"
+  default policy assistantLlmConfigWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may write assistant configuration"
+  default policy assistantLlmConfigExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may execute assistant configuration"
+
+  // Configure is also the creation path (createViaConfigure) so first-time
+  // setup and later correction are the same form — settings stay correctable.
+  command configure(baseUrl: string, apiKey: string, model: string) {
+    guard self.deletedAt == null
+    constraint assistantBaseUrlHttp: startsWith(baseUrl, "https://") or startsWith(baseUrl, "http://localhost") or startsWith(baseUrl, "http://127.0.0.1") "Base URL must be an HTTP(S) endpoint"
+    constraint assistantApiKeyNonEmpty: trim(apiKey) != "" "API key cannot be empty"
+    constraint assistantModelNonEmpty: trim(model) != "" "Model cannot be empty"
+    mutate baseUrl = trim(baseUrl)
+    mutate apiKey = apiKey
+    mutate model = trim(model)
+    mutate configuredAt = now()
+  }
+
+  store AssistantLlmConfig in durable
+}

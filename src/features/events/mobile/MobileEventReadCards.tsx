@@ -127,7 +127,7 @@ export function MobileTimelineCard({
         <MobileEmpty>No run-of-show blocks yet.</MobileEmpty>
       ) : (
         shown.map((row) => {
-          const at = row.startsAt ?? row.scheduledAt;
+          const at = row.startsAt;
           const who = formatAssigneeLabel({
             teams: row.assigneeTeams ?? [],
             personNames: (row.assigneePersonIds ?? []).map((id) =>
@@ -138,7 +138,7 @@ export function MobileTimelineCard({
           return (
             <div key={row._id} className="mobile-row">
               <span className="w-20 shrink-0 font-mono text-base text-ink-2">
-                {at != null ? formatTime(at) : "—"}
+                {at != null ? formatTime(at) : "Time not set"}
               </span>
               <span className="mobile-row-main">
                 <span className="block truncate">{row.name}</span>

@@ -95,9 +95,18 @@ export interface TppColumn {
 
 export type TppCellValue = string | number | boolean | null;
 
+export interface TppReportContext {
+  label: string;
+  value: TppCellValue;
+  kind?: TppColumn["kind"];
+}
+
 export interface TppRow {
   id: string;
   values: Readonly<Record<string, TppCellValue>>;
+  recipeLinks?: Readonly<
+    Record<string, { kind: "dish" | "component"; id: string }>
+  >;
 }
 
 export interface TppGroup {
@@ -121,7 +130,13 @@ export interface TppMeasure extends TppTotal {
 export interface TppDocumentSection {
   id: string;
   heading?: string;
-  rows: readonly { label?: string; value: string }[];
+  headingLevel?: 3 | 4;
+  printContext?: string;
+  rows: readonly {
+    label?: string;
+    value: string;
+    recipe?: { kind: "dish" | "component"; id: string };
+  }[];
 }
 
 export interface TppLabel {
@@ -133,6 +148,7 @@ export type TppReportResult =
   | {
       kind: "table";
       title: string;
+      context?: readonly TppReportContext[];
       columns: readonly TppColumn[];
       rows: readonly TppRow[];
       groups: readonly TppGroup[];
@@ -143,6 +159,7 @@ export type TppReportResult =
       title: string;
       template: string;
       sections: readonly TppDocumentSection[];
+      exportTable?: { columns: readonly TppColumn[]; rows: readonly TppRow[] };
     }
   | {
       kind: "labels";

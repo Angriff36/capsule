@@ -41,10 +41,14 @@ export function TppReportResult({ result }: { result: Result }) {
           columns={result.columns}
           rows={result.rows}
           totals={result.totals}
+          context={result.kind === "table" ? result.context : undefined}
         />
       ) : null}
       {result.kind === "document" ? (
-        <TppReportDocument sections={result.sections} />
+        <TppReportDocument
+          sections={result.sections}
+          template={result.template}
+        />
       ) : null}
       {result.kind === "labels" ? (
         <TppReportLabels stock={result.stock} labels={result.labels} />

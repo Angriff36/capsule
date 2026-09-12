@@ -86,7 +86,7 @@ describe("CapsuleEventPrepCoordinator", () => {
     );
   });
 
-  it("creates an event dish then syncs prep tasks without host demand create", async () => {
+  it("reads generated prep after adding the dish without host prep or demand writes", async () => {
     const execute = vi
       .fn()
       .mockResolvedValueOnce({ docId: "event-dish-1" })
@@ -104,7 +104,21 @@ describe("CapsuleEventPrepCoordinator", () => {
             status: "active",
           },
         ],
-        tasks: [],
+        tasks: [
+          {
+            id: "generated-task",
+            eventDishId: "event-dish-1",
+            eventId: "event-1",
+            dishId: "dish-1",
+            dishTaskId: "template-1",
+            name: "Portion vegetables",
+            quantity: 40,
+            unit: "portion",
+            isGenerated: true,
+            status: "pending",
+            version: 1,
+          },
+        ],
         demands: [
           {
             id: "demand-1",
@@ -131,7 +145,6 @@ describe("CapsuleEventPrepCoordinator", () => {
     ).resolves.toEqual({
       eventDishId: "event-dish-1",
       taskCount: 1,
-      demandCount: 0,
     });
 
     expect(execute).toHaveBeenNthCalledWith(
@@ -146,7 +159,7 @@ describe("CapsuleEventPrepCoordinator", () => {
         capabilityId: "IngredientDemand.calculate",
       }),
     );
-    expect(execute).toHaveBeenCalledWith(
+    expect(execute).not.toHaveBeenCalledWith(
       expect.objectContaining({
         capabilityId: "PrepTask.open",
       }),

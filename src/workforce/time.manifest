@@ -1,6 +1,6 @@
 // Capsule workforce-2 — TimeRecord + Qualification.
 // Compile entry: uses logistics packing head (PackList/Delivery + prior chain).
-// Schedule/OpenShift remain deferred (OD024).
+// Scheduled work and open event staffing needs live in shift/assignment.manifest.
 
 use "../logistics/packing.manifest"
 
@@ -49,10 +49,12 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   transition status from "closed" to ["corrected"]
   transition status from "corrected" to ["corrected"]
 
-  default policy timeRecordRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read time records"
-  default policy timeRecordWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write time records through commands"
-  default policy timeRecordExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute time record commands"
+  default policy timeRecordRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read time records"
+  default policy timeRecordWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write time records through commands"
+  default policy timeRecordExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute time record commands"
 
+  // The linked Person is authoritative for self-service; the old direct-ID
+  // identity path remains available only to unlinked bootstrap identities.
   command clockIn(
     personId: uuid,
     optional shiftId: uuid,
@@ -63,7 +65,7 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
     guard self.status == "open"
     guard self.deletedAt == null
     guard user.id != null
-    guard personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     guard self.person != null and self.person.status == "active"
     constraint clockInPersonMatch: personId == self.personId "Clock-in personId must match the seeded person reference"
     constraint clockInShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Clock-in shiftId must match the seeded shift reference when provided"
@@ -93,7 +95,7 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
     guard self.clockOutAt == null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     constraint clockOutBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes must be non-negative"
     mutate clockOutAt = now()
     mutate breakMinutes = breakMinutes != null ? breakMinutes : self.breakMinutes

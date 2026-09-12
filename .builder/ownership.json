@@ -2,13 +2,13 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "a5d0efbdcd0bf8059607fd3fd73d0fba6a19a4c78d669ed96a79ecc63328b0f9"
+      "sha256": "637bcd2ec840d0e40e2c05e49b479f7e34bc6574920bd828757b6a13a4ed19f1"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "997e859e52856e9ddf377db57c81eb762b1a053176c74505b66fa6254c51d3e8"
+      "sha256": "2d66e3e7b32e77a4861f9e2c0c090008965d180ec57486394fd072dad2173541"
     },
     "convex/lib/authContext.ts": {
       "sha256": "ee98a50d1d9b7db6bed6f2aedfd9ba45fa0bc8e245abdc4a230dc84b6f0aa5ad",
@@ -18,54 +18,54 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "2fa21190da5472524886c35a389ef6fcac09ed2ea883e9cc23c50727e4b9d55d"
+      "sha256": "1c31b3599e4332931ec99ffea63ae7b2888982975ec901e62054b74ef9262465"
     },
     "convex/queries.ts": {
-      "sha256": "fa7e99863874253f0a6226bad7865fd2abda793a9c4089a91162f63626b4eb21"
+      "sha256": "52ea59b180f6b5fcbdfb0abf9553c0b3a3c1eaa4015ffbf21d8e07a2452df9cd"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "ccb42f59504a632a86318909faf1fb53f173650ed6b2580f576cd5101932da11"
+      "sha256": "6862ede1f3788668f2955f89a7442b4d931608adffacd6e6c236bc9f026d35e8"
     },
     "manifest-context-summary.json": {
-      "sha256": "083a7f726ebe20d01c35e38c810945416009156602a874749c3d303284e01769"
+      "sha256": "4687d1cfbe88ba899966f61fd11fd433341c1ca59d5e8c6dc8ed2e7538ffc622"
     },
     "package.json": {
-      "sha256": "112f8a17d1c49e8b3e7868b15627a56001354977dc634ed844dad9f27fbe68d7"
+      "sha256": "781e24be7cdd037246c0ea87e2fa703c521401fd0761444c24c6851d40775028"
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "e68103946bc26601ccde17e8f0e146eb9fafd149bcd5b7ff84be2b1b88699309"
+      "sha256": "9e8e208456f66bd72cc5ff1a378d7982b62773ee5e2e03a68420f2a0b8bd24c4"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "c51249dcf719f6da3ce29aaa2d61610653c0b7d321936ce51c891d178b25a0be"
+      "sha256": "ccb35f8d47364690c682c1c028bba4aca0e1b1f93d72b42482b30350584f6a7c"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "9fb2dc7157b8b7f3ae1a777f6b8f809521716b99e73e08f7120904d2d358ce28"
+      "sha256": "4b69a86e143cb3c9c7b73c1c1cfc497f95b5955f0508d79589deb708ca444675"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "9fb78db7f0c15ef518a49c2621e3d0d19fe99eee5f51fb6e032cb223cb677e61"
+      "sha256": "1986be465b0391d50640e85a90c51908c21fa0326c51f575844a17534d0ca57c"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "3dab426c8613ca698e488656792d9ed61d63ed72a0cb343fd8fc235e9ef6af81"
+      "sha256": "71d91a40f19a1f231b951314463167e2b048623778ad7a2e82a163382af703ac"
     },
     "tests/manifest-convex.contract.test.ts": {
-      "sha256": "da05ace95f77f78735178cfd76e6d42cf2ccfdb0e16c5551b9b2a066df4b4a21"
+      "sha256": "f8ec020d2006bf2fbae1d84a9c6056e76dc258b0625077a23c5e09a9c7caf180"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "9cba5bb3ad97a7081a1ccb5ecb534ca033d9e28144cbd14605a9e0875a31fe6a"
+      "sha256": "33fb8a1ff9938c4b906ca7937e556c65b68896e78f87ecc28185417b14ae378c"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "^3.6.48",
+      "@angriff36/manifest": "^3.6.55",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },
@@ -86,6 +86,7 @@
     "paths": [
       "manifest.config.yaml",
       "src/admin/announcement.manifest",
+      "src/admin/assistant.manifest",
       "src/admin/capability-setting.manifest",
       "src/admin/cutover-decision.manifest",
       "src/app.manifest",

@@ -21,6 +21,7 @@ type Props = {
   ingredientId: string;
   ingredients: readonly IngredientCatalogRow[] | undefined;
   link?: boolean;
+  wrap?: boolean;
 };
 
 function CatalogThumb({
@@ -69,6 +70,7 @@ export function IngredientCatalogLabel({
   ingredientId,
   ingredients,
   link = false,
+  wrap = false,
 }: Props) {
   const row = ingredients?.find((item) => item._id === ingredientId);
   const batchActive = useIngredientCatalogImageBatchActive();
@@ -78,7 +80,7 @@ export function IngredientCatalogLabel({
     return <span>Unknown ingredient</span>;
   }
   const body = (
-    <span className="inline-flex min-w-0 items-center gap-2">
+    <span className="inline-flex min-w-0 max-w-full items-center gap-2">
       {batchActive ? (
         <CatalogThumb
           name={row.name}
@@ -92,7 +94,11 @@ export function IngredientCatalogLabel({
           size="thumb"
         />
       )}
-      <strong className="truncate">{row.name}</strong>
+      <strong
+        className={wrap ? "min-w-0 whitespace-normal break-words" : "truncate"}
+      >
+        {row.name}
+      </strong>
     </span>
   );
   if (link) {

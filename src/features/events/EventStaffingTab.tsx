@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import {
   useCreateEventAssignment,
   useCreateEventStaffNeed,
   useEventAssignmentUnassign,
   useEventStaffNeedCancel,
+  useEventStaffNeedChangeCoverage,
   useEventStaffNeedClaim,
   useEventStaffNeedFill,
-  useShiftCancel,
+  useEventStaffNeedReleaseClaim,
+  useGetEvent,
   useListAvailabilityWindow,
   useListEventAssignment,
   useListEventStaffNeed,
@@ -16,8 +18,7 @@ import {
   useListShiftType,
   useListTimeOffRequest,
 } from "../../lib/manifest-convex-react";
-import type { Id } from "../../lib/api";
-import { useScheduleShift } from "../../lib/workforceScheduling";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import {
@@ -35,11 +36,6 @@ import {
   readStaffRole,
 } from "./EventStaffingRoleSelect";
 import {
-  cancellableEventShifts,
-  eventShiftFor,
-  shiftWindowFor,
-} from "./eventStaffShifts";
-import {
   EventTimelineStaffRoster,
   type PersonRow,
 } from "./eventTimelineStaffRoster";
@@ -54,7 +50,10 @@ function personLabel(person: PersonRow): string {
   return EventTimelineStaffRoster.labelFor(person);
 }
 
-export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
+export function EventStaffingTab({ eventId }: Props) {
+  const auth = useAuthStatus();
+  const event = useGetEvent(eventId);
+  const canManage = event?.staffingCanManage === true;
   const assignments = useListEventAssignment();
   const needs = useListEventStaffNeed();
   const people = useListPerson();
@@ -64,28 +63,21 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
   const timeOff = useListTimeOffRequest();
   const availability = useListAvailabilityWindow();
   const createAssignment = useCreateEventAssignment();
-  // Authored atomic seam: repeats Shift.schedule checks and rejects approved
-  // time-off overlap in one transaction (docs/systems/workforce.md).
-  const scheduleShift = useScheduleShift();
-  const cancelShift = useShiftCancel();
   const unassign = useEventAssignmentUnassign();
   const createNeed = useCreateEventStaffNeed();
   const claimNeed = useEventStaffNeedClaim();
   const fillNeed = useEventStaffNeedFill();
+  const releaseClaim = useEventStaffNeedReleaseClaim();
   const cancelNeed = useEventStaffNeedCancel();
+  const changeCoverage = useEventStaffNeedChangeCoverage();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
-  const [shiftNotice, setShiftNotice] = useState<string | null>(null);
-  // Handlers read the latest rows, not the render they were created in.
-  const shiftsRef = useRef(shifts);
-  shiftsRef.current = shifts;
-  const activitiesRef = useRef(activities);
-  activitiesRef.current = activities;
-  /** Shift scheduling needs both lists loaded to avoid duplicates. */
-  const shiftDataReady = shifts !== undefined && activities !== undefined;
   const [needPersonIds, setNeedPersonIds] = useState<Record<string, string>>(
     {},
   );
+  const [coverageDrafts, setCoverageDrafts] = useState<
+    Record<string, Record<string, string>>
+  >({});
   const { prompt, host } = useActionPrompt(busy != null);
 
   const eventAssignments = useMemo(
@@ -115,12 +107,25 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
         assignments: eventAssignments,
         people: people ?? [],
         staffNeeds: eventNeeds,
+        shifts,
       }),
-    [eventAssignments, eventId, eventNeeds, people],
+    [eventAssignments, eventId, eventNeeds, people, shifts],
   );
 
-  const windowStart = Number(startsAt ?? 0);
-  const windowEnd = Number(endsAt ?? startsAt ?? 0);
+  const crewWindow = {
+    startsAt: activities?.find(
+      (row) =>
+        row.eventId === eventId &&
+        row.deletedAt == null &&
+        row.timingMilestone === "staff_on",
+    )?.startsAt,
+    endsAt: activities?.find(
+      (row) =>
+        row.eventId === eventId &&
+        row.deletedAt == null &&
+        row.timingMilestone === "staff_off",
+    )?.startsAt,
+  };
 
   const roleOptions = useMemo(
     () =>
@@ -136,57 +141,33 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
     [assignments, needs, shiftTypes],
   );
 
-  /** Roster rows carry the scheduled shift window (timeline-derived). */
-  const rosterWithShifts = useMemo(
-    () =>
-      roster.map((entry) => {
-        const shift = eventShiftFor(shifts, eventId, entry.personId);
-        if (!shift?.startsAt) return entry;
-        return { ...entry, startsAt: shift.startsAt, endsAt: shift.endsAt };
-      }),
-    [eventId, roster, shifts],
-  );
+  const rosterWithShifts = roster;
 
-  /** Schedule a Shift for this person from their timeline blocks (or the event window). */
-  const scheduleEventShift = async (personId: string, role: string) => {
-    const liveShifts = shiftsRef.current;
-    if (liveShifts === undefined) return;
-    if (eventShiftFor(liveShifts, eventId, personId)) return;
-    const window = shiftWindowFor({
-      eventId,
-      personId,
-      activities: activitiesRef.current,
-      eventStartsAt: startsAt,
-      eventEndsAt: endsAt,
-    });
-    if (!window) return;
-    await scheduleShift({
-      personId: personId as Id<"people">,
-      eventId: eventId as Id<"events">,
-      role,
-      startsAt: window.startsAt,
-      endsAt: window.endsAt,
-      onePerEvent: true,
-    });
-  };
-  const rosterMissingShift = roster.filter(
-    (entry) => !eventShiftFor(shifts, eventId, entry.personId),
-  );
-  // The notice is about a missing shift; once none is missing it is stale.
-  useEffect(() => {
-    if (shiftNotice && shiftDataReady && rosterMissingShift.length === 0) {
-      setShiftNotice(null);
-    }
-  }, [rosterMissingShift.length, shiftDataReady, shiftNotice]);
-
-  const conflictsFor = (personId: string) => {
+  const conflictsFor = (
+    personId: string,
+    plannedWindows: readonly {
+      startsAt?: number | null;
+      endsAt?: number | null;
+    }[] = [crewWindow],
+  ) => {
+    const windows = plannedWindows.filter(
+      (window) => window.startsAt != null && window.endsAt != null,
+    );
+    const overlaps = (
+      start: number | null | undefined,
+      end: number | null | undefined,
+    ) =>
+      start != null &&
+      end != null &&
+      windows.some(
+        (window) => start < window.endsAt! && end > window.startsAt!,
+      );
     const overlappingShifts = (shifts ?? []).filter(
       (shift) =>
         shift.deletedAt == null &&
         shift.personId === personId &&
         shift.status !== "cancelled" &&
-        Number(shift.startsAt ?? 0) < windowEnd &&
-        Number(shift.endsAt ?? 0) > windowStart &&
+        overlaps(shift.startsAt, shift.endsAt) &&
         shift.eventId !== eventId,
     );
     const approvedOff = (timeOff ?? []).filter(
@@ -194,22 +175,32 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
         row.deletedAt == null &&
         row.personId === personId &&
         String(row.status) === "approved" &&
-        Number(row.startsAt ?? 0) < windowEnd &&
-        Number(row.endsAt ?? 0) > windowStart,
+        overlaps(row.startsAt, row.endsAt),
     );
-    const available = (availability ?? []).some(
-      (row) =>
-        row.deletedAt == null &&
-        row.personId === personId &&
-        Number(row.startsAt ?? 0) <= windowStart &&
-        Number(row.endsAt ?? Date.now()) >= windowEnd,
-    );
+    const available =
+      windows.length > 0 &&
+      windows.every((window) =>
+        (availability ?? []).some(
+          (row) =>
+            row.deletedAt == null &&
+            row.personId === personId &&
+            row.startsAt != null &&
+            row.endsAt != null &&
+            row.startsAt <= window.startsAt! &&
+            row.endsAt >= window.endsAt!,
+        ),
+      );
     return { overlappingShifts, approvedOff, available };
   };
 
   const conflictNotes: StaffingConflictNote[] = [];
-  for (const entry of roster) {
-    const conflict = conflictsFor(entry.personId);
+  for (const entry of rosterWithShifts) {
+    const conflict = conflictsFor(
+      entry.personId,
+      entry.shiftWindows?.length
+        ? entry.shiftWindows
+        : (entry.plannedWindows ?? [entry]),
+    );
     const reasons: string[] = [];
     if (conflict.overlappingShifts.length > 0)
       reasons.push("Overlapping shift");
@@ -227,6 +218,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
   const openShiftCount = eventNeeds.filter(
     (need) => need.status === "open" || need.status === "claimed",
   ).length;
+  const rosterPeopleCount = new Set(roster.map((entry) => entry.personId)).size;
 
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -240,6 +232,22 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
     }
   };
 
+  if (
+    assignments === undefined ||
+    needs === undefined ||
+    people === undefined
+  ) {
+    return (
+      <section
+        aria-busy="true"
+        role="status"
+        className="py-4 text-base text-ink-2"
+      >
+        Loading event staffing…
+      </section>
+    );
+  }
+
   return (
     <section className="space-y-4" data-testid="event-staffing-tab">
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 border-b border-line pb-3">
@@ -248,157 +256,133 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
             Event staff
           </h2>
           <p className="mt-1.5 text-base text-ink-2">
-            {roster.length} on the roster · {openShiftCount} shift
+            {rosterPeopleCount} on the roster · {openShiftCount} shift
             {openShiftCount === 1 ? "" : "s"} still to cover
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <p className="text-base text-ink-3">
-            Assign people, post open shifts for claim, and watch availability
-            conflicts.
+            Crew, planned times, open shifts, and availability conflicts.
           </p>
-          {rosterMissingShift.length > 0 ? (
-            <button
-              type="button"
-              className="btn btn-ghost"
-              disabled={busy != null || !shiftDataReady}
-              onClick={() =>
-                void run("syncShifts", async () => {
-                  const done = new Set<string>();
-                  for (const entry of rosterMissingShift) {
-                    if (done.has(entry.personId)) continue;
-                    done.add(entry.personId);
-                    await scheduleEventShift(entry.personId, entry.role);
-                  }
-                  setShiftNotice(null);
-                })
-              }
-            >
-              Sync {rosterMissingShift.length} shift
-              {rosterMissingShift.length === 1 ? "" : "s"} from timeline
-            </button>
-          ) : null}
         </div>
       </header>
       {failure ? <FailureBanner failure={failure} /> : null}
-      {shiftNotice ? (
+      {activities !== undefined &&
+      (crewWindow.startsAt == null || crewWindow.endsAt == null) ? (
         <p
           role="status"
-          className="rounded-sm border border-warn/40 bg-warn-soft px-3 py-2 text-sm text-warn"
+          className="border-y border-line py-2 text-base text-ink-2"
         >
-          {shiftNotice}
+          Crew timing needs attention. Complete staff-on and staff-off in
+          Timeline; assignments can be saved while their shift times are being
+          planned.
         </p>
       ) : null}
       {host}
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]">
         <div className="flex min-w-0 flex-col gap-4">
-          <form
-            className="card grid gap-2 px-4 py-3 sm:grid-cols-4"
-            onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
-              formEvent.preventDefault();
-              const data = new FormData(formEvent.currentTarget);
-              const personId = String(data.get("personId") ?? "");
-              const role = readStaffRole(data, "role");
-              if (!personId || !role) return;
-              setShiftNotice(null);
-              void run("assign", async () => {
-                await createAssignment({
-                  eventId,
-                  personId,
-                  role,
-                  startsAt: startsAt ?? undefined,
-                  endsAt: endsAt ?? undefined,
+          {canManage ? (
+            <form
+              className="card grid gap-2 px-4 py-3 sm:grid-cols-4"
+              onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
+                formEvent.preventDefault();
+                const data = new FormData(formEvent.currentTarget);
+                const personId = String(data.get("personId") ?? "");
+                const role = readStaffRole(data, "role");
+                if (!personId || !role) return;
+                const form = formEvent.currentTarget;
+                void run("assign", async () => {
+                  await createAssignment({
+                    eventId,
+                    personId,
+                    role,
+                  });
+                  form.reset();
                 });
-                try {
-                  await scheduleEventShift(personId, role);
-                } catch {
-                  // The assignment is saved; only the shift is missing.
-                  setShiftNotice(
-                    "Assignment saved, but the shift could not be scheduled. Use “Sync shifts from timeline” to retry.",
-                  );
-                }
-              });
-              formEvent.currentTarget.reset();
-            }}
-          >
-            <label className="field-label sm:col-span-2">
-              Assign person
-              <select name="personId" className="field-input" required>
-                <option value="">Select…</option>
-                {activePeople.map((person) => {
-                  const conflict = conflictsFor(person._id);
-                  return (
-                    <option key={person._id} value={person._id}>
-                      {personLabel(person)}
-                      {conflict.overlappingShifts.length
-                        ? " · shift conflict"
-                        : ""}
-                      {conflict.approvedOff.length ? " · time off" : ""}
-                    </option>
-                  );
-                })}
-              </select>
-            </label>
-            <label className="field-label">
-              Role
-              <StaffRoleSelect name="role" roles={roleOptions} />
-            </label>
-            <button
-              type="submit"
-              className="btn btn-primary self-end"
-              disabled={busy != null || !shiftDataReady}
+              }}
             >
-              Assign
-            </button>
-          </form>
+              <label className="field-label sm:col-span-2">
+                Assign person
+                <select name="personId" className="field-input" required>
+                  <option value="">Select…</option>
+                  {activePeople.map((person) => {
+                    const conflict = conflictsFor(person._id);
+                    return (
+                      <option key={person._id} value={person._id}>
+                        {personLabel(person)}
+                        {conflict.overlappingShifts.length
+                          ? " · shift conflict"
+                          : ""}
+                        {conflict.approvedOff.length ? " · time off" : ""}
+                      </option>
+                    );
+                  })}
+                </select>
+              </label>
+              <label className="field-label">
+                Role
+                <StaffRoleSelect name="role" roles={roleOptions} />
+              </label>
+              <button
+                type="submit"
+                className="btn btn-primary self-end"
+                disabled={busy != null}
+              >
+                Assign
+              </button>
+            </form>
+          ) : null}
 
           <EventStaffingCoverageView
             roster={rosterWithShifts}
+            canManage={canManage}
+            currentPersonId={auth?.personId ?? null}
             eventNeeds={eventNeeds as EventStaffNeedRow[]}
             people={people ?? []}
             activePeople={activePeople}
             busy={busy}
             needPersonIds={needPersonIds}
             postForm={
-              <form
-                className="grid gap-2 sm:grid-cols-3"
-                onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
-                  formEvent.preventDefault();
-                  const data = new FormData(formEvent.currentTarget);
-                  const role = readStaffRole(data, "role");
-                  const description = String(
-                    data.get("description") ?? "",
-                  ).trim();
-                  if (!role) return;
-                  void run("postOpen", () =>
-                    createNeed({
-                      eventId,
-                      role,
-                      description: description || undefined,
-                      startsAt: startsAt ?? undefined,
-                      endsAt: endsAt ?? undefined,
-                    }),
-                  );
-                  formEvent.currentTarget.reset();
-                }}
-              >
-                <label className="field-label">
-                  Role
-                  <StaffRoleSelect name="role" roles={roleOptions} />
-                </label>
-                <label className="field-label">
-                  Description
-                  <input name="description" className="field-input" />
-                </label>
-                <button
-                  type="submit"
-                  className="btn btn-ghost self-end"
-                  disabled={busy != null}
+              canManage ? (
+                <form
+                  className="grid gap-2 sm:grid-cols-3"
+                  onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
+                    formEvent.preventDefault();
+                    const data = new FormData(formEvent.currentTarget);
+                    const role = readStaffRole(data, "role");
+                    const description = String(
+                      data.get("description") ?? "",
+                    ).trim();
+                    if (!role) return;
+                    const form = formEvent.currentTarget;
+                    void run("postOpen", async () => {
+                      await createNeed({
+                        eventId,
+                        role,
+                        description: description || undefined,
+                      });
+                      form.reset();
+                    });
+                  }}
                 >
-                  Post open shift
-                </button>
-              </form>
+                  <label className="field-label">
+                    Role
+                    <StaffRoleSelect name="role" roles={roleOptions} />
+                  </label>
+                  <label className="field-label">
+                    Description
+                    <input name="description" className="field-input" />
+                  </label>
+                  <button
+                    type="submit"
+                    className="btn btn-ghost self-end"
+                    disabled={busy != null}
+                  >
+                    Post open shift
+                  </button>
+                </form>
+              ) : undefined
             }
             onNeedPersonChange={(needId, personId) =>
               setNeedPersonIds((current) => ({
@@ -410,37 +394,6 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
               const target = entry.unassign;
               if (!target) return;
               void run(`unassign:${target.docId}`, async () => {
-                // Their last row for this event (other live assignments or a
-                // filled open shift keep them staffed): retire the linked
-                // shift first. If the unassign then fails, the roster still
-                // shows them and "Sync shifts" offers the retry — never a
-                // scheduled shift for someone who is off the roster.
-                const stillStaffed =
-                  eventAssignments.some(
-                    (row) =>
-                      row.personId === entry.personId &&
-                      row._id !== target.docId,
-                  ) ||
-                  eventNeeds.some(
-                    (need) =>
-                      need.status === "filled" &&
-                      need.filledByPersonId === entry.personId,
-                  );
-                if (!stillStaffed) {
-                  // Every linked shift that can still be cancelled; completed
-                  // and no-show shifts are attendance history and stay.
-                  for (const shift of cancellableEventShifts(
-                    shiftsRef.current,
-                    eventId,
-                    entry.personId,
-                  )) {
-                    await cancelShift({
-                      docId: shift._id,
-                      version: shift.version,
-                      reason: "Unassigned from the event",
-                    });
-                  }
-                }
                 await unassign({
                   docId: target.docId,
                   version: target.version,
@@ -465,14 +418,28 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
                 }),
               )
             }
+            onReleaseClaim={(need) =>
+              void run(`release:${need._id}`, () =>
+                releaseClaim({ docId: need._id, version: need.version }),
+              )
+            }
             onCancel={(need) => {
               void (async () => {
                 const reason = await prompt.askReason({
-                  title: "Cancel open shift",
-                  description: "Record why this open shift is coming down.",
+                  title:
+                    need.status === "filled"
+                      ? "Remove covered request"
+                      : "Cancel open shift",
+                  description:
+                    need.status === "filled"
+                      ? "Remove this staffing requirement and its future coverage. Other assigned roles and recorded work stay intact."
+                      : "Record why this open shift is coming down.",
                   label: "Cancellation reason",
                   placeholder: "e.g. Covered by a reassignment",
-                  confirmLabel: "Cancel shift",
+                  confirmLabel:
+                    need.status === "filled"
+                      ? "Remove coverage"
+                      : "Cancel shift",
                   tone: "danger",
                 });
                 if (!reason) return;
@@ -483,6 +450,69 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
                     reason,
                   }),
                 );
+              })();
+            }}
+            onChangeCoverage={(need) => {
+              void (async () => {
+                const draft = coverageDrafts[need._id];
+                const values = await prompt.askFields({
+                  title: `Change ${need.role} coverage`,
+                  description:
+                    "Choose another staff member or reopen for volunteers. The role and instructions carry over; recorded work stays with its original staff member.",
+                  fields: [
+                    {
+                      name: "personId",
+                      label: "Cover with",
+                      required: false,
+                      placeholder: "Reopen for volunteers",
+                      defaultValue: draft?.personId,
+                      options: activePeople.map((person) => ({
+                        value: person._id,
+                        label: personLabel(person),
+                      })),
+                    },
+                    {
+                      name: "startsAt",
+                      label: "New start (optional)",
+                      inputType: "datetime-local",
+                      required: false,
+                      defaultValue: draft?.startsAt,
+                      helper:
+                        "Leave both times blank to reuse the connected coverage windows, including split shifts.",
+                    },
+                    {
+                      name: "endsAt",
+                      label: "New end (optional)",
+                      inputType: "datetime-local",
+                      required: false,
+                      defaultValue: draft?.endsAt,
+                    },
+                  ],
+                  confirmLabel: "Save coverage",
+                });
+                if (!values) return;
+                setCoverageDrafts((current) => ({
+                  ...current,
+                  [need._id]: values,
+                }));
+                void run(`changeCoverage:${need._id}`, async () => {
+                  await changeCoverage({
+                    docId: need._id,
+                    version: need.version,
+                    personId: values.personId || undefined,
+                    startsAt: values.startsAt
+                      ? new Date(values.startsAt).getTime()
+                      : undefined,
+                    endsAt: values.endsAt
+                      ? new Date(values.endsAt).getTime()
+                      : undefined,
+                  });
+                  setCoverageDrafts((current) => {
+                    const next = { ...current };
+                    delete next[need._id];
+                    return next;
+                  });
+                });
               })();
             }}
             conflictsFor={conflictsFor}

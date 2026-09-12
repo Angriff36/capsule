@@ -63,11 +63,11 @@ describe("Culinary planning slice contract", () => {
       "useListEventDish",
       "useEventDishAdjustServings",
       "useEventDishRemove",
-      "useListDishTask",
-      "useListPrepTask",
+      "useReconcileEventPrepWork",
+      "../../lib/safeCulinaryOperations",
       "useListIngredientDemand",
-      "useCreatePrepTask",
-      "usePrepTaskRefreshGenerated",
+      "useCreateInventoryReservation",
+      "useInventoryReservationRelease",
     ]) {
       expect(eventMenu).toContain(hook);
     }

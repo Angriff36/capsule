@@ -30,7 +30,9 @@ Use a **dispatch manifest**:
 
 ## Cross-system handoffs
 
-Pack items may reference Dish and ProductionBatch; PackList/Delivery belong to Event; Delivery may reference a Person driver. Pack and delivery terminal state contributes to Event readiness. Event cancellation should cancel active logistics work.
+Pack items may reference Dish and ProductionBatch; PackList/Delivery belong to Event; Delivery may reference a Person driver. Pack and delivery terminal state contributes to Event readiness. The event cancellation callback stops unfinished pack lists and scheduled/in-transit deliveries through source-owned commands that require the parent event to be cancelled. The parent's authorization is sufficient; the separate human logistics cancel commands retain their existing permissions.
+
+Dispatched pack lists and delivered, failed or previously cancelled deliveries remain unchanged. Packed quantities, loading/departure times, driver/vehicle assignments and historical records remain recorded. The callback skips deleted and foreign-tenant rows, is repeatable without writes, and runs in the parent transaction.
 
 ## States and permissions
 
@@ -40,7 +42,7 @@ Vehicle, route optimization, returns, loss records, equipment entities, and ship
 
 ## Current status
 
-Shipping authored `/logistics` workspace (2026-07-20): pack lists, load-sheet detail, and deliveries consume generated createVia/query/command hooks and lifecycle metadata. Routes: `/logistics/packs`, `/logistics/packs/:id`, `/logistics/deliveries`. Runtime proof: `tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts` (open → pack → schedule → transit → confirm, plus auth denial and tenant isolation). Event-cancellation fan-out remains structurally present; do not claim every downstream cancellation consequence is end-to-end verified beyond this slice’s pack/delivery lifecycle.
+The authored workspace has routes `/logistics/packs`, `/logistics/packs/:id`, and `/logistics/deliveries`, using generated commands and lifecycle metadata. Existing runtime proof: `tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts`. Current source-branch cancellation qualification covers admin/event_manager, active and terminal packing/delivery states, deleted/foreign records, repeated cleanup, and combined purchasing/stock/billing records. These isolated runtime checks do not prove live-data repair, authenticated deployment, rescheduling, or the full operational workflow; see [the source-backed progress record](../../codex-plans/source-backed-operations/progress.md).
 
 ## References
 

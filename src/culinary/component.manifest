@@ -19,6 +19,8 @@ entity Component mixin TenantScoped, SoftDeletable {
   property cuisine: string?
   property description: string?
   property instructions: string?
+  property recipeSourceFingerprint: string?
+  property recipeSourceText: string?
   property required versionNumber: int = 1
   property required yieldQuantity: decimal(10, 2) = 1
   property required yieldUnit: UnitOfMeasure = "portion"
@@ -66,7 +68,9 @@ entity Component mixin TenantScoped, SoftDeletable {
     optional category: string,
     optional cuisine: string,
     optional description: string,
-    optional instructions: string
+    optional instructions: string,
+    optional sourceFingerprint: string,
+    optional sourceText: string
   ) {
     guard self.draftedAt == null
     guard self.deletedAt == null
@@ -83,6 +87,8 @@ entity Component mixin TenantScoped, SoftDeletable {
     mutate cuisine = cuisine
     mutate description = description
     mutate instructions = instructions
+    mutate recipeSourceFingerprint = sourceFingerprint
+    mutate recipeSourceText = sourceText
     mutate versionNumber = 1
     mutate draftedAt = now()
     emit ComponentDrafted {

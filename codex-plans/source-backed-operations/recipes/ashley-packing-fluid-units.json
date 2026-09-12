@@ -1,0 +1,35 @@
+{
+  "packListId": "qn74zdd566841ftstrnhy6f69s8dpsde",
+  "items": [
+    {
+      "itemId": "qh7dgxv0mq8vbz9bwnp1v3b07d8dqkdf",
+      "description": "Bacon Jam - Show Association",
+      "sourceFluidOunces": 10.5,
+      "sourceReference": "TPP reports/event_specific/Pack_List.xlsx sheet1 A264: (10.5 Oz - Fld) Bacon Jam"
+    },
+    {
+      "itemId": "qh75mzm9gnxznhxetegn9axdhs8dqcsm",
+      "description": "Caramel Sauce - Show Association",
+      "sourceFluidOunces": 83.5,
+      "sourceReference": "TPP reports/event_specific/Pack_List.xlsx sheet1 G281: (83.5 Oz - Fld) Caramel Sauce"
+    },
+    {
+      "itemId": "qh7c3nmqpst3pejekaytqz8jjh8dqxf8",
+      "description": "Chocolate Sauce - Show Association",
+      "sourceFluidOunces": 83.5,
+      "sourceReference": "TPP reports/event_specific/Pack_List.xlsx sheet1 A291: (83.5 Oz - Fld) Chocolate Sauce"
+    },
+    {
+      "itemId": "qh7ajrgw0q1qejm2r94ghm1gb98dqn6c",
+      "description": "Cream sauce for chicken - Show Association",
+      "sourceFluidOunces": 167,
+      "sourceReference": "TPP reports/event_specific/Pack_List.xlsx sheet1 G294: (167 Oz - Fld) Cream sauce for chicken"
+    },
+    {
+      "itemId": "qh7aperbexmcawqg0k6z4gv6nh8dph1r",
+      "description": "Balsamic Glaze - Show Association",
+      "sourceFluidOunces": 10.5,
+      "sourceReference": "TPP reports/event_specific/Pack_List.xlsx sheet1 A347: (10.5 Oz - Fld) Balsamic Glaze"
+    }
+  ]
+}

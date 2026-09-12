@@ -28,7 +28,11 @@ export type {
 } from "./CapsuleEventBundleCoordinator";
 export { buildEventBundlePlan } from "./CapsuleEventBundlePlan";
 export type { EventBundlePlan, PlannedStep } from "./CapsuleEventBundlePlan";
-export { toCapsuleUnit, CAPSULE_UNITS } from "./CapsuleMeasureUnit";
+export {
+  toCapsuleUnit,
+  toCapsuleMeasure,
+  CAPSULE_UNITS,
+} from "./CapsuleMeasureUnit";
 export type { CapsuleUnit } from "./CapsuleMeasureUnit";
 export { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 export { CapsuleComponentStatusLoader } from "./CapsuleComponentStatusLoader";

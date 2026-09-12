@@ -47,11 +47,11 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   ref vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
   ref vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
 
-  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity > 0 "Required quantity must be positive once opened"
+  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "Required quantity cannot be negative"
 
   transition status from "open" to ["ordered", "cancelled"]
-  transition status from "ordered" to ["fulfilled", "cancelled"]
-  transition status from "fulfilled" to []
+  transition status from "ordered" to ["open", "fulfilled", "cancelled"]
+  transition status from "fulfilled" to ["open"]
   transition status from "cancelled" to []
 
   // manageAccess: Event.approve (event_manager) foreach-creates PurchaseNeed;
@@ -122,9 +122,10 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open"
     guard self.openedAt != null
     guard self.deletedAt == null
-    // Idempotent: same draft line re-assign is a no-op; different line is blocked.
-    guard self.vendorOrderId == null or (self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId)
-    guard self.vendorOrderLineId == null or self.vendorOrderLineId == vendorOrderLineId
+    // Keep one editable draft link; a submitted order remains in the demand
+    // link history while a later shortage can link to a new draft.
+    guard self.vendorOrderId == null or (self.vendorOrder != null and self.vendorOrder.status != "draft") or (self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId)
+    guard self.vendorOrderLineId == null or (self.vendorOrder != null and self.vendorOrder.status != "draft") or self.vendorOrderLineId == vendorOrderLineId
     mutate vendorOrderId = vendorOrderId
     mutate vendorOrderLineId = vendorOrderLineId
     emit PurchaseNeedDraftAssigned {
@@ -139,13 +140,24 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Post-approve demand reconcile: revise open need quantity; weekly line re-ensures.
-  command reviseRequired(requiredQuantity: decimal(12, 4)) {
-    guard self.status == "open"
+  // Reconcile current need without rewriting previously submitted order lines.
+  command reviseRequired(requiredQuantity: decimal(12, 4), optional unit: UnitOfMeasure) {
+    guard self.status == "open" or self.status == "ordered" or self.status == "fulfilled"
     guard self.openedAt != null
     guard self.deletedAt == null
-    constraint reviseNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
-    mutate requiredQuantity = requiredQuantity
+    constraint reviseNeedQuantityPositive: requiredQuantity >= 0 "Required quantity cannot be negative"
+    // Preserve the purchasing unit for compatible recipe measurements.
+    // Exact factors mirror src/lib/recipeUnitConversion.ts.
+    compute incomingUnit = unit != null ? unit : self.unit
+    compute sourceMass = incomingUnit == "gram" ? 1 : incomingUnit == "kilogram" ? 1000 : incomingUnit == "ounce" ? 28.349523125 : incomingUnit == "pound" ? 453.59237 : 0
+    compute sourceVolume = incomingUnit == "milliliter" ? 1 : incomingUnit == "liter" ? 1000 : incomingUnit == "teaspoon" ? 4.92892159375 : incomingUnit == "tablespoon" ? 14.78676478125 : incomingUnit == "cup" ? 236.5882365 : incomingUnit == "pint" ? 473.176473 : incomingUnit == "quart" ? 946.352946 : incomingUnit == "gallon" ? 3785.411784 : 0
+    compute targetMass = self.unit == "gram" ? 1 : self.unit == "kilogram" ? 1000 : self.unit == "ounce" ? 28.349523125 : self.unit == "pound" ? 453.59237 : 0
+    compute targetVolume = self.unit == "milliliter" ? 1 : self.unit == "liter" ? 1000 : self.unit == "teaspoon" ? 4.92892159375 : self.unit == "tablespoon" ? 14.78676478125 : self.unit == "cup" ? 236.5882365 : self.unit == "pint" ? 473.176473 : self.unit == "quart" ? 946.352946 : self.unit == "gallon" ? 3785.411784 : 0
+    compute compatibleUnit = incomingUnit == self.unit or (sourceMass > 0 and targetMass > 0) or (sourceVolume > 0 and targetVolume > 0)
+    compute unitRatio = incomingUnit == self.unit ? 1 : (sourceMass > 0 and targetMass > 0 ? sourceMass / targetMass : (sourceVolume > 0 and targetVolume > 0 ? sourceVolume / targetVolume : 1))
+    mutate requiredQuantity = requiredQuantity * unitRatio
+    mutate unit = compatibleUnit ? self.unit : incomingUnit
+    mutate status = "open"
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId
@@ -153,7 +165,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
       ingredientDemandId: self.ingredientDemandId
       ingredientId: self.ingredientId
       preferredVendorId: self.preferredVendorId
-      requiredQuantity: requiredQuantity
+      requiredQuantity: self.requiredQuantity
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
       status: "open"
@@ -182,8 +194,8 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Receiving automation stays deferred (OD019); fulfilment is an explicit
-  // procurement acknowledgement until line-received targeting is product-defined.
+  // Fulfilment is an explicit procurement acknowledgement. Receipt lots already
+  // update stock; a later demand increase can reopen purchasing work.
   command markFulfilled() {
     guard self.status == "ordered"
     guard self.orderedAt != null
@@ -223,7 +235,56 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Event managers may cancel their event without acting as purchasing managers.
+  // The parent must already be cancelled; the transactional event handler skips
+  // fulfilled and previously cancelled needs so their whole history stays intact.
+  command standDownWithEvent() {
+    guard self.status == "open" or self.status == "ordered"
+    guard self.deletedAt == null
+    guard self.event != null and self.event.stage == "cancelled"
+    compute previousStatus = self.status
+    compute reason = self.event.cancellationReason != null ? self.event.cancellationReason : "Event cancelled"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PurchaseNeedCancelled {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
+  // Retired demand links retain the draft's provenance; active pointers must no
+  // longer make submission try to mark a cancelled need as ordered.
+  command releaseCancelledDraft() {
+    guard self.status == "cancelled"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and (self.vendorOrder.status == "draft" or (self.vendorOrder.status == "cancelled" and self.vendorOrder.submittedAt == null))
+    compute previousOrderId = self.vendorOrderId
+    compute previousLineId = self.vendorOrderLineId
+    mutate vendorOrderId = null
+    mutate vendorOrderLineId = null
+    emit PurchaseNeedDraftReleased {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: previousOrderId
+      vendorOrderLineId: previousLineId
+    }
+  }
+
   store PurchaseNeed in durable
+}
+
+event PurchaseNeedDraftReleased: "purchase_need.draft_released" {
+  purchaseNeedId: string
+  tenantId: string
+  vendorOrderId: string?
+  vendorOrderLineId: string?
 }
 
 event PurchaseNeedOpened: "purchase_need.opened" {
@@ -320,6 +381,7 @@ on IngredientDemandConfirmed run PurchaseNeed.create
   resolve null
   params {
     eventId: payload.eventId,
+    purchasingWeekStart: payload.purchasingWeekStart,
     ingredientDemandId: payload.ingredientDemandId,
     ingredientId: payload.ingredientId,
     preferredVendorId: payload.preferredVendorId,
@@ -332,8 +394,6 @@ on IngredientDemandConfirmed run PurchaseNeed.create
 on VendorOrderSubmitted fanOut PurchaseNeed where vendorOrderId = payload.vendorOrderId
   run markDraftOrdered
 
-// Event cancellation stops open purchasing work (product definition § 3 /
-// interconnection requirements: cancellation stops inappropriate downstream work).
-on EventCancelled fanOut PurchaseNeed where eventId = payload.eventId
-  run cancel
-  params { reason: payload.reason }
+// The transactional operational event handler stands down only unfinished
+// purchase needs. A blanket fan-out through the human cancel command rejects
+// settled needs and event managers, rolling back the entire event cancellation.

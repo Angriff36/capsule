@@ -33,6 +33,7 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
+  property indexed activeDishId: uuid?
   property required dishId: uuid
   property required searchable name: string = ""
   property required serviceMethod: DishServiceMethod = "cooked_at_kitchen"
@@ -83,6 +84,7 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
     constraint defineContainerName: length(trim(name)) > 0 "Container name is required"
     constraint defineContainerServings: servingsPerContainer >= 1 "Servings per container must be at least 1"
     mutate dishId = dishId
+    mutate activeDishId = dishId
     mutate name = name
     mutate serviceMethod = serviceMethod
     mutate servingsPerContainer = servingsPerContainer
@@ -136,6 +138,7 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     mutate status = "retired"
+    mutate activeDishId = null
     mutate retiredAt = now()
     emit DishContainerRetired {
       dishContainerId: self.id
@@ -148,12 +151,17 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
     guard self.status == "retired"
     guard self.deletedAt == null
     mutate status = "active"
+    mutate activeDishId = self.dishId
     mutate retiredAt = null
     emit DishContainerReinstated {
       dishContainerId: self.id
       tenantId: self.tenantId
       dishId: self.dishId
     }
+  }
+
+  command refreshActiveKey() {
+    mutate activeDishId = self.deletedAt == null and self.status == "active" ? self.dishId : null
   }
 
   store DishContainer in durable
@@ -203,15 +211,39 @@ on PackListOpened fanOut EventDish where eventId = payload.eventId
     packListId: payload.packListId
   }
 
+// Catalog changes must reach events whose packing lists already exist.
+// The active recipe key is cleared at event completion/cancellation and is
+// explicitly backfilled for legacy events by the recipe reconciliation seam.
+on DishContainerDefined fanOut EventDish where recipeSyncDishId = payload.dishId
+  run requestCatalogPacking
+
+on DishContainerRevised fanOut EventDish where recipeSyncDishId = payload.dishId
+  run requestCatalogPacking
+
+on DishContainerReinstated fanOut EventDish where recipeSyncDishId = payload.dishId
+  run requestCatalogPacking
+
+on EventDishCatalogPackingRequested fanOut PackList where activeEventId = payload.eventId
+  run requestDishContainers
+  params {
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    quantityServings: payload.quantityServings
+  }
+
 on EventDishContainerPackRequested fanOut DishContainer where dishId = payload.dishId
-  run PackListItem.addItem
-  match packListId = payload.packListId, dishContainerId = self.id
+  run refreshActiveKey
+
+on EventDishContainerPackRequested fanOut DishContainer where activeDishId = payload.dishId
+  run PackListItem.ensureContainer
+  match packListId = payload.packListId, dishContainerId = self.id, eventDishId = payload.eventDishId
   else create
   params {
     packListId: payload.packListId
     dishContainerId: self.id
     description: self.name
-    requiredQuantity: ceil(payload.quantityServings / self.servingsPerContainer) + self.baseQuantity
+    eventDishId: payload.eventDishId
+    quantityServings: payload.quantityServings
     unit: self.unit
     dishId: payload.dishId
   }

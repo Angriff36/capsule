@@ -83,7 +83,14 @@ export function useActionPrompt(busy = false): {
     [controller, announceDismissed],
   );
 
-  useEffect(() => controller.subscribe(setPending), [controller]);
+  useEffect(
+    () =>
+      controller.subscribe((next) => {
+        setPending(next);
+        if (next) setNotice(null);
+      }),
+    [controller],
+  );
 
   useEffect(() => {
     if (!notice) return;

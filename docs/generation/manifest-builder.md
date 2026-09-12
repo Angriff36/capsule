@@ -244,6 +244,9 @@ The source contract for DishTask templates, EventDish-owned PrepTask rows,
 IngredientDemand provenance, and weekly draft VendorOrder reconciliation is
 documented in [event-prep-and-weekly-order-workflow.md](../event-prep-and-weekly-order-workflow.md).
 Edit the `.manifest` sources and regenerate owned projections; do not hand-edit
-Convex output. The current Manifest compiler does not support child-creating
-reactions, so the Capsule orchestrator owns generated-row reconciliation while
-the Manifest events and commands remain the domain contract.
+Convex output. Generated reactions create the initial rows. Published Manifest
+3.6.51 also supports the configured transactional `eventHandlerImport`; Capsule
+uses `convex/lib/operationalEvents.ts` to reconcile remaining prep after serving
+changes through generated commands. UI transport wrappers remain in
+`src/lib/safeCulinaryOperations.ts`; policies and governed writes remain on the
+generated command surface.

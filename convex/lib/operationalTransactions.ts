@@ -1,7 +1,8 @@
 import { v } from "convex/values";
 import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
-import { mutation } from "../_generated/server";
+import { mutation, query } from "../_generated/server";
+import { readEventTimingPlan } from "./eventTimingOperations";
 import { getAuthContext, requireTenant } from "./authContext";
 import {
   readMaterializationReceipt,
@@ -9,6 +10,11 @@ import {
 } from "./materializationReceipt";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import { materializeCateringPackage, type CateringPackageResult } from "./cateringPackageOperations";
+
+export const eventTimingPlan = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args) => readEventTimingPlan(ctx, args.eventId),
+});
 
 export const applyCateringPackage = mutation({
   args: {
@@ -284,7 +290,7 @@ export const reorderEventTimeline = mutation({
     rows: v.array(
       v.object({
         docId: v.id("eventTimelineActivities"),
-        startsAt: v.number(),
+        startsAt: v.optional(v.number()),
         endsAt: v.optional(v.number()),
         sortOrder: v.number(),
         version: v.number(),
@@ -314,8 +320,65 @@ export const reorderEventTimeline = mutation({
     const liveIds = new Set(live.map((row) => String(row._id)));
     if (args.rows.some((row) => !liveIds.has(String(row.docId))))
       throw new Error("Timeline activity not found for this event");
-    for (const row of args.rows)
-      await ctx.runMutation(api.mutations.EventTimelineActivity_adjust, row);
+    const liveById = new Map(live.map((row) => [String(row._id), row]));
+    for (const row of args.rows) {
+      const prior = liveById.get(String(row.docId))!;
+      await ctx.runMutation(api.mutations.EventTimelineActivity_adjust, {
+        ...row,
+        // A reorder that retains times is not a time edit. This also keeps
+        // ordering usable for historical rows with an invalid old window.
+        startsAt: (row.startsAt ?? null) === (prior.startsAt ?? null) ? undefined : row.startsAt,
+        endsAt: (row.endsAt ?? null) === (prior.endsAt ?? null) ? undefined : row.endsAt,
+      });
+    }
     return { adjusted: args.rows.length };
+  },
+});
+
+/** One transaction: a failed block must not leave an unusable partial run. */
+export const scheduleEventTimeline = mutation({
+  args: {
+    eventId: v.id("events"),
+    operationKey: v.string(),
+    plans: v.array(v.object({
+      idempotencyKey: v.string(),
+      name: v.string(),
+      startsAt: v.optional(v.number()),
+      endsAt: v.optional(v.number()),
+      category: v.optional(v.string()),
+      notes: v.optional(v.string()),
+      responsibleParty: v.optional(v.string()),
+      assigneeTeams: v.optional(v.array(v.string())),
+    })),
+  },
+  handler: async (ctx, args): Promise<{ created: number; existing: number }> => {
+    const tenantId = requireTenant(await getAuthContext(ctx));
+    const event = await ctx.runQuery(api.queries.getEvent, { id: args.eventId });
+    if (!event) throw new Error("Event not found");
+    const live = (await ctx.db.query("eventTimelineActivities")
+      .withIndex("by_eventId", (q) => q.eq("eventId", args.eventId)).collect())
+      .filter((row) => row.tenantId === tenantId && row.deletedAt == null && row.scheduledAt != null);
+    const identity = (row: { name?: string | null; category?: string | null }) =>
+      JSON.stringify([row.name?.trim().toLowerCase(), row.category?.trim().toLowerCase() ?? ""]);
+    const existing = new Set(live.map(identity));
+    let sortOrder = live.reduce((max, row) => Math.max(max, row.sortOrder ?? 0), -1) + 1;
+    let created = 0;
+    let reused = 0;
+    for (const plan of args.plans) {
+      const key = identity(plan);
+      if (existing.has(key)) {
+        reused++;
+        continue;
+      }
+      await ctx.runMutation(api.mutations.EventTimelineActivity_createViaSchedule, {
+        ...plan,
+        eventId: args.eventId,
+        idempotencyKey: `${args.operationKey}:${plan.idempotencyKey}`,
+        sortOrder: sortOrder++,
+      });
+      existing.add(key);
+      created++;
+    }
+    return { created, existing: reused };
   },
 });

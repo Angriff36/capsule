@@ -49,6 +49,7 @@ export type EventPrepTask = {
   dishTaskId?: string | null;
   name: string;
   quantity: number;
+  completedQuantity?: number | null;
   unit: EventPrepUnit;
   ingredientId?: string | null;
   ingredientDemandId?: string | null;
@@ -139,6 +140,7 @@ type Ports = {
     docId: string;
     version?: number;
     quantity: number;
+    unit?: EventPrepUnit;
     specialInstructions?: string;
   }) => Promise<unknown>;
 };

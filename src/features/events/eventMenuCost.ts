@@ -156,10 +156,10 @@ function servingsFor(
   dish: EventMenuCostDish,
   expectedHeadcount: number,
 ): number {
-  const override = Number(dish.headcountOverride ?? 0);
-  if (Number.isFinite(override) && override > 0) return override;
   const qty = Number(dish.quantityServings);
-  if (Number.isFinite(qty) && qty > 0) return qty;
+  // The event line's servings are shared by prep, demand and food cost.
+  // Zero is an explicit 86, even when a legacy override remains.
+  if (Number.isFinite(qty) && qty >= 0) return qty;
   const headcount = Number(expectedHeadcount);
   return Number.isFinite(headcount) && headcount > 0 ? headcount : 0;
 }

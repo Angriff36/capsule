@@ -65,14 +65,19 @@ export function EventStaffingSummaryAside({
   const claimed = needs.filter((need) => need.status === "claimed").length;
   const filled = needs.filter((need) => need.status === "filled").length;
 
-  const byRole = new Map<string, number>();
+  const peopleCount = new Set(roster.map((entry) => entry.personId)).size;
+  const byRole = new Map<string, Set<string>>();
   for (const entry of roster) {
     const role = entry.role.trim() || "Unassigned role";
-    byRole.set(role, (byRole.get(role) ?? 0) + 1);
+    const people = byRole.get(role) ?? new Set<string>();
+    people.add(entry.personId);
+    byRole.set(role, people);
   }
-  const roles = [...byRole.entries()].sort(
-    (left, right) => right[1] - left[1] || left[0].localeCompare(right[0]),
-  );
+  const roles = [...byRole.entries()]
+    .map(([role, people]) => [role, people.size] as const)
+    .sort(
+      (left, right) => right[1] - left[1] || left[0].localeCompare(right[0]),
+    );
 
   const posted = needs.filter((need) => need.status !== "cancelled").length;
   const coveredPct = posted === 0 ? 0 : Math.round((filled / posted) * 100);
@@ -82,9 +87,9 @@ export function EventStaffingSummaryAside({
       <AsideCard title="Staffing summary">
         <div className="divide-y divide-line">
           <div className="pb-1">
-            <StatRow label="On the roster" value={roster.length} />
+            <StatRow label="On the roster" value={peopleCount} />
             <StatRow
-              label="Confirmed"
+              label="Confirmed assignments"
               value={confirmed}
               tone={confirmed > 0 ? "text-ok" : "text-ink-3"}
             />
@@ -168,11 +173,11 @@ export function EventStaffingSummaryAside({
       ) : roster.length > 0 ? (
         <section className="rounded-md border border-ok/40 bg-ok-soft px-3.5 py-3">
           <h3 className="text-sm font-bold tracking-[0.06em] text-ok uppercase">
-            No conflicts
+            No conflicts found
           </h3>
           <p className="mt-1 text-base text-ink-2">
-            Nobody on this roster has an overlapping shift or approved time off
-            in the event window.
+            No overlapping shifts or approved time off were found in the records
+            visible to you.
           </p>
         </section>
       ) : null}

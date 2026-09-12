@@ -366,7 +366,7 @@ function TaskRow({
           {linkedComponent && task.componentId ? (
             <>
               {" · "}
-              <Link to={componentPath(task.componentId)}>
+              <Link to={componentPath(task.componentId, task._id)}>
                 {linkedComponent}
               </Link>
             </>

@@ -132,18 +132,3 @@ export function operationalRequirementsText(
   ].filter((part): part is string => typeof part === "string");
   return parts.length > 0 ? parts.join("\n") : undefined;
 }
-
-/**
- * Quantities the kitchen and purchasing commands accept start at 1. TPP
- * prints fractions ("0.03 Gallon"). Round up and keep the printed amount.
- */
-export function wholeQuantity(value: number | undefined): {
-  quantity: number;
-  rounded: boolean;
-} {
-  if (value === undefined || !Number.isFinite(value) || value <= 0) {
-    return { quantity: 1, rounded: value !== undefined };
-  }
-  if (value < 1) return { quantity: 1, rounded: true };
-  return { quantity: value, rounded: false };
-}

@@ -1,0 +1,155 @@
+[
+  {
+    "name": "Make Sherry Vinaigrette salad dressing",
+    "key": "197b50fe7692d7ebfcc97ddd7ed61aa837afad1b1bd2df7de005851719e0df10",
+    "yieldQuantity": 2,
+    "yieldUnit": "quart",
+    "ingredients": [
+      {
+        "name": "Sherry",
+        "quantity": 0.3958333333333333,
+        "unit": "quart",
+        "source": "Salad_Dressing.xlsx sheet1 A289/B289/E289: 12 2/3 Oz - Fld"
+      },
+      {
+        "name": "Dijon",
+        "quantity": 3.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A290/B290/E290: 3 Tblsp - Dry"
+      },
+      {
+        "name": "Honey",
+        "quantity": 0.75,
+        "unit": "cup",
+        "source": "Salad_Dressing.xlsx sheet1 A291/B291/E291: 3/4 Cup"
+      },
+      {
+        "name": "White Sugar",
+        "quantity": 1.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A292/B292/E292: 1 Tblsp - Dry"
+      },
+      {
+        "name": "Olive Oil",
+        "quantity": 1.5,
+        "unit": "quart",
+        "source": "Salad_Dressing.xlsx sheet1 A293/B293/E293: 1 1/2 Quart"
+      }
+    ],
+    "instructions": "Combine all ingredients except oil. Blend with an immersion blender, then slowly add oil while continuing to blend."
+  },
+  {
+    "name": "Salad Dressing - Raspberry Vinaigrette",
+    "key": "2fc14e47a41390a727aa85ca2ba584592dc8d42ff8988a5129452f23e83de7d7",
+    "yieldQuantity": 3,
+    "yieldUnit": "quart",
+    "ingredients": [
+      {
+        "name": "Apple Cider Vinegar",
+        "quantity": 2.0,
+        "unit": "cup",
+        "source": "Salad_Dressing.xlsx sheet1 A397/B397/E397: 2 Cup - Fld"
+      },
+      {
+        "name": "Honey",
+        "quantity": 1.0,
+        "unit": "cup",
+        "source": "Salad_Dressing.xlsx sheet1 A398/B398/E398: 1 Cup"
+      },
+      {
+        "name": "Spice - Cinnamon",
+        "quantity": 0.5,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A399/B399/E399: 1/2 Tblsp - Dry"
+      },
+      {
+        "name": "Lemon Juice",
+        "quantity": 1.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A400/B400/E400: 1 Tblsp - Fld"
+      },
+      {
+        "name": "Eggs",
+        "quantity": 6.0,
+        "unit": "each",
+        "source": "Salad_Dressing.xlsx sheet1 A401/B401/E401: 6 Each"
+      },
+      {
+        "name": "White Sugar",
+        "quantity": 4.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A402/B402/E402: 4 Tblsp - Dry"
+      },
+      {
+        "name": "Olive Oil",
+        "quantity": 1.5,
+        "unit": "quart",
+        "source": "Salad_Dressing.xlsx sheet1 A403/B403/E403: 1 1/2 Quart"
+      },
+      {
+        "name": "Red Wine Vinegar",
+        "quantity": 0.5,
+        "unit": "cup",
+        "source": "Salad_Dressing.xlsx sheet1 A404/B404/E404: 1/2 Cup - Fld"
+      },
+      {
+        "name": "Raspberry Jam",
+        "quantity": 0.71875,
+        "unit": "quart",
+        "source": "Salad_Dressing.xlsx sheet1 A405/B405/E405: 23 Oz - Fld"
+      }
+    ],
+    "instructions": "Combine all ingredients except oils. Mix with an immersion blender, then slowly add oils while mixing."
+  },
+  {
+    "name": "Salad Dressing - White Wine Vinaigrette",
+    "key": "6a32c325192887d7b0212fa068a882f0c4f167b6d87f5930ee558b49b43d7941",
+    "yieldQuantity": 2,
+    "yieldUnit": "quart",
+    "ingredients": [
+      {
+        "name": "White Cooking Wine",
+        "quantity": 1.0,
+        "unit": "cup",
+        "source": "Salad_Dressing.xlsx sheet1 A450/B450/E450: 1 Cup"
+      },
+      {
+        "name": "Lemon Juice",
+        "quantity": 1.0,
+        "unit": "cup",
+        "source": "Salad_Dressing.xlsx sheet1 A451/B451/E451: 1 Cup"
+      },
+      {
+        "name": "Honey",
+        "quantity": 3.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A452/B452/E452: 3 Tblsp - Dry"
+      },
+      {
+        "name": "Dijon",
+        "quantity": 3.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A453/B453/E453: 3 Tblsp - Dry"
+      },
+      {
+        "name": "Salt",
+        "quantity": 3.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A454/B454/E454: 3 Tblsp - Dry"
+      },
+      {
+        "name": "Pepper",
+        "quantity": 1.0,
+        "unit": "tablespoon",
+        "source": "Salad_Dressing.xlsx sheet1 A455/B455/E455: 1 Tblsp - Dry"
+      },
+      {
+        "name": "Olive Oil",
+        "quantity": 1.0,
+        "unit": "quart",
+        "source": "Salad_Dressing.xlsx sheet1 A456/B456/E456: 1 Quart"
+      }
+    ],
+    "instructions": "Combine all ingredients except oil. Slowly add oil while blending."
+  }
+]

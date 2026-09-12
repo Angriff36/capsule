@@ -14,10 +14,13 @@ import {
   useListVendor,
   useListVendorContact,
   useListVendorOrderLine,
+  useListVendorOrderLineDemand,
   useVendorOrderApprove,
   useVendorOrderCancel,
   useVendorOrderConfirm,
   useVendorOrderLineRecordReceipt,
+  useVendorOrderLineReconcileDraftRequirement,
+  useVendorOrderLineReviseQuantity,
   useVendorOrderMarkPartiallyReceived,
   useVendorOrderMarkReceived,
   useVendorOrderRequestChanges,
@@ -44,6 +47,7 @@ export function VendorOrderPage() {
   const vendors = useListVendor();
   const vendorContacts = useListVendorContact();
   const lines = useListVendorOrderLine();
+  const demandLinks = useListVendorOrderLineDemand();
   const needs = useListPurchaseNeed();
   const events = useListEvent();
   const ingredients = useListIngredient();
@@ -60,6 +64,8 @@ export function VendorOrderPage() {
   const cancelOrder = useVendorOrderCancel();
   const updateTotals = useVendorOrderUpdateTotals();
   const recordReceipt = useVendorOrderLineRecordReceipt();
+  const reconcileLine = useVendorOrderLineReconcileDraftRequirement();
+  const reviseLine = useVendorOrderLineReviseQuantity();
   const [showLineForm, setShowLineForm] = useState(false);
   const [receivingLineId, setReceivingLineId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -168,6 +174,41 @@ export function VendorOrderPage() {
       element.reset();
       setShowLineForm(false);
     });
+  };
+
+  const editLineQuantity = (line: NonNullable<typeof lines>[number]) => {
+    void (async () => {
+      const values = await prompt.askFields({
+        title: `Edit ${ingredientName(line.ingredientId)} quantity`,
+        description: "Your quantity is kept when event requirements change.",
+        fields: [
+          {
+            name: "orderedQuantity",
+            label: `Order quantity (${line.unit})`,
+            defaultValue: String(line.orderedQuantity),
+            inputType: "number",
+            required: true,
+          },
+          {
+            name: "unitCost",
+            label: `Cost per ${line.unit}`,
+            defaultValue: String(line.unitCost),
+            inputType: "number",
+            required: true,
+          },
+        ],
+        confirmLabel: "Save quantity",
+      });
+      if (!values) return;
+      void run(`${line._id}:quantity`, async () => {
+        await reviseLine({
+          docId: line._id,
+          version: line.version,
+          orderedQuantity: Number(values.orderedQuantity),
+          unitCost: Number(values.unitCost),
+        });
+      });
+    })();
   };
 
   const submitReceipt = (event: FormEvent<HTMLFormElement>, line: any) => {
@@ -291,7 +332,7 @@ export function VendorOrderPage() {
       </Link>
       <header className="order-folio-masthead">
         <div>
-          <p className="eyebrow">Vendor order · {order._id.slice(-8)}</p>
+          <p className="eyebrow">Vendor order</p>
           <h1 className="display-title mt-2">{vendorOrderTitle(order)}</h1>
           <p className="mt-3 text-ink-2">
             {vendor?.name ?? "Unknown vendor"} ·{" "}
@@ -308,12 +349,10 @@ export function VendorOrderPage() {
       </header>
       <InventoryWorkspaceNav />
       <aside className="supply-degraded" role="note">
-        <strong>
-          Marking an order received does not update your stock counts
-        </strong>
+        <strong>Line receipts update stock</strong>
         <span>
-          Record the receipt here, then log the delivery in the Stock book once
-          the goods are physically put away.
+          Record each delivery against its order line with the supplier lot
+          number. Mark the order received once receiving is complete.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -425,7 +464,7 @@ export function VendorOrderPage() {
                   <option key={need._id} value={need._id}>
                     {ingredientName(need.ingredientId)} ·{" "}
                     {need.requiredQuantity} {need.unit} ·{" "}
-                    {need.eventId.slice(-8)}
+                    {eventName(need.eventId)}
                   </option>
                 ))}
               </select>
@@ -482,6 +521,7 @@ export function VendorOrderPage() {
           <span>{orderLines.length} lines</span>
         </div>
         {lines === undefined ||
+        demandLinks === undefined ||
         needs === undefined ||
         events === undefined ||
         ingredients === undefined ||
@@ -501,7 +541,15 @@ export function VendorOrderPage() {
             {orderLines.map((line) => {
               const lineNeeds = needs.filter(
                 (item) =>
-                  item.deletedAt == null && item.vendorOrderLineId === line._id,
+                  item.deletedAt == null &&
+                  (item.vendorOrderLineId === line._id ||
+                    demandLinks.some(
+                      (link) =>
+                        link.deletedAt == null &&
+                        link.removedAt == null &&
+                        link.vendorOrderLineId === line._id &&
+                        link.ingredientDemandId === item.ingredientDemandId,
+                    )),
               );
               const lineLots = inventoryLots
                 .filter(
@@ -528,6 +576,12 @@ export function VendorOrderPage() {
                         <small key={need._id}>
                           {eventName(need.eventId)} · {need.requiredQuantity}{" "}
                           {need.unit}
+                          {events.find((event) => event._id === need.eventId)
+                            ?.stage === "cancelled"
+                            ? " · event cancelled"
+                            : need.status === "cancelled"
+                              ? " · purchasing cancelled"
+                              : ""}
                         </small>
                       ))}
                     </div>
@@ -548,26 +602,79 @@ export function VendorOrderPage() {
                           ? ` · discrepancy ${line.discrepancyQuantity}`
                           : ""}
                       </small>
+                      {isDraft && line.plannedQuantity != null ? (
+                        <small>
+                          Current calculation: {line.plannedQuantity}{" "}
+                          {line.unit}
+                          {line.quantityIsManual !== false
+                            ? " · order quantity kept"
+                            : " · updates with event requirements"}
+                        </small>
+                      ) : null}
+                      {isDraft && line.quantityReviewReason ? (
+                        <small role="status">{line.quantityReviewReason}</small>
+                      ) : null}
                     </div>
                     <div>
                       <StatusChip status={String(line.status)} />
                       <span>{locationName(line.locationId)}</span>
                     </div>
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      disabled={
-                        busy != null ||
-                        !isOpenForReceiving ||
-                        Boolean(line.isFullyReceived)
-                      }
-                      onClick={() =>
-                        setReceivingLineId((value) =>
-                          value === line._id ? null : line._id,
-                        )
-                      }
-                    >
-                      Record receipt
-                    </button>
+                    <div className="supply-row-actions">
+                      {isDraft && line.status === "added" ? (
+                        <>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => editLineQuantity(line)}
+                          >
+                            Edit quantity
+                          </button>
+                          {line.plannedQuantity != null &&
+                          line.quantityIsManual !== false ? (
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              disabled={busy != null}
+                              onClick={() =>
+                                void run(`${line._id}:plan`, async () => {
+                                  await reconcileLine({
+                                    docId: line._id,
+                                    version: line.version,
+                                    plannedQuantity: Number(
+                                      line.plannedQuantity,
+                                    ),
+                                    quantityIsManual: false,
+                                    ...(line.ingredientDemandId
+                                      ? {
+                                          ingredientDemandId:
+                                            line.ingredientDemandId,
+                                        }
+                                      : {}),
+                                  });
+                                })
+                              }
+                            >
+                              Use {line.plannedQuantity} {line.unit}
+                            </button>
+                          ) : null}
+                        </>
+                      ) : (
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          disabled={
+                            busy != null ||
+                            !isOpenForReceiving ||
+                            Boolean(line.isFullyReceived)
+                          }
+                          onClick={() =>
+                            setReceivingLineId((value) =>
+                              value === line._id ? null : line._id,
+                            )
+                          }
+                        >
+                          Record receipt
+                        </button>
+                      )}
+                    </div>
                   </div>
                   {lineLots.length > 0 ? (
                     <div
@@ -580,8 +687,8 @@ export function VendorOrderPage() {
                           <li key={lot._id}>
                             <strong>{lot.supplierLotNumber}</strong>
                             <span>
-                              {lot.receiptQuantity} {lot.unit} · PO line{" "}
-                              {line._id.slice(-8)}
+                              {lot.receiptQuantity} {lot.unit} ·{" "}
+                              {ingredientName(line.ingredientId)}
                             </span>
                           </li>
                         ))}

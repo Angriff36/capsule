@@ -1,8 +1,4 @@
-import type {
-  BundlePrepTask,
-  EventBundle,
-  BundleHeader,
-} from "../lib/tppReports/eventBundle";
+import type { EventBundle, BundleHeader } from "../lib/tppReports/eventBundle";
 import { toEpochMillis } from "../lib/tppReports/reportValues";
 import { planCommerceSteps } from "./CapsuleEventBundleCommercePlan";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
@@ -15,11 +11,10 @@ import {
   personNameParts,
   timelineEntryExists,
   venueAddressText,
-  wholeQuantity,
   type PlannedStep,
 } from "./CapsuleEventBundleShared";
 import { planSupplySteps } from "./CapsuleEventBundleSupplyPlan";
-import { toCapsuleUnit } from "./CapsuleMeasureUnit";
+import { toCapsuleMeasure } from "./CapsuleMeasureUnit";
 
 export type { PlannedStep } from "./CapsuleEventBundleShared";
 
@@ -61,10 +56,6 @@ export interface EventBundlePlan {
 }
 
 const HOUR_MS = 3_600_000;
-
-function prepTaskUnit(task: BundlePrepTask): string | undefined {
-  return toCapsuleUnit(task.unit);
-}
 
 function emptySummary(): EventBundlePlan["summary"] {
   return {
@@ -324,11 +315,10 @@ export function buildEventBundlePlan(
       (task) => `${dishKey(task.dishName)}:${normalizeName(task.name)}`,
     ),
   );
-  let roundedPrep = 0;
   bundle.prepTasks.forEach((task, index) => {
     const taskDishKey = dishKey(task.dishName);
     const eventDishRef = eventDishRefs.get(taskDishKey);
-    const unit = prepTaskUnit(task);
+    const measure = toCapsuleMeasure(task.quantity, task.unit);
     if (eventDishRef === undefined) {
       summary.skippedPrepTasks += 1;
       warnings.push(
@@ -336,17 +326,16 @@ export function buildEventBundlePlan(
       );
       return;
     }
-    if (unit === undefined) {
+    if (measure === undefined) {
       summary.skippedPrepTasks += 1;
       warnings.push(
-        `Prep task "${task.name}" was skipped: unit "${task.unit ?? "(none)"}" has no Capsule equivalent.`,
+        `Prep task "${task.name}" was skipped: quantity or unit "${task.quantity ?? "(none)"} ${task.unit ?? "(none)"}" could not be mapped.`,
       );
       return;
     }
     if (knownPrep.has(`${taskDishKey}:${normalizeName(task.name)}`)) return;
 
-    const { quantity, rounded } = wholeQuantity(task.quantity);
-    if (rounded) roundedPrep += 1;
+    const { quantity, unit } = measure;
     summary.prepTasks += 1;
     steps.push({
       capabilityId: "PrepTask.open",
@@ -361,22 +350,10 @@ export function buildEventBundlePlan(
         quantity,
         unit,
         category: task.category,
-        specialInstructions: rounded
-          ? [
-              task.specialInstructions,
-              `TPP quantity: ${task.quantity} ${task.unit ?? ""}`.trim(),
-            ]
-              .filter(Boolean)
-              .join(" · ")
-          : task.specialInstructions,
+        specialInstructions: task.specialInstructions,
       },
     });
   });
-  if (roundedPrep > 0) {
-    warnings.push(
-      `${roundedPrep} prep task(s) under one unit were rounded up to 1 (the printed amount is kept in the instructions).`,
-    );
-  }
 
   if (bundle.packList.length > 0) {
     const knownItems = new Set(existing?.packList?.itemDescriptions ?? []);
@@ -403,7 +380,14 @@ export function buildEventBundlePlan(
     }
 
     bundle.packList.forEach((item, index) => {
-      const unit = toCapsuleUnit(item.unit) ?? "each";
+      const measure = toCapsuleMeasure(item.quantity, item.unit);
+      if (!measure) {
+        warnings.push(
+          `Packing item "${item.name}" was skipped: quantity or unit could not be mapped.`,
+        );
+        return;
+      }
+      if (measure.quantity === 0) return;
       const forItems =
         item.forItems.length > 0 ? ` (for ${item.forItems.join(", ")})` : "";
       const description = `${item.classification}: ${item.name}${forItems}`;
@@ -418,8 +402,8 @@ export function buildEventBundlePlan(
         args: {
           packListId: "packList",
           description,
-          requiredQuantity: wholeQuantity(item.quantity).quantity,
-          unit,
+          requiredQuantity: measure.quantity,
+          unit: measure.unit,
         },
       });
     });

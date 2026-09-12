@@ -51,16 +51,16 @@ entity PackList mixin TenantScoped, SoftDeletable {
 
   transition status from "draft" to ["packing", "cancelled"]
   transition status from "packing" to ["packed", "cancelled"]
-  transition status from "packed" to ["loaded", "cancelled"]
-  transition status from "loaded" to ["dispatched", "cancelled"]
+  transition status from "packed" to ["packing", "loaded", "cancelled"]
+  transition status from "loaded" to ["packing", "dispatched", "cancelled"]
   transition status from "dispatched" to []
   transition status from "cancelled" to []
 
   // manageAccess: Event.approve (event_manager) reaction-opens PackList;
   // logisticsAccess: packing staff. Same cascade pattern as PurchaseNeed.
-  default policy packListRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack lists"
-  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack lists through commands"
-  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list commands"
+  default policy packListRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may read pack lists"
+  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may write pack lists through commands"
+  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may execute pack list commands"
 
   // Idempotent open: Event.approve reaction may re-fire; do not fail or duplicate.
   command open(
@@ -69,6 +69,9 @@ entity PackList mixin TenantScoped, SoftDeletable {
     optional purpose: string,
     optional notes: string
   ) {
+    // Preserve the existing header-creation authority; kitchen access supports
+    // packing existing lists and automatic recipe-driven requirement updates.
+    guard roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess")
     guard self.deletedAt == null
     guard self.status != "cancelled" and self.status != "dispatched"
     guard self.event != null
@@ -89,6 +92,24 @@ entity PackList mixin TenantScoped, SoftDeletable {
       purpose: purpose != null ? purpose : self.purpose
       status: self.status
     }
+  }
+
+  command requestDishContainers(eventDishId: uuid, dishId: uuid, quantityServings: number) {
+    // A dispatched list records what went out; new planning uses a live list.
+    guard self.deletedAt == null and self.status != "dispatched" and self.status != "cancelled"
+    emit EventDishContainerPackRequested {
+      eventDishId: eventDishId
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: dishId
+      packListId: self.id
+      quantityServings: quantityServings
+    }
+  }
+
+  // Earlier packing/loading timestamps are facts; new requirements reopen work.
+  command acknowledgePackingRequirement(additionalRequired: boolean) {
+    mutate status = self.deletedAt == null and additionalRequired and (self.status == "packed" or self.status == "loaded") ? "packing" : self.status
   }
 
   command startPacking() {
@@ -187,13 +208,35 @@ entity PackList mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Automatic stand-down never changes completed logistics history.
+  command standDownWithEvent() {
+    guard self.status == "draft" or self.status == "packing" or self.status == "packed" or self.status == "loaded"
+    guard self.deletedAt == null
+    // The parent event cancellation supplies the authorization and reason.
+    guard self.event != null and self.event.stage == "cancelled"
+    compute reason = self.event.cancellationReason != null ? self.event.cancellationReason : "Event cancelled"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate activeEventId = null
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PackListCancelled {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      name: self.name
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
   store PackList in durable
 }
 
 // EventCancelled → cancel pending/active pack lists for that event.
-on EventCancelled fanOut PackList where eventId = payload.eventId
-  run cancel
-  params { reason: payload.reason }
+// The transactional operational callback selects unfinished records before
+// invoking PackList.standDownWithEvent. Settled history is not mutated.
 
 // Line on a PackList. Description covers equipment/containers; optional Dish /
 // ProductionBatch refs when packing produced culinary output (no Equipment entity).
@@ -208,7 +251,13 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // Set when the line was generated from a DishContainer, so re-opening or
   // re-running the pack cascade updates the same line instead of duplicating.
   property dishContainerId: uuid?
+  property eventDishId: uuid?
+  property followsDishServings: boolean?
+  property containerServings: int?
   property productionBatchId: uuid?
+  // Internal source evidence for a reviewed correction of imported unit labels.
+  property unitCorrectionSource: string?
+  property associationSource: string?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -219,21 +268,25 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo dishContainer: DishContainer fields [tenantId, dishContainerId] references [tenantId, id]
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
 
-  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity > 0) "Listed pack items require a description and positive required quantity"
+  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity >= 0) "Listed pack items require a description and nonnegative required quantity"
   constraint itemPackedNonnegative: self.packedQuantity >= 0 "Packed quantity cannot be negative"
-  constraint itemPackedNotOver: self.packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+  // Packed is an observed fact; a later plan reduction can leave surplus.
+  computed surplusQuantity: decimal(12, 4) = max(0, self.packedQuantity - self.requiredQuantity)
 
   transition status from "pending" to ["listed"]
   transition status from "listed" to ["packed", "missing"]
-  transition status from "packed" to []
+  transition status from "packed" to ["listed"]
   transition status from "missing" to []
 
-  // Match the parent PackList: managers can compose package supply lists.
-  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack list items"
-  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack list items through commands"
-  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list item commands"
+  // Kitchen and logistics share physical packing; recipe corrections also
+  // reconcile container requirements through these same commands.
+  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may read pack list items"
+  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may write pack list items through commands"
+  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may execute pack list item commands"
 
   command addItem(
     packListId: uuid,
@@ -271,6 +324,103 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
       requiredQuantity: requiredQuantity
       unit: unit
       status: "listed"
+    }
+  }
+
+  command ensureContainer(packListId: uuid, dishContainerId: uuid, eventDishId: uuid, dishId: uuid, description: string, quantityServings: number, unit: UnitOfMeasure) {
+    guard self.deletedAt == null
+    // Generated lines must retain their original event and container references.
+    constraint containerReferencesMatch: self.packListId == packListId and self.dishContainerId == dishContainerId and self.eventDishId == eventDishId and self.dishId == dishId "Container references must match the packing line"
+    guard self.packList != null and self.dishContainer != null and self.eventDish != null
+    constraint containerEventMatch: self.packList.eventId == self.eventDish.eventId and self.eventDish.dishId == dishId and self.dishContainer.dishId == dishId "Container and menu line must belong to this event and dish"
+    compute eligible = self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    compute planned = quantityServings > 0 ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    mutate description = self.listedAt == null ? description : self.description
+    mutate unit = self.listedAt == null ? unit : self.unit
+    mutate followsDishServings = self.followsDishServings != null ? self.followsDishServings : true
+    mutate requiredQuantity = eligible and self.followsDishServings != false ? planned : self.requiredQuantity
+    mutate containerServings = quantityServings
+    mutate status = self.listedAt == null ? "listed" : (eligible and self.followsDishServings != false and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status)
+    mutate listedAt = self.listedAt != null ? self.listedAt : now()
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: self.requiredQuantity > self.packedQuantity
+    }
+  }
+
+  command adoptContainerLink(eventDishId: uuid, followsDishServings: boolean, containerServings: int, expectedItemVersion: int, expectedPackListVersion: int, expectedEventDishVersion: int, expectedContainerVersion: int) {
+    guard user.role == "owner" or user.role == "admin" or user.role == "system"
+    guard self.deletedAt == null and self.packList != null and self.dishContainer != null
+    guard self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    // Repair active planning links without rewriting completed event history.
+    guard self.packList.deletedAt == null and self.packList.event != null and self.packList.event.deletedAt == null
+    guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    guard self.dishContainer.deletedAt == null
+    // Apply only the records reviewed for this repair, preserving intervening staff edits.
+    guard self.version == expectedItemVersion and self.packList.version == expectedPackListVersion and self.dishContainer.version == expectedContainerVersion
+    constraint adoptionKeepsEventDish: self.eventDishId == null or self.eventDishId == eventDishId "Packing line already belongs to a different event dish"
+    constraint adoptionServingsValid: containerServings >= 0 "Servings cannot be negative"
+    constraint adoptionDishMatches: self.dishContainer.dishId == self.dishId "Container must match the packing dish"
+    constraint adoptionUnitMatches: followsDishServings == false or self.unit == self.dishContainer.unit "Automatic packing requires the container template unit"
+    guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == self.dishId and item.deletedAt == null and item.quantityServings == containerServings and item.version == expectedEventDishVersion)) == 1
+    // One menu line and container must not become two packing requirements.
+    guard count_of(filter(self.packList.items, (item) => item.id != self.id and item.deletedAt == null and item.eventDishId == eventDishId and item.dishContainerId == self.dishContainerId)) == 0
+    mutate eventDishId = eventDishId
+    mutate followsDishServings = followsDishServings
+    mutate containerServings = containerServings
+  }
+
+  // Restore a reviewed menu association without inventing container capacity.
+  command restoreImportedAssociation(dishId: uuid, eventDishId: uuid, expectedDescription: string, expectedVersion: int, expectedPackListVersion: int, expectedEventVersion: int, expectedEventDishVersion: int, sourceReference: string) {
+    guard user.role == "owner" or user.role == "admin" or user.role == "system"
+    guard self.deletedAt == null and self.listedAt != null
+    guard self.version == expectedVersion
+    guard self.packList != null and self.packList.deletedAt == null and self.packList.version == expectedPackListVersion
+    guard self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    guard self.packList.event != null and self.packList.event.deletedAt == null and self.packList.event.version == expectedEventVersion
+    guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    guard self.dishId == null and self.eventDishId == null and self.dishContainerId == null and self.followsDishServings != true and self.associationSource == null
+    guard count_of(filter(self.packList.event.eventDishes, (item) => item.id == eventDishId and item.dishId == dishId and item.deletedAt == null and item.removedAt == null and item.version == expectedEventDishVersion)) == 1
+    constraint associationSourceRequired: length(trim(sourceReference)) > 0 "The original packing association source is required"
+    constraint associationDescriptionMatches: self.description == expectedDescription "Packing description changed since source review"
+    mutate dishId = dishId
+    mutate eventDishId = eventDishId
+    mutate associationSource = sourceReference
+  }
+
+  // Legacy TPP Oz - Fld was imported as the mass unit ounce. This repair is
+  // deliberately separate from ordinary quantity edits: both planned and
+  // physically packed amounts must retain their original volume.
+  command correctImportedFluidOunces(sourceReference: string, expectedVersion: int) {
+    guard user.role == "owner" or user.role == "admin" or user.role == "system"
+    guard self.deletedAt == null and self.listedAt != null
+    // Apply the reviewed snapshot only; never overwrite later packing work.
+    guard self.version == expectedVersion
+    guard self.packList != null and self.packList.deletedAt == null and self.packList.event != null and self.packList.event.deletedAt == null
+    guard self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    guard self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    // Template-driven lines must be repaired at their source instead.
+    guard self.dishContainerId == null and self.followsDishServings != true
+    guard self.unit == "ounce" and self.unitCorrectionSource == null
+    constraint fluidCorrectionSourceRequired: length(trim(sourceReference)) > 0 "The original fluid-ounce source is required"
+    mutate requiredQuantity = self.requiredQuantity / 8
+    mutate packedQuantity = self.packedQuantity / 8
+    mutate unit = "cup"
+    mutate unitCorrectionSource = sourceReference
+  }
+
+  command syncContainerServings(quantityServings: number) {
+    // Catalog edits update active planning, never the recorded completed event.
+    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.packList.event != null and self.packList.event.deletedAt == null and self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
+    mutate requiredQuantity = eligible ? planned : self.requiredQuantity
+    mutate containerServings = eligible ? quantityServings : self.containerServings
+    mutate status = eligible and self.status == "packed" and planned > self.packedQuantity ? "listed" : self.status
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: eligible and self.requiredQuantity > self.packedQuantity
     }
   }
 
@@ -335,6 +485,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     constraint adjustQuantityAbovePacked: requiredQuantity >= self.packedQuantity "Required quantity cannot be below packed quantity"
     compute previousRequired = self.requiredQuantity
     mutate requiredQuantity = requiredQuantity
+    mutate followsDishServings = false
     emit PackListItemQuantityAdjusted {
       packListItemId: self.id
       tenantId: self.tenantId
@@ -474,3 +625,44 @@ on EventApproved run PackList.open
     eventId: payload.eventId
     name: "Event pack list"
   }
+
+
+on EventDishServingsAdjusted fanOut PackListItem where eventDishId = payload.eventDishId
+  run syncContainerServings
+  params { quantityServings: payload.quantityServings }
+
+on EventDishRemoved fanOut PackListItem where eventDishId = payload.eventDishId
+  run syncContainerServings
+  params { quantityServings: 0 }
+
+// Keep the last menu serving count when a template retires, so reinstatement
+// restores the requirement without replacing the packing record or staff edits.
+on DishContainerRevised fanOut PackListItem where dishContainerId = payload.dishContainerId
+  run syncContainerServings
+  params { quantityServings: self.containerServings != null ? self.containerServings : 0 }
+
+on DishContainerRetired fanOut PackListItem where dishContainerId = payload.dishContainerId
+  run syncContainerServings
+  params { quantityServings: self.containerServings != null ? self.containerServings : 0 }
+
+on DishContainerReinstated fanOut PackListItem where dishContainerId = payload.dishContainerId
+  run syncContainerServings
+  params { quantityServings: self.containerServings != null ? self.containerServings : 0 }
+
+on EventDishAdded fanOut PackList where activeEventId = payload.eventId
+  run requestDishContainers
+  params {
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    quantityServings: payload.quantityServings
+  }
+
+event PackListItemRequirementSynced: "pack_list_item.requirement_synced" {
+  packListId: string
+  tenantId: string
+  additionalRequired: boolean
+}
+
+on PackListItemRequirementSynced run PackList.acknowledgePackingRequirement
+  resolve payload.packListId
+  params { additionalRequired: payload.additionalRequired }

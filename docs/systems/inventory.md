@@ -32,19 +32,21 @@ Use a **stock book and demand ledger**. The key row composition is ingredient + 
 
 ## Cross-system handoffs
 
-Culinary and Event facts create demand; confirmed demand creates procurement work; receiving should update stock; prep consumes demand; cancellation releases reservations; waste should affect stock. Only declared and verified reactions may be shown as automatic.
+Culinary and Event facts create demand; confirmed demand creates procurement work. Line receipts update stock through an immutable supplier lot. Consuming a reservation decrements physical on-hand stock; releasing it only frees the hold.
+
+Event cancellation and completion release active reservations in the originating command transaction. Previously released or consumed reservations remain unchanged, including their quantities, timestamps and reasons. Pending, deleted and foreign-tenant rows are excluded. Repeated cleanup makes no writes, and a required release failure rolls back the event change. This behavior is qualified on the current source branch; live-data repair and deployed verification remain outstanding.
 
 ## States and permissions
 
 Inventory staff can perform routine movements; level/lifecycle and supersede/void actions may require management. Every adjustment needs visible provenance. Exact quantity/cost precision and full-text search remain degraded in the current projection.
 
-Open decisions include storage-location vocabulary, reserve/consume stock effects, aggregate shortage, waste stock decrement, and alternate-key reaction resolution.
+Aggregate shortage across purchasing dates, reservation-aware stock allocation, rescheduling propagation and affected-data repair remain open in the source-backed workflow record.
 
 ## Current status
 
 The authored `/inventory` workspace now ships these routes:
 
-- `/inventory/demand` — calculate, confirm, fulfill, or supersede event-scoped IngredientDemand and explicitly create a PurchaseNeed from confirmed demand;
+- `/inventory/demand` — review event-scoped IngredientDemand and the approval-to-purchasing handoff;
 - `/inventory/stock` — register storage, open stock lines, receive or recount stock, and reserve/release/consume stock for events;
 - `/inventory/counts` — select one or more storage locations, freeze every active stock line into a guided count sheet, record and revise physical counts, reconcile each line against the current ledger, post reasoned adjustment events only when required, and close the session after every frozen line is reconciled;
 - `/inventory/audit` — select an InventoryItem and review its opening, receipt, adjustment, recount, reservation, issue, waste, and transfer evidence newest-first; each row shows actor, timestamp, quantity measure, before/after values, and its hash-chain link;
@@ -56,7 +58,7 @@ Inventory quantity events now capture the authenticated actor subject. The audit
 
 Stock counts keep the frozen expected quantity separate from the live ledger. When staff reconcile a counted line, the command compares the physical count with the current InventoryItem balance inside the transaction. A match closes the line without ledger noise; a mismatch emits a StockCount variance fact whose reaction invokes the existing `InventoryItem.adjustQuantity` command with an actor and reason. The session cannot close until its original frozen line total exists and every line is reconciled.
 
-Search and exact decimal precision remain degraded. The stock book shows on-hand and active reservation facts separately and does not invent an aggregate shortage rule. Procurement users can deliberately generate a draft vendor order from open purchase needs in a last-seven-days, upcoming-seven-days, or custom inclusive event-date range; matching ingredient/unit quantities combine while each demand remains linked. Draft generation does not submit the order or mark a need ordered. Each recorded partial receipt creates a searchable supplier-lot fact with purchase-order-line provenance for downstream traceability and recall work. Receipt-to-stock automation is not claimed.
+Search and exact decimal precision remain degraded. The stock book shows on-hand and active reservation facts separately. Approved event demand maintains purchasing drafts; draft generation does not submit the order or mark a need ordered. Each partial line receipt creates a searchable supplier-lot fact with purchase-order-line provenance and updates stock in the same transaction. Current purchasing behavior and its unresolved date/allocation issues are documented in [procurement.md](procurement.md).
 
 Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and `bun run check:supply-manifest`.
 

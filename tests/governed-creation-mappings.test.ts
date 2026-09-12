@@ -11,6 +11,7 @@ describe("governed creation mappings", () => {
     expect(mappings).toEqual([
       "AnnouncementDismissal_createViaDismiss",
       "Announcement_createViaPost",
+      "AssistantLlmConfig_createViaConfigure",
       "Attachment_createViaAttach",
       "AvailabilityWindow_createViaDeclare",
       "Candidate_createViaApply",

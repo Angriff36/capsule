@@ -20,8 +20,11 @@ export const KITCHEN_SECTIONS: readonly {
   { key: "prep", label: "Command deck", path: "/kitchen/prep" },
 ] as const;
 
-export function componentPath(id: string) {
-  return `/kitchen/components/${id}`;
+export function componentPath(id: string, prepTaskId?: string) {
+  const path = `/kitchen/components/${id}`;
+  return prepTaskId
+    ? `${path}?prepTask=${encodeURIComponent(prepTaskId)}`
+    : path;
 }
 
 export function ingredientPath(id: string) {

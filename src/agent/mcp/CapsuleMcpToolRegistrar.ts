@@ -87,7 +87,7 @@ export class CapsuleMcpToolRegistrar {
 
     server.tool(
       "add_event_dish_and_sync_prep",
-      "Add a Dish to an Event, then materialize PrepTasks from active DishTask templates (host sync). IngredientDemand is Manifest-owned on EventDish.addToEvent (this tool sets skipDemand). Does not create or submit a purchase order.",
+      "Add a Dish to an Event. The generated command materializes prep and ingredient demand in the same transaction; purchasing follows the event workflow. Returns the current linked prep count. Replaying the same key preserves later menu edits and completed work.",
       {
         eventId: z.string(),
         dishId: z.string(),

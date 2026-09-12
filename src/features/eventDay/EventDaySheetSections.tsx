@@ -209,7 +209,7 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
   return (
     <div>
       {rows.map((row) => {
-        const at = row.startsAt ?? row.scheduledAt;
+        const at = row.startsAt;
         const who = formatAssigneeLabel({
           teams: row.assigneeTeams ?? [],
           personNames: (row.assigneePersonIds ?? []).map((id) =>
@@ -220,7 +220,7 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
         return (
           <Row
             key={row._id}
-            time={typeof at === "number" ? formatTime(at) : "—"}
+            time={typeof at === "number" ? formatTime(at) : "Time not set"}
             title={String(row.name)}
             sub={[who, String(row.siteNotes ?? "").trim()]
               .filter(Boolean)

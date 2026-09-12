@@ -417,6 +417,11 @@ const ApiKeysPage = lazy(() =>
     default: module.ApiKeysPage,
   })),
 );
+const AssistantSettingsPage = lazy(() =>
+  import("../features/admin/AssistantSettingsPage").then((module) => ({
+    default: module.AssistantSettingsPage,
+  })),
+);
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
@@ -1336,6 +1341,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PermissionsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/assistant"
+              element={
+                <SupplyRoute>
+                  <AssistantSettingsPage />
                 </SupplyRoute>
               }
             />

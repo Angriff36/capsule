@@ -1765,6 +1765,17 @@
   }
 }
 
+@media (max-width: 519px) {
+  .mobile-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .mobile-actions > .action-menu > summary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Phone section picker: one button naming the current section; the menu
    lists every destination grouped by workflow. No sideways scrolling. */
 .event-section-picker {
@@ -2298,6 +2309,12 @@
   font-size: 9px;
 }
 
+.purchase-queue .purchase-stock-context {
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--color-ink-2);
+}
+
 .purchase-queue div > span,
 .vendor-index div > span {
   margin-top: 3px;
@@ -2352,22 +2369,34 @@
 
 .order-line-summary {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) 140px 140px auto;
+  grid-template-columns:
+    minmax(180px, 1fr) minmax(140px, 0.45fr) minmax(100px, auto)
+    auto;
   align-items: center;
   gap: 1rem;
   padding: 1rem 0;
   border-bottom: 1px solid var(--color-line);
 }
 
+.order-line-summary > * {
+  min-width: 0;
+}
+
 .order-line-summary strong,
-.order-line-summary span {
+.order-line-summary span:not(.chip) {
   display: block;
 }
 
-.order-line-summary span {
+.order-line-summary span:not(.chip) {
   margin-top: 3px;
   color: var(--color-ink-3);
-  font-size: 10px;
+  font-size: var(--text-sm);
+}
+
+.order-line-summary small {
+  display: block;
+  font-size: var(--text-sm);
+  line-height: 1.5;
 }
 
 .order-line-quantity strong {
@@ -2636,6 +2665,10 @@
   }
 }
 @media (max-width: 900px) {
+  .order-line-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
   .supply-split {
     grid-template-columns: 1fr;
   }
@@ -2666,7 +2699,10 @@
     justify-items: start;
   }
   .order-line-summary {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .order-line-summary .supply-row-actions .btn {
+    min-height: 40px;
   }
 }
 @media (max-width: 520px) {
@@ -2938,6 +2974,21 @@
 
 .tpp-result-table {
   min-width: 720px;
+}
+
+.tpp-result-table .tpp-report-context {
+  color: var(--color-ink);
+  white-space: normal;
+  text-align: left;
+}
+
+.tpp-report-context > span {
+  display: inline-block;
+  margin-right: 1.25rem;
+}
+
+.tpp-report-context strong {
+  display: inline;
 }
 
 .tpp-result-table td[data-kind="money"],
@@ -4091,7 +4142,7 @@
 
 /* Collapse component line form/list by Composition column width, not viewport —
    the work grid is already 2-col from 960px while the form only stacked at 767. */
-@container culinary (max-width: 640px) {
+@container culinary (max-width: 800px) {
   .culinary-line-form {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
@@ -4299,6 +4350,59 @@
   }
   .print-sheet .supply-table-wrap {
     overflow: visible;
+  }
+  .tpp-result-table:has(.tpp-report-context) {
+    min-width: 0;
+    width: 100%;
+  }
+  body:has(.tpp-report-context),
+  .tpp-print-area:has(.tpp-report-context) {
+    page: contextual-table;
+  }
+  .tpp-result-table:has(.tpp-report-context) th,
+  .tpp-result-table:has(.tpp-report-context) td {
+    padding: 3pt 5pt;
+    font-size: 10pt;
+    line-height: 1.2;
+  }
+  .tpp-result-table:has(.tpp-report-context) tr {
+    break-inside: avoid;
+  }
+  body:has(.tpp-document--production),
+  .tpp-print-area:has(.tpp-document--production) {
+    page: production-worksheet;
+  }
+  .tpp-document--production {
+    max-width: none;
+    padding: 0;
+    gap: 0.6rem;
+    font-size: 10pt;
+    line-height: 1.25;
+  }
+  .tpp-document--production h3,
+  .tpp-document--production h4 {
+    padding: 0.25rem 0;
+    font-size: 11pt;
+  }
+  .tpp-document--production dl > div {
+    grid-template-columns: minmax(0, 0.45fr) minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.2rem 0;
+  }
+  .tpp-document--production dt {
+    font-size: inherit;
+  }
+  .tpp-document-print-context {
+    padding-top: 0.2rem;
+    font-size: 9pt;
+  }
+  @page production-worksheet {
+    size: letter portrait;
+    margin: 12mm;
+  }
+  @page contextual-table {
+    size: letter landscape;
+    margin: 10mm;
   }
   @page {
     size: landscape;

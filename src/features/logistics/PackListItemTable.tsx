@@ -1,5 +1,10 @@
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import type { LogisticsAction } from "./LogisticsLifecyclePolicy";
+import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
+import {
+  packingItemDescription,
+  packingAssociationMissing,
+} from "../../lib/packingDisplay";
 
 interface PackListItemRow {
   _id: string;
@@ -98,7 +103,7 @@ export function PackListItemTable({
                 {canSelectItem(item) ? (
                   <input
                     type="checkbox"
-                    aria-label={`Select ${item.description}`}
+                    aria-label={`Select ${packingItemDescription(item.description)}`}
                     checked={isItemSelected(item._id)}
                     disabled={busy != null}
                     onChange={(event) =>
@@ -108,9 +113,20 @@ export function PackListItemTable({
                 ) : null}
               </td>
               <td>
-                <strong>{item.description}</strong>
-                {dishName(item.dishId) ? (
-                  <small>{dishName(item.dishId)}</small>
+                <strong>{packingItemDescription(item.description)}</strong>
+                {item.dishId ? (
+                  dishName(item.dishId) ? (
+                    <small className="block">
+                      For{" "}
+                      <CulinaryEntityLink kind="dish" id={item.dishId}>
+                        {dishName(item.dishId)}
+                      </CulinaryEntityLink>
+                    </small>
+                  ) : (
+                    <small className="block">Dish unavailable</small>
+                  )
+                ) : packingAssociationMissing(item.description) ? (
+                  <small className="block">Association not recorded</small>
                 ) : null}
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">

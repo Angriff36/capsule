@@ -1,9 +1,11 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreateComponentIngredient,
   useGetComponent,
+  useGetPrepTask,
+  useGetEvent,
   useListComponentImport,
   useListDish,
   useListDishComponent,
@@ -11,6 +13,7 @@ import {
   useListIngredientPriceObservation,
   useListPerson,
   useListComponentIngredient,
+  useListComponentStep,
   useListComponentSnapshot,
   useComponentIngredientAdjustQuantity,
   useComponentIngredientRemove,
@@ -31,6 +34,7 @@ import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
+import { readableRecipeAmount } from "./RecipeNotes";
 import { IngredientCatalogLabel } from "./IngredientCatalogLabel";
 import { IngredientOptionPicker } from "./IngredientOptionPicker";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -59,6 +63,7 @@ import {
 } from "../../lib/pendingOperationKey";
 import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperations";
 import { componentRestoreOutcome } from "./culinaryRecovery";
+import { ComponentPrepContext, prepRecipeYield } from "./ComponentPrepContext";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -70,11 +75,19 @@ function optional(value: FormDataEntryValue | null) {
 
 export function ComponentDetailPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const prepTaskId = searchParams.get("prepTask") || undefined;
   const component = useRouteRecord(useGetComponent, id);
+  const prepTask = useRouteRecord(useGetPrepTask, prepTaskId);
+  const prepEvent = useRouteRecord(
+    useGetEvent,
+    prepTask?.componentId === id ? prepTask?.eventId : undefined,
+  );
   useTrackRecent("Component", component?.name);
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
   const lines = useListComponentIngredient();
+  const steps = useListComponentStep();
   const dishes = useListDish();
   const dishComponents = useListDishComponent();
   const revise = useComponentReviseDraft();
@@ -117,7 +130,11 @@ export function ComponentDetailPage() {
       : null;
   }, [allImports, id]);
   const [editing, setEditing] = useState(false);
-  const [targetYield, setTargetYield] = useState("");
+  const previewKey = JSON.stringify([id, prepTaskId, component?.yieldUnit]);
+  const [yieldPreview, setYieldPreview] = useState<{
+    key: string;
+    value: string;
+  } | null>(null);
   const [showLineForm, setShowLineForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -147,6 +164,24 @@ export function ComponentDetailPage() {
       (line) => line.deletedAt == null && line.componentId === component._id,
     )
     .sort((a, b) => a.sortOrder - b.sortOrder);
+  const componentSteps = (steps ?? [])
+    .filter(
+      (step) => step.deletedAt == null && step.componentId === component._id,
+    )
+    .sort(
+      (a, b) =>
+        a.sortOrder - b.sortOrder ||
+        a._creationTime - b._creationTime ||
+        String(a._id).localeCompare(String(b._id)),
+    );
+  const methodInstructions = component.instructions?.trim();
+  const methodMatchesSteps =
+    componentSteps.length > 0 &&
+    methodInstructions?.replace(/\s+/g, " ") ===
+      componentSteps
+        .map((step) => step.instruction.trim())
+        .join(" ")
+        .replace(/\s+/g, " ");
   const componentDishIds = new Set(
     (dishComponents ?? [])
       .filter(
@@ -161,19 +196,22 @@ export function ComponentDetailPage() {
     String(component.status),
     component.deletedAt,
   );
+  const prepYield = prepRecipeYield(component, prepTask);
+  const hasYieldPreview = yieldPreview?.key === previewKey;
+  const targetYield = hasYieldPreview
+    ? yieldPreview.value
+    : prepYield == null
+      ? ""
+      : String(prepYield);
   const targetYieldNumber = Number(targetYield);
   const baseYield = Number(component.yieldQuantity);
   const scaleFactor =
     targetYield.trim() !== "" &&
     Number.isFinite(targetYieldNumber) &&
-    targetYieldNumber > 0 &&
+    targetYieldNumber >= 0 &&
     baseYield > 0
       ? targetYieldNumber / baseYield
       : null;
-  const scaled = (quantity: number) => {
-    const value = quantity * (scaleFactor ?? 1);
-    return Number.isInteger(value) ? String(value) : value.toFixed(2);
-  };
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     "Unknown ingredient";
@@ -425,84 +463,96 @@ export function ComponentDetailPage() {
             <dd>{component.cuisine || "—"}</dd>
           </div>
         </dl>
+        {prepTaskId ? (
+          <ComponentPrepContext
+            recipe={component}
+            task={prepTask}
+            event={prepEvent}
+          />
+        ) : null}
       </header>
-
-      <ComponentCostPanel
-        summary={componentCost}
-        yieldUnit={component.yieldUnit}
-        loading={
-          ingredients === undefined ||
-          lines === undefined ||
-          priceObservations === undefined
-        }
-      />
-
-      <ComponentNutritionPanel
-        heading="Per-portion nutrition"
-        portionLabel={`per portion · serves ${servesPerYield}`}
-        totals={componentNutrition.perPortion}
-        coverageNote={nutritionCoverageNote}
-        loading={ingredients === undefined || lines === undefined}
-      />
-
-      {sourceImport ? (
-        <ComponentImportSourcePanel
-          kind={sourceImport.sourceKind}
-          filename={sourceImport.sourceFilename ?? undefined}
-          rawText={sourceImport.rawSourceText ?? ""}
-          csvSheetText={sourceImport.csvSheetText ?? undefined}
-          csvLinesText={sourceImport.csvLinesText ?? undefined}
-          importId={String(sourceImport._id)}
-          status={sourceImport.status}
-        />
-      ) : null}
 
       <div className="culinary-work-grid">
         <section className="culinary-section">
           <div className="culinary-section-heading">
             <h2>Composition</h2>
-            <span>{formatCountNoun(componentLines.length, "line")}</span>
+            <span>
+              {lines === undefined
+                ? "Loading…"
+                : formatCountNoun(componentLines.length, "line")}
+            </span>
           </div>
           <div className="flex flex-wrap items-end gap-3">
             <label className="field-label">
               Scale to yield ({String(component.yieldUnit)})
               <input
                 type="number"
-                min={0.01}
-                step="0.01"
+                min={0}
+                step="any"
                 className="input"
                 placeholder={String(component.yieldQuantity)}
                 value={targetYield}
-                onChange={(event) => setTargetYield(event.target.value)}
+                onChange={(event) =>
+                  setYieldPreview({
+                    key: previewKey,
+                    value: event.target.value,
+                  })
+                }
                 aria-label="Scale to yield"
               />
             </label>
             {scaleFactor != null ? (
               <>
                 <span className="font-mono text-xs text-ink-3">
-                  × {scaleFactor.toFixed(2)} of the canonical component (preview
-                  only — component is unchanged)
+                  ×{" "}
+                  {scaleFactor.toLocaleString(undefined, {
+                    maximumSignificantDigits: 4,
+                  })}{" "}
+                  recipe · Preview quantities
                 </span>
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"
-                  onClick={() => setTargetYield("")}
+                  onClick={() =>
+                    setYieldPreview({ key: previewKey, value: "" })
+                  }
                 >
-                  Reset
+                  {prepTaskId ? "Recipe batch" : "Reset"}
                 </button>
               </>
             ) : null}
+            {hasYieldPreview && prepYield != null ? (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setYieldPreview(null)}
+              >
+                Use prep amount
+              </button>
+            ) : null}
           </div>
-          {componentLines.length ? (
+          {lines === undefined || ingredients === undefined ? (
+            <p className="py-4 text-base text-ink-2" role="status">
+              Loading ingredients…
+            </p>
+          ) : componentLines.length ? (
             <ul className="ingredient-list">
               {componentLines.map((line) => (
                 <li key={line._id}>
                   <strong>
-                    {scaled(Number(line.quantity))} {String(line.unit)}
+                    {readableRecipeAmount(
+                      Number(line.quantity) * (scaleFactor ?? 1),
+                      String(line.unit),
+                    )}
                     {scaleFactor != null ? (
                       <span className="font-mono text-2xs text-ink-3">
                         {" "}
-                        (base {line.quantity})
+                        (base{" "}
+                        {readableRecipeAmount(
+                          Number(line.quantity),
+                          String(line.unit),
+                        )}
+                        )
                       </span>
                     ) : null}
                   </strong>
@@ -511,6 +561,7 @@ export function ComponentDetailPage() {
                       ingredientId={line.ingredientId}
                       ingredients={ingredients}
                       link
+                      wrap
                     />
                   </span>
                   <span>{line.prepNotes || "No preparation note"}</span>
@@ -650,16 +701,41 @@ export function ComponentDetailPage() {
           <div className="culinary-section-heading">
             <h2>Method</h2>
           </div>
-          {component.instructions ? (
-            <div className="method-prose">{component.instructions}</div>
-          ) : (
+          {methodInstructions && !methodMatchesSteps ? (
+            <div className="method-prose">{methodInstructions}</div>
+          ) : null}
+          {steps === undefined ? (
+            <p className="py-4 text-base text-ink-2" role="status">
+              Loading method steps…
+            </p>
+          ) : componentSteps.length ? (
+            <ol className="divide-y divide-line" aria-label="Method steps">
+              {componentSteps.map((step, index) => (
+                <li key={step._id} className="flex min-w-0 gap-3 py-4">
+                  <span className="font-mono text-base text-ink-2" aria-hidden>
+                    {index + 1}.
+                  </span>
+                  <div className="min-w-0 space-y-1">
+                    <p className="whitespace-pre-wrap break-words text-base text-ink">
+                      {step.instruction}
+                    </p>
+                    {step.durationMinutes != null ? (
+                      <span className="text-sm text-ink-2">
+                        {step.durationMinutes} min
+                      </span>
+                    ) : null}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : !methodInstructions ? (
             <div className="document-empty">
               <p>No method recorded.</p>
               <span>
                 Edit this draft to capture the source-backed instructions.
               </span>
             </div>
-          )}
+          ) : null}
         </section>
       </div>
 
@@ -677,6 +753,36 @@ export function ComponentDetailPage() {
             formRef={draftForm.formRef}
           />
         </>
+      ) : null}
+
+      <ComponentCostPanel
+        summary={componentCost}
+        yieldUnit={component.yieldUnit}
+        loading={
+          ingredients === undefined ||
+          lines === undefined ||
+          priceObservations === undefined
+        }
+      />
+
+      <ComponentNutritionPanel
+        heading="Per-portion nutrition"
+        portionLabel={`per portion · serves ${servesPerYield}`}
+        totals={componentNutrition.perPortion}
+        coverageNote={nutritionCoverageNote}
+        loading={ingredients === undefined || lines === undefined}
+      />
+
+      {sourceImport ? (
+        <ComponentImportSourcePanel
+          kind={sourceImport.sourceKind}
+          filename={sourceImport.sourceFilename ?? undefined}
+          rawText={sourceImport.rawSourceText ?? ""}
+          csvSheetText={sourceImport.csvSheetText ?? undefined}
+          csvLinesText={sourceImport.csvLinesText ?? undefined}
+          importId={String(sourceImport._id)}
+          status={sourceImport.status}
+        />
       ) : null}
 
       <ComponentVersionHistoryPanel

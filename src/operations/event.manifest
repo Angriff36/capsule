@@ -38,6 +38,17 @@ enum EventRecurrenceFrequency {
   annually
 }
 
+enum EventTimingMilestone {
+  staff_on
+  shop_departure
+  onsite_arrival
+  service
+  cleanup
+  venue_departure
+  shop_return
+  staff_off
+}
+
 enum EventRecurrenceEndCondition {
   on_date
   after_occurrences
@@ -556,6 +567,15 @@ entity Event mixin TenantScoped, SoftDeletable {
   property required eventType: string = ""
   property startsAt: datetime?
   property endsAt: datetime?
+  // Explicit service anchor: event start can instead mean guest arrival.
+  property serviceStartsAt: datetime?
+  property timingSetupMinutes: float?
+  property timingLoadMinutes: float?
+  property timingOutboundTravelMinutes: float?
+  property timingCleanupMinutes: float?
+  property timingReturnTravelMinutes: float?
+  property timingUnloadMinutes: float?
+  property timingConfiguredAt: datetime?
   // Purchasing week bucket key for weekly VendorOrder draft consolidation.
   // Set with startsAt on plan/reschedule; align multiple events to the same
   // week start so they share one draft (UTC Monday midnight recommended).
@@ -643,6 +663,18 @@ entity Event mixin TenantScoped, SoftDeletable {
   hasMany layoutSections: EventLayoutSection
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
+  computed timingCanRecalculate: boolean = self.deletedAt == null and self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled"
+  // Same authority as the staffing commands, evaluated for the current reader.
+  computed staffingCanManage: boolean = roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+  // Mangia Ops Final Lock Training p4. Unknown durations stay unknown.
+  // Suggested setup is presented for explicit acceptance, never silently saved.
+  computed timingSuggestedSetupMinutes: float? = self.serviceStyle != null and self.serviceStyle.name == "Full Service" ? 180 : (self.serviceStyle != null and self.serviceStyle.name == "Limited Service" ? 90 : null)
+  computed timingOnsiteAt: datetime? = self.serviceStartsAt != null and self.timingSetupMinutes != null ? self.serviceStartsAt - self.timingSetupMinutes * 60000 : null
+  computed timingDepartShopAt: datetime? = self.timingOnsiteAt != null and self.timingOutboundTravelMinutes != null ? self.timingOnsiteAt - self.timingOutboundTravelMinutes * 60000 : null
+  computed timingStaffOnAt: datetime? = self.timingDepartShopAt != null and self.timingLoadMinutes != null ? self.timingDepartShopAt - self.timingLoadMinutes * 60000 : null
+  computed timingDepartVenueAt: datetime? = self.endsAt != null and self.timingCleanupMinutes != null ? self.endsAt + self.timingCleanupMinutes * 60000 : null
+  computed timingReturnShopAt: datetime? = self.timingDepartVenueAt != null and self.timingReturnTravelMinutes != null ? self.timingDepartVenueAt + self.timingReturnTravelMinutes * 60000 : null
+  computed timingStaffOffAt: datetime? = self.timingReturnShopAt != null and self.timingUnloadMinutes != null ? self.timingReturnShopAt + self.timingUnloadMinutes * 60000 : null
   computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
   // Setup readiness for approval / automation (UI EventSetupProgress). Distinct
   // from isReadyForExecution (in-flight prep/pack/delivery). Uses raw child
@@ -685,7 +717,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   transition stage from "cancelled" to []
   transition stage from "closed_out" to []
 
-  default policy eventRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read events"
+  default policy eventRead read: roleAllows(user.role, "staffAccess") "Staff may read shared event plans and operational context"
   // Write policies gate command mutation (see Client note); staff tier here,
   // manager-only commands (approve/cancel/changePricing/...) carry guards.
   default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write events through commands"
@@ -766,6 +798,8 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
     guard self.deletedAt == null
     constraint scheduleDates: endsAt > startsAt "Event end must be after its start"
+    compute shiftedServiceStartsAt = self.serviceStartsAt != null and self.startsAt != null ? self.serviceStartsAt + (startsAt - self.startsAt) : self.serviceStartsAt
+    mutate serviceStartsAt = shiftedServiceStartsAt
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate purchasingWeekStart = startsAt
@@ -774,6 +808,39 @@ entity Event mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       startsAt: startsAt
       endsAt: endsAt
+    }
+  }
+
+  // Full timing form: omitted values deliberately clear unknown inputs.
+  command configureTiming(
+    optional serviceStartsAt: datetime,
+    optional setupMinutes: number,
+    optional loadMinutes: number,
+    optional outboundTravelMinutes: number,
+    optional cleanupMinutes: number,
+    optional returnTravelMinutes: number,
+    optional unloadMinutes: number
+  ) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their recorded timing; correct individual blocks if needed"
+    constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup minutes cannot be negative"
+    constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load minutes cannot be negative"
+    constraint timingOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel minutes cannot be negative"
+    constraint timingCleanupNonnegative: cleanupMinutes == null or cleanupMinutes >= 0 "Cleanup minutes cannot be negative"
+    constraint timingReturnNonnegative: returnTravelMinutes == null or returnTravelMinutes >= 0 "Return travel minutes cannot be negative"
+    constraint timingUnloadNonnegative: unloadMinutes == null or unloadMinutes >= 0 "Unload minutes cannot be negative"
+    mutate serviceStartsAt = serviceStartsAt
+    mutate timingSetupMinutes = setupMinutes
+    mutate timingLoadMinutes = loadMinutes
+    mutate timingOutboundTravelMinutes = outboundTravelMinutes
+    mutate timingCleanupMinutes = cleanupMinutes
+    mutate timingReturnTravelMinutes = returnTravelMinutes
+    mutate timingUnloadMinutes = unloadMinutes
+    mutate timingConfiguredAt = now()
+    emit EventTimingConfigured {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -1311,7 +1378,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
 // ---------------------------------------------------------------------------
 // EventTimelineActivity — a named activity on an event's day-of timeline
 // (vendor arrival, kitchen production start, guest arrival, service, breakdown)
-// with a start time and responsible party. Rendered as a Gantt-style strip on
+// with an optional planned time and responsible party. Rendered as a Gantt-style strip on
 // the event detail page and exported to the BEO.
 // ---------------------------------------------------------------------------
 
@@ -1344,6 +1411,10 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   // done during the event; null = still open.
   property completedAt: datetime?
   property completedByPersonId: string?
+  // Keep automatic planning separate from manual timing and performed work.
+  property timingMilestone: EventTimingMilestone?
+  property timingManuallyAdjustedAt: datetime?
+  property timingPerformedAt: datetime?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
@@ -1351,14 +1422,14 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
   constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
 
-  default policy eventTimelineActivityRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may read the event timeline"
-  default policy eventTimelineActivityWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may write the event timeline through commands"
-  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may execute event timeline commands"
+  default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may read the shared event timeline"
+  default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may record timeline work through commands"
+  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute timeline work commands"
 
   command schedule(
     eventId: uuid,
     name: string,
-    startsAt: datetime,
+    optional startsAt: datetime,
     optional endsAt: datetime,
     optional responsibleParty: string,
     optional notes: string,
@@ -1371,7 +1442,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt == null
     guard self.deletedAt == null
     constraint scheduleActivityName: length(trim(name)) > 0 "Activity name is required"
-    constraint scheduleActivityWindow: endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
+    // Preserve the planning access boundary while crew can mark work done.
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may schedule the event timeline"
+    constraint scheduleActivityWindow: startsAt == null or endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
     constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
     mutate eventId = eventId
     mutate name = name
@@ -1398,6 +1471,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     optional name: string,
     optional startsAt: datetime,
     optional endsAt: datetime,
+    optional clearStartsAt: boolean,
+    optional clearEndsAt: boolean,
     optional responsibleParty: string,
     optional notes: string,
     optional category: string,
@@ -1409,10 +1484,17 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.scheduledAt != null
     guard self.deletedAt == null
     constraint adjustActivityName: name == null or length(trim(name)) > 0 "Activity name cannot be blanked"
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may adjust the event timeline"
     constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
+    compute nextStartsAt = clearStartsAt == true ? null : (startsAt != null ? startsAt : self.startsAt)
+    compute nextEndsAt = clearEndsAt == true ? null : (endsAt != null ? endsAt : self.endsAt)
+    compute manualTimingChanged = (clearStartsAt == true and self.startsAt != null) or (clearEndsAt == true and self.endsAt != null) or (startsAt != null and startsAt != self.startsAt) or (endsAt != null and endsAt != self.endsAt)
+    mutate timingManuallyAdjustedAt = self.timingMilestone != null and manualTimingChanged ? now() : self.timingManuallyAdjustedAt
+    // Validate time edits; unrelated notes/assignments can still repair legacy work.
+    constraint adjustActivityWindow: (startsAt == null and endsAt == null) or clearStartsAt == true or clearEndsAt == true or (startsAt == null and self.startsAt == null) or (endsAt == null and self.endsAt == null) or (endsAt != null ? endsAt : self.endsAt) >= (startsAt != null ? startsAt : self.startsAt) "Activity end must not precede its start"
     mutate name = name != null ? name : self.name
-    mutate startsAt = startsAt != null ? startsAt : self.startsAt
-    mutate endsAt = endsAt != null ? endsAt : self.endsAt
+    mutate startsAt = nextStartsAt
+    mutate endsAt = nextEndsAt
     mutate responsibleParty = responsibleParty != null ? responsibleParty : self.responsibleParty
     mutate notes = notes != null ? notes : self.notes
     mutate category = category != null ? category : self.category
@@ -1430,9 +1512,50 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   // Event-day tracker: mark a run-of-show block done (and undo it).
   command complete(optional completedByPersonId: string) {
     guard self.deletedAt == null
+    mutate timingPerformedAt = self.timingPerformedAt != null ? self.timingPerformedAt : now()
     mutate completedAt = now()
-    mutate completedByPersonId = completedByPersonId
+    // Keep the optional input for older callers; attribution comes from sign-in.
+    mutate completedByPersonId = user.personId
     emit EventTimelineActivityCompleted {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Reconcile only the timing window. Names, notes, assignments and order stay.
+  command planTiming(
+    milestone: EventTimingMilestone,
+    optional startsAt: datetime,
+    optional endsAt: datetime
+  ) {
+    guard self.deletedAt == null
+    guard self.scheduledAt != null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    constraint activeTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their recorded times"
+    constraint sameTimingMilestone: self.timingMilestone == null or self.timingMilestone == milestone "This block already represents another timing milestone"
+    constraint plannedTimingWindow: startsAt == null or endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
+    compute keepTiming = self.completedAt != null or self.timingPerformedAt != null or self.timingManuallyAdjustedAt != null or (self.timingMilestone == null and (self.startsAt != null or self.endsAt != null))
+    mutate timingManuallyAdjustedAt = self.timingMilestone == null and (self.startsAt != null or self.endsAt != null) ? now() : self.timingManuallyAdjustedAt
+    mutate timingMilestone = milestone
+    mutate startsAt = keepTiming ? self.startsAt : startsAt
+    mutate endsAt = keepTiming ? self.endsAt : endsAt
+    emit EventTimelineTimingPlanned {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command useCalculatedTiming() {
+    guard self.deletedAt == null
+    guard self.timingMilestone != null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
+    constraint activeCalculatedTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their recorded times"
+    // An explicit return to the plan may change manual times, not work history.
+    constraint preservePerformedTiming: self.completedAt == null and self.timingPerformedAt == null "Performed work keeps its recorded time"
+    mutate timingManuallyAdjustedAt = null
+    emit EventTimelineCalculatedTimingRequested {
       activityId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
@@ -1452,6 +1575,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
 
   command remove() {
     guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may remove event timeline activities"
     mutate deletedAt = now()
     emit EventTimelineActivityRemoved {
       activityId: self.id
@@ -1869,12 +1993,29 @@ event EventGuestWithdrawn: "event_guest.withdrawn" {
   reason: string
 }
 
+event EventTimingConfigured: "event.timing_configured" {
+  eventId: string
+  tenantId: string
+}
+
+event EventTimelineTimingPlanned: "event_timeline_activity.timing_planned" {
+  activityId: string
+  eventId: string
+  tenantId: string
+}
+
+event EventTimelineCalculatedTimingRequested: "event_timeline_activity.calculated_timing_requested" {
+  activityId: string
+  eventId: string
+  tenantId: string
+}
+
 event EventTimelineActivityScheduled: "event_timeline_activity.scheduled" {
   activityId: string
   tenantId: string
   eventId: string
   name: string
-  startsAt: datetime
+  startsAt: datetime?
 }
 
 event EventTimelineActivityAdjusted: "event_timeline_activity.adjusted" {
