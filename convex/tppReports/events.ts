@@ -159,13 +159,16 @@ async function eventStaffing(
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
       .take(REPORT_ROW_LIMIT),
   ]);
+  const reportShifts = await Promise.all(
+    shifts.map((shift) => decryptReportFields(ctx, "Shift", ["notes"], shift)),
+  );
   const peopleById = new Map(
     people.map((person) => [String(person._id), person] as const),
   );
   const referencedPersonIds = [
     ...assignments.map((row) => row.personId),
     ...staffNeeds.map((row) => row.filledByPersonId),
-    ...shifts.map((row) => row.personId),
+    ...reportShifts.map((row) => row.personId),
   ].filter((personId): personId is Id<"people"> => personId != null);
   const missingPeople = await Promise.all(
     [...new Set(referencedPersonIds.map(String))]
@@ -183,7 +186,7 @@ async function eventStaffing(
     eventId: String(eventId),
     assignments: assignments.filter((row) => isLiveTenantRow(row, tenantId)),
     staffNeeds: staffNeeds.filter((row) => isLiveTenantRow(row, tenantId)),
-    shifts: shifts.filter((row) => isLiveTenantRow(row, tenantId)),
+    shifts: reportShifts.filter((row) => isLiveTenantRow(row, tenantId)),
     people: resolvedPeople.filter((row) => isLiveTenantRow(row, tenantId)),
   });
 }
@@ -894,23 +897,31 @@ export const run = query({
             : args.reportId === "heating-serving-labels"
               ? "avery_5160"
               : "table_tent",
-        labels: menu.map(({ item, dish }) => ({
-          id: item._id,
-          lines:
-            args.reportId === "event-menu-item-labels"
-              ? [
-                  event.title,
-                  dateText(event.startsAt),
-                  event.primaryContactName ?? "",
-                  dish.name,
-                ]
-              : args.reportId === "heating-serving-labels"
+        labels: menu.map(({ item, dish }) => {
+          const menuNotes = displayEventMenuNotes(item.specialInstructions);
+          return {
+            id: item._id,
+            lines:
+              args.reportId === "event-menu-item-labels"
                 ? [
+                    event.title,
+                    dateText(event.startsAt),
+                    event.primaryContactName ?? "",
                     dish.name,
-                    item.specialInstructions ?? dish.description ?? "",
                   ]
-                : [dish.name, dish.description ?? ""],
-        })),
+                : args.reportId === "heating-serving-labels"
+                  ? [
+                      dish.name,
+                      serviceMethodText(
+                        dish.serviceInstructions,
+                        dish.serviceInstructionsSource,
+                        dish.recipeInstructions,
+                      ),
+                      ...(menuNotes ? [`Event notes: ${menuNotes}`] : []),
+                    ]
+                  : [dish.name, dish.description ?? ""],
+          };
+        }),
       };
     }
 

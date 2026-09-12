@@ -123,6 +123,12 @@ const planEntries = supported.map((row: any) => {
     throw new Error(`Active dish is missing from the snapshot: ${row.name}`);
   if (typeof dish.version !== "number")
     throw new Error(`Dish version is missing from the snapshot: ${row.name}`);
+  const sourceName = String(row.name ?? "").trim();
+  const dishName = String(dish.name ?? "").trim();
+  if (!sourceName || dishName !== sourceName)
+    throw new Error(
+      `Source dish name does not match snapshot dish: ${sourceName} -> ${dishName}`,
+    );
   const instructions = row.method.instructions.trim();
   const serviceInstructions = String(dish.serviceInstructions ?? "").trim();
   const serviceSource = String(dish.serviceInstructionsSource ?? "").trim();
@@ -138,6 +144,7 @@ const planEntries = supported.map((row: any) => {
   return {
     dishId: row.dishId,
     name: row.name,
+    dishName,
     sourceRow: row.method.sourceRow,
     instructionsCell: row.method.instructionsCell,
     instructions,

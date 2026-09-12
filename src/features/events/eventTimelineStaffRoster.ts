@@ -90,7 +90,13 @@ export class EventTimelineStaffRoster {
   }): TimelineStaffOption[] {
     const seen = new Set<string>();
     const options: TimelineStaffOption[] = [];
+    const knownPeople = new Set(
+      (input.people ?? [])
+        .filter((person) => person.deletedAt == null)
+        .map((person) => person._id),
+    );
     for (const entry of EventTimelineStaffRoster.staffingRosterEntries(input)) {
+      if (!knownPeople.has(entry.personId)) continue;
       if (seen.has(entry.personId)) continue;
       seen.add(entry.personId);
       options.push({ personId: entry.personId, label: entry.label });

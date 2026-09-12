@@ -145,13 +145,14 @@ const staffEntry = (
 ): BeoRosterEntry | null => {
   if (!("assignment" in line)) return line;
   if (
-    !line.person ||
     line.assignment.status === "unassigned" ||
     line.assignment.status === "cancelled"
   )
     return null;
   return {
-    label: `${line.person.givenName} ${line.person.familyName}`.trim(),
+    label: line.person
+      ? `${line.person.givenName} ${line.person.familyName}`.trim()
+      : "Unresolved staff member",
     role: line.assignment.role,
     status: line.assignment.status,
     source: "assignment",
@@ -315,18 +316,8 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
             doc.setFont("helvetica", "bold");
             doc.setFontSize(BODY_FONT_SIZE);
             doc.setTextColor(15, 15, 17);
-            const continuation = wrappedLines(
-              doc,
-              `${block.primary} (continued)`,
-              textWidth,
-              BODY_FONT_SIZE,
-              "bold",
-            );
-            for (const text of continuation) {
-              doc.text(text, MARGIN, cursor);
-              cursor += BODY_FONT_SIZE * 1.3;
-            }
-            cursor += 2;
+            doc.text("Entry continued:", MARGIN, cursor);
+            cursor += BODY_FONT_SIZE * 1.3 + 2;
           }
         }
         doc.setFont("helvetica", line.weight);
