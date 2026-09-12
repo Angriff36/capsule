@@ -343,7 +343,12 @@ export function EventTrackerPage() {
     if (!id || lane.dayStart == null) return;
     const event = facts.find((entry) => entry.id === id);
     if (!event || !canReschedule(event)) return;
-    if (event.startsAt != null && startOfDay(event.startsAt) === lane.dayStart)
+    // Same display-day rule as lane placement: a job that started before
+    // today sits on Today, and a drop back onto Today is a no-op.
+    if (
+      event.startsAt != null &&
+      Math.max(startOfDay(event.startsAt), today) === lane.dayStart
+    )
       return;
     const next = movedSchedule(event, lane.dayStart);
     void run(
