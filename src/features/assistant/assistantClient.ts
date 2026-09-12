@@ -89,6 +89,12 @@ export async function uploadAssistantFile(
   if (!response.ok)
     throw new Error(`Upload of ${file.name} failed (${response.status}).`);
   const { storageId } = (await response.json()) as { storageId: string };
+  // Bind the blob to this uploader — the turn action only inlines files that
+  // the caller registered or that the caller's tenant references.
+  await convex.mutation(api.assistantConfig.registerUpload, {
+    storageId,
+    name: file.name,
+  });
   return {
     storageId,
     name: file.name,

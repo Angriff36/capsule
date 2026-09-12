@@ -27,6 +27,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.AssistantLlmConfig_createViaConfigure, { "baseUrl": "demo-baseUrl-1", "apiKey": "demo-apiKey-1", "model": "demo-model-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.AssistantLlmConfig_createViaConfigure, { "baseUrl": "demo-baseUrl-2", "apiKey": "demo-apiKey-2", "model": "demo-model-2" } as any);
+  // skip AssistantUpload: no creation command in IR (2 rows unused)
   // Attachment has multiple initialization commands (attach, remove); using the selected initialization command: attach.
   // Attachment → api.mutations.Attachment_createViaAttach
   rowsAttempted += 1;
@@ -743,6 +744,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "AssistantLlmConfig",
       "createMutation": "AssistantLlmConfig_createViaConfigure",
+      "rowCount": 2
+    },
+    {
+      "entity": "AssistantUpload",
+      "createMutation": null,
       "rowCount": 2
     },
     {

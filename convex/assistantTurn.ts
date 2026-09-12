@@ -14,7 +14,7 @@
 "use node";
 
 import { v } from "convex/values";
-import { action } from "./_generated/server";
+import { action, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import {
   assistantToolDefs,
@@ -112,34 +112,45 @@ function systemPrompt(): string {
     "4. SETUP NOTES — the notes field is the field team's north star. 'Edit to amplify': fill gaps, kill redundancy, add detail that affects packing (linen colors, dietary counts, rain plans, kit descriptions). Propose Event.changeRequirements with the amplified text for approval.",
     "5. PACKLIST — flag quantity anomalies vs guest count, duplicated items, and placeholder/X items; verify tent, handwashing, tarp, flooring are present for on-site events.",
     "6. EQUIP — rentals and coordinating serving items match the service style (trays + jacks for plated, station equipment for stations).",
-    "7. WRAP UP — if everything passes and the user confirms, offer Event.finalizeEvent to mark the event final. Never finalize without explicit confirmation.",
+    "7. WRAP UP — if everything passes and the user confirms, offer to mark the event final. Event.finalizeEvent only succeeds once the event is in the executing stage; if the event is earlier in its lifecycle, say that marking Final happens when it reaches execution, and do not propose commands that will be denied.",
   ].join("\n");
 }
 
 /** Images become inline data URLs; text files are inlined as text blocks. */
 async function buildUserContent(
-  ctx: { storage: { getUrl: (id: string) => Promise<string | null> } },
+  ctx: ActionCtx,
   m: {
     content?: string;
     files?: AssistantFile[];
   },
+  urls: Record<string, string | null>,
+  inline: boolean,
 ): Promise<string | Array<ContentPart>> {
   const files = m.files ?? [];
   if (files.length === 0) return m.content ?? "";
   const parts: Array<ContentPart> = [];
   if (m.content) parts.push({ type: "text", text: m.content });
   for (const file of files) {
+    // Only the newest user turn re-reads files — older turns keep a
+    // placeholder so multi-turn vision threads don't re-send megabytes.
+    if (!inline) {
+      parts.push({
+        type: "text",
+        text: `[attached ${file.kind === "image" ? "image" : "file"}: ${file.name} — already shared earlier in this conversation]`,
+      });
+      continue;
+    }
+    const url = urls[file.storageId];
+    if (!url) {
+      parts.push({
+        type: "text",
+        text: `[attached ${file.kind === "image" ? "image" : "file"} ${file.name} is not available to you]`,
+      });
+      continue;
+    }
+    const response = await fetch(url);
+    const bytes = Buffer.from(await response.arrayBuffer());
     if (file.kind === "image") {
-      const url = await ctx.storage.getUrl(file.storageId);
-      if (!url) {
-        parts.push({
-          type: "text",
-          text: `[attached image ${file.name} is no longer available]`,
-        });
-        continue;
-      }
-      const response = await fetch(url);
-      const bytes = Buffer.from(await response.arrayBuffer());
       if (bytes.length > 5 * 1024 * 1024) {
         parts.push({
           type: "text",
@@ -154,16 +165,6 @@ async function buildUserContent(
         },
       });
     } else {
-      const url = await ctx.storage.getUrl(file.storageId);
-      if (!url) {
-        parts.push({
-          type: "text",
-          text: `[attached file ${file.name} is no longer available]`,
-        });
-        continue;
-      }
-      const response = await fetch(url);
-      const bytes = Buffer.from(await response.arrayBuffer());
       const text = bytes.subarray(0, 200_000).toString("utf8");
       parts.push({
         type: "text",
@@ -187,6 +188,7 @@ const MAX_HISTORY_CHARS = 150_000;
 type TurnMessage = {
   role: "user" | "assistant" | "tool";
   content?: string;
+  files?: AssistantFile[];
   toolCalls?: Array<{ id: string; name: string; argumentsJson: string }>;
   toolCallId?: string;
 };
@@ -245,9 +247,35 @@ export const turn = action({
     }
 
     const wire: WireMessage[] = [{ role: "system", content: systemPrompt() }];
-    for (const m of trimHistory(args.messages)) {
+    // Resolve every referenced file once, scoped to the caller (tenant-
+    // referenced blobs or the caller's own registered uploads).
+    const history = trimHistory(args.messages);
+    const lastUserIndex = history.reduce(
+      (last, m, i) => (m.role === "user" && m.files?.length ? i : last),
+      -1,
+    );
+    const allFiles = history.flatMap((m) => m.files ?? []);
+    const urlMap: Record<string, string | null> = {};
+    if (allFiles.length > 0) {
+      const resolved = await ctx.runQuery(
+        internal.assistantConfig.resolveFiles,
+        {
+          subject: identity.subject,
+          files: allFiles.map((f) => ({
+            storageId: f.storageId,
+            kind: f.kind,
+          })),
+        },
+      );
+      for (const r of resolved) urlMap[r.storageId] = r.url;
+    }
+    for (let i = 0; i < history.length; i++) {
+      const m = history[i];
       if (m.role === "user") {
-        wire.push({ role: "user", content: await buildUserContent(ctx, m) });
+        wire.push({
+          role: "user",
+          content: await buildUserContent(ctx, m, urlMap, i === lastUserIndex),
+        });
       } else if (m.role === "assistant") {
         wire.push({
           role: "assistant",
