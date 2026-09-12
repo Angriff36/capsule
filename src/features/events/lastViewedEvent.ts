@@ -24,6 +24,7 @@ export function isProtectedFromLastViewedRestore(path: string): boolean {
   if (
     pathname === "/events/new" ||
     pathname === "/events/templates" ||
+    pathname === "/events/tracker" ||
     pathname === "/events/capacity"
   ) {
     return true;

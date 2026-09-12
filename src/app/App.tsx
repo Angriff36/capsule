@@ -9,8 +9,10 @@ import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlanne
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
+import { EventTrackerPage } from "../features/events/EventTrackerPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
+import { HomeCalendarPage } from "../features/home/HomeCalendarPage";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
@@ -650,8 +652,10 @@ export function App() {
             }
           />
           <Route element={<AppShell />}>
-            <Route index element={<HomePage />} />
+            <Route index element={<HomeCalendarPage />} />
+            <Route path="/today" element={<HomePage />} />
             <Route path="/events" element={<EventsListPage />} />
+            <Route path="/events/tracker" element={<EventTrackerPage />} />
             <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/templates" element={<EventTemplatesPage />} />
             <Route

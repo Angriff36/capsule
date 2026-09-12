@@ -60,6 +60,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
+    prefix: "/events/tracker",
+    title: "Event tracker",
+    purpose:
+      "The next two weeks as day lanes, so the things that change at the last minute can be changed right here.",
+    steps: [
+      "Drag a card to another day to move the event.",
+      "Change the time, guest count, venue, or owner on the card.",
+      "Use the lock button to move the event to the next stage.",
+    ],
+  },
+  {
     prefix: "/events/capacity",
     title: "Capacity planner",
     purpose:
