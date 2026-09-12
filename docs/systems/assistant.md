@@ -13,8 +13,12 @@ One chat drawer, mounted app-wide (`Ctrl+J` or the topbar sparkle button).
   uses (`api.mutations.*` / `api.queries.*`). Authz is therefore identical to
   the UI — no separate AI surface, per
   `docs/generation/2026-07-17-command-api-surface-boundary.md`.
-- **Tool surface** — `convex/lib/assistantToolSurface.ts`: 19 curated write
-  commands (Event, EventDish, Dish, PrepTask, Client) + 10 tenant-scoped reads.
+- **Tool surface** — `convex/lib/assistantToolSurface.ts`: ~69 curated write
+  commands (events, kitchen, fleet, deliveries, pack lists, equipment,
+  purchasing, vendor orders, shifts, time off, saved report definitions) + 26
+  tenant-scoped reads. Money paths (invoices, payments, payroll) and staff
+  administration (hire, terminate, pay rate, roles) are deliberately NOT on
+  the surface.
 - **Settings** — `src/features/admin/AssistantSettingsPage.tsx` at
   `/admin/assistant`, saved through the governed generated commands.
   Generated queries filter by the CALLER's tenant, so reads are bounded by the

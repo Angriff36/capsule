@@ -73,7 +73,7 @@ function systemPrompt(): string {
   const today = new Date().toISOString().slice(0, 10);
   return [
     "You are the Capsule assistant, embedded in the Capsule catering app.",
-    "You help with events, dishes, prep tasks, and clients.",
+    "You help with events, dishes, prep tasks, clients, fleet and deliveries, pack lists, equipment, purchasing, vendor orders, shifts, time off, and saved reports.",
     `Today's date is ${today}.`,
     "",
     "Rules:",
