@@ -7,7 +7,13 @@
  * hash, target tenant, and a live Convex URL.
  */
 import { createHash } from "node:crypto";
-import { mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
+import {
+  mkdirSync,
+  readFileSync,
+  renameSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { parseArgs } from "node:util";
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
@@ -189,6 +195,7 @@ if (snapshot.Dish.some((dish: any) => dish.tenantId !== document.tenantId))
 const planHash = hash(JSON.stringify(document));
 mkdirSync(values.out, { recursive: true });
 const receiptPath = `${values.out}/receipt.json`;
+const stagedReceiptPath = `${receiptPath}.pending`;
 writeFileSync(`${values.out}/plan.json`, JSON.stringify(document, null, 2));
 writeFileSync(`${values.out}/plan.sha256`, planHash);
 console.log(
@@ -230,7 +237,7 @@ const receipts: Array<Record<string, unknown>> = [];
 let receiptStarted = false;
 const writeReceipt = () =>
   writeFileSync(
-    receiptPath,
+    stagedReceiptPath,
     JSON.stringify(
       { planSha256: planHash, tenantId: document.tenantId, entries: receipts },
       null,
@@ -239,13 +246,8 @@ const writeReceipt = () =>
   );
 const startReceipt = () => {
   if (receiptStarted) return;
-  // Keep the prior receipt until an authenticated backend read succeeds. An
-  // expired token or unavailable backend must not erase recovery evidence.
-  try {
-    unlinkSync(receiptPath);
-  } catch (error: any) {
-    if (error?.code !== "ENOENT") throw error;
-  }
+  // Keep the prior receipt until every entry is acknowledged and read back.
+  // A later failure must not erase recovery evidence from an earlier attempt.
   receiptStarted = true;
   writeReceipt();
 };
@@ -353,7 +355,15 @@ for (const entry of planEntries) {
     throw error;
   }
 }
-if (receiptStarted) writeReceipt();
+if (receiptStarted) {
+  writeReceipt();
+  try {
+    unlinkSync(receiptPath);
+  } catch (error: any) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  renameSync(stagedReceiptPath, receiptPath);
+}
 console.log(
   JSON.stringify(
     {

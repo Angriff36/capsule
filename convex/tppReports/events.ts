@@ -160,6 +160,11 @@ async function eventStaffing(
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
       .take(REPORT_ROW_LIMIT),
   ]);
+  const reportAssignments = await Promise.all(
+    assignments.map((assignment) =>
+      decryptReportFields(ctx, "EventAssignment", ["notes"], assignment),
+    ),
+  );
   const reportShifts = await Promise.all(
     shifts.map((shift) => decryptReportFields(ctx, "Shift", ["notes"], shift)),
   );
@@ -185,7 +190,9 @@ async function eventStaffing(
   ];
   return EventTimelineStaffRoster.staffingRosterEntries({
     eventId: String(eventId),
-    assignments: assignments.filter((row) => isLiveTenantRow(row, tenantId)),
+    assignments: reportAssignments.filter((row) =>
+      isLiveTenantRow(row, tenantId),
+    ),
     staffNeeds: staffNeeds.filter((row) => isLiveTenantRow(row, tenantId)),
     shifts: reportShifts.filter((row) => isLiveTenantRow(row, tenantId)),
     people: resolvedPeople.filter((row) => isLiveTenantRow(row, tenantId)),
@@ -258,26 +265,38 @@ function serviceMethodText(
 }
 
 const SERVICE_LABEL_MAX_CHARS = 54;
+const SERVICE_LABEL_NOTE_MAX_CHARS = 36;
+
+function boundedLabelText(text: string, maxChars: number): string {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxChars) return normalized;
+  const boundary = normalized.lastIndexOf(" ", maxChars + 1);
+  return `${normalized.slice(0, boundary > 0 ? boundary : maxChars)}…`;
+}
 
 function serviceLabel(
   dishName: string,
   serviceText: string,
   id: string,
 ): TppLabel {
-  const firstLine =
-    serviceText
-      .split(/\r?\n/)
-      .map((line) => line.replace(/\s+/g, " ").trim())
-      .find(Boolean) || "Service method not recorded.";
-  const boundary = firstLine.lastIndexOf(" ", SERVICE_LABEL_MAX_CHARS + 1);
-  const instruction =
-    firstLine.length <= SERVICE_LABEL_MAX_CHARS
-      ? firstLine
-      : `${firstLine.slice(
-          0,
-          boundary > 0 ? boundary : SERVICE_LABEL_MAX_CHARS,
-        )}…`;
-  return { id, lines: [dishName, instruction] };
+  const lines = serviceText
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  const firstLine = lines[0] || "Service method not recorded.";
+  const noteLine = lines.find((line) =>
+    line.toLowerCase().startsWith("event notes:"),
+  );
+  return {
+    id,
+    lines: [
+      dishName,
+      boundedLabelText(firstLine, SERVICE_LABEL_MAX_CHARS),
+      ...(noteLine
+        ? [boundedLabelText(noteLine, SERVICE_LABEL_NOTE_MAX_CHARS)]
+        : []),
+    ],
+  };
 }
 
 async function productionWorksheet(
