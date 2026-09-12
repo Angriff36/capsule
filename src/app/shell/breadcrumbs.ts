@@ -37,6 +37,9 @@ function isKitchenCatalogDetail(
  */
 export function breadcrumbsForPath(pathname: string): Breadcrumb[] {
   if (pathname === "/") return [{ label: "Home" }];
+  if (pathname === "/today") {
+    return [{ label: "Home", to: "/" }, { label: "Today’s service" }];
+  }
   if (pathname === "/settings/email") return [{ label: "Email settings" }];
   const area = navigationCatalog.areaForPath(pathname);
   if (!area) return [{ label: "Capsule" }];

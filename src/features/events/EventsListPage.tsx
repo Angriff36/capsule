@@ -282,6 +282,7 @@ export function EventsListPage() {
             <PlusIcon /> New event
           </Link>
           <ActionMenu>
+            <Link to="/events/tracker">Event tracker</Link>
             <Link to="/events/capacity">Capacity calendar</Link>
             <Link to="/events/templates">Templates</Link>
           </ActionMenu>
