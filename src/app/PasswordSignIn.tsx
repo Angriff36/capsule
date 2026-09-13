@@ -1,20 +1,29 @@
 import { SignIn, useSignIn } from "@clerk/react";
 import { useState, type FormEvent } from "react";
 import {
+  type SecondFactorChannel,
+  SignInSecondFactor,
+} from "./auth/SignInSecondFactor";
+import { type SignInStep, signInStepCopy } from "./auth/signInStepCopy";
+import {
   bindSignInPersistence,
   prepareSignInPersistence,
 } from "./SessionPersistenceBoundary";
 
-/** Password first; invitation tickets and additional factors remain Clerk-owned. */
+/**
+ * Password first. New-device and MFA codes complete on this same screen;
+ * only invitation tickets and provider-only recovery reach Clerk's widget.
+ */
 export function PasswordSignIn() {
   const { signIn } = useSignIn();
   const [remember, setRemember] = useState(true);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [code, setCode] = useState("");
-  const [step, setStep] = useState<"login" | "reset" | "code" | "new-password">(
-    "login",
-  );
+  const [step, setStep] = useState<SignInStep>("login");
+  const [verifyChannel, setVerifyChannel] =
+    useState<SecondFactorChannel | null>(null);
+  const [newDevice, setNewDevice] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [provider, setProvider] = useState(() => {
@@ -40,10 +49,40 @@ export function PasswordSignIn() {
           },
         }),
       );
+    } else if (SignInSecondFactor.isPending(signIn.status)) {
+      // New-device trust and MFA: send the code and take it on this screen.
+      const factor = new SignInSecondFactor(signIn);
+      const channel = factor.pick();
+      if (!channel) {
+        setProvider(true);
+        return;
+      }
+      const isNewDevice = signIn.status === "needs_client_trust";
+      check(await factor.send(channel));
+      setNewDevice(isNewDevice);
+      setVerifyChannel(channel);
+      setCode("");
+      setStep("verify");
+    } else if (signIn.status === "needs_new_password") {
+      setStep("new-password");
     } else {
-      // MFA, device trust, and any provider-required recovery stay in the
-      // provider flow. A successful password is never treated as a session.
+      // Anything else Clerk requires (tickets, provider recovery) stays in
+      // the provider flow. A successful password is never treated as a session.
       setProvider(true);
+    }
+  };
+  const resend = async () => {
+    if (busy || !verifyChannel) return;
+    setBusy(true);
+    setError("");
+    try {
+      check(await new SignInSecondFactor(signIn).send(verifyChannel));
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not send a new code.",
+      );
+    } finally {
+      setBusy(false);
     }
   };
   const submit = async (event: FormEvent<HTMLFormElement>) => {
@@ -58,6 +97,15 @@ export function PasswordSignIn() {
           await signIn.password({ identifier: identifier.trim(), password }),
         );
         setPassword("");
+        await finish();
+      } else if (step === "verify" && verifyChannel) {
+        check(
+          await new SignInSecondFactor(signIn).verify(
+            verifyChannel,
+            code.trim(),
+          ),
+        );
+        setCode("");
         await finish();
       } else if (step === "reset") {
         check(await signIn.create({ identifier: identifier.trim() }));
@@ -92,6 +140,7 @@ export function PasswordSignIn() {
       check(await signIn.reset());
       setPassword("");
       setCode("");
+      setVerifyChannel(null);
       setStep("login");
       setProvider(false);
       // Remove a stale widget step without leaving the requested app route.
@@ -136,30 +185,17 @@ export function PasswordSignIn() {
       </div>
     );
   }
-  const title =
-    step === "login"
-      ? "Sign in to Capsule"
-      : step === "reset"
-        ? "Set or reset your password"
-        : step === "code"
-          ? "Check your email"
-          : "Choose your password";
+  const copyContext = { step, verifyChannel, newDevice };
   return (
     <section
       aria-labelledby="capsule-sign-in-title"
       className="w-full max-w-md border border-line bg-panel p-6 sm:p-8"
     >
       <h1 id="capsule-sign-in-title" className="text-2xl font-bold">
-        {title}
+        {signInStepCopy.title(copyContext)}
       </h1>
       <p className="mt-2 text-base text-ink-2">
-        {step === "login"
-          ? "Use your username or email and password."
-          : step === "reset"
-            ? "We will email a code to verify your account so you can choose a password."
-            : step === "code"
-              ? "Enter the password-reset code we sent to your account email."
-              : "Use this password the next time you sign in."}
+        {signInStepCopy.description(copyContext)}
       </p>
       <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
         {(step === "login" || step === "reset") && (
@@ -204,17 +240,17 @@ export function PasswordSignIn() {
             />
           </label>
         )}
-        {step === "code" && (
+        {(step === "code" || step === "verify") && (
           <label
             className="flex flex-col gap-2 text-base font-semibold"
             htmlFor="capsule-reset-code"
           >
-            Reset code
+            {step === "code" ? "Reset code" : "Verification code"}
             <input
               id="capsule-reset-code"
               name="code"
               type="text"
-              inputMode="numeric"
+              inputMode={verifyChannel === "backup_code" ? "text" : "numeric"}
               autoComplete="one-time-code"
               required
               value={code}
@@ -247,18 +283,22 @@ export function PasswordSignIn() {
           className="btn btn-primary min-h-[44px] w-full"
           disabled={busy}
         >
-          {busy
-            ? "Please wait..."
-            : step === "login"
-              ? "Sign in"
-              : step === "reset"
-                ? "Send reset code"
-                : step === "code"
-                  ? "Verify code"
-                  : "Save password and sign in"}
+          {busy ? "Please wait..." : signInStepCopy.submitLabel(copyContext)}
         </button>
       </form>
       <div className="mt-4 flex flex-col items-start gap-2">
+        {step === "verify" &&
+          verifyChannel &&
+          SignInSecondFactor.canResend(verifyChannel) && (
+            <button
+              type="button"
+              className="text-link min-h-[44px] text-left"
+              disabled={busy}
+              onClick={() => void resend()}
+            >
+              Send a new code
+            </button>
+          )}
         {step === "login" ? (
           <>
             <button

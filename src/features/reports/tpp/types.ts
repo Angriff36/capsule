@@ -90,7 +90,7 @@ export interface TppReportOption {
 export interface TppColumn {
   key: string;
   label: string;
-  kind: "text" | "date" | "number" | "money" | "quantity";
+  kind: "text" | "date" | "datetime" | "number" | "money" | "quantity";
 }
 
 export type TppCellValue = string | number | boolean | null;

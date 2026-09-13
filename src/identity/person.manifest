@@ -62,6 +62,13 @@ entity Person mixin TenantScoped, SoftDeletable {
   property required searchable familyName: string
   property required encrypted email: string
   property encrypted phone: string?
+  // Postal address: ordinary editable contact data for the Staff Address &
+  // Phone List (#272). Optional and never gating.
+  property encrypted addressLine1: string?
+  property encrypted addressLine2: string?
+  property encrypted city: string?
+  property encrypted region: string?
+  property encrypted postalCode: string?
   property required role: CapsuleRole = "staff"
   // Optional link to external auth subject (Clerk/etc.). When set on an active
   // Person, convex/lib/authContext.ts uses this row's role as runtime
@@ -150,6 +157,46 @@ entity Person mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       givenName: givenName
       familyName: familyName
+    }
+  }
+
+  // Fix a wrong or changed contact email after hire. Email is contact data,
+  // not login identity (sign-in resolves by authSubjectId), so this is a
+  // normal workforce-manager profile edit. The authored convex/personEmail.ts
+  // seam runs this and then moves the linked sign-in account to the new
+  // address so the invitation and the profile stay on one mailbox (#270).
+  // Allowed while inactive too — a contact fix must not need a reactivation.
+  command correctEmail(email: string) {
+    guard self.deletedAt == null
+    guard self.status != "terminated"
+    constraint correctEmailPresent: length(trim(email)) > 0 "Email is required"
+    mutate email = email
+    emit PersonEmailCorrected {
+      personId: self.id
+      tenantId: self.tenantId
+      email: email
+    }
+  }
+
+  // Postal address for the staff address list and mailings. Contact data
+  // only; allowed while inactive, like correctEmail.
+  command changeAddress(
+    optional addressLine1: string,
+    optional addressLine2: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string
+  ) {
+    guard self.deletedAt == null
+    guard self.status != "terminated"
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    emit PersonAddressChanged {
+      personId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -302,6 +349,17 @@ event PersonIdentityCorrected: "person.identity_corrected" {
   tenantId: string
   givenName: string
   familyName: string
+}
+
+event PersonEmailCorrected: "person.email_corrected" {
+  personId: string
+  tenantId: string
+  email: string
+}
+
+event PersonAddressChanged: "person.address_changed" {
+  personId: string
+  tenantId: string
 }
 
 event PersonRoleAssigned: "person.role_assigned" {

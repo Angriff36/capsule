@@ -22,6 +22,10 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property recipeSourceText: string?
   property recipeSourceYield: string?
   property recipeSourceFingerprint: string?
+  // Reusable service guidance is separate from recipe preparation; event-only
+  // instructions remain on EventDish.
+  property serviceInstructions: string?
+  property serviceInstructionsSource: string?
   property category: string?
   property course: string?
   property serviceStyle: string?
@@ -139,6 +143,19 @@ entity Dish mixin TenantScoped, SoftDeletable {
       dishId: self.id
       tenantId: self.tenantId
       sourceFingerprint: sourceFingerprint
+    }
+  }
+
+  command saveServiceInstructions(instructions: string, source: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint serviceInstructionsSourcePresent: length(trim(source)) > 0 "Service instruction source is required"
+    mutate serviceInstructions = instructions
+    mutate serviceInstructionsSource = source
+    emit DishServiceInstructionsSaved {
+      dishId: self.id
+      tenantId: self.tenantId
+      source: source
     }
   }
 
@@ -647,6 +664,12 @@ event DishDetailsRevised: "dish.details_revised" {
   dishId: string
   tenantId: string
   name: string
+}
+
+event DishServiceInstructionsSaved: "dish.service_instructions_saved" {
+  dishId: string
+  tenantId: string
+  source: string
 }
 
 event DishPortioningUpdated: "dish.portioning_updated" {

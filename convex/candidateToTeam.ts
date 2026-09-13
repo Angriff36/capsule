@@ -74,7 +74,16 @@ export type HireIntoTeamResult =
   | { kind: "hired_no_email" }
   // The matching profile is INACTIVE. Nothing was mutated; the UI must
   // re-present the action as an explicit restore before this proceeds.
-  | { kind: "needs_restore"; personId: string; email: string };
+  | { kind: "needs_restore"; personId: string; email: string }
+  // The candidate row's email no longer matches the linked profile (a KM
+  // re-import changed it). Nothing was mailed; the UI offers to move the
+  // profile — and its sign-in — to the candidate's address, then resend.
+  | {
+      kind: "email_mismatch";
+      personId: string;
+      personEmail: string;
+      candidateEmail: string;
+    };
 
 export const hireIntoTeam = mutation({
   args: {
@@ -173,9 +182,12 @@ export const hireIntoTeam = mutation({
         const personEmail = await readStoredEmail(ctx, linked.email);
         const candidateEmail = normalized(candidate.email);
         if (candidateEmail && candidateEmail !== personEmail) {
-          throw new ConvexError(
-            `The candidate row says ${candidateEmail} but their sign-in profile uses ${personEmail}. Fix the profile under Team roles, then resend.`,
-          );
+          return {
+            kind: "email_mismatch",
+            personId: String(linked._id),
+            personEmail,
+            candidateEmail,
+          };
         }
         // NOTE: an ACTIVE privileged profile is NOT gated here on purpose.
         // The link already exists — resending grants nothing new, and

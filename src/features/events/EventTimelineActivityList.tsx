@@ -6,6 +6,7 @@ import {
   type TimelineAssigneeSelection,
 } from "./EventTimelineAssigneePicker";
 import { EventTimelineBlockQuestions } from "./EventTimelineBlockQuestions";
+import { ReviewFlagInline } from "./review-flags/ReviewFlagInline";
 import type { TimelineStaffOption } from "./eventTimelineStaffRoster";
 import { GanttStrip } from "./EventTimelineGanttStrip";
 import {
@@ -237,6 +238,13 @@ export function EventTimelineActivityList({
                 >
                   {editingId === activity._id ? "Close editor" : "Edit block"}
                 </button>
+                <ReviewFlagInline
+                  eventId={eventId}
+                  targetKind="timeline_activity"
+                  targetId={activity._id}
+                  targetLabel={activity.name}
+                  disabled={isBusy}
+                />
                 <button
                   type="button"
                   className="btn-link text-ink-3"

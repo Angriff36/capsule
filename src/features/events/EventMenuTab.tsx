@@ -15,6 +15,7 @@ import {
   useListDishContainer,
   useListDishIngredient,
   useListEventDish,
+  useListEventGuest,
   useListIngredient,
   useListIngredientPriceObservation,
   useListInventoryItem,
@@ -42,7 +43,7 @@ import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { ActionMenu, ActionMenuRule } from "../../ui/primitives";
+import { ActionMenu, ActionMenuRule, Skeleton } from "../../ui/primitives";
 import { PlusIcon } from "../../ui/icons";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import type { EventStockShortage } from "./EventStockReservationCoordinator";
@@ -51,7 +52,15 @@ import { reconcileRecoveredMenuRequest } from "./reconcileRecoveredMenuRequest";
 import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 import { EventDraftPoButton } from "./EventDraftPoButton";
+import { EventMenuLineNote } from "./EventMenuLineNote";
+import {
+  EventMenuDietaryConflictsCard,
+  type DietaryConflictInputs,
+} from "./EventMenuDietaryConflictsCard";
 import { EventMenuRecipeEditor } from "./EventMenuRecipeEditor";
+import { eventMenuHeadcountHint } from "../../lib/eventMenuHeadcountHint";
+import { ReviewFlagButton } from "./review-flags/ReviewFlagButton";
+import { useEventReviewFlags } from "./review-flags/useEventReviewFlags";
 import { eventMenuCourseTallies, EventMenuSidebar } from "./EventMenuSidebar";
 import {
   buildEventMenuCost,
@@ -97,6 +106,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const event = useGetEvent(eventId);
   const dishes = useListDish();
   const eventDishes = useListEventDish();
+  const eventGuests = useListEventGuest();
+  const reviewFlags = useEventReviewFlags(eventId);
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const components = useListComponent();
@@ -315,6 +326,35 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     [dishes, selections],
   );
 
+  // Event-stated restrictions vs. what the catalog says is in each dish
+  // (#368 item 14). Reuses the rows already loaded for costing.
+  const dietaryConflictInputs: DietaryConflictInputs = useMemo(
+    () => ({
+      eventId,
+      event,
+      guests: eventGuests ?? [],
+      selections,
+      dishes,
+      dishIngredients: dishIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
+      ingredients: ingredients ?? [],
+      components: components ?? [],
+    }),
+    [
+      componentIngredients,
+      components,
+      dishComponents,
+      dishIngredients,
+      dishes,
+      event,
+      eventGuests,
+      eventId,
+      ingredients,
+      selections,
+    ],
+  );
+
   const menuAllergenCodes = useMemo(() => {
     const codes = new Set<string>();
     for (const selection of selections) {
@@ -443,38 +483,53 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     setStockPhase((current) => current + 1);
   };
 
-  const editLineNote = (row: EventMenuNoteRow) => {
+  // One dish-specific note per menu line, for THIS event only. Works for
+  // lines with no note yet (the row's "Add kitchen note" button) as well as
+  // the sidebar's Edit; sell price and pans ride along untouched.
+  const editNoteForLine = (lineId: string, suggestedNote?: string) => {
     void (async () => {
-      const selection = selections.find((item) => item._id === row.lineId);
+      const selection = selections.find((item) => item._id === lineId);
       if (!selection) return;
+      const dishName =
+        dishes?.find((dish) => dish._id === selection.dishId)?.name ??
+        "Unknown dish";
+      const current = parseEventMenuLineFields(selection.specialInstructions);
+      const startingNote =
+        suggestedNote && !current.notes.includes(suggestedNote)
+          ? [current.notes.trim(), suggestedNote].filter(Boolean).join("\n")
+          : current.notes;
       const values = await prompt.askFields({
-        title: `Menu note — ${row.dishName}`,
-        description: "Shown on the menu rail. Keeps sell and pans fields.",
+        title: `Kitchen note — ${dishName}`,
+        description:
+          "An instruction for this dish on this event only — sauce on the side, doneness, plating, allergy handling. Prints on the menu and prep sheets. The catalog dish is not changed.",
         fields: [
           {
             name: "note",
             label: "Note",
-            defaultValue: row.note,
-            inputType: "text",
+            defaultValue: startingNote,
+            multiline: true,
+            required: false,
+            placeholder: "e.g. Peppercorn cream sauce on the side",
           },
         ],
         confirmLabel: "Save note",
       });
       if (!values) return;
-      const current = parseEventMenuLineFields(selection.specialInstructions);
-      await run(`note:${row.lineId}`, () =>
+      await run(`note:${lineId}`, () =>
         updateInstructions({
           docId: selection._id,
           version: selection.version,
-          specialInstructions: encodeEventMenuLineFields({
-            unitSellPrice: current.unitSellPrice,
-            containerCount: current.containerCount,
-            notes: values.note ?? "",
-          }),
+          specialInstructions:
+            encodeEventMenuLineFields({
+              unitSellPrice: current.unitSellPrice,
+              containerCount: current.containerCount,
+              notes: values.note ?? "",
+            }) || undefined,
         }),
       );
     })();
   };
+  const editLineNote = (row: EventMenuNoteRow) => editNoteForLine(row.lineId);
 
   return (
     <section className="space-y-4" data-testid="event-menu-tab">
@@ -672,7 +727,20 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             />
           ) : null}
 
-          {selections.length === 0 ? (
+          {eventDishes === undefined || dishes === undefined ? (
+            // Menu rows still arriving (first load, or returning via Back):
+            // never claim "no dishes" until the list has actually answered.
+            <div
+              className="card space-y-3 px-5 py-6"
+              role="status"
+              aria-label="Loading event menu"
+              data-testid="event-menu-loading"
+            >
+              <Skeleton className="h-11" />
+              <Skeleton className="h-11" />
+              <Skeleton className="h-11" />
+            </div>
+          ) : selections.length === 0 ? (
             <div className="card px-5 py-10 text-center">
               <p className="text-base font-semibold text-ink">
                 No dishes on this event yet
@@ -774,6 +842,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     servings,
                   );
                   const recipeOpen = openRecipeId === selection._id;
+                  const headcountHint = eventMenuHeadcountHint({
+                    dishName: dish?.name ?? "Unknown dish",
+                    quantityServings: Number(selection.quantityServings),
+                    expectedHeadcount,
+                    headcountOverride: (
+                      selection as { headcountOverride?: number | null }
+                    ).headcountOverride,
+                  });
                   return (
                     <li key={selection._id}>
                       <form
@@ -855,12 +931,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           />
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <Link
-                                to={dish ? dishPath(dish._id) : "#"}
-                                className="text-base font-semibold text-ink hover:underline"
-                              >
+                              <span className="text-base font-semibold text-ink">
                                 {dish?.name ?? "Unknown dish"}
-                              </Link>
+                              </span>
+                              {dish ? (
+                                <Link
+                                  to={dishPath(dish._id)}
+                                  className="text-xs text-ink-3 underline decoration-dotted hover:text-ink"
+                                  title="Opens the shared catalog record. Edits there change this dish on every event — use the kitchen note below for event-only instructions."
+                                  data-testid="event-menu-catalog-link"
+                                >
+                                  Catalog dish ↗
+                                </Link>
+                              ) : null}
                               <AllergenIconRow codes={dish?.allergenSummary} />
                               <span
                                 className={`rounded-sm px-2 py-0.5 text-xs font-semibold ${
@@ -879,6 +962,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             <p className="mt-0.5 truncate text-sm text-ink-3">
                               {dish?.description || "No description yet."}
                             </p>
+                            <EventMenuLineNote
+                              specialInstructions={
+                                selection.specialInstructions
+                              }
+                              busy={busy != null}
+                              onEdit={() => editNoteForLine(selection._id)}
+                            />
                             <p className="mt-1 text-sm text-ink-2 xl:hidden">
                               {selection.quantityServings} servings
                               {" · est. "}
@@ -908,6 +998,15 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                 {row.flag}
                               </p>
                             ))}
+                            {headcountHint ? (
+                              <p
+                                className="mt-1 text-sm font-medium text-warn"
+                                data-testid="menu-headcount-hint"
+                                title="Set a food-cost headcount on this line if the count is deliberate."
+                              >
+                                {headcountHint.text}
+                              </p>
+                            ) : null}
                           </div>
                         </div>
 
@@ -992,6 +1091,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           >
                             Save
                           </button>
+                          <ReviewFlagButton
+                            flags={reviewFlags}
+                            prompt={prompt}
+                            targetKind="menu_line"
+                            targetId={selection._id}
+                            targetLabel={dish?.name ?? "Unknown dish"}
+                            suggestedQuestion={headcountHint?.question}
+                            busy={busy != null}
+                            onError={(error) =>
+                              setFailure(classifyCommandFailure(error))
+                            }
+                            compact
+                          />
                           <ActionMenu>
                             <button
                               type="button"
@@ -1128,6 +1240,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           busy={busy != null}
           onApplyTemplate={applyTemplate}
           onEditNote={editLineNote}
+          leading={
+            <EventMenuDietaryConflictsCard
+              inputs={dietaryConflictInputs}
+              busy={busy != null}
+              onNoteLine={editNoteForLine}
+            />
+          }
         >
           <div className="card p-4">
             <p className="eyebrow">Purchasing</p>

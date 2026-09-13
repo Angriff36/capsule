@@ -8,6 +8,11 @@ export { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
 export { CapsuleAgentJwtMinter } from "./CapsuleAgentJwtMinter";
 export type { MintedAgentJwt } from "./CapsuleAgentJwtMinter";
 export { CapsuleAgentJwtSession } from "./CapsuleAgentJwtSession";
+export { CapsuleAgentPersonFirstClaimCheck } from "./CapsuleAgentPersonFirstClaimCheck";
+export type {
+  PersonFirstAuthStatus,
+  PersonFirstAuthStatusReader,
+} from "./CapsuleAgentPersonFirstClaimCheck";
 export {
   CapsuleCommandUiCoverage,
   CAPABILITY_UI_SURFACES,

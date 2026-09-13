@@ -21,6 +21,9 @@ import {
   retireUnusedAutomaticDraft,
   standDownEventPurchasing,
 } from "./purchasingEvents";
+import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
+import { deleteBlobIfOrphan } from "./blobs";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -87,6 +90,28 @@ export async function handleManifestEvent(
     ["EventTimingConfigured", "EventScheduleChanged"].includes(event.type)) {
     await reconcileEventTiming(ctx, event.entityId as Id<"events">);
     await reconcileEventStaffing(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Organization" && event.type === "OrganizationBrandLogoSet") {
+    // A replaced or removed logo leaves no orphan blob behind (#237).
+    const previous = event.payload.previousStorageId;
+    if (typeof previous === "string" && previous !== event.payload.storageId)
+      await deleteBlobIfOrphan(ctx, previous);
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {
+    if (event.payload.previousPurchasingWeekStart !== event.payload.purchasingWeekStart)
+      await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Invoice" &&
+    (event.type === "InvoiceIssued" || event.type === "InvoiceNumberAssigned")) {
+    // A manually assigned number is validated exactly like an explicit one at issue.
+    await ensureUniqueInvoiceNumber(
+      ctx,
+      event.entityId as Id<"invoices">,
+      event.type === "InvoiceIssued" && event.payload.autoNumbered === true,
+    );
     return;
   }
   if (event.entity === "EventTimelineActivity" &&

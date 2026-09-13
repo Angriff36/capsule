@@ -2,11 +2,12 @@ import type { EventBundle } from "../lib/tppReports/eventBundle";
 import {
   buildEventBundlePlan,
   type EventBundlePlan,
-  type PlannedStep,
-  bundleIdentity,
 } from "./CapsuleEventBundlePlan";
 import type { CapsuleCommandExecutor } from "./CapsuleCommandExecutor";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
+import { eventBundleIdempotencyScope } from "./CapsuleEventBundleIdempotencyScope";
+import { runPlannedSteps } from "./CapsuleEventBundleStepRunner";
+import { warningsNeedingDecision } from "./CapsuleEventBundleWarnings";
 import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 
 /**
@@ -20,11 +21,17 @@ import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 export interface CapsuleEventBundleEnterOptions {
   bundle: EventBundle;
   /**
+   * The Convex tenant id the executor's identity belongs to. Scopes the
+   * idempotency keys, so two tenants entering the same TPP invoice number
+   * never replay each other's cached results.
+   */
+  tenantId: string;
+  /**
    * Required when the bundle carries warnings. Warnings mean the reports
    * disagreed or something could not be mapped; a human decides, not the agent.
    */
   acceptWarnings?: boolean;
-  /** Overrides the idempotency scope. Defaults to the TPP invoice number. */
+  /** Overrides the idempotency scope. Defaults to tenant + TPP invoice number. */
   idempotencyScope?: string;
   /**
    * Tenant records to match against. `existing` attaches the run to an event
@@ -50,39 +57,7 @@ export interface CapsuleEventBundleEnterResult {
   warnings: string[];
 }
 
-function asDocId(result: unknown): string {
-  if (result && typeof result === "object") {
-    const record = result as Record<string, unknown>;
-    for (const field of ["docId", "_id", "id"]) {
-      const value = record[field];
-      if (typeof value === "string") return value;
-    }
-  }
-  throw new Error("Command result carried no record id");
-}
-
-function dropEmptyArgs(args: Record<string, unknown>): Record<string, unknown> {
-  const kept: Record<string, unknown> = {};
-  for (const [name, value] of Object.entries(args)) {
-    if (value === undefined || value === "") continue;
-    kept[name] = value;
-  }
-  return kept;
-}
-
-/**
- * Warnings that report data left out of the event, or a value that was
- * guessed for it (an assumed start time); everything else is a note.
- */
-const NEEDS_DECISION =
-  /was skipped|were skipped|not entered|match no person|is assumed|different invoice numbers/;
-
-/** The warnings a human must accept before entering; the rest are notes. */
-export function warningsNeedingDecision(plan: {
-  warnings: string[];
-}): string[] {
-  return plan.warnings.filter((warning) => NEEDS_DECISION.test(warning));
-}
+export { warningsNeedingDecision };
 
 export class CapsuleEventBundleCoordinator {
   constructor(private readonly executor: CapsuleCommandExecutor) {}
@@ -126,25 +101,19 @@ export class CapsuleEventBundleCoordinator {
     }
 
     // Same identity the planner uses for business keys, so two no-invoice
-    // bundles never replay each other's idempotency results.
+    // bundles never replay each other's idempotency results — pinned to the
+    // tenant, so two tenants' bundles never do either.
     const scope =
       options.idempotencyScope ??
-      `tpp:${bundleIdentity(options.bundle.header)}`;
+      eventBundleIdempotencyScope(options.tenantId, options.bundle.header);
     const keys = new CapsuleIdempotencyKeyFactory(scope);
-    const createdIds: Record<string, string> = { ...plan.seedIds };
-
-    for (const step of plan.steps) {
-      const args = this.resolveArgs(step, createdIds);
-      const result = await this.executor.execute({
-        capabilityId: step.capabilityId,
-        args: dropEmptyArgs(args),
-        idempotencyKey: keys.forCapability(
-          step.capabilityId,
-          step.idempotencySuffix,
-        ),
-      });
-      createdIds[step.ref] = asDocId(result);
-    }
+    const createdIds = await runPlannedSteps({
+      steps: plan.steps,
+      seedIds: plan.seedIds,
+      executor: this.executor,
+      idempotencyKeyFor: (step) =>
+        keys.forCapability(step.capabilityId, step.idempotencySuffix),
+    });
 
     const eventId = createdIds.event;
     if (eventId === undefined) throw new Error("The event was not created");
@@ -156,25 +125,5 @@ export class CapsuleEventBundleCoordinator {
       idempotencyScope: scope,
       warnings: plan.warnings,
     };
-  }
-
-  /** Replace step references with the ids the earlier steps produced. */
-  private resolveArgs(
-    step: PlannedStep,
-    createdIds: Record<string, string>,
-  ): Record<string, unknown> {
-    const args = { ...step.args };
-    for (const name of step.resolveRefs ?? []) {
-      const ref = args[name];
-      if (typeof ref !== "string") continue;
-      const id = createdIds[ref];
-      if (id === undefined) {
-        throw new Error(
-          `Step "${step.label}" needs ${name} from "${ref}", which has not been created`,
-        );
-      }
-      args[name] = id;
-    }
-    return args;
   }
 }

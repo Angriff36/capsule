@@ -292,6 +292,7 @@ export function EventEquipmentPanel({
               </div>
             ) : (
               <EventEquipmentSheet
+                eventId={eventId}
                 rows={sheetRows}
                 busy={busy}
                 draft={checklistDraft}

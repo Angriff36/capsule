@@ -131,11 +131,15 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
     // The fixture has no start time, so the preview warns. Entering must
     // refuse until that warning is acknowledged.
     expect(preview.plan.warnings.length).toBeGreaterThan(0);
-    await expect(coordinator.enter({ bundle })).rejects.toThrow(
-      /Refusing to enter/,
-    );
+    await expect(
+      coordinator.enter({ bundle, tenantId: TENANT_ID }),
+    ).rejects.toThrow(/Refusing to enter/);
 
-    const result = await coordinator.enter({ bundle, acceptWarnings: true });
+    const result = await coordinator.enter({
+      bundle,
+      tenantId: TENANT_ID,
+      acceptWarnings: true,
+    });
     expect(result.eventId).toBeTruthy();
     expect(result.executedSteps).toBe(preview.plan.steps.length);
 
@@ -246,7 +250,11 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
     const coordinator = new CapsuleEventBundleCoordinator(executor);
     const { bundle } = readBundle();
 
-    const first = await coordinator.enter({ bundle, acceptWarnings: true });
+    const first = await coordinator.enter({
+      bundle,
+      tenantId: TENANT_ID,
+      acceptWarnings: true,
+    });
 
     // Read the tenant back the way the live loader does, from the same tables.
     const context = await admin.run(async (ctx) => {
@@ -355,6 +363,7 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
     const callsBefore = executor.calls.length;
     const second = await coordinator.enter({
       bundle,
+      tenantId: TENANT_ID,
       acceptWarnings: true,
       context,
     });
@@ -375,10 +384,19 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
     );
     const { bundle } = readBundle();
 
-    const first = await coordinator.enter({ bundle, acceptWarnings: true });
-    const second = await coordinator.enter({ bundle, acceptWarnings: true });
+    const first = await coordinator.enter({
+      bundle,
+      tenantId: TENANT_ID,
+      acceptWarnings: true,
+    });
+    const second = await coordinator.enter({
+      bundle,
+      tenantId: TENANT_ID,
+      acceptWarnings: true,
+    });
 
     expect(second.eventId).toBe(first.eventId);
+    expect(first.idempotencyScope).toBe(`tpp:${TENANT_ID}:7001`);
     const counts = await admin.run(async (ctx) => ({
       events: (await ctx.db.query("events").collect()).length,
       eventDishes: (await ctx.db.query("eventDishes").collect()).length,

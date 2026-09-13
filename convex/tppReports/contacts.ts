@@ -68,6 +68,48 @@ function dateText(value: number | null | undefined): string {
   return value == null ? "" : new Date(value).toLocaleDateString("en-US");
 }
 
+/** "YYYY-MM-DD" → epoch ms at UTC noon, so no zone shifts the calendar day. */
+function birthdayEpoch(birthday: string | null | undefined): number | null {
+  const match = birthday?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const [, year, month, day] = match;
+  return Date.UTC(Number(year), Number(month) - 1, Number(day), 12);
+}
+
+/** Clients with a birthday on file, in calendar order (month, then day). */
+function birthdayRows(
+  clients: Array<{
+    _id: string;
+    companyName?: string | null;
+    givenName?: string | null;
+    familyName?: string | null;
+    phone?: string | null;
+    birthday?: string | null;
+  }>,
+): TppRow[] {
+  return clients
+    .flatMap((client) => {
+      const birthday = birthdayEpoch(client.birthday);
+      return birthday === null ? [] : [{ client, birthday }];
+    })
+    .sort((a, b) => {
+      const aDate = new Date(a.birthday);
+      const bDate = new Date(b.birthday);
+      return (
+        aDate.getUTCMonth() - bDate.getUTCMonth() ||
+        aDate.getUTCDate() - bDate.getUTCDate()
+      );
+    })
+    .map(({ client, birthday }) => ({
+      id: client._id,
+      values: {
+        name: clientName(client),
+        birthday,
+        phone: client.phone ?? "",
+      },
+    }));
+}
+
 async function eventBundle(
   ctx: QueryCtx,
   tenantId: string,
@@ -189,11 +231,23 @@ export const run = query({
               "region",
               "postalCode",
               "countryCode",
+              "birthday",
             ],
             client,
           ),
         ),
       );
+      if (args.reportId === "birthday-list") {
+        return table(
+          args.reportId,
+          [
+            { key: "name", label: "Contact", kind: "text" },
+            { key: "birthday", label: "Birthday", kind: "date" },
+            { key: "phone", label: "Phone", kind: "text" },
+          ],
+          birthdayRows(clients),
+        );
+      }
       const filtered =
         args.reportId === "contact-activity"
           ? clients.filter((row) =>
@@ -222,17 +276,6 @@ export const run = query({
           created: client.createdAt ?? null,
         },
       }));
-      if (args.reportId === "birthday-list") {
-        return table(
-          args.reportId,
-          [
-            { key: "name", label: "Contact", kind: "text" },
-            { key: "birthday", label: "Birthday", kind: "date" },
-            { key: "phone", label: "Phone", kind: "text" },
-          ],
-          [],
-        );
-      }
       return table(
         args.reportId,
         [

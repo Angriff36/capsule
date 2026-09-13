@@ -96,6 +96,9 @@ entity Client mixin TenantScoped, SoftDeletable {
   property encrypted region: string?
   property encrypted postalCode: string?
   property encrypted countryCode: string?
+  // Calendar date "YYYY-MM-DD" for the Birthday List report (#272). Contact
+  // data for person clients; optional and never gating.
+  property encrypted birthday: string?
   property private encrypted taxId: string?
   property required taxExempt: boolean = false
   property required paymentTermsDays: int = 30
@@ -206,6 +209,19 @@ entity Client mixin TenantScoped, SoftDeletable {
     mutate postalCode = postalCode
     mutate countryCode = countryCode
     emit ClientContactChanged {
+      clientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Birthday as a calendar date, or null to clear it. Its own command so a
+  // contact edit that omits the field never wipes a stored birthday.
+  command setBirthday(optional birthday: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint birthdayCalendarDate: birthday == null or length(trim(birthday)) == 10 "Birthday must be a YYYY-MM-DD date"
+    mutate birthday = birthday
+    emit ClientBirthdaySet {
       clientId: self.id
       tenantId: self.tenantId
     }
@@ -326,6 +342,10 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property encrypted region: string?
   property encrypted postalCode: string?
   property encrypted countryCode: string?
+  // GPS pin for venues that have no street address — a campsite, a field, a
+  // trailhead (#368 item 9). Decimal degrees; north/east positive.
+  property latitude: float?
+  property longitude: float?
   property encrypted contactName: string?
   property encrypted contactEmail: string?
   property encrypted contactPhone: string?
@@ -356,6 +376,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
 
   constraint venueIdentityComplete: self.registeredAt == null or length(trim(self.name)) > 0 "Registered venues require a name"
   constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity cannot be negative"
+  constraint venueLatitudeRange: self.latitude == null or (self.latitude >= -90 and self.latitude <= 90) "Latitude must be between -90 and 90"
+  constraint venueLongitudeRange: self.longitude == null or (self.longitude >= -180 and self.longitude <= 180) "Longitude must be between -180 and 180"
 
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
@@ -387,6 +409,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
     optional region: string,
     optional postalCode: string,
     optional countryCode: string,
+    optional latitude: number,
+    optional longitude: number,
     optional contactName: string,
     optional contactEmail: string,
     optional contactPhone: string,
@@ -420,6 +444,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate region = region
     mutate postalCode = postalCode
     mutate countryCode = countryCode
+    mutate latitude = latitude
+    mutate longitude = longitude
     mutate contactName = contactName
     mutate contactEmail = contactEmail
     mutate contactPhone = contactPhone
@@ -458,6 +484,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
     optional region: string,
     optional postalCode: string,
     optional countryCode: string,
+    optional latitude: number,
+    optional longitude: number,
     optional contactName: string,
     optional contactEmail: string,
     optional contactPhone: string,
@@ -488,6 +516,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate region = region
     mutate postalCode = postalCode
     mutate countryCode = countryCode
+    mutate latitude = latitude
+    mutate longitude = longitude
     mutate contactName = contactName
     mutate contactEmail = contactEmail
     mutate contactPhone = contactPhone
@@ -577,8 +607,12 @@ entity Event mixin TenantScoped, SoftDeletable {
   property timingUnloadMinutes: float?
   property timingConfiguredAt: datetime?
   // Purchasing week bucket key for weekly VendorOrder draft consolidation.
-  // Set with startsAt on plan/reschedule; align multiple events to the same
-  // week start so they share one draft (UTC Monday midnight recommended).
+  // Normalized from startsAt on plan/reschedule to the Monday 08:00 UTC that
+  // starts the event's week (Monday 00:00 US Pacific / 04:00 US Eastern —
+  // every US zone reads it as Monday). Storing the raw start time gave every
+  // event its own "week", so two events in one week each subtracted the same
+  // stock and ordered separately (#327). Week arithmetic: epoch ms, one week
+  // is 604800000 ms, and 374400000 ms is Monday 1970-01-05 08:00 UTC.
   property purchasingWeekStart: datetime?
   property venueName: string?
   property venueAddress: string?
@@ -762,7 +796,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate eventType = eventType
     mutate startsAt = startsAt
     mutate endsAt = endsAt
-    mutate purchasingWeekStart = startsAt
+    mutate purchasingWeekStart = startsAt - ((startsAt - 374400000) % 604800000)
     mutate serviceStyleId = serviceStyleId
     mutate occasionId = occasionId
     mutate venueId = venueId
@@ -799,15 +833,45 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint scheduleDates: endsAt > startsAt "Event end must be after its start"
     compute shiftedServiceStartsAt = self.serviceStartsAt != null and self.startsAt != null ? self.serviceStartsAt + (startsAt - self.startsAt) : self.serviceStartsAt
+    compute previousPurchasingWeekStart = self.purchasingWeekStart
+    compute nextPurchasingWeekStart = startsAt - ((startsAt - 374400000) % 604800000)
     mutate serviceStartsAt = shiftedServiceStartsAt
     mutate startsAt = startsAt
     mutate endsAt = endsAt
-    mutate purchasingWeekStart = startsAt
+    mutate purchasingWeekStart = nextPurchasingWeekStart
     emit EventScheduleChanged {
       eventId: self.id
       tenantId: self.tenantId
       startsAt: startsAt
       endsAt: endsAt
+    }
+    // Purchasing follows the event to its new week (#328). Declared consumers
+    // refresh the recipe/demand week copies; the transactional handler moves
+    // open purchase needs between weekly drafts (submitted orders stay put).
+    emit EventPurchasingWeekChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      purchasingWeekStart: nextPurchasingWeekStart
+      previousPurchasingWeekStart: previousPurchasingWeekStart
+    }
+  }
+
+  // Repeatable repair for events planned before week keys were normalized:
+  // recomputes the week from the stored start and re-drives the same
+  // propagation a reschedule does. Safe to run again; a no-op week change
+  // still refreshes copies and moves nothing.
+  command normalizePurchasingWeek() {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.deletedAt == null
+    guard self.startsAt != null
+    compute previousPurchasingWeekStart = self.purchasingWeekStart
+    compute nextPurchasingWeekStart = self.startsAt - ((self.startsAt - 374400000) % 604800000)
+    mutate purchasingWeekStart = nextPurchasingWeekStart
+    emit EventPurchasingWeekChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      purchasingWeekStart: nextPurchasingWeekStart
+      previousPurchasingWeekStart: previousPurchasingWeekStart
     }
   }
 
@@ -1777,6 +1841,11 @@ event ClientContactChanged: "client.contact_changed" {
   tenantId: string
 }
 
+event ClientBirthdaySet: "client.birthday_set" {
+  clientId: string
+  tenantId: string
+}
+
 event ClientBillingProfileChanged: "client.billing_profile_changed" {
   clientId: string
   tenantId: string
@@ -1830,6 +1899,13 @@ event EventScheduleChanged: "event.schedule_changed" {
   tenantId: string
   startsAt: datetime
   endsAt: datetime
+}
+
+event EventPurchasingWeekChanged: "event.purchasing_week_changed" {
+  eventId: string
+  tenantId: string
+  purchasingWeekStart: datetime
+  previousPurchasingWeekStart: datetime?
 }
 
 event EventRecurrenceConfigured: "event.recurrence_configured" {

@@ -15,6 +15,7 @@ import {
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { useBrandLogoManager } from "./brandLogoUpload";
 import { isValidBrandColor, useTenantBranding } from "./tenantBranding";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
@@ -30,7 +31,9 @@ const canManageBranding = (role: string | undefined) =>
 
 export function BrandingPage() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
-  const { branding, record, clerkOrganization, loading } = useTenantBranding();
+  const { branding, record, clerkOrganization, hasStoredLogo, loading } =
+    useTenantBranding();
+  const brandLogo = useBrandLogoManager();
   const configureBranding = useOrganizationConfigureBranding();
   const createOrganization = useCreateOrganization();
   const setDefaultCurrency = useOrganizationSetDefaultCurrency();
@@ -119,6 +122,7 @@ export function BrandingPage() {
     setError(null);
     setNotice(null);
     try {
+      let organizationId: string;
       if (record) {
         await configureBranding({
           docId: record._id,
@@ -128,16 +132,20 @@ export function BrandingPage() {
           primaryColor,
           accentColor,
         });
+        organizationId = String(record._id);
       } else {
-        await createOrganization({
+        const created = await createOrganization({
           name: clerkOrganization?.name || displayName,
           brandDisplayName: displayName,
           brandAddress: address,
           brandPrimaryColor: primaryColor,
           brandAccentColor: accentColor,
         });
+        organizationId = String(created.docId);
       }
-      if (logoFile) await clerkOrganization?.setLogo({ file: logoFile });
+      // The logo lives on the tenant record (Convex storage), so admins
+      // without a Clerk organization keep it too (#237).
+      if (logoFile) await brandLogo.upload(organizationId, logoFile);
       setLogoFile(null);
       setNotice("Branding saved. New PDFs will use it automatically.");
     } catch (cause) {
@@ -150,12 +158,17 @@ export function BrandingPage() {
   }
 
   async function removeLogo() {
-    if (!canEdit || !clerkOrganization || busy) return;
+    if (!canEdit || busy) return;
     setBusy(true);
     setError(null);
     setNotice(null);
     try {
-      await clerkOrganization.setLogo({ file: null });
+      if (record && hasStoredLogo) {
+        await brandLogo.remove(String(record._id));
+      } else if (clerkOrganization?.hasImage) {
+        // Legacy logo still on the Clerk organization only.
+        await clerkOrganization.setLogo({ file: null });
+      }
       setLogoFile(null);
       setNotice("Logo removed. PDFs will use the display name instead.");
     } catch (cause) {

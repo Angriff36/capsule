@@ -202,6 +202,8 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate confirmedAt = now()
     mutate purchaseEligibleEventId = null
     mutate preferredVendorId = self.ingredient.preferredVendorId
+    // The event owns the purchasing week (#328); refresh before the need opens.
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit IngredientDemandConfirmed {
       purchasingWeekStart: self.purchasingWeekStart
       ingredientDemandId: self.id
@@ -224,6 +226,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate status = self.status == "calculated" ? "confirmed" : self.status
     mutate confirmedAt = self.status == "calculated" ? now() : self.confirmedAt
     mutate purchaseEligibleEventId = null
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit IngredientDemandReleased {
       ingredientDemandId: self.id
       tenantId: self.tenantId
@@ -241,6 +244,9 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate purchaseEligibleEventId = (self.status == "calculated" and self.purchaseEligibleEventId == null) ? self.eventId : self.purchaseEligibleEventId
     mutate preferredVendorId = self.ingredient.preferredVendorId
+    // Runs before PurchaseNeed.create in the approve transaction, so needs open
+    // on the event's current week even after a reschedule (#328).
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
   }
 
   command recalculate(newQuantity: decimal(12, 4), reason: string) {

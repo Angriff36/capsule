@@ -11,6 +11,8 @@ import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
+import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
+import { coordinatesFromFields } from "./venueCoordinates";
 
 const VENUE_TYPES = [
   "client_site",
@@ -81,11 +83,21 @@ export function VenuesPage() {
     event.preventDefault();
     const element = event.currentTarget;
     const data = new FormData(element);
+    const coordinates = coordinatesFromFields(
+      String(data.get("latitude") ?? ""),
+      String(data.get("longitude") ?? ""),
+    );
+    if (!coordinates.ok) {
+      setFailure(new Error(coordinates.error));
+      return;
+    }
     void run("register", async () => {
       await createVenue({
         name: String(data.get("name") ?? "").trim(),
         venueType: String(data.get("venueType")) as VenueType,
         capacity: Number(data.get("capacity")),
+        latitude: coordinates.value?.latitude,
+        longitude: coordinates.value?.longitude,
         onPremise: data.get("onPremise") === "on",
         kitchenAccess:
           String(data.get("kitchenAccess") ?? "").trim() || undefined,
@@ -108,7 +120,7 @@ export function VenuesPage() {
         city: String(data.get("city") ?? "").trim(),
         region: String(data.get("region") ?? "").trim(),
         postalCode: String(data.get("postalCode") ?? "").trim(),
-        country: String(data.get("country") ?? "").trim() || undefined,
+        countryCode: String(data.get("country") ?? "").trim() || undefined,
         accessNotes: String(data.get("accessNotes") ?? "").trim() || undefined,
         cateringNotes:
           String(data.get("cateringNotes") ?? "").trim() || undefined,
@@ -315,6 +327,7 @@ export function VenuesPage() {
                 placeholder="62701"
               />
             </div>
+            <VenueCoordinatesFields />
             <div>
               <label className="block text-xs font-medium text-ink-2">
                 Contact Name

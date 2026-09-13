@@ -10,13 +10,20 @@ use "./payment.manifest"
 // Currency code / exchange rate default to the tenant's functional currency
 // (no exchangeRate field on EventApproved). Finance can adjust per invoice on
 // the issue form before sending.
+// invoiceSequence: 0 marks the issue as auto-numbered (issues #136 / #165 —
+// the draft never carries the raw event document id). The command writes the
+// placeholder "INV-1" and emits InvoiceIssued with autoNumbered: true; the
+// authored numbering seam (convex/lib/invoiceNumbering.ts) then replaces it,
+// inside the same transaction, with the tenant's persisted
+// InvoiceNumberSequence + 1. No count() here: a reaction-param count compiles
+// to a full by_tenantId collect of the tenant's invoices on every approval.
 on EventApproved run Invoice.issue
   match eventId = payload.eventId
   else create
   params {
     clientId: payload.clientId
     eventId: payload.eventId
-    invoiceNumber: payload.eventId
+    invoiceSequence: 0
     subtotal: payload.quotedPrice
     taxAmount: 0
     discountAmount: 0

@@ -105,6 +105,10 @@ entity Candidate mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard user.id != null
     constraint advanceNotTerminal: toStage != "hired" and toStage != "rejected" "Use Hire or Reject to reach a terminal stage"
+    // A hire with a live team profile must be undone through revokeHire so the
+    // profile (and any sign-in on it) is handled in the same step — a plain
+    // stage move would leave that access stranded (#269).
+    constraint advanceKeepsProfileHonest: self.stage != "hired" or self.hiredPersonId == null "This hire has a team profile. Use Revoke hire so their profile is handled too"
     mutate stage = toStage
     mutate stageChangedAt = now()
     emit CandidateStageChanged {
@@ -127,6 +131,27 @@ entity Candidate mixin TenantScoped, SoftDeletable {
     emit CandidateRejected {
       candidateId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  // Undo a hire: back to a non-terminal stage and drop the profile link. The
+  // authored convex/candidateToTeam.ts revokeHire seam deactivates or
+  // terminates the linked Person FIRST, then runs this — so a candidate is
+  // never "reopened" while their team profile still holds live access (#269).
+  command revokeHire(toStage: CandidateStage, optional reason: string) {
+    guard self.appliedAt != null
+    guard self.stage == "hired"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint revokeNotTerminal: toStage != "hired" and toStage != "rejected" "Pick the stage the candidate goes back to"
+    mutate stage = toStage
+    mutate hiredPersonId = null
+    mutate stageChangedAt = now()
+    emit CandidateHireRevoked {
+      candidateId: self.id
+      tenantId: self.tenantId
+      toStage: toStage
+      reason: reason
     }
   }
 
@@ -242,6 +267,13 @@ event CandidateRejected: "candidate.rejected" {
 event CandidateHired: "candidate.hired" {
   candidateId: string
   tenantId: string
+}
+
+event CandidateHireRevoked: "candidate.hire_revoked" {
+  candidateId: string
+  tenantId: string
+  toStage: string
+  reason: string?
 }
 
 event InterviewScheduled: "interview.scheduled" {

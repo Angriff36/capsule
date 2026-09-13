@@ -39,6 +39,7 @@ export type CatalogItem = {
   isTemplate?: boolean | null;
   primaryImageStorageId?: string | null;
   allergenSummary?: string[] | null;
+  dietaryTags?: string[] | null;
   deletedAt?: number | null;
   editionNumber?: number | null;
   canonicalDishId?: string | null;
@@ -442,6 +443,9 @@ function previewFacts(section: KitchenSection, item: CatalogItem) {
   ];
   if (section === "dishes" && item.course) {
     facts.push({ label: "Course", value: item.course });
+  }
+  if (section === "dishes" && item.dietaryTags && item.dietaryTags.length) {
+    facts.push({ label: "Dietary", value: item.dietaryTags.join(", ") });
   }
   if (section === "components" && item.cuisine) {
     facts.push({ label: "Cuisine", value: item.cuisine });

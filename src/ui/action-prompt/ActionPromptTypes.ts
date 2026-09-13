@@ -6,6 +6,8 @@ export interface ActionPromptField {
   defaultValue?: string;
   placeholder?: string;
   inputType?: "text" | "number" | "datetime-local";
+  /** Render a textarea instead of a single-line input (free-text notes). */
+  multiline?: boolean;
   /** When present the field renders as a select over these options. */
   options?: Array<{ value: string; label: string }>;
   required?: boolean;

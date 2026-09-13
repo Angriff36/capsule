@@ -21,6 +21,7 @@ import {
   type DensitySource,
   type FdcFoodPortion,
 } from "./foodDensityFromLookup";
+import { UsdaCountPortionWeight } from "./usdaCountPortionGrams";
 
 const OFF_BASE = "https://world.openfoodfacts.org/api/v2";
 
@@ -75,25 +76,6 @@ function rawUsdaServingGrams(food: {
   });
 }
 
-function firstPortionGrams(
-  portions?: readonly FdcFoodPortion[] | null,
-): number | undefined {
-  if (!portions?.length) return undefined;
-  for (const portion of portions) {
-    const amount = portion.amount;
-    const gramWeight = portion.gramWeight;
-    if (
-      amount != null &&
-      gramWeight != null &&
-      amount > 0 &&
-      gramWeight > 0
-    ) {
-      return gramWeight / amount;
-    }
-  }
-  return undefined;
-}
-
 export async function loadUsdaAutofill(
   externalId: string,
 ): Promise<AutofillProfile> {
@@ -143,7 +125,10 @@ export async function loadUsdaAutofill(
       servingSize,
       servingSizeUnit,
       householdServingFullText,
-    }) ?? firstPortionGrams(food.foodPortions);
+    }) ??
+    // Only count-shaped portions ("1 medium", "1 slice") may become an
+    // each-weight; "1 cup" stays with density (#248).
+    new UsdaCountPortionWeight().gramsPerEach(food.foodPortions);
   const density = new LookupFoodDensity().resolve({
     foodPortions: food.foodPortions,
     servingGrams: rawUsdaServingGrams({ servingSize, servingSizeUnit }),

@@ -10,9 +10,11 @@ import { groupEventPrep } from "../../src/lib/eventPrepGroups";
 import { displayEventMenuNotes } from "../../src/features/events/eventMenuLineFields";
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
+import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelineStaffRoster";
 import type {
   TppColumn,
   TppDocumentSection,
+  TppLabel,
   TppReportResult,
   TppRow,
 } from "../../src/features/reports/tpp/types";
@@ -133,6 +135,173 @@ async function eventMenu(
     const dish = dishes[index];
     return dish && isLiveTenantRow(dish, tenantId) ? [{ item, dish }] : [];
   });
+}
+
+async function eventStaffing(
+  ctx: QueryCtx,
+  tenantId: string,
+  eventId: Id<"events">,
+) {
+  const [assignments, staffNeeds, shifts, people] = await Promise.all([
+    ctx.db
+      .query("eventAssignments")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .take(REPORT_ROW_LIMIT),
+    ctx.db
+      .query("eventStaffNeeds")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .take(REPORT_ROW_LIMIT),
+    ctx.db
+      .query("shifts")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .take(REPORT_ROW_LIMIT),
+    ctx.db
+      .query("people")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .take(REPORT_ROW_LIMIT),
+  ]);
+  const reportAssignments = await Promise.all(
+    assignments.map((assignment) =>
+      decryptReportFields(ctx, "EventAssignment", ["notes"], assignment),
+    ),
+  );
+  const reportShifts = await Promise.all(
+    shifts.map((shift) => decryptReportFields(ctx, "Shift", ["notes"], shift)),
+  );
+  const peopleById = new Map(
+    people.map((person) => [String(person._id), person] as const),
+  );
+  const referencedPersonIds = [
+    ...assignments.map((row) => row.personId),
+    ...staffNeeds.map((row) => row.filledByPersonId),
+    ...reportShifts.map((row) => row.personId),
+  ].filter((personId): personId is Id<"people"> => personId != null);
+  const missingPeople = await Promise.all(
+    [...new Set(referencedPersonIds.map(String))]
+      .filter((personId) => !peopleById.has(personId))
+      .map((personId) => ctx.db.get(personId as Id<"people">)),
+  );
+  const resolvedPeople = [
+    ...people,
+    ...missingPeople.filter(
+      (person): person is Doc<"people"> =>
+        person != null && isLiveTenantRow(person, tenantId),
+    ),
+  ];
+  return EventTimelineStaffRoster.staffingRosterEntries({
+    eventId: String(eventId),
+    assignments: reportAssignments.filter((row) =>
+      isLiveTenantRow(row, tenantId),
+    ),
+    staffNeeds: staffNeeds.filter((row) => isLiveTenantRow(row, tenantId)),
+    shifts: reportShifts.filter((row) => isLiveTenantRow(row, tenantId)),
+    people: resolvedPeople.filter((row) => isLiveTenantRow(row, tenantId)),
+  });
+}
+
+function staffWindowText(window: {
+  startsAt?: number | null;
+  endsAt?: number | null;
+}): string {
+  if (window.startsAt == null && window.endsAt == null) return "Time not set";
+  return [dateText(window.startsAt), dateText(window.endsAt)]
+    .filter(Boolean)
+    .join(" – ");
+}
+
+function staffDetails(
+  entry: ReturnType<
+    typeof EventTimelineStaffRoster.staffingRosterEntries
+  >[number],
+): string {
+  const windows = entry.shiftWindows?.length
+    ? entry.shiftWindows
+    : (entry.plannedWindows ?? []);
+  const sources = [...new Set(entry.sources ?? [entry.source])]
+    .map((source) =>
+      source === "filled_need" ? "filled staffing request" : source,
+    )
+    .join(" + ");
+  return [
+    windows.length ? windows.map(staffWindowText).join("; ") : "Time not set",
+    entry.status.replaceAll("_", " "),
+    sources,
+    ...(entry.notes ?? []),
+  ]
+    .filter(Boolean)
+    .join(" — ");
+}
+
+function serviceMethodText(
+  serviceInstructions: string | null | undefined,
+  serviceInstructionsSource: string | null | undefined,
+  recipeInstructions: string | null | undefined,
+): string {
+  const text = String(serviceInstructions ?? "").trim();
+  if (text) return text;
+  if (String(serviceInstructionsSource ?? "").trim())
+    return "Service method not recorded.";
+  const legacy = String(recipeInstructions ?? "").trim();
+  if (!legacy) return "Service method not recorded.";
+  const lines = legacy.split(/\r?\n/);
+  const heatingIndex = lines.findIndex((line) =>
+    /^\s*Heating\s*&\s*Serving\s*:/i.test(line),
+  );
+  if (heatingIndex >= 0) {
+    const heading = lines[heatingIndex].match(
+      /^\s*Heating\s*&\s*Serving\s*:\s*(.*)$/i,
+    );
+    const section = heading?.[1]?.trim() ? [heading[1].trim()] : [];
+    for (const line of lines.slice(heatingIndex + 1)) {
+      if (/^\s*(?:Method|Preparation|Ingredients|Recipe|Notes)\s*:/i.test(line))
+        break;
+      section.push(line);
+    }
+    return section.join("\n").trim() || "Service method not recorded.";
+  }
+  if (/^Method\s*:/i.test(legacy))
+    return "Service method not recorded. Preparation method is recorded separately.";
+  return "Service method not recorded.";
+}
+
+function serviceSourceText(source: string | null | undefined): string {
+  const normalized = String(source ?? "").trim();
+  return normalized ? `Source: ${normalized}` : "";
+}
+
+const SERVICE_LABEL_MAX_CHARS = 54;
+const SERVICE_LABEL_NOTE_MAX_CHARS = 36;
+
+function boundedLabelText(text: string, maxChars: number): string {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxChars) return normalized;
+  const boundary = normalized.lastIndexOf(" ", maxChars + 1);
+  return `${normalized.slice(0, boundary > 0 ? boundary : maxChars)}…`;
+}
+
+function serviceLabel(
+  dishName: string,
+  serviceText: string,
+  id: string,
+): TppLabel {
+  const lines = serviceText
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+  const firstLine = lines[0] || "Service method not recorded.";
+  const noteLine = lines.find((line) =>
+    line.toLowerCase().startsWith("event notes:"),
+  );
+  return {
+    id,
+    lines: [
+      dishName,
+      boundedLabelText(firstLine, SERVICE_LABEL_MAX_CHARS),
+      ...(noteLine
+        ? [boundedLabelText(noteLine, SERVICE_LABEL_NOTE_MAX_CHARS)]
+        : []),
+    ],
+  };
 }
 
 async function productionWorksheet(
@@ -581,8 +750,8 @@ export const run = query({
           { key: "event", label: "Event", kind: "text" },
           { key: "staff", label: "Staff member", kind: "text" },
           { key: "role", label: "Role", kind: "text" },
-          { key: "starts", label: "Starts", kind: "date" },
-          { key: "ends", label: "Ends", kind: "date" },
+          { key: "starts", label: "Starts", kind: "datetime" },
+          { key: "ends", label: "Ends", kind: "datetime" },
           { key: "status", label: "Status", kind: "text" },
         ],
         shifts
@@ -776,23 +945,37 @@ export const run = query({
             : args.reportId === "heating-serving-labels"
               ? "avery_5160"
               : "table_tent",
-        labels: menu.map(({ item, dish }) => ({
-          id: item._id,
-          lines:
-            args.reportId === "event-menu-item-labels"
-              ? [
-                  event.title,
-                  dateText(event.startsAt),
-                  event.primaryContactName ?? "",
-                  dish.name,
-                ]
-              : args.reportId === "heating-serving-labels"
+        labels: menu.map(({ item, dish }) => {
+          const menuNotes = displayEventMenuNotes(item.specialInstructions);
+          if (args.reportId === "heating-serving-labels") {
+            return serviceLabel(
+              dish.name,
+              [
+                serviceMethodText(
+                  dish.serviceInstructions,
+                  dish.serviceInstructionsSource,
+                  dish.recipeInstructions,
+                ),
+                menuNotes ? `Event notes: ${menuNotes}` : "",
+              ]
+                .filter(Boolean)
+                .join("\n"),
+              String(item._id),
+            );
+          }
+          return {
+            id: item._id,
+            lines:
+              args.reportId === "event-menu-item-labels"
                 ? [
+                    event.title,
+                    dateText(event.startsAt),
+                    event.primaryContactName ?? "",
                     dish.name,
-                    item.specialInstructions ?? dish.description ?? "",
                   ]
                 : [dish.name, dish.description ?? ""],
-        })),
+          };
+        }),
       };
     }
 
@@ -804,25 +987,21 @@ export const run = query({
         "heating-serving-event-menu",
       ].includes(args.reportId)
     ) {
-      const [timeline, assignments, reservations, equipment] =
-        await Promise.all([
-          ctx.db
-            .query("eventTimelineActivities")
-            .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-            .take(REPORT_ROW_LIMIT),
-          ctx.db
-            .query("eventAssignments")
-            .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-            .take(REPORT_ROW_LIMIT),
-          ctx.db
-            .query("equipmentReservations")
-            .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-            .take(REPORT_ROW_LIMIT),
-          ctx.db
-            .query("equipments")
-            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-            .take(REPORT_ROW_LIMIT),
-        ]);
+      const [timeline, staffing, reservations, equipment] = await Promise.all([
+        ctx.db
+          .query("eventTimelineActivities")
+          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+          .take(REPORT_ROW_LIMIT),
+        eventStaffing(ctx, tenantId, event._id),
+        ctx.db
+          .query("equipmentReservations")
+          .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+          .take(REPORT_ROW_LIMIT),
+        ctx.db
+          .query("equipments")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .take(REPORT_ROW_LIMIT),
+      ]);
       const equipmentById = new Map(
         equipment.map((item) => [String(item._id), item.name]),
       );
@@ -843,10 +1022,30 @@ export const run = query({
               args.reportId === "heating-serving-event-menu"
                 ? "Heating and serving"
                 : "Menu",
-            rows: menu.map(({ item, dish }) => ({
-              label: item.course ?? dish.course ?? "",
-              value: `${dish.name}${item.specialInstructions ? ` — ${item.specialInstructions}` : ""}`,
-            })),
+            rows: menu.map(({ item, dish }) => {
+              const menuNotes = displayEventMenuNotes(item.specialInstructions);
+              if (args.reportId === "heating-serving-event-menu") {
+                return {
+                  label: `${dish.name} · ${item.quantityServings} servings`,
+                  value: [
+                    serviceMethodText(
+                      dish.serviceInstructions,
+                      dish.serviceInstructionsSource,
+                      dish.recipeInstructions,
+                    ),
+                    serviceSourceText(dish.serviceInstructionsSource),
+                    menuNotes ? `Event notes: ${menuNotes}` : "",
+                  ]
+                    .filter(Boolean)
+                    .join("\n"),
+                  recipe: { kind: "dish" as const, id: String(dish._id) },
+                };
+              }
+              return {
+                label: item.course ?? dish.course ?? "",
+                value: `${dish.name}${menuNotes ? ` — ${menuNotes}` : ""}`,
+              };
+            }),
           },
           {
             id: "timeline",
@@ -866,12 +1065,10 @@ export const run = query({
           {
             id: "staff",
             heading: "Staffing",
-            rows: assignments
-              .filter((row) => isLiveTenantRow(row, tenantId))
-              .map((row) => ({
-                label: row.role,
-                value: `${dateText(row.startsAt)} – ${dateText(row.endsAt)}${row.notes ? ` — ${row.notes}` : ""}`,
-              })),
+            rows: staffing.map((entry) => ({
+              label: `${entry.label} — ${entry.role || "Role not set"}`,
+              value: staffDetails(entry),
+            })),
           },
           {
             id: "equipment",

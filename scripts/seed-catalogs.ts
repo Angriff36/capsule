@@ -14,71 +14,21 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
 import { CapsuleAgentAuthManager } from "../src/agent/CapsuleAgentAuthManager";
 
+import {
+  OCCASION_CATALOG,
+  REFERRAL_SOURCE_CATALOG,
+  type StandardCatalogRow,
+} from "../src/features/admin/catalogStandardOptions";
 import { SERVICE_STYLE_CATALOG } from "../src/features/events/serviceStyleCatalog";
 
-interface CatalogRow {
-  name: string;
-  code: string;
-  description?: string;
-}
-
-const SERVICE_STYLES: CatalogRow[] = [...SERVICE_STYLE_CATALOG];
-
-const OCCASIONS: CatalogRow[] = [
-  { name: "Corporate Event", code: "corporate-event" },
-  { name: "Wedding", code: "wedding" },
-  { name: "Social Event", code: "social-event" },
-  { name: "Vending", code: "vending" },
-  { name: "Christmas Party", code: "christmas-party" },
-  { name: "Birthday Party", code: "birthday-party" },
-  { name: "Holiday", code: "holiday" },
-  { name: "Rehearsal Dinner", code: "rehearsal-dinner" },
-  { name: "Marketing Event", code: "marketing-event" },
-  { name: "Fundraiser / Gala", code: "fundraiser-gala" },
-  { name: "Funeral / Memorial / Celebration of Life", code: "memorial" },
-  { name: "Aviation", code: "aviation" },
-  { name: "Retreat", code: "retreat" },
-  { name: "Graduation Party", code: "graduation-party" },
-  { name: "Grand Opening", code: "grand-opening" },
-  { name: "Private Chef", code: "private-chef" },
-  { name: "Anniversary", code: "anniversary" },
-  { name: "Open House", code: "open-house" },
-  { name: "Bridal Shower", code: "bridal-shower" },
-  { name: "Baby Shower", code: "baby-shower" },
-  { name: "Retirement", code: "retirement" },
-  { name: "Client Tasting", code: "client-tasting" },
-  { name: "Other", code: "other" },
-];
-
-const REFERRAL_SOURCES: CatalogRow[] = [
-  { name: "EZ Cater", code: "ez-cater" },
-  { name: "Repeat Customer", code: "repeat-customer" },
-  { name: "Referral", code: "referral" },
-  { name: "Google", code: "google" },
-  { name: "Salesperson", code: "salesperson" },
-  { name: "Greater Spokane Food Truck Association", code: "gsfta" },
-  { name: "Venue", code: "venue" },
-  { name: "Event Planner", code: "event-planner" },
-  { name: "The Knot", code: "the-knot" },
-  { name: "Mangia Web", code: "mangia-web" },
-  { name: "Spokane Eats", code: "spokane-eats" },
-  { name: "Stancraft", code: "stancraft" },
-  { name: "Wedding Planner", code: "wedding-planner" },
-  { name: "Itex", code: "itex" },
-  { name: "Wedding Wire", code: "wedding-wire" },
-  { name: "Another Caterer", code: "another-caterer" },
-  { name: "Instagram", code: "instagram" },
-  { name: "Facebook", code: "facebook" },
-  { name: "CDA Press", code: "cda-press" },
-  { name: "Air Culinaire", code: "air-culinaire" },
-  { name: "Templins", code: "templins" },
-  { name: "Bridal Fair", code: "bridal-fair" },
-  { name: "Other", code: "other" },
-];
+// The same lists the Admin → Catalogs "Add the standard list" button uses.
+const SERVICE_STYLES: StandardCatalogRow[] = [...SERVICE_STYLE_CATALOG];
+const OCCASIONS: StandardCatalogRow[] = [...OCCASION_CATALOG];
+const REFERRAL_SOURCES: StandardCatalogRow[] = [...REFERRAL_SOURCE_CATALOG];
 
 interface SeedTarget {
   label: string;
-  rows: CatalogRow[];
+  rows: StandardCatalogRow[];
   list: typeof api.queries.listOccasion;
   create: typeof api.mutations.Occasion_createViaRegister;
 }

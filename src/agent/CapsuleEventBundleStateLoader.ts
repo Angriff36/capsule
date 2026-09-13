@@ -1,6 +1,14 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../lib/api";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
+import type { CatalogCandidates } from "./CapsuleEventBundleCatalogMatch";
+import {
+  directoryRows,
+  liveRow,
+  mapBundleDirectory,
+  rowText,
+  type BundleDirectoryRow,
+} from "./CapsuleEventBundleDirectoryMapper";
 import type {
   CapsuleEventBundleDirectory,
   CapsuleEventBundleExistingEvent,
@@ -11,19 +19,10 @@ type QueryClient = {
   setAuth?: (token: string) => void;
 };
 
-type Row = Record<string, unknown>;
-
-function rows(value: unknown): Row[] {
-  return Array.isArray(value) ? (value as Row[]) : [];
-}
-
-function live(row: Row): boolean {
-  return row.deletedAt == null;
-}
-
-function text(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
+type Row = BundleDirectoryRow;
+const rows = directoryRows;
+const live = liveRow;
+const text = rowText;
 
 /**
  * Reads the tenant records the bundle planners match against, with the same
@@ -51,6 +50,8 @@ export class CapsuleEventBundleStateLoader {
       payments,
       proposals,
       vendorOrders,
+      proposalLines,
+      vendorOrderLines,
     ] = await Promise.all([
       client.query(api.queries.listOrganization, {}),
       client.query(api.queries.listPerson, {}),
@@ -60,50 +61,72 @@ export class CapsuleEventBundleStateLoader {
       client.query(api.queries.listPayment, {}),
       client.query(api.queries.listProposal, {}),
       client.query(api.queries.listVendorOrder, {}),
+      client.query(api.queries.listProposalLineItem, {}),
+      client.query(api.queries.listVendorOrderLine, {}),
     ]);
+    return mapBundleDirectory({
+      organizations,
+      people,
+      vendors,
+      ingredients,
+      invoices,
+      payments,
+      proposals,
+      vendorOrders,
+      proposalLines,
+      vendorOrderLines,
+    });
+  }
+
+  /**
+   * Active clients, venues and dishes as name candidates, so a bundle for a
+   * client, venue or dish already in Capsule reuses the record (exact
+   * normalized name or, for clients, email) instead of registering a twin.
+   */
+  async loadCatalogCandidates(): Promise<CatalogCandidates> {
+    const client = await this.resolveClient();
+    const [clients, venues, dishes] = await Promise.all([
+      client.query(api.queries.listClient, {}),
+      client.query(api.queries.listVenue, {}),
+      client.query(api.queries.listDish, {}),
+    ]);
+    const active = (row: Row) => live(row) && row.status === "active";
     return {
-      organizationNames: rows(organizations)
-        .filter(live)
-        .flatMap((row) => [text(row.name), text(row.brandDisplayName)])
-        .filter((name) => name.length > 0),
-      people: rows(people)
-        .filter(live)
+      clients: rows(clients)
+        .filter(active)
         .map((row) => ({
           id: String(row._id),
-          name: `${text(row.givenName)} ${text(row.familyName)}`.trim(),
+          name:
+            text(row.companyName) ||
+            `${text(row.givenName)} ${text(row.familyName)}`.trim(),
+          aliases: [text(row.email)].filter((alias) => alias.length > 0),
         })),
-      vendors: rows(vendors)
+      venues: rows(venues)
+        .filter(active)
+        .map((row) => ({ id: String(row._id), name: text(row.name) })),
+      dishes: rows(dishes)
         .filter(live)
         .map((row) => ({ id: String(row._id), name: text(row.name) })),
-      ingredients: rows(ingredients)
-        .filter(live)
-        .map((row) => ({ id: String(row._id), name: text(row.name) })),
-      invoices: rows(invoices)
-        .filter(live)
-        .map((row) => ({
-          id: String(row._id),
-          invoiceNumber: text(row.invoiceNumber),
-          status: text(row.status),
-        })),
-      payments: rows(payments)
-        .filter(live)
-        .map((row) => ({
-          id: String(row._id),
-          invoiceId: String(row.invoiceId),
-          amountCents: Math.round(Number(row.amount ?? 0) * 100),
-          status: text(row.status),
-        })),
-      proposals: rows(proposals)
-        .filter(live)
-        .map((row) => ({
-          id: String(row._id),
-          proposalNumber: text(row.proposalNumber),
-          status: text(row.status),
-        })),
-      vendorOrderNumbers: rows(vendorOrders)
-        .filter(live)
-        .map((row) => text(row.orderNumber)),
     };
+  }
+
+  /**
+   * The tenant the executor's identity resolves to — the same answer the
+   * UI's AuthGate reads. It pins the bundle's idempotency scope; an identity
+   * with no tenant cannot enter a bundle.
+   */
+  async loadTenantId(): Promise<string> {
+    const client = await this.resolveClient();
+    const status = (await client.query(api.authStatus.getAuthStatus, {})) as {
+      tenantId?: string | null;
+    } | null;
+    const tenantId = status?.tenantId?.trim() ?? "";
+    if (tenantId.length === 0) {
+      throw new Error(
+        "This sign-in is not linked to an organization, so no bundle can be entered for it.",
+      );
+    }
+    return tenantId;
   }
 
   async loadExisting(

@@ -126,22 +126,24 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     expect(search).not.toContain("if (statuses && !statuses.has");
   });
 
-  it("queryInvoices paginates instead of take(120)", () => {
+  it("queryInvoices scans past the first page without a second paginate", () => {
     // QA 191: billed INV-2026-QA1 / draft INV-8BJQS7 can sit past the
     // first 120 tenant rows. Restoring .take(120) still passed helper tests.
+    // #303: Convex allows one .paginate() per execution, so a cursor loop
+    // threw past the first 100 invoices. Bounded async iteration instead.
     const search = readFileSync("convex/search.ts", "utf8");
     const start = search.indexOf("async function queryInvoices");
     const end = search.indexOf("function invoiceHint", start);
     expect(start).toBeGreaterThan(-1);
     expect(end).toBeGreaterThan(start);
     const fn = search.slice(start, end);
-    expect(fn).toContain(".paginate(");
-    expect(fn).toContain("MAX_PAGES");
-    expect(fn).toContain("paginate({ numItems: PAGE, cursor })");
+    expect(fn).not.toMatch(/\.paginate\(\s*\{/);
+    expect(fn).toContain("for await (const inv of ctx.db");
+    expect(fn).toContain("MAX_SCANNED");
     expect(fn).not.toMatch(/\.take\(\s*120\s*\)/);
     // QA 193: .filter(deletedAt === null) emptied pages (undefined ≠ null)
     // and the scan spun 8–9s with no hits. Skip deleted in JS.
-    expect(fn).toContain("inv.deletedAt != null");
+    expect(fn).toContain("inv.deletedAt == null");
     expect(fn).not.toContain('q.eq(q.field("deletedAt"), null)');
   });
 

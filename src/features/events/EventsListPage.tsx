@@ -12,6 +12,7 @@ import {
 } from "../../ui/primitives";
 import { SavedViewsBar } from "../views/SavedViewsBar";
 import { clientDisplayName } from "./clientName";
+import { eventImportPath } from "./eventRoutes";
 import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
 
 /** Question tabs first (what is upcoming / needs action), then the stages. */
@@ -282,6 +283,7 @@ export function EventsListPage() {
             <PlusIcon /> New event
           </Link>
           <ActionMenu>
+            <Link to={eventImportPath()}>Import from BEO / worksheet</Link>
             <Link to="/events/tracker">Event tracker</Link>
             <Link to="/events/capacity">Capacity calendar</Link>
             <Link to="/events/templates">Templates</Link>
@@ -332,9 +334,14 @@ export function EventsListPage() {
                 : "Book the first event to start planning."
             }
             action={
-              <Link to="/events/new" className="btn btn-primary">
-                <PlusIcon /> New event
-              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <Link to="/events/new" className="btn btn-primary">
+                  <PlusIcon /> New event
+                </Link>
+                <Link to={eventImportPath()} className="btn btn-secondary">
+                  Import from BEO
+                </Link>
+              </div>
             }
           />
         </div>

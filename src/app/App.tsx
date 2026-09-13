@@ -8,6 +8,7 @@ import { EventAllergenBriefingPage } from "../features/events/EventAllergenBrief
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
+import { EventImportPage } from "../features/events/import/EventImportPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTrackerPage } from "../features/events/EventTrackerPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
@@ -657,6 +658,7 @@ export function App() {
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/events/tracker" element={<EventTrackerPage />} />
             <Route path="/events/new" element={<EventCreatePage />} />
+            <Route path="/events/import" element={<EventImportPage />} />
             <Route path="/events/templates" element={<EventTemplatesPage />} />
             <Route
               path="/events/capacity"
