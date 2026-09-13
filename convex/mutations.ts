@@ -10957,16 +10957,13 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
       const target = __row;
       await __runIngredientDemandEnsurePurchaseEligible(ctx, { docId: (__row as any)._id } as any);
     }
-    const __agg0_rows = await ctx.db.query("invoices").withIndex("by_tenantId", (q) => q.eq("tenantId", payload.tenantId)).collect();
-    const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0 = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant).length;
     const __match1_raw = await ctx.db.query("invoices").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match1_rows = __match1_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match1_id = __match1_rows.length > 0 ? (__match1_rows[0] as any)._id : null;
     if (__match1_id) {
-      await __runInvoiceIssue(ctx, { docId: __match1_id, clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: __agg0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice } as any);
+      await __runInvoiceIssue(ctx, { docId: __match1_id, clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: 0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice } as any);
     } else {
-      const __elseArgs: Record<string, any> = { clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: __agg0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice };
+      const __elseArgs: Record<string, any> = { clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: 0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice };
       const __elseDoc: Record<string, any> = {
         tenantId: __auth.tenantId,
         subtotal: 0,

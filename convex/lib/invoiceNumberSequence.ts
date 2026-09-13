@@ -16,11 +16,10 @@ export interface InvoiceNumberLedger {
  * are never written here.
  *
  * A tenant that predates the row starts at 0 without reading its invoice
- * history: the first mint begins at the cascade's own proposal (a count of
- * the tenant's live invoices + 1, which is what the old design issued) and
- * probes upward, one indexed point read per taken number, until a number no
- * invoice — live or deleted — has ever held. Every later mint is one row
- * read, one probe, one patch.
+ * history: the first mint probes upward from INV-1, one indexed point read
+ * per number already held (live or deleted), until a free one; it then holds
+ * the high-water mark, so every later mint is one row read, one probe, one
+ * patch.
  */
 export class InvoiceNumberSequenceStore {
   constructor(
@@ -29,14 +28,10 @@ export class InvoiceNumberSequenceStore {
     private readonly ledger: InvoiceNumberLedger,
   ) {}
 
-  /**
-   * Reserves and returns the next auto number, advancing the sequence. `floor`
-   * is the lowest `<n>` worth trying (the cascade's proposal); the sequence
-   * never hands out a number at or below what it has already issued.
-   */
-  async mintNext(floor: number): Promise<string> {
+  /** Reserves and returns the next auto number, advancing the sequence. */
+  async mintNext(): Promise<string> {
     const row = await this.row();
-    let next = Math.max(row.lastNumber + 1, floor, 1);
+    let next = row.lastNumber + 1;
     // The sequence is authoritative, but a number may still be held by a row
     // that never passed through it (hand-typed before the sequence existed,
     // or edited outside commands); skip past any holder, live or deleted.

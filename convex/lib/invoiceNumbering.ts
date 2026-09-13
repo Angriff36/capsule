@@ -13,15 +13,15 @@ import { parseAutoInvoiceNumber } from "./invoiceNumberFormat";
  * transaction (`handleManifestEvent`) on InvoiceIssued and on
  * InvoiceNumberAssigned.
  *
- * Why a seam: the EventApproved cascade proposes `INV-<count + 1>` from a
- * count of the tenant's live invoices, so once an earlier invoice is deleted
- * the next approval repeats a number; the Convex projection does not enforce
- * the manifest's `property unique invoiceNumber`, and a command cannot read
- * its sibling rows.
+ * Why a seam: the EventApproved cascade issues the placeholder `INV-1`
+ * (`invoiceSequence: 0`, `autoNumbered: true`) because a reaction-param
+ * count of the tenant's invoices would collect the whole ledger on every
+ * approval; the Convex projection does not enforce the manifest's
+ * `property unique invoiceNumber`, and a command cannot read its sibling rows.
  *
  * - Auto-minted number (InvoiceIssued without a supplied number): replaced by
  *   the tenant's persisted sequence (`InvoiceNumberSequence.lastNumber + 1`,
- *   floored at the cascade's proposal, skipping any number ever held), through
+ *   skipping any number ever held, live or deleted), through
  *   the governed Invoice.assignNumber command run as the tenant's system role
  *   — the approver is an event/sales user, not finance, and the renumber is a
  *   consequence of the approval they were allowed to make. Two concurrent
@@ -54,8 +54,7 @@ export async function ensureUniqueInvoiceNumber(
     ledger,
   );
   if (autoNumbered) {
-    const proposed = parseAutoInvoiceNumber(number) ?? 0;
-    const assigned = await sequence.mintNext(proposed);
+    const assigned = await sequence.mintNext();
     if (assigned !== number) await assignNumber(ctx, invoice, assigned);
     return;
   }

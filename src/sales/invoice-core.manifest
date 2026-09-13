@@ -101,9 +101,12 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may execute invoice commands"
 
   // invoiceNumber is what finance typed. When it is absent the number is
-  // minted from invoiceSequence — a reaction-param count of the tenant's
-  // invoices supplied by the EventApproved cascade — as "INV-<n>", so an
-  // auto-issued draft never carries the raw event document id (#136, #165).
+  // "INV-<invoiceSequence + 1>" — the EventApproved cascade passes
+  // invoiceSequence: 0, so the row is written as the placeholder "INV-1" and
+  // InvoiceIssued carries autoNumbered: true; the authored numbering seam
+  // replaces it in the same transaction with the tenant's persisted sequence
+  // (invoice-number-sequence.manifest). An auto-issued draft therefore never
+  // carries the raw event document id (#136, #165).
   command issue(
     clientId: uuid,
     optional invoiceNumber: string,
@@ -170,9 +173,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
 
   // Invoice numbers stay unique per tenant through the authored numbering seam
   // (convex/lib/invoiceNumbering.ts), which runs on InvoiceIssued and on
-  // InvoiceNumberAssigned: an auto-minted "INV-<n>" (the EventApproved
-  // cascade's count-based invoiceSequence, which repeats a number once an
-  // earlier invoice is deleted) is replaced here with the tenant's persisted
+  // InvoiceNumberAssigned: the cascade's auto-numbered placeholder "INV-1"
+  // is replaced here with the tenant's persisted
   // InvoiceNumberSequence (invoice-number-sequence.manifest) + 1; an explicit
   // number — supplied at issue or assigned manually by finance through this
   // command — that duplicates a live invoice is rejected instead, and an
