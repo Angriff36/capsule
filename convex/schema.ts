@@ -3018,6 +3018,7 @@ export default defineSchema({
     receivedQuantity: v.number(),
     supplyWeekStart: v.optional(v.union(v.number(), v.null())),
     pendingSupplyQuantity: v.optional(v.union(v.number(), v.null())),
+    stockAppliedQuantity: v.optional(v.union(v.number(), v.null())),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle")),
     unitCost: v.number(),
     lineTotalAmount: v.optional(v.union(v.number(), v.null())),

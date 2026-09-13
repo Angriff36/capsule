@@ -3309,6 +3309,7 @@ export const VendorOrderLineSchema = z.object({
   receivedQuantity: z.number().min(0).default(0),
   supplyWeekStart: z.coerce.date().nullable().optional(),
   pendingSupplyQuantity: z.number().nullable().optional(),
+  stockAppliedQuantity: z.number().nullable().optional(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
   unitCost: z.number().min(0).default(0),
   lineTotalAmount: z.number().nullable().optional(),
@@ -4842,6 +4843,11 @@ export type EventFinalizeEventParams = z.infer<typeof EventFinalizeEventParamsSc
 export const EventLockForSalesParamsSchema = z.object({});
 
 export type EventLockForSalesParams = z.infer<typeof EventLockForSalesParamsSchema>;
+
+// Command: normalizePurchasingWeek on Event
+export const EventNormalizePurchasingWeekParamsSchema = z.object({});
+
+export type EventNormalizePurchasingWeekParams = z.infer<typeof EventNormalizePurchasingWeekParamsSchema>;
 
 // Command: planEngagement on Event
 export const EventPlanEngagementParamsSchema = z.object({
@@ -7509,6 +7515,13 @@ export const PurchaseNeedMarkOrderedParamsSchema = z.object({
 
 export type PurchaseNeedMarkOrderedParams = z.infer<typeof PurchaseNeedMarkOrderedParamsSchema>;
 
+// Command: moveToWeek on PurchaseNeed
+export const PurchaseNeedMoveToWeekParamsSchema = z.object({
+  purchasingWeekStart: z.coerce.date(),
+});
+
+export type PurchaseNeedMoveToWeekParams = z.infer<typeof PurchaseNeedMoveToWeekParamsSchema>;
+
 // Command: releaseCancelledDraft on PurchaseNeed
 export const PurchaseNeedReleaseCancelledDraftParamsSchema = z.object({});
 
@@ -8808,6 +8821,7 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
   pendingSupply: z.number().optional(),
   orderedNeed: z.number().optional(),
   fulfilledNeed: z.number().optional(),
+  stockClaimed: z.number().optional(),
 });
 
 export type VendorOrderLineEnsureWeeklyLineParams = z.infer<typeof VendorOrderLineEnsureWeeklyLineParamsSchema>;

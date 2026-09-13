@@ -431,6 +431,11 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   // Outstanding supply already committed outside the editable weekly draft.
   property supplyWeekStart: datetime?
   property pendingSupplyQuantity: decimal(12, 4)?
+  // Stock on hand this automatic line counted on instead of ordering. Other
+  // weeks' lines subtract it, so one physical bag of flour is never promised
+  // to two weeks (#327). Only open ("added") lines count; lines a buyer adds
+  // by hand never claim stock.
+  property stockAppliedQuantity: decimal(12, 4)?
   property required unit: UnitOfMeasure = "each"
   property required unitCost: money(12, 2) = 0
   // Stored orderedQuantity * unitCost fact so header rollups can sum it
@@ -534,13 +539,21 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     ingredientDemandId: uuid,
     optional pendingSupply: decimal(12, 4),
     optional orderedNeed: decimal(12, 4),
-    optional fulfilledNeed: decimal(12, 4)
+    optional fulfilledNeed: decimal(12, 4),
+    optional stockClaimed: decimal(12, 4)
   ) {
     guard self.deletedAt == null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.ingredient != null and self.ingredient.status == "active"
     constraint ensureContributionPositive: contributionQuantity >= 0 "Contribution quantity cannot be negative"
-    compute orderQty = max(0, weekNeed + (orderedNeed != null ? orderedNeed : 0) + (fulfilledNeed != null ? fulfilledNeed : 0) - onHand - (pendingSupply != null ? pendingSupply : 0))
+    // stockClaimed sums every open automatic line's stockAppliedQuantity for
+    // this ingredient/unit, including this line's own earlier claim, which is
+    // returned before the week's share of stock is worked out (#327).
+    compute ownClaim = self.stockAppliedQuantity != null ? self.stockAppliedQuantity : 0
+    compute claimedElsewhere = max(0, (stockClaimed != null ? stockClaimed : 0) - ownClaim)
+    compute availableStock = max(0, onHand - claimedElsewhere)
+    compute requirement = max(0, weekNeed + (orderedNeed != null ? orderedNeed : 0) + (fulfilledNeed != null ? fulfilledNeed : 0) - (pendingSupply != null ? pendingSupply : 0))
+    compute orderQty = max(0, requirement - availableStock)
     compute effectiveUnitCost = self.unitCost > 0 ? self.unitCost : self.ingredient.costPerUnit
     compute nextQuantity = self.addedAt != null and self.quantityIsManual != false ? self.orderedQuantity : orderQty
     mutate vendorOrderId = vendorOrderId
@@ -548,6 +561,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     mutate ingredientDemandId = ingredientDemandId
     mutate orderedQuantity = nextQuantity
     mutate plannedQuantity = orderQty
+    mutate stockAppliedQuantity = min(availableStock, requirement)
     mutate quantityIsManual = self.addedAt == null ? false : self.quantityIsManual
     mutate quantityReviewReason = null
     mutate unit = unit
@@ -580,6 +594,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
 
   command releaseSupply() {
     mutate pendingSupplyQuantity = 0
+    // A cancelled order no longer holds stock for its week; a draft reopened
+    // for changes keeps its claim until the next weekly recalculation.
+    mutate stockAppliedQuantity = self.vendorOrder != null and self.vendorOrder.status == "cancelled" ? 0 : self.stockAppliedQuantity
   }
 
   command reviseQuantity(

@@ -112,7 +112,9 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     mutate servings = servings
     mutate yieldQuantity = yieldQuantity
     mutate batchMultiplier = batchMultiplier
-    mutate purchasingWeekStart = purchasingWeekStart
+    // The event owns the purchasing week; a reschedule (#328) must not leave
+    // recipe-driven reseeds on the week the dish was first added.
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
     mutate seededAt = now()
     emit EventDishComponentSeeded {
       seedId: self.id
@@ -124,7 +126,7 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
       servings: servings
       yieldQuantity: yieldQuantity
       batchMultiplier: batchMultiplier
-      purchasingWeekStart: purchasingWeekStart
+      purchasingWeekStart: self.purchasingWeekStart
     }
   }
 
@@ -140,6 +142,7 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
   command refresh() {
     guard self.deletedAt == null
     mutate servings = self.eventDish != null ? self.eventDish.quantityServings : self.servings
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventDishComponentSeeded {
       seedId: self.id
       tenantId: self.tenantId
@@ -214,7 +217,9 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate quantityPerServing = quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing)
     mutate unit = unit
     mutate servings = servings
-    mutate purchasingWeekStart = purchasingWeekStart
+    // The event owns the purchasing week (#328); the passed value is only a
+    // fallback for rows whose event cannot be resolved.
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
     mutate recordedAt = now()
     emit EventIngredientContributionRecorded {
       contributionId: self.id
@@ -224,7 +229,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId
       quantity: quantity
       unit: unit
-      purchasingWeekStart: purchasingWeekStart
+      purchasingWeekStart: self.purchasingWeekStart
     }
   }
 
@@ -240,6 +245,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate quantityPerServing = self.quantityPerServing != null ? self.quantityPerServing : (self.servings > 0 ? self.quantity / self.servings : null)
     mutate quantity = quantity
     mutate servings = servings
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
@@ -258,6 +264,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     constraint retireReason: length(trim(reason)) > 0 "Retire reason is required"
     mutate deletedAt = now()
     mutate quantity = 0
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
@@ -277,6 +284,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     compute changedUnit = self.unit != currentUnit
     mutate deletedAt = changedUnit ? now() : self.deletedAt
     mutate quantity = changedUnit ? 0 : self.quantity
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
@@ -482,6 +490,7 @@ on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
     fulfilledNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, unit == payload.unit, status == "fulfilled", of requiredQuantity)
     onHand: sum(InventoryItem where ingredientId == payload.ingredientId, unit == payload.unit, of quantityOnHand)
     pendingSupply: sum(VendorOrderLine where ingredientId == payload.ingredientId, supplyWeekStart == payload.purchasingWeekStart, unit == payload.unit, of pendingSupplyQuantity)
+    stockClaimed: sum(VendorOrderLine where ingredientId == payload.ingredientId, unit == payload.unit, status == "added", of stockAppliedQuantity)
     contributionQuantity: payload.requiredQuantity
     unit: payload.unit
     purchaseNeedId: payload.purchaseNeedId

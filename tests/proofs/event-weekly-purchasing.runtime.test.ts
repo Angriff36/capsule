@@ -12,6 +12,8 @@ import { modules } from "./convex-test-modules";
 const S = {
   tenantId: "tenant-weekly-purchasing-e2e",
   weekStart: Date.UTC(2026, 6, 20, 12, 0),
+  // Event.planEngagement normalizes the purchasing week to Monday 08:00 UTC.
+  weekKey: Date.UTC(2026, 6, 20, 8, 0),
   endsAt: Date.UTC(2026, 6, 20, 22, 0),
   endsAtB: Date.UTC(2026, 6, 21, 22, 0),
   headcountA: 100,
@@ -361,7 +363,7 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
       vendorId: string;
     };
     expect(draft.status).toBe("draft");
-    expect(draft.sourceRangeStart).toBe(S.weekStart);
+    expect(draft.sourceRangeStart).toBe(S.weekKey);
 
     const flourDemandTotal =
       S.flourPerServing * S.headcountA + S.flourPerServing * S.headcountB;

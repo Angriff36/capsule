@@ -192,6 +192,7 @@ import {
   EventLayoutSectionRemoveParamsSchema,
   EventLayoutSectionUpdateParamsSchema,
   EventLockForSalesParamsSchema,
+  EventNormalizePurchasingWeekParamsSchema,
   EventPlanEngagementParamsSchema,
   EventReassignClientParamsSchema,
   EventRescheduleParamsSchema,
@@ -469,6 +470,7 @@ import {
   PurchaseNeedMarkDraftOrderedParamsSchema,
   PurchaseNeedMarkFulfilledParamsSchema,
   PurchaseNeedMarkOrderedParamsSchema,
+  PurchaseNeedMoveToWeekParamsSchema,
   PurchaseNeedReleaseCancelledDraftParamsSchema,
   PurchaseNeedReviseRequiredParamsSchema,
   PurchaseNeedStandDownWithEventParamsSchema,
@@ -2850,6 +2852,16 @@ export function useEventLockForSales() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventLockForSalesParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.normalizePurchasingWeek. */
+export function useEventNormalizePurchasingWeek() {
+  const mutate = useMutation(api.mutations.Event_normalizePurchasingWeek);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventNormalizePurchasingWeekParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7145,6 +7157,16 @@ export function usePurchaseNeedMarkOrdered() {
   };
 }
 
+/** Mutation hook for PurchaseNeed.moveToWeek. */
+export function usePurchaseNeedMoveToWeek() {
+  const mutate = useMutation(api.mutations.PurchaseNeed_moveToWeek);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PurchaseNeedMoveToWeekParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PurchaseNeed.releaseCancelledDraft. */
 export function usePurchaseNeedReleaseCancelledDraft() {
   const mutate = useMutation(api.mutations.PurchaseNeed_releaseCancelledDraft);
@@ -10101,4 +10123,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1071 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1073 as const;

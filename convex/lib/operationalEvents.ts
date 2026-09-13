@@ -21,6 +21,7 @@ import {
   retireUnusedAutomaticDraft,
   standDownEventPurchasing,
 } from "./purchasingEvents";
+import { moveEventPurchasingWeek } from "./purchasingReschedule";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -87,6 +88,11 @@ export async function handleManifestEvent(
     ["EventTimingConfigured", "EventScheduleChanged"].includes(event.type)) {
     await reconcileEventTiming(ctx, event.entityId as Id<"events">);
     await reconcileEventStaffing(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {
+    if (event.payload.previousPurchasingWeekStart !== event.payload.purchasingWeekStart)
+      await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
     return;
   }
   if (event.entity === "EventTimelineActivity" &&

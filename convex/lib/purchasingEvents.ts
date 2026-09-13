@@ -161,6 +161,37 @@ export async function reconcileCancelledPurchaseDrafts(
   const need = await ctx.db.get(needId);
   if (!need || need.tenantId !== tenantId || need.deletedAt != null) return;
   if (need.status !== "cancelled") return;
+  await releaseNeedDraftContributions(
+    ctx,
+    need,
+    need.cancellationReason ?? "Purchase need cancelled",
+  );
+  if (need.vendorOrderId) {
+    const order = await ctx.db.get(need.vendorOrderId);
+    if (
+      order?.tenantId === tenantId &&
+      (order.status === "draft" ||
+        (order.status === "cancelled" && order.submittedAt == null))
+    )
+      await ctx.runMutation(api.mutations.PurchaseNeed_releaseCancelledDraft, {
+        docId: need._id,
+        version: need.version,
+      });
+  }
+}
+
+/**
+ * Retire one need's demand links on editable draft lines and shrink those
+ * lines' calculated requirement by the removed contribution. Shared by
+ * cancellation and by moving a need to another purchasing week (#328).
+ * Submitted orders are never touched.
+ */
+export async function releaseNeedDraftContributions(
+  ctx: MutationCtx,
+  need: Doc<"purchaseNeeds">,
+  reason: string,
+) {
+  const tenantId = need.tenantId;
   const links = await ctx.db
     .query("vendorOrderLineDemands")
     .withIndex("by_ingredientDemandId", (q) =>
@@ -197,8 +228,7 @@ export async function reconcileCancelledPurchaseDrafts(
       await ctx.runMutation(api.mutations.VendorOrderLineDemand_retire, {
         docId: link._id,
         version: link.version,
-
-        reason: need.cancellationReason ?? "Purchase need cancelled",
+        reason,
       });
     }
     const remaining = await ctx.db
@@ -252,18 +282,6 @@ export async function reconcileCancelledPurchaseDrafts(
           ...(nextDemand ? { ingredientDemandId: nextDemand } : {}),
         },
       );
-  }
-  if (need.vendorOrderId) {
-    const order = await ctx.db.get(need.vendorOrderId);
-    if (
-      order?.tenantId === tenantId &&
-      (order.status === "draft" ||
-        (order.status === "cancelled" && order.submittedAt == null))
-    )
-      await ctx.runMutation(api.mutations.PurchaseNeed_releaseCancelledDraft, {
-        docId: need._id,
-        version: need.version,
-      });
   }
 }
 

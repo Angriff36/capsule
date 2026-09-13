@@ -259,6 +259,33 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Rescheduled event (#328): an open need follows its event to the new
+  // purchasing week. The transactional handler has already retired this need's
+  // link on the old editable draft; the re-emitted PurchaseNeedOpened routes it
+  // into the new week's draft. A pointer at a submitted order is kept — that
+  // supply was ordered and stays historical; only editable draft pointers clear.
+  command moveToWeek(purchasingWeekStart: datetime) {
+    guard self.status == "open"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    compute onEditableDraft = self.vendorOrder != null and self.vendorOrder.status == "draft"
+    mutate vendorOrderId = onEditableDraft ? null : self.vendorOrderId
+    mutate vendorOrderLineId = onEditableDraft ? null : self.vendorOrderLineId
+    mutate purchasingWeekStart = purchasingWeekStart
+    emit PurchaseNeedOpened {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      preferredVendorId: self.preferredVendorId
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+      purchasingWeekStart: purchasingWeekStart
+      status: "open"
+    }
+  }
+
   // Retired demand links retain the draft's provenance; active pointers must no
   // longer make submission try to mark a cancelled need as ordered.
   command releaseCancelledDraft() {
