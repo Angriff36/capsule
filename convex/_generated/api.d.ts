@@ -71,6 +71,8 @@ import type * as lib_ingredientLookupApplyCost from "../lib/ingredientLookupAppl
 import type * as lib_ingredientLookupApplyNutrition from "../lib/ingredientLookupApplyNutrition.js";
 import type * as lib_ingredientLookupAutofill from "../lib/ingredientLookupAutofill.js";
 import type * as lib_inventoryEvents from "../lib/inventoryEvents.js";
+import type * as lib_invoiceNumberFormat from "../lib/invoiceNumberFormat.js";
+import type * as lib_invoiceNumberSequence from "../lib/invoiceNumberSequence.js";
 import type * as lib_invoiceNumbering from "../lib/invoiceNumbering.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
@@ -219,6 +221,8 @@ declare const fullApi: ApiFromModules<{
   "lib/ingredientLookupApplyNutrition": typeof lib_ingredientLookupApplyNutrition;
   "lib/ingredientLookupAutofill": typeof lib_ingredientLookupAutofill;
   "lib/inventoryEvents": typeof lib_inventoryEvents;
+  "lib/invoiceNumberFormat": typeof lib_invoiceNumberFormat;
+  "lib/invoiceNumberSequence": typeof lib_invoiceNumberSequence;
   "lib/invoiceNumbering": typeof lib_invoiceNumbering;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;

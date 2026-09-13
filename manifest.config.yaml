@@ -68,3 +68,9 @@ projections:
         Ingredient:
           - fields: [primaryImageStorageId]
             name: by_primaryImageStorageId
+        # Invoice numbers are unique per tenant; the numbering seam
+        # (convex/lib/invoiceNumbering.ts) checks a proposed number with a point
+        # lookup instead of reading the tenant's invoice history.
+        Invoice:
+          - fields: [tenantId, invoiceNumber]
+            name: by_tenantId_and_invoiceNumber

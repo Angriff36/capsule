@@ -5056,6 +5056,16 @@ export function useCreateInvoice() {
   };
 }
 
+/** Reactive list for InvoiceNumberSequence. */
+export function useListInvoiceNumberSequence() {
+  return useQuery(api.queries.listInvoiceNumberSequence);
+}
+
+/** Reactive get-by-id for InvoiceNumberSequence. Pass "skip" to suspend. */
+export function useGetInvoiceNumberSequence(id: string | "skip") {
+  return useQuery(api.queries.getInvoiceNumberSequence, id === "skip" ? "skip" : { id: id as any });
+}
+
 /** Reactive list for Lead. */
 export function useListLead() {
   return useQuery(api.queries.listLead);
@@ -10189,4 +10199,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1079 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1081 as const;

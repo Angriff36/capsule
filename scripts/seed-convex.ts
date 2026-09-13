@@ -314,6 +314,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Invoice_createViaIssue, { "clientId": "clientId-invoice-1", "eventId": "eventId-invoice-1", "invoiceNumber": "demo-invoiceNumber-1", "subtotal": 1, "taxAmount": 1, "discountAmount": 1, "total": 1, "lineItems": "demo-lineItems-1", "taxBreakdown": "demo-taxBreakdown-1", "paymentTermsDays": 1, "dueDate": 1767268800000, "notes": "demo-notes-1", "currencyCode": "demo-currencyCode-1", "exchangeRate": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Invoice_createViaIssue, { "clientId": "clientId-invoice-2", "eventId": "eventId-invoice-2", "invoiceNumber": "demo-invoiceNumber-2", "subtotal": 2, "taxAmount": 2, "discountAmount": 2, "total": 2, "lineItems": "demo-lineItems-2", "taxBreakdown": "demo-taxBreakdown-2", "paymentTermsDays": 2, "dueDate": 1767355200000, "notes": "demo-notes-2", "currencyCode": "demo-currencyCode-2", "exchangeRate": 2 } as any);
+  // skip InvoiceNumberSequence: no creation command in IR (2 rows unused)
   // Lead → api.mutations.Lead_createViaCapture
   rowsAttempted += 1;
   await client.mutation(api.mutations.Lead_createViaCapture, { "leadType": "demo-leadType-1", "companyName": "Lead 1", "givenName": "Lead 1", "familyName": "Lead 1", "email": "user1@example.com", "phone": "demo-phone-1", "source": "demo-source-1", "referralSourceId": "referralSourceId-lead-1", "estimatedValue": 1, "probability": 1, "notes": "demo-notes-1" } as any);
@@ -1039,6 +1040,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "Invoice",
       "createMutation": "Invoice_createViaIssue",
+      "rowCount": 2
+    },
+    {
+      "entity": "InvoiceNumberSequence",
+      "createMutation": null,
       "rowCount": 2
     },
     {

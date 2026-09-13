@@ -172,11 +172,11 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   // (convex/lib/invoiceNumbering.ts), which runs on InvoiceIssued: an
   // auto-minted "INV-<n>" (the EventApproved cascade's count-based
   // invoiceSequence, which repeats a number once an earlier invoice is deleted)
-  // that would duplicate another invoice's number is re-minted here to one past
-  // the highest INV- number the tenant has ever issued; an explicit number that
-  // duplicates a live invoice is rejected instead. The Convex projection does not
-  // enforce `property unique`, and a command cannot read sibling rows, so the
-  // scan is the seam's — the write is this governed command's.
+  // is replaced here with the tenant's persisted InvoiceNumberSequence
+  // (invoice-number-sequence.manifest) + 1; an explicit number that duplicates a
+  // live invoice is rejected instead. The Convex projection does not enforce
+  // `property unique`, and a command cannot read sibling rows, so the lookups
+  // are the seam's — the write is this governed command's.
   command assignNumber(invoiceNumber: string) {
     guard self.deletedAt == null
     guard self.issuedAt != null

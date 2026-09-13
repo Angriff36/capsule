@@ -1610,6 +1610,17 @@ export const InvoiceComputedSchema = InvoiceSchema.extend({
 export type Invoice = z.infer<typeof InvoiceSchema>;
 export type InvoiceWithComputed = z.infer<typeof InvoiceComputedSchema>;
 
+// Entity: InvoiceNumberSequence
+export const InvoiceNumberSequenceSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  lastNumber: z.number().int(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InvoiceNumberSequence = z.infer<typeof InvoiceNumberSequenceSchema>;
+
 // Entity: Lead
 export const LeadSchema = z.object({
   id: z.string().uuid(),
