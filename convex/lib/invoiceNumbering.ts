@@ -9,8 +9,9 @@ import {
 import { parseAutoInvoiceNumber } from "./invoiceNumberFormat";
 
 /**
- * Keeps invoice numbers unique per tenant. Runs on InvoiceIssued, inside the
- * issuing transaction (`handleManifestEvent`).
+ * Keeps invoice numbers unique per tenant. Runs inside the writing
+ * transaction (`handleManifestEvent`) on InvoiceIssued and on
+ * InvoiceNumberAssigned.
  *
  * Why a seam: the EventApproved cascade proposes `INV-<count + 1>` from a
  * count of the tenant's live invoices, so once an earlier invoice is deleted
@@ -18,21 +19,23 @@ import { parseAutoInvoiceNumber } from "./invoiceNumberFormat";
  * the manifest's `property unique invoiceNumber`, and a command cannot read
  * its sibling rows.
  *
- * - Auto-minted number (none supplied): replaced by the tenant's persisted
- *   sequence (`InvoiceNumberSequence.lastNumber + 1`, then advanced), through
+ * - Auto-minted number (InvoiceIssued without a supplied number): replaced by
+ *   the tenant's persisted sequence (`InvoiceNumberSequence.lastNumber + 1`,
+ *   floored at the cascade's proposal, skipping any number ever held), through
  *   the governed Invoice.assignNumber command run as the tenant's system role
  *   — the approver is an event/sales user, not finance, and the renumber is a
  *   consequence of the approval they were allowed to make. Two concurrent
  *   issuances both write the sequence row, so Convex OCC serializes them and
  *   the later one mints the next number.
- * - Explicit number that duplicates a LIVE invoice: rejected, which rolls the
- *   issue back. Otherwise kept as supplied; an explicit `INV-<n>` above the
+ * - Explicit number (InvoiceIssued with a supplied number, or any
+ *   InvoiceNumberAssigned, including a manual Invoice.assignNumber by finance):
+ *   rejected when it duplicates a LIVE invoice of the tenant, which rolls the
+ *   command back. Otherwise kept as supplied; an explicit `INV-<n>` above the
  *   sequence advances it so later auto numbers skip past it.
  *
  * Every lookup is an indexed point read (`by_tenantId_and_invoiceNumber`,
  * `by_tenantId` on the one-row sequence table); the tenant's invoice history
- * is only read once, the first time a tenant needs a sequence row. Invoice
- * rows are written only through the governed command.
+ * is never scanned. Invoice rows are written only through the governed command.
  */
 export async function ensureUniqueInvoiceNumber(
   ctx: MutationCtx,
@@ -51,7 +54,8 @@ export async function ensureUniqueInvoiceNumber(
     ledger,
   );
   if (autoNumbered) {
-    const assigned = await sequence.mintNext();
+    const proposed = parseAutoInvoiceNumber(number) ?? 0;
+    const assigned = await sequence.mintNext(proposed);
     if (assigned !== number) await assignNumber(ctx, invoice, assigned);
     return;
   }
@@ -65,7 +69,7 @@ export async function ensureUniqueInvoiceNumber(
   if (explicit !== null) await sequence.advanceTo(explicit);
 }
 
-/** Indexed reads over the tenant's invoice numbers, excluding the one being issued. */
+/** Indexed point reads over the tenant's invoice numbers, excluding the one being written. */
 class IssuedInvoiceNumbers implements InvoiceNumberLedger {
   constructor(
     private readonly ctx: MutationCtx,
@@ -78,21 +82,6 @@ class IssuedInvoiceNumbers implements InvoiceNumberLedger {
 
   async isHeldLive(number: string): Promise<boolean> {
     return (await this.holders(number)).some((row) => row.deletedAt == null);
-  }
-
-  /** One-time seed: the same read the EventApproved cascade performs on every approval. */
-  async highestIssued(): Promise<number> {
-    const rows = await this.ctx.db
-      .query("invoices")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", this.issuing.tenantId))
-      .collect();
-    let highest = 0;
-    for (const row of rows) {
-      if (row._id === this.issuing._id) continue;
-      const n = parseAutoInvoiceNumber(row.invoiceNumber);
-      if (n !== null) highest = Math.max(highest, n);
-    }
-    return highest;
   }
 
   private async holders(number: string) {

@@ -3,18 +3,24 @@ import { formatAutoInvoiceNumber } from "./invoiceNumberFormat";
 
 /** What the sequence needs to know about the tenant's issued invoices. */
 export interface InvoiceNumberLedger {
-  /** Highest `INV-<n>` already issued (live or deleted), for a first-time seed. */
-  highestIssued(): Promise<number>;
   /** Whether some other invoice (live or deleted) already holds this number. */
   isHeld(number: string): Promise<boolean>;
 }
 
 /**
  * The tenant's `InvoiceNumberSequence` row (src/sales/invoice-number-sequence.manifest):
- * the highest `INV-<n>` ever issued for the tenant, live or deleted. Seam-only
- * — no generated command reads or writes it — so writes are raw `ctx.db` calls
- * on that table alone, stamping the entity's own fields (tenantId, timestamps;
- * it is not soft-deletable). Invoice rows themselves are never written here.
+ * the highest `INV-<n>` the seam has minted or been told about for the tenant.
+ * Seam-only — no generated command reads or writes it — so writes are raw
+ * `ctx.db` calls on that table alone, stamping the entity's own fields
+ * (tenantId, timestamps; it is not soft-deletable). Invoice rows themselves
+ * are never written here.
+ *
+ * A tenant that predates the row starts at 0 without reading its invoice
+ * history: the first mint begins at the cascade's own proposal (a count of
+ * the tenant's live invoices + 1, which is what the old design issued) and
+ * probes upward, one indexed point read per taken number, until a number no
+ * invoice — live or deleted — has ever held. Every later mint is one row
+ * read, one probe, one patch.
  */
 export class InvoiceNumberSequenceStore {
   constructor(
@@ -23,10 +29,14 @@ export class InvoiceNumberSequenceStore {
     private readonly ledger: InvoiceNumberLedger,
   ) {}
 
-  /** Reserves and returns the next auto number, advancing the sequence. */
-  async mintNext(): Promise<string> {
+  /**
+   * Reserves and returns the next auto number, advancing the sequence. `floor`
+   * is the lowest `<n>` worth trying (the cascade's proposal); the sequence
+   * never hands out a number at or below what it has already issued.
+   */
+  async mintNext(floor: number): Promise<string> {
     const row = await this.row();
-    let next = row.lastNumber + 1;
+    let next = Math.max(row.lastNumber + 1, floor, 1);
     // The sequence is authoritative, but a number may still be held by a row
     // that never passed through it (hand-typed before the sequence existed,
     // or edited outside commands); skip past any holder, live or deleted.
@@ -51,16 +61,13 @@ export class InvoiceNumberSequenceStore {
       .withIndex("by_tenantId", (q) => q.eq("tenantId", this.tenantId))
       .first();
     if (existing) return existing;
-    // First time this tenant needs a sequence: seed it from what was already
-    // issued (once per tenant); afterwards every read is this one-row lookup.
-    const lastNumber = await this.ledger.highestIssued();
     const now = Date.now();
     const id = await this.ctx.db.insert("invoiceNumberSequences", {
       tenantId: this.tenantId,
-      lastNumber,
+      lastNumber: 0,
       createdAt: now,
       updatedAt: now,
     });
-    return { _id: id, lastNumber };
+    return { _id: id, lastNumber: 0 };
   }
 }
