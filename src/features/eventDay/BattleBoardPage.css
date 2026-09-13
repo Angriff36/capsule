@@ -247,22 +247,52 @@
   white-space: nowrap;
 }
 
-/* Browser print → "Save as PDF": only the document reaches the paper. */
+/* Browser print → "Save as PDF": only the document reaches the paper.
+   The board sits inside the Event Day phone frame (.evd fixed + scrolling,
+   .evd-frame relative, max-width 430px). An absolutely positioned .bbd-doc
+   sized itself against that frame, so a Letter sheet printed a phone-width
+   column and long boards could not paginate (#357). In print the frame is
+   released to normal flow and the document flows across the full sheet. */
 @media print {
   body * {
     visibility: hidden;
+  }
+  .evd:has(.bbd-doc) {
+    position: static;
+    inset: auto;
+    overflow: visible;
+    height: auto;
+    background: none;
+    color-scheme: light;
+  }
+  .evd:has(.bbd-doc) .evd-frame {
+    position: static;
+    display: block;
+    max-width: none;
+    min-height: 0;
+    background: none;
+    box-shadow: none;
   }
   .bbd-doc,
   .bbd-doc * {
     visibility: visible;
   }
   .bbd-doc {
-    position: absolute;
-    inset: 0 auto auto 0;
-    width: 100%;
+    position: static;
+    width: auto;
+    max-width: none;
     margin: 0;
     padding: 10mm 9mm;
     border-radius: 0;
+    box-shadow: none;
+  }
+  .bbd-section,
+  .bbd-sheet,
+  .bbd-meta {
+    break-inside: avoid;
+  }
+  .bbd-kicker {
+    break-after: avoid;
   }
   .bbd-no-print {
     display: none !important;
