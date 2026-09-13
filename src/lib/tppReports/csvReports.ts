@@ -42,3 +42,23 @@ export function parseCsvReportText(text: string): EventBundlePart | undefined {
       return undefined;
   }
 }
+
+/**
+ * Parse the same row-shaped reports from a grid that was not CSV text (a
+ * workbook export). Pack-list classification headings, which CSV marks by
+ * indentation, are read from the grid as they stand.
+ */
+export function parseRowReport(rows: string[][]): EventBundlePart | undefined {
+  switch (detectCsvSource(rows)) {
+    case "eventWorksheet":
+      return parseEventWorksheet(rows);
+    case "packList":
+      return parsePackList(rows);
+    case "orderList":
+      return parseOrderList(rows);
+    case "proposal":
+      return parseProposal(rows);
+    default:
+      return undefined;
+  }
+}

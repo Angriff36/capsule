@@ -1,4 +1,4 @@
-import { parseCsvReportText } from "./csvReports";
+import { parseCsvReportText, parseRowReport } from "./csvReports";
 import type {
   EventBundle,
   EventBundlePart,
@@ -9,7 +9,8 @@ import { parseBattleBoard } from "./parseBattleBoard";
 import { parseBeoWorkbook } from "./parseBeoWorkbook";
 import { parseProductionWorksheet } from "./parseProductionWorksheet";
 import { readPdfTextLines } from "./pdfTextReader";
-import { readXlsxSheets } from "./xlsxReader";
+import { readXlsxWorkbook } from "./xlsxReader";
+import { XlsxReportGrid } from "./xlsxReportGrid";
 
 /**
  * Turns raw report files into one event bundle.
@@ -56,14 +57,19 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
     return parseBattleBoard(readPdfTextLines(file.contents));
   }
   if (lower.endsWith(".xlsx")) {
-    const sheets = readXlsxSheets(file.contents);
+    // Typed read: date cells print as M/D/YYYY and format-literal units ride
+    // along with their numbers, so a report exported as a workbook reads the
+    // same as the CSV TPP prints (issue #274).
+    const sheets = XlsxReportGrid.fromWorkbook(readXlsxWorkbook(file.contents));
     const rows = sheets.flatMap((sheet) => sheet.rows);
     const source = detectWorkbookSource(rows);
     if (source === "beo") return parseBeoWorkbook(sheets);
     if (source === "productionWorksheet") {
       return parseProductionWorksheet(sheets);
     }
-    return undefined;
+    // The row-shaped reports (worksheet, pack list, order list, proposal)
+    // are the same grid whether TPP exported CSV or a workbook.
+    return parseRowReport(rows);
   }
   if (!lower.endsWith(".csv")) return undefined;
   return parseCsvReportText(file.contents.toString("utf8"));
