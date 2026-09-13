@@ -4,7 +4,6 @@ import type { CapsuleEventBundleCatalogMatch } from "../../../agent/CapsuleEvent
 import {
   useListClient,
   useListDish,
-  useListPerson,
   useListVenue,
 } from "../../../lib/manifest-convex-react";
 import {
@@ -22,6 +21,7 @@ import { EventImportMatchCard } from "./EventImportMatchCard";
 import { EventImportPreviewPanel } from "./EventImportPreviewPanel";
 import { EventImportSourcesPanel } from "./EventImportSourcesPanel";
 import { EventImportWarnings } from "./EventImportWarnings";
+import { useEventImportDirectory } from "./useEventImportDirectory";
 import { useEventImportRunner } from "./useEventImportRunner";
 
 /**
@@ -37,7 +37,7 @@ export function EventImportPage() {
   const clients = useListClient();
   const venues = useListVenue();
   const dishes = useListDish();
-  const people = useListPerson();
+  const directory = useEventImportDirectory();
 
   const [pastedText, setPastedText] = useState("");
   const [csvFiles, setCsvFiles] = useState<TextReportSource[]>([]);
@@ -68,17 +68,6 @@ export function EventImportPage() {
     () => (dishes ?? []).filter((dish) => dish.deletedAt == null),
     [dishes],
   );
-  const peopleDirectory = useMemo(
-    () =>
-      (people ?? [])
-        .filter((person) => person.deletedAt == null)
-        .map((person) => ({
-          id: person._id,
-          name: `${person.givenName ?? ""} ${person.familyName ?? ""}`.trim(),
-        })),
-    [people],
-  );
-
   // Suggest matches once per distinct bundle identity; the person's picks
   // then stick while they keep editing the paste.
   const suggestion = useMemo(() => {
@@ -116,7 +105,7 @@ export function EventImportPage() {
   const runner = useEventImportRunner({
     bundle,
     catalog: match,
-    people: peopleDirectory,
+    directory,
   });
   const busy = runner.progress !== null;
 
@@ -216,7 +205,9 @@ export function EventImportPage() {
                 ? `Creating… ${runner.progress?.completed ?? 0} of ${runner.progress?.total ?? 0}`
                 : runner.plan
                   ? `Create event (${runner.plan.steps.length} steps)`
-                  : "Create event"}
+                  : bundle && !directory
+                    ? "Checking existing records…"
+                    : "Create event"}
             </button>
             {runner.progress ? (
               <span className="text-sm text-ink-2" role="status">

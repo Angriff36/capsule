@@ -1,6 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { warningsNeedingDecision } from "../../../agent/CapsuleEventBundleWarnings";
-import type { CapsuleEventBundleCatalogMatch } from "../../../agent/CapsuleEventBundleExistingState";
+import type {
+  CapsuleEventBundleCatalogMatch,
+  CapsuleEventBundleDirectory,
+} from "../../../agent/CapsuleEventBundleExistingState";
 import {
   buildEventBundlePlan,
   bundleIdentity,
@@ -32,31 +35,25 @@ export interface EventImportResult {
 export function useEventImportRunner(input: {
   bundle: EventBundle | null;
   catalog: CapsuleEventBundleCatalogMatch;
-  people: ReadonlyArray<{ id: string; name: string }>;
+  /** Tenant records to resume against; null while they are still loading. */
+  directory: CapsuleEventBundleDirectory | null;
 }) {
   const commands = useEventImportCommandExecutor();
   const [progress, setProgress] = useState<EventImportProgress | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [result, setResult] = useState<EventImportResult | null>(null);
 
+  // No plan until the directory is in: planning against an empty one would
+  // draw fresh parents for a bundle that is already half-entered.
   const plan: EventBundlePlan | null = useMemo(() => {
-    if (!input.bundle) return null;
+    if (!input.bundle || !input.directory) return null;
     return buildEventBundlePlan(input.bundle, {
       catalog: input.catalog,
-      directory: {
-        organizationNames: [],
-        people: [...input.people],
-        vendors: [],
-        ingredients: [],
-        invoices: [],
-        payments: [],
-        proposals: [],
-        vendorOrderNumbers: [],
-      },
+      directory: input.directory,
       unmatchedStaffAsOpenShifts: true,
       raiseReviewFlags: true,
     });
-  }, [input.bundle, input.catalog, input.people]);
+  }, [input.bundle, input.catalog, input.directory]);
 
   const decisions = useMemo(
     () => (plan ? warningsNeedingDecision(plan) : []),

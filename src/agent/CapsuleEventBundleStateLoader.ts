@@ -1,6 +1,13 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../lib/api";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
+import {
+  directoryRows,
+  liveRow,
+  mapBundleDirectory,
+  rowText,
+  type BundleDirectoryRow,
+} from "./CapsuleEventBundleDirectoryMapper";
 import type {
   CapsuleEventBundleDirectory,
   CapsuleEventBundleExistingEvent,
@@ -11,34 +18,10 @@ type QueryClient = {
   setAuth?: (token: string) => void;
 };
 
-type Row = Record<string, unknown>;
-
-function rows(value: unknown): Row[] {
-  return Array.isArray(value) ? (value as Row[]) : [];
-}
-
-function live(row: Row): boolean {
-  return row.deletedAt == null;
-}
-
-function text(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-function groupBy(
-  items: Row[],
-  keyOf: (row: Row) => string,
-  valueOf: (row: Row) => string,
-): Map<string, string[]> {
-  const grouped = new Map<string, string[]>();
-  for (const row of items) {
-    const key = keyOf(row);
-    const bucket = grouped.get(key) ?? [];
-    bucket.push(valueOf(row));
-    grouped.set(key, bucket);
-  }
-  return grouped;
-}
+type Row = BundleDirectoryRow;
+const rows = directoryRows;
+const live = liveRow;
+const text = rowText;
 
 /**
  * Reads the tenant records the bundle planners match against, with the same
@@ -80,72 +63,18 @@ export class CapsuleEventBundleStateLoader {
       client.query(api.queries.listProposalLineItem, {}),
       client.query(api.queries.listVendorOrderLine, {}),
     ]);
-    const linesByProposal = groupBy(
-      rows(proposalLines).filter(live),
-      (row) => String(row.proposalId),
-      (row) => text(row.description),
-    );
-    const ingredientsByOrder = groupBy(
-      rows(vendorOrderLines).filter(
-        (row) => live(row) && row.status !== "cancelled",
-      ),
-      (row) => String(row.vendorOrderId),
-      (row) => String(row.ingredientId),
-    );
-    const liveOrders = rows(vendorOrders).filter(live);
-    return {
-      organizationNames: rows(organizations)
-        .filter(live)
-        .flatMap((row) => [text(row.name), text(row.brandDisplayName)])
-        .filter((name) => name.length > 0),
-      people: rows(people)
-        .filter(live)
-        .map((row) => ({
-          id: String(row._id),
-          name: `${text(row.givenName)} ${text(row.familyName)}`.trim(),
-        })),
-      vendors: rows(vendors)
-        .filter(live)
-        .map((row) => ({ id: String(row._id), name: text(row.name) })),
-      ingredients: rows(ingredients)
-        .filter(live)
-        .map((row) => ({ id: String(row._id), name: text(row.name) })),
-      invoices: rows(invoices)
-        .filter(live)
-        .map((row) => ({
-          id: String(row._id),
-          invoiceNumber: text(row.invoiceNumber),
-          status: text(row.status),
-          depositAmountCents:
-            row.depositAmount == null
-              ? null
-              : Math.round(Number(row.depositAmount) * 100),
-          depositPaid: row.depositPaidAt != null,
-        })),
-      payments: rows(payments)
-        .filter(live)
-        .map((row) => ({
-          id: String(row._id),
-          invoiceId: String(row.invoiceId),
-          amountCents: Math.round(Number(row.amount ?? 0) * 100),
-          status: text(row.status),
-        })),
-      proposals: rows(proposals)
-        .filter(live)
-        .map((row) => ({
-          id: String(row._id),
-          proposalNumber: text(row.proposalNumber),
-          status: text(row.status),
-          lineDescriptions: linesByProposal.get(String(row._id)) ?? [],
-        })),
-      vendorOrderNumbers: liveOrders.map((row) => text(row.orderNumber)),
-      vendorOrders: liveOrders.map((row) => ({
-        id: String(row._id),
-        orderNumber: text(row.orderNumber),
-        status: text(row.status),
-        lineIngredientIds: ingredientsByOrder.get(String(row._id)) ?? [],
-      })),
-    };
+    return mapBundleDirectory({
+      organizations,
+      people,
+      vendors,
+      ingredients,
+      invoices,
+      payments,
+      proposals,
+      vendorOrders,
+      proposalLines,
+      vendorOrderLines,
+    });
   }
 
   async loadExisting(
