@@ -7,6 +7,7 @@ import {
 import type { CapsuleCommandExecutor } from "./CapsuleCommandExecutor";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
 import { runPlannedSteps } from "./CapsuleEventBundleStepRunner";
+import { warningsNeedingDecision } from "./CapsuleEventBundleWarnings";
 import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 
 /**
@@ -50,19 +51,7 @@ export interface CapsuleEventBundleEnterResult {
   warnings: string[];
 }
 
-/**
- * Warnings that report data left out of the event, or a value that was
- * guessed for it (an assumed start time); everything else is a note.
- */
-const NEEDS_DECISION =
-  /was skipped|were skipped|not entered|match no person|is assumed|different invoice numbers/;
-
-/** The warnings a human must accept before entering; the rest are notes. */
-export function warningsNeedingDecision(plan: {
-  warnings: string[];
-}): string[] {
-  return plan.warnings.filter((warning) => NEEDS_DECISION.test(warning));
-}
+export { warningsNeedingDecision };
 
 export class CapsuleEventBundleCoordinator {
   constructor(private readonly executor: CapsuleCommandExecutor) {}

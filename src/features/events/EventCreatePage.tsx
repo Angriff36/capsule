@@ -36,7 +36,11 @@ import {
 } from "./serviceStyleCatalog";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
-import { eventDetailPath, eventsIndexPath } from "./eventRoutes";
+import {
+  eventDetailPath,
+  eventImportPath,
+  eventsIndexPath,
+} from "./eventRoutes";
 import { proposalEventPrefill } from "./ProposalEventPrefill";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
@@ -48,6 +52,7 @@ import {
   type VenueTypeCode,
 } from "./EventCreateInlineForms";
 import { findLikelyDuplicates } from "./inlineRecordDuplicates";
+import { venueAddress, venueSummary } from "./venuePickerSummary";
 import {
   coordinatesFromFields,
   formatCoordinates,
@@ -69,33 +74,6 @@ function eventFieldRules(data: FormData): Record<string, string> {
     return { endsAt: "End must be after the start time." };
   }
   return {};
-}
-
-function venueAddress(venue: Doc<"venues"> | undefined): string | undefined {
-  if (!venue) return undefined;
-  return (
-    [
-      venue.addressLine1,
-      venue.addressLine2,
-      venue.city,
-      venue.region,
-      venue.postalCode,
-    ]
-      .filter(Boolean)
-      .join(", ") || undefined
-  );
-}
-
-/** One quiet line that tells two same-named venues apart in a picker. */
-function venueSummary(venue: Doc<"venues">): string {
-  const pin = venueCoordinates(venue);
-  const parts = [
-    venueAddress(venue) ??
-      (pin ? `GPS ${formatCoordinates(pin)}` : "No address recorded"),
-  ];
-  const capacity = Number(venue.capacity ?? 0);
-  parts.push(capacity > 0 ? `capacity ${capacity}` : "capacity not set");
-  return parts.join(" · ");
 }
 
 // Collapsible form block (native <details>) styled like Section. Uncontrolled:
@@ -522,6 +500,11 @@ export function EventCreatePage() {
       <PageHeader
         title="New event"
         lead="The essentials for a new booking — who it's for, where, when, and the budget."
+        actions={
+          <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
+            Have a BEO? Import it instead
+          </Link>
+        }
       />
 
       {failure ? <FailureBanner failure={failure} /> : null}
