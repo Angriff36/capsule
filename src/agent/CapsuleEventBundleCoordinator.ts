@@ -2,11 +2,11 @@ import type { EventBundle } from "../lib/tppReports/eventBundle";
 import {
   buildEventBundlePlan,
   type EventBundlePlan,
-  type PlannedStep,
   bundleIdentity,
 } from "./CapsuleEventBundlePlan";
 import type { CapsuleCommandExecutor } from "./CapsuleCommandExecutor";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
+import { runPlannedSteps } from "./CapsuleEventBundleStepRunner";
 import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 
 /**
@@ -48,26 +48,6 @@ export interface CapsuleEventBundleEnterResult {
   executedSteps: number;
   idempotencyScope: string;
   warnings: string[];
-}
-
-function asDocId(result: unknown): string {
-  if (result && typeof result === "object") {
-    const record = result as Record<string, unknown>;
-    for (const field of ["docId", "_id", "id"]) {
-      const value = record[field];
-      if (typeof value === "string") return value;
-    }
-  }
-  throw new Error("Command result carried no record id");
-}
-
-function dropEmptyArgs(args: Record<string, unknown>): Record<string, unknown> {
-  const kept: Record<string, unknown> = {};
-  for (const [name, value] of Object.entries(args)) {
-    if (value === undefined || value === "") continue;
-    kept[name] = value;
-  }
-  return kept;
 }
 
 /**
@@ -131,20 +111,13 @@ export class CapsuleEventBundleCoordinator {
       options.idempotencyScope ??
       `tpp:${bundleIdentity(options.bundle.header)}`;
     const keys = new CapsuleIdempotencyKeyFactory(scope);
-    const createdIds: Record<string, string> = { ...plan.seedIds };
-
-    for (const step of plan.steps) {
-      const args = this.resolveArgs(step, createdIds);
-      const result = await this.executor.execute({
-        capabilityId: step.capabilityId,
-        args: dropEmptyArgs(args),
-        idempotencyKey: keys.forCapability(
-          step.capabilityId,
-          step.idempotencySuffix,
-        ),
-      });
-      createdIds[step.ref] = asDocId(result);
-    }
+    const createdIds = await runPlannedSteps({
+      steps: plan.steps,
+      seedIds: plan.seedIds,
+      executor: this.executor,
+      idempotencyKeyFor: (step) =>
+        keys.forCapability(step.capabilityId, step.idempotencySuffix),
+    });
 
     const eventId = createdIds.event;
     if (eventId === undefined) throw new Error("The event was not created");
@@ -156,25 +129,5 @@ export class CapsuleEventBundleCoordinator {
       idempotencyScope: scope,
       warnings: plan.warnings,
     };
-  }
-
-  /** Replace step references with the ids the earlier steps produced. */
-  private resolveArgs(
-    step: PlannedStep,
-    createdIds: Record<string, string>,
-  ): Record<string, unknown> {
-    const args = { ...step.args };
-    for (const name of step.resolveRefs ?? []) {
-      const ref = args[name];
-      if (typeof ref !== "string") continue;
-      const id = createdIds[ref];
-      if (id === undefined) {
-        throw new Error(
-          `Step "${step.label}" needs ${name} from "${ref}", which has not been created`,
-        );
-      }
-      args[name] = id;
-    }
-    return args;
   }
 }

@@ -44,7 +44,31 @@ export interface CapsuleEventBundleExistingEvent {
   assignedPersonIds: string[];
 }
 
+/**
+ * Records already in the tenant that the bundle should reuse instead of
+ * creating twins: the client, the venue, and catalog dishes keyed by
+ * `dishKey(menu item name)`. Chosen by a person on the import review screen.
+ */
+export interface CapsuleEventBundleCatalogMatch {
+  clientId?: string;
+  venueId?: string;
+  dishIds?: Record<string, string>;
+}
+
 export interface CapsuleEventBundleContext {
   directory?: CapsuleEventBundleDirectory;
   existing?: CapsuleEventBundleExistingEvent;
+  catalog?: CapsuleEventBundleCatalogMatch;
+  /**
+   * Staff rows that match no person become open shifts (EventStaffNeed) with
+   * the printed role and times, instead of a "match no person" warning. TPP
+   * prints unfilled roles as "*Unassigned*", so this is how those come in.
+   */
+  unmatchedStaffAsOpenShifts?: boolean;
+  /**
+   * Raise a ReviewFlag on the event for each report disagreement, and on each
+   * menu line whose servings are out of step with the guest count, so the
+   * Ops Final Lock walk-through starts with the anomalies already listed.
+   */
+  raiseReviewFlags?: boolean;
 }

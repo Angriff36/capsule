@@ -13,6 +13,7 @@ import {
   venueAddressText,
   type PlannedStep,
 } from "./CapsuleEventBundleShared";
+import { planReviewFlagSteps } from "./CapsuleEventBundleReviewFlagPlan";
 import { planSupplySteps } from "./CapsuleEventBundleSupplyPlan";
 import { toCapsuleMeasure } from "./CapsuleMeasureUnit";
 
@@ -52,6 +53,8 @@ export interface EventBundlePlan {
     orderLines: number;
     unassignedLines: number;
     inHouseLines: number;
+    openShifts: number;
+    reviewFlags: number;
   };
 }
 
@@ -73,6 +76,8 @@ function emptySummary(): EventBundlePlan["summary"] {
     orderLines: 0,
     unassignedLines: 0,
     inHouseLines: 0,
+    openShifts: 0,
+    reviewFlags: 0,
   };
 }
 
@@ -139,12 +144,15 @@ export function buildEventBundlePlan(
         )
       : startsAt + HOUR_MS;
 
+  const catalog = context.catalog ?? {};
   if (existing) {
     seedIds.event = existing.eventId;
     seedIds.client = existing.clientId;
     if (existing.venueId !== undefined) seedIds.venue = existing.venueId;
   } else {
-    if (bundle.venue.name !== undefined) {
+    if (catalog.venueId !== undefined) {
+      seedIds.venue = catalog.venueId;
+    } else if (bundle.venue.name !== undefined) {
       steps.push({
         capabilityId: "Venue.register",
         ref: "venue",
@@ -160,43 +168,48 @@ export function buildEventBundlePlan(
           postalCode: bundle.venue.postalCode,
           contactName: bundle.venue.contactName,
           contactPhone: bundle.venue.contactPhone ?? bundle.venue.phone,
+          latitude: bundle.venue.latitude,
+          longitude: bundle.venue.longitude,
           cateringNotes: bundle.notes.cateringKitchen,
           loadInInstructions: bundle.notes.serviceSetup,
         },
       });
     }
 
-    const { givenName, familyName } = personNameParts(bundle.client.name);
-    steps.push({
-      capabilityId: "Client.register",
-      ref: "client",
-      label: `Register client ${bundle.client.name ?? "(unnamed)"}`,
-      idempotencySuffix: `client:${normalizeName(bundle.client.name ?? invoice)}`,
-      args: {
-        clientType: "person",
-        givenName,
-        familyName,
-        email: bundle.client.email,
-        phone: bundle.client.phone,
-        addressLine1: bundle.client.addressLine1,
-        city: bundle.client.city,
-        region: bundle.client.region,
-        postalCode: bundle.client.postalCode,
-      },
-    });
+    if (catalog.clientId !== undefined) {
+      seedIds.client = catalog.clientId;
+    } else {
+      const { givenName, familyName } = personNameParts(bundle.client.name);
+      steps.push({
+        capabilityId: "Client.register",
+        ref: "client",
+        label: `Register client ${bundle.client.name ?? "(unnamed)"}`,
+        idempotencySuffix: `client:${normalizeName(bundle.client.name ?? invoice)}`,
+        args: {
+          clientType: "person",
+          givenName,
+          familyName,
+          email: bundle.client.email,
+          phone: bundle.client.phone,
+          addressLine1: bundle.client.addressLine1,
+          city: bundle.client.city,
+          region: bundle.client.region,
+          postalCode: bundle.client.postalCode,
+        },
+      });
+    }
 
+    const hasVenue =
+      seedIds.venue !== undefined || bundle.venue.name !== undefined;
     steps.push({
       capabilityId: "Event.planEngagement",
       ref: "event",
       label: `Plan event ${bundle.header.title ?? invoice}`,
       idempotencySuffix: `event:${invoice}`,
-      resolveRefs:
-        bundle.venue.name === undefined
-          ? ["clientId"]
-          : ["clientId", "venueId"],
+      resolveRefs: hasVenue ? ["clientId", "venueId"] : ["clientId"],
       args: {
         clientId: "client",
-        venueId: bundle.venue.name === undefined ? undefined : "venue",
+        venueId: hasVenue ? "venue" : undefined,
         title: bundle.header.title ?? `TPP invoice ${invoice}`,
         eventType: bundle.header.eventType ?? bundle.header.occasion ?? "Event",
         startsAt,
@@ -277,21 +290,26 @@ export function buildEventBundlePlan(
       return;
     }
 
-    summary.dishes += 1;
-    steps.push({
-      capabilityId: "Dish.introduce",
-      ref: dishRef,
-      label: `Introduce dish ${item.name}`,
-      idempotencySuffix: `dish:${key}`,
-      args: {
-        name: item.name,
-        portionSize: 1,
-        portionUnit: "serving",
-        description: item.description,
-        course: item.course,
-        serviceStyle: bundle.header.serviceStyle,
-      },
-    });
+    const catalogDishId = catalog.dishIds?.[key];
+    if (catalogDishId !== undefined) {
+      seedIds[dishRef] = catalogDishId;
+    } else {
+      summary.dishes += 1;
+      steps.push({
+        capabilityId: "Dish.introduce",
+        ref: dishRef,
+        label: `Introduce dish ${item.name}`,
+        idempotencySuffix: `dish:${key}`,
+        args: {
+          name: item.name,
+          portionSize: 1,
+          portionUnit: "serving",
+          description: item.description,
+          course: item.course,
+          serviceStyle: bundle.header.serviceStyle,
+        },
+      });
+    }
     steps.push({
       capabilityId: "EventDish.addToEvent",
       ref: eventDishRef,
@@ -427,6 +445,17 @@ export function buildEventBundlePlan(
   warnings.push(...supply.warnings);
   Object.assign(seedIds, supply.seedIds);
   Object.assign(summary, supply.counts);
+
+  if (context.raiseReviewFlags) {
+    const flags = planReviewFlagSteps({
+      bundle,
+      invoice,
+      warnings,
+      eventDishRefs,
+    });
+    steps.push(...flags.steps);
+    summary.reviewFlags = flags.count;
+  }
 
   return { steps, seedIds, warnings, summary };
 }

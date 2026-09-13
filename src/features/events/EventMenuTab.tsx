@@ -58,7 +58,7 @@ import {
   type DietaryConflictInputs,
 } from "./EventMenuDietaryConflictsCard";
 import { EventMenuRecipeEditor } from "./EventMenuRecipeEditor";
-import { eventMenuHeadcountHint } from "./eventMenuHeadcountHint";
+import { eventMenuHeadcountHint } from "../../lib/eventMenuHeadcountHint";
 import { ReviewFlagButton } from "./review-flags/ReviewFlagButton";
 import { useEventReviewFlags } from "./review-flags/useEventReviewFlags";
 import { eventMenuCourseTallies, EventMenuSidebar } from "./EventMenuSidebar";

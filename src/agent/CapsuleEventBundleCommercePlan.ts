@@ -36,6 +36,7 @@ export interface CommercePlanResult {
     proposalLines: number;
     payments: number;
     staffAssignments: number;
+    openShifts: number;
   };
 }
 
@@ -52,6 +53,7 @@ export function planCommerceSteps(
     proposalLines: 0,
     payments: 0,
     staffAssignments: 0,
+    openShifts: 0,
   };
   const totals = bundle.totals;
 
@@ -350,6 +352,7 @@ export function planCommerceSteps(
   steps.push(...staff.steps);
   warnings.push(...staff.warnings);
   counts.staffAssignments = staff.count;
+  counts.openShifts = staff.openShifts;
 
   return { steps, warnings, seedIds, counts };
 }

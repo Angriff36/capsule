@@ -56,6 +56,9 @@ export interface BundleVenue {
   phone?: string;
   contactName?: string;
   contactPhone?: string;
+  /** Decimal degrees, for sites that have coordinates but no street address. */
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface BundleTimelineEntry {
@@ -121,10 +124,14 @@ export interface BundleOrderLine {
 }
 
 export interface BundleStaffAssignment {
+  /** A real name, or "Unassigned" when TPP tracks the role without a person. */
   name: string;
   role?: string;
   team?: string;
   station?: string;
+  /** Shift window, minutes after midnight, when the report prints in/out times. */
+  startMinutes?: number;
+  endMinutes?: number;
 }
 
 export interface BundlePayment {

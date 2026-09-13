@@ -1,4 +1,4 @@
-import { readCsvRows } from "./csvRows";
+import { parseCsvReportText } from "./csvReports";
 import type {
   EventBundle,
   EventBundlePart,
@@ -7,11 +7,7 @@ import type {
 import { mergeEventBundle } from "./mergeEventBundle";
 import { parseBattleBoard } from "./parseBattleBoard";
 import { parseBeoWorkbook } from "./parseBeoWorkbook";
-import { parseEventWorksheet } from "./parseEventWorksheet";
-import { parseOrderList } from "./parseOrderList";
-import { parsePackList } from "./parsePackList";
 import { parseProductionWorksheet } from "./parseProductionWorksheet";
-import { parseProposal } from "./parseProposal";
 import { readPdfTextLines } from "./pdfTextReader";
 import { readXlsxSheets } from "./xlsxReader";
 
@@ -35,21 +31,6 @@ export interface EventBundleLoadResult {
   recognized: Array<{ name: string; source: EventBundleSource }>;
   /** Files whose shape matched no known report. */
   unrecognized: string[];
-}
-
-function detectCsvSource(
-  rows: readonly (readonly string[])[],
-): EventBundleSource | undefined {
-  const head = rows
-    .slice(0, 12)
-    .map((row) => row.join(" ").toLowerCase())
-    .join(" | ");
-
-  if (head.includes("event worksheet")) return "eventWorksheet";
-  if (head.includes("pack list")) return "packList";
-  if (head.includes("order list")) return "orderList";
-  if (head.includes("prepared for")) return "proposal";
-  return undefined;
 }
 
 export function detectWorkbookSource(
@@ -85,22 +66,7 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
     return undefined;
   }
   if (!lower.endsWith(".csv")) return undefined;
-
-  const text = file.contents.toString("utf8");
-  const source = detectCsvSource(readCsvRows(text));
-  switch (source) {
-    case "eventWorksheet":
-      return parseEventWorksheet(readCsvRows(text));
-    case "packList":
-      // Classification headings are marked by indentation alone.
-      return parsePackList(readCsvRows(text, { keepIndentMarker: true }));
-    case "orderList":
-      return parseOrderList(readCsvRows(text));
-    case "proposal":
-      return parseProposal(readCsvRows(text));
-    default:
-      return undefined;
-  }
+  return parseCsvReportText(file.contents.toString("utf8"));
 }
 
 /** Read a set of TPP report files into one merged bundle. */
