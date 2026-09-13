@@ -79,7 +79,14 @@ export function EquipmentForm({
         {editing ? null : (
           <label className="field-label">
             Asset tag
-            <input name="assetTag" className="input" required />
+            <input
+              name="assetTag"
+              className="input"
+              placeholder="Leave blank to tag from the name"
+            />
+            <span className="field-hint">
+              Optional — blank gets a tag like BIG-JOHN-GRILL.
+            </span>
           </label>
         )}
         <label className="field-label">

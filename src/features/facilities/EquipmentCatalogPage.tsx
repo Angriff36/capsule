@@ -15,6 +15,7 @@ import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { EquipmentBulkAddPanel } from "./EquipmentBulkAddPanel";
+import { assetTagFor } from "./equipmentPackListParser";
 import {
   EQUIPMENT_CONDITIONS as CONDITIONS,
   EquipmentForm,
@@ -60,9 +61,13 @@ export function EquipmentCatalogPage() {
     const element = event.currentTarget;
     const data = new FormData(element);
     void run("register", async () => {
+      const name = String(data.get("name") ?? "").trim();
+      const typedTag = String(data.get("assetTag") ?? "").trim();
       await createEquipment({
-        name: String(data.get("name") ?? "").trim(),
-        assetTag: String(data.get("assetTag") ?? "").trim(),
+        name,
+        assetTag:
+          typedTag ||
+          assetTagFor(name, new Set(rows.map((item) => item.assetTag))),
         category: String(data.get("category") ?? "").trim(),
         ownership: String(data.get("ownership")) as "owned" | "rented",
         quantity: Number(data.get("quantity")),
