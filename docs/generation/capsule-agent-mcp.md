@@ -53,8 +53,13 @@ below (or call the driver from a one-off `bun` script).
 ## Setup
 
 1. Convex + Clerk working for the UI (session token claims `role` + `tenantId`).
-2. Sign into Capsule with a workspace org, then: `bun run agent:mint-jwt`
-   (writes `CAPSULE_AGENT_JWT` into `.env.local`).
+2. Sign into Capsule, then: `bun run agent:mint-jwt`
+   (writes `CAPSULE_AGENT_JWT` into `.env.local`). An account with a
+   workspace org mints from the org session (`roleSource: idp`). A
+   person-first account with no Clerk org also mints: the server takes
+   tenant/role from the linked Person, and the minter confirms that through
+   `authStatus.getAuthStatus` (`roleSource: person`) — this path needs
+   `CONVEX_URL`/`VITE_CONVEX_URL` set before minting.
 3. Ensure `CONVEX_URL` is set.
 4. Cursor MCP is wired locally (do not hand-edit unless paths change):
    - Project: `.cursor/mcp.json` (gitignored)
