@@ -5,6 +5,7 @@ import {
   normalizeName,
   operationalRequirementsText,
   personNameParts,
+  serviceRequirementsText,
   venueAddressText,
   type PlannedStep,
 } from "./CapsuleEventBundleShared";
@@ -124,7 +125,7 @@ export function planCommerceSteps(
       });
     }
     const operational = operationalRequirementsText(bundle);
-    const service = bundle.notes.eventOverview;
+    const service = serviceRequirementsText(bundle);
     if (
       (operational !== undefined &&
         operational !== (existing.event.operationalRequirements ?? "")) ||

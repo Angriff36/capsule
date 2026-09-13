@@ -165,6 +165,8 @@ export interface BundleNotes {
   equipmentRentals?: string;
   decor?: string;
   additionalTasks?: string;
+  /** "Allergies: NO ONIONS" — hard restrictions the whole menu must honor. */
+  dietary?: string;
 }
 
 export interface EventBundle {

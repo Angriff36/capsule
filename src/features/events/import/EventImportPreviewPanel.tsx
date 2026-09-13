@@ -87,6 +87,7 @@ export function EventImportPreviewPanel({ bundle, plan, recognized }: Props) {
           }
         />
         <Fact label="Salesperson" value={header.salespersonName} />
+        <Fact label="Dietary" value={bundle.notes.dietary} />
       </dl>
 
       {summary ? (

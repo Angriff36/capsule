@@ -50,6 +50,19 @@ const TRAILING_SERVINGS = new RegExp(
 );
 const NOTE_LINE =
   /^(?:\*+\s*|(?:note|notes|special instructions?)\s*:\s*|[-–•]\s+)(.+)$/i;
+/**
+ * Unmarked prose under a menu row is either the dish's catalog description
+ * ("Assorted cured meats and cheeses") or a line-cook instruction for this
+ * event ("Peppercorn cream sauce on the side", "blue rare for bride & groom").
+ * Directive words mark the instruction; it must stay on the event line, not
+ * change the shared catalog dish.
+ */
+const INSTRUCTION_CUE =
+  /\b(?:on the side|away from|own (?:tray|platter|plate)|separate(?:ly)?|bride|groom|rare|medium|well[- ]done|less done|more done|overcook|undercook|dry|no |not |without|hold (?:the )?|omit|extra|double|half|only|instead|swap|substitut|allerg|gluten|dairy|vegan|vegetarian|kosher|halal|nut[- ]free|must|please|do not|don't|make sure|be sure|keep|serve|cook|prep|cut|slice|plate|label|warm|hot|cold|chill|reheat|tasting|last time|client (?:wants|asked|prefers)|per client)\b/i;
+
+function looksLikeInstruction(text: string): boolean {
+  return INSTRUCTION_CUE.test(text);
+}
 const PRINTED_FOOTER = /^printed date/i;
 const PAGE_FOOTER = /^page \d+( of \d+)?$/i;
 
@@ -73,7 +86,7 @@ const SECTION_HEADINGS: Array<{ pattern: RegExp; section: Section }> = [
 
 const HEADER_LABELS: Record<string, string[]> = {
   invoice: ["invoice #", "invoice number", "invoice", "inv #", "event #"],
-  title: ["event title", "event name", "title"],
+  title: ["event title", "event name", "title", "event"],
   date: ["event date", "date"],
   time: ["event time", "time", "hours"],
   guests: ["guest count", "guests", "headcount", "head count", "attendance"],
@@ -83,8 +96,18 @@ const HEADER_LABELS: Record<string, string[]> = {
   salesperson: ["salesperson", "sales person", "sales rep", "coordinator"],
   contact: ["contact", "client", "customer", "host"],
   location: ["location", "venue", "site"],
+  address: ["venue address", "site address", "address", "gps", "coordinates"],
   phone: ["phone", "cell", "mobile"],
   email: ["email", "e-mail"],
+  dietary: [
+    "allergies",
+    "allergy",
+    "allergens",
+    "dietary restrictions",
+    "dietary notes",
+    "dietary",
+    "restrictions",
+  ],
 };
 
 interface ReadLine {
@@ -96,10 +119,13 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-/** "Label: value", "Label   value" or "Label" alone (value on the next line). */
+/**
+ * "Label: value", "Label #: value", "Label   value" or "Label" alone (value on
+ * the next line).
+ */
 function labelPattern(label: string): RegExp {
   return new RegExp(
-    `^${escapeRegExp(label)}(?:\\s*[:#]\\s*|\\s{2,}|\\s*$)(.*)$`,
+    `^${escapeRegExp(label)}(?:(?:\\s*[:#])+\\s*|\\s{2,}|\\s*$)(.*)$`,
     "i",
   );
 }
@@ -258,6 +284,36 @@ function readCoordinates(
   return { latitude, longitude, matched: match[0] };
 }
 
+/**
+ * A BEO that prints "Venue: Singh Campsite" on one line and "Address: 47.01359°
+ * N, 116.52979° W" (or a street address) on the next: fold the address line
+ * into the venue when the venue line did not already carry one.
+ */
+function readVenueWithAddress(
+  location: string | undefined,
+  addressLine: string | undefined,
+): EventBundlePart["venue"] {
+  const venue: NonNullable<EventBundlePart["venue"]> =
+    readVenue(location) ?? {};
+  if (!addressLine) return venue;
+  const coordinates = readCoordinates(addressLine);
+  if (coordinates && venue.latitude === undefined) {
+    venue.latitude = coordinates.latitude;
+    venue.longitude = coordinates.longitude;
+  }
+  const street = coordinates
+    ? addressLine.replace(coordinates.matched, " ").trim()
+    : addressLine;
+  if (street.length > 0 && venue.addressLine1 === undefined) {
+    const address = parseAddressBlob(street);
+    venue.addressLine1 = address?.addressLine1;
+    venue.city = address?.city;
+    venue.region = address?.region;
+    venue.postalCode = address?.postalCode;
+  }
+  return venue;
+}
+
 function readVenue(location: string | undefined): EventBundlePart["venue"] {
   if (!location) return {};
   const beforeContact = location.replace(/venue contact:[\s\S]*$/i, "").trim();
@@ -398,10 +454,20 @@ function readMenuBodyLine(
     menu.push(item);
     return;
   }
+  // "Allergies: NO ONIONS" printed under the menu is a header fact the
+  // header pass reads, not a course or a description of the row above.
+  if (looksLikeLabel(withoutClock)) return;
   // A short title-case line starts a new course; prose describes the row above.
   if (looksLikeCourseHeading(withoutClock)) {
     courseState.setCourse(withoutClock.replace(/:$/, ""));
-  } else if (current && current.description === undefined) {
+    return;
+  }
+  if (!current) return;
+  if (looksLikeInstruction(withoutClock)) {
+    current.specialInstructions = current.specialInstructions
+      ? `${current.specialInstructions} ${withoutClock}`
+      : withoutClock;
+  } else if (current.description === undefined) {
     current.description = withoutClock;
   }
 }
@@ -435,11 +501,17 @@ export function parseBeoText(text: string): EventBundlePart {
 
   const salesperson = labelValue(lines, "salesperson");
   const salespersonEmail = parseEmail(salesperson);
+  const invoiceNumber = labelValue(lines, "invoice")?.match(/\d+/)?.[0];
+  const title = labelValue(lines, "title");
+  const dietary = labelValue(lines, "dietary");
+  if (dietary) notes.dietary = dietary;
   return {
     source: "beo",
     header: {
-      invoiceNumber: labelValue(lines, "invoice")?.match(/\d+/)?.[0],
-      title: labelValue(lines, "title"),
+      invoiceNumber,
+      // "Event #: 5935" satisfies the bare "event" label too; a number is
+      // the invoice, not a title.
+      title: title && !/^\d+$/.test(title) ? title : undefined,
       eventDate,
       startMinutes: parseClockMinutes(timeRange?.[1] ?? eventTime),
       endMinutes: parseClockMinutes(timeRange?.[2]),
@@ -458,7 +530,10 @@ export function parseBeoText(text: string): EventBundlePart {
       email: contact.email ?? parseEmail(labelValue(lines, "email")),
       phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
     },
-    venue: readVenue(labelValue(lines, "location")),
+    venue: readVenueWithAddress(
+      labelValue(lines, "location"),
+      labelValue(lines, "address"),
+    ),
     timeline: body.timeline,
     menu: body.menu,
     staff: body.staff,

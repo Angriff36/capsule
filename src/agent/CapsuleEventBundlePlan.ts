@@ -9,6 +9,7 @@ import {
   normalizeName,
   operationalRequirementsText,
   personNameParts,
+  serviceRequirementsText,
   timelineEntryExists,
   venueAddressText,
   type PlannedStep,
@@ -225,7 +226,7 @@ export function buildEventBundlePlan(
         quotedPrice: centsToDollars(bundle.totals.eventTotalCents),
         venueName: bundle.venue.name,
         venueAddress: venueAddressText(bundle),
-        serviceRequirements: bundle.notes.eventOverview,
+        serviceRequirements: serviceRequirementsText(bundle),
         operationalRequirements: operationalRequirementsText(bundle),
       },
     });

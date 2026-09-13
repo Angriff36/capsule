@@ -116,6 +116,22 @@ export function venueAddressText(bundle: EventBundle): string | undefined {
   return parts.length > 0 ? parts.join(", ") : undefined;
 }
 
+/**
+ * Guest-facing requirements for the event record: the BEO overview plus any
+ * hard dietary line ("NO ONIONS"). The Menu tab's dietary cross-check reads
+ * this field, so the restriction is checked against every dish from day one.
+ */
+export function serviceRequirementsText(
+  bundle: EventBundle,
+): string | undefined {
+  const notes = bundle.notes;
+  const parts = [
+    notes.eventOverview,
+    notes.dietary && `Dietary: ${notes.dietary}`,
+  ].filter((part): part is string => typeof part === "string");
+  return parts.length > 0 ? parts.join("\n") : undefined;
+}
+
 /** Operational prose the reports carry, joined for the event record. */
 export function operationalRequirementsText(
   bundle: EventBundle,
