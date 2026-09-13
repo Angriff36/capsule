@@ -27,6 +27,8 @@ type Props = {
   busy: boolean;
   onApplyTemplate: (template: MenuTemplate) => void;
   onEditNote: (row: EventMenuNoteRow) => void;
+  /** Rendered first — for anything that needs a decision (dietary conflicts). */
+  leading?: ReactNode;
   children?: ReactNode;
 };
 
@@ -64,10 +66,12 @@ export function EventMenuSidebar({
   busy,
   onApplyTemplate,
   onEditNote,
+  leading,
   children,
 }: Props) {
   return (
     <aside className="flex w-full shrink-0 flex-col gap-4 lg:w-72">
+      {leading}
       {courses.length > 0 ? (
         <div className="card p-4">
           <p className="text-sm font-semibold text-ink">Courses</p>

@@ -15,6 +15,7 @@ import {
   useListDishContainer,
   useListDishIngredient,
   useListEventDish,
+  useListEventGuest,
   useListIngredient,
   useListIngredientPriceObservation,
   useListInventoryItem,
@@ -52,6 +53,10 @@ import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventMenuLineNote } from "./EventMenuLineNote";
+import {
+  EventMenuDietaryConflictsCard,
+  type DietaryConflictInputs,
+} from "./EventMenuDietaryConflictsCard";
 import { EventMenuRecipeEditor } from "./EventMenuRecipeEditor";
 import { eventMenuCourseTallies, EventMenuSidebar } from "./EventMenuSidebar";
 import {
@@ -98,6 +103,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const event = useGetEvent(eventId);
   const dishes = useListDish();
   const eventDishes = useListEventDish();
+  const eventGuests = useListEventGuest();
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const components = useListComponent();
@@ -316,6 +322,35 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     [dishes, selections],
   );
 
+  // Event-stated restrictions vs. what the catalog says is in each dish
+  // (#368 item 14). Reuses the rows already loaded for costing.
+  const dietaryConflictInputs: DietaryConflictInputs = useMemo(
+    () => ({
+      eventId,
+      event,
+      guests: eventGuests ?? [],
+      selections,
+      dishes,
+      dishIngredients: dishIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
+      ingredients: ingredients ?? [],
+      components: components ?? [],
+    }),
+    [
+      componentIngredients,
+      components,
+      dishComponents,
+      dishIngredients,
+      dishes,
+      event,
+      eventGuests,
+      eventId,
+      ingredients,
+      selections,
+    ],
+  );
+
   const menuAllergenCodes = useMemo(() => {
     const codes = new Set<string>();
     for (const selection of selections) {
@@ -447,7 +482,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   // One dish-specific note per menu line, for THIS event only. Works for
   // lines with no note yet (the row's "Add kitchen note" button) as well as
   // the sidebar's Edit; sell price and pans ride along untouched.
-  const editNoteForLine = (lineId: string) => {
+  const editNoteForLine = (lineId: string, suggestedNote?: string) => {
     void (async () => {
       const selection = selections.find((item) => item._id === lineId);
       if (!selection) return;
@@ -455,6 +490,10 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         dishes?.find((dish) => dish._id === selection.dishId)?.name ??
         "Unknown dish";
       const current = parseEventMenuLineFields(selection.specialInstructions);
+      const startingNote =
+        suggestedNote && !current.notes.includes(suggestedNote)
+          ? [current.notes.trim(), suggestedNote].filter(Boolean).join("\n")
+          : current.notes;
       const values = await prompt.askFields({
         title: `Kitchen note — ${dishName}`,
         description:
@@ -463,7 +502,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           {
             name: "note",
             label: "Note",
-            defaultValue: current.notes,
+            defaultValue: startingNote,
             multiline: true,
             required: false,
             placeholder: "e.g. Peppercorn cream sauce on the side",
@@ -1167,6 +1206,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           busy={busy != null}
           onApplyTemplate={applyTemplate}
           onEditNote={editLineNote}
+          leading={
+            <EventMenuDietaryConflictsCard
+              inputs={dietaryConflictInputs}
+              busy={busy != null}
+              onNoteLine={editNoteForLine}
+            />
+          }
         >
           <div className="card p-4">
             <p className="eyebrow">Purchasing</p>
