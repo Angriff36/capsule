@@ -27,6 +27,8 @@ type OverviewEvent = {
   hasMenuDishes?: boolean;
   hasStaffAssigned?: boolean;
   eventType: string;
+  venueId?: Id<"venues"> | null;
+  venueName?: string | null;
   venueAddress?: string | null;
   occasionId?: Id<"occasions"> | null;
   serviceStyleId?: Id<"serviceStyles"> | null;
@@ -108,6 +110,9 @@ export function EventOverviewTab({
             endsAt={endsAt}
             expectedHeadcount={expectedHeadcount}
             venue={venue}
+            venueId={event.venueId}
+            venueName={event.venueName}
+            venuesLoading={reviseProps.venuesLoading}
             venueAddress={event.venueAddress}
             occasionId={event.occasionId}
             serviceStyleId={event.serviceStyleId}

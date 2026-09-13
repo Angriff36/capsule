@@ -52,6 +52,7 @@ import {
   UsersIcon,
 } from "../../ui/icons";
 import { MapPinIcon, TagIcon } from "./eventDetailIcons";
+import { eventVenueLabel } from "./eventVenueLabel";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import {
@@ -221,6 +222,12 @@ function EventDetailContent({
       venue.deletedAt == null,
   );
   const venue = venues?.find((row) => row._id === event.venueId);
+  const venueLabel = eventVenueLabel({
+    venueId: event.venueId,
+    venueName: event.venueName,
+    venue,
+    venuesLoading: venues === undefined,
+  });
 
   const setTab = (tab: EventDetailTab) => {
     const next = new URLSearchParams(searchParams);
@@ -466,9 +473,7 @@ function EventDetailContent({
             <HeroFact label="Headcount">
               {formatCount(event.expectedHeadcount)} guests
             </HeroFact>
-            <HeroFact label="Venue">
-              {venue ? venue.name : "No venue yet"}
-            </HeroFact>
+            <HeroFact label="Venue">{venueLabel}</HeroFact>
             <HeroFact label="Client">
               {clientDisplayName(event.clientId, clients)}
             </HeroFact>
@@ -535,7 +540,7 @@ function EventDetailContent({
                       {venue.name}
                     </Link>
                   ) : (
-                    "No venue yet"
+                    venueLabel
                   )}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
