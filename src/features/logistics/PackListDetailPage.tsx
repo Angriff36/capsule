@@ -303,6 +303,18 @@ export function PackListDetailPage() {
     })();
   };
 
+  /**
+   * Item-level packed/missing need the list past DRAFT (PackListItem guards
+   * on packList.status). Ticking the first item is a perfectly clear "we've
+   * started", so start the list instead of throwing a server error (#142).
+   * Returns a suffix for the notice so the operator sees the list moved.
+   */
+  const ensurePacking = async (): Promise<string> => {
+    if (String(packList.status) !== "draft") return "";
+    await startPacking({ docId: packList._id, version: packList.version });
+    return " Packing started on this list.";
+  };
+
   const invokeItem = async (
     item: {
       _id: string;
@@ -329,19 +341,23 @@ export function PackListDetailPage() {
       });
       if (!values) return;
       void run(`${item._id}:${key}`, async () => {
+        const started = await ensurePacking();
         await markItemPacked({
           docId: item._id,
           version: item.version,
           packedQuantity: Number(values.packedQuantity),
         });
-        setNotice("Item marked packed.");
+        setNotice(`Item marked packed.${started}`);
       });
       return;
     }
     if (key === "markMissing") {
       void run(`${item._id}:${key}`, async () => {
+        const started = await ensurePacking();
         await markItemMissing({ docId: item._id, version: item.version });
-        setNotice("Item marked missing — resolve it in its owning system.");
+        setNotice(
+          `Item marked missing — resolve it in its owning system.${started}`,
+        );
       });
       return;
     }
@@ -385,6 +401,7 @@ export function PackListDetailPage() {
     const targets = selection.selected.filter(itemCanPack);
     if (targets.length === 0) return;
     void run("bulk-pack", async () => {
+      await ensurePacking();
       await bulk.runBulk(targets, async (item) => {
         await markItemPacked({
           docId: item._id,
@@ -403,6 +420,7 @@ export function PackListDetailPage() {
     const targets = selection.selected.filter(itemCanMiss);
     if (targets.length === 0) return;
     void run("bulk-missing", async () => {
+      await ensurePacking();
       await bulk.runBulk(targets, async (item) => {
         await markItemMissing({ docId: item._id, version: item.version });
       });

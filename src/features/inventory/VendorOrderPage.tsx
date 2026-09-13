@@ -4,6 +4,7 @@ import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
+  useCreateStorageLocation,
   useCreateVendorOrderLine,
   useGetVendorOrder,
   useListEvent,
@@ -33,6 +34,10 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import {
+  NEW_LOCATION_FIELD,
+  ReceiptLocationField,
+} from "./ReceiptLocationField";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
@@ -53,6 +58,7 @@ export function VendorOrderPage() {
   const ingredients = useListIngredient();
   const inventoryLots = useListInventoryLot();
   const locations = useListStorageLocation();
+  const createLocation = useCreateStorageLocation();
   const createLine = useCreateVendorOrderLine();
   const submitOrder = useVendorOrderSubmit();
   const submitForApproval = useVendorOrderSubmitForApproval();
@@ -216,12 +222,24 @@ export function VendorOrderPage() {
     const element = event.currentTarget;
     const data = new FormData(element);
     const discrepancy = String(data.get("discrepancyQuantity") ?? "").trim();
+    const newLocationName = String(data.get(NEW_LOCATION_FIELD) ?? "").trim();
     void run(`${line._id}:receipt`, async () => {
+      // Fresh workspace: the field was a name box, so register the location
+      // first and receive into it (#143).
+      const locationId = newLocationName
+        ? String(
+            (
+              (await createLocation({ name: newLocationName })) as {
+                docId: string;
+              }
+            ).docId,
+          )
+        : String(data.get("locationId"));
       await recordReceipt({
         docId: line._id,
         version: line.version,
         quantity: Number(data.get("quantity")),
-        locationId: String(data.get("locationId")),
+        locationId,
         unitPrice: Number(data.get("unitPrice")),
         supplierLotNumber: String(data.get("supplierLotNumber") ?? "").trim(),
         discrepancyQuantity: discrepancy ? Number(discrepancy) : undefined,
@@ -711,28 +729,10 @@ export function VendorOrderPage() {
                           required
                         />
                       </label>
-                      <label className="field-label">
-                        Location
-                        <select
-                          name="locationId"
-                          className="input"
-                          defaultValue={line.locationId ?? ""}
-                          required
-                        >
-                          <option value="">Select location</option>
-                          {(locations ?? [])
-                            .filter(
-                              (item) =>
-                                item.deletedAt == null &&
-                                item.status === "active",
-                            )
-                            .map((item) => (
-                              <option key={item._id} value={item._id}>
-                                {item.name}
-                              </option>
-                            ))}
-                        </select>
-                      </label>
+                      <ReceiptLocationField
+                        locations={locations}
+                        defaultLocationId={line.locationId}
+                      />
                       <label className="field-label">
                         Confirmed unit price
                         <input
