@@ -104,11 +104,13 @@ export async function handleManifestEvent(
       await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
     return;
   }
-  if (event.entity === "Invoice" && event.type === "InvoiceIssued") {
+  if (event.entity === "Invoice" &&
+    (event.type === "InvoiceIssued" || event.type === "InvoiceNumberAssigned")) {
+    // A manually assigned number is validated exactly like an explicit one at issue.
     await ensureUniqueInvoiceNumber(
       ctx,
       event.entityId as Id<"invoices">,
-      event.payload.autoNumbered === true,
+      event.type === "InvoiceIssued" && event.payload.autoNumbered === true,
     );
     return;
   }
