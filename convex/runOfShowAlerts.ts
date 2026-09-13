@@ -27,10 +27,10 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { getAuthContext, requireTenant } from "./lib/authContext";
+import { RunAlertLoopLedger } from "./lib/runOfShowAlertLoop";
 import { live, tenantPerson } from "./lib/teamChatRead";
 import type { PushPayload, PushTarget } from "./teamChatPush";
 
-const CONFIG_ENTITY = "RunAlertConfig";
 const SENT_ENTITY = "RunAlert";
 const SCAN_INTERVAL_MS = 60_000;
 const LEAD_MS = 5 * 60_000;
@@ -63,23 +63,14 @@ function vapidConfigured(): boolean {
   );
 }
 
+const loopLedger = new RunAlertLoopLedger();
+
 /** Latest config event wins, mirroring smsAlerts.latestConfigEnabled. */
 async function alertsEnabled(
   ctx: QueryCtx,
   tenantId: string,
 ): Promise<boolean> {
-  const rows = await ctx.db
-    .query("manifestEvents")
-    .withIndex("by_entityId", (q) => q.eq("entityId", tenantId))
-    .collect();
-  const config = rows
-    .filter(
-      (row) =>
-        row.entity === CONFIG_ENTITY &&
-        (row.type === "RunAlertsEnabled" || row.type === "RunAlertsDisabled"),
-    )
-    .sort((left, right) => right.createdAt - left.createdAt)[0];
-  return config?.type === "RunAlertsEnabled";
+  return loopLedger.enabled(ctx, tenantId);
 }
 
 /** The account-level phone-alert switch team chat also obeys. */
@@ -145,22 +136,28 @@ export const enableAlerts = action({
         "Push is not configured on this deployment yet, so background alerts cannot run.",
       );
     }
-    if (await ctx.runQuery(internal.runOfShowAlerts.isEnabled, { tenantId })) {
-      // The scanner is already running for this tenant — enabling twice
-      // must not fork a second loop.
-      return { enabled: true };
-    }
-    await ctx.runMutation(internal.runOfShowAlerts.recordConfigEvent, {
-      tenantId,
-      type: "RunAlertsEnabled",
-      actorId: auth.id,
-    });
+    // One mutation decides whether a new loop may start, so two concurrent
+    // enables (or a disable/enable inside one scan) cannot fork a second
+    // scanner (#298). A null generation means a loop already owns the tenant.
+    const generation = await ctx.runMutation(
+      internal.runOfShowAlerts.claimLoop,
+      { tenantId, actorId: auth.id },
+    );
+    if (generation == null) return { enabled: true };
     await ctx.scheduler.runAfter(0, internal.runOfShowAlerts.tick, {
       tenantId,
       scheduleNext: true,
+      generation,
     });
     return { enabled: true };
   },
+});
+
+export const claimLoop = internalMutation({
+  args: { tenantId: v.string(), actorId: v.optional(v.string()) },
+  returns: v.union(v.string(), v.null()),
+  handler: async (ctx, args) =>
+    loopLedger.claim(ctx, args.tenantId, args.actorId),
 });
 
 export const disableAlerts = action({
@@ -168,38 +165,35 @@ export const disableAlerts = action({
   handler: async (ctx): Promise<{ disabled: true }> => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
-    await ctx.runMutation(internal.runOfShowAlerts.recordConfigEvent, {
+    await ctx.runMutation(internal.runOfShowAlerts.recordDisabled, {
       tenantId,
-      type: "RunAlertsDisabled",
       actorId: auth.id,
     });
     return { disabled: true };
   },
 });
 
-export const recordConfigEvent = internalMutation({
-  args: {
-    tenantId: v.string(),
-    type: v.union(
-      v.literal("RunAlertsEnabled"),
-      v.literal("RunAlertsDisabled"),
-    ),
-    actorId: v.optional(v.string()),
-  },
+export const recordDisabled = internalMutation({
+  args: { tenantId: v.string(), actorId: v.optional(v.string()) },
   handler: async (ctx, args) => {
-    await ctx.db.insert("manifestEvents", {
-      type: args.type,
-      entity: CONFIG_ENTITY,
-      entityId: args.tenantId,
-      payload: { tenantId: args.tenantId, actorId: args.actorId ?? null },
-      createdAt: Date.now(),
-    });
+    await loopLedger.disable(ctx, args.tenantId, args.actorId);
   },
 });
 
 export const isEnabled = internalQuery({
   args: { tenantId: v.string() },
   handler: async (ctx, args) => alertsEnabled(ctx, args.tenantId),
+});
+
+/** Whether the tick that carries `generation` still owns the scanner loop. */
+export const mayScan = internalQuery({
+  args: { tenantId: v.string(), generation: v.optional(v.string()) },
+  returns: v.boolean(),
+  handler: async (ctx, args) => {
+    const owner = await loopLedger.owner(ctx, args.tenantId);
+    const latest = await loopLedger.latestConfig(ctx, args.tenantId);
+    return RunAlertLoopLedger.mayScan(owner, latest, args.generation);
+  },
 });
 
 /** One alert moment per kind per activity, kept only when due right now. */
@@ -384,12 +378,19 @@ export const recordRunPushResults = internalMutation({
 });
 
 export const tick = internalAction({
-  args: { tenantId: v.string(), scheduleNext: v.optional(v.boolean()) },
+  args: {
+    tenantId: v.string(),
+    scheduleNext: v.optional(v.boolean()),
+    generation: v.optional(v.string()),
+  },
   handler: async (ctx, args): Promise<void> => {
-    const enabled = await ctx.runQuery(internal.runOfShowAlerts.isEnabled, {
+    // Disabled, or a newer enable owns the loop: this scanner retires
+    // without rescheduling, so duplicate loops die within one interval.
+    const owns = await ctx.runQuery(internal.runOfShowAlerts.mayScan, {
       tenantId: args.tenantId,
+      generation: args.generation,
     });
-    if (!enabled) return;
+    if (!owns) return;
     const now = Date.now();
     try {
       const jobs = await ctx.runQuery(
@@ -411,7 +412,11 @@ export const tick = internalAction({
         await ctx.scheduler.runAfter(
           SCAN_INTERVAL_MS,
           internal.runOfShowAlerts.tick,
-          { tenantId: args.tenantId, scheduleNext: true },
+          {
+            tenantId: args.tenantId,
+            scheduleNext: true,
+            generation: args.generation,
+          },
         );
       }
     }
