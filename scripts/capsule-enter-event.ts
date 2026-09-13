@@ -139,7 +139,12 @@ async function main(): Promise<void> {
     return;
   }
 
-  const result = await coordinator.enter({ bundle, acceptWarnings, context });
+  const result = await coordinator.enter({
+    bundle,
+    tenantId: await loader.loadTenantId(),
+    acceptWarnings,
+    context,
+  });
   console.log(
     JSON.stringify(
       {

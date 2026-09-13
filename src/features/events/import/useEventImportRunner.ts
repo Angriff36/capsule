@@ -4,21 +4,23 @@ import type {
   CapsuleEventBundleCatalogMatch,
   CapsuleEventBundleDirectory,
 } from "../../../agent/CapsuleEventBundleExistingState";
+import { eventBundleIdempotencyScope } from "../../../agent/CapsuleEventBundleIdempotencyScope";
 import {
   buildEventBundlePlan,
-  bundleIdentity,
   type EventBundlePlan,
 } from "../../../agent/CapsuleEventBundlePlan";
 import { runPlannedSteps } from "../../../agent/CapsuleEventBundleStepRunner";
 import type { EventBundle } from "../../../lib/tppReports/eventBundle";
+import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { useEventImportCommandExecutor } from "./useEventImportCommandExecutor";
 
 /**
  * Plans and runs an event-bundle import from the browser. The plan is the
- * same one the agent previews; the run uses the same idempotency scope
- * (`tpp:<invoice>`), so re-importing the same BEO — here or through the MCP
- * host — adds what is missing instead of a second event.
+ * same one the agent previews; the run uses the same tenant-scoped
+ * idempotency scope (`tpp:<tenant>:<invoice>`), so re-importing the same BEO
+ * — here or through the MCP host — adds what is missing instead of a second
+ * event, and another tenant's identical invoice number never collides.
  */
 
 export interface EventImportProgress {
@@ -39,6 +41,7 @@ export function useEventImportRunner(input: {
   directory: CapsuleEventBundleDirectory | null;
 }) {
   const commands = useEventImportCommandExecutor();
+  const tenantId = useAuthStatus()?.tenantId ?? null;
   const [progress, setProgress] = useState<EventImportProgress | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [result, setResult] = useState<EventImportResult | null>(null);
@@ -64,8 +67,9 @@ export function useEventImportRunner(input: {
     if (!plan || !input.bundle) return;
     setFailure(null);
     setResult(null);
-    const scope = `tpp:${bundleIdentity(input.bundle.header)}`;
     try {
+      // Throws while the signed-in tenant is unknown: no tenant, no key.
+      const scope = eventBundleIdempotencyScope(tenantId, input.bundle.header);
       const unsupported = commands.unsupported(
         plan.steps.map((step) => step.capabilityId),
       );
@@ -91,7 +95,7 @@ export function useEventImportRunner(input: {
     } finally {
       setProgress(null);
     }
-  }, [commands, input.bundle, plan]);
+  }, [commands, input.bundle, plan, tenantId]);
 
   return {
     plan,

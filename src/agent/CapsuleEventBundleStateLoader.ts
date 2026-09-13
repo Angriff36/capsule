@@ -110,6 +110,25 @@ export class CapsuleEventBundleStateLoader {
     };
   }
 
+  /**
+   * The tenant the executor's identity resolves to — the same answer the
+   * UI's AuthGate reads. It pins the bundle's idempotency scope; an identity
+   * with no tenant cannot enter a bundle.
+   */
+  async loadTenantId(): Promise<string> {
+    const client = await this.resolveClient();
+    const status = (await client.query(api.authStatus.getAuthStatus, {})) as {
+      tenantId?: string | null;
+    } | null;
+    const tenantId = status?.tenantId?.trim() ?? "";
+    if (tenantId.length === 0) {
+      throw new Error(
+        "This sign-in is not linked to an organization, so no bundle can be entered for it.",
+      );
+    }
+    return tenantId;
+  }
+
   async loadExisting(
     eventId: string,
   ): Promise<CapsuleEventBundleExistingEvent> {

@@ -137,6 +137,7 @@ export class CapsuleMcpEventBundleRegistrar {
           this.executor,
         ).enter({
           bundle,
+          tenantId: await this.stateLoader.loadTenantId(),
           acceptWarnings,
           context: await this.context(bundle, existingEventId, true),
         });

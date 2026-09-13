@@ -2,10 +2,10 @@ import type { EventBundle } from "../lib/tppReports/eventBundle";
 import {
   buildEventBundlePlan,
   type EventBundlePlan,
-  bundleIdentity,
 } from "./CapsuleEventBundlePlan";
 import type { CapsuleCommandExecutor } from "./CapsuleCommandExecutor";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
+import { eventBundleIdempotencyScope } from "./CapsuleEventBundleIdempotencyScope";
 import { runPlannedSteps } from "./CapsuleEventBundleStepRunner";
 import { warningsNeedingDecision } from "./CapsuleEventBundleWarnings";
 import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
@@ -21,11 +21,17 @@ import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 export interface CapsuleEventBundleEnterOptions {
   bundle: EventBundle;
   /**
+   * The Convex tenant id the executor's identity belongs to. Scopes the
+   * idempotency keys, so two tenants entering the same TPP invoice number
+   * never replay each other's cached results.
+   */
+  tenantId: string;
+  /**
    * Required when the bundle carries warnings. Warnings mean the reports
    * disagreed or something could not be mapped; a human decides, not the agent.
    */
   acceptWarnings?: boolean;
-  /** Overrides the idempotency scope. Defaults to the TPP invoice number. */
+  /** Overrides the idempotency scope. Defaults to tenant + TPP invoice number. */
   idempotencyScope?: string;
   /**
    * Tenant records to match against. `existing` attaches the run to an event
@@ -95,10 +101,11 @@ export class CapsuleEventBundleCoordinator {
     }
 
     // Same identity the planner uses for business keys, so two no-invoice
-    // bundles never replay each other's idempotency results.
+    // bundles never replay each other's idempotency results — pinned to the
+    // tenant, so two tenants' bundles never do either.
     const scope =
       options.idempotencyScope ??
-      `tpp:${bundleIdentity(options.bundle.header)}`;
+      eventBundleIdempotencyScope(options.tenantId, options.bundle.header);
     const keys = new CapsuleIdempotencyKeyFactory(scope);
     const createdIds = await runPlannedSteps({
       steps: plan.steps,
