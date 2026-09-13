@@ -153,6 +153,24 @@ entity Person mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Fix a wrong or changed contact email after hire. Email is contact data,
+  // not login identity (sign-in resolves by authSubjectId), so this is a
+  // normal workforce-manager profile edit. The authored convex/personEmail.ts
+  // seam runs this and then moves the linked sign-in account to the new
+  // address so the invitation and the profile stay on one mailbox (#270).
+  // Allowed while inactive too — a contact fix must not need a reactivation.
+  command correctEmail(email: string) {
+    guard self.deletedAt == null
+    guard self.status != "terminated"
+    constraint correctEmailPresent: length(trim(email)) > 0 "Email is required"
+    mutate email = email
+    emit PersonEmailCorrected {
+      personId: self.id
+      tenantId: self.tenantId
+      email: email
+    }
+  }
+
   // Set the hourly pay rate. Uses the default workforce write/execute
   // policies (workforce managers set pay). Drives live labor-cost math in
   // closeouts and reports.
@@ -302,6 +320,12 @@ event PersonIdentityCorrected: "person.identity_corrected" {
   tenantId: string
   givenName: string
   familyName: string
+}
+
+event PersonEmailCorrected: "person.email_corrected" {
+  personId: string
+  tenantId: string
+  email: string
 }
 
 event PersonRoleAssigned: "person.role_assigned" {

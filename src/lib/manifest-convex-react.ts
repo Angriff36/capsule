@@ -404,6 +404,7 @@ import {
   PayrollInputPrepareParamsSchema,
   PerformanceReviewRecordParamsSchema,
   PersonAssignRoleParamsSchema,
+  PersonCorrectEmailParamsSchema,
   PersonCorrectIdentityParamsSchema,
   PersonDeactivateParamsSchema,
   PersonHireParamsSchema,
@@ -6267,6 +6268,16 @@ export function usePersonAssignRole() {
   };
 }
 
+/** Mutation hook for Person.correctEmail. */
+export function usePersonCorrectEmail() {
+  const mutate = useMutation(api.mutations.Person_correctEmail);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonCorrectEmailParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Person.correctIdentity. */
 export function usePersonCorrectIdentity() {
   const mutate = useMutation(api.mutations.Person_correctIdentity);
@@ -10134,4 +10145,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1074 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1075 as const;

@@ -16,6 +16,10 @@ import {
 } from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
+import {
+  CandidateEmailMismatchNotice,
+  type CandidateEmailMismatch,
+} from "./CandidateEmailMismatchNotice";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -90,6 +94,9 @@ export function CandidatesPage() {
     text: string;
     tone: "ok" | "warn";
   } | null>(null);
+  // A hired candidate whose row email drifted from the linked profile (#270).
+  const [emailMismatch, setEmailMismatch] =
+    useState<CandidateEmailMismatch | null>(null);
   // Candidates whose matched profile is INACTIVE: the next Hire click carries
   // explicit restore intent ("Restore and resend").
   const [restoreReady, setRestoreReady] = useState<Set<string>>(new Set());
@@ -193,6 +200,7 @@ export function CandidatesPage() {
   }) => {
     setFailure(null);
     setNotice(null);
+    setEmailMismatch(null);
     setBusy(true);
     const linkedPerson =
       candidate.hiredPersonId != null
@@ -222,6 +230,15 @@ export function CandidatesPage() {
         setNotice({
           text: `Hired ${candidate.fullName}. The candidate has no usable email, so no sign-in could be created — add them under Administration → Permissions → Team roles.`,
           tone: "warn",
+        });
+        return;
+      }
+      if (result.kind === "email_mismatch") {
+        setEmailMismatch({
+          candidateName: candidate.fullName,
+          personId: result.personId,
+          personEmail: result.personEmail,
+          candidateEmail: result.candidateEmail,
         });
         return;
       }
@@ -332,6 +349,31 @@ export function CandidatesPage() {
         >
           {notice.text}
         </output>
+      ) : null}
+      {emailMismatch ? (
+        <CandidateEmailMismatchNotice
+          mismatch={emailMismatch}
+          onError={setFailure}
+          onResolved={(warning) => {
+            const pending = emailMismatch;
+            setEmailMismatch(null);
+            if (warning) {
+              setNotice({ text: warning, tone: "warn" });
+              return;
+            }
+            const candidate = liveCandidates.find(
+              (row) => row.hiredPersonId === pending.personId,
+            );
+            if (candidate) {
+              void hireCandidate({
+                _id: candidate._id,
+                fullName: candidate.fullName,
+                version: candidate.version,
+                hiredPersonId: candidate.hiredPersonId,
+              });
+            }
+          }}
+        />
       ) : null}
 
       {/* KM interview-tool import (spec §9.3 "map the KM JSON into the model"). */}

@@ -6971,6 +6971,13 @@ export const PersonAssignRoleParamsSchema = z.object({
 
 export type PersonAssignRoleParams = z.infer<typeof PersonAssignRoleParamsSchema>;
 
+// Command: correctEmail on Person
+export const PersonCorrectEmailParamsSchema = z.object({
+  email: z.string(),
+});
+
+export type PersonCorrectEmailParams = z.infer<typeof PersonCorrectEmailParamsSchema>;
+
 // Command: correctIdentity on Person
 export const PersonCorrectIdentityParamsSchema = z.object({
   givenName: z.string(),

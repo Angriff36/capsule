@@ -109,6 +109,7 @@ import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as mutations from "../mutations.js";
 import type * as notifications from "../notifications.js";
+import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
 import type * as personalDataExport from "../personalDataExport.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
@@ -253,6 +254,7 @@ declare const fullApi: ApiFromModules<{
   messageInbox: typeof messageInbox;
   mutations: typeof mutations;
   notifications: typeof notifications;
+  personEmail: typeof personEmail;
   personEmployeeNumber: typeof personEmployeeNumber;
   personalDataExport: typeof personalDataExport;
   pushSubscriptions: typeof pushSubscriptions;

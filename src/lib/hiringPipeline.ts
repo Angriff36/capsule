@@ -15,6 +15,11 @@ export function useHireCandidateIntoTeam() {
   return useMutation(api.candidateToTeam.hireIntoTeam);
 }
 
+/** Move a team profile (and its linked sign-in) to a corrected email (#270). */
+export function useCorrectStaffEmail() {
+  return useAction(api.personEmail.correctStaffEmail);
+}
+
 /** Ask Clerk to email a hired person's Capsule invitation. */
 export function useProvisionStaffSignIn() {
   return useAction(api.authProvision.provisionStaffSignIn);

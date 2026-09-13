@@ -402,7 +402,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PerformanceReview_createViaRecord, { "personId": "personId-performance-review-1", "reviewerId": "reviewerId-performance-review-1", "eventId": "eventId-performance-review-1", "reviewDate": 1767268800000, "reliabilityRating": 1, "qualityRating": 1, "teamworkRating": 1, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PerformanceReview_createViaRecord, { "personId": "personId-performance-review-2", "reviewerId": "reviewerId-performance-review-2", "eventId": "eventId-performance-review-2", "reviewDate": 1767355200000, "reliabilityRating": 2, "qualityRating": 2, "teamworkRating": 2, "notes": "demo-notes-2" } as any);
-  // Person has multiple initialization commands (correctIdentity, hire); using the selected initialization command: hire.
+  // Person has multiple initialization commands (correctEmail, correctIdentity, hire); using the selected initialization command: hire.
   // Person → api.mutations.Person_createViaHire
   rowsAttempted += 1;
   await client.mutation(api.mutations.Person_createViaHire, { "givenName": "Person 1", "familyName": "Person 1", "email": "user1@example.com", "phone": "demo-phone-1", "role": "demo-role-1", "authSubjectId": "authSubjectId-person-1", "employeeNumber": "demo-employeeNumber-1", "employmentType": "demo-employmentType-1" } as any);
