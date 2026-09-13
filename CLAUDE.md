@@ -48,7 +48,7 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
 ## Process
 
 - Use `docs/` as architecture truth; keep `AGENTS.md` mechanical (commands only).
-- Commit only when asked. One concern per commit; include proof (`bun run check` or a focused subset).
+- Commit OFTEN.  One concern per commit; include proof (`bun run check` or a focused subset).
 - Never commit `.env.local`, credentials, or `.artifacts/` dumps.
 - Do not amend pushed history or force-push `main`.
 - **Branch and release rule (owner, 2026-08-25).** Nothing pushes to `main`
