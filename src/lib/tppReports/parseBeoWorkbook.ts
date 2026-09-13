@@ -15,6 +15,7 @@ import {
   parseEmail,
   parsePersonBlob,
   parsePhone,
+  parseReportDate,
 } from "./reportValues";
 import type { XlsxSheet } from "./xlsxReader";
 
@@ -35,6 +36,16 @@ function fromExcelSerial(value: string | undefined): string | undefined {
   const days = Number(value);
   const date = new Date(Date.UTC(1899, 11, 30) + days * 86_400_000);
   return date.toISOString().slice(0, 10);
+}
+
+/**
+ * The Date cell arrives either printed (`9/12/2026`, what the typed workbook
+ * grid renders for a date-formatted cell) or as the raw Excel serial (a
+ * General-formatted cell, or a raw-grid read). Neither shape is guessed at:
+ * anything else leaves eventDate unset and the BEO warning stands.
+ */
+function parseBeoDate(value: string | undefined): string | undefined {
+  return parseReportDate(value) ?? fromExcelSerial(value);
 }
 
 function rowText(row: readonly string[]): string {
@@ -158,7 +169,7 @@ export function parseBeoWorkbook(
     header: {
       invoiceNumber: label("Invoice #"),
       title: label("Event Title"),
-      eventDate: fromExcelSerial(label("Date")),
+      eventDate: parseBeoDate(label("Date")),
       startMinutes: parseClockMinutes(eventTime?.split("-")[0]),
       endMinutes: parseClockMinutes(eventTime?.split("-")[1]),
       guestCount: parseCount(label("Guest Count")),
