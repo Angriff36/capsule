@@ -17,6 +17,9 @@ import { parseClockMinutes, parseCount, parseReportDate } from "./reportValues";
 const TIME_ROW = /^(\d{1,2}:\d{2}\s*[AP]M)\s+(.*)$/;
 const TEAM = /\b(FOH|BOH)\b/;
 const ROSTER_HEADER = /^NAME\s+ROLE\s+TEAM\s+SHIFT\s+STATION$/;
+/** The SHIFT column: "3:00 PM - 11:00 PM", followed by the station text. */
+const SHIFT_RANGE =
+  /^(\d{1,2}:\d{2}\s*[AP]\.?M\.?)\s*[-–—]\s*(\d{1,2}:\d{2}\s*[AP]\.?M\.?)\s*(.*)$/i;
 const TIMELINE_HEADER = /^TI\s?ME\s+TASK\s+CAT/;
 /** Section titles are printed with wide letter spacing, as "ST AF F R OST ER". */
 const SECTION_TITLE = /^[A-Z][A-Z\s&/]{3,}$/;
@@ -40,10 +43,18 @@ function readStaff(lines: readonly string[]): BundleStaffAssignment[] {
     const words = line.slice(0, team.index).trim().split(/\s+/);
     const role = words.length > 1 ? words.pop() : undefined;
     const name = words.join(" ");
-    const station = line.slice(team.index + team[0].length).trim();
     if (name.length === 0) continue;
     const entry: BundleStaffAssignment = { name, team: team[1] };
     if (role) entry.role = role;
+    // After the team comes SHIFT ("3:00 PM - 11:00 PM") then STATION. The
+    // shift feeds the assignment's start and end; only the rest is station.
+    const afterTeam = line.slice(team.index + team[0].length).trim();
+    const shift = afterTeam.match(SHIFT_RANGE);
+    const station = shift ? shift[3]!.trim() : afterTeam;
+    const start = parseClockMinutes(shift?.[1]);
+    const end = parseClockMinutes(shift?.[2]);
+    if (start !== undefined) entry.startMinutes = start;
+    if (end !== undefined) entry.endMinutes = end;
     if (station.length > 0) entry.station = station;
     staff.push(entry);
   }
