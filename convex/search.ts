@@ -319,39 +319,35 @@ async function queryInvoices(
   // is undefined, not null, so every page emptied, scanned never moved, and
   // the query spun until timeout (QA 193: Searching… 8–9s then No matches).
   // Skip deleted rows in JS like addHit (`deletedAt != null`).
-  const PAGE = 100;
-  const MAX_PAGES = 25;
+  // Convex allows one .paginate() per function execution, so a page loop
+  // threw past the first 100 invoices (#303). Bounded async iteration keeps
+  // the same 2,500-row scan budget without a second cursor.
+  const MAX_SCANNED = 2_500;
   const MAX_HITS = 15;
   const out: SearchHit[] = [];
-  let cursor: string | null = null;
-  let pages = 0;
+  let scanned = 0;
 
-  while (pages < MAX_PAGES && out.length < MAX_HITS) {
-    const page = await ctx.db
-      .query("invoices")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .paginate({ numItems: PAGE, cursor });
-    pages += 1;
-    for (const inv of page.page) {
-      if (inv.deletedAt != null) continue;
-      // Null status filter includes paid (QA Gallery INV-2026-QA1 is billed).
-      if (!keepInvoiceForSearch(inv, parsed, statuses)) continue;
-      if (ageThreshold !== null) {
-        const anchor = inv.dueDate ?? inv.issuedAt;
-        if (anchor == null || anchor > ageThreshold) continue;
+  for await (const inv of ctx.db
+    .query("invoices")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))) {
+    scanned += 1;
+    // Null status filter includes paid (QA Gallery INV-2026-QA1 is billed).
+    if (inv.deletedAt == null && keepInvoiceForSearch(inv, parsed, statuses)) {
+      const anchor = inv.dueDate ?? inv.issuedAt;
+      const oldEnough =
+        ageThreshold === null || (anchor != null && anchor <= ageThreshold);
+      if (oldEnough) {
+        out.push({
+          kind: "invoice",
+          id: String(inv._id),
+          label: invoiceSearchLabel(inv),
+          hint: invoiceHint(inv, now),
+          path: `/finance/invoices/${inv._id}`,
+          score: parsed.invoiceNumbers.length > 0 ? 0.9 : 0.5,
+        });
       }
-      out.push({
-        kind: "invoice",
-        id: String(inv._id),
-        label: invoiceSearchLabel(inv),
-        hint: invoiceHint(inv, now),
-        path: `/finance/invoices/${inv._id}`,
-        score: parsed.invoiceNumbers.length > 0 ? 0.9 : 0.5,
-      });
-      if (out.length >= MAX_HITS) break;
     }
-    if (page.isDone) break;
-    cursor = page.continueCursor;
+    if (out.length >= MAX_HITS || scanned >= MAX_SCANNED) break;
   }
   out.sort((a, b) => b.score - a.score);
   return out.slice(0, MAX_HITS);
