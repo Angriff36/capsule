@@ -3,6 +3,7 @@ import type { MutationCtx } from "../_generated/server";
 import { api } from "../_generated/api";
 import { getAuthContext, requireTenant } from "./authContext";
 import { releaseNeedDraftContributions } from "./purchasingEvents";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
 /**
  * Runs inside Event.reschedule / Event.normalizePurchasingWeek after the
@@ -11,6 +12,12 @@ import { releaseNeedDraftContributions } from "./purchasingEvents";
  * week, where the existing weekly routing consolidates it with that week's
  * other events. Needs already ordered or fulfilled keep their week: that
  * supply was bought for a real order and stays historical.
+ *
+ * The week move is a consequence of the reschedule the caller was already
+ * authorized to make, so it runs as the tenant's system role: event and
+ * sales staff can reschedule an event with open purchase needs without
+ * holding purchasing permissions of their own, and PurchaseNeed.moveToWeek
+ * keeps its inventory/manager policy for everyone who calls it directly.
  */
 export async function moveEventPurchasingWeek(
   ctx: MutationCtx,
@@ -32,13 +39,15 @@ export async function moveEventPurchasingWeek(
       need.status === "open" &&
       need.purchasingWeekStart !== weekStart,
   );
+  if (movable.length === 0) return;
+  const purchasing = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
   for (const need of movable) {
     try {
-      await moveNeedToWeek(ctx, need, weekStart);
+      await moveNeedToWeek(purchasing, need, weekStart);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       throw new Error(
-        `Moving this event's purchasing to its new week needs purchasing or manager access. ${detail}`,
+        `Moving this event's purchasing to its new week did not complete, so the reschedule was not saved. ${detail}`,
       );
     }
   }
