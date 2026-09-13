@@ -34,6 +34,7 @@ import {
   ClientOutreachTaskOpenParamsSchema,
   ClientReactivateParamsSchema,
   ClientRegisterParamsSchema,
+  ClientSetBirthdayParamsSchema,
   ClientStageClientMergeParamsSchema,
   ComponentDraftParamsSchema,
   ComponentImportApproveReviewParamsSchema,
@@ -405,6 +406,7 @@ import {
   PayrollInputPrepareParamsSchema,
   PerformanceReviewRecordParamsSchema,
   PersonAssignRoleParamsSchema,
+  PersonChangeAddressParamsSchema,
   PersonCorrectEmailParamsSchema,
   PersonCorrectIdentityParamsSchema,
   PersonDeactivateParamsSchema,
@@ -1041,6 +1043,16 @@ export function useClientRegister() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ClientRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Client.setBirthday. */
+export function useClientSetBirthday() {
+  const mutate = useMutation(api.mutations.Client_setBirthday);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientSetBirthdayParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6279,6 +6291,16 @@ export function usePersonAssignRole() {
   };
 }
 
+/** Mutation hook for Person.changeAddress. */
+export function usePersonChangeAddress() {
+  const mutate = useMutation(api.mutations.Person_changeAddress);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PersonChangeAddressParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Person.correctEmail. */
 export function usePersonCorrectEmail() {
   const mutate = useMutation(api.mutations.Person_correctEmail);
@@ -10156,4 +10178,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1076 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1078 as const;

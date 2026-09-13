@@ -152,6 +152,7 @@ export const ClientSchema = z.object({
   region: z.string().nullable().optional(),
   postalCode: z.string().nullable().optional(),
   countryCode: z.string().nullable().optional(),
+  birthday: z.string().nullable().optional(),
   taxId: z.string().nullable().optional(),
   taxExempt: z.boolean().default(false),
   paymentTermsDays: z.number().int().default(30),
@@ -2056,6 +2057,11 @@ export const PersonSchema = z.object({
   familyName: z.string(),
   email: z.string(),
   phone: z.string().nullable().optional(),
+  addressLine1: z.string().nullable().optional(),
+  addressLine2: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  region: z.string().nullable().optional(),
+  postalCode: z.string().nullable().optional(),
   role: z.enum(["staff", "kitchen_staff", "kitchen_lead", "sales_staff", "event_staff", "inventory_staff", "procurement_staff", "logistics_staff", "driver", "workforce_staff", "finance_staff", "manager", "kitchen_manager", "sales_manager", "event_manager", "inventory_manager", "logistics_manager", "workforce_manager", "finance_manager", "admin", "owner", "system"]).default("staff"),
   authSubjectId: z.string().nullable().optional(),
   employeeNumber: z.string().nullable().optional(),
@@ -3774,6 +3780,13 @@ export const ClientRegisterParamsSchema = z.object({
 });
 
 export type ClientRegisterParams = z.infer<typeof ClientRegisterParamsSchema>;
+
+// Command: setBirthday on Client
+export const ClientSetBirthdayParamsSchema = z.object({
+  birthday: z.string().optional(),
+});
+
+export type ClientSetBirthdayParams = z.infer<typeof ClientSetBirthdayParamsSchema>;
 
 // Command: stageClientMerge on Client
 export const ClientStageClientMergeParamsSchema = z.object({
@@ -6978,6 +6991,17 @@ export const PersonAssignRoleParamsSchema = z.object({
 });
 
 export type PersonAssignRoleParams = z.infer<typeof PersonAssignRoleParamsSchema>;
+
+// Command: changeAddress on Person
+export const PersonChangeAddressParamsSchema = z.object({
+  addressLine1: z.string().optional(),
+  addressLine2: z.string().optional(),
+  city: z.string().optional(),
+  region: z.string().optional(),
+  postalCode: z.string().optional(),
+});
+
+export type PersonChangeAddressParams = z.infer<typeof PersonChangeAddressParamsSchema>;
 
 // Command: correctEmail on Person
 export const PersonCorrectEmailParamsSchema = z.object({

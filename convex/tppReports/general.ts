@@ -481,7 +481,20 @@ export const run = query({
         .take(REPORT_ROW_LIMIT);
       const people = await Promise.all(
         rawPeople.map((person) =>
-          decryptReportFields(ctx, "Person", ["email", "phone"], person),
+          decryptReportFields(
+            ctx,
+            "Person",
+            [
+              "email",
+              "phone",
+              "addressLine1",
+              "addressLine2",
+              "city",
+              "region",
+              "postalCode",
+            ],
+            person,
+          ),
         ),
       );
       return table(
@@ -489,6 +502,7 @@ export const run = query({
         [
           { key: "staff", label: "Staff member", kind: "text" },
           { key: "role", label: "Role", kind: "text" },
+          { key: "address", label: "Address", kind: "text" },
           { key: "phone", label: "Phone", kind: "text" },
           { key: "email", label: "Email", kind: "text" },
         ],
@@ -501,6 +515,15 @@ export const run = query({
             values: {
               staff: `${row.givenName} ${row.familyName}`,
               role: row.role,
+              address: [
+                row.addressLine1,
+                row.addressLine2,
+                [row.city, row.region, row.postalCode]
+                  .filter(Boolean)
+                  .join(" "),
+              ]
+                .filter(Boolean)
+                .join(", "),
               phone: row.phone ?? "",
               email: row.email,
             },

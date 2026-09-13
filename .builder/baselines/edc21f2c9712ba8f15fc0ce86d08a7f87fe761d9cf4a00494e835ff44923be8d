@@ -1135,7 +1135,7 @@ export const listClient = query({
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("clients").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).clientType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isArchived = ((__row as any).status === "archived"); return { ...(__row as any), displayName: (__row as any).displayName, isArchived: (__row as any).isArchived }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).taxId;
@@ -1156,7 +1156,7 @@ export const getClient = query({
     if (doc && (doc as any).deletedAt != null) return null;
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
-    const __doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], __rawDoc);
+    const __doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __rawDoc);
     (__doc as any).displayName = (((__doc as any).clientType === "company") ? (__doc as any).companyName : (((__doc as any).givenName + " ") + (__doc as any).familyName));
     (__doc as any).isArchived = ((__doc as any).status === "archived");
     const __hydrated = { ...(__doc as any), displayName: (__doc as any).displayName, isArchived: (__doc as any).isArchived };
@@ -1178,7 +1178,7 @@ export const listClientByTenantId = query({
     if (__tenant == null) return [];
     let rows = await ctx.db.query("clients").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).clientType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isArchived = ((__row as any).status === "archived"); return { ...(__row as any), displayName: (__row as any).displayName, isArchived: (__row as any).isArchived }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).taxId;
@@ -1198,7 +1198,7 @@ export const listClientByAssignedToId = query({
     let rows = await ctx.db.query("clients").withIndex("by_assignedToId", (q) => q.eq("assignedToId", assignedToId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).clientType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isArchived = ((__row as any).status === "archived"); return { ...(__row as any), displayName: (__row as any).displayName, isArchived: (__row as any).isArchived }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).taxId;
@@ -1218,7 +1218,7 @@ export const listClientByClientMergeAuthorizationId = query({
     let rows = await ctx.db.query("clients").withIndex("by_clientMergeAuthorizationId", (q) => q.eq("clientMergeAuthorizationId", clientMergeAuthorizationId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).clientType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isArchived = ((__row as any).status === "archived"); return { ...(__row as any), displayName: (__row as any).displayName, isArchived: (__row as any).isArchived }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).taxId;
@@ -1238,7 +1238,7 @@ export const listClientByMergedIntoClientId = query({
     let rows = await ctx.db.query("clients").withIndex("by_mergedIntoClientId", (q) => q.eq("mergedIntoClientId", mergedIntoClientId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).clientType === "company") ? (__row as any).companyName : (((__row as any).givenName + " ") + (__row as any).familyName)); (__row as any).isArchived = ((__row as any).status === "archived"); return { ...(__row as any), displayName: (__row as any).displayName, isArchived: (__row as any).isArchived }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).taxId;
@@ -8332,7 +8332,7 @@ export const listPerson = query({
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("people").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).hourlyRate;
@@ -8353,7 +8353,7 @@ export const getPerson = query({
     if (doc && (doc as any).deletedAt != null) return null;
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
-    const __doc = await __decryptDoc(ctx, "Person", ["email","phone"], __rawDoc);
+    const __doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __rawDoc);
     (__doc as any).displayName = (((__doc as any).givenName + " ") + (__doc as any).familyName);
     (__doc as any).isAssignable = (((__doc as any).status === "active") && ((__doc as any).deletedAt == null));
     const __hydrated = { ...(__doc as any), displayName: (__doc as any).displayName, isAssignable: (__doc as any).isAssignable };
@@ -8375,7 +8375,7 @@ export const listPersonByTenantId = query({
     if (__tenant == null) return [];
     let rows = await ctx.db.query("people").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).hourlyRate;
@@ -8395,7 +8395,7 @@ export const listPersonByAuthSubjectId = query({
     let rows = await ctx.db.query("people").withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", authSubjectId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).hourlyRate;
@@ -8414,7 +8414,7 @@ export const listPersonByTenantIdAndStatus = query({
     if (__tenant == null) return [];
     let rows = await ctx.db.query("people").withIndex("by_tenantId_and_status", (q) => q.eq("tenantId", __tenant).eq("status", status)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], row)));
     return ((__plainRows).map((__row) => { (__row as any).displayName = (((__row as any).givenName + " ") + (__row as any).familyName); (__row as any).isAssignable = (((__row as any).status === "active") && ((__row as any).deletedAt == null)); return { ...(__row as any), displayName: (__row as any).displayName, isAssignable: (__row as any).isAssignable }; })).map((d) => {
       const o = { ...(d as any) };
       delete (o as any).hourlyRate;

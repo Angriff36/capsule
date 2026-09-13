@@ -6,6 +6,7 @@ import {
   useClientContactRemove,
   useClientContactSetPrimary,
   useClientReactivate,
+  useClientSetBirthday,
   useCreateClientContact,
   useGetClient,
   useListClientContact,
@@ -58,6 +59,7 @@ export function ClientDetailPage() {
   const setPrimary = useClientContactSetPrimary();
   const removeContact = useClientContactRemove();
   const changeContact = useClientChangeContact();
+  const setBirthday = useClientSetBirthday();
   const archive = useClientArchive();
   const reactivate = useClientReactivate();
   const [showContact, setShowContact] = useState(false);
@@ -160,13 +162,27 @@ export function ClientDetailPage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     void run("change-contact", async () => {
+      // Generated updates wipe optional params that arrive omitted, so the
+      // stored address rides along unchanged with the fields this form edits.
       await changeContact({
         docId: client._id,
         version: client.version,
         email: optional(String(data.get("email") ?? "")),
         phone: optional(String(data.get("phone") ?? "")),
         website: optional(String(data.get("website") ?? "")),
+        addressLine1: client.addressLine1 ?? undefined,
+        addressLine2: client.addressLine2 ?? undefined,
+        city: client.city ?? undefined,
+        region: client.region ?? undefined,
+        postalCode: client.postalCode ?? undefined,
+        countryCode: client.countryCode ?? undefined,
       });
+      const birthday = optional(String(data.get("birthday") ?? ""));
+      if ((birthday ?? null) !== (client.birthday ?? null)) {
+        // No version: the contact save just advanced it, and this is the
+        // same person's single submit.
+        await setBirthday({ docId: client._id, birthday });
+      }
       setNotice("Account contact details updated.");
     });
   };
@@ -354,6 +370,17 @@ export function ClientDetailPage() {
         <label>
           Website
           <input name="website" defaultValue={client.website ?? ""} />
+        </label>
+        <label>
+          Birthday
+          <input
+            name="birthday"
+            type="date"
+            defaultValue={client.birthday ?? ""}
+          />
+          <span className="field-hint">
+            Optional — feeds the Birthday List report.
+          </span>
         </label>
         <button
           className="btn btn-ghost"

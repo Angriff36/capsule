@@ -96,6 +96,9 @@ entity Client mixin TenantScoped, SoftDeletable {
   property encrypted region: string?
   property encrypted postalCode: string?
   property encrypted countryCode: string?
+  // Calendar date "YYYY-MM-DD" for the Birthday List report (#272). Contact
+  // data for person clients; optional and never gating.
+  property encrypted birthday: string?
   property private encrypted taxId: string?
   property required taxExempt: boolean = false
   property required paymentTermsDays: int = 30
@@ -206,6 +209,19 @@ entity Client mixin TenantScoped, SoftDeletable {
     mutate postalCode = postalCode
     mutate countryCode = countryCode
     emit ClientContactChanged {
+      clientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Birthday as a calendar date, or null to clear it. Its own command so a
+  // contact edit that omits the field never wipes a stored birthday.
+  command setBirthday(optional birthday: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint birthdayCalendarDate: birthday == null or length(trim(birthday)) == 10 "Birthday must be a YYYY-MM-DD date"
+    mutate birthday = birthday
+    emit ClientBirthdaySet {
       clientId: self.id
       tenantId: self.tenantId
     }
@@ -1821,6 +1837,11 @@ event ClientRegistered: "client.registered" {
 }
 
 event ClientContactChanged: "client.contact_changed" {
+  clientId: string
+  tenantId: string
+}
+
+event ClientBirthdaySet: "client.birthday_set" {
   clientId: string
   tenantId: string
 }

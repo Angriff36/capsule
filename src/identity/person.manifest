@@ -62,6 +62,13 @@ entity Person mixin TenantScoped, SoftDeletable {
   property required searchable familyName: string
   property required encrypted email: string
   property encrypted phone: string?
+  // Postal address: ordinary editable contact data for the Staff Address &
+  // Phone List (#272). Optional and never gating.
+  property encrypted addressLine1: string?
+  property encrypted addressLine2: string?
+  property encrypted city: string?
+  property encrypted region: string?
+  property encrypted postalCode: string?
   property required role: CapsuleRole = "staff"
   // Optional link to external auth subject (Clerk/etc.). When set on an active
   // Person, convex/lib/authContext.ts uses this row's role as runtime
@@ -168,6 +175,28 @@ entity Person mixin TenantScoped, SoftDeletable {
       personId: self.id
       tenantId: self.tenantId
       email: email
+    }
+  }
+
+  // Postal address for the staff address list and mailings. Contact data
+  // only; allowed while inactive, like correctEmail.
+  command changeAddress(
+    optional addressLine1: string,
+    optional addressLine2: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string
+  ) {
+    guard self.deletedAt == null
+    guard self.status != "terminated"
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    emit PersonAddressChanged {
+      personId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -326,6 +355,11 @@ event PersonEmailCorrected: "person.email_corrected" {
   personId: string
   tenantId: string
   email: string
+}
+
+event PersonAddressChanged: "person.address_changed" {
+  personId: string
+  tenantId: string
 }
 
 event PersonRoleAssigned: "person.role_assigned" {
