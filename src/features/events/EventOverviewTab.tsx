@@ -7,6 +7,7 @@ import {
 import { EventProposalEnhancementsCard } from "../clients/EventProposalEnhancementsCard";
 import { EventProposalSourceCard } from "../clients/EventProposalSourceCard";
 import { EventDetailsCard } from "./EventDetailsCard";
+import { EventInvoiceCard } from "./EventInvoiceCard";
 import type {
   EventLifecycleAction,
   EventLifecycleActionKey,
@@ -133,6 +134,7 @@ export function EventOverviewTab({
             marginHref={eventDetailPath(eventId, "margin")}
             locked={!reviseProps.canRevise}
           />
+          <EventInvoiceCard eventId={eventId} currencyCode={currencyCode} />
           <EventWeatherPanel venue={venue} />
         </div>
 

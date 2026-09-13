@@ -6144,7 +6144,8 @@ export type InvoiceApplyPaymentParams = z.infer<typeof InvoiceApplyPaymentParams
 // Command: issue on Invoice
 export const InvoiceIssueParamsSchema = z.object({
   clientId: z.string().min(1),
-  invoiceNumber: z.string(),
+  invoiceNumber: z.string().optional(),
+  invoiceSequence: z.number().int().optional(),
   subtotal: z.number(),
   taxAmount: z.number(),
   discountAmount: z.number(),

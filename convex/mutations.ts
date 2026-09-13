@@ -10851,13 +10851,16 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
       const target = __row;
       await __runIngredientDemandEnsurePurchaseEligible(ctx, { docId: (__row as any)._id } as any);
     }
+    const __agg0_rows = await ctx.db.query("invoices").withIndex("by_tenantId", (q) => q.eq("tenantId", payload.tenantId)).collect();
+    const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
+    const __agg0 = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant).length;
     const __match1_raw = await ctx.db.query("invoices").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     const __match1_rows = __match1_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match1_id = __match1_rows.length > 0 ? (__match1_rows[0] as any)._id : null;
     if (__match1_id) {
-      await __runInvoiceIssue(ctx, { docId: __match1_id, clientId: payload.clientId, eventId: payload.eventId, invoiceNumber: payload.eventId, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice } as any);
+      await __runInvoiceIssue(ctx, { docId: __match1_id, clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: __agg0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice } as any);
     } else {
-      const __elseArgs: Record<string, any> = { clientId: payload.clientId, eventId: payload.eventId, invoiceNumber: payload.eventId, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice };
+      const __elseArgs: Record<string, any> = { clientId: payload.clientId, eventId: payload.eventId, invoiceSequence: __agg0, subtotal: payload.quotedPrice, taxAmount: 0, discountAmount: 0, total: payload.quotedPrice };
       const __elseDoc: Record<string, any> = {
         tenantId: __auth.tenantId,
         subtotal: 0,
@@ -23273,7 +23276,7 @@ export const Invoice_applyPayment = mutation({
   },
 });
 
-async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNumber, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate, version }: any, __creation = false) {
+async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -23290,20 +23293,21 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === doc.clientId))) throw new Error("Issue clientId must match the seeded client reference");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Issue eventId must match the seeded event reference when both are set");
-    if (!((((invoiceNumber).trim()).length > 0))) throw new Error("Invoice number is required");
+    if (!((((invoiceNumber != null) && (((invoiceNumber).trim()).length > 0)) || (invoiceSequence != null)))) throw new Error("Invoice number is required");
     if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Invoice money amounts cannot be negative");
     if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Invoice total must equal subtotal plus tax minus discount");
     if (!(((currencyCode == null) || (((currencyCode).trim()).length === 3)))) throw new Error("Currency code must be a three-letter ISO 4217 code");
     if (!(((exchangeRate == null) || (exchangeRate > 0)))) throw new Error("Exchange rate must be greater than zero");
     const normalizedCurrencyCode = ((currencyCode != null) ? (currencyCode).toUpperCase() : null);
     const resolvedExchangeRate = ((exchangeRate != null) ? exchangeRate : 1);
+    const resolvedInvoiceNumber = ((invoiceNumber != null) ? invoiceNumber : ("INV-" + (invoiceSequence + 1)));
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       clientId: clientId,
       eventId: ((eventId != null) ? eventId : doc.eventId),
-      invoiceNumber: invoiceNumber,
+      invoiceNumber: resolvedInvoiceNumber,
       subtotal: subtotal,
       taxAmount: taxAmount,
       discountAmount: discountAmount,
@@ -23324,8 +23328,8 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: invoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
-    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: invoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: resolvedInvoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
+    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: resolvedInvoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -23335,7 +23339,8 @@ export const Invoice_issue = mutation({
   args: {
     docId: v.id("invoices"),
     clientId: v.string(),
-    invoiceNumber: v.string(),
+    invoiceNumber: v.optional(v.string()),
+    invoiceSequence: v.optional(v.number()),
     subtotal: v.number(),
     taxAmount: v.number(),
     discountAmount: v.number(),
@@ -23367,7 +23372,8 @@ export const Invoice_issue = mutation({
 export const Invoice_createViaIssue = mutation({
   args: {
     clientId: v.string(),
-    invoiceNumber: v.string(),
+    invoiceNumber: v.optional(v.string()),
+    invoiceSequence: v.optional(v.number()),
     subtotal: v.number(),
     taxAmount: v.number(),
     discountAmount: v.number(),
@@ -23389,7 +23395,7 @@ export const Invoice_createViaIssue = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { clientId, invoiceNumber, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate } = args;
+    const { clientId, invoiceNumber, invoiceSequence, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown, currencyCode, exchangeRate } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       paymentTermsDays: args.paymentTermsDays !== undefined ? args.paymentTermsDays : 30,
@@ -23420,7 +23426,7 @@ export const Invoice_createViaIssue = mutation({
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === __draft.clientId))) throw new Error("Issue clientId must match the seeded client reference");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Issue eventId must match the seeded event reference when both are set");
-    if (!((((invoiceNumber).trim()).length > 0))) throw new Error("Invoice number is required");
+    if (!((((invoiceNumber != null) && (((invoiceNumber).trim()).length > 0)) || (invoiceSequence != null)))) throw new Error("Invoice number is required");
     if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Invoice money amounts cannot be negative");
     if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Invoice total must equal subtotal plus tax minus discount");
     if (!(((currencyCode == null) || (((currencyCode).trim()).length === 3)))) throw new Error("Currency code must be a three-letter ISO 4217 code");
@@ -23431,9 +23437,10 @@ export const Invoice_createViaIssue = mutation({
     };
     const normalizedCurrencyCode = ((currencyCode != null) ? (currencyCode).toUpperCase() : null);
     const resolvedExchangeRate = ((exchangeRate != null) ? exchangeRate : 1);
+    const resolvedInvoiceNumber = ((invoiceNumber != null) ? invoiceNumber : ("INV-" + (invoiceSequence + 1)));
     doc.clientId = clientId;
     doc.eventId = ((eventId != null) ? eventId : doc.eventId);
-    doc.invoiceNumber = invoiceNumber;
+    doc.invoiceNumber = resolvedInvoiceNumber;
     doc.subtotal = subtotal;
     doc.taxAmount = taxAmount;
     doc.discountAmount = discountAmount;
@@ -23451,8 +23458,8 @@ export const Invoice_createViaIssue = mutation({
     doc.exchangeRate = resolvedExchangeRate;
     doc.issuedAt = Date.now();
     const docId = await ctx.db.insert("invoices", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: invoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
-    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: invoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: resolvedInvoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
+    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: resolvedInvoiceNumber, total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     const __result = { docId };
