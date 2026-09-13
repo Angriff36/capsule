@@ -1661,6 +1661,7 @@ export default defineSchema({
     capability: v.union(v.literal("kitchen"), v.literal("inventory"), v.literal("procurement"), v.literal("events"), v.literal("sales"), v.literal("logistics"), v.literal("workforce"), v.literal("finance"), v.literal("reports"), v.literal("administration")),
     enabled: v.boolean(),
     updatedBy: v.optional(v.union(v.string(), v.null())),
+    registeredAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

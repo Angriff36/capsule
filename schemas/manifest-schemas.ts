@@ -1846,6 +1846,7 @@ export const OrganizationCapabilitySettingSchema = z.object({
   capability: z.enum(["kitchen", "inventory", "procurement", "events", "sales", "logistics", "workforce", "finance", "reports", "administration"]),
   enabled: z.boolean().default(true),
   updatedBy: z.string().nullable().optional(),
+  registeredAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

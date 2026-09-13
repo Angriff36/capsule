@@ -26870,7 +26870,7 @@ async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { do
     if (!((user.id != null))) throw new Error("Authenticated staff may write capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may execute capability setting commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((doc.capability == null))) throw new Error("Guard 1 failed");
+    if (!((doc.registeredAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -26879,6 +26879,7 @@ async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { do
       capability: capability,
       enabled: enabled,
       updatedBy: updatedBy,
+      registeredAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -26934,7 +26935,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
     if (!((user.id != null))) throw new Error("Authenticated staff may write capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may execute capability setting commands");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((__draft.capability == null))) throw new Error("Guard 1 failed");
+    if (!((__draft.registeredAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
     const doc: Record<string, any> = {
       ...__draft,
@@ -26943,6 +26944,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
     doc.capability = capability;
     doc.enabled = enabled;
     doc.updatedBy = updatedBy;
+    doc.registeredAt = Date.now();
     const docId = await ctx.db.insert("organizationCapabilitySettings", doc as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
