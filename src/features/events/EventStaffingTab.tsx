@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useState } from "react";
 import {
   useCreateEventAssignment,
   useCreateEventStaffNeed,
@@ -30,11 +30,8 @@ import {
   type StaffingConflictNote,
 } from "./EventStaffingSummaryAside";
 import { FailureBanner } from "./FailureBanner";
-import {
-  StaffRoleSelect,
-  collectStaffRoles,
-  readStaffRole,
-} from "./EventStaffingRoleSelect";
+import { EventStaffingAddForm } from "./EventStaffingAddForm";
+import { collectStaffRoles } from "./EventStaffingRoleSelect";
 import {
   EventTimelineStaffRoster,
   type PersonRow,
@@ -283,55 +280,41 @@ export function EventStaffingTab({ eventId }: Props) {
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]">
         <div className="flex min-w-0 flex-col gap-4">
           {canManage ? (
-            <form
-              className="card grid gap-2 px-4 py-3 sm:grid-cols-4"
-              onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
-                formEvent.preventDefault();
-                const data = new FormData(formEvent.currentTarget);
-                const personId = String(data.get("personId") ?? "");
-                const role = readStaffRole(data, "role");
-                if (!personId || !role) return;
-                const form = formEvent.currentTarget;
+            <EventStaffingAddForm
+              people={activePeople}
+              roles={roleOptions}
+              busy={busy != null}
+              personConflictLabel={(personId) => {
+                const conflict = conflictsFor(personId);
+                return `${conflict.overlappingShifts.length ? " · shift conflict" : ""}${conflict.approvedOff.length ? " · time off" : ""}`;
+              }}
+              onSubmit={(submission, form) => {
+                if (submission.kind === "open") {
+                  void run("postOpen", async () => {
+                    await createNeed({
+                      eventId,
+                      role: submission.role,
+                      description: submission.description,
+                      startsAt: submission.startsAt,
+                      endsAt: submission.endsAt,
+                    });
+                    form.reset();
+                  });
+                  return;
+                }
                 void run("assign", async () => {
                   await createAssignment({
                     eventId,
-                    personId,
-                    role,
+                    personId: submission.personId,
+                    role: submission.role,
+                    startsAt: submission.startsAt,
+                    endsAt: submission.endsAt,
+                    notes: submission.notes,
                   });
                   form.reset();
                 });
               }}
-            >
-              <label className="field-label sm:col-span-2">
-                Assign person
-                <select name="personId" className="field-input" required>
-                  <option value="">Select…</option>
-                  {activePeople.map((person) => {
-                    const conflict = conflictsFor(person._id);
-                    return (
-                      <option key={person._id} value={person._id}>
-                        {personLabel(person)}
-                        {conflict.overlappingShifts.length
-                          ? " · shift conflict"
-                          : ""}
-                        {conflict.approvedOff.length ? " · time off" : ""}
-                      </option>
-                    );
-                  })}
-                </select>
-              </label>
-              <label className="field-label">
-                Role
-                <StaffRoleSelect name="role" roles={roleOptions} />
-              </label>
-              <button
-                type="submit"
-                className="btn btn-primary self-end"
-                disabled={busy != null}
-              >
-                Assign
-              </button>
-            </form>
+            />
           ) : null}
 
           <EventStaffingCoverageView
@@ -345,43 +328,10 @@ export function EventStaffingTab({ eventId }: Props) {
             needPersonIds={needPersonIds}
             postForm={
               canManage ? (
-                <form
-                  className="grid gap-2 sm:grid-cols-3"
-                  onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
-                    formEvent.preventDefault();
-                    const data = new FormData(formEvent.currentTarget);
-                    const role = readStaffRole(data, "role");
-                    const description = String(
-                      data.get("description") ?? "",
-                    ).trim();
-                    if (!role) return;
-                    const form = formEvent.currentTarget;
-                    void run("postOpen", async () => {
-                      await createNeed({
-                        eventId,
-                        role,
-                        description: description || undefined,
-                      });
-                      form.reset();
-                    });
-                  }}
-                >
-                  <label className="field-label">
-                    Role
-                    <StaffRoleSelect name="role" roles={roleOptions} />
-                  </label>
-                  <label className="field-label">
-                    Description
-                    <input name="description" className="field-input" />
-                  </label>
-                  <button
-                    type="submit"
-                    className="btn btn-ghost self-end"
-                    disabled={busy != null}
-                  >
-                    Post open shift
-                  </button>
-                </form>
+                <p className="text-sm text-ink-3">
+                  To add an open shift, pick “Leave open — assign someone later”
+                  in the form above.
+                </p>
               ) : undefined
             }
             onNeedPersonChange={(needId, personId) =>
