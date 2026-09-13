@@ -1823,6 +1823,7 @@ export const OrganizationSchema = z.object({
   brandAddress: z.string().nullable().optional(),
   brandPrimaryColor: z.string().nullable().optional(),
   brandAccentColor: z.string().nullable().optional(),
+  brandLogoStorageId: z.string().nullable().optional(),
   defaultCurrencyCode: z.string().nullable().optional(),
   defaultExchangeRateScale: z.number().int().optional().default(6),
   createdAt: z.coerce.date().optional(),
@@ -6558,6 +6559,13 @@ export const OrganizationRenameParamsSchema = z.object({
 });
 
 export type OrganizationRenameParams = z.infer<typeof OrganizationRenameParamsSchema>;
+
+// Command: setBrandLogo on Organization
+export const OrganizationSetBrandLogoParamsSchema = z.object({
+  storageId: z.string().optional(),
+});
+
+export type OrganizationSetBrandLogoParams = z.infer<typeof OrganizationSetBrandLogoParamsSchema>;
 
 // Command: setDefaultCurrency on Organization
 export const OrganizationSetDefaultCurrencyParamsSchema = z.object({

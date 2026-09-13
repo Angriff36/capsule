@@ -1647,6 +1647,7 @@ export default defineSchema({
     brandAddress: v.optional(v.union(v.string(), v.null())),
     brandPrimaryColor: v.optional(v.union(v.string(), v.null())),
     brandAccentColor: v.optional(v.union(v.string(), v.null())),
+    brandLogoStorageId: v.optional(v.union(v.string(), v.null())),
     defaultCurrencyCode: v.optional(v.union(v.string(), v.null())),
     defaultExchangeRateScale: v.optional(v.number()),
     createdAt: v.optional(v.number()),

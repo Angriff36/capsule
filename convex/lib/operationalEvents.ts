@@ -22,6 +22,7 @@ import {
   standDownEventPurchasing,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import { deleteBlobIfOrphan } from "./blobs";
 
 /** Runs after declared reactions, inside the originating command transaction. */
 export async function handleManifestEvent(
@@ -88,6 +89,13 @@ export async function handleManifestEvent(
     ["EventTimingConfigured", "EventScheduleChanged"].includes(event.type)) {
     await reconcileEventTiming(ctx, event.entityId as Id<"events">);
     await reconcileEventStaffing(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Organization" && event.type === "OrganizationBrandLogoSet") {
+    // A replaced or removed logo leaves no orphan blob behind (#237).
+    const previous = event.payload.previousStorageId;
+    if (typeof previous === "string" && previous !== event.payload.storageId)
+      await deleteBlobIfOrphan(ctx, previous);
     return;
   }
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {

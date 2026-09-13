@@ -354,6 +354,7 @@ import {
   OrganizationReactivateParamsSchema,
   OrganizationRegisterParamsSchema,
   OrganizationRenameParamsSchema,
+  OrganizationSetBrandLogoParamsSchema,
   OrganizationSetDefaultCurrencyParamsSchema,
   OrganizationSuspendParamsSchema,
   PackListAcknowledgePackingRequirementParamsSchema,
@@ -5557,6 +5558,16 @@ export function useOrganizationRename() {
   };
 }
 
+/** Mutation hook for Organization.setBrandLogo. */
+export function useOrganizationSetBrandLogo() {
+  const mutate = useMutation(api.mutations.Organization_setBrandLogo);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationSetBrandLogoParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Organization.setDefaultCurrency. */
 export function useOrganizationSetDefaultCurrency() {
   const mutate = useMutation(api.mutations.Organization_setDefaultCurrency);
@@ -10123,4 +10134,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1073 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1074 as const;

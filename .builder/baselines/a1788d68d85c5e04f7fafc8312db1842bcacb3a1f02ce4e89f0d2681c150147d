@@ -1058,6 +1058,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Organization_rename", () => {
     expect(typeof (mutations as any).Organization_rename).toBe("function");
   });
+  it("exports mutation Organization_setBrandLogo", () => {
+    expect(typeof (mutations as any).Organization_setBrandLogo).toBe("function");
+  });
   it("exports mutation Organization_setDefaultCurrency", () => {
     expect(typeof (mutations as any).Organization_setDefaultCurrency).toBe("function");
   });
@@ -2002,4 +2005,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 665 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 666 as const;
