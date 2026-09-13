@@ -200,6 +200,23 @@ export function ActionPromptPanel({
                       </option>
                     ))}
                   </select>
+                ) : field.multiline ? (
+                  <textarea
+                    id={fieldId}
+                    name={field.name}
+                    rows={3}
+                    className="input mt-1 min-h-20 py-2"
+                    value={values[field.name] ?? ""}
+                    required={field.required ?? true}
+                    autoFocus={index === 0}
+                    placeholder={field.placeholder}
+                    onChange={(event) =>
+                      setValues((current) => ({
+                        ...current,
+                        [field.name]: event.target.value,
+                      }))
+                    }
+                  />
                 ) : (
                   <input
                     id={fieldId}
