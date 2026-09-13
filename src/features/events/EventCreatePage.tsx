@@ -48,6 +48,11 @@ import {
   type VenueTypeCode,
 } from "./EventCreateInlineForms";
 import { findLikelyDuplicates } from "./inlineRecordDuplicates";
+import {
+  coordinatesFromFields,
+  formatCoordinates,
+  venueCoordinates,
+} from "../facilities/venueCoordinates";
 
 // People who can be named as an event's salesperson/owner (Event.assignedToId).
 const SALES_PERSON_ROLES = new Set(["sales_staff", "sales_manager", "owner"]);
@@ -83,7 +88,11 @@ function venueAddress(venue: Doc<"venues"> | undefined): string | undefined {
 
 /** One quiet line that tells two same-named venues apart in a picker. */
 function venueSummary(venue: Doc<"venues">): string {
-  const parts = [venueAddress(venue) ?? "No address recorded"];
+  const pin = venueCoordinates(venue);
+  const parts = [
+    venueAddress(venue) ??
+      (pin ? `GPS ${formatCoordinates(pin)}` : "No address recorded"),
+  ];
   const capacity = Number(venue.capacity ?? 0);
   parts.push(capacity > 0 ? `capacity ${capacity}` : "capacity not set");
   return parts.join(" · ");
@@ -367,6 +376,14 @@ export function EventCreatePage() {
       );
       return;
     }
+    const coordinates = coordinatesFromFields(
+      String(data.get("latitude") ?? ""),
+      String(data.get("longitude") ?? ""),
+    );
+    if (!coordinates.ok) {
+      setFailure(classifyCommandFailure(new Error(coordinates.error)));
+      return;
+    }
     const name = String(data.get("name") ?? "").trim();
     const args = cleanCommandArgs.from({
       name,
@@ -376,6 +393,8 @@ export function EventCreatePage() {
       city: optional(String(data.get("city") ?? "")),
       region: optional(String(data.get("region") ?? "")),
       postalCode: optional(String(data.get("postalCode") ?? "")),
+      latitude: coordinates.value?.latitude,
+      longitude: coordinates.value?.longitude,
     });
     const matches = findLikelyDuplicates(
       { name },

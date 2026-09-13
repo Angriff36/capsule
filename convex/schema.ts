@@ -3044,6 +3044,8 @@ export default defineSchema({
     region: v.optional(v.union(v.string(), v.null())),
     postalCode: v.optional(v.union(v.string(), v.null())),
     countryCode: v.optional(v.union(v.string(), v.null())),
+    latitude: v.optional(v.union(v.number(), v.null())),
+    longitude: v.optional(v.union(v.number(), v.null())),
     contactName: v.optional(v.union(v.string(), v.null())),
     contactEmail: v.optional(v.union(v.string(), v.null())),
     contactPhone: v.optional(v.union(v.string(), v.null())),

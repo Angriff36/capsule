@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { VenueCoordinatesFields } from "../facilities/VenueCoordinatesFields";
 
 export const VENUE_TYPES = [
   ["client_site", "Client site"],
@@ -195,7 +196,7 @@ export function InlineVenueForm({
         <input
           name="addressLine1"
           className="input"
-          placeholder="Street address, or GPS coordinates for a site with none"
+          placeholder="Street address (leave blank for a GPS-only site)"
         />
       </label>
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -211,6 +212,9 @@ export function InlineVenueForm({
           Postal
           <input name="postalCode" className="input" />
         </label>
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <VenueCoordinatesFields compact />
       </div>
       <button className="btn btn-primary btn-sm" disabled={busy}>
         {busy ? "Creating…" : "Create and select venue"}

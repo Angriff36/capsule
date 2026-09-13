@@ -48173,7 +48173,7 @@ export const Venue_deactivate = mutation({
   },
 });
 
-async function __runVenueRegister(ctx: MutationCtx, { docId, name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, contactName, contactEmail, contactPhone, accessNotes, cateringNotes, version }: any, __creation = false) {
+async function __runVenueRegister(ctx: MutationCtx, { docId, name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -48214,6 +48214,8 @@ async function __runVenueRegister(ctx: MutationCtx, { docId, name, venueType, ca
       region: region,
       postalCode: postalCode,
       countryCode: countryCode,
+      latitude: latitude,
+      longitude: longitude,
       contactName: contactName,
       contactEmail: contactEmail,
       contactPhone: contactPhone,
@@ -48257,6 +48259,8 @@ export const Venue_register = mutation({
     region: v.optional(v.string()),
     postalCode: v.optional(v.string()),
     countryCode: v.optional(v.string()),
+    latitude: v.optional(v.any()),
+    longitude: v.optional(v.any()),
     contactName: v.optional(v.string()),
     contactEmail: v.optional(v.string()),
     contactPhone: v.optional(v.string()),
@@ -48302,6 +48306,8 @@ export const Venue_createViaRegister = mutation({
     region: v.optional(v.string()),
     postalCode: v.optional(v.string()),
     countryCode: v.optional(v.string()),
+    latitude: v.optional(v.any()),
+    longitude: v.optional(v.any()),
     contactName: v.optional(v.string()),
     contactEmail: v.optional(v.string()),
     contactPhone: v.optional(v.string()),
@@ -48316,7 +48322,7 @@ export const Venue_createViaRegister = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, contactName, contactEmail, contactPhone, accessNotes, cateringNotes } = args;
+    const { name, venueType, capacity, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       status: "active",
@@ -48335,8 +48341,10 @@ export const Venue_createViaRegister = mutation({
       hasFreightElevator: args.hasFreightElevator,
       hasStairs: args.hasStairs,
       kitchenAccess: args.kitchenAccess,
+      latitude: args.latitude,
       loadInInstructions: args.loadInInstructions,
       logisticsNotes: args.logisticsNotes,
+      longitude: args.longitude,
       name: args.name,
       onPremise: args.onPremise,
       parkingAvailable: args.parkingAvailable,
@@ -48384,6 +48392,8 @@ export const Venue_createViaRegister = mutation({
     doc.region = region;
     doc.postalCode = postalCode;
     doc.countryCode = countryCode;
+    doc.latitude = latitude;
+    doc.longitude = longitude;
     doc.contactName = contactName;
     doc.contactEmail = contactEmail;
     doc.contactPhone = contactPhone;
@@ -48404,7 +48414,7 @@ export const Venue_createViaRegister = mutation({
   },
 });
 
-async function __runVenueUpdateDetails(ctx: MutationCtx, { docId, name, venueType, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, contactName, contactEmail, contactPhone, accessNotes, cateringNotes, version }: any, __creation = false) {
+async function __runVenueUpdateDetails(ctx: MutationCtx, { docId, name, venueType, onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes, loadInInstructions, powerAvailable, waterAccess, hasStairs, wasteRules, permitsInsuranceNotes, restrictions, addressLine1, addressLine2, city, region, postalCode, countryCode, latitude, longitude, contactName, contactEmail, contactPhone, accessNotes, cateringNotes, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -48442,6 +48452,8 @@ async function __runVenueUpdateDetails(ctx: MutationCtx, { docId, name, venueTyp
       region: region,
       postalCode: postalCode,
       countryCode: countryCode,
+      latitude: latitude,
+      longitude: longitude,
       contactName: contactName,
       contactEmail: contactEmail,
       contactPhone: contactPhone,
@@ -48483,6 +48495,8 @@ export const Venue_updateDetails = mutation({
     region: v.optional(v.string()),
     postalCode: v.optional(v.string()),
     countryCode: v.optional(v.string()),
+    latitude: v.optional(v.any()),
+    longitude: v.optional(v.any()),
     contactName: v.optional(v.string()),
     contactEmail: v.optional(v.string()),
     contactPhone: v.optional(v.string()),

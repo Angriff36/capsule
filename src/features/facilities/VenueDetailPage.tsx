@@ -20,6 +20,13 @@ import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
 import { VenueScorecardPanel } from "./VenueScorecardPanel";
+import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
+import {
+  coordinatesFromFields,
+  coordinatesMapUrl,
+  formatCoordinates,
+  venueCoordinates,
+} from "./venueCoordinates";
 
 const VENUE_TYPES = [
   "client_site",
@@ -112,11 +119,21 @@ export function VenueDetailPage() {
     event.preventDefault();
     const element = event.currentTarget;
     const data = new FormData(element);
+    const coordinates = coordinatesFromFields(
+      String(data.get("latitude") ?? ""),
+      String(data.get("longitude") ?? ""),
+    );
+    if (!coordinates.ok) {
+      setFailure(new Error(coordinates.error));
+      return;
+    }
     void run("updateDetails", async () => {
       await updateDetails({
         docId: venue._id,
         version: venue.version,
         name: String(data.get("name") ?? "").trim(),
+        latitude: coordinates.value?.latitude,
+        longitude: coordinates.value?.longitude,
         venueType: String(data.get("venueType")) as VenueType,
         onPremise: data.get("onPremise") === "on",
         kitchenAccess:
@@ -434,6 +451,10 @@ export function VenueDetailPage() {
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
               />
             </div>
+            <VenueCoordinatesFields
+              defaultLatitude={venue.latitude}
+              defaultLongitude={venue.longitude}
+            />
             <div>
               <label className="block text-xs font-medium text-ink-2">
                 Contact Name
@@ -725,6 +746,28 @@ export function VenueDetailPage() {
                 .join(", ") || "Not set"}
             </dd>
           </div>
+          {(() => {
+            const pin = venueCoordinates(venue);
+            return pin ? (
+              <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
+                <dt className="text-xs font-medium text-ink-3">GPS</dt>
+                <dd
+                  className="col-span-2 text-xs text-ink"
+                  data-testid="venue-coordinates"
+                >
+                  {formatCoordinates(pin)}{" "}
+                  <a
+                    href={coordinatesMapUrl(pin)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-brand hover:underline"
+                  >
+                    Open in Maps ↗
+                  </a>
+                </dd>
+              </div>
+            ) : null;
+          })()}
           {(venue.contactName || venue.contactEmail || venue.contactPhone) && (
             <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
               <dt className="text-xs font-medium text-ink-3">Contact</dt>
