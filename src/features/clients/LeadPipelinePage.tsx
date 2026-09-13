@@ -1,5 +1,4 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
-import { useMutation } from "convex/react";
 import { Link } from "react-router-dom";
 import {
   useCreateClient,
@@ -14,7 +13,7 @@ import {
   useListLead,
   useListReferralSource,
 } from "../../lib/manifest-convex-react";
-import { api, type Id } from "../../lib/api";
+import { type Id } from "../../lib/api";
 import { formatDate } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { TableSkeleton } from "../../ui/primitives";
@@ -22,6 +21,7 @@ import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { LeadSourceReport } from "./LeadSourceReport";
+import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import "./LeadPipelinePage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useActionNotice } from "../../ui/action-result";
@@ -105,9 +105,7 @@ export function LeadPipelinePage() {
   const createProposal = useCreateProposal();
   // Capture a revision snapshot on send (spec §5.5 / Priority 10) via the
   // authored action that wraps Proposal_send + best-effort capture.
-  const sendProposal = useMutation(
-    api.lib.proposalRevision.sendProposalWithRevisionCapture,
-  );
+  const sendProposal = useSendProposalWithRevisionCapture();
   const stageProposal = useLeadStageProposal();
   const confirmProposalSent = useLeadConfirmProposalSent();
 

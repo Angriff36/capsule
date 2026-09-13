@@ -34,10 +34,26 @@ import {
   useInvoiceSetDeposit,
   usePaymentSettle,
   useProposalAccept,
-  useProposalSend,
 } from "../../../lib/manifest-convex-react";
+import { useSendProposalWithRevisionCapture } from "../../clients/useSendProposalWithRevisionCapture";
 
 type CommandRunner = (args: Record<string, unknown>) => Promise<unknown>;
+
+/**
+ * Proposal.send takes the same authored seam the Sales screens and the
+ * agent's `CapsuleCommandSeamRoutes` use, so an imported proposal gets the
+ * price-override audit and the revision snapshot too (#241). The seam takes
+ * no idempotency key; the plan only sends a proposal it just drafted.
+ */
+function useProposalSendWithRevisionCapture(): CommandRunner {
+  const send = useSendProposalWithRevisionCapture();
+  return (args) =>
+    send({
+      docId: args.docId as Parameters<typeof send>[0]["docId"],
+      ...(typeof args.version === "number" ? { version: args.version } : {}),
+      changeSummary: "Proposal sent from the TPP reports import",
+    });
+}
 
 /**
  * The browser twin of the agent's `ConvexCommandClient`: every command an
@@ -74,7 +90,7 @@ export function useEventImportCommandExecutor(): EventImportCommandExecutor {
     "ReviewFlag.raise": useCreateReviewFlag(),
     "Proposal.draft": useCreateProposal(),
     "ProposalLineItem.addLine": useCreateProposalLineItem(),
-    "Proposal.send": useProposalSend(),
+    "Proposal.send": useProposalSendWithRevisionCapture(),
     "Proposal.accept": useProposalAccept(),
     "Ingredient.introduce": useCreateIngredient(),
     "Vendor.onboard": useCreateVendor(),
