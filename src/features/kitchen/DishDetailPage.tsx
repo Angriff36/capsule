@@ -25,6 +25,7 @@ import { DishContainersPanel } from "./DishContainersPanel";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
 import { DishComponentsPanel } from "./DishComponentsPanel";
 import { DishIngredientsPanel } from "./DishIngredientsPanel";
+import { DishPlateCostFact } from "./DishPlateCostFact";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { RecipeNotes } from "./RecipeNotes";
 import "./DishRecipe.css";
@@ -162,6 +163,7 @@ export function DishDetailPage() {
               {dish.portionSize} {String(dish.portionUnit)}
             </dd>
           </div>
+          <DishPlateCostFact dishId={dish._id} />
           <div>
             <dt>Category</dt>
             <dd>{dish.category || "—"}</dd>
@@ -178,6 +180,14 @@ export function DishDetailPage() {
             <dt>Allergens</dt>
             <dd>
               <AllergenIconRow codes={dish.allergenSummary} />
+            </dd>
+          </div>
+          <div>
+            <dt>Dietary</dt>
+            <dd data-testid="dish-dietary-tags">
+              {dish.dietaryTags && dish.dietaryTags.length > 0
+                ? dish.dietaryTags.join(", ")
+                : "—"}
             </dd>
           </div>
         </dl>
