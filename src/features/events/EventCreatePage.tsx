@@ -582,7 +582,7 @@ export function EventCreatePage() {
                 </label>
                 {occasionsEmpty ? (
                   <p className="mt-1 text-xs leading-relaxed text-ink-3">
-                    No occasions yet — add them in{" "}
+                    No occasions yet — open{" "}
                     <Link
                       to="/admin/catalogs"
                       target="_blank"
@@ -591,7 +591,9 @@ export function EventCreatePage() {
                     >
                       Admin → Catalogs
                     </Link>{" "}
-                    (opens in a new tab; this form stays put).
+                    and click “Add the standard list” (Wedding, Corporate Event,
+                    …). Opens in a new tab; this form stays put and the list
+                    fills in here right away.
                   </p>
                 ) : null}
               </div>
@@ -700,7 +702,9 @@ export function EventCreatePage() {
                 </label>
                 {builtInServiceStyles ? (
                   <p className="mt-1 text-xs leading-relaxed text-ink-3">
-                    Showing the four built-in service styles — add your own in{" "}
+                    Showing the built-in service styles as labels only — they
+                    are not saved on the event until they exist as catalog rows.
+                    Open{" "}
                     <Link
                       to="/admin/catalogs"
                       target="_blank"
@@ -709,7 +713,9 @@ export function EventCreatePage() {
                     >
                       Admin → Catalogs
                     </Link>{" "}
-                    (opens in a new tab; this form stays put).
+                    and click “Add the standard list” (Buffet – Cook Onsite,
+                    Plated, Family Style, …). Opens in a new tab; this form
+                    stays put.
                   </p>
                 ) : null}
               </div>
@@ -805,6 +811,24 @@ export function EventCreatePage() {
                     </option>
                   ))}
                 </select>
+                {people !== undefined && salespeople.length === 0 ? (
+                  <span
+                    className="field-hint"
+                    data-testid="salesperson-empty-hint"
+                  >
+                    Nobody has a sales role yet. This list shows people whose
+                    role is Sales staff, Sales manager or Owner — set that in{" "}
+                    <Link
+                      to="/admin"
+                      target="_blank"
+                      rel="noopener"
+                      className="underline font-medium"
+                    >
+                      Admin → Team roles
+                    </Link>{" "}
+                    (new tab; this form stays put).
+                  </span>
+                ) : null}
               </label>
               <label className="field-label">
                 Referral source

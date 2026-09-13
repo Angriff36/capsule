@@ -18,6 +18,11 @@ import {
 import { PageHeader } from "../../ui/primitives";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { CatalogsSection, type CatalogRow } from "./CatalogsSection";
+import {
+  OCCASION_CATALOG,
+  REFERRAL_SOURCE_CATALOG,
+  SERVICE_STYLE_CATALOG,
+} from "./catalogStandardOptions";
 
 // Reference catalogs behind the event and lead selectors
 // (dropdown-lists-and-their-admin-screen.md). Every selector that reads these
@@ -53,6 +58,7 @@ export function CatalogsPage() {
         singular="service style"
         feeds="the event form and the public quote form read this list"
         rows={serviceStyles}
+        standardRows={SERVICE_STYLE_CATALOG}
         commands={{
           register: createServiceStyle,
           revise: reviseServiceStyle,
@@ -65,6 +71,7 @@ export function CatalogsPage() {
         singular="occasion"
         feeds="the event form and the public quote form read this list"
         rows={occasions}
+        standardRows={OCCASION_CATALOG}
         commands={{
           register: createOccasion,
           revise: reviseOccasion,
@@ -77,6 +84,7 @@ export function CatalogsPage() {
         singular="referral source"
         feeds="lead capture reads this list"
         rows={referralSources}
+        standardRows={REFERRAL_SOURCE_CATALOG}
         commands={{
           register: createReferralSource,
           revise: reviseReferralSource,

@@ -2,6 +2,8 @@ import { useMemo, useState, type FormEvent } from "react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionFailure, useActionNotice } from "../../ui/action-result";
 import { ErrorState, Section, TableSkeleton } from "../../ui/primitives";
+import { CatalogStandardListButton } from "./CatalogStandardListButton";
+import type { StandardCatalogRow } from "./catalogStandardOptions";
 
 // ServiceStyle, Occasion and ReferralSource share one command shape
 // (register / reviseDetails / deactivate / activate) and one field set, so a
@@ -32,6 +34,8 @@ type Props = {
   feeds: string;
   rows: CatalogRow[] | undefined;
   commands: CatalogCommands;
+  /** The standard catering list offered as a one-click add (missing codes only). */
+  standardRows?: readonly StandardCatalogRow[];
 };
 
 export function CatalogsSection({
@@ -40,6 +44,7 @@ export function CatalogsSection({
   feeds,
   rows,
   commands,
+  standardRows,
 }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const { error, setError } = useActionFailure();
@@ -97,6 +102,26 @@ export function CatalogsSection({
       await commands.register({ name, code, sortOrder, description });
       form.reset();
       setNotice(`${name} added — selectors pick it up immediately.`);
+    });
+  };
+
+  const addStandardRows = (missing: StandardCatalogRow[]) => {
+    void run("standard", async () => {
+      const nextOrder =
+        sorted.reduce((max, row) => Math.max(max, row.sortOrder ?? 0), -1) + 1;
+      let added = 0;
+      for (const [index, row] of missing.entries()) {
+        await commands.register({
+          name: row.name,
+          code: row.code,
+          sortOrder: nextOrder + index,
+          description: row.description,
+        });
+        added += 1;
+      }
+      setNotice(
+        `${added} standard ${singular}${added === 1 ? "" : "s"} added — selectors pick them up immediately.`,
+      );
     });
   };
 
@@ -182,6 +207,16 @@ export function CatalogsSection({
         >
           {notice}
         </p>
+      ) : null}
+
+      {standardRows ? (
+        <CatalogStandardListButton
+          singular={singular}
+          standardRows={standardRows}
+          existing={rows}
+          busy={busy != null}
+          onAdd={addStandardRows}
+        />
       ) : null}
 
       <form
