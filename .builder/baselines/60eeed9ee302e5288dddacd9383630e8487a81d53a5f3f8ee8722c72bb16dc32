@@ -3693,6 +3693,14 @@ export const CandidateRejectParamsSchema = z.object({
 
 export type CandidateRejectParams = z.infer<typeof CandidateRejectParamsSchema>;
 
+// Command: revokeHire on Candidate
+export const CandidateRevokeHireParamsSchema = z.object({
+  toStage: z.enum(["application", "screening", "interview", "decision", "hired", "rejected"]),
+  reason: z.string().optional(),
+});
+
+export type CandidateRevokeHireParams = z.infer<typeof CandidateRevokeHireParamsSchema>;
+
 // Command: archive on Client
 export const ClientArchiveParamsSchema = z.object({
   reason: z.string(),

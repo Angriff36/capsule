@@ -15,6 +15,11 @@ export function useHireCandidateIntoTeam() {
   return useMutation(api.candidateToTeam.hireIntoTeam);
 }
 
+/** Undo a hire: handle the linked profile, then reopen the candidate (#269). */
+export function useRevokeCandidateHire() {
+  return useMutation(api.candidateHireRevocation.revokeHire);
+}
+
 /** Move a team profile (and its linked sign-in) to a corrected email (#270). */
 export function useCorrectStaffEmail() {
   return useAction(api.personEmail.correctStaffEmail);

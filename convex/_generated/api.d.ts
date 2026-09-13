@@ -19,6 +19,7 @@ import type * as authLink from "../authLink.js";
 import type * as authProvision from "../authProvision.js";
 import type * as authStatus from "../authStatus.js";
 import type * as brandLogo from "../brandLogo.js";
+import type * as candidateHireRevocation from "../candidateHireRevocation.js";
 import type * as candidateToTeam from "../candidateToTeam.js";
 import type * as chatNotifyPreference from "../chatNotifyPreference.js";
 import type * as clientPortal from "../clientPortal.js";
@@ -164,6 +165,7 @@ declare const fullApi: ApiFromModules<{
   authProvision: typeof authProvision;
   authStatus: typeof authStatus;
   brandLogo: typeof brandLogo;
+  candidateHireRevocation: typeof candidateHireRevocation;
   candidateToTeam: typeof candidateToTeam;
   chatNotifyPreference: typeof chatNotifyPreference;
   clientPortal: typeof clientPortal;

@@ -16,10 +16,12 @@ import {
 } from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   CandidateEmailMismatchNotice,
   type CandidateEmailMismatch,
 } from "./CandidateEmailMismatchNotice";
+import { CandidateRevokeHireControl } from "./CandidateRevokeHireControl";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -76,6 +78,10 @@ export function CandidatesPage() {
   const candidates = useListCandidate();
   const interviews = useListInterview();
   const people = useListPerson();
+  const authStatus = useAuthStatus();
+  const viewerIsAdmin = ["admin", "owner", "system"].includes(
+    authStatus?.role ?? "",
+  );
 
   const createCandidate = useCreateCandidate();
   const advance = useCandidateAdvance();
@@ -509,6 +515,21 @@ export function CandidatesPage() {
                   </div>
                 </div>
 
+                {candidate.stage === "hired" &&
+                candidate.hiredPersonId != null ? (
+                  <CandidateRevokeHireControl
+                    candidateId={candidate._id}
+                    candidateName={candidate.fullName}
+                    version={candidate.version}
+                    canTerminate={viewerIsAdmin}
+                    busy={busy}
+                    onDone={(text) => {
+                      setFailure(null);
+                      setNotice({ text, tone: "warn" });
+                    }}
+                    onError={setFailure}
+                  />
+                ) : null}
                 <div className="supply-form-grid">
                   <label className="field-label">
                     Move to stage
@@ -535,10 +556,15 @@ export function CandidatesPage() {
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      disabled={busy || candidate.hiredPersonId != null}
+                      disabled={
+                        busy ||
+                        (candidate.stage === "hired" &&
+                          candidate.hiredPersonId != null)
+                      }
                       title={
+                        candidate.stage === "hired" &&
                         candidate.hiredPersonId != null
-                          ? "Reopening is disabled while a team profile is linked (issue #269). Change their status under Administration → Permissions → Team roles."
+                          ? "This hire has a team profile — use Revoke hire above so their profile is handled in the same step."
                           : undefined
                       }
                       onClick={(e) => {
@@ -558,13 +584,6 @@ export function CandidatesPage() {
                     >
                       Move
                     </button>
-                    {candidate.hiredPersonId != null ? (
-                      <p className="text-sm text-ink-2 mt-2">
-                        Reopening is disabled while a team profile is linked
-                        (issue #269). Change their status under Administration →
-                        Permissions → Team roles.
-                      </p>
-                    ) : null}
                   </label>
                   <label className="field-label">
                     Rejection note (optional)

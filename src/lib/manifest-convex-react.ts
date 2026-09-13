@@ -15,6 +15,7 @@ import {
   CandidateApplyParamsSchema,
   CandidateHireParamsSchema,
   CandidateRejectParamsSchema,
+  CandidateRevokeHireParamsSchema,
   ClientArchiveParamsSchema,
   ClientAssignOwnerParamsSchema,
   ClientChangeBillingProfileParamsSchema,
@@ -929,6 +930,16 @@ export function useCandidateReject() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = CandidateRejectParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Candidate.revokeHire. */
+export function useCandidateRevokeHire() {
+  const mutate = useMutation(api.mutations.Candidate_revokeHire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CandidateRevokeHireParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -10145,4 +10156,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1075 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1076 as const;
