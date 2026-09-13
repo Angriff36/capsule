@@ -80,19 +80,19 @@ export class BuilderRegenGuard {
     if (stagedOwned.length === 0) return [];
 
     const violations: string[] = [];
-    if (!staged.includes(OWNERSHIP_PATH)) {
-      violations.push(
-        `staged Builder-owned files without ${OWNERSHIP_PATH}: ${stagedOwned.join(", ")}`,
-      );
-      return violations;
-    }
-
+    // The ledger the commit will carry: the staged copy when it changed, else
+    // the copy already in the index (== HEAD). The latter covers a companion
+    // commit whose digest landed one commit earlier — the ledger is unchanged
+    // but still authoritative, so demanding it appear in the diff would be an
+    // impossible-to-satisfy trap (2026-09-13, wiring/contract.json).
     let stagedOwnership: OwnershipManifest;
     try {
       const stagedContent = this.gitShowStaged(OWNERSHIP_PATH);
       stagedOwnership = JSON.parse(stagedContent) as OwnershipManifest;
     } catch {
-      violations.push(`could not read staged ${OWNERSHIP_PATH}`);
+      violations.push(
+        `staged Builder-owned files without a readable ${OWNERSHIP_PATH}: ${stagedOwned.join(", ")}`,
+      );
       return violations;
     }
 
