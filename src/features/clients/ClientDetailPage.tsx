@@ -15,6 +15,7 @@ import {
   useListProposal,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -373,9 +374,8 @@ export function ClientDetailPage() {
         </label>
         <label>
           Birthday
-          <input
+          <BoundedDateInput
             name="birthday"
-            type="date"
             defaultValue={client.birthday ?? ""}
           />
           <span className="field-hint">
