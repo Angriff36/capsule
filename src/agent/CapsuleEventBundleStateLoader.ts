@@ -25,6 +25,21 @@ function text(value: unknown): string {
   return typeof value === "string" ? value : "";
 }
 
+function groupBy(
+  items: Row[],
+  keyOf: (row: Row) => string,
+  valueOf: (row: Row) => string,
+): Map<string, string[]> {
+  const grouped = new Map<string, string[]>();
+  for (const row of items) {
+    const key = keyOf(row);
+    const bucket = grouped.get(key) ?? [];
+    bucket.push(valueOf(row));
+    grouped.set(key, bucket);
+  }
+  return grouped;
+}
+
 /**
  * Reads the tenant records the bundle planners match against, with the same
  * generated queries the UI uses. Live path remints the JWT on every load.
@@ -51,6 +66,8 @@ export class CapsuleEventBundleStateLoader {
       payments,
       proposals,
       vendorOrders,
+      proposalLines,
+      vendorOrderLines,
     ] = await Promise.all([
       client.query(api.queries.listOrganization, {}),
       client.query(api.queries.listPerson, {}),
@@ -60,7 +77,22 @@ export class CapsuleEventBundleStateLoader {
       client.query(api.queries.listPayment, {}),
       client.query(api.queries.listProposal, {}),
       client.query(api.queries.listVendorOrder, {}),
+      client.query(api.queries.listProposalLineItem, {}),
+      client.query(api.queries.listVendorOrderLine, {}),
     ]);
+    const linesByProposal = groupBy(
+      rows(proposalLines).filter(live),
+      (row) => String(row.proposalId),
+      (row) => text(row.description),
+    );
+    const ingredientsByOrder = groupBy(
+      rows(vendorOrderLines).filter(
+        (row) => live(row) && row.status !== "cancelled",
+      ),
+      (row) => String(row.vendorOrderId),
+      (row) => String(row.ingredientId),
+    );
+    const liveOrders = rows(vendorOrders).filter(live);
     return {
       organizationNames: rows(organizations)
         .filter(live)
@@ -84,6 +116,11 @@ export class CapsuleEventBundleStateLoader {
           id: String(row._id),
           invoiceNumber: text(row.invoiceNumber),
           status: text(row.status),
+          depositAmountCents:
+            row.depositAmount == null
+              ? null
+              : Math.round(Number(row.depositAmount) * 100),
+          depositPaid: row.depositPaidAt != null,
         })),
       payments: rows(payments)
         .filter(live)
@@ -99,10 +136,15 @@ export class CapsuleEventBundleStateLoader {
           id: String(row._id),
           proposalNumber: text(row.proposalNumber),
           status: text(row.status),
+          lineDescriptions: linesByProposal.get(String(row._id)) ?? [],
         })),
-      vendorOrderNumbers: rows(vendorOrders)
-        .filter(live)
-        .map((row) => text(row.orderNumber)),
+      vendorOrderNumbers: liveOrders.map((row) => text(row.orderNumber)),
+      vendorOrders: liveOrders.map((row) => ({
+        id: String(row._id),
+        orderNumber: text(row.orderNumber),
+        status: text(row.status),
+        lineIngredientIds: ingredientsByOrder.get(String(row._id)) ?? [],
+      })),
     };
   }
 

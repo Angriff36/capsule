@@ -10,7 +10,17 @@ export interface CapsuleEventBundleDirectory {
   people: Array<{ id: string; name: string }>;
   vendors: Array<{ id: string; name: string }>;
   ingredients: Array<{ id: string; name: string }>;
-  invoices: Array<{ id: string; invoiceNumber: string; status: string }>;
+  invoices: Array<{
+    id: string;
+    invoiceNumber: string;
+    status: string;
+    /**
+     * Deposit already on the invoice, in cents (null when none). Undefined
+     * means the loader did not read it; the planner then leaves it alone.
+     */
+    depositAmountCents?: number | null;
+    depositPaid?: boolean;
+  }>;
   /** Payments on the tenant's invoices, amounts in cents. */
   payments: Array<{
     id: string;
@@ -18,8 +28,30 @@ export interface CapsuleEventBundleDirectory {
     amountCents: number;
     status: string;
   }>;
-  proposals: Array<{ id: string; proposalNumber: string; status: string }>;
+  proposals: Array<{
+    id: string;
+    proposalNumber: string;
+    status: string;
+    /**
+     * Descriptions of the lines already on the proposal. Undefined means the
+     * loader did not read them; the planner then adds no lines to a proposal
+     * it did not draft. A partially entered proposal resumes only when the
+     * lines are known.
+     */
+    lineDescriptions?: string[];
+  }>;
   vendorOrderNumbers: string[];
+  /**
+   * Vendor orders with the ingredient each line orders, so a run that opened
+   * an order but never finished its lines adds only the missing ones.
+   * Undefined means the loader did not read them.
+   */
+  vendorOrders?: Array<{
+    id: string;
+    orderNumber: string;
+    status: string;
+    lineIngredientIds: string[];
+  }>;
 }
 
 /** An event that already exists. The run attaches to it. */

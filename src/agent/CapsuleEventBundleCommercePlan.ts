@@ -10,6 +10,10 @@ import {
   type PlannedStep,
 } from "./CapsuleEventBundleShared";
 import { planBillingSteps } from "./CapsuleEventBundleBillingPlan";
+import {
+  missingProposalLines,
+  planProposalLines,
+} from "./CapsuleEventBundleProposalLines";
 import { planStaffSteps } from "./CapsuleEventBundleStaffPlan";
 
 /**
@@ -238,71 +242,28 @@ export function planCommerceSteps(
             .join(" "),
         },
       });
-      bundle.menu.forEach((item, index) => {
-        if (
-          item.unitPriceCents === undefined &&
-          item.totalPriceCents === undefined
-        ) {
-          return;
-        }
-        const quantity = item.quantityServings ?? bundle.header.guestCount ?? 1;
-        const amount = centsToDollars(
-          item.totalPriceCents ?? (item.unitPriceCents ?? 0) * quantity,
-        );
-        const unitPrice = centsToDollars(
-          item.unitPriceCents ??
-            (quantity > 0
-              ? Math.round((item.totalPriceCents ?? 0) / quantity)
-              : 0),
-        );
-        const perPerson =
-          quantity > 1 &&
-          item.unitPriceCents !== undefined &&
-          Math.abs(
-            item.unitPriceCents * quantity - (item.totalPriceCents ?? 0),
-          ) < quantity;
+    }
+    // Lines: all of them on a fresh proposal; on one a prior run already
+    // drafted, only the ones it never got to (a failed run can leave the
+    // proposal with some or none of its lines).
+    const plannedLines = planProposalLines(bundle, invoice);
+    const lines = knownProposal
+      ? knownProposal.lineDescriptions === undefined
+        ? []
+        : missingProposalLines(plannedLines, knownProposal.lineDescriptions)
+      : plannedLines;
+    if (knownProposal && lines.length > 0 && knownProposal.status !== "draft") {
+      warnings.push(
+        `Proposal ${invoice} is ${knownProposal.status} but ${lines.length} priced line(s) from the reports are not on it (${lines
+          .map((line) => line.description)
+          .join(
+            ", ",
+          )}). They were not entered: lines can only be added to a draft proposal; revise it in Sales if they belong.`,
+      );
+    } else {
+      for (const line of lines) {
         counts.proposalLines += 1;
-        steps.push({
-          capabilityId: "ProposalLineItem.addLine",
-          ref: `proposal-line:${index}`,
-          label: `Price ${item.name} on the proposal`,
-          idempotencySuffix: `proposal-line:${invoice}:${normalizeName(item.name)}`,
-          resolveRefs: ["proposalId"],
-          args: {
-            proposalId: "proposal",
-            description: item.course
-              ? `${item.name} (${item.course})`
-              : item.name,
-            pricingBasis: perPerson ? "per_person" : "flat",
-            unitPrice: perPerson ? unitPrice : amount,
-            amount,
-            quantity: perPerson ? quantity : 1,
-            unit: perPerson ? "serving" : undefined,
-            sortOrder: index,
-          },
-        });
-      });
-      if (
-        totals.serviceChargeCents !== undefined &&
-        totals.serviceChargeCents > 0
-      ) {
-        counts.proposalLines += 1;
-        steps.push({
-          capabilityId: "ProposalLineItem.addLine",
-          ref: "proposal-line:service",
-          label: "Add the service charge to the proposal",
-          idempotencySuffix: `proposal-line:${invoice}:servicecharge`,
-          resolveRefs: ["proposalId"],
-          args: {
-            proposalId: "proposal",
-            description: "Service charge",
-            pricingBasis: "flat",
-            unitPrice: centsToDollars(totals.serviceChargeCents),
-            amount: centsToDollars(totals.serviceChargeCents),
-            quantity: 1,
-            sortOrder: bundle.menu.length,
-          },
-        });
+        steps.push(line.step);
       }
     }
 

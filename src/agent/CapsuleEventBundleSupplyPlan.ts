@@ -181,30 +181,55 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
     }
 
     const orderNumber = `TPP-${invoice}-${key}`;
-    if (directory.vendorOrderNumbers.includes(orderNumber)) {
-      warnings.push(
-        `Vendor order ${orderNumber} already exists; its lines were left as they are.`,
-      );
-      continue;
-    }
     const orderRef = `order:${key}`;
-    steps.push({
-      capabilityId: "VendorOrder.open",
-      ref: orderRef,
-      label: `Open a vendor order with ${group.name}`,
-      idempotencySuffix: `order:${invoice}:${key}`,
-      resolveRefs: ["vendorId", "eventId"],
-      args: {
-        vendorId: vendorRef,
-        eventId: "event",
-        orderNumber,
-        notes: `TPP order list for invoice ${invoice}.`,
-      },
-    });
+    // An order a prior run opened resumes: only lines it never got to are
+    // added. Without line detail from the loader there is nothing to compare.
+    let orderedIngredientIds: ReadonlySet<string> | undefined;
+    if (directory.vendorOrderNumbers.includes(orderNumber)) {
+      const known = directory.vendorOrders?.find(
+        (row) => row.orderNumber === orderNumber,
+      );
+      if (!known) {
+        warnings.push(
+          `Vendor order ${orderNumber} already exists; its lines were left as they are.`,
+        );
+        continue;
+      }
+      if (known.status !== "draft") {
+        warnings.push(
+          `Vendor order ${orderNumber} is ${known.status}; its ${group.lines.length} line(s) from the reports were not entered because lines can only be added while the order is a draft.`,
+        );
+        continue;
+      }
+      seedIds[orderRef] = known.id;
+      orderedIngredientIds = new Set(known.lineIngredientIds);
+    } else {
+      steps.push({
+        capabilityId: "VendorOrder.open",
+        ref: orderRef,
+        label: `Open a vendor order with ${group.name}`,
+        idempotencySuffix: `order:${invoice}:${key}`,
+        resolveRefs: ["vendorId", "eventId"],
+        args: {
+          vendorId: vendorRef,
+          eventId: "event",
+          orderNumber,
+          notes: `TPP order list for invoice ${invoice}.`,
+        },
+      });
+    }
     group.lines.forEach((line, index) => {
       const ingredientKey = normalizeName(cleanItemName(line.inventoryItem));
       const ingredientRef = ingredientRefs.get(ingredientKey);
       if (ingredientRef === undefined) return;
+      const ingredientId = seedIds[ingredientRef];
+      if (
+        orderedIngredientIds !== undefined &&
+        ingredientId !== undefined &&
+        orderedIngredientIds.has(ingredientId)
+      ) {
+        return;
+      }
       const measure = toCapsuleMeasure(
         line.purchaseQuantity ?? line.orderQuantity,
         line.purchaseQuantity != null
