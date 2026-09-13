@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import { Link } from "react-router-dom";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { localDateTime } from "./eventDetailFormHelpers";
 
@@ -59,6 +60,22 @@ export function EventEquipmentReserveForm({
             </option>
           ))}
         </select>
+        {equipment.length < 5 ? (
+          <span className="field-hint" data-testid="equipment-thin-catalog">
+            Only {equipment.length} item{equipment.length === 1 ? "" : "s"} in
+            the catalog. Add the real kit in{" "}
+            <Link
+              to="/facilities/equipment"
+              target="_blank"
+              rel="noopener"
+              className="underline font-medium"
+            >
+              Facilities → Equipment
+            </Link>{" "}
+            — “Paste a pack list” or “Add the standard kit” fills it in one go
+            (new tab; this form stays put).
+          </span>
+        ) : null}
       </label>
       <label className="field-label">
         Quantity

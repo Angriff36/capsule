@@ -14,24 +14,12 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
-
-const CONDITIONS = [
-  "excellent",
-  "good",
-  "fair",
-  "poor",
-  "out_of_service",
-] as const;
-
-const CATEGORY_SUGGESTIONS = [
-  "Cooking",
-  "Serving",
-  "Holding",
-  "Furniture",
-  "Linens",
-  "Shelter",
-  "Transport",
-];
+import { EquipmentBulkAddPanel } from "./EquipmentBulkAddPanel";
+import {
+  EQUIPMENT_CONDITIONS as CONDITIONS,
+  EquipmentForm,
+  type EquipmentDetailRow,
+} from "./EquipmentForm";
 
 export function EquipmentCatalogPage() {
   const equipment = useListEquipment();
@@ -42,6 +30,8 @@ export function EquipmentCatalogPage() {
   const reactivate = useEquipmentReactivate();
   const reviseDetails = useEquipmentReviseDetails();
   const [showForm, setShowForm] = useState(false);
+  const [showBulk, setShowBulk] = useState(false);
+  const [bulkNotice, setBulkNotice] = useState<string | null>(null);
   const [editing, setEditing] = useState<EquipmentDetailRow | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -185,9 +175,21 @@ export function EquipmentCatalogPage() {
         </div>
         <div className="supply-masthead-actions">
           <button
+            className="btn btn-secondary"
+            onClick={() => {
+              setEditing(null);
+              setShowForm(false);
+              setShowBulk(true);
+            }}
+            data-testid="equipment-open-bulk"
+          >
+            Paste a pack list
+          </button>
+          <button
             className="btn btn-primary"
             onClick={() => {
               setEditing(null);
+              setShowBulk(false);
               setShowForm(true);
             }}
           >
@@ -198,6 +200,38 @@ export function EquipmentCatalogPage() {
       <FacilitiesWorkspaceNav />
       {host}
       {failure ? <SupplyFailureBanner error={failure} /> : null}
+      {bulkNotice ? (
+        <p
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
+          role="status"
+        >
+          {bulkNotice}
+        </p>
+      ) : null}
+      {showBulk ? (
+        <EquipmentBulkAddPanel
+          existing={rows}
+          busy={busy != null}
+          register={async (args) => {
+            setFailure(null);
+            setBusy("bulk");
+            try {
+              return await createEquipment(args);
+            } catch (error) {
+              setFailure(error);
+              throw error;
+            } finally {
+              setBusy(null);
+            }
+          }}
+          onDone={(added) =>
+            setBulkNotice(
+              `${added} item${added === 1 ? "" : "s"} added to the catalog — they can be reserved on any event now.`,
+            )
+          }
+          onClose={() => setShowBulk(false)}
+        />
+      ) : null}
       {showForm ? (
         <EquipmentForm
           busy={busy != null}
@@ -354,150 +388,3 @@ type EquipmentRow = {
   registeredAt?: number | null;
   deletedAt?: number | null;
 };
-
-type EquipmentDetailRow = {
-  _id: string;
-  version: number;
-  name: string;
-  category: string;
-  ownership: "owned" | "rented";
-  purchaseValue: number;
-  homeLocation?: string | null;
-  currentLocation?: string | null;
-};
-
-function EquipmentForm({
-  busy,
-  onSubmit,
-  onClose,
-  editItem,
-}: {
-  busy: boolean;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-  onClose: () => void;
-  editItem?: EquipmentDetailRow | null;
-}) {
-  const editing = editItem != null;
-  return (
-    <form className="supply-form" onSubmit={onSubmit}>
-      <div className="supply-form-heading">
-        <div>
-          <p className="eyebrow">Equipment</p>
-          <h2>{editing ? "Edit equipment details" : "Register equipment"}</h2>
-        </div>
-        <div className="supply-row-actions">
-          <button type="button" className="btn btn-ghost" onClick={onClose}>
-            Cancel
-          </button>
-          <button className="btn btn-primary" disabled={busy}>
-            {busy ? "Working…" : editing ? "Save" : "Register"}
-          </button>
-        </div>
-      </div>
-      <div className="supply-form-grid">
-        <label className="field-label">
-          Name
-          <input
-            name="name"
-            className="input"
-            required
-            autoFocus
-            defaultValue={editItem?.name}
-          />
-        </label>
-        {editing ? null : (
-          <label className="field-label">
-            Asset tag
-            <input name="assetTag" className="input" required />
-          </label>
-        )}
-        <label className="field-label">
-          Category
-          <input
-            name="category"
-            className="input"
-            required
-            list="equipment-categories"
-            defaultValue={editItem?.category}
-          />
-          <datalist id="equipment-categories">
-            {CATEGORY_SUGGESTIONS.map((category) => (
-              <option key={category} value={category} />
-            ))}
-          </datalist>
-        </label>
-        <label className="field-label">
-          Ownership
-          <select
-            name="ownership"
-            className="input"
-            defaultValue={editItem?.ownership ?? "owned"}
-          >
-            <option value="owned">Owned</option>
-            <option value="rented">Rented</option>
-          </select>
-        </label>
-        {editing ? null : (
-          <label className="field-label">
-            Quantity
-            <input
-              name="quantity"
-              className="input"
-              type="number"
-              min={1}
-              step={1}
-              defaultValue={1}
-              required
-            />
-          </label>
-        )}
-        <label className="field-label">
-          Purchase value (per unit)
-          <input
-            name="purchaseValue"
-            className="input"
-            type="number"
-            min={0}
-            step="any"
-            defaultValue={editItem?.purchaseValue ?? 0}
-            required
-          />
-        </label>
-        {editing ? null : (
-          <label className="field-label">
-            Condition
-            <select name="condition" className="input" defaultValue="good">
-              {CONDITIONS.map((condition) => (
-                <option key={condition} value={condition}>
-                  {condition.replace("_", " ")}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-        {editing ? (
-          <>
-            <label className="field-label">
-              Home location
-              <input
-                name="homeLocation"
-                className="input"
-                defaultValue={editItem?.homeLocation ?? ""}
-                placeholder="Where it lives"
-              />
-            </label>
-            <label className="field-label">
-              Current location
-              <input
-                name="currentLocation"
-                className="input"
-                defaultValue={editItem?.currentLocation ?? ""}
-                placeholder="Where it is now"
-              />
-            </label>
-          </>
-        ) : null}
-      </div>
-    </form>
-  );
-}
