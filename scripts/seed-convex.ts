@@ -503,6 +503,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.RevenueAttribution_create, { "eventId": "eventId-revenue-attribution-1", "attributionType": "demo-attributionType-1", "allocationMethod": "demo-allocationMethod-1", "venueId": "venueId-revenue-attribution-1", "salespersonId": "salespersonId-revenue-attribution-1", "referralSourceId": "referralSourceId-revenue-attribution-1", "partnerPersonId": "partnerPersonId-revenue-attribution-1", "partnerClientId": "partnerClientId-revenue-attribution-1", "percentBasis": 1, "fixedAmount": 1, "effectiveStartDate": 1767268800000, "effectiveEndDate": 1767268800000, "reason": "demo-reason-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.RevenueAttribution_create, { "eventId": "eventId-revenue-attribution-2", "attributionType": "demo-attributionType-2", "allocationMethod": "demo-allocationMethod-2", "venueId": "venueId-revenue-attribution-2", "salespersonId": "salespersonId-revenue-attribution-2", "referralSourceId": "referralSourceId-revenue-attribution-2", "partnerPersonId": "partnerPersonId-revenue-attribution-2", "partnerClientId": "partnerClientId-revenue-attribution-2", "percentBasis": 2, "fixedAmount": 2, "effectiveStartDate": 1767355200000, "effectiveEndDate": 1767355200000, "reason": "demo-reason-2" } as any);
+  // ReviewFlag → api.mutations.ReviewFlag_createViaRaise
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ReviewFlag_createViaRaise, { "eventId": "eventId-review-flag-1", "targetKind": "demo-targetKind-1", "targetId": "targetId-review-flag-1", "targetLabel": "demo-targetLabel-1", "question": "demo-question-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ReviewFlag_createViaRaise, { "eventId": "eventId-review-flag-2", "targetKind": "demo-targetKind-2", "targetId": "targetId-review-flag-2", "targetLabel": "demo-targetLabel-2", "question": "demo-question-2" } as any);
   // RoleScorecard → api.mutations.RoleScorecard_createViaDefine
   rowsAttempted += 1;
   await client.mutation(api.mutations.RoleScorecard_createViaDefine, { "role": "demo-role-1", "title": "RoleScorecard 1", "expectations": "demo-expectations-1", "effectiveFrom": 1767268800000 } as any);
@@ -1219,6 +1224,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "RevenueAttribution",
       "createMutation": "RevenueAttribution_create",
+      "rowCount": 2
+    },
+    {
+      "entity": "ReviewFlag",
+      "createMutation": "ReviewFlag_createViaRaise",
       "rowCount": 2
     },
     {

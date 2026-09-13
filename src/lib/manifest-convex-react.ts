@@ -499,6 +499,11 @@ import {
   RevenueAttributionRejectParamsSchema,
   RevenueAttributionRequestApprovalParamsSchema,
   RevenueAttributionUpdateParamsSchema,
+  ReviewFlagDismissParamsSchema,
+  ReviewFlagMarkResolvedParamsSchema,
+  ReviewFlagRaiseParamsSchema,
+  ReviewFlagReopenParamsSchema,
+  ReviewFlagReviseQuestionParamsSchema,
   RoleScorecardArchiveParamsSchema,
   RoleScorecardDefineParamsSchema,
   RoleScorecardReactivateParamsSchema,
@@ -7565,6 +7570,77 @@ export function useRevenueAttributionUpdate() {
   };
 }
 
+/** Reactive list for ReviewFlag. */
+export function useListReviewFlag() {
+  return useQuery(api.queries.listReviewFlag);
+}
+
+/** Reactive get-by-id for ReviewFlag. Pass "skip" to suspend. */
+export function useGetReviewFlag(id: string | "skip") {
+  return useQuery(api.queries.getReviewFlag, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ReviewFlag.dismiss. */
+export function useReviewFlagDismiss() {
+  const mutate = useMutation(api.mutations.ReviewFlag_dismiss);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ReviewFlagDismissParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ReviewFlag.markResolved. */
+export function useReviewFlagMarkResolved() {
+  const mutate = useMutation(api.mutations.ReviewFlag_markResolved);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ReviewFlagMarkResolvedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ReviewFlag.raise. */
+export function useReviewFlagRaise() {
+  const mutate = useMutation(api.mutations.ReviewFlag_raise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ReviewFlagRaiseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ReviewFlag.reopen. */
+export function useReviewFlagReopen() {
+  const mutate = useMutation(api.mutations.ReviewFlag_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ReviewFlagReopenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ReviewFlag.reviseQuestion. */
+export function useReviewFlagReviseQuestion() {
+  const mutate = useMutation(api.mutations.ReviewFlag_reviseQuestion);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ReviewFlagReviseQuestionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ReviewFlag.raise. */
+export function useCreateReviewFlag() {
+  const mutate = useMutation(api.mutations.ReviewFlag_createViaRaise);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ReviewFlagRaiseParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for RoleScorecard. */
 export function useListRoleScorecard() {
   return useQuery(api.queries.listRoleScorecard);
@@ -10025,4 +10101,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1063 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1071 as const;

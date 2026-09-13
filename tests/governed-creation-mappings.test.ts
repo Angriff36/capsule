@@ -95,6 +95,7 @@ describe("governed creation mappings", () => {
       "QualityCheck_createViaOpen",
       "RecurringAvailability_createViaDeclare",
       "ReferralSource_createViaRegister",
+      "ReviewFlag_createViaRaise",
       "RoleScorecard_createViaDefine",
       "SavedReportDefinition_createViaCreateDefinition",
       "ServiceStyle_createViaRegister",

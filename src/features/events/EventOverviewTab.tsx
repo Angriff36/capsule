@@ -17,6 +17,7 @@ import { EventSetupProgress } from "./EventSetupProgress";
 import { EventStageActionsCard } from "./EventStageActionsCard";
 import { EventTimelineCommentsPanel } from "./EventTimelineCommentsPanel";
 import { EventWeatherPanel } from "./EventWeatherPanel";
+import { EventReviewFlagsSection } from "./review-flags/EventReviewFlagsSection";
 import { eventDetailPath } from "./eventRoutes";
 import "./EventOverview.css";
 
@@ -102,6 +103,7 @@ export function EventOverviewTab({
             busy={reviseProps.busy}
             onAction={onAction}
           />
+          <EventReviewFlagsSection eventId={eventId} />
           <EventDetailsCard
             clientId={clientId}
             clients={clients}

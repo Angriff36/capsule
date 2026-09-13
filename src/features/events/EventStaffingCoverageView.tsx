@@ -2,6 +2,7 @@ import { type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
+import { ReviewFlagInline } from "./review-flags/ReviewFlagInline";
 import {
   EventTimelineStaffRoster,
   type PersonRow,
@@ -425,6 +426,15 @@ export function EventStaffingCoverageView({
                           >
                             Release hold
                           </button>
+                        ) : null}
+                        {need.eventId ? (
+                          <ReviewFlagInline
+                            eventId={need.eventId}
+                            targetKind="staff_need"
+                            targetId={need._id}
+                            targetLabel={title}
+                            disabled={busy != null}
+                          />
                         ) : null}
                         {canManage && claimable ? (
                           <button

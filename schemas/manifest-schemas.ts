@@ -2536,6 +2536,28 @@ export const RevenueAttributionSchema = z.object({
 
 export type RevenueAttribution = z.infer<typeof RevenueAttributionSchema>;
 
+// Entity: ReviewFlag
+export const ReviewFlagSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  targetKind: z.enum(["whole_event", "menu_line", "timeline_activity", "equipment_reservation", "staff_need", "assignment", "pack_list_item"]).default("whole_event"),
+  targetId: z.string().nullable().optional(),
+  targetLabel: z.string().default(""),
+  question: z.string().default(""),
+  resolution: z.string().nullable().optional(),
+  raisedById: z.string().nullable().optional(),
+  settledById: z.string().nullable().optional(),
+  status: z.enum(["open", "resolved", "dismissed"]).default("open"),
+  raisedAt: z.coerce.date().nullable().optional(),
+  settledAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ReviewFlag = z.infer<typeof ReviewFlagSchema>;
+
 // Entity: RoleScorecard
 export const RoleScorecardSchema = z.object({
   id: z.string().uuid(),
@@ -7730,6 +7752,43 @@ export const RevenueAttributionUpdateParamsSchema = z.object({
 });
 
 export type RevenueAttributionUpdateParams = z.infer<typeof RevenueAttributionUpdateParamsSchema>;
+
+// Command: dismiss on ReviewFlag
+export const ReviewFlagDismissParamsSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type ReviewFlagDismissParams = z.infer<typeof ReviewFlagDismissParamsSchema>;
+
+// Command: markResolved on ReviewFlag
+export const ReviewFlagMarkResolvedParamsSchema = z.object({
+  resolution: z.string(),
+});
+
+export type ReviewFlagMarkResolvedParams = z.infer<typeof ReviewFlagMarkResolvedParamsSchema>;
+
+// Command: raise on ReviewFlag
+export const ReviewFlagRaiseParamsSchema = z.object({
+  eventId: z.string().min(1),
+  targetKind: z.enum(["whole_event", "menu_line", "timeline_activity", "equipment_reservation", "staff_need", "assignment", "pack_list_item"]),
+  question: z.string(),
+  targetId: z.string().optional(),
+  targetLabel: z.string().optional(),
+});
+
+export type ReviewFlagRaiseParams = z.infer<typeof ReviewFlagRaiseParamsSchema>;
+
+// Command: reopen on ReviewFlag
+export const ReviewFlagReopenParamsSchema = z.object({});
+
+export type ReviewFlagReopenParams = z.infer<typeof ReviewFlagReopenParamsSchema>;
+
+// Command: reviseQuestion on ReviewFlag
+export const ReviewFlagReviseQuestionParamsSchema = z.object({
+  question: z.string(),
+});
+
+export type ReviewFlagReviseQuestionParams = z.infer<typeof ReviewFlagReviseQuestionParamsSchema>;
 
 // Command: archive on RoleScorecard
 export const RoleScorecardArchiveParamsSchema = z.object({

@@ -1499,6 +1499,21 @@ describe("Manifest Convex contract", () => {
   it("exports mutation RevenueAttribution_update", () => {
     expect(typeof (mutations as any).RevenueAttribution_update).toBe("function");
   });
+  it("exports mutation ReviewFlag_dismiss", () => {
+    expect(typeof (mutations as any).ReviewFlag_dismiss).toBe("function");
+  });
+  it("exports mutation ReviewFlag_markResolved", () => {
+    expect(typeof (mutations as any).ReviewFlag_markResolved).toBe("function");
+  });
+  it("exports mutation ReviewFlag_raise", () => {
+    expect(typeof (mutations as any).ReviewFlag_raise).toBe("function");
+  });
+  it("exports mutation ReviewFlag_reopen", () => {
+    expect(typeof (mutations as any).ReviewFlag_reopen).toBe("function");
+  });
+  it("exports mutation ReviewFlag_reviseQuestion", () => {
+    expect(typeof (mutations as any).ReviewFlag_reviseQuestion).toBe("function");
+  });
   it("exports mutation RoleScorecard_archive", () => {
     expect(typeof (mutations as any).RoleScorecard_archive).toBe("function");
   });
@@ -1981,4 +1996,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 658 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 663 as const;

@@ -58,6 +58,9 @@ import {
   type DietaryConflictInputs,
 } from "./EventMenuDietaryConflictsCard";
 import { EventMenuRecipeEditor } from "./EventMenuRecipeEditor";
+import { eventMenuHeadcountHint } from "./eventMenuHeadcountHint";
+import { ReviewFlagButton } from "./review-flags/ReviewFlagButton";
+import { useEventReviewFlags } from "./review-flags/useEventReviewFlags";
 import { eventMenuCourseTallies, EventMenuSidebar } from "./EventMenuSidebar";
 import {
   buildEventMenuCost,
@@ -104,6 +107,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const dishes = useListDish();
   const eventDishes = useListEventDish();
   const eventGuests = useListEventGuest();
+  const reviewFlags = useEventReviewFlags(eventId);
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const components = useListComponent();
@@ -838,6 +842,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     servings,
                   );
                   const recipeOpen = openRecipeId === selection._id;
+                  const headcountHint = eventMenuHeadcountHint({
+                    dishName: dish?.name ?? "Unknown dish",
+                    quantityServings: Number(selection.quantityServings),
+                    expectedHeadcount,
+                    headcountOverride: (
+                      selection as { headcountOverride?: number | null }
+                    ).headcountOverride,
+                  });
                   return (
                     <li key={selection._id}>
                       <form
@@ -986,6 +998,15 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                 {row.flag}
                               </p>
                             ))}
+                            {headcountHint ? (
+                              <p
+                                className="mt-1 text-sm font-medium text-warn"
+                                data-testid="menu-headcount-hint"
+                                title="Set a food-cost headcount on this line if the count is deliberate."
+                              >
+                                {headcountHint.text}
+                              </p>
+                            ) : null}
                           </div>
                         </div>
 
@@ -1070,6 +1091,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           >
                             Save
                           </button>
+                          <ReviewFlagButton
+                            flags={reviewFlags}
+                            prompt={prompt}
+                            targetKind="menu_line"
+                            targetId={selection._id}
+                            targetLabel={dish?.name ?? "Unknown dish"}
+                            suggestedQuestion={headcountHint?.question}
+                            busy={busy != null}
+                            onError={(error) =>
+                              setFailure(classifyCommandFailure(error))
+                            }
+                            compact
+                          />
                           <ActionMenu>
                             <button
                               type="button"
