@@ -4,6 +4,7 @@ import { api } from "../lib/api";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
 import { CapsuleCommandArgsNormalizer } from "./CapsuleCommandArgsNormalizer";
 import { CapsuleCommandCatalog } from "./CapsuleCommandCatalog";
+import { CapsuleCommandSeamRoutes } from "./CapsuleCommandSeamRoutes";
 import type {
   CapsuleCommandExecutor,
   CapsuleCommandInvocation,
@@ -21,19 +22,30 @@ export class ConvexCommandClient implements CapsuleCommandExecutor {
   private readonly auth: CapsuleAgentAuthManager;
   private readonly catalog: CapsuleCommandCatalog;
   private readonly argsNormalizer: CapsuleCommandArgsNormalizer;
+  private readonly seamRoutes: CapsuleCommandSeamRoutes;
 
   constructor(
     auth: CapsuleAgentAuthManager = new CapsuleAgentAuthManager(),
     catalog: CapsuleCommandCatalog = new CapsuleCommandCatalog(),
     argsNormalizer: CapsuleCommandArgsNormalizer = new CapsuleCommandArgsNormalizer(),
+    seamRoutes: CapsuleCommandSeamRoutes = new CapsuleCommandSeamRoutes(),
   ) {
     this.auth = auth;
     this.catalog = catalog;
     this.argsNormalizer = argsNormalizer;
+    this.seamRoutes = seamRoutes;
   }
 
   async execute(invocation: CapsuleCommandInvocation): Promise<unknown> {
     const descriptor = this.catalog.get(invocation.capabilityId);
+    const seam = this.seamRoutes.get(invocation.capabilityId);
+    if (seam) {
+      const client = await this.resolveClient();
+      return client.mutation(
+        seam.ref,
+        seam.args(this.argsNormalizer.normalize(descriptor, invocation.args)),
+      );
+    }
     const mutationTable = api.mutations as unknown as Record<
       string,
       AnyMutationRef
