@@ -917,6 +917,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Invoice_applyPayment", () => {
     expect(typeof (mutations as any).Invoice_applyPayment).toBe("function");
   });
+  it("exports mutation Invoice_assignNumber", () => {
+    expect(typeof (mutations as any).Invoice_assignNumber).toBe("function");
+  });
   it("exports mutation Invoice_issue", () => {
     expect(typeof (mutations as any).Invoice_issue).toBe("function");
   });
@@ -2017,4 +2020,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 670 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 671 as const;

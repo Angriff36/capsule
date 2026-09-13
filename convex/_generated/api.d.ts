@@ -71,6 +71,7 @@ import type * as lib_ingredientLookupApplyCost from "../lib/ingredientLookupAppl
 import type * as lib_ingredientLookupApplyNutrition from "../lib/ingredientLookupApplyNutrition.js";
 import type * as lib_ingredientLookupAutofill from "../lib/ingredientLookupAutofill.js";
 import type * as lib_inventoryEvents from "../lib/inventoryEvents.js";
+import type * as lib_invoiceNumbering from "../lib/invoiceNumbering.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
 import type * as lib_lookupCostBarcodeDiscovery from "../lib/lookupCostBarcodeDiscovery.js";
@@ -102,6 +103,7 @@ import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
 import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
 import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
+import type * as lib_tenantSystemCommandRunner from "../lib/tenantSystemCommandRunner.js";
 import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_typicalKitchenDensity from "../lib/typicalKitchenDensity.js";
 import type * as lib_usdaCountPortionGrams from "../lib/usdaCountPortionGrams.js";
@@ -217,6 +219,7 @@ declare const fullApi: ApiFromModules<{
   "lib/ingredientLookupApplyNutrition": typeof lib_ingredientLookupApplyNutrition;
   "lib/ingredientLookupAutofill": typeof lib_ingredientLookupAutofill;
   "lib/inventoryEvents": typeof lib_inventoryEvents;
+  "lib/invoiceNumbering": typeof lib_invoiceNumbering;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
   "lib/lookupCostBarcodeDiscovery": typeof lib_lookupCostBarcodeDiscovery;
@@ -248,6 +251,7 @@ declare const fullApi: ApiFromModules<{
   "lib/staffSignInPassword": typeof lib_staffSignInPassword;
   "lib/teamChatRead": typeof lib_teamChatRead;
   "lib/teamChatScan": typeof lib_teamChatScan;
+  "lib/tenantSystemCommandRunner": typeof lib_tenantSystemCommandRunner;
   "lib/twilio": typeof lib_twilio;
   "lib/typicalKitchenDensity": typeof lib_typicalKitchenDensity;
   "lib/usdaCountPortionGrams": typeof lib_usdaCountPortionGrams;

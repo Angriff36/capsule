@@ -160,10 +160,33 @@ entity Invoice mixin TenantScoped, SoftDeletable {
       clientId: clientId
       eventId: eventId != null ? eventId : self.eventId
       invoiceNumber: resolvedInvoiceNumber
+      autoNumbered: invoiceNumber == null
       total: total
       amountDue: total
       currencyCode: normalizedCurrencyCode
       exchangeRate: resolvedExchangeRate
+    }
+  }
+
+  // Invoice numbers stay unique per tenant through the authored numbering seam
+  // (convex/lib/invoiceNumbering.ts), which runs on InvoiceIssued: an
+  // auto-minted "INV-<n>" (the EventApproved cascade's count-based
+  // invoiceSequence, which repeats a number once an earlier invoice is deleted)
+  // that would duplicate another invoice's number is re-minted here to one past
+  // the highest INV- number the tenant has ever issued; an explicit number that
+  // duplicates a live invoice is rejected instead. The Convex projection does not
+  // enforce `property unique`, and a command cannot read sibling rows, so the
+  // scan is the seam's — the write is this governed command's.
+  command assignNumber(invoiceNumber: string) {
+    guard self.deletedAt == null
+    guard self.issuedAt != null
+    guard self.sentAt == null
+    constraint assignNumberPresent: length(trim(invoiceNumber)) > 0 "Invoice number is required"
+    mutate invoiceNumber = invoiceNumber
+    emit InvoiceNumberAssigned {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      invoiceNumber: invoiceNumber
     }
   }
 
@@ -460,10 +483,18 @@ event InvoiceIssued: "invoice.issued" {
   clientId: string
   eventId: string?
   invoiceNumber: string
+  // True when the number came from invoiceSequence rather than the caller.
+  autoNumbered: boolean
   total: money(12, 2)
   amountDue: money(12, 2)
   currencyCode: string?
   exchangeRate: decimal(18, 8)?
+}
+
+event InvoiceNumberAssigned: "invoice.number_assigned" {
+  invoiceId: string
+  tenantId: string
+  invoiceNumber: string
 }
 
 event InvoiceSent: "invoice.sent" {

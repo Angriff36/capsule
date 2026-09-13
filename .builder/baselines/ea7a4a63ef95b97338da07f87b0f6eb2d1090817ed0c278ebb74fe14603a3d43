@@ -6170,6 +6170,13 @@ export const InvoiceApplyPaymentParamsSchema = z.object({
 
 export type InvoiceApplyPaymentParams = z.infer<typeof InvoiceApplyPaymentParamsSchema>;
 
+// Command: assignNumber on Invoice
+export const InvoiceAssignNumberParamsSchema = z.object({
+  invoiceNumber: z.string(),
+});
+
+export type InvoiceAssignNumberParams = z.infer<typeof InvoiceAssignNumberParamsSchema>;
+
 // Command: issue on Invoice
 export const InvoiceIssueParamsSchema = z.object({
   clientId: z.string().min(1),
