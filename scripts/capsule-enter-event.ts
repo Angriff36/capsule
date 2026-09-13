@@ -12,6 +12,7 @@
  */
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { suggestCatalogMatches } from "../src/agent/CapsuleEventBundleCatalogMatch";
 import { CapsuleEventBundleCoordinator } from "../src/agent/CapsuleEventBundleCoordinator";
 import type { CapsuleEventBundleContext } from "../src/agent/CapsuleEventBundleExistingState";
 import { CapsuleEventBundleStateLoader } from "../src/agent/CapsuleEventBundleStateLoader";
@@ -96,6 +97,13 @@ async function main(): Promise<void> {
   context.directory = await loader.loadDirectory();
   if (eventId !== undefined) {
     context.existing = await loader.loadExisting(eventId);
+  } else {
+    // A client, venue or dish already in Capsule is reused by exact name
+    // instead of registered again (#241).
+    context.catalog = suggestCatalogMatches(
+      bundle,
+      await loader.loadCatalogCandidates(),
+    );
   }
 
   if (preview) {
@@ -114,6 +122,11 @@ async function main(): Promise<void> {
           venue: bundle.venue.name,
           client: bundle.client.name,
           attachesTo: eventId,
+          reusesExisting: {
+            clientId: context.catalog?.clientId,
+            venueId: context.catalog?.venueId,
+            dishCount: Object.keys(context.catalog?.dishIds ?? {}).length,
+          },
           wouldCreate: result.plan.summary,
           commandCount: result.plan.steps.length,
           safeToEnterWithoutApproval: result.safeToEnterWithoutApproval,

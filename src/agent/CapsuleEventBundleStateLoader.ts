@@ -1,6 +1,7 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../lib/api";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
+import type { CatalogCandidates } from "./CapsuleEventBundleCatalogMatch";
 import {
   directoryRows,
   liveRow,
@@ -75,6 +76,38 @@ export class CapsuleEventBundleStateLoader {
       proposalLines,
       vendorOrderLines,
     });
+  }
+
+  /**
+   * Active clients, venues and dishes as name candidates, so a bundle for a
+   * client, venue or dish already in Capsule reuses the record (exact
+   * normalized name or, for clients, email) instead of registering a twin.
+   */
+  async loadCatalogCandidates(): Promise<CatalogCandidates> {
+    const client = await this.resolveClient();
+    const [clients, venues, dishes] = await Promise.all([
+      client.query(api.queries.listClient, {}),
+      client.query(api.queries.listVenue, {}),
+      client.query(api.queries.listDish, {}),
+    ]);
+    const active = (row: Row) => live(row) && row.status === "active";
+    return {
+      clients: rows(clients)
+        .filter(active)
+        .map((row) => ({
+          id: String(row._id),
+          name:
+            text(row.companyName) ||
+            `${text(row.givenName)} ${text(row.familyName)}`.trim(),
+          aliases: [text(row.email)].filter((alias) => alias.length > 0),
+        })),
+      venues: rows(venues)
+        .filter(active)
+        .map((row) => ({ id: String(row._id), name: text(row.name) })),
+      dishes: rows(dishes)
+        .filter(live)
+        .map((row) => ({ id: String(row._id), name: text(row.name) })),
+    };
   }
 
   async loadExisting(
