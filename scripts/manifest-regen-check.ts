@@ -5,7 +5,18 @@
  * pending: run `bun run manifest:regen`, commit the result, push again.
  */
 import { spawnSync } from "node:child_process";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { builderEntrypoint } from "./manifest-regen.ts";
+import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
+
+const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const rewritten = new ManifestLineEndingNormalizer(CAPSULE_ROOT).normalize();
+if (rewritten > 0) {
+  console.log(
+    `manifest-regen-check: normalized ${rewritten} .manifest file(s) to LF`,
+  );
+}
 
 const result = spawnSync(
   "bun",

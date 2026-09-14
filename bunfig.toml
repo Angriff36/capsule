@@ -1,0 +1,1 @@
+preload = ["./scripts/seed-convex-auth-preload.ts"]
