@@ -3,16 +3,16 @@
   "meta": {
     "compilerVersion": "3.6.55",
     "schemaVersion": "1.0",
-    "contentHash": "02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:0887a823a0863fd26a66daf4706547837bcdc9c4f8818cdd19c1c40522bf4d5f:097db3fc846d0f2756e7b603f1f3cfc1c8e91aa9f77925b7e1c219ac534e1024:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0bbe5c6b89d616edba1f370154d328cbcc1642a0aba05526e477215478ba8f71:0c5e93243568ed44b613fd741c9e8766d3767999f669b39e91de6b564a158c52:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:106467e5fb7a675584d5fa4d51ac9de735b2cd1f238b36097f0ea3fe9ce414bf:10a4578b3480dd31d00e465253a2acaa870b3601494a81fb52be4b7d0695fb50:1135ee7e2859e984444fff8b1c528e405d2528aeb1965c48ae48b9fa60847324:121e93f8efa838e2f173713fb057b78a5f7bb930cf9dca8eff8c0a87fbc68f27:167502ef1313276d83dad635aaa0aadd7cb781cd9c73ea3f21ed27c6a2af27a7:16fadfdbf1d8532618d5f4164ff3a68ed851312dfe6c99d975eb4779ebd11a7b:17a5e94b0cdfe6bd9e152c479f7f24175a1d18a7c905a1c56048540faf1c1b33:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:1c267034198933314406622f03e68866811cbc6c5577c941910b5cbbbdd21103:226861e02cd8fad3f19051359d40853e69350f350289a48eb861b6b8fbd07118:233a533b83ca52b8fbd1471e60ed35d120138cd2d577bafd693e5a80159a2167:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:2586efecb26eb6d3ab81704c081dec9025edd813cf431c19719e6bab1cca628c:2c9865acdfaadcd1c8c957c90b2dcbd170930959a0bb2f5e10f08b70301df036:2ef8146221c737655bcdc2938ea439d3672ae18af8002d3995420c3e93304e34:2f7595509e9b214aca6f231283b80ca3ab10b6d9cef862d8a286fe6a7c8dc141:333e9f62f3a0b49dd08db012882eb22057ed1490e30f1a3be80996a3dd5ed7d5:3b44cacf14dbedc865feb1c9011d1b26e6b557e9ff0d64cacf43750b7bb23dc5:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:45b9fd721e27b116404817462338b82f697856a06df2d0e7808798290c28abf7:47e3ff14c3364b281c344145bf8d052957aea63156dc0924038c780781a2191c:49adcdf55aefbe7c5fe43e8b6de4d9187d525362dc451ccff8a30606cc615348:4c33b6d3f7ad16f1e732538c08f04d7af56e9e04c09744bfaee6919214f83e1a:4f7eb03bb569a4a5c990aabba0bc5302a24f629fd5a26ee46844f327add4bbf6:541f2781cf4206423c1682e6111aefdee9563fe469281f1970be8992a7f20b60:575efe4c07a00785ecb17477a238f9109bd218d9021063a688e51cbd024f2167:5983b06b581f50324d5f583c27aa732ca33574a3c600e3ea2a8204df889b3144:6186d3f304d800d46945c7093edb988d4e003062181427c548f82768971a56e2:6638bfd4c511e63bfb150b8061f43d677f93bda8a512148a8cd2ff51234fe110:696fe5529bfae2c19544648f271e5919f95df41273d88be3534b37846d2a80a6:6a66fb46bc607c202ab6cb620934fb95a34931867402bc60cbfdc9f5bf2ec768:6ab5316476685e336a35a59852d8d6da3c23003a5ccda03fff304fd5f4679d29:6d4ef205ddca620d3d8c4df06a5736a61d0ebefada7ed4def9db7cc57ea4b904:6dbed59513b2348e042807bd653405a130e38d13a43e28ff78b332d097c22f74:6e5aa7f5c3265d6ea3b946cf133ed0288da838ebc99fb8ee951a123f4afd28cd:72bbc6daec9d2b16b642d0881feeb7e50fbc2649e39022d3cc1e48bd01a9537c:74037e9e1f2cdb00ee6ca5ad77ffbce3f94874a743640aeb4f9d2b4180582231:741dd603d6d5d46af0106082424b0b15cef21c9c606f08ec35b24d004ea37e7f:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:760d7ab4a4f2dc13f8f28b7043e15f159579b0e0517f14892d6f7898e36a6526:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:77a0b952992183b0044a401049c361756355f5d7dc835f69e60d36d6ce8d8a4e:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:8167e03359676ce8dec75aff52024062d50edcc941e7cb60113b375fc4b51578:830ed5dda6f389bec01c4b9beb6da607d8c36341db7268131a064d0770e56f06:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:91f7a31501c2ea80c03376344b06b6c20d190abf36a50699331330fab2fdd5c8:9287f818468dd0b04949b87630a11cf848ce6c62f1fc08c75910b3724bd15228:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:97996bb0225e4d09ca9f3233bb87c518d59bdb0aa7f40fc7942a364b1f9032d4:9a1f2ae809fd84ccefa0b7b872bb5d8eaa411c75f9d789451a987a90f67e950b:9a66d23a675bd9e3c609e93882e67fbe17945cc450ad12643ef856e541d9961f:9bf932cacf71358da1862cef610681da0a2c5c186f22c28237f04902d170f3b6:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a404937b25248068a98c5cc4a35cbb79c20535f1f1a85caecd37355696ecd0c3:a6114e54e8f49a0cb121537998e74a7c8bf8dc42411bdd02a45e18cfc7b460f4:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:add29a8cc2a2ee66b8869910f71ffc57b4b002e641022a5fcc52f150f45e2e64:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b3f57b05f86854f5cb1fc57a2f70aa5f114d94099db7eba4175735e127e7c3a6:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:bbf48333cf8470117d0d0f5a9acac982d4ef1b2dc96712b6935150640a514a89:c4c5e7ea3db8cead5baff1af1f614cecd44f92eb347dc7fed2c67e3aaedb1177:c9226301df7528db1c4a4575eded7ea1545f7093b6e9eb7aacccd028f98ea214:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d2b7ec32514c2ca0abd4da3902919d28cd89378d6713fc7c89736f40ddd57d90:d2ca8039529a58875513713febc26816a0afd8db71b746d0302f9893c59cd6e0:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d68ce48244ea6935fdc5db7ed618c3e6a3eb13337566a2b1cacc7e29aa0f270d:d91f0bdc8b57b8105251a6cb7bc79608480679588e80c6e97940f3baedddbf3e:e4a277c73bc05813517c4b1cc912071cd5fca6536873b8e7669567c63f56603a:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f0c18656b05048b52def70aa6b4e9c5591d99c7da9b6a57712bcf57cefffe34b:f37836019797b1ba8f2a84dffabb933d2547177ecb548a3fd88a9ccdff014d35:f5117535c503885d15b8ceb0133989074fa7afab0237da1c9daab9c09147ef3c:f5dc9c9869e969138e74400a6d165987f026b35dc777bee473740cd583fb36b8:f6213ea2db82a8ee4bb293bcd779b3d77bdadc069771e7c28e5f69024b42edb4:f7c8e9975b35bf8749f417027f24e90506ea6999bfe8a8ebb7f5d9a75641eaa3:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fd5788e6d1d70f7281d8150f21137b4c6703bc509537503cee553a3101e9a681",
+    "contentHash": "02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:0887a823a0863fd26a66daf4706547837bcdc9c4f8818cdd19c1c40522bf4d5f:097db3fc846d0f2756e7b603f1f3cfc1c8e91aa9f77925b7e1c219ac534e1024:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0bbe5c6b89d616edba1f370154d328cbcc1642a0aba05526e477215478ba8f71:0c5e93243568ed44b613fd741c9e8766d3767999f669b39e91de6b564a158c52:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:106467e5fb7a675584d5fa4d51ac9de735b2cd1f238b36097f0ea3fe9ce414bf:10a4578b3480dd31d00e465253a2acaa870b3601494a81fb52be4b7d0695fb50:1135ee7e2859e984444fff8b1c528e405d2528aeb1965c48ae48b9fa60847324:121e93f8efa838e2f173713fb057b78a5f7bb930cf9dca8eff8c0a87fbc68f27:167502ef1313276d83dad635aaa0aadd7cb781cd9c73ea3f21ed27c6a2af27a7:16fadfdbf1d8532618d5f4164ff3a68ed851312dfe6c99d975eb4779ebd11a7b:17a5e94b0cdfe6bd9e152c479f7f24175a1d18a7c905a1c56048540faf1c1b33:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:1c267034198933314406622f03e68866811cbc6c5577c941910b5cbbbdd21103:233a533b83ca52b8fbd1471e60ed35d120138cd2d577bafd693e5a80159a2167:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:2586efecb26eb6d3ab81704c081dec9025edd813cf431c19719e6bab1cca628c:2c9865acdfaadcd1c8c957c90b2dcbd170930959a0bb2f5e10f08b70301df036:2ef8146221c737655bcdc2938ea439d3672ae18af8002d3995420c3e93304e34:2f7595509e9b214aca6f231283b80ca3ab10b6d9cef862d8a286fe6a7c8dc141:333e9f62f3a0b49dd08db012882eb22057ed1490e30f1a3be80996a3dd5ed7d5:349be9d786d9881eaf5f4b5e4d2791a4ddaa5fdf5b8c119c7caf8d9cf7f5debf:398a1e959bae9093fa1314bffb0330faecf506c37b6eb60d1f53e0ccfcf0e9d4:3b44cacf14dbedc865feb1c9011d1b26e6b557e9ff0d64cacf43750b7bb23dc5:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:45b9fd721e27b116404817462338b82f697856a06df2d0e7808798290c28abf7:49adcdf55aefbe7c5fe43e8b6de4d9187d525362dc451ccff8a30606cc615348:4f7eb03bb569a4a5c990aabba0bc5302a24f629fd5a26ee46844f327add4bbf6:541f2781cf4206423c1682e6111aefdee9563fe469281f1970be8992a7f20b60:6186d3f304d800d46945c7093edb988d4e003062181427c548f82768971a56e2:6638bfd4c511e63bfb150b8061f43d677f93bda8a512148a8cd2ff51234fe110:696fe5529bfae2c19544648f271e5919f95df41273d88be3534b37846d2a80a6:6a66fb46bc607c202ab6cb620934fb95a34931867402bc60cbfdc9f5bf2ec768:6ab5316476685e336a35a59852d8d6da3c23003a5ccda03fff304fd5f4679d29:6d4ef205ddca620d3d8c4df06a5736a61d0ebefada7ed4def9db7cc57ea4b904:6dbed59513b2348e042807bd653405a130e38d13a43e28ff78b332d097c22f74:6e5aa7f5c3265d6ea3b946cf133ed0288da838ebc99fb8ee951a123f4afd28cd:72bbc6daec9d2b16b642d0881feeb7e50fbc2649e39022d3cc1e48bd01a9537c:74037e9e1f2cdb00ee6ca5ad77ffbce3f94874a743640aeb4f9d2b4180582231:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:760d7ab4a4f2dc13f8f28b7043e15f159579b0e0517f14892d6f7898e36a6526:7649267abfa9c3c41325797dbe1441cfed1e0f57d8a32a0758661582ed4a29a8:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:77a0b952992183b0044a401049c361756355f5d7dc835f69e60d36d6ce8d8a4e:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7ce9d7b9069290c9cd8cb37323b694a1520cf3f8eae3600cb29588e7d9ccb6c0:8167e03359676ce8dec75aff52024062d50edcc941e7cb60113b375fc4b51578:830ed5dda6f389bec01c4b9beb6da607d8c36341db7268131a064d0770e56f06:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:898e804bb804e9e417d9fe842b7b7519c430ddfd695d9b09a11688568bdd1d0f:91f7a31501c2ea80c03376344b06b6c20d190abf36a50699331330fab2fdd5c8:9287f818468dd0b04949b87630a11cf848ce6c62f1fc08c75910b3724bd15228:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:9a1f2ae809fd84ccefa0b7b872bb5d8eaa411c75f9d789451a987a90f67e950b:9bf932cacf71358da1862cef610681da0a2c5c186f22c28237f04902d170f3b6:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a404937b25248068a98c5cc4a35cbb79c20535f1f1a85caecd37355696ecd0c3:a6114e54e8f49a0cb121537998e74a7c8bf8dc42411bdd02a45e18cfc7b460f4:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:add29a8cc2a2ee66b8869910f71ffc57b4b002e641022a5fcc52f150f45e2e64:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b3f57b05f86854f5cb1fc57a2f70aa5f114d94099db7eba4175735e127e7c3a6:b6f2329a88971f331d01a12c2e1381bc8d80300f2910e9d09272944040bddb09:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:be356557944c0cb4c1b05cb4be32d96560564b8dcd497e6e352cea56557e56a1:c4c5e7ea3db8cead5baff1af1f614cecd44f92eb347dc7fed2c67e3aaedb1177:c9226301df7528db1c4a4575eded7ea1545f7093b6e9eb7aacccd028f98ea214:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cf074a7bfbf7e2aa6a32fa5250f195eccefe55e089873c782c0953201e846bde:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d2b7ec32514c2ca0abd4da3902919d28cd89378d6713fc7c89736f40ddd57d90:d2ca8039529a58875513713febc26816a0afd8db71b746d0302f9893c59cd6e0:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d68ce48244ea6935fdc5db7ed618c3e6a3eb13337566a2b1cacc7e29aa0f270d:d696e613e19b91a28340877addc6c9f2953efdf0d0e310e1560d6c99e61ea3a1:d91f0bdc8b57b8105251a6cb7bc79608480679588e80c6e97940f3baedddbf3e:e17490682182c27b149b9b11de98967293084f471676cbdaa63685c188a9e1a7:e4a277c73bc05813517c4b1cc912071cd5fca6536873b8e7669567c63f56603a:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f0c18656b05048b52def70aa6b4e9c5591d99c7da9b6a57712bcf57cefffe34b:f37836019797b1ba8f2a84dffabb933d2547177ecb548a3fd88a9ccdff014d35:f5117535c503885d15b8ceb0133989074fa7afab0237da1c9daab9c09147ef3c:f5dc9c9869e969138e74400a6d165987f026b35dc777bee473740cd583fb36b8:f6213ea2db82a8ee4bb293bcd779b3d77bdadc069771e7c28e5f69024b42edb4:f7c8e9975b35bf8749f417027f24e90506ea6999bfe8a8ebb7f5d9a75641eaa3:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fd5788e6d1d70f7281d8150f21137b4c6703bc509537503cee553a3101e9a681",
     "projection": "llm-context"
   },
   "domain": {
-    "entityCount": 144,
-    "commandCount": 670,
-    "policyCount": 422,
-    "constraintCount": 229,
-    "enumCount": 146,
-    "eventCount": 588,
+    "entityCount": 153,
+    "commandCount": 707,
+    "policyCount": 449,
+    "constraintCount": 242,
+    "enumCount": 157,
+    "eventCount": 614,
     "modules": [],
     "multiTenant": true
   },
@@ -2059,6 +2059,18 @@
           "modifiers": []
         },
         {
+          "name": "storageWindowDays",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "storageWindowSource",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -2126,6 +2138,16 @@
           "name": "ingredientLines",
           "kind": "hasMany",
           "target": "ComponentIngredient"
+        },
+        {
+          "name": "componentLines",
+          "kind": "hasMany",
+          "target": "ComponentComponent"
+        },
+        {
+          "name": "portionSpecs",
+          "kind": "hasMany",
+          "target": "ComponentPortionSpec"
         }
       ],
       "constraints": [
@@ -2169,7 +2191,8 @@
         "retire",
         "retract",
         "reviseDraft",
-        "setServesPerYield"
+        "setServesPerYield",
+        "setStorageWindow"
       ],
       "policies": [],
       "key": [
@@ -2198,6 +2221,179 @@
           "from": "retired",
           "to": []
         }
+      ]
+    },
+    {
+      "name": "ComponentComponent",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "componentId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "childComponentId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "each"
+        },
+        {
+          "name": "sortOrder",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "wasteFactor",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": [],
+          "defaultValue": 1
+        },
+        {
+          "name": "quantityBasis",
+          "type": "QuantityBasis | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "prepNotes",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "addedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "component",
+          "kind": "belongsTo",
+          "target": "Component",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "componentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "childComponent",
+          "kind": "belongsTo",
+          "target": "Component",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "childComponentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "nestedLineNotSelf",
+          "code": "nestedLineNotSelf",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A recipe cannot contain itself",
+          "overrideable": false
+        },
+        {
+          "name": "nestedLineQuantityPositive",
+          "code": "nestedLineQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Nested recipe quantity must be positive",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "add",
+        "adjustQuantity",
+        "remove"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -2886,6 +3082,12 @@
           "modifiers": []
         },
         {
+          "name": "quantityBasis",
+          "type": "QuantityBasis | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "addedAt",
           "type": "datetime | null",
           "required": false,
@@ -2994,6 +3196,150 @@
         "adjustQuantity",
         "remove",
         "setWasteFactor"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "ComponentPortionSpec",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "componentId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required",
+            "searchable"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "pieceQuantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
+          "name": "pieceUnit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "ounce"
+        },
+        {
+          "name": "piecesPerBatch",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "source",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "definedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "component",
+          "kind": "belongsTo",
+          "target": "Component",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "componentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "portionSpecNamed",
+          "code": "portionSpecNamed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Portion spec name is required",
+          "overrideable": false
+        },
+        {
+          "name": "portionSpecPiecePositive",
+          "code": "portionSpecPiecePositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Piece quantity must be positive",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "define",
+        "retire",
+        "revise"
       ],
       "policies": [],
       "key": [
@@ -4552,6 +4898,12 @@
           "modifiers": []
         },
         {
+          "name": "kind",
+          "type": "DishKind | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -4662,6 +5014,7 @@
       ],
       "commands": [
         "classifyAllergens",
+        "classifyKind",
         "clearPrimaryImage",
         "introduce",
         "linkAsEdition",
@@ -4773,6 +5126,24 @@
           "modifiers": []
         },
         {
+          "name": "portionSpecId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "pieceCount",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "quantityBasis",
+          "type": "QuantityBasis | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "attachedAt",
           "type": "datetime | null",
           "required": false,
@@ -4832,12 +5203,28 @@
               "id"
             ]
           }
+        },
+        {
+          "name": "portionSpec",
+          "kind": "belongsTo",
+          "target": "ComponentPortionSpec",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "portionSpecId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
         }
       ],
       "constraints": [],
       "commands": [
         "attach",
-        "detach"
+        "detach",
+        "setPortionSpec"
       ],
       "policies": [],
       "key": [
@@ -5154,6 +5541,18 @@
           "modifiers": []
         },
         {
+          "name": "quantityBasis",
+          "type": "QuantityBasis | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "quantityBasisSource",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "addedAt",
           "type": "datetime | null",
           "required": false,
@@ -5382,6 +5781,48 @@
           "modifiers": []
         },
         {
+          "name": "stage",
+          "type": "DishTaskStage | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "resolution",
+          "type": "TaskResolution | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "choiceOptions",
+          "type": "list<string> | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "leadTimeMinDays",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "leadTimeMaxDays",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sequenceAfterDishTaskId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "stationId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "status",
           "type": "DishTaskStatus",
           "required": true,
@@ -5471,6 +5912,11 @@
               "id"
             ]
           }
+        },
+        {
+          "name": "materials",
+          "kind": "hasMany",
+          "target": "DishTaskMaterial"
         }
       ],
       "constraints": [
@@ -5503,7 +5949,8 @@
         "add",
         "backfillActiveKey",
         "retire",
-        "revise"
+        "revise",
+        "specifyWork"
       ],
       "policies": [],
       "key": [
@@ -5525,6 +5972,176 @@
             "active"
           ]
         }
+      ]
+    },
+    {
+      "name": "DishTaskMaterial",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dishTaskId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "dishIngredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dishComponentId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dishContainerId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "workQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "workUnit",
+          "type": "UnitOfMeasure | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "linkedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "dishTask",
+          "kind": "belongsTo",
+          "target": "DishTask",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishTaskId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "dishIngredient",
+          "kind": "belongsTo",
+          "target": "DishIngredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishIngredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "dishComponent",
+          "kind": "belongsTo",
+          "target": "DishComponent",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishComponentId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "dishContainer",
+          "kind": "belongsTo",
+          "target": "DishContainer",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishContainerId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "materialHasTarget",
+          "code": "materialHasTarget",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A task material must point at a requirement",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "link",
+        "unlink"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -8558,6 +9175,213 @@
       ]
     },
     {
+      "name": "EventDishLineOverride",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventDishId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "kind",
+          "type": "EventDishOverrideKind",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "adjust"
+        },
+        {
+          "name": "targetDishIngredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "targetDishComponentId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "targetDishContainerId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "targetDishTaskId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "componentId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "quantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "portionsAffected",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "appliedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "revokedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "eventDish",
+          "kind": "belongsTo",
+          "target": "EventDish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventDishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "overrideReasonPresent",
+          "code": "overrideReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Override reason is required",
+          "overrideable": false
+        },
+        {
+          "name": "overridePortionsNonnegative",
+          "code": "overridePortionsNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Portions affected cannot be negative",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "apply",
+        "revoke"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
       "name": "EventGuest",
       "properties": [
         {
@@ -8903,6 +9727,86 @@
           "modifiers": []
         },
         {
+          "name": "sourceKey",
+          "type": "string | null",
+          "required": false,
+          "modifiers": [
+            "indexed"
+          ]
+        },
+        {
+          "name": "exactQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "roundedQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "quantityBasis",
+          "type": "QuantityBasis | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "unitStatus",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "ownership",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sourceDishIngredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sourceDishComponentId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "componentPath",
+          "type": "list<string> | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "productionBatchId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "productionBatchAllocationId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "supersededAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "supersededBySourceKey",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -8973,7 +9877,8 @@
         "refreshRecipeSync",
         "retire",
         "retirePreviousUnit",
-        "revise"
+        "revise",
+        "supersede"
       ],
       "policies": [],
       "key": [
@@ -10066,6 +10971,98 @@
           "defaultValue": ""
         },
         {
+          "name": "sourceAccount",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "role",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "ordinal",
+          "type": "int | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "linkKey",
+          "type": "string | null",
+          "required": false,
+          "modifiers": [
+            "indexed"
+          ]
+        },
+        {
+          "name": "decision",
+          "type": "LinkDecision | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "suggestedBy",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "decidedByUserId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "decidedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "appliedValues",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "appliedSourceVersion",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "appliedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "appliedImportRunId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sourceVersion",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lastSeenAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "lastSeenImportRunId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "verified",
           "type": "boolean",
           "required": true,
@@ -10215,8 +11212,11 @@
         }
       ],
       "commands": [
+        "decide",
         "discard",
         "link",
+        "observe",
+        "recordApplied",
         "resolveConflict",
         "retire",
         "unlinkExternalRecord",
@@ -10426,6 +11426,194 @@
       "key": [
         "tenantId",
         "id"
+      ]
+    },
+    {
+      "name": "ImportConflict",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "externalRecordLinkId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "field",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "appliedValue",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "capsuleValue",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sourceValue",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sourceVersion",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "status",
+          "type": "ImportConflictStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "pending"
+        },
+        {
+          "name": "resolvedByUserId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "resolvedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "resolvedOnSourceVersion",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "raisedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "externalRecordLink",
+          "kind": "belongsTo",
+          "target": "ExternalRecordLink",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "externalRecordLinkId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "conflictFieldPresent",
+          "code": "conflictFieldPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Conflict field is required",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "raise",
+        "settle",
+        "updateSource"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "pending",
+          "to": [
+            "keep_capsule",
+            "take_source",
+            "manual"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "keep_capsule",
+          "to": [
+            "pending"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "take_source",
+          "to": [
+            "pending"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "manual",
+          "to": [
+            "pending"
+          ]
+        }
       ]
     },
     {
@@ -13733,6 +14921,165 @@
       "relationships": [],
       "constraints": [],
       "commands": [],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "ItemUnitMapping",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "componentId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "kind",
+          "type": "ItemUnitMappingKind",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "pack"
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "each"
+        },
+        {
+          "name": "equalsQuantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
+          "name": "equalsUnit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "each"
+        },
+        {
+          "name": "fromBasis",
+          "type": "QuantityBasis | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "toBasis",
+          "type": "QuantityBasis | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "source",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "confirmedByUserId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "ingredient",
+          "kind": "belongsTo",
+          "target": "Ingredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "ingredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "mappingQuantityPositive",
+          "code": "mappingQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Mapping quantity must be positive",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "record",
+        "retire"
+      ],
       "policies": [],
       "key": [
         "tenantId",
@@ -17826,6 +19173,42 @@
           "modifiers": []
         },
         {
+          "name": "overrideOfDishTaskId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "overrideReason",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "resolution",
+          "type": "TaskResolution | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "choiceOptions",
+          "type": "list<string> | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "chosenOption",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "stationId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -18003,14 +19386,17 @@
         "complete",
         "linkRecipe",
         "markBlocked",
+        "markOverride",
         "open",
         "reconcileRemainingWork",
         "refreshGenerated",
         "refreshRecipeTemplate",
         "release",
         "replaceRecipeComponent",
+        "resolveChoice",
         "retireWithTemplate",
         "revise",
+        "setChoice",
         "standDown",
         "start",
         "unblock"
@@ -18424,6 +19810,128 @@
       ]
     },
     {
+      "name": "PrepTaskMaterial",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "prepTaskId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "eventIngredientContributionId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "productionBatchAllocationId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dishIngredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dishComponentId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "workQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "workUnit",
+          "type": "UnitOfMeasure | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "linkedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "prepTask",
+          "kind": "belongsTo",
+          "target": "PrepTask",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "prepTaskId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "link",
+        "unlink"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
       "name": "ProductionBatch",
       "properties": [
         {
@@ -18486,6 +19994,42 @@
             "required"
           ],
           "defaultValue": "portion"
+        },
+        {
+          "name": "plannedExact",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "plannedRounded",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "surplusQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "roundingScope",
+          "type": "RoundingScope | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "portionSpecId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "productionDate",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
         },
         {
           "name": "notes",
@@ -18604,6 +20148,7 @@
         "cancel",
         "complete",
         "plan",
+        "reconcilePlan",
         "start"
       ],
       "policies": [],
@@ -18636,6 +20181,244 @@
         {
           "property": "status",
           "from": "cancelled",
+          "to": []
+        }
+      ]
+    },
+    {
+      "name": "ProductionBatchAllocation",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "productionBatchId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "eventId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventDishId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "allocatedQuantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "portion"
+        },
+        {
+          "name": "formulaShare",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "isSurplus",
+          "type": "boolean",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": false
+        },
+        {
+          "name": "status",
+          "type": "BatchAllocationStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "planned"
+        },
+        {
+          "name": "allocatedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "producedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "portionedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "releaseReason",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "productionBatch",
+          "kind": "belongsTo",
+          "target": "ProductionBatch",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "productionBatchId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "eventDish",
+          "kind": "belongsTo",
+          "target": "EventDish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventDishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "allocationQuantityNonnegative",
+          "code": "allocationQuantityNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Allocated quantity cannot be negative",
+          "overrideable": false
+        },
+        {
+          "name": "allocationOwner",
+          "code": "allocationOwner",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "An allocation belongs to an event or is surplus",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "allocate",
+        "markPortioned",
+        "markProduced",
+        "release"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "planned",
+          "to": [
+            "produced",
+            "released"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "produced",
+          "to": [
+            "portioned",
+            "released"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "portioned",
+          "to": []
+        },
+        {
+          "property": "status",
+          "from": "released",
           "to": []
         }
       ]
@@ -24102,6 +25885,143 @@
       "key": [
         "tenantId",
         "id"
+      ]
+    },
+    {
+      "name": "Station",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required",
+            "searchable"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "sortOrder",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "aliases",
+          "type": "list<string> | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "status",
+          "type": "StationStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "active"
+        },
+        {
+          "name": "definedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "retiredAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [],
+      "constraints": [
+        {
+          "name": "stationNamed",
+          "code": "stationNamed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Station name is required",
+          "overrideable": false
+        },
+        {
+          "name": "stationSortNonnegative",
+          "code": "stationSortNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Sort order cannot be negative",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "define",
+        "reinstate",
+        "rename",
+        "retire"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "active",
+          "to": [
+            "retired"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "retired",
+          "to": [
+            "active"
+          ]
+        }
       ]
     },
     {
@@ -33196,6 +35116,275 @@
       ]
     },
     {
+      "name": "setStorageWindow",
+      "entity": "Component",
+      "parameters": [
+        {
+          "name": "storageWindowDays",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "storageWindowNonnegative",
+          "code": "storageWindowNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Storage window cannot be negative"
+        }
+      ],
+      "policies": [
+        "componentRead",
+        "componentWrite",
+        "componentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "storageWindowDays",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "storageWindowSource",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ComponentStorageWindowSet"
+      ]
+    },
+    {
+      "name": "add",
+      "entity": "ComponentComponent",
+      "parameters": [
+        {
+          "name": "componentId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "childComponentId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "sortOrder",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "wasteFactor",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "quantityBasis",
+          "type": "QuantityBasis",
+          "required": false
+        },
+        {
+          "name": "prepNotes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "addNestedNotSelf",
+          "code": "addNestedNotSelf",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A recipe cannot contain itself"
+        },
+        {
+          "name": "addNestedQuantity",
+          "code": "addNestedQuantity",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Nested recipe quantity must be positive"
+        },
+        {
+          "name": "addNestedWasteFactor",
+          "code": "addNestedWasteFactor",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Waste factor must be greater than 0"
+        }
+      ],
+      "policies": [
+        "componentComponentRead",
+        "componentComponentWrite",
+        "componentComponentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "componentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "childComponentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sortOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "wasteFactor",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantityBasis",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "prepNotes",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "addedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ComponentComponentAdded"
+      ]
+    },
+    {
+      "name": "adjustQuantity",
+      "entity": "ComponentComponent",
+      "parameters": [
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "adjustNestedQuantity",
+          "code": "adjustNestedQuantity",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Nested recipe quantity must be positive"
+        }
+      ],
+      "policies": [
+        "componentComponentRead",
+        "componentComponentWrite",
+        "componentComponentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ComponentComponentQuantityAdjusted"
+      ]
+    },
+    {
+      "name": "remove",
+      "entity": "ComponentComponent",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "removeNestedReason",
+          "code": "removeNestedReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Removal reason is required"
+        }
+      ],
+      "policies": [
+        "componentComponentRead",
+        "componentComponentWrite",
+        "componentComponentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ComponentComponentRemoved"
+      ]
+    },
+    {
       "name": "approveReview",
       "entity": "ComponentImport",
       "parameters": [],
@@ -34725,6 +36914,239 @@
       ],
       "emits": [
         "ComponentIngredientWasteFactorSet"
+      ]
+    },
+    {
+      "name": "define",
+      "entity": "ComponentPortionSpec",
+      "parameters": [
+        {
+          "name": "componentId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "pieceQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "pieceUnit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "piecesPerBatch",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "defineSpecName",
+          "code": "defineSpecName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Portion spec name is required"
+        },
+        {
+          "name": "defineSpecPiece",
+          "code": "defineSpecPiece",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Piece quantity must be positive"
+        },
+        {
+          "name": "defineSpecPieces",
+          "code": "defineSpecPieces",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Pieces per batch must be positive"
+        }
+      ],
+      "policies": [
+        "componentPortionSpecRead",
+        "componentPortionSpecWrite",
+        "componentPortionSpecExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "componentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "pieceQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "pieceUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "piecesPerBatch",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "source",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "definedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ComponentPortionSpecDefined"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "ComponentPortionSpec",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireSpecReason",
+          "code": "retireSpecReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Reason is required"
+        }
+      ],
+      "policies": [
+        "componentPortionSpecRead",
+        "componentPortionSpecWrite",
+        "componentPortionSpecExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ComponentPortionSpecRetired"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "ComponentPortionSpec",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "pieceQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "pieceUnit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "piecesPerBatch",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseSpecName",
+          "code": "reviseSpecName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Portion spec name is required"
+        },
+        {
+          "name": "reviseSpecPiece",
+          "code": "reviseSpecPiece",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Piece quantity must be positive"
+        }
+      ],
+      "policies": [
+        "componentPortionSpecRead",
+        "componentPortionSpecWrite",
+        "componentPortionSpecExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "pieceQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "pieceUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "piecesPerBatch",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "source",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ComponentPortionSpecRevised"
       ]
     },
     {
@@ -36533,6 +38955,36 @@
       ]
     },
     {
+      "name": "classifyKind",
+      "entity": "Dish",
+      "parameters": [
+        {
+          "name": "kind",
+          "type": "DishKind",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "dishRead",
+        "dishWrite",
+        "dishExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "kind",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishKindClassified"
+      ]
+    },
+    {
       "name": "clearPrimaryImage",
       "entity": "Dish",
       "parameters": [],
@@ -37407,6 +39859,65 @@
       ],
       "emits": [
         "DishComponentDetached"
+      ]
+    },
+    {
+      "name": "setPortionSpec",
+      "entity": "DishComponent",
+      "parameters": [
+        {
+          "name": "portionSpecId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "pieceCount",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "quantityBasis",
+          "type": "QuantityBasis",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "portionSpecPiecesPositive",
+          "code": "portionSpecPiecesPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Pieces per portion must be positive"
+        }
+      ],
+      "policies": [
+        "dishComponentRead",
+        "dishComponentWrite",
+        "dishComponentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "portionSpecId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "pieceCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantityBasis",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishComponentPortionSpecSet"
       ]
     },
     {
@@ -38369,6 +40880,252 @@
       ],
       "emits": [
         "DishTaskRevised"
+      ]
+    },
+    {
+      "name": "specifyWork",
+      "entity": "DishTask",
+      "parameters": [
+        {
+          "name": "stage",
+          "type": "DishTaskStage",
+          "required": false
+        },
+        {
+          "name": "resolution",
+          "type": "TaskResolution",
+          "required": false
+        },
+        {
+          "name": "choiceOptions",
+          "type": "list<string>",
+          "required": false
+        },
+        {
+          "name": "leadTimeMinDays",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "leadTimeMaxDays",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "sequenceAfterDishTaskId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "stationId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "specifyLeadTimeNonnegative",
+          "code": "specifyLeadTimeNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Lead time cannot be negative"
+        },
+        {
+          "name": "specifySequenceNotSelf",
+          "code": "specifySequenceNotSelf",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A step cannot follow itself"
+        }
+      ],
+      "policies": [
+        "dishTaskRead",
+        "dishTaskWrite",
+        "dishTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "stage",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolution",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "choiceOptions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "leadTimeMinDays",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "leadTimeMaxDays",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sequenceAfterDishTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "stationId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskWorkSpecified"
+      ]
+    },
+    {
+      "name": "link",
+      "entity": "DishTaskMaterial",
+      "parameters": [
+        {
+          "name": "dishTaskId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "dishIngredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "dishComponentId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "dishContainerId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "workQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "workUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "linkMaterialTarget",
+          "code": "linkMaterialTarget",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A task material must point at a requirement"
+        },
+        {
+          "name": "linkWorkQuantity",
+          "code": "linkWorkQuantity",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Work quantity must be positive"
+        }
+      ],
+      "policies": [
+        "dishTaskMaterialRead",
+        "dishTaskMaterialWrite",
+        "dishTaskMaterialExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "dishTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishComponentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishContainerId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "workQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "workUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "linkedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskMaterialLinked"
+      ]
+    },
+    {
+      "name": "unlink",
+      "entity": "DishTaskMaterial",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "unlinkMaterialReason",
+          "code": "unlinkMaterialReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Reason is required"
+        }
+      ],
+      "policies": [
+        "dishTaskMaterialRead",
+        "dishTaskMaterialWrite",
+        "dishTaskMaterialExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskMaterialUnlinked"
       ]
     },
     {
@@ -42647,6 +45404,235 @@
       ]
     },
     {
+      "name": "apply",
+      "entity": "EventDishLineOverride",
+      "parameters": [
+        {
+          "name": "eventDishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "kind",
+          "type": "EventDishOverrideKind",
+          "required": true
+        },
+        {
+          "name": "portionsAffected",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "targetDishIngredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "targetDishComponentId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "targetDishContainerId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "targetDishTaskId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "componentId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "applyOverrideReason",
+          "code": "applyOverrideReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Override reason is required"
+        },
+        {
+          "name": "applyOverridePortions",
+          "code": "applyOverridePortions",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Portions affected cannot be negative"
+        },
+        {
+          "name": "applyOverrideTarget",
+          "code": "applyOverrideTarget",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Remove, replace and adjust need a target line"
+        },
+        {
+          "name": "applyOverrideSource",
+          "code": "applyOverrideSource",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Add and replace need an ingredient or a recipe"
+        }
+      ],
+      "policies": [
+        "eventDishLineOverrideRead",
+        "eventDishLineOverrideWrite",
+        "eventDishLineOverrideExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventDishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "kind",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "targetDishIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "targetDishComponentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "targetDishContainerId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "targetDishTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "componentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "portionsAffected",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "reason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "appliedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventDishLineOverrideApplied"
+      ]
+    },
+    {
+      "name": "revoke",
+      "entity": "EventDishLineOverride",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "revokeOverrideReason",
+          "code": "revokeOverrideReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Revoke reason is required"
+        }
+      ],
+      "policies": [
+        "eventDishLineOverrideRead",
+        "eventDishLineOverrideWrite",
+        "eventDishLineOverrideExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "revokedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventDishLineOverrideRevoked"
+      ]
+    },
+    {
       "name": "assignTable",
       "entity": "EventGuest",
       "parameters": [
@@ -43002,6 +45988,61 @@
           "name": "purchasingWeekStart",
           "type": "datetime",
           "required": false
+        },
+        {
+          "name": "sourceKey",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "exactQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "roundedQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "quantityBasis",
+          "type": "QuantityBasis",
+          "required": false
+        },
+        {
+          "name": "unitStatus",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ownership",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sourceDishIngredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "sourceDishComponentId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "componentPath",
+          "type": "list<string>",
+          "required": false
+        },
+        {
+          "name": "productionBatchId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "productionBatchAllocationId",
+          "type": "uuid",
+          "required": false
         }
       ],
       "guards": [
@@ -43029,6 +46070,11 @@
         "eventIngredientContributionExecute"
       ],
       "actions": [
+        {
+          "kind": "compute",
+          "target": "batchKeep",
+          "expression": "[omitted]"
+        },
         {
           "kind": "mutate",
           "target": "eventId",
@@ -43092,6 +46138,71 @@
         {
           "kind": "mutate",
           "target": "recordedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "exactQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "roundedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantityBasis",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unitStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ownership",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceDishIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceDishComponentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "componentPath",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "productionBatchId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "productionBatchAllocationId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "supersededAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "supersededBySourceKey",
           "expression": "[omitted]"
         }
       ],
@@ -43253,6 +46364,11 @@
       ],
       "actions": [
         {
+          "kind": "compute",
+          "target": "batchOwned",
+          "expression": "[omitted]"
+        },
+        {
           "kind": "mutate",
           "target": "quantityPerServing",
           "expression": "[omitted]"
@@ -43265,6 +46381,70 @@
         {
           "kind": "mutate",
           "target": "servings",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchasingWeekStart",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventIngredientContributionRecorded"
+      ]
+    },
+    {
+      "name": "supersede",
+      "entity": "EventIngredientContribution",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "supersededBySourceKey",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "supersedeReason",
+          "code": "supersedeReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Supersede reason is required"
+        }
+      ],
+      "policies": [
+        "eventIngredientContributionRead",
+        "eventIngredientContributionWrite",
+        "eventIngredientContributionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "supersededAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "supersededBySourceKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
           "expression": "[omitted]"
         },
         {
@@ -45055,6 +48235,83 @@
       ]
     },
     {
+      "name": "decide",
+      "entity": "ExternalRecordLink",
+      "parameters": [
+        {
+          "name": "decision",
+          "type": "LinkDecision",
+          "required": true
+        },
+        {
+          "name": "decidedByUserId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "decideUserPresent",
+          "code": "decideUserPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Deciding user is required"
+        }
+      ],
+      "policies": [
+        "externalRecordLinkRead",
+        "externalRecordLinkWrite",
+        "externalRecordLinkExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "decision",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "decidedByUserId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "decidedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "verified",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "verifiedByUserId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastVerifiedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "conflictStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedByUserId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
       "name": "discard",
       "entity": "ExternalRecordLink",
       "parameters": [
@@ -45158,6 +48415,41 @@
         },
         {
           "name": "metadata",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sourceAccount",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ordinal",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "linkKey",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "decision",
+          "type": "LinkDecision",
+          "required": false
+        },
+        {
+          "name": "suggestedBy",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sourceVersion",
           "type": "string",
           "required": false
         }
@@ -45278,11 +48570,164 @@
           "kind": "mutate",
           "target": "conflictStatus",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceAccount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "role",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ordinal",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "linkKey",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "decision",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "suggestedBy",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceVersion",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastSeenAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastSeenImportRunId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
         "ExternalRecordLinked"
       ]
+    },
+    {
+      "name": "observe",
+      "entity": "ExternalRecordLink",
+      "parameters": [
+        {
+          "name": "sourceVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "rawSourceData",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "importRunId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "externalRecordLinkRead",
+        "externalRecordLinkWrite",
+        "externalRecordLinkExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "sourceVersion",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "rawSourceData",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastSeenAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "lastSeenImportRunId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "recordApplied",
+      "entity": "ExternalRecordLink",
+      "parameters": [
+        {
+          "name": "appliedValues",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "appliedSourceVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "importRunId",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "externalRecordLinkRead",
+        "externalRecordLinkWrite",
+        "externalRecordLinkExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "appliedValues",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "appliedSourceVersion",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "appliedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "appliedImportRunId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "resolveConflict",
@@ -45855,6 +49300,226 @@
       "emits": [
         "ImportArtifactRegistered"
       ]
+    },
+    {
+      "name": "raise",
+      "entity": "ImportConflict",
+      "parameters": [
+        {
+          "name": "externalRecordLinkId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "field",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "appliedValue",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "capsuleValue",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sourceValue",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "sourceVersion",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "raiseFieldPresent",
+          "code": "raiseFieldPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Conflict field is required"
+        }
+      ],
+      "policies": [
+        "importConflictRead",
+        "importConflictWrite",
+        "importConflictExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "externalRecordLinkId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "field",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "appliedValue",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "capsuleValue",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceValue",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceVersion",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "raisedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ImportConflictRaised"
+      ]
+    },
+    {
+      "name": "settle",
+      "entity": "ImportConflict",
+      "parameters": [
+        {
+          "name": "resolution",
+          "type": "ImportConflictStatus",
+          "required": true
+        },
+        {
+          "name": "resolvedByUserId",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "settleUserPresent",
+          "code": "settleUserPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Resolving user is required"
+        },
+        {
+          "name": "settleNotPending",
+          "code": "settleNotPending",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Resolution must pick keep_capsule, take_source or manual"
+        }
+      ],
+      "policies": [
+        "importConflictRead",
+        "importConflictWrite",
+        "importConflictExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedByUserId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedOnSourceVersion",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ImportConflictResolved"
+      ]
+    },
+    {
+      "name": "updateSource",
+      "entity": "ImportConflict",
+      "parameters": [
+        {
+          "name": "sourceValue",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sourceVersion",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "capsuleValue",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "importConflictRead",
+        "importConflictWrite",
+        "importConflictExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "sourceValue",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceVersion",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "capsuleValue",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "activate",
@@ -51651,6 +55316,181 @@
       ],
       "emits": [
         "InvoiceWrittenOff"
+      ]
+    },
+    {
+      "name": "record",
+      "entity": "ItemUnitMapping",
+      "parameters": [
+        {
+          "name": "kind",
+          "type": "ItemUnitMappingKind",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "equalsQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "equalsUnit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "componentId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "fromBasis",
+          "type": "QuantityBasis",
+          "required": false
+        },
+        {
+          "name": "toBasis",
+          "type": "QuantityBasis",
+          "required": false
+        },
+        {
+          "name": "source",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordMappingTarget",
+          "code": "recordMappingTarget",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A unit mapping needs an ingredient or a recipe"
+        },
+        {
+          "name": "recordMappingPositive",
+          "code": "recordMappingPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Mapping quantity must be positive"
+        }
+      ],
+      "policies": [
+        "itemUnitMappingRead",
+        "itemUnitMappingWrite",
+        "itemUnitMappingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "componentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "kind",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "equalsQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "equalsUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "fromBasis",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "toBasis",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "source",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "confirmedByUserId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ItemUnitMappingRecorded"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "ItemUnitMapping",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireMappingReason",
+          "code": "retireMappingReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Reason is required"
+        }
+      ],
+      "policies": [
+        "itemUnitMappingRead",
+        "itemUnitMappingWrite",
+        "itemUnitMappingExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ItemUnitMappingRetired"
       ]
     },
     {
@@ -57550,6 +61390,7 @@
       "guards": [
         "[omitted]",
         "[omitted]",
+        "[omitted]",
         "[omitted]"
       ],
       "constraints": [
@@ -57662,6 +61503,7 @@
       "entity": "PrepTask",
       "parameters": [],
       "guards": [
+        "[omitted]",
         "[omitted]",
         "[omitted]",
         "[omitted]"
@@ -57899,6 +61741,87 @@
       ]
     },
     {
+      "name": "markOverride",
+      "entity": "PrepTask",
+      "parameters": [
+        {
+          "name": "overrideOfDishTaskId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "overrideReasonPresent",
+          "code": "overrideReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Override reason is required"
+        },
+        {
+          "name": "overrideNamePresent",
+          "code": "overrideNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Prep task name cannot be blank"
+        }
+      ],
+      "policies": [
+        "prepTaskRead",
+        "prepTaskWrite",
+        "prepTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "overrideOfDishTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "overrideReason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "specialInstructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "isGenerated",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PrepTaskOverridden"
+      ]
+    },
+    {
       "name": "open",
       "entity": "PrepTask",
       "parameters": [
@@ -57985,6 +61908,16 @@
         {
           "name": "notes",
           "type": "string",
+          "required": false
+        },
+        {
+          "name": "resolution",
+          "type": "TaskResolution",
+          "required": false
+        },
+        {
+          "name": "choiceOptions",
+          "type": "list<string>",
           "required": false
         }
       ],
@@ -58111,6 +62044,16 @@
         {
           "kind": "mutate",
           "target": "station",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolution",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "choiceOptions",
           "expression": "[omitted]"
         },
         {
@@ -58469,6 +62412,57 @@
       "emits": []
     },
     {
+      "name": "resolveChoice",
+      "entity": "PrepTask",
+      "parameters": [
+        {
+          "name": "choice",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "choicePresent",
+          "code": "choicePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A choice is required"
+        },
+        {
+          "name": "choiceListed",
+          "code": "choiceListed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Choice must be one of the listed options"
+        }
+      ],
+      "policies": [
+        "prepTaskRead",
+        "prepTaskWrite",
+        "prepTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "chosenOption",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolution",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PrepTaskChoiceResolved"
+      ]
+    },
+    {
       "name": "retireWithTemplate",
       "entity": "PrepTask",
       "parameters": [
@@ -58637,6 +62631,49 @@
       ]
     },
     {
+      "name": "setChoice",
+      "entity": "PrepTask",
+      "parameters": [
+        {
+          "name": "choiceOptions",
+          "type": "list<string>",
+          "required": true
+        },
+        {
+          "name": "resolution",
+          "type": "TaskResolution",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "prepTaskRead",
+        "prepTaskWrite",
+        "prepTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "choiceOptions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolution",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "chosenOption",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
       "name": "standDown",
       "entity": "PrepTask",
       "parameters": [
@@ -58700,6 +62737,7 @@
       "entity": "PrepTask",
       "parameters": [],
       "guards": [
+        "[omitted]",
         "[omitted]",
         "[omitted]",
         "[omitted]",
@@ -59098,6 +63136,149 @@
       ]
     },
     {
+      "name": "link",
+      "entity": "PrepTaskMaterial",
+      "parameters": [
+        {
+          "name": "prepTaskId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "eventIngredientContributionId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "productionBatchAllocationId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "dishIngredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "dishComponentId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "workQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "workUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "linkPrepMaterialTarget",
+          "code": "linkPrepMaterialTarget",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A prep task material must point at a requirement or allocation"
+        }
+      ],
+      "policies": [
+        "prepTaskMaterialRead",
+        "prepTaskMaterialWrite",
+        "prepTaskMaterialExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "prepTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventIngredientContributionId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "productionBatchAllocationId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishComponentId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "workQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "workUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "linkedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PrepTaskMaterialLinked"
+      ]
+    },
+    {
+      "name": "unlink",
+      "entity": "PrepTaskMaterial",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "unlinkPrepMaterialReason",
+          "code": "unlinkPrepMaterialReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Reason is required"
+        }
+      ],
+      "policies": [
+        "prepTaskMaterialRead",
+        "prepTaskMaterialWrite",
+        "prepTaskMaterialExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PrepTaskMaterialUnlinked"
+      ]
+    },
+    {
       "name": "cancel",
       "entity": "ProductionBatch",
       "parameters": [
@@ -59308,6 +63489,103 @@
       ]
     },
     {
+      "name": "reconcilePlan",
+      "entity": "ProductionBatch",
+      "parameters": [
+        {
+          "name": "plannedExact",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "plannedRounded",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "roundingScope",
+          "type": "RoundingScope",
+          "required": false
+        },
+        {
+          "name": "portionSpecId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "productionDate",
+          "type": "datetime",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reconcileExactNonnegative",
+          "code": "reconcileExactNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Exact quantity cannot be negative"
+        },
+        {
+          "name": "reconcileRoundedCoversExact",
+          "code": "reconcileRoundedCoversExact",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Rounded quantity cannot be below the exact need"
+        }
+      ],
+      "policies": [
+        "productionBatchRead",
+        "productionBatchWrite",
+        "productionBatchExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "plannedExact",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "plannedRounded",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "surplusQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "plannedYield",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "roundingScope",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "portionSpecId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "productionDate",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ProductionBatchPlanReconciled"
+      ]
+    },
+    {
       "name": "start",
       "entity": "ProductionBatch",
       "parameters": [],
@@ -59342,6 +63620,227 @@
       "emits": [
         "ProductionBatchStarted"
       ]
+    },
+    {
+      "name": "allocate",
+      "entity": "ProductionBatchAllocation",
+      "parameters": [
+        {
+          "name": "productionBatchId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "allocatedQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "formulaShare",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "eventDishId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "isSurplus",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "allocateQuantity",
+          "code": "allocateQuantity",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Allocated quantity cannot be negative"
+        },
+        {
+          "name": "allocateShare",
+          "code": "allocateShare",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Formula share cannot be negative"
+        },
+        {
+          "name": "allocateOwner",
+          "code": "allocateOwner",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "An allocation belongs to an event or is surplus"
+        }
+      ],
+      "policies": [
+        "productionBatchAllocationRead",
+        "productionBatchAllocationWrite",
+        "productionBatchAllocationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "productionBatchId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventDishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "allocatedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "formulaShare",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "isSurplus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "allocatedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "ProductionBatchAllocated"
+      ]
+    },
+    {
+      "name": "markPortioned",
+      "entity": "ProductionBatchAllocation",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "productionBatchAllocationRead",
+        "productionBatchAllocationWrite",
+        "productionBatchAllocationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "portionedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "markProduced",
+      "entity": "ProductionBatchAllocation",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "productionBatchAllocationRead",
+        "productionBatchAllocationWrite",
+        "productionBatchAllocationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "producedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "release",
+      "entity": "ProductionBatchAllocation",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "releaseAllocationReason",
+          "code": "releaseAllocationReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Release reason is required"
+        }
+      ],
+      "policies": [
+        "productionBatchAllocationRead",
+        "productionBatchAllocationWrite",
+        "productionBatchAllocationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "releaseReason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "accept",
@@ -66913,6 +71412,199 @@
       "emits": [
         "StaffMessageSent"
       ]
+    },
+    {
+      "name": "define",
+      "entity": "Station",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sortOrder",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "aliases",
+          "type": "list<string>",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "defineStationName",
+          "code": "defineStationName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Station name is required"
+        }
+      ],
+      "policies": [
+        "stationRead",
+        "stationWrite",
+        "stationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sortOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "aliases",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "definedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "StationDefined"
+      ]
+    },
+    {
+      "name": "reinstate",
+      "entity": "Station",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "stationRead",
+        "stationWrite",
+        "stationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "retiredAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "rename",
+      "entity": "Station",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sortOrder",
+          "type": "int",
+          "required": false
+        },
+        {
+          "name": "aliases",
+          "type": "list<string>",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "renameStationName",
+          "code": "renameStationName",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Station name is required"
+        }
+      ],
+      "policies": [
+        "stationRead",
+        "stationWrite",
+        "stationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sortOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "aliases",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "StationRenamed"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "Station",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireStationReason",
+          "code": "retireStationReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Reason is required"
+        }
+      ],
+      "policies": [
+        "stationRead",
+        "stationWrite",
+        "stationExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "retiredAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "confirmLedgerMatch",
@@ -76254,6 +80946,27 @@
       "message": "Sales staff may write client accounts through commands"
     },
     {
+      "name": "componentComponentExecute",
+      "entity": "ComponentComponent",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may execute nested recipe line commands"
+    },
+    {
+      "name": "componentComponentRead",
+      "entity": "ComponentComponent",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may read nested recipe lines"
+    },
+    {
+      "name": "componentComponentWrite",
+      "entity": "ComponentComponent",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may write nested recipe lines through commands"
+    },
+    {
       "name": "componentExecute",
       "entity": "Component",
       "action": "execute",
@@ -76322,6 +81035,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"kitchenAccess\")",
       "message": "Kitchen staff may write component ingredient lines through commands"
+    },
+    {
+      "name": "componentPortionSpecExecute",
+      "entity": "ComponentPortionSpec",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may execute portion spec commands"
+    },
+    {
+      "name": "componentPortionSpecRead",
+      "entity": "ComponentPortionSpec",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may read portion specs"
+    },
+    {
+      "name": "componentPortionSpecWrite",
+      "entity": "ComponentPortionSpec",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may write portion specs through commands"
     },
     {
       "name": "componentRead",
@@ -76569,6 +81303,27 @@
       "message": "Kitchen staff and managers may execute dish task template commands"
     },
     {
+      "name": "dishTaskMaterialExecute",
+      "entity": "DishTaskMaterial",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may execute task material commands"
+    },
+    {
+      "name": "dishTaskMaterialRead",
+      "entity": "DishTaskMaterial",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may read task materials"
+    },
+    {
+      "name": "dishTaskMaterialWrite",
+      "entity": "DishTaskMaterial",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may write task materials through commands"
+    },
+    {
       "name": "dishTaskRead",
       "entity": "DishTask",
       "action": "read",
@@ -76721,6 +81476,27 @@
       "action": "execute",
       "expression": "roleAllows(user.role, \"manageAccess\") or roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"kitchenAccess\")",
       "message": "Managers, sales and kitchen staff may execute event dish commands"
+    },
+    {
+      "name": "eventDishLineOverrideExecute",
+      "entity": "EventDishLineOverride",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"manageAccess\") or roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Managers and kitchen staff may execute event dish override commands"
+    },
+    {
+      "name": "eventDishLineOverrideRead",
+      "entity": "EventDishLineOverride",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Employed staff may read event dish overrides"
+    },
+    {
+      "name": "eventDishLineOverrideWrite",
+      "entity": "EventDishLineOverride",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"manageAccess\") or roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Managers and kitchen staff may write event dish overrides through commands"
     },
     {
       "name": "eventDishRead",
@@ -76945,6 +81721,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"importAccess\")",
       "message": "Staff may write import artifacts through commands"
+    },
+    {
+      "name": "importConflictExecute",
+      "entity": "ImportConflict",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"importAccess\")",
+      "message": "Staff may execute import conflict commands"
+    },
+    {
+      "name": "importConflictRead",
+      "entity": "ImportConflict",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"importAccess\")",
+      "message": "Staff may read import conflicts"
+    },
+    {
+      "name": "importConflictWrite",
+      "entity": "ImportConflict",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"importAccess\")",
+      "message": "Staff may write import conflicts through commands"
     },
     {
       "name": "importDatasetRead",
@@ -77211,6 +82008,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"financeAccess\") or roleAllows(user.role, \"manageAccess\")",
       "message": "Finance staff and managers may write invoices through commands"
+    },
+    {
+      "name": "itemUnitMappingExecute",
+      "entity": "ItemUnitMapping",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen, inventory and managers may execute unit mapping commands"
+    },
+    {
+      "name": "itemUnitMappingRead",
+      "entity": "ItemUnitMapping",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen, inventory and managers may read unit mappings"
+    },
+    {
+      "name": "itemUnitMappingWrite",
+      "entity": "ItemUnitMapping",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen, inventory and managers may write unit mappings through commands"
     },
     {
       "name": "leadExecute",
@@ -77661,6 +82479,27 @@
       "message": "Kitchen and event managers may execute prep task commands"
     },
     {
+      "name": "prepTaskMaterialExecute",
+      "entity": "PrepTaskMaterial",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen and event managers may execute prep task material commands"
+    },
+    {
+      "name": "prepTaskMaterialRead",
+      "entity": "PrepTaskMaterial",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen and event managers may read prep task materials"
+    },
+    {
+      "name": "prepTaskMaterialWrite",
+      "entity": "PrepTaskMaterial",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen and event managers may write prep task materials through commands"
+    },
+    {
       "name": "prepTaskRead",
       "entity": "PrepTask",
       "action": "read",
@@ -77673,6 +82512,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
       "message": "Kitchen and event managers may write prep tasks through commands"
+    },
+    {
+      "name": "productionBatchAllocationExecute",
+      "entity": "ProductionBatchAllocation",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may execute batch allocation commands"
+    },
+    {
+      "name": "productionBatchAllocationRead",
+      "entity": "ProductionBatchAllocation",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may read batch allocations"
+    },
+    {
+      "name": "productionBatchAllocationWrite",
+      "entity": "ProductionBatchAllocation",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may write batch allocations through commands"
     },
     {
       "name": "productionBatchExecute",
@@ -78198,6 +83058,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"staffAccess\")",
       "message": "Staff may write staff messages through commands"
+    },
+    {
+      "name": "stationExecute",
+      "entity": "Station",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may execute station commands"
+    },
+    {
+      "name": "stationRead",
+      "entity": "Station",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"staffAccess\")",
+      "message": "Employed staff may read stations"
+    },
+    {
+      "name": "stationWrite",
+      "entity": "Station",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may write stations through commands"
     },
     {
       "name": "stockCountLineExecute",
@@ -79018,6 +83899,24 @@
       "overrideable": false
     },
     {
+      "entity": "ComponentComponent",
+      "name": "nestedLineNotSelf",
+      "code": "nestedLineNotSelf",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "A recipe cannot contain itself",
+      "overrideable": false
+    },
+    {
+      "entity": "ComponentComponent",
+      "name": "nestedLineQuantityPositive",
+      "code": "nestedLineQuantityPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Nested recipe quantity must be positive",
+      "overrideable": false
+    },
+    {
       "entity": "ComponentImport",
       "name": "importSourcePresent",
       "code": "importSourcePresent",
@@ -79105,6 +84004,24 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Waste factor must be greater than 0",
+      "overrideable": false
+    },
+    {
+      "entity": "ComponentPortionSpec",
+      "name": "portionSpecNamed",
+      "code": "portionSpecNamed",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Portion spec name is required",
+      "overrideable": false
+    },
+    {
+      "entity": "ComponentPortionSpec",
+      "name": "portionSpecPiecePositive",
+      "code": "portionSpecPiecePositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Piece quantity must be positive",
       "overrideable": false
     },
     {
@@ -79258,6 +84175,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Dish task sort order cannot be negative",
+      "overrideable": false
+    },
+    {
+      "entity": "DishTaskMaterial",
+      "name": "materialHasTarget",
+      "code": "materialHasTarget",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "A task material must point at a requirement",
       "overrideable": false
     },
     {
@@ -79459,6 +84385,24 @@
       "overrideable": false
     },
     {
+      "entity": "EventDishLineOverride",
+      "name": "overrideReasonPresent",
+      "code": "overrideReasonPresent",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Override reason is required",
+      "overrideable": false
+    },
+    {
+      "entity": "EventDishLineOverride",
+      "name": "overridePortionsNonnegative",
+      "code": "overridePortionsNonnegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Portions affected cannot be negative",
+      "overrideable": false
+    },
+    {
       "entity": "EventGuest",
       "name": "guestIdentityComplete",
       "code": "guestIdentityComplete",
@@ -79636,6 +84580,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Entry count must not be negative",
+      "overrideable": false
+    },
+    {
+      "entity": "ImportConflict",
+      "name": "conflictFieldPresent",
+      "code": "conflictFieldPresent",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Conflict field is required",
       "overrideable": false
     },
     {
@@ -79834,6 +84787,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Invoice amount due must equal total minus payments and applied credits",
+      "overrideable": false
+    },
+    {
+      "entity": "ItemUnitMapping",
+      "name": "mappingQuantityPositive",
+      "code": "mappingQuantityPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Mapping quantity must be positive",
       "overrideable": false
     },
     {
@@ -80131,6 +85093,24 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Actual yield cannot be negative",
+      "overrideable": false
+    },
+    {
+      "entity": "ProductionBatchAllocation",
+      "name": "allocationQuantityNonnegative",
+      "code": "allocationQuantityNonnegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Allocated quantity cannot be negative",
+      "overrideable": false
+    },
+    {
+      "entity": "ProductionBatchAllocation",
+      "name": "allocationOwner",
+      "code": "allocationOwner",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "An allocation belongs to an event or is surplus",
       "overrideable": false
     },
     {
@@ -80482,6 +85462,24 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Sender and recipient must be different people",
+      "overrideable": false
+    },
+    {
+      "entity": "Station",
+      "name": "stationNamed",
+      "code": "stationNamed",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Station name is required",
+      "overrideable": false
+    },
+    {
+      "entity": "Station",
+      "name": "stationSortNonnegative",
+      "code": "stationSortNonnegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Sort order cannot be negative",
       "overrideable": false
     },
     {
@@ -81179,6 +86177,50 @@
       "name": "ingredientLines"
     },
     {
+      "source": "Component",
+      "target": "ComponentComponent",
+      "kind": "hasMany",
+      "name": "componentLines"
+    },
+    {
+      "source": "Component",
+      "target": "ComponentPortionSpec",
+      "kind": "hasMany",
+      "name": "portionSpecs"
+    },
+    {
+      "source": "ComponentComponent",
+      "target": "Component",
+      "kind": "belongsTo",
+      "name": "component",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "componentId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "ComponentComponent",
+      "target": "Component",
+      "kind": "belongsTo",
+      "name": "childComponent",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "childComponentId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "ComponentImport",
       "target": "ComponentImportLine",
       "kind": "hasMany",
@@ -81257,6 +86299,22 @@
         "fields": [
           "tenantId",
           "ingredientId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "ComponentPortionSpec",
+      "target": "Component",
+      "kind": "belongsTo",
+      "name": "component",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "componentId"
         ],
         "references": [
           "tenantId",
@@ -81635,6 +86693,22 @@
       }
     },
     {
+      "source": "DishComponent",
+      "target": "ComponentPortionSpec",
+      "kind": "belongsTo",
+      "name": "portionSpec",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "portionSpecId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "DishContainer",
       "target": "Dish",
       "kind": "belongsTo",
@@ -81723,6 +86797,76 @@
         "fields": [
           "tenantId",
           "ingredientId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTask",
+      "target": "DishTaskMaterial",
+      "kind": "hasMany",
+      "name": "materials"
+    },
+    {
+      "source": "DishTaskMaterial",
+      "target": "DishTask",
+      "kind": "belongsTo",
+      "name": "dishTask",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishTaskId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTaskMaterial",
+      "target": "DishIngredient",
+      "kind": "belongsTo",
+      "name": "dishIngredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishIngredientId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTaskMaterial",
+      "target": "DishComponent",
+      "kind": "belongsTo",
+      "name": "dishComponent",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishComponentId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTaskMaterial",
+      "target": "DishContainer",
+      "kind": "belongsTo",
+      "name": "dishContainer",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishContainerId"
         ],
         "references": [
           "tenantId",
@@ -82203,6 +87347,38 @@
       }
     },
     {
+      "source": "EventDishLineOverride",
+      "target": "EventDish",
+      "kind": "belongsTo",
+      "name": "eventDish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventDishId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventDishLineOverride",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "EventGuest",
       "target": "Event",
       "kind": "belongsTo",
@@ -82435,6 +87611,22 @@
         "fields": [
           "tenantId",
           "importRunId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "ImportConflict",
+      "target": "ExternalRecordLink",
+      "kind": "belongsTo",
+      "name": "externalRecordLink",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "externalRecordLinkId"
         ],
         "references": [
           "tenantId",
@@ -82977,6 +88169,22 @@
       "target": "Payment",
       "kind": "hasMany",
       "name": "payments"
+    },
+    {
+      "source": "ItemUnitMapping",
+      "target": "Ingredient",
+      "kind": "belongsTo",
+      "name": "ingredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "ingredientId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
     },
     {
       "source": "Lead",
@@ -83761,6 +88969,22 @@
       }
     },
     {
+      "source": "PrepTaskMaterial",
+      "target": "PrepTask",
+      "kind": "belongsTo",
+      "name": "prepTask",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "prepTaskId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "ProductionBatch",
       "target": "Component",
       "kind": "belongsTo",
@@ -83785,6 +89009,54 @@
         "fields": [
           "tenantId",
           "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "ProductionBatchAllocation",
+      "target": "ProductionBatch",
+      "kind": "belongsTo",
+      "name": "productionBatch",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "productionBatchId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "ProductionBatchAllocation",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "ProductionBatchAllocation",
+      "target": "EventDish",
+      "kind": "belongsTo",
+      "name": "eventDish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventDishId"
         ],
         "references": [
           "tenantId",
@@ -85857,6 +91129,23 @@
       ]
     },
     {
+      "name": "BatchAllocationStatus",
+      "values": [
+        {
+          "name": "planned"
+        },
+        {
+          "name": "produced"
+        },
+        {
+          "name": "portioned"
+        },
+        {
+          "name": "released"
+        }
+      ]
+    },
+    {
       "name": "CandidateStage",
       "values": [
         {
@@ -85938,6 +91227,48 @@
         },
         {
           "name": "pack_list"
+        },
+        {
+          "name": "ingredient"
+        },
+        {
+          "name": "component"
+        },
+        {
+          "name": "component_portion_spec"
+        },
+        {
+          "name": "component_ingredient"
+        },
+        {
+          "name": "component_component"
+        },
+        {
+          "name": "dish"
+        },
+        {
+          "name": "dish_ingredient"
+        },
+        {
+          "name": "dish_component"
+        },
+        {
+          "name": "dish_task"
+        },
+        {
+          "name": "dish_container"
+        },
+        {
+          "name": "station"
+        },
+        {
+          "name": "unit"
+        },
+        {
+          "name": "event_dish"
+        },
+        {
+          "name": "prep_task"
         }
       ]
     },
@@ -86321,6 +91652,23 @@
       ]
     },
     {
+      "name": "DishKind",
+      "values": [
+        {
+          "name": "food"
+        },
+        {
+          "name": "supply"
+        },
+        {
+          "name": "service"
+        },
+        {
+          "name": "package"
+        }
+      ]
+    },
+    {
       "name": "DishServiceMethod",
       "values": [
         {
@@ -86345,6 +91693,20 @@
         },
         {
           "name": "retired"
+        }
+      ]
+    },
+    {
+      "name": "DishTaskStage",
+      "values": [
+        {
+          "name": "kitchen"
+        },
+        {
+          "name": "at_event"
+        },
+        {
+          "name": "pack"
         }
       ]
     },
@@ -86488,6 +91850,23 @@
         },
         {
           "name": "finalized"
+        }
+      ]
+    },
+    {
+      "name": "EventDishOverrideKind",
+      "values": [
+        {
+          "name": "add"
+        },
+        {
+          "name": "remove"
+        },
+        {
+          "name": "replace"
+        },
+        {
+          "name": "adjust"
         }
       ]
     },
@@ -86671,6 +92050,23 @@
         },
         {
           "name": "failed"
+        }
+      ]
+    },
+    {
+      "name": "ImportConflictStatus",
+      "values": [
+        {
+          "name": "pending"
+        },
+        {
+          "name": "keep_capsule"
+        },
+        {
+          "name": "take_source"
+        },
+        {
+          "name": "manual"
         }
       ]
     },
@@ -86944,6 +92340,23 @@
       ]
     },
     {
+      "name": "ItemUnitMappingKind",
+      "values": [
+        {
+          "name": "pack"
+        },
+        {
+          "name": "density"
+        },
+        {
+          "name": "portion"
+        },
+        {
+          "name": "yield"
+        }
+      ]
+    },
+    {
       "name": "LeadStage",
       "values": [
         {
@@ -86957,6 +92370,20 @@
         },
         {
           "name": "negotiating"
+        }
+      ]
+    },
+    {
+      "name": "LinkDecision",
+      "values": [
+        {
+          "name": "suggested"
+        },
+        {
+          "name": "approved"
+        },
+        {
+          "name": "rejected"
         }
       ]
     },
@@ -87552,6 +92979,26 @@
       ]
     },
     {
+      "name": "QuantityBasis",
+      "values": [
+        {
+          "name": "as_purchased"
+        },
+        {
+          "name": "as_produced"
+        },
+        {
+          "name": "raw"
+        },
+        {
+          "name": "cooked"
+        },
+        {
+          "name": "unknown"
+        }
+      ]
+    },
+    {
       "name": "QuoteSubmissionStatus",
       "values": [
         {
@@ -87685,6 +93132,26 @@
       ]
     },
     {
+      "name": "RoundingScope",
+      "values": [
+        {
+          "name": "none"
+        },
+        {
+          "name": "dish_allocation"
+        },
+        {
+          "name": "event_total"
+        },
+        {
+          "name": "production_group"
+        },
+        {
+          "name": "purchase_pack"
+        }
+      ]
+    },
+    {
       "name": "RsvpStatus",
       "values": [
         {
@@ -87812,6 +93279,17 @@
       ]
     },
     {
+      "name": "StationStatus",
+      "values": [
+        {
+          "name": "active"
+        },
+        {
+          "name": "retired"
+        }
+      ]
+    },
+    {
       "name": "StockCountLineStatus",
       "values": [
         {
@@ -87869,6 +93347,20 @@
         },
         {
           "name": "resolved"
+        }
+      ]
+    },
+    {
+      "name": "TaskResolution",
+      "values": [
+        {
+          "name": "resolved"
+        },
+        {
+          "name": "choice_pending"
+        },
+        {
+          "name": "content_missing"
         }
       ]
     },
@@ -88004,6 +93496,30 @@
         },
         {
           "name": "bottle"
+        },
+        {
+          "name": "fluid_ounce"
+        },
+        {
+          "name": "piece"
+        },
+        {
+          "name": "slice"
+        },
+        {
+          "name": "pizza"
+        },
+        {
+          "name": "package"
+        },
+        {
+          "name": "case"
+        },
+        {
+          "name": "can"
+        },
+        {
+          "name": "tub"
         }
       ]
     },
@@ -88561,6 +94077,21 @@
       "payload": "{clientId: string, tenantId: string, clientType: string}"
     },
     {
+      "name": "ComponentComponentAdded",
+      "channel": "component_component.added",
+      "payload": "{componentComponentId: string, tenantId: string, componentId: string, childComponentId: string, quantity: decimal, unit: UnitOfMeasure}"
+    },
+    {
+      "name": "ComponentComponentQuantityAdjusted",
+      "channel": "component_component.quantity_adjusted",
+      "payload": "{componentComponentId: string, tenantId: string, componentId: string, childComponentId: string, quantity: decimal, unit: UnitOfMeasure, previousUnit: UnitOfMeasure}"
+    },
+    {
+      "name": "ComponentComponentRemoved",
+      "channel": "component_component.removed",
+      "payload": "{componentComponentId: string, tenantId: string, componentId: string, childComponentId: string, reason: string}"
+    },
+    {
       "name": "ComponentDrafted",
       "channel": "component.drafted",
       "payload": "{componentId: string, tenantId: string, name: string, yieldQuantity: decimal, yieldUnit: UnitOfMeasure, servesPerYield: int, batchMultiplier: decimal, versionNumber: number}"
@@ -88701,6 +94232,21 @@
       "payload": "{componentIngredientId: string, tenantId: string, componentId: string, ingredientId: string, wasteFactor: decimal}"
     },
     {
+      "name": "ComponentPortionSpecDefined",
+      "channel": "component_portion_spec.defined",
+      "payload": "{componentPortionSpecId: string, tenantId: string, componentId: string, name: string}"
+    },
+    {
+      "name": "ComponentPortionSpecRetired",
+      "channel": "component_portion_spec.retired",
+      "payload": "{componentPortionSpecId: string, tenantId: string, componentId: string, reason: string}"
+    },
+    {
+      "name": "ComponentPortionSpecRevised",
+      "channel": "component_portion_spec.revised",
+      "payload": "{componentPortionSpecId: string, tenantId: string, componentId: string, name: string}"
+    },
+    {
       "name": "ComponentPurged",
       "channel": "component.purged",
       "payload": "{componentId: string, tenantId: string, reason: string}"
@@ -88734,6 +94280,11 @@
       "name": "ComponentStepRevised",
       "channel": "component_step.revised",
       "payload": "{componentStepId: string, tenantId: string, componentId: string, instruction: string, sortOrder: number}"
+    },
+    {
+      "name": "ComponentStorageWindowSet",
+      "channel": "component.storage_window_set",
+      "payload": "{componentId: string, tenantId: string, storageWindowDays: int}"
     },
     {
       "name": "ComponentVersionPublished",
@@ -88861,6 +94412,11 @@
       "payload": "{dishComponentId: string, tenantId: string, dishId: string, componentId: string, reason: string}"
     },
     {
+      "name": "DishComponentPortionSpecSet",
+      "channel": "dish_component.portion_spec_set",
+      "payload": "{dishComponentId: string, tenantId: string, dishId: string, componentId: string, portionSpecId: string, pieceCount: decimal}"
+    },
+    {
       "name": "DishContainerDefined",
       "channel": "dish_container.defined",
       "payload": "{dishContainerId: string, tenantId: string, dishId: string, name: string, serviceMethod: string}"
@@ -88911,6 +94467,11 @@
       "payload": "{dishId: string, tenantId: string, name: string, portionSize: decimal, portionUnit: UnitOfMeasure, allergenSummary: list<AllergenCode>}"
     },
     {
+      "name": "DishKindClassified",
+      "channel": "dish.kind_classified",
+      "payload": "{dishId: string, tenantId: string, kind: DishKind}"
+    },
+    {
       "name": "DishMerged",
       "channel": "dish.merged",
       "payload": "{dishId: string, tenantId: string, targetDishId: string, reason: string}"
@@ -88949,6 +94510,21 @@
       "name": "DishServiceInstructionsSaved",
       "channel": "dish.service_instructions_saved",
       "payload": "{dishId: string, tenantId: string, source: string}"
+    },
+    {
+      "name": "DishTaskMaterialLinked",
+      "channel": "dish_task_material.linked",
+      "payload": "{dishTaskMaterialId: string, tenantId: string, dishTaskId: string, dishIngredientId: string | null, dishComponentId: string | null, dishContainerId: string | null}"
+    },
+    {
+      "name": "DishTaskMaterialUnlinked",
+      "channel": "dish_task_material.unlinked",
+      "payload": "{dishTaskMaterialId: string, tenantId: string, dishTaskId: string, reason: string}"
+    },
+    {
+      "name": "DishTaskWorkSpecified",
+      "channel": "dish_task.work_specified",
+      "payload": "{dishTaskId: string, tenantId: string, dishId: string, stage: DishTaskStage | null, resolution: TaskResolution | null}"
     },
     {
       "name": "EmailNotificationSubscriptionConfigured",
@@ -89154,6 +94730,16 @@
       "name": "EventDishInstructionsUpdated",
       "channel": "event_dish.instructions_updated",
       "payload": "{eventDishId: string, tenantId: string, eventId: string, dishId: string}"
+    },
+    {
+      "name": "EventDishLineOverrideApplied",
+      "channel": "event_dish_line_override.applied",
+      "payload": "{eventDishLineOverrideId: string, tenantId: string, eventDishId: string, eventId: string, kind: EventDishOverrideKind, portionsAffected: decimal}"
+    },
+    {
+      "name": "EventDishLineOverrideRevoked",
+      "channel": "event_dish_line_override.revoked",
+      "payload": "{eventDishLineOverrideId: string, tenantId: string, eventDishId: string, eventId: string, reason: string}"
     },
     {
       "name": "EventDishRemoved",
@@ -89449,6 +95035,16 @@
       "name": "ImportArtifactRegistered",
       "channel": "import_artifact.registered",
       "payload": "{importArtifactId: string, tenantId: string, importRunId: string, name: string, checksum: string | null, byteSize: int, entryCount: int}"
+    },
+    {
+      "name": "ImportConflictRaised",
+      "channel": "import_conflict.raised",
+      "payload": "{importConflictId: string, tenantId: string, externalRecordLinkId: string, field: string}"
+    },
+    {
+      "name": "ImportConflictResolved",
+      "channel": "import_conflict.resolved",
+      "payload": "{importConflictId: string, tenantId: string, externalRecordLinkId: string, field: string, status: ImportConflictStatus}"
     },
     {
       "name": "ImportDatasetActivated",
@@ -89804,6 +95400,16 @@
       "name": "InvoiceWrittenOff",
       "channel": "invoice.written_off",
       "payload": "{invoiceId: string, tenantId: string, clientId: string, eventId: string | null, reason: string, writeOffAmount: money}"
+    },
+    {
+      "name": "ItemUnitMappingRecorded",
+      "channel": "item_unit_mapping.recorded",
+      "payload": "{itemUnitMappingId: string, tenantId: string, kind: ItemUnitMappingKind, unit: UnitOfMeasure}"
+    },
+    {
+      "name": "ItemUnitMappingRetired",
+      "channel": "item_unit_mapping.retired",
+      "payload": "{itemUnitMappingId: string, tenantId: string, reason: string}"
     },
     {
       "name": "LeadCaptured",
@@ -90256,6 +95862,11 @@
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, quantity: decimal, unit: UnitOfMeasure, previousStatus: PrepTaskStatus, status: PrepTaskStatus, reason: string}"
     },
     {
+      "name": "PrepTaskChoiceResolved",
+      "channel": "prep_task.choice_resolved",
+      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, choice: string}"
+    },
+    {
       "name": "PrepTaskClaimed",
       "channel": "prep_task.claimed",
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, assignedToId: string, quantity: decimal, unit: UnitOfMeasure, previousStatus: PrepTaskStatus, status: PrepTaskStatus}"
@@ -90291,9 +95902,24 @@
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, quantity: decimal, unit: UnitOfMeasure, specialInstructions: string | null}"
     },
     {
+      "name": "PrepTaskMaterialLinked",
+      "channel": "prep_task_material.linked",
+      "payload": "{prepTaskMaterialId: string, tenantId: string, prepTaskId: string}"
+    },
+    {
+      "name": "PrepTaskMaterialUnlinked",
+      "channel": "prep_task_material.unlinked",
+      "payload": "{prepTaskMaterialId: string, tenantId: string, prepTaskId: string, reason: string}"
+    },
+    {
       "name": "PrepTaskOpened",
       "channel": "prep_task.opened",
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, ingredientId: string | null, ingredientDemandId: string | null, dishId: string | null, componentId: string | null, dishTaskId: string | null, category: string, taskType: string, specialInstructions: string | null, isGenerated: boolean, quantity: decimal, unit: UnitOfMeasure, station: string | null, dueAt: datetime | null, status: PrepTaskStatus}"
+    },
+    {
+      "name": "PrepTaskOverridden",
+      "channel": "prep_task.overridden",
+      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, overrideOfDishTaskId: string, reason: string}"
     },
     {
       "name": "PrepTaskReleased",
@@ -90316,6 +95942,11 @@
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, quantity: decimal, unit: UnitOfMeasure, previousStatus: PrepTaskStatus, status: PrepTaskStatus}"
     },
     {
+      "name": "ProductionBatchAllocated",
+      "channel": "production_batch_allocation.allocated",
+      "payload": "{productionBatchAllocationId: string, tenantId: string, productionBatchId: string, eventId: string | null, eventDishId: string | null, allocatedQuantity: decimal, unit: UnitOfMeasure, formulaShare: decimal, isSurplus: boolean}"
+    },
+    {
       "name": "ProductionBatchCancelled",
       "channel": "production_batch.cancelled",
       "payload": "{productionBatchId: string, tenantId: string, componentId: string, eventId: string | null, plannedYield: decimal, actualYield: decimal | null, yieldUnit: UnitOfMeasure, previousStatus: ProductionBatchStatus, status: ProductionBatchStatus, reason: string}"
@@ -90329,6 +95960,11 @@
       "name": "ProductionBatchPlanned",
       "channel": "production_batch.planned",
       "payload": "{productionBatchId: string, tenantId: string, componentId: string, eventId: string | null, plannedYield: decimal, yieldUnit: UnitOfMeasure, status: ProductionBatchStatus}"
+    },
+    {
+      "name": "ProductionBatchPlanReconciled",
+      "channel": "production_batch.plan_reconciled",
+      "payload": "{productionBatchId: string, tenantId: string, componentId: string, plannedExact: decimal, plannedRounded: decimal, surplusQuantity: decimal}"
     },
     {
       "name": "ProductionBatchStarted",
@@ -90839,6 +96475,16 @@
       "name": "StaffMessageSent",
       "channel": "staff_message.sent",
       "payload": "{staffMessageId: string, tenantId: string, senderPersonId: string, recipientPersonId: string | null, eventId: string | null}"
+    },
+    {
+      "name": "StationDefined",
+      "channel": "station.defined",
+      "payload": "{stationId: string, tenantId: string, name: string}"
+    },
+    {
+      "name": "StationRenamed",
+      "channel": "station.renamed",
+      "payload": "{stationId: string, tenantId: string, name: string}"
     },
     {
       "name": "StockCountLineCounted",
@@ -91399,6 +97045,10 @@
       "target": "durable"
     },
     {
+      "entity": "ComponentComponent",
+      "target": "durable"
+    },
+    {
       "entity": "ComponentImport",
       "target": "durable"
     },
@@ -91408,6 +97058,10 @@
     },
     {
       "entity": "ComponentIngredient",
+      "target": "durable"
+    },
+    {
+      "entity": "ComponentPortionSpec",
       "target": "durable"
     },
     {
@@ -91459,6 +97113,10 @@
       "target": "durable"
     },
     {
+      "entity": "DishTaskMaterial",
+      "target": "durable"
+    },
+    {
       "entity": "EmailNotificationSubscription",
       "target": "durable"
     },
@@ -91503,6 +97161,10 @@
       "target": "durable"
     },
     {
+      "entity": "EventDishLineOverride",
+      "target": "durable"
+    },
+    {
       "entity": "EventGuest",
       "target": "durable"
     },
@@ -91536,6 +97198,10 @@
     },
     {
       "entity": "ImportArtifact",
+      "target": "durable"
+    },
+    {
+      "entity": "ImportConflict",
       "target": "durable"
     },
     {
@@ -91588,6 +97254,10 @@
     },
     {
       "entity": "InvoiceNumberSequence",
+      "target": "durable"
+    },
+    {
+      "entity": "ItemUnitMapping",
       "target": "durable"
     },
     {
@@ -91679,7 +97349,15 @@
       "target": "durable"
     },
     {
+      "entity": "PrepTaskMaterial",
+      "target": "durable"
+    },
+    {
       "entity": "ProductionBatch",
+      "target": "durable"
+    },
+    {
+      "entity": "ProductionBatchAllocation",
       "target": "durable"
     },
     {
@@ -91780,6 +97458,10 @@
     },
     {
       "entity": "StaffMessage",
+      "target": "durable"
+    },
+    {
+      "entity": "Station",
       "target": "durable"
     },
     {

@@ -35,6 +35,50 @@ Menu
   └── MenuDish[] → Dish      # required menu composition
 ```
 
+## Naming and mapping model (Revision 2, 2026-09-14)
+
+Kitchen-facing words map onto the existing entities; nothing was collapsed:
+
+| Kitchen word     | Entity                                            | Responsibility                                                                                  |
+| ---------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Ingredient       | Ingredient                                        | A thing we buy. Never carries work.                                                             |
+| Recipe           | Component                                         | A thing we make: batch formula, yield, method, portion specs. "Recipe" is the display word.     |
+| Sub-recipe       | ComponentComponent                                | A recipe used inside a recipe. A relationship, not a type. Cycles are rejected.                 |
+| Portion spec     | ComponentPortionSpec                              | A named output size (10 oz dough ball, 15 per batch). 5 oz and 10 oz stay distinct.             |
+| Food requirement | DishIngredient / DishComponent (per portion)      | The ONLY source of purchasing demand and food cost. Carries `quantityBasis`.                    |
+| Prep step        | DishTask + DishTaskMaterial                       | Work on a dish, linked to the requirement(s) it acts on. Work quantity is never demand.          |
+| Prep task        | PrepTask + PrepTaskMaterial                       | The event copy. `overrideOfDishTaskId` survives regeneration; `choice_pending` blocks claiming. |
+| Supply           | DishContainer, `Dish.kind = supply`               | Own quantities and pack tasks; never food demand.                                               |
+| Batch            | ProductionBatch + ProductionBatchAllocation       | Exact need, rounded make quantity, surplus; shares owned per event dish or as surplus.          |
+| Station          | Station                                           | Controlled records; free-text `station` columns stay as imported labels.                        |
+
+Demand has ONE calculation: `convex/lib/culinaryModel/demand.ts` (`expandEventDish`,
+`planSharedBatch`, `reconcileContributions`), exposed by the authored seam
+`convex/culinaryDemand.ts` (`eventDemandReview`, `reconcileEventDemand`,
+`planSharedRecipeBatch`, `componentContentReport`, `kitchenUnresolvedReport`,
+`addNestedRecipeLine`). Rules: units convert inside a dimension with documented
+factors (`units.ts`); crossing dimensions or leaving a count unit needs an
+`ItemUnitMapping`; a cooked basis needs a confirmed yield mapping; anything else is
+unresolved, stays visible (quantity 0, `exactQuantity` kept) and is excluded from the
+finalized purchasing total. Cost confidence (`costing.ts`) is one nested definition:
+known subtotal shown apart from the count of unknown lines; a recipe with no lines
+shows "cost unknown", never $0.00. Event overrides (`EventDishLineOverride`) and
+resolved choices change the effective requirement set; tasks never add demand.
+Shared batches write their ingredient shares once, owned per allocation; the surplus
+share is purchased once on the first event and labelled `batch_surplus`; completing a
+batch marks allocations produced and leaves portioning/packing tasks open. Grouping
+across events requires `Component.storageWindowDays`.
+
+Identity: `ExternalRecordLink` key is `(sourceSystem, sourceAccount, recordType,
+externalId, role, ordinal)`; dish usages are keyed by the parent TPP recipe row, the
+shared ingredient/recipe by the item. Three-way re-import (`importMapping.ts`):
+capsule == source reconciles without conflict and advances the applied baseline;
+all-three-differ raises an `ImportConflict` once; absence from a filtered export
+never supersedes. The TPP mapper (`tppImport.ts`) suggests links only; "Make" stays a
+recipe (even with no content), "Portion X" over one inventory row is a portioning
+pattern over that ingredient, never a recipe. Acceptance tests:
+`tests/culinary-model-acceptance.test.ts`.
+
 ## Primary workspace
 
 Use a **culinary book** rather than a dashboard:

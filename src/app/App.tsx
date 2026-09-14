@@ -21,6 +21,7 @@ import { IngredientDetailPage } from "../features/kitchen/IngredientDetailPage";
 import { ComponentImportPage } from "../features/kitchen/import/ComponentImportPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
 import { KitchenDashboardPage } from "../features/kitchen/KitchenDashboardPage";
+import { KitchenUnresolvedWorkPage } from "../features/kitchen/KitchenUnresolvedWorkPage";
 import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { ComponentDetailPage } from "../features/kitchen/ComponentDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
@@ -726,6 +727,10 @@ export function App() {
               element={<AllergenMatrixPage />}
             />
             <Route path="/kitchen/prep" element={<KitchenDashboardPage />} />
+            <Route
+              path="/kitchen/unresolved"
+              element={<KitchenUnresolvedWorkPage />}
+            />
             <Route
               path="/kitchen/yield"
               element={

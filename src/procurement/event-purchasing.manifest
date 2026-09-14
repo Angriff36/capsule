@@ -182,6 +182,24 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   property required servings: decimal(12, 4) = 0
   property purchasingWeekStart: datetime?
   property recordedAt: datetime?
+  // Revision-2 culinary model (2026-09-14). Rows written by the authored
+  // demand engine carry a stable sourceKey (event dish + requirement path) so
+  // replanning replaces them idempotently, plus the resolution the purchasing
+  // total needs: basis, unit status, ownership (event_dish | batch_allocation
+  // | batch_surplus) and the component path walked for nested recipes.
+  property indexed sourceKey: string?
+  property exactQuantity: decimal(12, 4)?
+  property roundedQuantity: decimal(12, 4)?
+  property quantityBasis: QuantityBasis?
+  property unitStatus: string?
+  property ownership: string?
+  property sourceDishIngredientId: uuid?
+  property sourceDishComponentId: uuid?
+  property componentPath: list<string>?
+  property productionBatchId: uuid?
+  property productionBatchAllocationId: uuid?
+  property supersededAt: datetime?
+  property supersededBySourceKey: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
@@ -201,11 +219,27 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     servings: decimal(12, 4),
     optional quantityPerServing: decimal(12, 6),
     optional componentId: uuid,
-    optional purchasingWeekStart: datetime
+    optional purchasingWeekStart: datetime,
+    // Revision-2 engine fields. Reactions omit them; an omitted value keeps the
+    // stored one so a replayed reaction never wipes engine annotations.
+    optional sourceKey: string,
+    optional exactQuantity: decimal(12, 4),
+    optional roundedQuantity: decimal(12, 4),
+    optional quantityBasis: QuantityBasis,
+    optional unitStatus: string,
+    optional ownership: string,
+    optional sourceDishIngredientId: uuid,
+    optional sourceDishComponentId: uuid,
+    optional componentPath: list<string>,
+    optional productionBatchId: uuid,
+    optional productionBatchAllocationId: uuid
   ) {
     guard self.deletedAt == null
     constraint recordQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
     constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
+    // A legacy reaction (no sourceKey) that matches a batch-owned share must
+    // leave it untouched: the batch owns that quantity, not the serving count.
+    compute batchKeep = sourceKey == null and (self.ownership == "batch_allocation" or self.ownership == "batch_surplus")
     mutate eventId = eventId
     mutate eventDishId = eventDishId
     mutate dishId = dishId
@@ -213,14 +247,32 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate recipeSyncComponentId = componentId
     mutate ingredientId = ingredientId
     mutate recipeSyncIngredientId = ingredientId
-    mutate quantity = quantity
-    mutate quantityPerServing = quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing)
-    mutate unit = unit
-    mutate servings = servings
+    mutate quantity = batchKeep ? self.quantity : quantity
+    mutate quantityPerServing = batchKeep ? self.quantityPerServing : (quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing))
+    mutate unit = batchKeep ? self.unit : unit
+    mutate servings = batchKeep ? self.servings : servings
     // The event owns the purchasing week (#328); the passed value is only a
     // fallback for rows whose event cannot be resolved.
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
     mutate recordedAt = now()
+    // The engine always passes sourceKey. A legacy reaction never does: it
+    // then rewrites the quantity with the legacy formula, so every engine
+    // annotation is cleared rather than left stale; the next reconcile
+    // re-adopts the row by (component, ingredient, unit). Batch-owned rows
+    // (batchKeep) keep every annotation.
+    mutate sourceKey = sourceKey != null ? sourceKey : self.sourceKey
+    mutate exactQuantity = sourceKey != null ? exactQuantity : (batchKeep ? self.exactQuantity : null)
+    mutate roundedQuantity = sourceKey != null ? roundedQuantity : (batchKeep ? self.roundedQuantity : null)
+    mutate quantityBasis = sourceKey != null ? quantityBasis : (batchKeep ? self.quantityBasis : null)
+    mutate unitStatus = sourceKey != null ? unitStatus : (batchKeep ? self.unitStatus : null)
+    mutate ownership = sourceKey != null ? ownership : (batchKeep ? self.ownership : null)
+    mutate sourceDishIngredientId = sourceKey != null ? sourceDishIngredientId : (batchKeep ? self.sourceDishIngredientId : null)
+    mutate sourceDishComponentId = sourceKey != null ? sourceDishComponentId : (batchKeep ? self.sourceDishComponentId : null)
+    mutate componentPath = sourceKey != null ? componentPath : (batchKeep ? self.componentPath : [])
+    mutate productionBatchId = sourceKey != null ? productionBatchId : (batchKeep ? self.productionBatchId : null)
+    mutate productionBatchAllocationId = sourceKey != null ? productionBatchAllocationId : (batchKeep ? self.productionBatchAllocationId : null)
+    mutate supersededAt = batchKeep ? self.supersededAt : null
+    mutate supersededBySourceKey = batchKeep ? self.supersededBySourceKey : null
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
@@ -242,9 +294,12 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     guard self.recordedAt != null
     guard self.deletedAt == null
     constraint reviseQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
+    // Batch-owned shares are sized by their allocation, not by servings; a
+    // headcount change never rewrites them (replan the batch instead).
+    compute batchOwned = self.ownership == "batch_allocation" or self.ownership == "batch_surplus"
     mutate quantityPerServing = self.quantityPerServing != null ? self.quantityPerServing : (self.servings > 0 ? self.quantity / self.servings : null)
-    mutate quantity = quantity
-    mutate servings = servings
+    mutate quantity = batchOwned ? self.quantity : quantity
+    mutate servings = batchOwned ? self.servings : servings
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventIngredientContributionRecorded {
       contributionId: self.id
@@ -252,7 +307,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       eventId: self.eventId
       eventDishId: self.eventDishId
       ingredientId: self.ingredientId
-      quantity: quantity
+      quantity: self.quantity
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
     }
@@ -262,6 +317,30 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     guard self.recordedAt != null
     guard self.deletedAt == null
     constraint retireReason: length(trim(reason)) > 0 "Retire reason is required"
+    mutate deletedAt = now()
+    mutate quantity = 0
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      ingredientId: self.ingredientId
+      quantity: 0
+      unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  // Revision-2: the demand engine replaces a superseded row (replan, override,
+  // choice) without losing where it came from. Quantity goes to zero so the
+  // aggregate re-sums; the sourceKey and the replacing key stay for tracing.
+  command supersede(reason: string, optional supersededBySourceKey: string) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint supersedeReason: length(trim(reason)) > 0 "Supersede reason is required"
+    mutate supersededAt = now()
+    mutate supersededBySourceKey = supersededBySourceKey
     mutate deletedAt = now()
     mutate quantity = 0
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart

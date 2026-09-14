@@ -36,6 +36,29 @@ enum CapsuleEntityType {
   stock
   location
   pack_list
+  // Revision-2 culinary model (2026-09-14)
+  ingredient
+  component
+  component_portion_spec
+  component_ingredient
+  component_component
+  dish
+  dish_ingredient
+  dish_component
+  dish_task
+  dish_container
+  station
+  unit
+  event_dish
+  prep_task
+}
+
+// Revision-2: whether a link is a machine suggestion, an approved identity, or
+// a rejected candidate. Only approved links are identity; names never are.
+enum LinkDecision {
+  suggested
+  approved
+  rejected
 }
 
 // Link verification status
@@ -54,7 +77,7 @@ enum ConflictStatus {
 
 entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
-  unique [tenantId, sourceSystem, recordType, externalId]
+  unique [tenantId, sourceSystem, sourceAccount, recordType, externalId, role, ordinal]
   timestamps
   versionProperty version: number
 
@@ -64,6 +87,28 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   property required externalId: string = ""
   property required capsuleEntity: CapsuleEntityType = "contact"
   property required capsuleId: string = ""
+  // Revision-2 identity (2026-09-14). One legacy record may map to several
+  // Capsule records, one link per role; ordinal separates several records of
+  // one role from one source row. Nullable so pre-field links validate; the
+  // authored key builder treats null account/role as "" and null ordinal as 0.
+  property sourceAccount: string?
+  property role: string?
+  property ordinal: int?
+  // Precomputed full key for indexed lookup (authored seam builds it).
+  property indexed linkKey: string?
+  property decision: LinkDecision?
+  property suggestedBy: string?
+  property decidedByUserId: string?
+  property decidedAt: datetime?
+  // Applied side: what Capsule last received from import (three-way baseline).
+  property appliedValues: string?
+  property appliedSourceVersion: string?
+  property appliedAt: datetime?
+  property appliedImportRunId: string?
+  // Latest side: what the newest import saw, applied or not.
+  property sourceVersion: string?
+  property lastSeenAt: datetime?
+  property lastSeenImportRunId: string?
 
   // Verification tracking
   property required verified: boolean = false
@@ -112,7 +157,14 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     optional effectiveStartDate: datetime,
     optional effectiveEndDate: datetime,
     optional rawSourceData: string,
-    optional metadata: string
+    optional metadata: string,
+    optional sourceAccount: string,
+    optional role: string,
+    optional ordinal: int,
+    optional linkKey: string,
+    optional decision: LinkDecision,
+    optional suggestedBy: string,
+    optional sourceVersion: string
   ) {
     guard self.deletedAt == null
     guard self.createdAt == null
@@ -135,6 +187,15 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     mutate rawSourceData = rawSourceData
     mutate metadata = metadata
     mutate conflictStatus = "pending_conflict"
+    mutate sourceAccount = sourceAccount
+    mutate role = role
+    mutate ordinal = ordinal != null ? ordinal : 0
+    mutate linkKey = linkKey
+    mutate decision = decision != null ? decision : "suggested"
+    mutate suggestedBy = suggestedBy
+    mutate sourceVersion = sourceVersion
+    mutate lastSeenAt = now()
+    mutate lastSeenImportRunId = sourceImportRunId
     emit ExternalRecordLinked {
       externalRecordLinkId: self.id
       tenantId: self.tenantId
@@ -146,6 +207,46 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
       verified: verified != null ? verified : false
       sourceImportRunId: sourceImportRunId
     }
+  }
+
+  // Revision-2: a repeat import saw this source record. Only the latest side
+  // moves; the applied baseline and Capsule values are untouched. Absence from
+  // a run leaves lastSeen where it was and never supersedes the link.
+  command observe(optional sourceVersion: string, optional rawSourceData: string, optional importRunId: string) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    mutate sourceVersion = sourceVersion != null ? sourceVersion : self.sourceVersion
+    mutate rawSourceData = rawSourceData != null ? rawSourceData : self.rawSourceData
+    mutate lastSeenAt = now()
+    mutate lastSeenImportRunId = importRunId != null ? importRunId : self.lastSeenImportRunId
+  }
+
+  // Revision-2: import wrote these field values into Capsule. Advances the
+  // three-way baseline. Also called when Capsule already equals the source, so
+  // an identical edit on both sides reconciles without a conflict.
+  command recordApplied(appliedValues: string, optional appliedSourceVersion: string, optional importRunId: string) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    mutate appliedValues = appliedValues
+    mutate appliedSourceVersion = appliedSourceVersion != null ? appliedSourceVersion : self.sourceVersion
+    mutate appliedAt = now()
+    mutate appliedImportRunId = importRunId != null ? importRunId : self.lastSeenImportRunId
+  }
+
+  // Revision-2: approve or reject a suggested identity. Approval is what makes
+  // the link an identity; a display name never is.
+  command decide(decision: LinkDecision, decidedByUserId: string) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint decideUserPresent: length(trim(decidedByUserId)) > 0 "Deciding user is required"
+    mutate decision = decision
+    mutate decidedByUserId = decidedByUserId
+    mutate decidedAt = now()
+    mutate verified = decision == "approved"
+    mutate verifiedByUserId = decision == "approved" ? decidedByUserId : self.verifiedByUserId
+    mutate lastVerifiedAt = now()
+    mutate conflictStatus = decision == "approved" ? "resolved" : self.conflictStatus
+    mutate resolvedByUserId = decision == "approved" ? decidedByUserId : self.resolvedByUserId
   }
 
   // verifyLink - Mark a link as verified (e.g., after user confirmation)
@@ -395,4 +496,120 @@ event ExternalRecordDiscarded: "external_record_link.discarded" {
   externalRecordLinkId: string
   tenantId: string
   reason: string
+}
+
+// Revision-2 culinary model (2026-09-14). One field-level disagreement between
+// the value last applied by import, the current Capsule value and the newest
+// source value. Raised only when all three differ. A pending conflict whose
+// source value has not changed is never raised again; a different source value
+// updates this row instead of creating a second one.
+enum ImportConflictStatus {
+  pending
+  keep_capsule
+  take_source
+  manual
+}
+
+entity ImportConflict mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required externalRecordLinkId: uuid
+  property required field: string = ""
+  property appliedValue: string?
+  property capsuleValue: string?
+  property sourceValue: string?
+  property sourceVersion: string?
+  property required status: ImportConflictStatus = "pending"
+  property resolvedByUserId: string?
+  property resolvedAt: datetime?
+  property resolvedOnSourceVersion: string?
+  property raisedAt: datetime?
+
+  belongsTo externalRecordLink: ExternalRecordLink fields [tenantId, externalRecordLinkId] references [tenantId, id]
+
+  constraint conflictFieldPresent: self.raisedAt == null or length(trim(self.field)) > 0 "Conflict field is required"
+
+  transition status from "pending" to ["keep_capsule", "take_source", "manual"]
+  transition status from "keep_capsule" to ["pending"]
+  transition status from "take_source" to ["pending"]
+  transition status from "manual" to ["pending"]
+
+  default policy importConflictRead read: roleAllows(user.role, "importAccess") "Staff may read import conflicts"
+  default policy importConflictWrite write: roleAllows(user.role, "importAccess") "Staff may write import conflicts through commands"
+  default policy importConflictExecute execute: roleAllows(user.role, "importAccess") "Staff may execute import conflict commands"
+
+  command raise(
+    externalRecordLinkId: uuid,
+    field: string,
+    optional appliedValue: string,
+    optional capsuleValue: string,
+    optional sourceValue: string,
+    optional sourceVersion: string
+  ) {
+    guard self.raisedAt == null
+    guard self.deletedAt == null
+    constraint raiseFieldPresent: length(trim(field)) > 0 "Conflict field is required"
+    mutate externalRecordLinkId = externalRecordLinkId
+    mutate field = field
+    mutate appliedValue = appliedValue
+    mutate capsuleValue = capsuleValue
+    mutate sourceValue = sourceValue
+    mutate sourceVersion = sourceVersion
+    mutate status = "pending"
+    mutate raisedAt = now()
+    emit ImportConflictRaised {
+      importConflictId: self.id
+      tenantId: self.tenantId
+      externalRecordLinkId: externalRecordLinkId
+      field: field
+    }
+  }
+
+  // A newer source value on a still-pending conflict updates this row.
+  command updateSource(sourceValue: string, optional sourceVersion: string, optional capsuleValue: string) {
+    guard self.raisedAt != null
+    guard self.deletedAt == null
+    mutate sourceValue = sourceValue
+    mutate sourceVersion = sourceVersion != null ? sourceVersion : self.sourceVersion
+    mutate capsuleValue = capsuleValue != null ? capsuleValue : self.capsuleValue
+    mutate status = "pending"
+  }
+
+  command settle(resolution: ImportConflictStatus, resolvedByUserId: string) {
+    guard self.raisedAt != null
+    guard self.deletedAt == null
+    guard self.status == "pending"
+    constraint settleUserPresent: length(trim(resolvedByUserId)) > 0 "Resolving user is required"
+    constraint settleNotPending: resolution != "pending" "Resolution must pick keep_capsule, take_source or manual"
+    mutate status = resolution
+    mutate resolvedByUserId = resolvedByUserId
+    mutate resolvedAt = now()
+    mutate resolvedOnSourceVersion = self.sourceVersion
+    emit ImportConflictResolved {
+      importConflictId: self.id
+      tenantId: self.tenantId
+      externalRecordLinkId: self.externalRecordLinkId
+      field: self.field
+      status: resolution
+    }
+  }
+
+  store ImportConflict in durable
+}
+
+event ImportConflictRaised: "import_conflict.raised" {
+  importConflictId: string
+  tenantId: string
+  externalRecordLinkId: string
+  field: string
+}
+
+event ImportConflictResolved: "import_conflict.resolved" {
+  importConflictId: string
+  tenantId: string
+  externalRecordLinkId: string
+  field: string
+  status: ImportConflictStatus
 }

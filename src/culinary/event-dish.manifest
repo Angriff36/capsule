@@ -413,3 +413,125 @@ event EventDishRemoved: "event_dish.removed" {
   previousQuantityServings: number
   reason: string
 }
+
+// Revision-2 culinary model (2026-09-14). Event-specific change to one dish's
+// food, supply or work lines without touching the master Dish. "1 vegan salad
+// with oil/vinegar" = remove creamy garlic for 1 portion + add oil and vinegar
+// for 1 portion. The demand engine applies these; tasks never do.
+enum EventDishOverrideKind {
+  add
+  remove
+  replace
+  adjust
+}
+
+entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventDishId: uuid
+  property required eventId: uuid
+  property required kind: EventDishOverrideKind = "adjust"
+  property targetDishIngredientId: uuid?
+  property targetDishComponentId: uuid?
+  property targetDishContainerId: uuid?
+  property targetDishTaskId: uuid?
+  property ingredientId: uuid?
+  property componentId: uuid?
+  property quantity: decimal(12, 4)?
+  property unit: UnitOfMeasure?
+  property required portionsAffected: decimal(12, 4) = 0
+  property required reason: string = ""
+  property appliedAt: datetime?
+  property revokedAt: datetime?
+
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint overrideReasonPresent: self.appliedAt == null or length(trim(self.reason)) > 0 "Override reason is required"
+  constraint overridePortionsNonnegative: self.portionsAffected >= 0 "Portions affected cannot be negative"
+
+  default policy eventDishLineOverrideRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dish overrides"
+  default policy eventDishLineOverrideWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may write event dish overrides through commands"
+  default policy eventDishLineOverrideExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may execute event dish override commands"
+
+  command apply(
+    eventDishId: uuid,
+    eventId: uuid,
+    kind: EventDishOverrideKind,
+    portionsAffected: decimal(12, 4),
+    reason: string,
+    optional targetDishIngredientId: uuid,
+    optional targetDishComponentId: uuid,
+    optional targetDishContainerId: uuid,
+    optional targetDishTaskId: uuid,
+    optional ingredientId: uuid,
+    optional componentId: uuid,
+    optional quantity: decimal(12, 4),
+    optional unit: UnitOfMeasure
+  ) {
+    guard self.appliedAt == null
+    guard self.deletedAt == null
+    constraint applyOverrideReason: length(trim(reason)) > 0 "Override reason is required"
+    constraint applyOverridePortions: portionsAffected >= 0 "Portions affected cannot be negative"
+    constraint applyOverrideTarget: kind == "add" or targetDishIngredientId != null or targetDishComponentId != null or targetDishContainerId != null or targetDishTaskId != null "Remove, replace and adjust need a target line"
+    constraint applyOverrideSource: (kind != "add" and kind != "replace") or ingredientId != null or componentId != null "Add and replace need an ingredient or a recipe"
+    mutate eventDishId = eventDishId
+    mutate eventId = eventId
+    mutate kind = kind
+    mutate targetDishIngredientId = targetDishIngredientId
+    mutate targetDishComponentId = targetDishComponentId
+    mutate targetDishContainerId = targetDishContainerId
+    mutate targetDishTaskId = targetDishTaskId
+    mutate ingredientId = ingredientId
+    mutate componentId = componentId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate portionsAffected = portionsAffected
+    mutate reason = reason
+    mutate appliedAt = now()
+    emit EventDishLineOverrideApplied {
+      eventDishLineOverrideId: self.id
+      tenantId: self.tenantId
+      eventDishId: eventDishId
+      eventId: eventId
+      kind: kind
+      portionsAffected: portionsAffected
+    }
+  }
+
+  command revoke(reason: string) {
+    guard self.appliedAt != null
+    guard self.deletedAt == null
+    constraint revokeOverrideReason: length(trim(reason)) > 0 "Revoke reason is required"
+    mutate revokedAt = now()
+    mutate deletedAt = now()
+    emit EventDishLineOverrideRevoked {
+      eventDishLineOverrideId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      reason: reason
+    }
+  }
+
+  store EventDishLineOverride in durable
+}
+
+event EventDishLineOverrideApplied: "event_dish_line_override.applied" {
+  eventDishLineOverrideId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  kind: EventDishOverrideKind
+  portionsAffected: decimal(12, 4)
+}
+
+event EventDishLineOverrideRevoked: "event_dish_line_override.revoked" {
+  eventDishLineOverrideId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  reason: string
+}

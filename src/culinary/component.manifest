@@ -33,9 +33,15 @@ entity Component mixin TenantScoped, SoftDeletable {
   property publishedAt: datetime?
   property retiredAt: datetime?
   property retirementReason: string?
+  // Revision-2 culinary model: how long a made batch keeps. Shared production
+  // groups form only inside a confirmed window; null = not confirmed.
+  property storageWindowDays: int?
+  property storageWindowSource: string?
 
   hasMany steps: ComponentStep
   hasMany ingredientLines: ComponentIngredient
+  hasMany componentLines: ComponentComponent
+  hasMany portionSpecs: ComponentPortionSpec
 
   computed isPublished: boolean = self.status == "published"
   computed isEditable: boolean = self.status == "draft"
@@ -141,6 +147,19 @@ entity Component mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Confirmed storage window with its source. Never inferred.
+  command setStorageWindow(storageWindowDays: int, optional source: string) {
+    guard self.deletedAt == null
+    constraint storageWindowNonnegative: storageWindowDays >= 0 "Storage window cannot be negative"
+    mutate storageWindowDays = storageWindowDays
+    mutate storageWindowSource = source
+    emit ComponentStorageWindowSet {
+      componentId: self.id
+      tenantId: self.tenantId
+      storageWindowDays: storageWindowDays
+    }
+  }
+
   // How many guests one yieldQuantity batch serves.
   command setServesPerYield(servesPerYield: int) {
     guard self.deletedAt == null
@@ -233,6 +252,8 @@ entity ComponentIngredient mixin TenantScoped, SoftDeletable {
   // Optional so pre-field ComponentIngredient rows validate under Convex schema push.
   property wasteFactor: decimal(10, 4)? = 1
   property prepNotes: string?
+  // Revision-2: basis the quantity is stated in (null = not yet classified).
+  property quantityBasis: QuantityBasis?
   property addedAt: datetime?
 
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
@@ -595,4 +616,249 @@ event ComponentSnapshotCaptured: "component_snapshot.captured" {
   tenantId: string
   componentId: string
   versionNumber: number
+}
+
+event ComponentStorageWindowSet: "component.storage_window_set" {
+  componentId: string
+  tenantId: string
+  storageWindowDays: int
+}
+
+// Revision-2 culinary model (2026-09-14). A recipe used inside another recipe.
+// A sub-recipe is this relationship, not a second entity type. Self-reference
+// is rejected here; deeper cycles are rejected by the authored nested-line seam
+// and by the demand expansion, which walks with a visited set.
+entity ComponentComponent mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required componentId: uuid
+  property required childComponentId: uuid
+  property required quantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required sortOrder: int = 0
+  property wasteFactor: decimal(10, 4)? = 1
+  property quantityBasis: QuantityBasis?
+  property prepNotes: string?
+  property addedAt: datetime?
+
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
+  belongsTo childComponent: Component fields [tenantId, childComponentId] references [tenantId, id]
+
+  constraint nestedLineNotSelf: self.addedAt == null or self.componentId != self.childComponentId "A recipe cannot contain itself"
+  constraint nestedLineQuantityPositive: self.addedAt == null or self.quantity > 0 "Nested recipe quantity must be positive"
+
+  default policy componentComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read nested recipe lines"
+  default policy componentComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write nested recipe lines through commands"
+  default policy componentComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute nested recipe line commands"
+
+  command add(
+    componentId: uuid,
+    childComponentId: uuid,
+    quantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    optional sortOrder: number,
+    optional wasteFactor: decimal(10, 4),
+    optional quantityBasis: QuantityBasis,
+    optional prepNotes: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addNestedNotSelf: componentId != childComponentId "A recipe cannot contain itself"
+    constraint addNestedQuantity: quantity > 0 "Nested recipe quantity must be positive"
+    constraint addNestedWasteFactor: wasteFactor == null or wasteFactor > 0 "Waste factor must be greater than 0"
+    mutate componentId = componentId
+    mutate childComponentId = childComponentId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate wasteFactor = wasteFactor != null ? wasteFactor : 1
+    mutate quantityBasis = quantityBasis != null ? quantityBasis : "as_produced"
+    mutate prepNotes = prepNotes
+    mutate addedAt = now()
+    emit ComponentComponentAdded {
+      componentComponentId: self.id
+      tenantId: self.tenantId
+      componentId: componentId
+      childComponentId: childComponentId
+      quantity: quantity
+      unit: unit
+    }
+  }
+
+  command adjustQuantity(quantity: decimal(12, 4), unit: UnitOfMeasure) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint adjustNestedQuantity: quantity > 0 "Nested recipe quantity must be positive"
+    compute previousUnit = self.unit
+    mutate quantity = quantity
+    mutate unit = unit
+    emit ComponentComponentQuantityAdjusted {
+      componentComponentId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      childComponentId: self.childComponentId
+      quantity: quantity
+      unit: unit
+      previousUnit: previousUnit
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint removeNestedReason: length(trim(reason)) > 0 "Removal reason is required"
+    mutate deletedAt = now()
+    emit ComponentComponentRemoved {
+      componentComponentId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      childComponentId: self.childComponentId
+      reason: reason
+    }
+  }
+
+  store ComponentComponent in durable
+}
+
+// A named output size of a recipe ("10 oz dough ball", 15 per batch). One
+// recipe may have several; the 5 oz and 10 oz outputs stay distinct even when
+// they share a formula. The batch mass is NOT derived from them.
+entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required componentId: uuid
+  property required searchable name: string = ""
+  property required pieceQuantity: decimal(12, 4) = 1
+  property required pieceUnit: UnitOfMeasure = "ounce"
+  property piecesPerBatch: decimal(12, 4)?
+  property source: string?
+  property definedAt: datetime?
+
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
+
+  constraint portionSpecNamed: self.definedAt == null or length(trim(self.name)) > 0 "Portion spec name is required"
+  constraint portionSpecPiecePositive: self.definedAt == null or self.pieceQuantity > 0 "Piece quantity must be positive"
+
+  default policy componentPortionSpecRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read portion specs"
+  default policy componentPortionSpecWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write portion specs through commands"
+  default policy componentPortionSpecExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute portion spec commands"
+
+  command define(
+    componentId: uuid,
+    name: string,
+    pieceQuantity: decimal(12, 4),
+    pieceUnit: UnitOfMeasure,
+    optional piecesPerBatch: decimal(12, 4),
+    optional source: string
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    constraint defineSpecName: length(trim(name)) > 0 "Portion spec name is required"
+    constraint defineSpecPiece: pieceQuantity > 0 "Piece quantity must be positive"
+    constraint defineSpecPieces: piecesPerBatch == null or piecesPerBatch > 0 "Pieces per batch must be positive"
+    mutate componentId = componentId
+    mutate name = name
+    mutate pieceQuantity = pieceQuantity
+    mutate pieceUnit = pieceUnit
+    mutate piecesPerBatch = piecesPerBatch
+    mutate source = source
+    mutate definedAt = now()
+    emit ComponentPortionSpecDefined {
+      componentPortionSpecId: self.id
+      tenantId: self.tenantId
+      componentId: componentId
+      name: name
+    }
+  }
+
+  command revise(
+    name: string,
+    pieceQuantity: decimal(12, 4),
+    pieceUnit: UnitOfMeasure,
+    optional piecesPerBatch: decimal(12, 4),
+    optional source: string
+  ) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    constraint reviseSpecName: length(trim(name)) > 0 "Portion spec name is required"
+    constraint reviseSpecPiece: pieceQuantity > 0 "Piece quantity must be positive"
+    mutate name = name
+    mutate pieceQuantity = pieceQuantity
+    mutate pieceUnit = pieceUnit
+    mutate piecesPerBatch = piecesPerBatch != null ? piecesPerBatch : self.piecesPerBatch
+    mutate source = source != null ? source : self.source
+    emit ComponentPortionSpecRevised {
+      componentPortionSpecId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      name: name
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    constraint retireSpecReason: length(trim(reason)) > 0 "Reason is required"
+    mutate deletedAt = now()
+    emit ComponentPortionSpecRetired {
+      componentPortionSpecId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      reason: reason
+    }
+  }
+
+  store ComponentPortionSpec in durable
+}
+
+event ComponentComponentAdded: "component_component.added" {
+  componentComponentId: string
+  tenantId: string
+  componentId: string
+  childComponentId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event ComponentComponentQuantityAdjusted: "component_component.quantity_adjusted" {
+  componentComponentId: string
+  tenantId: string
+  componentId: string
+  childComponentId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousUnit: UnitOfMeasure
+}
+
+event ComponentComponentRemoved: "component_component.removed" {
+  componentComponentId: string
+  tenantId: string
+  componentId: string
+  childComponentId: string
+  reason: string
+}
+
+event ComponentPortionSpecDefined: "component_portion_spec.defined" {
+  componentPortionSpecId: string
+  tenantId: string
+  componentId: string
+  name: string
+}
+
+event ComponentPortionSpecRevised: "component_portion_spec.revised" {
+  componentPortionSpecId: string
+  tenantId: string
+  componentId: string
+  name: string
+}
+
+event ComponentPortionSpecRetired: "component_portion_spec.retired" {
+  componentPortionSpecId: string
+  tenantId: string
+  componentId: string
+  reason: string
 }

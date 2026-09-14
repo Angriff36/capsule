@@ -69,58 +69,20 @@ function writeStoredIds(scope: string, ids: string[]) {
 
 type Active = { definition: TppReportDefinition; print: boolean };
 
-/**
- * The tab pinned to the right edge of the screen. It carries the report list
- * for whichever event the calendar has selected: view a report in place, or
- * print it straight away. The list is the operator's own — edit it once and
- * the browser remembers.
- */
-export function EventReportRail({
-  event,
-  storageScope,
-}: {
-  event: CalendarEventFacts | null;
-  /** Who the list belongs to (person id); keeps operators on a shared machine apart. */
-  storageScope: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [active, setActive] = useState<Active | null>(null);
+export type EventReportLaunch = {
+  eventId: string;
+  reportId: string;
+  print: boolean;
+};
+
+export function useEventReportList(storageScope: string) {
   const [ids, setIds] = useState<string[]>(
     () => readStoredIds(storageScope) ?? DEFAULT_REPORT_IDS,
   );
-  const tabRef = useRef<HTMLButtonElement>(null);
-  const railRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setIds(readStoredIds(storageScope) ?? DEFAULT_REPORT_IDS);
   }, [storageScope]);
-
-  // A closed rail is off-screen; keep its controls out of the tab order too.
-  useEffect(() => {
-    railRef.current?.toggleAttribute("inert", !open);
-  }, [open]);
-
-  const close = () => {
-    setOpen(false);
-    tabRef.current?.focus();
-  };
-
-  // A new selection resets the rail to its list and opens it.
-  const eventId = event?.id ?? null;
-  useEffect(() => {
-    setActive(null);
-    if (eventId) setOpen(true);
-  }, [eventId]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (keyEvent: KeyboardEvent) => {
-      if (keyEvent.key === "Escape") close();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
 
   const chosen = useMemo(
     () =>
@@ -142,6 +104,76 @@ export function EventReportRail({
     });
   };
 
+  return { ids, chosen, toggle };
+}
+
+/**
+ * The tab pinned to the right edge of the screen. It carries the report list
+ * for whichever event the calendar has selected: view a report in place, or
+ * print it straight away. The list is the operator's own — edit it once and
+ * the browser remembers.
+ */
+export function EventReportRail({
+  event,
+  reportIds,
+  reports,
+  onToggleReport,
+  launch,
+}: {
+  event: CalendarEventFacts | null;
+  reportIds: readonly string[];
+  reports: readonly TppReportDefinition[];
+  onToggleReport: (id: string) => void;
+  launch: EventReportLaunch | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [active, setActive] = useState<Active | null>(null);
+  const tabRef = useRef<HTMLButtonElement>(null);
+  const railRef = useRef<HTMLElement>(null);
+
+  // A closed rail is off-screen; keep its controls out of the tab order too.
+  useEffect(() => {
+    railRef.current?.toggleAttribute("inert", !open);
+  }, [open]);
+
+  const close = () => {
+    setOpen(false);
+    tabRef.current?.focus();
+  };
+
+  // A new selection resets the rail to its list and opens it.
+  const eventId = event?.id ?? null;
+  useEffect(() => {
+    setActive(null);
+    if (eventId) setOpen(true);
+  }, [eventId]);
+
+  // A launch request is consumed once; a later re-render with the same
+  // request (event object refreshed, list reopened) must not replay it or
+  // reopen the print dialog.
+  const consumedLaunch = useRef<EventReportLaunch | null>(null);
+  useEffect(() => {
+    if (!launch || !event || launch.eventId !== event.id) return;
+    if (consumedLaunch.current === launch) return;
+    const definition = EVENT_REPORTS.find(
+      (candidate) => candidate.id === launch.reportId,
+    );
+    if (!definition) return;
+    consumedLaunch.current = launch;
+    setActive({ definition, print: launch.print });
+    setOpen(true);
+  }, [event, launch]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (keyEvent: KeyboardEvent) => {
+      if (keyEvent.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   return (
     <>
       <button
@@ -155,7 +187,7 @@ export function EventReportRail({
         onClick={() => setOpen((value) => !value)}
       >
         <span>Reports</span>
-        {event ? <b>{chosen.length}</b> : null}
+        {event ? <b>{reports.length}</b> : null}
       </button>
 
       <aside
@@ -214,13 +246,13 @@ export function EventReportRail({
           />
         ) : event ? (
           <div className="home-report-list">
-            {chosen.length === 0 ? (
+            {reports.length === 0 ? (
               <p className="home-report-note">
                 Your list is empty. Choose the reports you print most.
               </p>
             ) : (
               <ul>
-                {chosen.map((definition) => (
+                {reports.map((definition) => (
                   <li key={definition.id}>
                     <div className="min-w-0">
                       <strong>{definition.name}</strong>
@@ -260,8 +292,8 @@ export function EventReportRail({
                     <label>
                       <input
                         type="checkbox"
-                        checked={ids.includes(definition.id)}
-                        onChange={() => toggle(definition.id)}
+                        checked={reportIds.includes(definition.id)}
+                        onChange={() => onToggleReport(definition.id)}
                       />
                       <span>{definition.name}</span>
                     </label>

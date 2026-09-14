@@ -57,6 +57,9 @@ import {
   unitOptionsFor,
 } from "./import/UnitOfMeasureMapper";
 import { ComponentImportSourcePanel } from "./import/ComponentImportSourcePanel";
+import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
+import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
+import { ComponentPortionSpecsPanel } from "./ComponentPortionSpecsPanel";
 import {
   beginPendingOperation,
   confirmPendingOperation,
@@ -472,6 +475,8 @@ export function ComponentDetailPage() {
         ) : null}
       </header>
 
+      <ComponentRecipeStatusPanel componentId={component._id} />
+
       <div className="culinary-work-grid">
         <section className="culinary-section">
           <div className="culinary-section-heading">
@@ -738,6 +743,10 @@ export function ComponentDetailPage() {
           ) : null}
         </section>
       </div>
+
+      <ComponentSubRecipesPanel componentId={component._id} />
+
+      <ComponentPortionSpecsPanel componentId={component._id} />
 
       {editing ? (
         <>

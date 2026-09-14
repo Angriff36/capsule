@@ -1,6 +1,6 @@
 import { groupEventPrep } from "../../lib/eventPrepGroups";
 export { groupEventPrep } from "../../lib/eventPrepGroups";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type {
   useListEventDish,
   useListPrepTask,
@@ -8,6 +8,9 @@ import type {
   useListComponent,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import { usePrepTaskResolveChoice } from "../../lib/manifest-convex-react";
+import { CHIP_TONE_CLASS } from "../../lib/statusLabels";
+import { StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
 import { readableRecipeAmount, recipeNoteLines } from "../kitchen/RecipeNotes";
 import { displayEventMenuNotes } from "./eventMenuLineFields";
@@ -43,6 +46,22 @@ export function EventPrepList({
   recipeFlags: Map<string, string[]>;
   renderQuantityFlags: (flags: string[]) => ReactNode;
 }) {
+  const resolveChoice = usePrepTaskResolveChoice();
+  const [choiceBusy, setChoiceBusy] = useState<string | null>(null);
+  const [choiceError, setChoiceError] = useState<string | null>(null);
+  const chooseOption = async (task: Task, choice: string) => {
+    setChoiceBusy(task._id);
+    setChoiceError(null);
+    try {
+      await resolveChoice({ docId: task._id, choice, version: task.version });
+    } catch (cause) {
+      setChoiceError(
+        cause instanceof Error ? cause.message : "Could not record the choice.",
+      );
+    } finally {
+      setChoiceBusy(null);
+    }
+  };
   const dishById = new Map(dishes.map((dish) => [String(dish._id), dish]));
   const componentById = new Map(
     components.map((component) => [String(component._id), component]),
@@ -52,6 +71,11 @@ export function EventPrepList({
   );
   return (
     <div className="space-y-8">
+      {choiceError ? (
+        <p className="text-base text-danger" role="alert">
+          {choiceError}
+        </p>
+      ) : null}
       {groupEventPrep(selections, tasks).map((group) => {
         const selection = group.selection;
         const dishId = selection?.dishId ?? group.tasks[0]?.dishId;
@@ -141,6 +165,53 @@ export function EventPrepList({
                         <h4 className="break-words text-base font-medium text-ink">
                           {task.name}
                         </h4>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {task.resolution === "choice_pending" ? (
+                            <>
+                              <StatusChip
+                                status="choice_pending"
+                                label="Choose: make / portion"
+                                color={CHIP_TONE_CLASS.warn}
+                              />
+                              {(task.choiceOptions ?? [])
+                                .filter((option): option is string =>
+                                  Boolean(option),
+                                )
+                                .map((option) => (
+                                  <button
+                                    key={option}
+                                    type="button"
+                                    className="btn btn-ghost btn-sm"
+                                    disabled={choiceBusy != null}
+                                    onClick={() =>
+                                      void chooseOption(task, option)
+                                    }
+                                  >
+                                    {option}
+                                  </button>
+                                ))}
+                            </>
+                          ) : null}
+                          {task.resolution === "content_missing" ? (
+                            <StatusChip
+                              status="content_missing"
+                              label="Recipe not on file"
+                              color={CHIP_TONE_CLASS.warn}
+                            />
+                          ) : null}
+                          {task.overrideOfDishTaskId ? (
+                            <span
+                              title={task.overrideReason ?? undefined}
+                              className="inline-flex"
+                            >
+                              <StatusChip
+                                status="event_override"
+                                label="Event override"
+                                color={CHIP_TONE_CLASS.info}
+                              />
+                            </span>
+                          ) : null}
+                        </div>
                         {notes.map((line) => (
                           <p
                             key={line}

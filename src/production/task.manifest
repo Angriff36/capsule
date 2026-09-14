@@ -56,6 +56,16 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   property cancellationReason: string?
   property blockedAt: datetime?
   property blockReason: string?
+  // Revision-2 culinary model (2026-09-14). An event-specific replacement of
+  // a template step keeps the template id here so regeneration (EventDishAdded
+  // replay, recipe refresh) leaves the replaced work alone.
+  property overrideOfDishTaskId: uuid?
+  property overrideReason: string?
+  // choice_pending work cannot be claimed until a person picks one option.
+  property resolution: TaskResolution?
+  property choiceOptions: list<string>?
+  property chosenOption: string?
+  property stationId: uuid?
 
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
@@ -101,7 +111,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     optional isGenerated: boolean,
     optional station: string,
     optional dueAt: datetime,
-    optional notes: string
+    optional notes: string,
+    optional resolution: TaskResolution,
+    optional choiceOptions: list<string>
   ) {
     guard self.claimedAt == null
     guard self.status == "pending"
@@ -117,7 +129,8 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     constraint openQuantityPositive: quantity >= 0 "Prep quantity cannot be negative"
     mutate eventDishId = eventDishId
     mutate eventId = eventId
-    mutate name = name
+    // An event-specific override keeps its own name and notes across replays.
+    mutate name = self.overrideOfDishTaskId != null ? self.name : name
     mutate ingredientId = ingredientId != null ? ingredientId : self.ingredientId
     mutate ingredientDemandId = ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
     mutate componentId = componentId != null ? componentId : self.componentId
@@ -125,11 +138,14 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate dishId = dishId != null ? dishId : self.dishId
     mutate category = category != null ? category : self.category
     mutate taskType = taskType != null ? taskType : self.taskType
-    mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
-    mutate isGenerated = isGenerated != null ? isGenerated : self.isGenerated
+    mutate specialInstructions = self.overrideOfDishTaskId != null ? self.specialInstructions : (specialInstructions != null ? specialInstructions : self.specialInstructions)
+    mutate isGenerated = self.overrideOfDishTaskId != null ? false : (isGenerated != null ? isGenerated : self.isGenerated)
     mutate quantity = quantity
     mutate unit = unit
     mutate station = station != null ? station : self.station
+    // Choice state comes from the template unless a person already picked.
+    mutate resolution = self.chosenOption != null ? self.resolution : (resolution != null ? resolution : self.resolution)
+    mutate choiceOptions = choiceOptions != null ? choiceOptions : self.choiceOptions
     mutate recipeTemplateVersion = self.dishTask != null ? self.dishTask.version : null
     mutate recipeTemplateName = self.dishTask != null ? self.dishTask.name : null
     mutate recipeTemplateInstructions = self.dishTask != null ? self.dishTask.instructions : null
@@ -310,8 +326,57 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate componentId = componentId
   }
 
+  // Replace this event's copy of a template step without touching the master
+  // Dish. "Send bulk mix, do not form crab cakes" is this command.
+  command markOverride(overrideOfDishTaskId: uuid, reason: string, optional name: string, optional specialInstructions: string) {
+    guard self.deletedAt == null
+    guard self.status == "pending" or self.status == "claimed" or self.status == "blocked"
+    constraint overrideReasonPresent: length(trim(reason)) > 0 "Override reason is required"
+    constraint overrideNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
+    mutate overrideOfDishTaskId = overrideOfDishTaskId
+    mutate overrideReason = reason
+    mutate name = name != null ? name : self.name
+    mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
+    mutate isGenerated = false
+    emit PrepTaskOverridden {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      overrideOfDishTaskId: overrideOfDishTaskId
+      reason: reason
+    }
+  }
+
+  // "Make or portion" and chef's-choice lines carry their options here until a
+  // person picks one. Picking resolves the task; demand then comes from the
+  // chosen branch only (authored demand engine).
+  command setChoice(choiceOptions: list<string>, optional resolution: TaskResolution) {
+    guard self.deletedAt == null
+    mutate choiceOptions = choiceOptions
+    mutate resolution = resolution != null ? resolution : "choice_pending"
+    mutate chosenOption = null
+  }
+
+  command resolveChoice(choice: string) {
+    guard self.deletedAt == null
+    guard self.resolution == "choice_pending"
+    constraint choicePresent: length(trim(choice)) > 0 "A choice is required"
+    constraint choiceListed: self.choiceOptions == null or self.choiceOptions contains choice "Choice must be one of the listed options"
+    mutate chosenOption = choice
+    mutate resolution = "resolved"
+    emit PrepTaskChoiceResolved {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      choice: choice
+    }
+  }
+
   command claim() {
     guard self.status == "pending"
+    guard self.resolution == null or self.resolution != "choice_pending"
     guard self.deletedAt == null
     guard user.personId != null
     constraint claimQuantityReady: self.quantity > 0 "Prep quantity must be positive before claim"
@@ -344,6 +409,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     // goes home, a station is behind, a lead pulls several steps together as
     // one job. Handing over never rewinds the step - a started step stays
     // started and a blocked step stays blocked, so nothing hides a stall.
+    guard self.resolution == null or self.resolution != "choice_pending"
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard personId != null
@@ -394,6 +460,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   }
 
   command start() {
+    guard self.resolution == null or self.resolution != "choice_pending"
     guard self.status == "claimed"
     guard self.claimedAt != null
     guard self.assignedToId != null
@@ -827,4 +894,103 @@ on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
     ingredientId: self.ingredientId
     specialInstructions: self.instructions
     station: self.station
+    resolution: self.resolution
+    choiceOptions: self.choiceOptions
   }
+
+event PrepTaskOverridden: "prep_task.overridden" {
+  prepTaskId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  overrideOfDishTaskId: string
+  reason: string
+}
+
+event PrepTaskChoiceResolved: "prep_task.choice_resolved" {
+  prepTaskId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  choice: string
+}
+
+// Revision-2 culinary model (2026-09-14). The event copy of DishTaskMaterial:
+// which contribution row or batch allocation this task acts on. The aggregate
+// IngredientDemand row is a sum; this link keeps the dish and preparation a
+// task belongs to. Work quantity here never feeds demand.
+entity PrepTaskMaterial mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required prepTaskId: uuid
+  property eventIngredientContributionId: uuid?
+  property productionBatchAllocationId: uuid?
+  property dishIngredientId: uuid?
+  property dishComponentId: uuid?
+  property workQuantity: decimal(12, 4)?
+  property workUnit: UnitOfMeasure?
+  property linkedAt: datetime?
+
+  belongsTo prepTask: PrepTask fields [tenantId, prepTaskId] references [tenantId, id]
+
+  default policy prepTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may read prep task materials"
+  default policy prepTaskMaterialWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may write prep task materials through commands"
+  default policy prepTaskMaterialExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may execute prep task material commands"
+
+  command link(
+    prepTaskId: uuid,
+    optional eventIngredientContributionId: uuid,
+    optional productionBatchAllocationId: uuid,
+    optional dishIngredientId: uuid,
+    optional dishComponentId: uuid,
+    optional workQuantity: decimal(12, 4),
+    optional workUnit: UnitOfMeasure
+  ) {
+    guard self.linkedAt == null
+    guard self.deletedAt == null
+    constraint linkPrepMaterialTarget: eventIngredientContributionId != null or productionBatchAllocationId != null or dishIngredientId != null or dishComponentId != null "A prep task material must point at a requirement or allocation"
+    mutate prepTaskId = prepTaskId
+    mutate eventIngredientContributionId = eventIngredientContributionId
+    mutate productionBatchAllocationId = productionBatchAllocationId
+    mutate dishIngredientId = dishIngredientId
+    mutate dishComponentId = dishComponentId
+    mutate workQuantity = workQuantity
+    mutate workUnit = workUnit
+    mutate linkedAt = now()
+    emit PrepTaskMaterialLinked {
+      prepTaskMaterialId: self.id
+      tenantId: self.tenantId
+      prepTaskId: prepTaskId
+    }
+  }
+
+  command unlink(reason: string) {
+    guard self.linkedAt != null
+    guard self.deletedAt == null
+    constraint unlinkPrepMaterialReason: length(trim(reason)) > 0 "Reason is required"
+    mutate deletedAt = now()
+    emit PrepTaskMaterialUnlinked {
+      prepTaskMaterialId: self.id
+      tenantId: self.tenantId
+      prepTaskId: self.prepTaskId
+      reason: reason
+    }
+  }
+
+  store PrepTaskMaterial in durable
+}
+
+event PrepTaskMaterialLinked: "prep_task_material.linked" {
+  prepTaskMaterialId: string
+  tenantId: string
+  prepTaskId: string
+}
+
+event PrepTaskMaterialUnlinked: "prep_task_material.unlinked" {
+  prepTaskMaterialId: string
+  tenantId: string
+  prepTaskId: string
+  reason: string
+}
