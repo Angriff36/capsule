@@ -25,6 +25,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { useReconcileLiveEventsForComponent } from "../../lib/culinaryDemandClient";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { buildComponentSnapshotData } from "./componentSnapshot";
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
@@ -100,6 +101,7 @@ export function ComponentDetailPage() {
   const createLine = useCreateComponentIngredient();
   const adjustLine = useComponentIngredientAdjustQuantity();
   const removeLine = useComponentIngredientRemove();
+  const reconcileEvents = useReconcileLiveEventsForComponent();
   // Creation path: the governed create hook (ComponentSnapshot_createViaCapture),
   // not the entity-command hook which targets an existing doc via docId.
   const captureSnapshot = useCreateComponentSnapshot();
@@ -366,6 +368,7 @@ export function ComponentDetailPage() {
         sortOrder: componentLines.length,
         prepNotes: optional(data.get("prepNotes")),
       });
+      await reconcileEvents(component._id);
       form.reset();
     });
   };
@@ -604,6 +607,7 @@ export function ComponentDetailPage() {
                               unit: line.unit,
                               version: line.version,
                             });
+                            await reconcileEvents(component._id);
                           });
                         })();
                       }}
@@ -634,6 +638,7 @@ export function ComponentDetailPage() {
                               reason,
                               version: line.version,
                             });
+                            await reconcileEvents(component._id);
                           });
                         })();
                       }}

@@ -26,6 +26,7 @@ import type * as clientPortal from "../clientPortal.js";
 import type * as computed from "../computed.js";
 import type * as crons from "../crons.js";
 import type * as culinaryDemand from "../culinaryDemand.js";
+import type * as culinaryDemandSweep from "../culinaryDemandSweep.js";
 import type * as cutover from "../cutover.js";
 import type * as driverAssignment from "../driverAssignment.js";
 import type * as emailNotifications from "../emailNotifications.js";
@@ -182,6 +183,7 @@ declare const fullApi: ApiFromModules<{
   computed: typeof computed;
   crons: typeof crons;
   culinaryDemand: typeof culinaryDemand;
+  culinaryDemandSweep: typeof culinaryDemandSweep;
   cutover: typeof cutover;
   driverAssignment: typeof driverAssignment;
   emailNotifications: typeof emailNotifications;

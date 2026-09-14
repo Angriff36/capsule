@@ -40,6 +40,14 @@ export function useAddNestedRecipeLine() {
     });
 }
 
+export function useReconcileLiveEventsForComponent() {
+  const mutate = useMutation(
+    api.culinaryDemandSweep.reconcileLiveEventsForComponent,
+  );
+  return (componentId: string) =>
+    mutate({ componentId: componentId as Id<"components"> });
+}
+
 /** Kitchen wording for each unresolved kind the demand engine reports. */
 export const UNRESOLVED_KIND_LABEL: Record<string, string> = {
   unit: "Unit not mapped",

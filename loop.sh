@@ -44,7 +44,9 @@ if [ "${1:-}" = "plan" ]; then
     # Full planning mode
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
-    MAX_ITERATIONS=${2:-0}
+    # Plan mode must converge. Unlimited plan ticks rewrite the same
+    # checklist forever (#271). Override with `./loop.sh plan 20`.
+    MAX_ITERATIONS=${2:-3}
 elif [ "${1:-}" = "plan-work" ]; then
     # Scoped planning mode — scope the plan to one body of work at creation time
     if [ -z "${2:-}" ]; then
@@ -328,6 +330,14 @@ $(ralph_integration_prompt)"
         echo "Plan complete. Branch includes $RALPH_REMOTE/$RALPH_BASE_BRANCH; local preview check passed."
         echo "Worktree: $(git rev-parse --show-toplevel) | Branch: $CURRENT_BRANCH | Commit: $(git rev-parse --short HEAD)"
         echo "Branch pushed. This is not a production deployment."
+        break
+    fi
+
+    # Plan mode: the agent writes .ralph-plan-converged when a tick changes
+    # no remaining `- [ ]` tasks (#271). Stop instead of looping forever.
+    if { [ "$MODE" = "plan" ] || [ "$MODE" = "plan-work" ]; } &&
+        [ -f .ralph-plan-converged ]; then
+        echo "Plan converged (.ralph-plan-converged). Start build mode next."
         break
     fi
 

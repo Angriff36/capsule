@@ -1025,6 +1025,10 @@ export const addNestedRecipeLine = mutation({
         prepNotes: args.prepNotes,
       },
     );
+    await ctx.runMutation(
+      api.culinaryDemandSweep.reconcileLiveEventsForComponent,
+      { componentId: args.componentId },
+    );
     return created;
   },
 });
