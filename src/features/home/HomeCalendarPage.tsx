@@ -1,5 +1,13 @@
-import { useMemo, useState, type FocusEvent, type MouseEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FocusEvent,
+  type MouseEvent,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
+import type { Id } from "../../lib/api";
 import { formatTime } from "../../lib/format";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
@@ -15,8 +23,18 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from "../../ui/icons";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
+import { reportActionFail, reportActionOk } from "../../ui/action-result";
 import { eventDetailPath, eventsIndexPath } from "../events/eventRoutes";
-import { EventReportRail } from "./EventReportRail";
+import {
+  useAssignVehicle,
+  useUnassignVehicle,
+} from "../facilities/vehicleAssignment";
+import {
+  EventReportRail,
+  useEventReportList,
+  type EventReportLaunch,
+} from "./EventReportRail";
+import type { TppReportDefinition } from "../reports/tpp/types";
 import {
   buildCalendarFacts,
   buildMonthGrid,
@@ -30,9 +48,21 @@ import "./HomeCalendar.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MAX_VISIBLE = 4;
-const TOOLTIP_WIDTH = 300;
+const TOOLTIP_WIDTH = 620;
+const TOOLTIP_HEIGHT = 430;
 
-type Hover = { event: CalendarEventFacts; top: number; left: number };
+type Hover = {
+  event: CalendarEventFacts;
+  top: number;
+  left: number;
+  width: number;
+};
+
+type CalendarVehicleOption = {
+  id: string;
+  label: string;
+  retired: boolean;
+};
 
 function monthLabel(year: number, month: number): string {
   return new Date(year, month, 1).toLocaleDateString(undefined, {
@@ -54,7 +84,39 @@ function dateSpan(event: CalendarEventFacts): string {
 }
 
 /** Fixed-position card so a chip at the bottom of the grid never clips. */
-function EventTooltip({ hover }: { hover: Hover }) {
+function EventTooltip({
+  hover,
+  reports,
+  onReportAction,
+  vehicles,
+  vehicleBusyId,
+  vehicleError,
+  onVehicleChange,
+  onEnter,
+  onLeave,
+  onFocus,
+  onBlur,
+}: {
+  hover: Hover;
+  reports: readonly TppReportDefinition[];
+  onReportAction: (
+    event: CalendarEventFacts,
+    definition: TppReportDefinition,
+    print: boolean,
+  ) => void;
+  vehicles: readonly CalendarVehicleOption[];
+  vehicleBusyId: string | null;
+  vehicleError: string | null;
+  onVehicleChange: (
+    deliveryId: string,
+    vehicleId: string,
+    version: number,
+  ) => void;
+  onEnter: () => void;
+  onLeave: () => void;
+  onFocus: () => void;
+  onBlur: () => void;
+}) {
   const { event } = hover;
   const facts: [string, string][] = [
     ["Event #", event.eventNumber],
@@ -69,10 +131,15 @@ function EventTooltip({ hover }: { hover: Hover }) {
   ];
   return (
     <div
-      role="tooltip"
+      role="dialog"
+      aria-label={`${event.title} details and reports`}
       className="home-cal-tooltip"
       data-lock={event.lock}
-      style={{ top: hover.top, left: hover.left, width: TOOLTIP_WIDTH }}
+      style={{ top: hover.top, left: hover.left, width: hover.width }}
+      onMouseEnter={onEnter}
+      onMouseLeave={onLeave}
+      onFocus={onFocus}
+      onBlur={onBlur}
     >
       <div className="home-cal-tooltip-head">
         <strong>{event.title}</strong>
@@ -80,28 +147,162 @@ function EventTooltip({ hover }: { hover: Hover }) {
           {event.lockLabel}
         </span>
       </div>
-      <dl>
-        {facts.map(([label, value]) => (
-          <div key={label}>
-            <dt>{label}</dt>
-            <dd>{value}</dd>
+      <div className="home-cal-tooltip-body">
+        <dl>
+          {facts.map(([label, value]) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>
+                {label === "Vehicle" && event.deliveryAssignments.length === 1
+                  ? (() => {
+                      const delivery = event.deliveryAssignments[0];
+                      return (
+                        <select
+                          className="input home-cal-tooltip-select"
+                          aria-label={`Vehicle for ${event.title}`}
+                          value={delivery.vehicleId ?? ""}
+                          disabled={
+                            !delivery.canChangeVehicle || vehicleBusyId != null
+                          }
+                          onChange={(domEvent) =>
+                            onVehicleChange(
+                              delivery.id,
+                              domEvent.currentTarget.value,
+                              delivery.version,
+                            )
+                          }
+                        >
+                          <option value="">
+                            {vehicleBusyId === delivery.id
+                              ? "Saving…"
+                              : "No vehicle"}
+                          </option>
+                          {vehicles.map((vehicle) => (
+                            <option
+                              key={vehicle.id}
+                              value={vehicle.id}
+                              disabled={vehicle.retired}
+                            >
+                              {vehicle.label}
+                              {vehicle.retired ? " · Retired" : ""}
+                            </option>
+                          ))}
+                        </select>
+                      );
+                    })()
+                  : value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+        {event.deliveryAssignments.length > 1 ? (
+          <section
+            className="home-cal-tooltip-vehicles"
+            aria-label="Delivery vehicle assignments"
+          >
+            <div className="home-cal-tooltip-section-head">
+              <strong>Vehicles</strong>
+              <span>{event.deliveryAssignments.length} runs</span>
+            </div>
+            <ul>
+              {event.deliveryAssignments.map((delivery) => (
+                <li key={delivery.id}>
+                  <span title={delivery.destination}>
+                    {delivery.destination}
+                  </span>
+                  <select
+                    className="input home-cal-tooltip-select"
+                    aria-label={`Vehicle for ${delivery.destination}`}
+                    value={delivery.vehicleId ?? ""}
+                    disabled={
+                      !delivery.canChangeVehicle || vehicleBusyId != null
+                    }
+                    onChange={(domEvent) =>
+                      onVehicleChange(
+                        delivery.id,
+                        domEvent.currentTarget.value,
+                        delivery.version,
+                      )
+                    }
+                  >
+                    <option value="">
+                      {vehicleBusyId === delivery.id ? "Saving…" : "No vehicle"}
+                    </option>
+                    {vehicles.map((vehicle) => (
+                      <option
+                        key={vehicle.id}
+                        value={vehicle.id}
+                        disabled={vehicle.retired}
+                      >
+                        {vehicle.label}
+                        {vehicle.retired ? " · Retired" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+        {vehicleError ? (
+          <p className="home-cal-tooltip-error" role="alert">
+            {vehicleError}
+          </p>
+        ) : null}
+        <section
+          className="home-cal-tooltip-reports"
+          aria-label="Event reports"
+        >
+          <div className="home-cal-tooltip-section-head">
+            <strong>Reports</strong>
+            <span>{reports.length} saved</span>
           </div>
-        ))}
-      </dl>
+          {reports.length > 0 ? (
+            <ul>
+              {reports.map((definition) => (
+                <li key={definition.id}>
+                  <span title={definition.name}>{definition.name}</span>
+                  <div className="home-cal-tooltip-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => onReportAction(event, definition, false)}
+                    >
+                      View
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => onReportAction(event, definition, true)}
+                    >
+                      Print
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Choose reports from the Reports tab.</p>
+          )}
+        </section>
+      </div>
     </div>
   );
 }
 
-function tooltipPosition(target: HTMLElement): { top: number; left: number } {
+function tooltipPosition(target: HTMLElement): {
+  top: number;
+  left: number;
+  width: number;
+} {
   const rect = target.getBoundingClientRect();
-  const left = Math.max(
-    8,
-    Math.min(rect.left, window.innerWidth - TOOLTIP_WIDTH - 8),
-  );
+  const width = Math.min(TOOLTIP_WIDTH, window.innerWidth - 16);
+  const left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8));
   const below = rect.bottom + 6;
-  // 300px is a generous card height; flip above when it will not fit below.
-  const top = below + 300 > window.innerHeight ? rect.top - 306 : below;
-  return { top: Math.max(8, top), left };
+  const above = rect.top - TOOLTIP_HEIGHT - 6;
+  const top =
+    window.innerHeight - below >= TOOLTIP_HEIGHT ? below : Math.max(8, above);
+  return { top, left, width };
 }
 
 /**
@@ -120,6 +321,8 @@ export function HomeCalendarPage() {
   const serviceStyles = useListServiceStyle();
   const people = useListPerson();
   const invoices = useListInvoice();
+  const assignVehicle = useAssignVehicle();
+  const unassignVehicle = useUnassignVehicle();
 
   const today = startOfDay(Date.now());
   const [cursor, setCursor] = useState(() => {
@@ -130,6 +333,42 @@ export function HomeCalendarPage() {
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
   const [hover, setHover] = useState<Hover | null>(null);
   const [lockFilter, setLockFilter] = useState<Set<string>>(new Set());
+  const [reportLaunch, setReportLaunch] = useState<EventReportLaunch | null>(
+    null,
+  );
+  const [vehicleBusyId, setVehicleBusyId] = useState<string | null>(null);
+  const [vehicleError, setVehicleError] = useState<string | null>(null);
+  const tooltipHideTimer = useRef<number | null>(null);
+  const storageScope = authStatus?.personId ?? "anonymous";
+  const {
+    ids: reportIds,
+    chosen: reports,
+    toggle: toggleReport,
+  } = useEventReportList(storageScope);
+
+  const vehicleOptions = useMemo<CalendarVehicleOption[]>(
+    () =>
+      (vehicles ?? [])
+        .filter((vehicle) => vehicle.deletedAt == null)
+        .map((vehicle) => ({
+          id: vehicle._id,
+          label: [vehicle.registration, vehicle.make, vehicle.model]
+            .filter((part) => Boolean(part))
+            .join(" · "),
+          retired: String(vehicle.operationalStatus) === "retired",
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [vehicles],
+  );
+
+  useEffect(
+    () => () => {
+      if (tooltipHideTimer.current != null) {
+        window.clearTimeout(tooltipHideTimer.current);
+      }
+    },
+    [],
+  );
 
   const loading = [
     authStatus,
@@ -216,11 +455,71 @@ export function HomeCalendarPage() {
       return next;
     });
 
+  const cancelTooltipHide = () => {
+    if (tooltipHideTimer.current != null) {
+      window.clearTimeout(tooltipHideTimer.current);
+      tooltipHideTimer.current = null;
+    }
+  };
   const showTooltip = (
     event: CalendarEventFacts,
     domEvent: MouseEvent<HTMLElement> | FocusEvent<HTMLElement>,
-  ) => setHover({ event, ...tooltipPosition(domEvent.currentTarget) });
-  const hideTooltip = () => setHover(null);
+  ) => {
+    cancelTooltipHide();
+    setVehicleError(null);
+    setHover({ event, ...tooltipPosition(domEvent.currentTarget) });
+  };
+  const hideTooltip = () => {
+    cancelTooltipHide();
+    tooltipHideTimer.current = window.setTimeout(() => {
+      setHover(null);
+      tooltipHideTimer.current = null;
+    }, 180);
+  };
+  const launchReport = (
+    event: CalendarEventFacts,
+    definition: TppReportDefinition,
+    print: boolean,
+  ) => {
+    setSelectedId(event.id);
+    setReportLaunch({ eventId: event.id, reportId: definition.id, print });
+    setHover(null);
+  };
+  const changeVehicle = (
+    deliveryId: string,
+    vehicleId: string,
+    version: number,
+  ) => {
+    setVehicleError(null);
+    setVehicleBusyId(deliveryId);
+    void (async () => {
+      try {
+        if (vehicleId) {
+          await assignVehicle({
+            deliveryId: deliveryId as Id<"deliveries">,
+            vehicleId: vehicleId as Id<"vehicles">,
+            version,
+          });
+          reportActionOk("Vehicle assigned.");
+        } else {
+          await unassignVehicle({
+            deliveryId: deliveryId as Id<"deliveries">,
+            version,
+          });
+          reportActionOk("Vehicle cleared.");
+        }
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Vehicle could not be updated.";
+        setVehicleError(message);
+        reportActionFail(message);
+      } finally {
+        setVehicleBusyId(null);
+      }
+    })();
+  };
 
   const chip = (event: CalendarEventFacts, dayStart: number) => {
     const continues =
@@ -421,10 +720,27 @@ export function HomeCalendarPage() {
         </div>
       ) : null}
 
-      {hover ? <EventTooltip hover={hover} /> : null}
+      {hover ? (
+        <EventTooltip
+          hover={hover}
+          reports={reports}
+          onReportAction={launchReport}
+          vehicles={vehicleOptions}
+          vehicleBusyId={vehicleBusyId}
+          vehicleError={vehicleError}
+          onVehicleChange={changeVehicle}
+          onEnter={cancelTooltipHide}
+          onLeave={hideTooltip}
+          onFocus={cancelTooltipHide}
+          onBlur={hideTooltip}
+        />
+      ) : null}
       <EventReportRail
         event={selected}
-        storageScope={authStatus?.personId ?? "anonymous"}
+        reportIds={reportIds}
+        reports={reports}
+        onToggleReport={toggleReport}
+        launch={reportLaunch}
       />
     </div>
   );

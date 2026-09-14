@@ -63,6 +63,7 @@ export interface CalendarEventFacts {
   eventNumber: string;
   guests: number;
   vehicle: string;
+  deliveryAssignments: CalendarDeliveryAssignment[];
   serviceType: string;
   venue: string;
   venueId: string | null;
@@ -76,6 +77,16 @@ export interface CalendarEventFacts {
   lock: LockStatus;
   lockLabel: string;
   version: number | undefined;
+}
+
+export interface CalendarDeliveryAssignment {
+  id: string;
+  destination: string;
+  version: number;
+  vehicleId: string | null;
+  vehicleLabel: string;
+  status: string;
+  canChangeVehicle: boolean;
 }
 
 export interface CalendarSources {
@@ -121,14 +132,29 @@ export function buildCalendarFacts(
   }
 
   const vehiclesByEvent = new Map<string, Set<string>>();
+  const deliveriesByEvent = new Map<string, CalendarDeliveryAssignment[]>();
   for (const delivery of sources.deliveries) {
     if (delivery.deletedAt != null || delivery.status === "cancelled") continue;
-    if (!delivery.vehicleId) continue;
-    const vehicle = vehicleById.get(delivery.vehicleId);
-    if (!vehicle) continue;
-    const set = vehiclesByEvent.get(delivery.eventId) ?? new Set<string>();
-    set.add(vehicleLabel(vehicle));
-    vehiclesByEvent.set(delivery.eventId, set);
+    const vehicle = delivery.vehicleId
+      ? vehicleById.get(delivery.vehicleId)
+      : undefined;
+    const assignments = deliveriesByEvent.get(delivery.eventId) ?? [];
+    assignments.push({
+      id: delivery._id,
+      destination: delivery.destination || "Delivery run",
+      version: delivery.version,
+      vehicleId: delivery.vehicleId ?? null,
+      vehicleLabel: vehicle ? vehicleLabel(vehicle) : "No vehicle",
+      status: String(delivery.status),
+      canChangeVehicle:
+        delivery.status === "scheduled" || delivery.status === "in_transit",
+    });
+    deliveriesByEvent.set(delivery.eventId, assignments);
+    if (vehicle) {
+      const set = vehiclesByEvent.get(delivery.eventId) ?? new Set<string>();
+      set.add(vehicleLabel(vehicle));
+      vehiclesByEvent.set(delivery.eventId, set);
+    }
   }
 
   return sources.events
@@ -158,6 +184,7 @@ export function buildCalendarFacts(
         eventNumber: invoiceByEvent.get(event._id) ?? shortRef(event._id),
         guests: event.expectedHeadcount ?? 0,
         vehicle: vehicles ? [...vehicles].join(", ") : "—",
+        deliveryAssignments: deliveriesByEvent.get(event._id) ?? [],
         serviceType: serviceType || "Not set",
         venue: venue?.name || event.venueName || "Venue not set",
         venueId: event.venueId ?? null,

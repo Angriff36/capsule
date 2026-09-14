@@ -255,13 +255,14 @@
 .home-cal-tooltip {
   position: fixed;
   z-index: 60;
+  max-width: calc(100vw - 16px);
   border: 1px solid var(--color-line-2);
   border-top: 3px solid var(--lock);
   border-radius: var(--radius-md);
   padding: 0.75rem 0.875rem;
   background: var(--color-panel);
   box-shadow: 0 16px 40px -16px rgb(15 15 17 / 0.4);
-  pointer-events: none;
+  pointer-events: auto;
 }
 .home-cal-tooltip-head {
   display: flex;
@@ -290,9 +291,15 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
+.home-cal-tooltip-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 1.1fr);
+  gap: 0.75rem 1rem;
+}
 .home-cal-tooltip dl {
   display: grid;
   gap: 0.2rem;
+  min-width: 0;
 }
 .home-cal-tooltip dl > div {
   display: grid;
@@ -306,6 +313,103 @@
 .home-cal-tooltip dd {
   color: var(--color-ink);
   overflow-wrap: anywhere;
+}
+.home-cal-tooltip-select {
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  padding-inline: 0.5rem;
+  font-size: var(--text-xs);
+}
+.home-cal-tooltip-vehicles {
+  min-width: 0;
+  border-left: 1px solid var(--color-line);
+  padding-left: 1rem;
+}
+.home-cal-tooltip-vehicles > ul {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+.home-cal-tooltip-vehicles li {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--color-line);
+}
+.home-cal-tooltip-vehicles li > span {
+  overflow: hidden;
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-cal-tooltip-error {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+.home-cal-tooltip-reports {
+  min-width: 0;
+  border-left: 1px solid var(--color-line);
+  padding-left: 1rem;
+}
+.home-cal-tooltip-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.home-cal-tooltip-section-head strong {
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.home-cal-tooltip-section-head span {
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.home-cal-tooltip-reports > ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 0.75rem;
+}
+.home-cal-tooltip-reports li {
+  display: grid;
+  min-width: 0;
+  gap: 0.3rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--color-line);
+}
+.home-cal-tooltip-reports li > span {
+  overflow: hidden;
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-cal-tooltip-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+.home-cal-tooltip-actions .btn {
+  min-width: 0;
+  padding-inline: 0.4rem;
+}
+.home-cal-tooltip-reports > p {
+  margin-top: 0.5rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+  line-height: 1.4;
 }
 
 /* Right-edge report tab and its drawer. */
@@ -475,6 +579,21 @@
 }
 
 @media (max-width: 768px) {
+  .home-cal-tooltip-body {
+    grid-template-columns: 1fr;
+  }
+  .home-cal-tooltip-reports {
+    border-top: 1px solid var(--color-line);
+    border-left: none;
+    padding-top: 0.75rem;
+    padding-left: 0;
+  }
+  .home-cal-tooltip-vehicles {
+    border-top: 1px solid var(--color-line);
+    border-left: none;
+    padding-top: 0.75rem;
+    padding-left: 0;
+  }
   .home-cal-day {
     min-height: 5.5rem;
   }
