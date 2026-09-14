@@ -489,7 +489,10 @@ export function expandEventDish(eventDish: EventDishLike, lookups: DemandLookups
       ingredient,
       stated: line.quantity * (line.wasteFactor ?? 1) * line.portions,
       statedUnit: line.unit,
-      basis: line.quantityBasis ?? "unknown",
+      // A line the kitchen typed in the catalog unit with no basis recorded is
+      // purchase basis by construction. Only an explicit "unknown" (set from
+      // import evidence) blocks purchasing.
+      basis: line.quantityBasis ?? "as_purchased",
       path: [],
       lineId: line.overrideId ? `${line.id}@${line.overrideId}` : line.id,
       sourceDishComponentId: null,

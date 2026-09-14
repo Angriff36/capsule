@@ -336,7 +336,8 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   property wasteFactor: decimal(10, 4)? = 1
   property prepNotes: string?
   // Revision-2: basis the per-portion quantity is stated in. Null means not
-  // classified; the demand engine treats null and "unknown" alike.
+  // classified (Capsule-entered lines are purchase basis by construction);
+  // an explicit "unknown" from import evidence blocks purchasing.
   property quantityBasis: QuantityBasis?
   property quantityBasisSource: string?
   property addedAt: datetime?

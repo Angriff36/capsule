@@ -151,7 +151,7 @@ export function ComponentPortionSpecsPanel({
           <input name="source" className="input" placeholder="Prep sheet" />
         </label>
         <button className="btn btn-primary self-end" disabled={busy}>
-          {busy ? "Adding…" : "Add portion size"}
+          {busy ? "Adding…" : "Add portion"}
         </button>
       </form>
     </section>

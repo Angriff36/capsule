@@ -372,7 +372,7 @@ describe("D. cooked bacon without a confirmed yield", () => {
                 ingredientId: "ing-bacon",
                 quantity: 1,
                 unit: "pound",
-                quantityBasis: null,
+                quantityBasis: "unknown",
               },
             ],
           },
