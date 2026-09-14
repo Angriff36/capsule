@@ -722,7 +722,13 @@ export function HomeCalendarPage() {
 
       {hover ? (
         <EventTooltip
-          hover={hover}
+          hover={{
+            ...hover,
+            // Read the hovered event from live facts so a saved vehicle change
+            // shows at once and the next change carries the current version.
+            event:
+              facts.find((row) => row.id === hover.event.id) ?? hover.event,
+          }}
           reports={reports}
           onReportAction={launchReport}
           vehicles={vehicleOptions}

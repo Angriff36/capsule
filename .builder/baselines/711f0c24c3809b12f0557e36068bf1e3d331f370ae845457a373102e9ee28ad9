@@ -14704,9 +14704,9 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
       const __fanMatch4_rows = __fanMatch4_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).dishTaskId === (__row as any)._id && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
       const __fanMatch4_id = __fanMatch4_rows.length > 0 ? (__fanMatch4_rows[0] as any)._id : null;
       if (__fanMatch4_id) {
-        await __runPrepTaskOpen(ctx, { docId: __fanMatch4_id, eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station } as any);
+        await __runPrepTaskOpen(ctx, { docId: __fanMatch4_id, eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station, resolution: __row.resolution, choiceOptions: __row.choiceOptions } as any);
       } else {
-        const __elseArgs: Record<string, any> = { eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station };
+        const __elseArgs: Record<string, any> = { eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station, resolution: __row.resolution, choiceOptions: __row.choiceOptions };
         const __elseDoc: Record<string, any> = {
           tenantId: __auth.tenantId,
           name: "",
@@ -14888,9 +14888,9 @@ export const EventDish_createViaAddToEvent = mutation({
       const __fanMatch4_rows = __fanMatch4_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).dishTaskId === (__row as any)._id && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
       const __fanMatch4_id = __fanMatch4_rows.length > 0 ? (__fanMatch4_rows[0] as any)._id : null;
       if (__fanMatch4_id) {
-        await __runPrepTaskOpen(ctx, { docId: __fanMatch4_id, eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station } as any);
+        await __runPrepTaskOpen(ctx, { docId: __fanMatch4_id, eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station, resolution: __row.resolution, choiceOptions: __row.choiceOptions } as any);
       } else {
-        const __elseArgs: Record<string, any> = { eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station };
+        const __elseArgs: Record<string, any> = { eventDishId: payload.eventDishId, eventId: payload.eventId, name: __row.name, quantity: (((__row.defaultQuantity != null) && (__row.defaultQuantity > 0)) ? (__row.defaultQuantity * payload.quantityServings) : payload.quantityServings), unit: ((__row.defaultUnit != null) ? __row.defaultUnit : "portion"), dishTaskId: (__row as any)._id, dishId: payload.dishId, category: __row.category, taskType: __row.taskType, componentId: __row.componentId, ingredientId: __row.ingredientId, specialInstructions: __row.instructions, station: __row.station, resolution: __row.resolution, choiceOptions: __row.choiceOptions };
         const __elseDoc: Record<string, any> = {
           tenantId: __auth.tenantId,
           name: "",
@@ -16563,16 +16563,16 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
       purchasingWeekStart: (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : purchasingWeekStart),
       recordedAt: Date.now(),
       sourceKey: ((sourceKey != null) ? sourceKey : doc.sourceKey),
-      exactQuantity: ((exactQuantity != null) ? exactQuantity : doc.exactQuantity),
-      roundedQuantity: ((roundedQuantity != null) ? roundedQuantity : doc.roundedQuantity),
-      quantityBasis: ((quantityBasis != null) ? quantityBasis : doc.quantityBasis),
-      unitStatus: ((unitStatus != null) ? unitStatus : doc.unitStatus),
-      ownership: ((ownership != null) ? ownership : doc.ownership),
-      sourceDishIngredientId: ((sourceDishIngredientId != null) ? sourceDishIngredientId : doc.sourceDishIngredientId),
-      sourceDishComponentId: ((sourceDishComponentId != null) ? sourceDishComponentId : doc.sourceDishComponentId),
-      componentPath: ((componentPath != null) ? componentPath : doc.componentPath),
-      productionBatchId: ((productionBatchId != null) ? productionBatchId : doc.productionBatchId),
-      productionBatchAllocationId: ((productionBatchAllocationId != null) ? productionBatchAllocationId : doc.productionBatchAllocationId),
+      exactQuantity: ((sourceKey != null) ? exactQuantity : null),
+      roundedQuantity: ((sourceKey != null) ? roundedQuantity : null),
+      quantityBasis: ((sourceKey != null) ? quantityBasis : null),
+      unitStatus: ((sourceKey != null) ? unitStatus : null),
+      ownership: ((sourceKey != null) ? ownership : null),
+      sourceDishIngredientId: ((sourceKey != null) ? sourceDishIngredientId : null),
+      sourceDishComponentId: ((sourceKey != null) ? sourceDishComponentId : null),
+      componentPath: ((sourceKey != null) ? componentPath : []),
+      productionBatchId: ((sourceKey != null) ? productionBatchId : null),
+      productionBatchAllocationId: ((sourceKey != null) ? productionBatchAllocationId : null),
       supersededAt: null,
       supersededBySourceKey: null,
       version: ((doc as any).version ?? 0) + 1
@@ -16773,16 +16773,16 @@ export const EventIngredientContribution_createViaRecord = mutation({
     doc.purchasingWeekStart = (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : purchasingWeekStart);
     doc.recordedAt = Date.now();
     doc.sourceKey = ((sourceKey != null) ? sourceKey : doc.sourceKey);
-    doc.exactQuantity = ((exactQuantity != null) ? exactQuantity : doc.exactQuantity);
-    doc.roundedQuantity = ((roundedQuantity != null) ? roundedQuantity : doc.roundedQuantity);
-    doc.quantityBasis = ((quantityBasis != null) ? quantityBasis : doc.quantityBasis);
-    doc.unitStatus = ((unitStatus != null) ? unitStatus : doc.unitStatus);
-    doc.ownership = ((ownership != null) ? ownership : doc.ownership);
-    doc.sourceDishIngredientId = ((sourceDishIngredientId != null) ? sourceDishIngredientId : doc.sourceDishIngredientId);
-    doc.sourceDishComponentId = ((sourceDishComponentId != null) ? sourceDishComponentId : doc.sourceDishComponentId);
-    doc.componentPath = ((componentPath != null) ? componentPath : doc.componentPath);
-    doc.productionBatchId = ((productionBatchId != null) ? productionBatchId : doc.productionBatchId);
-    doc.productionBatchAllocationId = ((productionBatchAllocationId != null) ? productionBatchAllocationId : doc.productionBatchAllocationId);
+    doc.exactQuantity = ((sourceKey != null) ? exactQuantity : null);
+    doc.roundedQuantity = ((sourceKey != null) ? roundedQuantity : null);
+    doc.quantityBasis = ((sourceKey != null) ? quantityBasis : null);
+    doc.unitStatus = ((sourceKey != null) ? unitStatus : null);
+    doc.ownership = ((sourceKey != null) ? ownership : null);
+    doc.sourceDishIngredientId = ((sourceKey != null) ? sourceDishIngredientId : null);
+    doc.sourceDishComponentId = ((sourceKey != null) ? sourceDishComponentId : null);
+    doc.componentPath = ((sourceKey != null) ? componentPath : []);
+    doc.productionBatchId = ((sourceKey != null) ? productionBatchId : null);
+    doc.productionBatchAllocationId = ((sourceKey != null) ? productionBatchAllocationId : null);
     doc.supersededAt = null;
     doc.supersededBySourceKey = null;
     const docId = await ctx.db.insert("eventIngredientContributions", doc as any);
@@ -17142,20 +17142,21 @@ async function __runEventIngredientContributionRevise(ctx: MutationCtx, { docId,
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((quantity >= 0))) throw new Error("Contribution quantity cannot be negative");
+    const batchOwned = ((doc.ownership === "batch_allocation") || (doc.ownership === "batch_surplus"));
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       quantityPerServing: ((doc.quantityPerServing != null) ? doc.quantityPerServing : ((doc.servings > 0) ? (doc.quantity / doc.servings) : null)),
-      quantity: quantity,
-      servings: servings,
+      quantity: (batchOwned ? doc.quantity : quantity),
+      servings: (batchOwned ? doc.servings : servings),
       purchasingWeekStart: (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : doc.purchasingWeekStart),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, contributionId: docId, tenantId: __after.tenantId, eventId: __after.eventId, eventDishId: __after.eventDishId, ingredientId: __after.ingredientId, quantity: quantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart, _subject: { entity: "EventIngredientContribution", command: "revise", id: docId } };
-    const __manifestEvent0 = { type: "EventIngredientContributionRecorded", entity: "EventIngredientContribution", entityId: docId, payload: { contributionId: docId, tenantId: __after.tenantId, eventId: __after.eventId, eventDishId: __after.eventDishId, ingredientId: __after.ingredientId, quantity: quantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, contributionId: docId, tenantId: __after.tenantId, eventId: __after.eventId, eventDishId: __after.eventDishId, ingredientId: __after.ingredientId, quantity: __after.quantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart, _subject: { entity: "EventIngredientContribution", command: "revise", id: docId } };
+    const __manifestEvent0 = { type: "EventIngredientContributionRecorded", entity: "EventIngredientContribution", entityId: docId, payload: { contributionId: docId, tenantId: __after.tenantId, eventId: __after.eventId, eventDishId: __after.eventDishId, ingredientId: __after.ingredientId, quantity: __after.quantity, unit: __after.unit, purchasingWeekStart: __after.purchasingWeekStart }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const __agg0_rows = await ctx.db.query("eventIngredientContributions").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
@@ -33347,9 +33348,10 @@ async function __runPrepTaskAssign(ctx: MutationCtx, { docId, personId, version 
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may write prep tasks through commands");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may execute prep task commands");
-    if (!(((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")) || (doc.status === "blocked")))) throw new Error("Guard 0 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((personId != null))) throw new Error("Guard 2 failed");
+    if (!(((doc.resolution == null) || (doc.resolution !== "choice_pending")))) throw new Error("Guard 0 failed");
+    if (!(((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")) || (doc.status === "blocked")))) throw new Error("Guard 1 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((personId != null))) throw new Error("Guard 3 failed");
     if (!((doc.quantity > 0))) throw new Error("Prep quantity must be positive before assign");
     const previousStatus = doc.status;
     const previousAssignee = doc.assignedToId;
@@ -33774,7 +33776,7 @@ export const PrepTask_markOverride = mutation({
   },
 });
 
-async function __runPrepTaskOpen(ctx: MutationCtx, { docId, eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, componentId, dishTaskId, dishId, category, taskType, specialInstructions, isGenerated, station, dueAt, notes, version }: any, __creation = false) {
+async function __runPrepTaskOpen(ctx: MutationCtx, { docId, eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, componentId, dishTaskId, dishId, category, taskType, specialInstructions, isGenerated, station, dueAt, notes, resolution, choiceOptions, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -33815,6 +33817,8 @@ async function __runPrepTaskOpen(ctx: MutationCtx, { docId, eventDishId, eventId
       quantity: quantity,
       unit: unit,
       station: ((station != null) ? station : doc.station),
+      resolution: ((doc.chosenOption != null) ? doc.resolution : ((resolution != null) ? resolution : doc.resolution)),
+      choiceOptions: ((choiceOptions != null) ? choiceOptions : doc.choiceOptions),
       recipeTemplateVersion: ((__rel_dishTask != null) ? __rel_dishTask.version : null),
       recipeTemplateName: ((__rel_dishTask != null) ? __rel_dishTask.name : null),
       recipeTemplateInstructions: ((__rel_dishTask != null) ? __rel_dishTask.instructions : null),
@@ -33852,6 +33856,8 @@ export const PrepTask_open = mutation({
     station: v.optional(v.string()),
     dueAt: v.optional(v.number()),
     notes: v.optional(v.string()),
+    resolution: v.optional(v.any()),
+    choiceOptions: v.optional(v.array(v.string())),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -33887,6 +33893,8 @@ export const PrepTask_createViaOpen = mutation({
     station: v.optional(v.string()),
     dueAt: v.optional(v.number()),
     notes: v.optional(v.string()),
+    resolution: v.optional(v.any()),
+    choiceOptions: v.optional(v.array(v.string())),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -33896,7 +33904,7 @@ export const PrepTask_createViaOpen = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, componentId, dishTaskId, dishId, category, taskType, specialInstructions, isGenerated, station, dueAt, notes } = args;
+    const { eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, componentId, dishTaskId, dishId, category, taskType, specialInstructions, isGenerated, station, dueAt, notes, resolution, choiceOptions } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       category: args.category !== undefined ? args.category : "finish_at_event",
@@ -33905,6 +33913,7 @@ export const PrepTask_createViaOpen = mutation({
       status: "pending",
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      choiceOptions: args.choiceOptions,
       componentId: args.componentId,
       dishId: args.dishId,
       dishTaskId: args.dishTaskId,
@@ -33916,6 +33925,7 @@ export const PrepTask_createViaOpen = mutation({
       name: args.name,
       notes: args.notes,
       quantity: args.quantity,
+      resolution: args.resolution,
       specialInstructions: args.specialInstructions,
       station: args.station,
       unit: args.unit
@@ -33954,6 +33964,8 @@ export const PrepTask_createViaOpen = mutation({
     doc.quantity = quantity;
     doc.unit = unit;
     doc.station = ((station != null) ? station : doc.station);
+    doc.resolution = ((doc.chosenOption != null) ? doc.resolution : ((resolution != null) ? resolution : doc.resolution));
+    doc.choiceOptions = ((choiceOptions != null) ? choiceOptions : doc.choiceOptions);
     doc.recipeTemplateVersion = ((__rel_dishTask != null) ? __rel_dishTask.version : null);
     doc.recipeTemplateName = ((__rel_dishTask != null) ? __rel_dishTask.name : null);
     doc.recipeTemplateInstructions = ((__rel_dishTask != null) ? __rel_dishTask.instructions : null);
@@ -34574,10 +34586,11 @@ async function __runPrepTaskStart(ctx: MutationCtx, { docId, version }: any, __c
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may write prep tasks through commands");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may execute prep task commands");
-    if (!((doc.status === "claimed"))) throw new Error("Guard 0 failed");
-    if (!((doc.claimedAt != null))) throw new Error("Guard 1 failed");
-    if (!((doc.assignedToId != null))) throw new Error("Guard 2 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
+    if (!(((doc.resolution == null) || (doc.resolution !== "choice_pending")))) throw new Error("Guard 0 failed");
+    if (!((doc.status === "claimed"))) throw new Error("Guard 1 failed");
+    if (!((doc.claimedAt != null))) throw new Error("Guard 2 failed");
+    if (!((doc.assignedToId != null))) throw new Error("Guard 3 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 4 failed");
     if (!((((doc.incomingDependencies) ?? []).filter((dependency: Doc<"prepTaskDependencies">) => ((dependency.isSatisfied === false))).length === 0))) throw new Error("Required predecessor prep tasks must be complete before this task can start");
     const previousStatus = doc.status;
     {

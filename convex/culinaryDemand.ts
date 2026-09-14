@@ -392,6 +392,8 @@ export interface EventDemandReview {
     componentId: string;
     productionBatchId: string;
   }[];
+  /** Allocations whose batch is still live; batch-owned rows outside this set are stale. */
+  activeAllocationIds: string[];
 }
 
 async function reviewEvent(
@@ -413,9 +415,11 @@ async function reviewEvent(
   const batches = await byTenant(ctx, "productionBatches", tenantId);
   const batchById = new Map(batches.map((b) => [String(b._id), b]));
   const batchSatisfied: EventDemandReview["batchSatisfied"] = [];
+  const activeAllocationIds: string[] = [];
   for (const a of allocations) {
     const batch = batchById.get(String(a.productionBatchId));
     if (!batch || batch.status === "cancelled" || !a.eventDishId) continue;
+    activeAllocationIds.push(String(a._id));
     batchSatisfied.push({
       eventDishId: String(a.eventDishId),
       componentId: String(batch.componentId),
@@ -448,6 +452,7 @@ async function reviewEvent(
     purchasing: purchasingTotals(all),
     unresolvedCount: results.reduce((n, r) => n + r.unresolved.length, 0),
     batchSatisfied,
+    activeAllocationIds,
   };
 }
 
@@ -650,6 +655,7 @@ export const reconcileEventDemand = mutation({
       typeof event.purchasingWeekStart === "number"
         ? event.purchasingWeekStart
         : undefined;
+    const activeAllocations = new Set(review.activeAllocationIds);
     for (const ed of review.eventDishes) {
       const dishId = ed.contributions[0]?.dishId ?? null;
       const plan = reconcileContributions(
@@ -676,17 +682,25 @@ export const reconcileEventDemand = mutation({
       }
       for (const s of plan.supersede) {
         const row = rowById.get(s.id);
-        if (
-          !row ||
+        if (!row) continue;
+        const batchOwned =
           row.ownership === "batch_allocation" ||
-          row.ownership === "batch_surplus"
+          row.ownership === "batch_surplus";
+        // Live batch shares are left alone; shares of a released allocation or
+        // a cancelled batch are stale and must not be counted twice.
+        if (
+          batchOwned &&
+          row.productionBatchAllocationId &&
+          activeAllocations.has(String(row.productionBatchAllocationId))
         )
           continue;
         await ctx.runMutation(
           api.mutations.EventIngredientContribution_supersede,
           {
             docId: row._id,
-            reason: "replaced by demand reconcile",
+            reason: batchOwned
+              ? "batch allocation released or cancelled"
+              : "replaced by demand reconcile",
             supersededBySourceKey: s.replacedBy ?? undefined,
           },
         );
@@ -774,6 +788,16 @@ export const planSharedRecipeBatch = mutation({
       lookups: catalog.lookups,
       rounding: { scope, rule, increment: args.roundingIncrement },
     });
+    // Every allocation must convert to the recipe yield unit before anything
+    // is written; a partial batch would delete demand for the unresolved event.
+    const resolvedAllocations = provisional.allocations.filter(
+      (a) => !a.isSurplus,
+    ).length;
+    if (resolvedAllocations !== args.allocations.length) {
+      throw new Error(
+        `Cannot plan this batch: ${provisional.unresolved.join("; ") || "an allocation could not be converted to the recipe yield unit"}`,
+      );
+    }
     const firstEvent = args.allocations[0];
     const created: { docId?: string } | null = await ctx.runMutation(
       api.mutations.ProductionBatch_createViaPlan,

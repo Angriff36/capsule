@@ -7657,6 +7657,8 @@ export const PrepTaskOpenParamsSchema = z.object({
   station: z.string().optional(),
   dueAt: z.coerce.date().optional(),
   notes: z.string().optional(),
+  resolution: z.enum(["resolved", "choice_pending", "content_missing"]).optional(),
+  choiceOptions: z.array(z.string()).optional(),
 });
 
 export type PrepTaskOpenParams = z.infer<typeof PrepTaskOpenParamsSchema>;

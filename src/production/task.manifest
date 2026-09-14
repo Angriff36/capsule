@@ -111,7 +111,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     optional isGenerated: boolean,
     optional station: string,
     optional dueAt: datetime,
-    optional notes: string
+    optional notes: string,
+    optional resolution: TaskResolution,
+    optional choiceOptions: list<string>
   ) {
     guard self.claimedAt == null
     guard self.status == "pending"
@@ -141,6 +143,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate quantity = quantity
     mutate unit = unit
     mutate station = station != null ? station : self.station
+    // Choice state comes from the template unless a person already picked.
+    mutate resolution = self.chosenOption != null ? self.resolution : (resolution != null ? resolution : self.resolution)
+    mutate choiceOptions = choiceOptions != null ? choiceOptions : self.choiceOptions
     mutate recipeTemplateVersion = self.dishTask != null ? self.dishTask.version : null
     mutate recipeTemplateName = self.dishTask != null ? self.dishTask.name : null
     mutate recipeTemplateInstructions = self.dishTask != null ? self.dishTask.instructions : null
@@ -404,6 +409,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     // goes home, a station is behind, a lead pulls several steps together as
     // one job. Handing over never rewinds the step - a started step stays
     // started and a blocked step stays blocked, so nothing hides a stall.
+    guard self.resolution == null or self.resolution != "choice_pending"
     guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
     guard self.deletedAt == null
     guard personId != null
@@ -454,6 +460,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   }
 
   command start() {
+    guard self.resolution == null or self.resolution != "choice_pending"
     guard self.status == "claimed"
     guard self.claimedAt != null
     guard self.assignedToId != null
@@ -887,6 +894,8 @@ on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
     ingredientId: self.ingredientId
     specialInstructions: self.instructions
     station: self.station
+    resolution: self.resolution
+    choiceOptions: self.choiceOptions
   }
 
 event PrepTaskOverridden: "prep_task.overridden" {

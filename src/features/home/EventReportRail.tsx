@@ -149,12 +149,18 @@ export function EventReportRail({
     if (eventId) setOpen(true);
   }, [eventId]);
 
+  // A launch request is consumed once; a later re-render with the same
+  // request (event object refreshed, list reopened) must not replay it or
+  // reopen the print dialog.
+  const consumedLaunch = useRef<EventReportLaunch | null>(null);
   useEffect(() => {
     if (!launch || !event || launch.eventId !== event.id) return;
+    if (consumedLaunch.current === launch) return;
     const definition = EVENT_REPORTS.find(
       (candidate) => candidate.id === launch.reportId,
     );
     if (!definition) return;
+    consumedLaunch.current = launch;
     setActive({ definition, print: launch.print });
     setOpen(true);
   }, [event, launch]);

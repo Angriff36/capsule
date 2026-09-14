@@ -222,7 +222,14 @@ export function effectiveRequirements(eventDish: EventDishLike, dish: DishLike):
       }
       if (o.targetDishComponentId) {
         const line = componentLines.find((l) => l.id === o.targetDishComponentId);
-        if (line) line.portions = Math.max(0, line.portions - affected);
+        if (line) {
+          line.portions = Math.max(0, line.portions - affected);
+          // adjust: the affected portions use the override quantity of the same
+          // recipe instead of vanishing.
+          if (o.kind === "adjust" && o.quantity != null && o.unit) {
+            componentLines.push({ ...line, portions: affected, overrideId: o.id, directQuantity: o.quantity, directUnit: o.unit });
+          }
+        }
       }
       if (o.targetDishTaskId) suppressedTaskIds.add(o.targetDishTaskId);
     }
@@ -289,8 +296,10 @@ export function effectiveRequirements(eventDish: EventDishLike, dish: DishLike):
   return { ingredientLines, componentLines, suppressedTaskIds, pendingChoices };
 }
 
-const contributionKey = (eventDishId: string, path: string[], lineId: string, ingredientId: string) =>
-  ["ed", eventDishId, ...path, lineId, ingredientId].join(":");
+// The key walks requirement EDGES (dish line id, nested line ids), so two
+// edges to the same sub-recipe under one parent never collide.
+const contributionKey = (eventDishId: string, edgePath: string[], lineId: string, ingredientId: string) =>
+  ["ed", eventDishId, ...edgePath, lineId, ingredientId].join(":");
 
 function expandComponent(
   args: {
@@ -299,6 +308,7 @@ function expandComponent(
     component: ComponentLike;
     batches: number;
     path: string[];
+    edgePath: string[];
     sourceDishComponentId: string;
     lookups: DemandLookups;
     out: EventDishDemand;
@@ -353,6 +363,7 @@ function expandComponent(
       statedUnit: line.unit,
       basis: line.quantityBasis ?? "as_purchased",
       path: nextPath,
+      edgePath: args.edgePath,
       lineId: line.id,
       sourceDishComponentId: args.sourceDishComponentId,
       sourceDishIngredientId: null,
@@ -380,7 +391,7 @@ function expandComponent(
       });
       continue;
     }
-    expandComponent({ ...args, component: child, batches: converted.quantity / child.yieldQuantity, path: nextPath });
+    expandComponent({ ...args, component: child, batches: converted.quantity / child.yieldQuantity, path: nextPath, edgePath: [...args.edgePath, line.id] });
   }
 }
 
@@ -392,6 +403,7 @@ function pushContribution(args: {
   statedUnit: UnitCode;
   basis: QuantityBasis;
   path: string[];
+  edgePath: string[];
   lineId: string;
   sourceDishComponentId: string | null;
   sourceDishIngredientId: string | null;
@@ -405,7 +417,7 @@ function pushContribution(args: {
   const converted = convertQuantity(basisResult.quantity, args.statedUnit, ingredient.unit, lookups.mappings, scope);
   const purchasable = basisResult.status === "resolved" && converted.status === "resolved";
   const contribution: Contribution = {
-    sourceKey: contributionKey(eventDish.id, args.path, args.lineId, ingredient.id),
+    sourceKey: contributionKey(eventDish.id, args.edgePath, args.lineId, ingredient.id),
     eventId: eventDish.eventId,
     eventDishId: eventDish.id,
     dishId: dish.id,
@@ -494,6 +506,7 @@ export function expandEventDish(eventDish: EventDishLike, lookups: DemandLookups
       // import evidence) blocks purchasing.
       basis: line.quantityBasis ?? "as_purchased",
       path: [],
+      edgePath: [],
       lineId: line.overrideId ? `${line.id}@${line.overrideId}` : line.id,
       sourceDishComponentId: null,
       sourceDishIngredientId: line.id.startsWith("override:") ? null : line.id,
@@ -549,7 +562,7 @@ export function expandEventDish(eventDish: EventDishLike, lookups: DemandLookups
       out.unresolved.push({ kind: "unit", eventDishId: eventDish.id, dishId: dish.id, refId: line.id, label: component.name, detail: `cannot express ${needQuantity} ${needUnit} of ${component.name} in batches (${unitStatus})` });
       continue;
     }
-    expandComponent({ eventDish, dish, component, batches, path: [], sourceDishComponentId: line.id.startsWith("override:") ? line.id : line.id, lookups, out, servings: line.portions });
+    expandComponent({ eventDish, dish, component, batches, path: [], edgePath: [line.overrideId ? `${line.id}@${line.overrideId}` : line.id], sourceDishComponentId: line.id, lookups, out, servings: line.portions });
   }
   return out;
 }

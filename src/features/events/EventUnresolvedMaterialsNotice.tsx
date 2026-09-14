@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   unresolvedKindLabel,
   useEventDemandReview,
@@ -9,6 +10,22 @@ import { StatusChip } from "../../ui/primitives";
 
 /** What this event still cannot order or cook, straight from the one demand
  *  calculation. Silent when every material resolves and the total is whole. */
+const RECALCULATE_ROLES = new Set([
+  "inventory_staff",
+  "procurement_staff",
+  "manager",
+  "kitchen_manager",
+  "sales_manager",
+  "event_manager",
+  "inventory_manager",
+  "logistics_manager",
+  "workforce_manager",
+  "finance_manager",
+  "admin",
+  "owner",
+  "system",
+]);
+
 export function EventUnresolvedMaterialsNotice({
   eventId,
 }: {
@@ -16,6 +33,10 @@ export function EventUnresolvedMaterialsNotice({
 }) {
   const review = useEventDemandReview(eventId);
   const reconcile = useReconcileEventDemand();
+  // Recalculating writes purchasing rows, which need inventory or manager
+  // access; only offer the button to roles the commands will accept.
+  const authStatus = useAuthStatus();
+  const canRecalculate = RECALCULATE_ROLES.has(authStatus?.role ?? "");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,14 +95,20 @@ export function EventUnresolvedMaterialsNotice({
             color={CHIP_TONE_CLASS.warn}
           />
         ) : null}
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          disabled={busy}
-          onClick={() => void recalculate()}
-        >
-          {busy ? "Working…" : "Recalculate demand"}
-        </button>
+        {canRecalculate ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={busy}
+            onClick={() => void recalculate()}
+          >
+            {busy ? "Working…" : "Recalculate demand"}
+          </button>
+        ) : (
+          <span className="text-sm text-ink-2">
+            A manager or inventory staff can recalculate demand.
+          </span>
+        )}
       </div>
       {error ? (
         <p className="text-base text-danger" role="alert">

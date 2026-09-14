@@ -252,17 +252,21 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     // fallback for rows whose event cannot be resolved.
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
     mutate recordedAt = now()
+    // The engine always passes sourceKey. A legacy reaction never does: it
+    // then rewrites the quantity with the legacy formula, so every engine
+    // annotation is cleared rather than left stale; the next reconcile
+    // re-adopts the row by (component, ingredient, unit).
     mutate sourceKey = sourceKey != null ? sourceKey : self.sourceKey
-    mutate exactQuantity = exactQuantity != null ? exactQuantity : self.exactQuantity
-    mutate roundedQuantity = roundedQuantity != null ? roundedQuantity : self.roundedQuantity
-    mutate quantityBasis = quantityBasis != null ? quantityBasis : self.quantityBasis
-    mutate unitStatus = unitStatus != null ? unitStatus : self.unitStatus
-    mutate ownership = ownership != null ? ownership : self.ownership
-    mutate sourceDishIngredientId = sourceDishIngredientId != null ? sourceDishIngredientId : self.sourceDishIngredientId
-    mutate sourceDishComponentId = sourceDishComponentId != null ? sourceDishComponentId : self.sourceDishComponentId
-    mutate componentPath = componentPath != null ? componentPath : self.componentPath
-    mutate productionBatchId = productionBatchId != null ? productionBatchId : self.productionBatchId
-    mutate productionBatchAllocationId = productionBatchAllocationId != null ? productionBatchAllocationId : self.productionBatchAllocationId
+    mutate exactQuantity = sourceKey != null ? exactQuantity : null
+    mutate roundedQuantity = sourceKey != null ? roundedQuantity : null
+    mutate quantityBasis = sourceKey != null ? quantityBasis : null
+    mutate unitStatus = sourceKey != null ? unitStatus : null
+    mutate ownership = sourceKey != null ? ownership : null
+    mutate sourceDishIngredientId = sourceKey != null ? sourceDishIngredientId : null
+    mutate sourceDishComponentId = sourceKey != null ? sourceDishComponentId : null
+    mutate componentPath = sourceKey != null ? componentPath : []
+    mutate productionBatchId = sourceKey != null ? productionBatchId : null
+    mutate productionBatchAllocationId = sourceKey != null ? productionBatchAllocationId : null
     mutate supersededAt = null
     mutate supersededBySourceKey = null
     emit EventIngredientContributionRecorded {
@@ -286,9 +290,12 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     guard self.recordedAt != null
     guard self.deletedAt == null
     constraint reviseQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
+    // Batch-owned shares are sized by their allocation, not by servings; a
+    // headcount change never rewrites them (replan the batch instead).
+    compute batchOwned = self.ownership == "batch_allocation" or self.ownership == "batch_surplus"
     mutate quantityPerServing = self.quantityPerServing != null ? self.quantityPerServing : (self.servings > 0 ? self.quantity / self.servings : null)
-    mutate quantity = quantity
-    mutate servings = servings
+    mutate quantity = batchOwned ? self.quantity : quantity
+    mutate servings = batchOwned ? self.servings : servings
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventIngredientContributionRecorded {
       contributionId: self.id
@@ -296,7 +303,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       eventId: self.eventId
       eventDishId: self.eventDishId
       ingredientId: self.ingredientId
-      quantity: quantity
+      quantity: self.quantity
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
     }

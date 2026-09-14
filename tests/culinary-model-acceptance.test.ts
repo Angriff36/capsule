@@ -1121,3 +1121,118 @@ describe("identity and re-import", () => {
     ).toBe("supersede");
   });
 });
+
+describe("review fixes: adjust override and duplicate sub-recipe edges", () => {
+  const cream = ingredient("ing-cream", "Heavy cream", "quart", 5);
+  const sauce = component({
+    id: "cmp-sauce",
+    name: "Sauce",
+    yieldQuantity: 1,
+    yieldUnit: "quart",
+    stepCount: 1,
+    ingredientLines: [
+      {
+        id: "sl",
+        ingredientId: "ing-cream",
+        quantity: 1,
+        unit: "quart",
+        quantityBasis: "as_purchased",
+      },
+    ],
+  });
+  it("an adjust override on a recipe line keeps the affected portions at the override quantity", () => {
+    const dish: DishLike = {
+      id: "d",
+      name: "Pasta",
+      kind: "food",
+      ingredientLines: [],
+      componentLines: [
+        {
+          id: "dc-sauce",
+          componentId: "cmp-sauce",
+          yieldQuantity: 8,
+          batchMultiplier: 1,
+        },
+      ],
+      tasks: [],
+    };
+    const lk = lookups({
+      dishes: [dish],
+      components: [sauce],
+      ingredients: [cream],
+    });
+    const demand = expandEventDish(
+      eventDish({
+        id: "ed",
+        dishId: "d",
+        quantityServings: 8,
+        overrides: [
+          {
+            id: "ov",
+            kind: "adjust",
+            targetDishComponentId: "dc-sauce",
+            quantity: 0.25,
+            unit: "quart",
+            portionsAffected: 2,
+          },
+        ],
+      }),
+      lk,
+    );
+    // 6 portions at 1/8 batch each = 0.75 qt, plus 2 portions at 0.25 qt = 0.5 qt.
+    const total = demand.contributions.reduce((s, c) => s + c.quantity, 0);
+    expect(total).toBeCloseTo(1.25, 6);
+    expect(demand.contributions).toHaveLength(2);
+  });
+  it("two edges to the same sub-recipe under one parent keep distinct keys", () => {
+    const parent = component({
+      id: "cmp-parent",
+      name: "Parent",
+      yieldQuantity: 1,
+      yieldUnit: "batch",
+      stepCount: 1,
+      componentLines: [
+        {
+          id: "edge-a",
+          childComponentId: "cmp-sauce",
+          quantity: 1,
+          unit: "quart",
+        },
+        {
+          id: "edge-b",
+          childComponentId: "cmp-sauce",
+          quantity: 2,
+          unit: "quart",
+        },
+      ],
+    });
+    const dish: DishLike = {
+      id: "d2",
+      name: "Double",
+      kind: "food",
+      ingredientLines: [],
+      componentLines: [
+        {
+          id: "dc-parent",
+          componentId: "cmp-parent",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+        },
+      ],
+      tasks: [],
+    };
+    const lk = lookups({
+      dishes: [dish],
+      components: [parent, sauce],
+      ingredients: [cream],
+    });
+    const demand = expandEventDish(
+      eventDish({ id: "ed2", dishId: "d2", quantityServings: 1 }),
+      lk,
+    );
+    expect(demand.contributions).toHaveLength(2);
+    expect(new Set(demand.contributions.map((c) => c.sourceKey)).size).toBe(2);
+    const plan = reconcileContributions([], demand.contributions, "ed2");
+    expect(plan.create).toHaveLength(2);
+  });
+});
