@@ -16545,6 +16545,7 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((quantity >= 0))) throw new Error("Contribution quantity cannot be negative");
     if (!((servings >= 0))) throw new Error("Contribution servings cannot be negative");
+    const batchKeep = ((sourceKey == null) && ((doc.ownership === "batch_allocation") || (doc.ownership === "batch_surplus")));
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -16556,25 +16557,25 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
       recipeSyncComponentId: componentId,
       ingredientId: ingredientId,
       recipeSyncIngredientId: ingredientId,
-      quantity: quantity,
-      quantityPerServing: ((quantityPerServing != null) ? quantityPerServing : ((servings > 0) ? (quantity / servings) : doc.quantityPerServing)),
-      unit: unit,
-      servings: servings,
+      quantity: (batchKeep ? doc.quantity : quantity),
+      quantityPerServing: (batchKeep ? doc.quantityPerServing : ((quantityPerServing != null) ? quantityPerServing : ((servings > 0) ? (quantity / servings) : doc.quantityPerServing))),
+      unit: (batchKeep ? doc.unit : unit),
+      servings: (batchKeep ? doc.servings : servings),
       purchasingWeekStart: (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : purchasingWeekStart),
       recordedAt: Date.now(),
       sourceKey: ((sourceKey != null) ? sourceKey : doc.sourceKey),
-      exactQuantity: ((sourceKey != null) ? exactQuantity : null),
-      roundedQuantity: ((sourceKey != null) ? roundedQuantity : null),
-      quantityBasis: ((sourceKey != null) ? quantityBasis : null),
-      unitStatus: ((sourceKey != null) ? unitStatus : null),
-      ownership: ((sourceKey != null) ? ownership : null),
-      sourceDishIngredientId: ((sourceKey != null) ? sourceDishIngredientId : null),
-      sourceDishComponentId: ((sourceKey != null) ? sourceDishComponentId : null),
-      componentPath: ((sourceKey != null) ? componentPath : []),
-      productionBatchId: ((sourceKey != null) ? productionBatchId : null),
-      productionBatchAllocationId: ((sourceKey != null) ? productionBatchAllocationId : null),
-      supersededAt: null,
-      supersededBySourceKey: null,
+      exactQuantity: ((sourceKey != null) ? exactQuantity : (batchKeep ? doc.exactQuantity : null)),
+      roundedQuantity: ((sourceKey != null) ? roundedQuantity : (batchKeep ? doc.roundedQuantity : null)),
+      quantityBasis: ((sourceKey != null) ? quantityBasis : (batchKeep ? doc.quantityBasis : null)),
+      unitStatus: ((sourceKey != null) ? unitStatus : (batchKeep ? doc.unitStatus : null)),
+      ownership: ((sourceKey != null) ? ownership : (batchKeep ? doc.ownership : null)),
+      sourceDishIngredientId: ((sourceKey != null) ? sourceDishIngredientId : (batchKeep ? doc.sourceDishIngredientId : null)),
+      sourceDishComponentId: ((sourceKey != null) ? sourceDishComponentId : (batchKeep ? doc.sourceDishComponentId : null)),
+      componentPath: ((sourceKey != null) ? componentPath : (batchKeep ? doc.componentPath : [])),
+      productionBatchId: ((sourceKey != null) ? productionBatchId : (batchKeep ? doc.productionBatchId : null)),
+      productionBatchAllocationId: ((sourceKey != null) ? productionBatchAllocationId : (batchKeep ? doc.productionBatchAllocationId : null)),
+      supersededAt: (batchKeep ? doc.supersededAt : null),
+      supersededBySourceKey: (batchKeep ? doc.supersededBySourceKey : null),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -16759,6 +16760,7 @@ export const EventIngredientContribution_createViaRecord = mutation({
       ...__draft,
       version: 1,
     };
+    const batchKeep = ((sourceKey == null) && ((doc.ownership === "batch_allocation") || (doc.ownership === "batch_surplus")));
     doc.eventId = eventId;
     doc.eventDishId = eventDishId;
     doc.dishId = dishId;
@@ -16766,25 +16768,25 @@ export const EventIngredientContribution_createViaRecord = mutation({
     doc.recipeSyncComponentId = componentId;
     doc.ingredientId = ingredientId;
     doc.recipeSyncIngredientId = ingredientId;
-    doc.quantity = quantity;
-    doc.quantityPerServing = ((quantityPerServing != null) ? quantityPerServing : ((servings > 0) ? (quantity / servings) : doc.quantityPerServing));
-    doc.unit = unit;
-    doc.servings = servings;
+    doc.quantity = (batchKeep ? doc.quantity : quantity);
+    doc.quantityPerServing = (batchKeep ? doc.quantityPerServing : ((quantityPerServing != null) ? quantityPerServing : ((servings > 0) ? (quantity / servings) : doc.quantityPerServing)));
+    doc.unit = (batchKeep ? doc.unit : unit);
+    doc.servings = (batchKeep ? doc.servings : servings);
     doc.purchasingWeekStart = (((__rel_event != null) && (__rel_event.purchasingWeekStart != null)) ? __rel_event.purchasingWeekStart : purchasingWeekStart);
     doc.recordedAt = Date.now();
     doc.sourceKey = ((sourceKey != null) ? sourceKey : doc.sourceKey);
-    doc.exactQuantity = ((sourceKey != null) ? exactQuantity : null);
-    doc.roundedQuantity = ((sourceKey != null) ? roundedQuantity : null);
-    doc.quantityBasis = ((sourceKey != null) ? quantityBasis : null);
-    doc.unitStatus = ((sourceKey != null) ? unitStatus : null);
-    doc.ownership = ((sourceKey != null) ? ownership : null);
-    doc.sourceDishIngredientId = ((sourceKey != null) ? sourceDishIngredientId : null);
-    doc.sourceDishComponentId = ((sourceKey != null) ? sourceDishComponentId : null);
-    doc.componentPath = ((sourceKey != null) ? componentPath : []);
-    doc.productionBatchId = ((sourceKey != null) ? productionBatchId : null);
-    doc.productionBatchAllocationId = ((sourceKey != null) ? productionBatchAllocationId : null);
-    doc.supersededAt = null;
-    doc.supersededBySourceKey = null;
+    doc.exactQuantity = ((sourceKey != null) ? exactQuantity : (batchKeep ? doc.exactQuantity : null));
+    doc.roundedQuantity = ((sourceKey != null) ? roundedQuantity : (batchKeep ? doc.roundedQuantity : null));
+    doc.quantityBasis = ((sourceKey != null) ? quantityBasis : (batchKeep ? doc.quantityBasis : null));
+    doc.unitStatus = ((sourceKey != null) ? unitStatus : (batchKeep ? doc.unitStatus : null));
+    doc.ownership = ((sourceKey != null) ? ownership : (batchKeep ? doc.ownership : null));
+    doc.sourceDishIngredientId = ((sourceKey != null) ? sourceDishIngredientId : (batchKeep ? doc.sourceDishIngredientId : null));
+    doc.sourceDishComponentId = ((sourceKey != null) ? sourceDishComponentId : (batchKeep ? doc.sourceDishComponentId : null));
+    doc.componentPath = ((sourceKey != null) ? componentPath : (batchKeep ? doc.componentPath : []));
+    doc.productionBatchId = ((sourceKey != null) ? productionBatchId : (batchKeep ? doc.productionBatchId : null));
+    doc.productionBatchAllocationId = ((sourceKey != null) ? productionBatchAllocationId : (batchKeep ? doc.productionBatchAllocationId : null));
+    doc.supersededAt = (batchKeep ? doc.supersededAt : null);
+    doc.supersededBySourceKey = (batchKeep ? doc.supersededBySourceKey : null);
     const docId = await ctx.db.insert("eventIngredientContributions", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, contributionId: docId, tenantId: doc.tenantId, eventId: eventId, eventDishId: eventDishId, ingredientId: ingredientId, quantity: quantity, unit: unit, purchasingWeekStart: doc.purchasingWeekStart, _subject: { entity: "EventIngredientContribution", command: "record", id: docId } };
     const __manifestEvent0 = { type: "EventIngredientContributionRecorded", entity: "EventIngredientContribution", entityId: docId, payload: { contributionId: docId, tenantId: doc.tenantId, eventId: eventId, eventDishId: eventDishId, ingredientId: ingredientId, quantity: quantity, unit: unit, purchasingWeekStart: doc.purchasingWeekStart }, createdAt: Date.now() };

@@ -14,7 +14,11 @@ import {
   type MutationCtx,
   type QueryCtx,
 } from "./_generated/server";
-import { getAuthContext, requireTenant } from "./lib/authContext";
+import {
+  getAuthContext,
+  requireTenant,
+  type AppAuthContext,
+} from "./lib/authContext";
 import {
   componentBatchCost,
   componentContentStatus,
@@ -379,6 +383,35 @@ async function requireEvent(
   return event;
 }
 
+/**
+ * Mirrors the manifest read policies these reports aggregate: Ingredient
+ * (kitchenAccess), EventIngredientContribution (inventoryAccess |
+ * manageAccess). Ordinary staff roles do not get raw quantities.
+ */
+function canReadCulinaryReports(role: string): boolean {
+  return (
+    role === "kitchen_staff" ||
+    role === "kitchen_lead" ||
+    role === "inventory_staff" ||
+    role === "procurement_staff" ||
+    role === "manager" ||
+    role.endsWith("_manager") ||
+    role === "admin" ||
+    role === "owner" ||
+    role === "system"
+  );
+}
+
+function requireCulinaryReader(auth: AppAuthContext): string {
+  const tenantId = requireTenant(auth);
+  if (!canReadCulinaryReports(auth.role)) {
+    throw new Error(
+      "Kitchen, inventory and managers may read culinary demand reports",
+    );
+  }
+  return tenantId;
+}
+
 export interface EventDemandReview {
   eventId: string;
   eventDishes: (EventDishDemand & {
@@ -414,12 +447,25 @@ async function reviewEvent(
   );
   const batches = await byTenant(ctx, "productionBatches", tenantId);
   const batchById = new Map(batches.map((b) => [String(b._id), b]));
+  // Every live allocation of a live batch keeps its rows, including the
+  // surplus allocation, which belongs to no event but is purchased on one.
+  const activeAllocationIds = (
+    await byTenant(ctx, "productionBatchAllocations", tenantId)
+  )
+    .filter((a) => {
+      const batch = batchById.get(String(a.productionBatchId));
+      return (
+        a.allocatedAt != null &&
+        a.status !== "released" &&
+        !!batch &&
+        batch.status !== "cancelled"
+      );
+    })
+    .map((a) => String(a._id));
   const batchSatisfied: EventDemandReview["batchSatisfied"] = [];
-  const activeAllocationIds: string[] = [];
   for (const a of allocations) {
     const batch = batchById.get(String(a.productionBatchId));
     if (!batch || batch.status === "cancelled" || !a.eventDishId) continue;
-    activeAllocationIds.push(String(a._id));
     batchSatisfied.push({
       eventDishId: String(a.eventDishId),
       componentId: String(batch.componentId),
@@ -460,7 +506,7 @@ async function reviewEvent(
 export const eventDemandReview = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args): Promise<EventDemandReview> => {
-    const tenantId = requireTenant(await getAuthContext(ctx));
+    const tenantId = requireCulinaryReader(await getAuthContext(ctx));
     return reviewEvent(ctx, tenantId, args.eventId);
   },
 });
@@ -481,7 +527,7 @@ export interface ComponentContentReport {
 export const componentContentReport = query({
   args: { componentId: v.id("components") },
   handler: async (ctx, args): Promise<ComponentContentReport | null> => {
-    const tenantId = requireTenant(await getAuthContext(ctx));
+    const tenantId = requireCulinaryReader(await getAuthContext(ctx));
     const catalog = await loadCatalog(ctx, tenantId);
     const component = catalog.lookups.components.get(String(args.componentId));
     if (!component) return null;
@@ -537,7 +583,7 @@ const OPEN_STAGES = new Set([
 export const kitchenUnresolvedReport = query({
   args: {},
   handler: async (ctx): Promise<UnresolvedWorkReport> => {
-    const tenantId = requireTenant(await getAuthContext(ctx));
+    const tenantId = requireCulinaryReader(await getAuthContext(ctx));
     const catalog = await loadCatalog(ctx, tenantId);
     const events = (await byTenant(ctx, "events", tenantId)).filter((e) =>
       OPEN_STAGES.has(e.stage),

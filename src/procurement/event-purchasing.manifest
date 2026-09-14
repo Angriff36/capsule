@@ -237,6 +237,9 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint recordQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
     constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
+    // A legacy reaction (no sourceKey) that matches a batch-owned share must
+    // leave it untouched: the batch owns that quantity, not the serving count.
+    compute batchKeep = sourceKey == null and (self.ownership == "batch_allocation" or self.ownership == "batch_surplus")
     mutate eventId = eventId
     mutate eventDishId = eventDishId
     mutate dishId = dishId
@@ -244,10 +247,10 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate recipeSyncComponentId = componentId
     mutate ingredientId = ingredientId
     mutate recipeSyncIngredientId = ingredientId
-    mutate quantity = quantity
-    mutate quantityPerServing = quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing)
-    mutate unit = unit
-    mutate servings = servings
+    mutate quantity = batchKeep ? self.quantity : quantity
+    mutate quantityPerServing = batchKeep ? self.quantityPerServing : (quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing))
+    mutate unit = batchKeep ? self.unit : unit
+    mutate servings = batchKeep ? self.servings : servings
     // The event owns the purchasing week (#328); the passed value is only a
     // fallback for rows whose event cannot be resolved.
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
@@ -255,20 +258,21 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     // The engine always passes sourceKey. A legacy reaction never does: it
     // then rewrites the quantity with the legacy formula, so every engine
     // annotation is cleared rather than left stale; the next reconcile
-    // re-adopts the row by (component, ingredient, unit).
+    // re-adopts the row by (component, ingredient, unit). Batch-owned rows
+    // (batchKeep) keep every annotation.
     mutate sourceKey = sourceKey != null ? sourceKey : self.sourceKey
-    mutate exactQuantity = sourceKey != null ? exactQuantity : null
-    mutate roundedQuantity = sourceKey != null ? roundedQuantity : null
-    mutate quantityBasis = sourceKey != null ? quantityBasis : null
-    mutate unitStatus = sourceKey != null ? unitStatus : null
-    mutate ownership = sourceKey != null ? ownership : null
-    mutate sourceDishIngredientId = sourceKey != null ? sourceDishIngredientId : null
-    mutate sourceDishComponentId = sourceKey != null ? sourceDishComponentId : null
-    mutate componentPath = sourceKey != null ? componentPath : []
-    mutate productionBatchId = sourceKey != null ? productionBatchId : null
-    mutate productionBatchAllocationId = sourceKey != null ? productionBatchAllocationId : null
-    mutate supersededAt = null
-    mutate supersededBySourceKey = null
+    mutate exactQuantity = sourceKey != null ? exactQuantity : (batchKeep ? self.exactQuantity : null)
+    mutate roundedQuantity = sourceKey != null ? roundedQuantity : (batchKeep ? self.roundedQuantity : null)
+    mutate quantityBasis = sourceKey != null ? quantityBasis : (batchKeep ? self.quantityBasis : null)
+    mutate unitStatus = sourceKey != null ? unitStatus : (batchKeep ? self.unitStatus : null)
+    mutate ownership = sourceKey != null ? ownership : (batchKeep ? self.ownership : null)
+    mutate sourceDishIngredientId = sourceKey != null ? sourceDishIngredientId : (batchKeep ? self.sourceDishIngredientId : null)
+    mutate sourceDishComponentId = sourceKey != null ? sourceDishComponentId : (batchKeep ? self.sourceDishComponentId : null)
+    mutate componentPath = sourceKey != null ? componentPath : (batchKeep ? self.componentPath : [])
+    mutate productionBatchId = sourceKey != null ? productionBatchId : (batchKeep ? self.productionBatchId : null)
+    mutate productionBatchAllocationId = sourceKey != null ? productionBatchAllocationId : (batchKeep ? self.productionBatchAllocationId : null)
+    mutate supersededAt = batchKeep ? self.supersededAt : null
+    mutate supersededBySourceKey = batchKeep ? self.supersededBySourceKey : null
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
