@@ -137,6 +137,8 @@ was imported or a deployment occurred.
 
 EventDish (and its PrepTasks) plus Component/Ingredient relationships drive demand, production batches, pack items, allergen checks, and costs. Culinary UI must show those downstream uses but route operational edits to Inventory, Production, Logistics, or Quality.
 
+**Service style is an operational instruction, not a duplicate key** — see [service-style-packaging.md](service-style-packaging.md). Drop Off packs disposable (to-go bowls, disposable utensils); Cook on Site / Finish at Kitchen packs hotel pans + real utensils. Pack-list templates select on `serviceStyleId`. Same-name dishes across service categories are deliberate variants; only merge name-identical dishes inside the SAME category.
+
 ## States and permissions
 
 Kitchen access governs normal work; costing and lifecycle commands may require higher capability. The UI must not invent procedures, prep time, nutrition, or media when the model does not supply them. Search declarations currently lack generated full-text support (import matching is client-side catalog scan).
