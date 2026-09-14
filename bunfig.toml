@@ -1,1 +1,4 @@
-preload = ["./scripts/seed-convex-auth-preload.ts"]
+preload = [
+  "./scripts/windows-git-bash-path-preload.ts",
+  "./scripts/seed-convex-auth-preload.ts",
+]

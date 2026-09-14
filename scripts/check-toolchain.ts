@@ -4,8 +4,9 @@
  * Run via `bun scripts/check-toolchain.ts` (not part of tsc project graph).
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { WindowsGitBashPath } from "./windowsGitBashPath.ts";
 
 class ToolchainGate {
   private readonly root: string;
@@ -67,20 +68,20 @@ class ToolchainGate {
 
   private assertWindowsBash(): void {
     if (process.platform !== "win32") return;
-    const located = spawnSync("where.exe", ["bash"], { encoding: "utf8" });
-    const first = located.stdout
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .find((line) => line.length > 0);
-    if (!first || !/System32\\bash\.exe/i.test(first)) return;
-    const gitBash = [
-      process.env.GIT_BASH,
-      "C:\\Program Files\\Git\\bin\\bash.exe",
-      "C:\\Program Files (x86)\\Git\\bin\\bash.exe",
-    ].find((path) => path && existsSync(path));
-    throw new Error(
-      `Windows check would use WSL bash (${first}) which fails when no distro is installed. Prepend Git Bash to PATH and re-run:\n$env:Path = "${gitBash ? gitBash.replace(/\\bash\.exe$/i, "") : "C:\\Program Files\\Git\\bin"};" + $env:Path`,
-    );
+    const gitBash = new WindowsGitBashPath();
+    gitBash.prependToPath();
+    const exe = gitBash.resolveExe();
+    if (!exe) {
+      throw new Error(
+        "Git Bash was not found. Install Git for Windows or set GIT_BASH to bash.exe so `bun run build` is not the WSL stub (#338).",
+      );
+    }
+    const probe = spawnSync(exe, ["-lc", "uname -s"], { encoding: "utf8" });
+    if (probe.status !== 0 || !/MINGW|MSYS|CYGWIN/i.test(probe.stdout ?? "")) {
+      throw new Error(
+        `Windows bash is not Git Bash (got ${(probe.stdout || probe.stderr || "").trim() || "no output"}). Prepend Git Bash to PATH. Expected at ${exe}.`,
+      );
+    }
   }
 }
 
