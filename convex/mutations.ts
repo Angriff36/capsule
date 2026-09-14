@@ -19327,7 +19327,6 @@ async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSyst
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may write external record links through commands");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may execute external record link commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((doc.createdAt == null))) throw new Error("Guard 1 failed");
     if (!((sourceSystem != null))) throw new Error("Source system is required");
     if (!((((externalId).trim()).length > 0))) throw new Error("External ID is required");
     if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
