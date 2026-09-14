@@ -50,6 +50,7 @@ const harness = vi.hoisted(() => ({
 // this mock only serves real modules like useAuthStatus.
 vi.mock("convex/react", () => ({
   useQuery: () => undefined,
+  useMutation: () => vi.fn(async () => null),
 }));
 
 vi.mock("../../../src/lib/safeCulinaryOperations", () => ({

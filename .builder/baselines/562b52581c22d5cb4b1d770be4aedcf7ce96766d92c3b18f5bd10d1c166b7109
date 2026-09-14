@@ -6,7 +6,7 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:0887a823a0863fd26a66daf4706547837bcdc9c4f8818cdd19c1c40522bf4d5f:097db3fc846d0f2756e7b603f1f3cfc1c8e91aa9f77925b7e1c219ac534e1024:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0bbe5c6b89d616edba1f370154d328cbcc1642a0aba05526e477215478ba8f71:0c5e93243568ed44b613fd741c9e8766d3767999f669b39e91de6b564a158c52:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:106467e5fb7a675584d5fa4d51ac9de735b2cd1f238b36097f0ea3fe9ce414bf:10a4578b3480dd31d00e465253a2acaa870b3601494a81fb52be4b7d0695fb50:1135ee7e2859e984444fff8b1c528e405d2528aeb1965c48ae48b9fa60847324:121e93f8efa838e2f173713fb057b78a5f7bb930cf9dca8eff8c0a87fbc68f27:167502ef1313276d83dad635aaa0aadd7cb781cd9c73ea3f21ed27c6a2af27a7:16fadfdbf1d8532618d5f4164ff3a68ed851312dfe6c99d975eb4779ebd11a7b:17a5e94b0cdfe6bd9e152c479f7f24175a1d18a7c905a1c56048540faf1c1b33:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:1c267034198933314406622f03e68866811cbc6c5577c941910b5cbbbdd21103:226861e02cd8fad3f19051359d40853e69350f350289a48eb861b6b8fbd07118:233a533b83ca52b8fbd1471e60ed35d120138cd2d577bafd693e5a80159a2167:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:2586efecb26eb6d3ab81704c081dec9025edd813cf431c19719e6bab1cca628c:2c9865acdfaadcd1c8c957c90b2dcbd170930959a0bb2f5e10f08b70301df036:2ef8146221c737655bcdc2938ea439d3672ae18af8002d3995420c3e93304e34:2f7595509e9b214aca6f231283b80ca3ab10b6d9cef862d8a286fe6a7c8dc141:333e9f62f3a0b49dd08db012882eb22057ed1490e30f1a3be80996a3dd5ed7d5:3b44cacf14dbedc865feb1c9011d1b26e6b557e9ff0d64cacf43750b7bb23dc5:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:45b9fd721e27b116404817462338b82f697856a06df2d0e7808798290c28abf7:47e3ff14c3364b281c344145bf8d052957aea63156dc0924038c780781a2191c:49adcdf55aefbe7c5fe43e8b6de4d9187d525362dc451ccff8a30606cc615348:4c33b6d3f7ad16f1e732538c08f04d7af56e9e04c09744bfaee6919214f83e1a:4f7eb03bb569a4a5c990aabba0bc5302a24f629fd5a26ee46844f327add4bbf6:541f2781cf4206423c1682e6111aefdee9563fe469281f1970be8992a7f20b60:575efe4c07a00785ecb17477a238f9109bd218d9021063a688e51cbd024f2167:5983b06b581f50324d5f583c27aa732ca33574a3c600e3ea2a8204df889b3144:6186d3f304d800d46945c7093edb988d4e003062181427c548f82768971a56e2:6638bfd4c511e63bfb150b8061f43d677f93bda8a512148a8cd2ff51234fe110:696fe5529bfae2c19544648f271e5919f95df41273d88be3534b37846d2a80a6:6a66fb46bc607c202ab6cb620934fb95a34931867402bc60cbfdc9f5bf2ec768:6ab5316476685e336a35a59852d8d6da3c23003a5ccda03fff304fd5f4679d29:6d4ef205ddca620d3d8c4df06a5736a61d0ebefada7ed4def9db7cc57ea4b904:6dbed59513b2348e042807bd653405a130e38d13a43e28ff78b332d097c22f74:6e5aa7f5c3265d6ea3b946cf133ed0288da838ebc99fb8ee951a123f4afd28cd:72bbc6daec9d2b16b642d0881feeb7e50fbc2649e39022d3cc1e48bd01a9537c:74037e9e1f2cdb00ee6ca5ad77ffbce3f94874a743640aeb4f9d2b4180582231:741dd603d6d5d46af0106082424b0b15cef21c9c606f08ec35b24d004ea37e7f:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:760d7ab4a4f2dc13f8f28b7043e15f159579b0e0517f14892d6f7898e36a6526:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:77a0b952992183b0044a401049c361756355f5d7dc835f69e60d36d6ce8d8a4e:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:8167e03359676ce8dec75aff52024062d50edcc941e7cb60113b375fc4b51578:830ed5dda6f389bec01c4b9beb6da607d8c36341db7268131a064d0770e56f06:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:91f7a31501c2ea80c03376344b06b6c20d190abf36a50699331330fab2fdd5c8:9287f818468dd0b04949b87630a11cf848ce6c62f1fc08c75910b3724bd15228:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:97996bb0225e4d09ca9f3233bb87c518d59bdb0aa7f40fc7942a364b1f9032d4:9a1f2ae809fd84ccefa0b7b872bb5d8eaa411c75f9d789451a987a90f67e950b:9a66d23a675bd9e3c609e93882e67fbe17945cc450ad12643ef856e541d9961f:9bf932cacf71358da1862cef610681da0a2c5c186f22c28237f04902d170f3b6:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a404937b25248068a98c5cc4a35cbb79c20535f1f1a85caecd37355696ecd0c3:a6114e54e8f49a0cb121537998e74a7c8bf8dc42411bdd02a45e18cfc7b460f4:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:add29a8cc2a2ee66b8869910f71ffc57b4b002e641022a5fcc52f150f45e2e64:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b3f57b05f86854f5cb1fc57a2f70aa5f114d94099db7eba4175735e127e7c3a6:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:bbf48333cf8470117d0d0f5a9acac982d4ef1b2dc96712b6935150640a514a89:c4c5e7ea3db8cead5baff1af1f614cecd44f92eb347dc7fed2c67e3aaedb1177:c9226301df7528db1c4a4575eded7ea1545f7093b6e9eb7aacccd028f98ea214:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d2b7ec32514c2ca0abd4da3902919d28cd89378d6713fc7c89736f40ddd57d90:d2ca8039529a58875513713febc26816a0afd8db71b746d0302f9893c59cd6e0:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d68ce48244ea6935fdc5db7ed618c3e6a3eb13337566a2b1cacc7e29aa0f270d:d91f0bdc8b57b8105251a6cb7bc79608480679588e80c6e97940f3baedddbf3e:e4a277c73bc05813517c4b1cc912071cd5fca6536873b8e7669567c63f56603a:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f0c18656b05048b52def70aa6b4e9c5591d99c7da9b6a57712bcf57cefffe34b:f37836019797b1ba8f2a84dffabb933d2547177ecb548a3fd88a9ccdff014d35:f5117535c503885d15b8ceb0133989074fa7afab0237da1c9daab9c09147ef3c:f5dc9c9869e969138e74400a6d165987f026b35dc777bee473740cd583fb36b8:f6213ea2db82a8ee4bb293bcd779b3d77bdadc069771e7c28e5f69024b42edb4:f7c8e9975b35bf8749f417027f24e90506ea6999bfe8a8ebb7f5d9a75641eaa3:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fd5788e6d1d70f7281d8150f21137b4c6703bc509537503cee553a3101e9a681";
+export const WIRING_CONTRACT_HASH = "00e3d6b74d8dd39fd128c242f3ccfd1a09017dce763e0973d0c3db72e15cf871:02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:0887a823a0863fd26a66daf4706547837bcdc9c4f8818cdd19c1c40522bf4d5f:097db3fc846d0f2756e7b603f1f3cfc1c8e91aa9f77925b7e1c219ac534e1024:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0bbe5c6b89d616edba1f370154d328cbcc1642a0aba05526e477215478ba8f71:0c5e93243568ed44b613fd741c9e8766d3767999f669b39e91de6b564a158c52:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:106467e5fb7a675584d5fa4d51ac9de735b2cd1f238b36097f0ea3fe9ce414bf:10a4578b3480dd31d00e465253a2acaa870b3601494a81fb52be4b7d0695fb50:1135ee7e2859e984444fff8b1c528e405d2528aeb1965c48ae48b9fa60847324:121e93f8efa838e2f173713fb057b78a5f7bb930cf9dca8eff8c0a87fbc68f27:167502ef1313276d83dad635aaa0aadd7cb781cd9c73ea3f21ed27c6a2af27a7:16fadfdbf1d8532618d5f4164ff3a68ed851312dfe6c99d975eb4779ebd11a7b:17a5e94b0cdfe6bd9e152c479f7f24175a1d18a7c905a1c56048540faf1c1b33:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:1c267034198933314406622f03e68866811cbc6c5577c941910b5cbbbdd21103:233a533b83ca52b8fbd1471e60ed35d120138cd2d577bafd693e5a80159a2167:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:2586efecb26eb6d3ab81704c081dec9025edd813cf431c19719e6bab1cca628c:2c9865acdfaadcd1c8c957c90b2dcbd170930959a0bb2f5e10f08b70301df036:2ef8146221c737655bcdc2938ea439d3672ae18af8002d3995420c3e93304e34:2f7595509e9b214aca6f231283b80ca3ab10b6d9cef862d8a286fe6a7c8dc141:333e9f62f3a0b49dd08db012882eb22057ed1490e30f1a3be80996a3dd5ed7d5:349be9d786d9881eaf5f4b5e4d2791a4ddaa5fdf5b8c119c7caf8d9cf7f5debf:3b44cacf14dbedc865feb1c9011d1b26e6b557e9ff0d64cacf43750b7bb23dc5:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:3f754bb58f4494ffe702e3edf024ec406c789b42d0f43a86cc0d01d3c77851b3:45b9fd721e27b116404817462338b82f697856a06df2d0e7808798290c28abf7:49adcdf55aefbe7c5fe43e8b6de4d9187d525362dc451ccff8a30606cc615348:4f7eb03bb569a4a5c990aabba0bc5302a24f629fd5a26ee46844f327add4bbf6:541f2781cf4206423c1682e6111aefdee9563fe469281f1970be8992a7f20b60:6186d3f304d800d46945c7093edb988d4e003062181427c548f82768971a56e2:6638bfd4c511e63bfb150b8061f43d677f93bda8a512148a8cd2ff51234fe110:696fe5529bfae2c19544648f271e5919f95df41273d88be3534b37846d2a80a6:6a66fb46bc607c202ab6cb620934fb95a34931867402bc60cbfdc9f5bf2ec768:6ab5316476685e336a35a59852d8d6da3c23003a5ccda03fff304fd5f4679d29:6d4ef205ddca620d3d8c4df06a5736a61d0ebefada7ed4def9db7cc57ea4b904:6dbed59513b2348e042807bd653405a130e38d13a43e28ff78b332d097c22f74:6e5aa7f5c3265d6ea3b946cf133ed0288da838ebc99fb8ee951a123f4afd28cd:72bbc6daec9d2b16b642d0881feeb7e50fbc2649e39022d3cc1e48bd01a9537c:74037e9e1f2cdb00ee6ca5ad77ffbce3f94874a743640aeb4f9d2b4180582231:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:760d7ab4a4f2dc13f8f28b7043e15f159579b0e0517f14892d6f7898e36a6526:7649267abfa9c3c41325797dbe1441cfed1e0f57d8a32a0758661582ed4a29a8:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:77a0b952992183b0044a401049c361756355f5d7dc835f69e60d36d6ce8d8a4e:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:8167e03359676ce8dec75aff52024062d50edcc941e7cb60113b375fc4b51578:830ed5dda6f389bec01c4b9beb6da607d8c36341db7268131a064d0770e56f06:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:898e804bb804e9e417d9fe842b7b7519c430ddfd695d9b09a11688568bdd1d0f:91f7a31501c2ea80c03376344b06b6c20d190abf36a50699331330fab2fdd5c8:9287f818468dd0b04949b87630a11cf848ce6c62f1fc08c75910b3724bd15228:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:9a1f2ae809fd84ccefa0b7b872bb5d8eaa411c75f9d789451a987a90f67e950b:9bf932cacf71358da1862cef610681da0a2c5c186f22c28237f04902d170f3b6:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a404937b25248068a98c5cc4a35cbb79c20535f1f1a85caecd37355696ecd0c3:a6114e54e8f49a0cb121537998e74a7c8bf8dc42411bdd02a45e18cfc7b460f4:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:add29a8cc2a2ee66b8869910f71ffc57b4b002e641022a5fcc52f150f45e2e64:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b3f57b05f86854f5cb1fc57a2f70aa5f114d94099db7eba4175735e127e7c3a6:b6f2329a88971f331d01a12c2e1381bc8d80300f2910e9d09272944040bddb09:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:be356557944c0cb4c1b05cb4be32d96560564b8dcd497e6e352cea56557e56a1:c4c5e7ea3db8cead5baff1af1f614cecd44f92eb347dc7fed2c67e3aaedb1177:c9226301df7528db1c4a4575eded7ea1545f7093b6e9eb7aacccd028f98ea214:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d1ef62adf831d0aa4ace8896b100cb023439c279ab0e5a0b5b5cc55fd9506fb3:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d2b7ec32514c2ca0abd4da3902919d28cd89378d6713fc7c89736f40ddd57d90:d2ca8039529a58875513713febc26816a0afd8db71b746d0302f9893c59cd6e0:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d68ce48244ea6935fdc5db7ed618c3e6a3eb13337566a2b1cacc7e29aa0f270d:d696e613e19b91a28340877addc6c9f2953efdf0d0e310e1560d6c99e61ea3a1:d91f0bdc8b57b8105251a6cb7bc79608480679588e80c6e97940f3baedddbf3e:e17490682182c27b149b9b11de98967293084f471676cbdaa63685c188a9e1a7:e4a277c73bc05813517c4b1cc912071cd5fca6536873b8e7669567c63f56603a:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f0c18656b05048b52def70aa6b4e9c5591d99c7da9b6a57712bcf57cefffe34b:f37836019797b1ba8f2a84dffabb933d2547177ecb548a3fd88a9ccdff014d35:f5117535c503885d15b8ceb0133989074fa7afab0237da1c9daab9c09147ef3c:f5dc9c9869e969138e74400a6d165987f026b35dc777bee473740cd583fb36b8:f6213ea2db82a8ee4bb293bcd779b3d77bdadc069771e7c28e5f69024b42edb4:f7c8e9975b35bf8749f417027f24e90506ea6999bfe8a8ebb7f5d9a75641eaa3:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fd5788e6d1d70f7281d8150f21137b4c6703bc509537503cee553a3101e9a681";
 
 // --- Announcement.post ---
 export interface AnnouncementPostClientInput {
@@ -1519,8 +1519,8 @@ export interface ComponentDraftClientInput {
   name: string;
   /** Bounds: 1..∞ */
   yieldQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 1..∞ */
   servesPerYield?: number;
   /** Bounds: 1..∞ */
@@ -1779,8 +1779,8 @@ export interface ComponentReviseDraftClientInput {
   name: string;
   /** Bounds: 1..∞ */
   yieldQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 1..∞ */
   batchMultiplier: number;
   /** Bounds: 1..∞ */
@@ -1863,6 +1863,182 @@ export const ComponentSetServesPerYieldInvalidation = [
     "kind": "entityDetail",
     "entity": "Component",
     "queryKeyHint": "queryKeys.component.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Component.setStorageWindow ---
+export interface ComponentSetStorageWindowClientInput {
+  /** Bounds: 0..∞ */
+  storageWindowDays: number;
+  source?: string;
+}
+
+export const ComponentSetStorageWindowCapability = {
+  capabilityId: "Component.setStorageWindow",
+  entity: "Component",
+  command: "setStorageWindow",
+  route: "/api/manifest/Component/commands/setStorageWindow",
+  instanceCommand: true,
+  clientParameterNames: ["storageWindowDays","source"],
+  serverParameterNames: [],
+  emits: ["ComponentStorageWindowSet"],
+} as const;
+
+/**
+ * Build command input for Component.setStorageWindow.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentSetStorageWindowInput(client: ComponentSetStorageWindowClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Component.setStorageWindow. */
+export const ComponentSetStorageWindowInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Component",
+    "queryKeyHint": "queryKeys.component.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ComponentComponent.add ---
+export interface ComponentComponentAddClientInput {
+  componentId: string;
+  childComponentId: string;
+  /** Bounds: 1..∞ */
+  quantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  sortOrder?: number;
+  /** Bounds: 1..∞ */
+  wasteFactor?: number;
+  /** Allowed: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" */
+  quantityBasis?: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown";
+  prepNotes?: string;
+}
+
+export const ComponentComponentAddCapability = {
+  capabilityId: "ComponentComponent.add",
+  entity: "ComponentComponent",
+  command: "add",
+  route: "/api/manifest/ComponentComponent/commands/add",
+  instanceCommand: true,
+  clientParameterNames: ["componentId","childComponentId","quantity","unit","sortOrder","wasteFactor","quantityBasis","prepNotes"],
+  serverParameterNames: [],
+  emits: ["ComponentComponentAdded"],
+} as const;
+
+/**
+ * Build command input for ComponentComponent.add.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentComponentAddInput(client: ComponentComponentAddClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ComponentComponent.add. */
+export const ComponentComponentAddInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ComponentComponent.adjustQuantity ---
+export interface ComponentComponentAdjustQuantityClientInput {
+  /** Bounds: 1..∞ */
+  quantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+}
+
+export const ComponentComponentAdjustQuantityCapability = {
+  capabilityId: "ComponentComponent.adjustQuantity",
+  entity: "ComponentComponent",
+  command: "adjustQuantity",
+  route: "/api/manifest/ComponentComponent/commands/adjustQuantity",
+  instanceCommand: true,
+  clientParameterNames: ["quantity","unit"],
+  serverParameterNames: [],
+  emits: ["ComponentComponentQuantityAdjusted"],
+} as const;
+
+/**
+ * Build command input for ComponentComponent.adjustQuantity.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentComponentAdjustQuantityInput(client: ComponentComponentAdjustQuantityClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ComponentComponent.adjustQuantity. */
+export const ComponentComponentAdjustQuantityInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ComponentComponent.remove ---
+export interface ComponentComponentRemoveClientInput {
+  reason: string;
+}
+
+export const ComponentComponentRemoveCapability = {
+  capabilityId: "ComponentComponent.remove",
+  entity: "ComponentComponent",
+  command: "remove",
+  route: "/api/manifest/ComponentComponent/commands/remove",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["ComponentComponentRemoved"],
+} as const;
+
+/**
+ * Build command input for ComponentComponent.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentComponentRemoveInput(client: ComponentComponentRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ComponentComponent.remove. */
+export const ComponentComponentRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentComponent",
+    "queryKeyHint": "queryKeys.componentComponent.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -2285,8 +2461,8 @@ export interface ComponentImportRecordParseClientInput {
   parsedInstructions?: string;
   /** Bounds: 1..∞ */
   parsedYieldQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  parsedYieldUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  parsedYieldUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 1..∞ */
   parsedBatchMultiplier?: number;
 }
@@ -2453,8 +2629,8 @@ export interface ComponentImportReviseReviewClientInput {
   parsedInstructions?: string;
   /** Bounds: 1..∞ */
   parsedYieldQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  parsedYieldUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  parsedYieldUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 1..∞ */
   parsedBatchMultiplier?: number;
 }
@@ -2780,8 +2956,8 @@ export const ComponentImportLineResetResolutionInvalidation = [
 export interface ComponentImportLineReviseMeasurementsClientInput {
   expectedReviewRevision: number;
   parsedQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  parsedUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  parsedUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   preparationNote?: string;
   parsedIngredientName?: string;
 }
@@ -2828,8 +3004,8 @@ export interface ComponentImportLineStageClientInput {
   sourceOrder: number;
   sourceLine: string;
   parsedQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  parsedUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  parsedUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   parsedIngredientName?: string;
   preparationNote?: string;
 }
@@ -2955,8 +3131,8 @@ export interface ComponentIngredientAddClientInput {
   ingredientId: string;
   /** Bounds: 1..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   sortOrder?: number;
   /** Bounds: 1..∞ */
   wasteFactor?: number;
@@ -3002,8 +3178,8 @@ export const ComponentIngredientAddInvalidation = [
 export interface ComponentIngredientAdjustQuantityClientInput {
   /** Bounds: 1..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const ComponentIngredientAdjustQuantityCapability = {
@@ -3118,6 +3294,140 @@ export const ComponentIngredientSetWasteFactorInvalidation = [
     "kind": "entityDetail",
     "entity": "ComponentIngredient",
     "queryKeyHint": "queryKeys.componentIngredient.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ComponentPortionSpec.define ---
+export interface ComponentPortionSpecDefineClientInput {
+  componentId: string;
+  name: string;
+  /** Bounds: 1..∞ */
+  pieceQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  pieceUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  /** Bounds: 1..∞ */
+  piecesPerBatch?: number;
+  source?: string;
+}
+
+export const ComponentPortionSpecDefineCapability = {
+  capabilityId: "ComponentPortionSpec.define",
+  entity: "ComponentPortionSpec",
+  command: "define",
+  route: "/api/manifest/ComponentPortionSpec/commands/define",
+  instanceCommand: true,
+  clientParameterNames: ["componentId","name","pieceQuantity","pieceUnit","piecesPerBatch","source"],
+  serverParameterNames: [],
+  emits: ["ComponentPortionSpecDefined"],
+} as const;
+
+/**
+ * Build command input for ComponentPortionSpec.define.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentPortionSpecDefineInput(client: ComponentPortionSpecDefineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ComponentPortionSpec.define. */
+export const ComponentPortionSpecDefineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ComponentPortionSpec.retire ---
+export interface ComponentPortionSpecRetireClientInput {
+  reason: string;
+}
+
+export const ComponentPortionSpecRetireCapability = {
+  capabilityId: "ComponentPortionSpec.retire",
+  entity: "ComponentPortionSpec",
+  command: "retire",
+  route: "/api/manifest/ComponentPortionSpec/commands/retire",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["ComponentPortionSpecRetired"],
+} as const;
+
+/**
+ * Build command input for ComponentPortionSpec.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentPortionSpecRetireInput(client: ComponentPortionSpecRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ComponentPortionSpec.retire. */
+export const ComponentPortionSpecRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ComponentPortionSpec.revise ---
+export interface ComponentPortionSpecReviseClientInput {
+  name: string;
+  /** Bounds: 1..∞ */
+  pieceQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  pieceUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  piecesPerBatch?: number;
+  source?: string;
+}
+
+export const ComponentPortionSpecReviseCapability = {
+  capabilityId: "ComponentPortionSpec.revise",
+  entity: "ComponentPortionSpec",
+  command: "revise",
+  route: "/api/manifest/ComponentPortionSpec/commands/revise",
+  instanceCommand: true,
+  clientParameterNames: ["name","pieceQuantity","pieceUnit","piecesPerBatch","source"],
+  serverParameterNames: [],
+  emits: ["ComponentPortionSpecRevised"],
+} as const;
+
+/**
+ * Build command input for ComponentPortionSpec.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindComponentPortionSpecReviseInput(client: ComponentPortionSpecReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ComponentPortionSpec.revise. */
+export const ComponentPortionSpecReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ComponentPortionSpec",
+    "queryKeyHint": "queryKeys.componentPortionSpec.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -4449,6 +4759,47 @@ export const DishClassifyAllergensInvalidation = [
   }
 ] as const;
 
+// --- Dish.classifyKind ---
+export interface DishClassifyKindClientInput {
+  /** Allowed: "food" | "supply" | "service" | "package" */
+  kind: "food" | "supply" | "service" | "package";
+}
+
+export const DishClassifyKindCapability = {
+  capabilityId: "Dish.classifyKind",
+  entity: "Dish",
+  command: "classifyKind",
+  route: "/api/manifest/Dish/commands/classifyKind",
+  instanceCommand: true,
+  clientParameterNames: ["kind"],
+  serverParameterNames: [],
+  emits: ["DishKindClassified"],
+} as const;
+
+/**
+ * Build command input for Dish.classifyKind.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishClassifyKindInput(client: DishClassifyKindClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Dish.classifyKind. */
+export const DishClassifyKindInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- Dish.clearPrimaryImage ---
 export type DishClearPrimaryImageClientInput = Record<string, never>;
 
@@ -4492,8 +4843,8 @@ export interface DishIntroduceClientInput {
   name: string;
   /** Bounds: 1..∞ */
   portionSize: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  portionUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  portionUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   description?: string;
   category?: string;
   course?: string;
@@ -4950,8 +5301,8 @@ export const DishSetPrimaryImageInvalidation = [
 export interface DishUpdatePortioningClientInput {
   /** Bounds: 1..∞ */
   portionSize: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  portionUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  portionUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const DishUpdatePortioningCapability = {
@@ -5076,6 +5427,50 @@ export const DishComponentDetachInvalidation = [
   }
 ] as const;
 
+// --- DishComponent.setPortionSpec ---
+export interface DishComponentSetPortionSpecClientInput {
+  portionSpecId: string;
+  /** Bounds: 1..∞ */
+  pieceCount: number;
+  /** Allowed: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" */
+  quantityBasis?: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown";
+}
+
+export const DishComponentSetPortionSpecCapability = {
+  capabilityId: "DishComponent.setPortionSpec",
+  entity: "DishComponent",
+  command: "setPortionSpec",
+  route: "/api/manifest/DishComponent/commands/setPortionSpec",
+  instanceCommand: true,
+  clientParameterNames: ["portionSpecId","pieceCount","quantityBasis"],
+  serverParameterNames: [],
+  emits: ["DishComponentPortionSpecSet"],
+} as const;
+
+/**
+ * Build command input for DishComponent.setPortionSpec.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishComponentSetPortionSpecInput(client: DishComponentSetPortionSpecClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DishComponent.setPortionSpec. */
+export const DishComponentSetPortionSpecInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishComponent",
+    "queryKeyHint": "queryKeys.dishComponent.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- DishContainer.define ---
 export interface DishContainerDefineClientInput {
   dishId: string;
@@ -5085,8 +5480,8 @@ export interface DishContainerDefineClientInput {
   /** Bounds: 1..∞ */
   servingsPerContainer: number;
   baseQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   equipmentNotes?: string;
   handlingNotes?: string;
   sortOrder?: number;
@@ -5271,8 +5666,8 @@ export interface DishContainerReviseClientInput {
   /** Bounds: 1..∞ */
   servingsPerContainer: number;
   baseQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   equipmentNotes?: string;
   handlingNotes?: string;
   sortOrder?: number;
@@ -5319,8 +5714,8 @@ export interface DishIngredientAddClientInput {
   ingredientId: string;
   /** Bounds: 1..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   sortOrder?: number;
   /** Bounds: 1..∞ */
   wasteFactor?: number;
@@ -5366,8 +5761,8 @@ export const DishIngredientAddInvalidation = [
 export interface DishIngredientAdjustQuantityClientInput {
   /** Bounds: 1..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const DishIngredientAdjustQuantityCapability = {
@@ -5453,8 +5848,8 @@ export interface DishTaskAddClientInput {
   taskType?: string;
   /** Bounds: 1..∞ */
   defaultQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  defaultUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  defaultUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   station?: string;
   /** Bounds: 0..∞ */
   sortOrder?: number;
@@ -5594,8 +5989,8 @@ export interface DishTaskReviseClientInput {
   taskType?: string;
   /** Bounds: 1..∞ */
   defaultQuantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  defaultUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  defaultUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   station?: string;
   /** Bounds: 0..∞ */
   sortOrder?: number;
@@ -5636,6 +6031,143 @@ export const DishTaskReviseInvalidation = [
     "kind": "entityDetail",
     "entity": "DishTask",
     "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- DishTask.specifyWork ---
+export interface DishTaskSpecifyWorkClientInput {
+  /** Allowed: "kitchen" | "at_event" | "pack" */
+  stage?: "kitchen" | "at_event" | "pack";
+  /** Allowed: "resolved" | "choice_pending" | "content_missing" */
+  resolution?: "resolved" | "choice_pending" | "content_missing";
+  choiceOptions?: string[];
+  /** Bounds: 0..∞ */
+  leadTimeMinDays?: number;
+  /** Bounds: 0..∞ */
+  leadTimeMaxDays?: number;
+  sequenceAfterDishTaskId?: string;
+  stationId?: string;
+}
+
+export const DishTaskSpecifyWorkCapability = {
+  capabilityId: "DishTask.specifyWork",
+  entity: "DishTask",
+  command: "specifyWork",
+  route: "/api/manifest/DishTask/commands/specifyWork",
+  instanceCommand: true,
+  clientParameterNames: ["stage","resolution","choiceOptions","leadTimeMinDays","leadTimeMaxDays","sequenceAfterDishTaskId","stationId"],
+  serverParameterNames: [],
+  emits: ["DishTaskWorkSpecified"],
+} as const;
+
+/**
+ * Build command input for DishTask.specifyWork.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishTaskSpecifyWorkInput(client: DishTaskSpecifyWorkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DishTask.specifyWork. */
+export const DishTaskSpecifyWorkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- DishTaskMaterial.link ---
+export interface DishTaskMaterialLinkClientInput {
+  dishTaskId: string;
+  dishIngredientId?: string;
+  dishComponentId?: string;
+  dishContainerId?: string;
+  /** Bounds: 1..∞ */
+  workQuantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  workUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+}
+
+export const DishTaskMaterialLinkCapability = {
+  capabilityId: "DishTaskMaterial.link",
+  entity: "DishTaskMaterial",
+  command: "link",
+  route: "/api/manifest/DishTaskMaterial/commands/link",
+  instanceCommand: true,
+  clientParameterNames: ["dishTaskId","dishIngredientId","dishComponentId","dishContainerId","workQuantity","workUnit"],
+  serverParameterNames: [],
+  emits: ["DishTaskMaterialLinked"],
+} as const;
+
+/**
+ * Build command input for DishTaskMaterial.link.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishTaskMaterialLinkInput(client: DishTaskMaterialLinkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DishTaskMaterial.link. */
+export const DishTaskMaterialLinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DishTaskMaterial",
+    "queryKeyHint": "queryKeys.dishTaskMaterial.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTaskMaterial",
+    "queryKeyHint": "queryKeys.dishTaskMaterial.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- DishTaskMaterial.unlink ---
+export interface DishTaskMaterialUnlinkClientInput {
+  reason: string;
+}
+
+export const DishTaskMaterialUnlinkCapability = {
+  capabilityId: "DishTaskMaterial.unlink",
+  entity: "DishTaskMaterial",
+  command: "unlink",
+  route: "/api/manifest/DishTaskMaterial/commands/unlink",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["DishTaskMaterialUnlinked"],
+} as const;
+
+/**
+ * Build command input for DishTaskMaterial.unlink.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishTaskMaterialUnlinkInput(client: DishTaskMaterialUnlinkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DishTaskMaterial.unlink. */
+export const DishTaskMaterialUnlinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DishTaskMaterial",
+    "queryKeyHint": "queryKeys.dishTaskMaterial.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTaskMaterial",
+    "queryKeyHint": "queryKeys.dishTaskMaterial.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -8680,6 +9212,101 @@ export const EventDishComponentSeedSeedInvalidation = [
   }
 ] as const;
 
+// --- EventDishLineOverride.apply ---
+export interface EventDishLineOverrideApplyClientInput {
+  eventDishId: string;
+  eventId: string;
+  /** Allowed: "add" | "remove" | "replace" | "adjust" */
+  kind: "add" | "remove" | "replace" | "adjust";
+  /** Bounds: 0..∞ */
+  portionsAffected: number;
+  reason: string;
+  targetDishIngredientId?: string;
+  targetDishComponentId?: string;
+  targetDishContainerId?: string;
+  targetDishTaskId?: string;
+  ingredientId?: string;
+  componentId?: string;
+  quantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+}
+
+export const EventDishLineOverrideApplyCapability = {
+  capabilityId: "EventDishLineOverride.apply",
+  entity: "EventDishLineOverride",
+  command: "apply",
+  route: "/api/manifest/EventDishLineOverride/commands/apply",
+  instanceCommand: true,
+  clientParameterNames: ["eventDishId","eventId","kind","portionsAffected","reason","targetDishIngredientId","targetDishComponentId","targetDishContainerId","targetDishTaskId","ingredientId","componentId","quantity","unit"],
+  serverParameterNames: [],
+  emits: ["EventDishLineOverrideApplied"],
+} as const;
+
+/**
+ * Build command input for EventDishLineOverride.apply.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventDishLineOverrideApplyInput(client: EventDishLineOverrideApplyClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventDishLineOverride.apply. */
+export const EventDishLineOverrideApplyInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventDishLineOverride",
+    "queryKeyHint": "queryKeys.eventDishLineOverride.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishLineOverride",
+    "queryKeyHint": "queryKeys.eventDishLineOverride.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- EventDishLineOverride.revoke ---
+export interface EventDishLineOverrideRevokeClientInput {
+  reason: string;
+}
+
+export const EventDishLineOverrideRevokeCapability = {
+  capabilityId: "EventDishLineOverride.revoke",
+  entity: "EventDishLineOverride",
+  command: "revoke",
+  route: "/api/manifest/EventDishLineOverride/commands/revoke",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["EventDishLineOverrideRevoked"],
+} as const;
+
+/**
+ * Build command input for EventDishLineOverride.revoke.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventDishLineOverrideRevokeInput(client: EventDishLineOverrideRevokeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventDishLineOverride.revoke. */
+export const EventDishLineOverrideRevokeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventDishLineOverride",
+    "queryKeyHint": "queryKeys.eventDishLineOverride.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishLineOverride",
+    "queryKeyHint": "queryKeys.eventDishLineOverride.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- EventGuest.assignTable ---
 export interface EventGuestAssignTableClientInput {
   tableAssignment: string;
@@ -8963,13 +9590,25 @@ export interface EventIngredientContributionRecordClientInput {
   ingredientId: string;
   /** Bounds: 0..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   servings: number;
   quantityPerServing?: number;
   componentId?: string;
   purchasingWeekStart?: string;
+  sourceKey?: string;
+  exactQuantity?: number;
+  roundedQuantity?: number;
+  /** Allowed: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" */
+  quantityBasis?: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown";
+  unitStatus?: string;
+  ownership?: string;
+  sourceDishIngredientId?: string;
+  sourceDishComponentId?: string;
+  componentPath?: string[];
+  productionBatchId?: string;
+  productionBatchAllocationId?: string;
 }
 
 export const EventIngredientContributionRecordCapability = {
@@ -8978,7 +9617,7 @@ export const EventIngredientContributionRecordCapability = {
   command: "record",
   route: "/api/manifest/EventIngredientContribution/commands/record",
   instanceCommand: true,
-  clientParameterNames: ["eventId","eventDishId","dishId","ingredientId","quantity","unit","servings","quantityPerServing","componentId","purchasingWeekStart"],
+  clientParameterNames: ["eventId","eventDishId","dishId","ingredientId","quantity","unit","servings","quantityPerServing","componentId","purchasingWeekStart","sourceKey","exactQuantity","roundedQuantity","quantityBasis","unitStatus","ownership","sourceDishIngredientId","sourceDishComponentId","componentPath","productionBatchId","productionBatchAllocationId"],
   serverParameterNames: [],
   emits: ["EventIngredientContributionRecorded"],
 } as const;
@@ -9087,8 +9726,8 @@ export const EventIngredientContributionRetireInvalidation = [
 
 // --- EventIngredientContribution.retirePreviousUnit ---
 export interface EventIngredientContributionRetirePreviousUnitClientInput {
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  currentUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  currentUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const EventIngredientContributionRetirePreviousUnitCapability = {
@@ -9154,6 +9793,47 @@ export function bindEventIngredientContributionReviseInput(client: EventIngredie
 
 /** Invalidation targets after a successful EventIngredientContribution.revise. */
 export const EventIngredientContributionReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- EventIngredientContribution.supersede ---
+export interface EventIngredientContributionSupersedeClientInput {
+  reason: string;
+  supersededBySourceKey?: string;
+}
+
+export const EventIngredientContributionSupersedeCapability = {
+  capabilityId: "EventIngredientContribution.supersede",
+  entity: "EventIngredientContribution",
+  command: "supersede",
+  route: "/api/manifest/EventIngredientContribution/commands/supersede",
+  instanceCommand: true,
+  clientParameterNames: ["reason","supersededBySourceKey"],
+  serverParameterNames: [],
+  emits: ["EventIngredientContributionRecorded"],
+} as const;
+
+/**
+ * Build command input for EventIngredientContribution.supersede.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventIngredientContributionSupersedeInput(client: EventIngredientContributionSupersedeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventIngredientContribution.supersede. */
+export const EventIngredientContributionSupersedeInvalidation = [
   {
     "kind": "entityList",
     "entity": "EventIngredientContribution",
@@ -10336,6 +11016,48 @@ export const EventTimelineCommentRemoveInvalidation = [
   }
 ] as const;
 
+// --- ExternalRecordLink.decide ---
+export interface ExternalRecordLinkDecideClientInput {
+  /** Allowed: "suggested" | "approved" | "rejected" */
+  decision: "suggested" | "approved" | "rejected";
+  decidedByUserId: string;
+}
+
+export const ExternalRecordLinkDecideCapability = {
+  capabilityId: "ExternalRecordLink.decide",
+  entity: "ExternalRecordLink",
+  command: "decide",
+  route: "/api/manifest/ExternalRecordLink/commands/decide",
+  instanceCommand: true,
+  clientParameterNames: ["decision","decidedByUserId"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for ExternalRecordLink.decide.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkDecideInput(client: ExternalRecordLinkDecideClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.decide. */
+export const ExternalRecordLinkDecideInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- ExternalRecordLink.discard ---
 export interface ExternalRecordLinkDiscardClientInput {
   reason: string;
@@ -10382,8 +11104,8 @@ export interface ExternalRecordLinkLinkClientInput {
   sourceSystem: "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online" | "google_calendar" | "stripe" | "other";
   recordType: string;
   externalId: string;
-  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" */
-  capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list";
+  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" */
+  capsuleEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task";
   capsuleId: string;
   verified?: boolean;
   verifiedByUserId?: string;
@@ -10392,6 +11114,14 @@ export interface ExternalRecordLinkLinkClientInput {
   effectiveEndDate?: string;
   rawSourceData?: string;
   metadata?: string;
+  sourceAccount?: string;
+  role?: string;
+  ordinal?: number;
+  linkKey?: string;
+  /** Allowed: "suggested" | "approved" | "rejected" */
+  decision?: "suggested" | "approved" | "rejected";
+  suggestedBy?: string;
+  sourceVersion?: string;
 }
 
 export const ExternalRecordLinkLinkCapability = {
@@ -10400,7 +11130,7 @@ export const ExternalRecordLinkLinkCapability = {
   command: "link",
   route: "/api/manifest/ExternalRecordLink/commands/link",
   instanceCommand: true,
-  clientParameterNames: ["sourceSystem","recordType","externalId","capsuleEntity","capsuleId","verified","verifiedByUserId","sourceImportRunId","effectiveStartDate","effectiveEndDate","rawSourceData","metadata"],
+  clientParameterNames: ["sourceSystem","recordType","externalId","capsuleEntity","capsuleId","verified","verifiedByUserId","sourceImportRunId","effectiveStartDate","effectiveEndDate","rawSourceData","metadata","sourceAccount","role","ordinal","linkKey","decision","suggestedBy","sourceVersion"],
   serverParameterNames: [],
   emits: ["ExternalRecordLinked"],
 } as const;
@@ -10415,6 +11145,90 @@ export function bindExternalRecordLinkLinkInput(client: ExternalRecordLinkLinkCl
 
 /** Invalidation targets after a successful ExternalRecordLink.link. */
 export const ExternalRecordLinkLinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ExternalRecordLink.observe ---
+export interface ExternalRecordLinkObserveClientInput {
+  sourceVersion?: string;
+  rawSourceData?: string;
+  importRunId?: string;
+}
+
+export const ExternalRecordLinkObserveCapability = {
+  capabilityId: "ExternalRecordLink.observe",
+  entity: "ExternalRecordLink",
+  command: "observe",
+  route: "/api/manifest/ExternalRecordLink/commands/observe",
+  instanceCommand: true,
+  clientParameterNames: ["sourceVersion","rawSourceData","importRunId"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for ExternalRecordLink.observe.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkObserveInput(client: ExternalRecordLinkObserveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.observe. */
+export const ExternalRecordLinkObserveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ExternalRecordLink",
+    "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ExternalRecordLink.recordApplied ---
+export interface ExternalRecordLinkRecordAppliedClientInput {
+  appliedValues: string;
+  appliedSourceVersion?: string;
+  importRunId?: string;
+}
+
+export const ExternalRecordLinkRecordAppliedCapability = {
+  capabilityId: "ExternalRecordLink.recordApplied",
+  entity: "ExternalRecordLink",
+  command: "recordApplied",
+  route: "/api/manifest/ExternalRecordLink/commands/recordApplied",
+  instanceCommand: true,
+  clientParameterNames: ["appliedValues","appliedSourceVersion","importRunId"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for ExternalRecordLink.recordApplied.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindExternalRecordLinkRecordAppliedInput(client: ExternalRecordLinkRecordAppliedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ExternalRecordLink.recordApplied. */
+export const ExternalRecordLinkRecordAppliedInvalidation = [
   {
     "kind": "entityList",
     "entity": "ExternalRecordLink",
@@ -10769,6 +11583,179 @@ export const ImportArtifactRegisterInvalidation = [
   }
 ] as const;
 
+// --- ImportConflict.raise ---
+export interface ImportConflictRaiseClientInput {
+  externalRecordLinkId: string;
+  field: string;
+  appliedValue?: string;
+  capsuleValue?: string;
+  sourceValue?: string;
+  sourceVersion?: string;
+}
+
+export const ImportConflictRaiseCapability = {
+  capabilityId: "ImportConflict.raise",
+  entity: "ImportConflict",
+  command: "raise",
+  route: "/api/manifest/ImportConflict/commands/raise",
+  instanceCommand: true,
+  clientParameterNames: ["externalRecordLinkId","field","appliedValue","capsuleValue","sourceValue","sourceVersion"],
+  serverParameterNames: [],
+  emits: ["ImportConflictRaised"],
+} as const;
+
+/**
+ * Build command input for ImportConflict.raise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportConflictRaiseInput(client: ImportConflictRaiseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportConflict.raise. */
+export const ImportConflictRaiseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for ImportConflict.raise. */
+export const ImportConflictRaiseLifecycle = [
+  {
+    "property": "status",
+    "from": "keep_capsule",
+    "to": "pending",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "take_source",
+    "to": "pending",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "manual",
+    "to": "pending",
+    "proven": true
+  }
+] as const;
+
+// --- ImportConflict.settle ---
+export interface ImportConflictSettleClientInput {
+  /** Allowed: "pending" | "keep_capsule" | "take_source" | "manual" */
+  resolution: "pending" | "keep_capsule" | "take_source" | "manual";
+  resolvedByUserId: string;
+}
+
+export const ImportConflictSettleCapability = {
+  capabilityId: "ImportConflict.settle",
+  entity: "ImportConflict",
+  command: "settle",
+  route: "/api/manifest/ImportConflict/commands/settle",
+  instanceCommand: true,
+  clientParameterNames: ["resolution","resolvedByUserId"],
+  serverParameterNames: [],
+  emits: ["ImportConflictResolved"],
+} as const;
+
+/**
+ * Build command input for ImportConflict.settle.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportConflictSettleInput(client: ImportConflictSettleClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportConflict.settle. */
+export const ImportConflictSettleInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ImportConflict.updateSource ---
+export interface ImportConflictUpdateSourceClientInput {
+  sourceValue: string;
+  sourceVersion?: string;
+  capsuleValue?: string;
+}
+
+export const ImportConflictUpdateSourceCapability = {
+  capabilityId: "ImportConflict.updateSource",
+  entity: "ImportConflict",
+  command: "updateSource",
+  route: "/api/manifest/ImportConflict/commands/updateSource",
+  instanceCommand: true,
+  clientParameterNames: ["sourceValue","sourceVersion","capsuleValue"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for ImportConflict.updateSource.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportConflictUpdateSourceInput(client: ImportConflictUpdateSourceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportConflict.updateSource. */
+export const ImportConflictUpdateSourceInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportConflict",
+    "queryKeyHint": "queryKeys.importConflict.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for ImportConflict.updateSource. */
+export const ImportConflictUpdateSourceLifecycle = [
+  {
+    "property": "status",
+    "from": "keep_capsule",
+    "to": "pending",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "take_source",
+    "to": "pending",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "manual",
+    "to": "pending",
+    "proven": true
+  }
+] as const;
+
 // --- ImportDataset.activate ---
 export type ImportDatasetActivateClientInput = Record<string, never>;
 
@@ -10889,8 +11876,8 @@ export const ImportDatasetRecordLastImportInvalidation = [
 export interface ImportDatasetRegisterClientInput {
   /** Allowed: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "invoices" | "proposals" */
   datasetCategory: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "invoices" | "proposals";
-  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" */
-  targetEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list";
+  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task" */
+  targetEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" | "pack_list" | "ingredient" | "component" | "component_portion_spec" | "component_ingredient" | "component_component" | "dish" | "dish_ingredient" | "dish_component" | "dish_task" | "dish_container" | "station" | "unit" | "event_dish" | "prep_task";
   config: string;
   name?: string;
   description?: string;
@@ -11989,8 +12976,8 @@ export const IngredientDiscontinueLifecycle = [
 // --- Ingredient.introduce ---
 export interface IngredientIntroduceClientInput {
   name: string;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   costPerUnit: number;
   allergens?: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[];
@@ -12446,8 +13433,8 @@ export const IngredientUpdateCostingInvalidation = [
 // --- Ingredient.updateDetails ---
 export interface IngredientUpdateDetailsClientInput {
   name: string;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   category?: string;
 }
 
@@ -12492,8 +13479,8 @@ export interface IngredientDemandCalculateClientInput {
   ingredientId: string;
   /** Bounds: 1..∞ */
   requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   servings?: number;
   dishId?: string;
@@ -12825,8 +13812,8 @@ export interface IngredientDemandSyncFromContributionsClientInput {
   eventId: string;
   ingredientId: string;
   requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   purchasingWeekStart?: string;
   total_gram?: number;
   total_kilogram?: number;
@@ -12887,8 +13874,8 @@ export interface IngredientPriceObservationRecordClientInput {
   receiptQuantity: number;
   /** Bounds: 1..∞ */
   cumulativeReceivedQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   unitPrice: number;
 }
@@ -13473,8 +14460,8 @@ export const InventoryItemAdjustQuantityInvalidation = [
 export interface InventoryItemOpenClientInput {
   ingredientId: string;
   locationId: string;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   quantityOnHand?: number;
   /** Bounds: 0..∞ */
@@ -13526,8 +14513,8 @@ export interface InventoryItemReceiveDeliveryClientInput {
   locationId: string;
   /** Bounds: 0..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   unitCost: number;
 }
@@ -13875,8 +14862,8 @@ export interface InventoryLotRecordClientInput {
   receiptQuantity: number;
   /** Bounds: 1..∞ */
   cumulativeReceivedQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   unitCost: number;
 }
@@ -14847,6 +15834,100 @@ export const InvoiceWriteOffLifecycle = [
     "from": "partial",
     "to": "written_off",
     "proven": true
+  }
+] as const;
+
+// --- ItemUnitMapping.record ---
+export interface ItemUnitMappingRecordClientInput {
+  /** Allowed: "pack" | "density" | "portion" | "yield" */
+  kind: "pack" | "density" | "portion" | "yield";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  /** Bounds: 1..∞ */
+  equalsQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  equalsUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  ingredientId?: string;
+  componentId?: string;
+  /** Allowed: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" */
+  fromBasis?: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown";
+  /** Allowed: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown" */
+  toBasis?: "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown";
+  source?: string;
+}
+
+export const ItemUnitMappingRecordCapability = {
+  capabilityId: "ItemUnitMapping.record",
+  entity: "ItemUnitMapping",
+  command: "record",
+  route: "/api/manifest/ItemUnitMapping/commands/record",
+  instanceCommand: true,
+  clientParameterNames: ["kind","unit","equalsQuantity","equalsUnit","ingredientId","componentId","fromBasis","toBasis","source"],
+  serverParameterNames: [],
+  emits: ["ItemUnitMappingRecorded"],
+} as const;
+
+/**
+ * Build command input for ItemUnitMapping.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindItemUnitMappingRecordInput(client: ItemUnitMappingRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ItemUnitMapping.record. */
+export const ItemUnitMappingRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ItemUnitMapping",
+    "queryKeyHint": "queryKeys.itemUnitMapping.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ItemUnitMapping",
+    "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ItemUnitMapping.retire ---
+export interface ItemUnitMappingRetireClientInput {
+  reason: string;
+}
+
+export const ItemUnitMappingRetireCapability = {
+  capabilityId: "ItemUnitMapping.retire",
+  entity: "ItemUnitMapping",
+  command: "retire",
+  route: "/api/manifest/ItemUnitMapping/commands/retire",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["ItemUnitMappingRetired"],
+} as const;
+
+/**
+ * Build command input for ItemUnitMapping.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindItemUnitMappingRetireInput(client: ItemUnitMappingRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ItemUnitMapping.retire. */
+export const ItemUnitMappingRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ItemUnitMapping",
+    "queryKeyHint": "queryKeys.itemUnitMapping.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ItemUnitMapping",
+    "queryKeyHint": "queryKeys.itemUnitMapping.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -17183,8 +18264,8 @@ export interface PackListItemAddItemClientInput {
   description: string;
   /** Bounds: 1..∞ */
   requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   dishId?: string;
   productionBatchId?: string;
 }
@@ -17377,8 +18458,8 @@ export interface PackListItemEnsureContainerClientInput {
   dishId: string;
   description: string;
   quantityServings: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const PackListItemEnsureContainerCapability = {
@@ -19796,6 +20877,49 @@ export const PrepTaskMarkBlockedLifecycle = [
   }
 ] as const;
 
+// --- PrepTask.markOverride ---
+export interface PrepTaskMarkOverrideClientInput {
+  overrideOfDishTaskId: string;
+  reason: string;
+  name?: string;
+  specialInstructions?: string;
+}
+
+export const PrepTaskMarkOverrideCapability = {
+  capabilityId: "PrepTask.markOverride",
+  entity: "PrepTask",
+  command: "markOverride",
+  route: "/api/manifest/PrepTask/commands/markOverride",
+  instanceCommand: true,
+  clientParameterNames: ["overrideOfDishTaskId","reason","name","specialInstructions"],
+  serverParameterNames: [],
+  emits: ["PrepTaskOverridden"],
+} as const;
+
+/**
+ * Build command input for PrepTask.markOverride.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskMarkOverrideInput(client: PrepTaskMarkOverrideClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTask.markOverride. */
+export const PrepTaskMarkOverrideInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- PrepTask.open ---
 export interface PrepTaskOpenClientInput {
   eventDishId: string;
@@ -19803,8 +20927,8 @@ export interface PrepTaskOpenClientInput {
   name: string;
   /** Bounds: 0..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   ingredientId?: string;
   ingredientDemandId?: string;
   componentId?: string;
@@ -19898,8 +21022,8 @@ export const PrepTaskReconcileRemainingWorkInvalidation = [
 export interface PrepTaskRefreshGeneratedClientInput {
   /** Bounds: 0..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   specialInstructions?: string;
 }
 
@@ -20073,6 +21197,46 @@ export const PrepTaskReplaceRecipeComponentInvalidation = [
   }
 ] as const;
 
+// --- PrepTask.resolveChoice ---
+export interface PrepTaskResolveChoiceClientInput {
+  choice: string;
+}
+
+export const PrepTaskResolveChoiceCapability = {
+  capabilityId: "PrepTask.resolveChoice",
+  entity: "PrepTask",
+  command: "resolveChoice",
+  route: "/api/manifest/PrepTask/commands/resolveChoice",
+  instanceCommand: true,
+  clientParameterNames: ["choice"],
+  serverParameterNames: [],
+  emits: ["PrepTaskChoiceResolved"],
+} as const;
+
+/**
+ * Build command input for PrepTask.resolveChoice.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskResolveChoiceInput(client: PrepTaskResolveChoiceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTask.resolveChoice. */
+export const PrepTaskResolveChoiceInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- PrepTask.retireWithTemplate ---
 export interface PrepTaskRetireWithTemplateClientInput {
   expectedVersion: number;
@@ -20146,8 +21310,8 @@ export interface PrepTaskReviseClientInput {
   name?: string;
   /** Bounds: 1..∞ */
   quantity?: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   category?: string;
   taskType?: string;
   specialInstructions?: string;
@@ -20176,6 +21340,48 @@ export function bindPrepTaskReviseInput(client: PrepTaskReviseClientInput): Reco
 
 /** Invalidation targets after a successful PrepTask.revise. */
 export const PrepTaskReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- PrepTask.setChoice ---
+export interface PrepTaskSetChoiceClientInput {
+  choiceOptions: string[];
+  /** Allowed: "resolved" | "choice_pending" | "content_missing" */
+  resolution?: "resolved" | "choice_pending" | "content_missing";
+}
+
+export const PrepTaskSetChoiceCapability = {
+  capabilityId: "PrepTask.setChoice",
+  entity: "PrepTask",
+  command: "setChoice",
+  route: "/api/manifest/PrepTask/commands/setChoice",
+  instanceCommand: true,
+  clientParameterNames: ["choiceOptions","resolution"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for PrepTask.setChoice.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskSetChoiceInput(client: PrepTaskSetChoiceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTask.setChoice. */
+export const PrepTaskSetChoiceInvalidation = [
   {
     "kind": "entityList",
     "entity": "PrepTask",
@@ -20538,6 +21744,93 @@ export const PrepTaskDependencySatisfyInvalidation = [
   }
 ] as const;
 
+// --- PrepTaskMaterial.link ---
+export interface PrepTaskMaterialLinkClientInput {
+  prepTaskId: string;
+  eventIngredientContributionId?: string;
+  productionBatchAllocationId?: string;
+  dishIngredientId?: string;
+  dishComponentId?: string;
+  workQuantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  workUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+}
+
+export const PrepTaskMaterialLinkCapability = {
+  capabilityId: "PrepTaskMaterial.link",
+  entity: "PrepTaskMaterial",
+  command: "link",
+  route: "/api/manifest/PrepTaskMaterial/commands/link",
+  instanceCommand: true,
+  clientParameterNames: ["prepTaskId","eventIngredientContributionId","productionBatchAllocationId","dishIngredientId","dishComponentId","workQuantity","workUnit"],
+  serverParameterNames: [],
+  emits: ["PrepTaskMaterialLinked"],
+} as const;
+
+/**
+ * Build command input for PrepTaskMaterial.link.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskMaterialLinkInput(client: PrepTaskMaterialLinkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTaskMaterial.link. */
+export const PrepTaskMaterialLinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTaskMaterial",
+    "queryKeyHint": "queryKeys.prepTaskMaterial.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTaskMaterial",
+    "queryKeyHint": "queryKeys.prepTaskMaterial.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- PrepTaskMaterial.unlink ---
+export interface PrepTaskMaterialUnlinkClientInput {
+  reason: string;
+}
+
+export const PrepTaskMaterialUnlinkCapability = {
+  capabilityId: "PrepTaskMaterial.unlink",
+  entity: "PrepTaskMaterial",
+  command: "unlink",
+  route: "/api/manifest/PrepTaskMaterial/commands/unlink",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["PrepTaskMaterialUnlinked"],
+} as const;
+
+/**
+ * Build command input for PrepTaskMaterial.unlink.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskMaterialUnlinkInput(client: PrepTaskMaterialUnlinkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTaskMaterial.unlink. */
+export const PrepTaskMaterialUnlinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTaskMaterial",
+    "queryKeyHint": "queryKeys.prepTaskMaterial.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTaskMaterial",
+    "queryKeyHint": "queryKeys.prepTaskMaterial.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- ProductionBatch.cancel ---
 export interface ProductionBatchCancelClientInput {
   reason: string;
@@ -20650,8 +21943,8 @@ export interface ProductionBatchPlanClientInput {
   componentId: string;
   /** Bounds: 1..∞ */
   plannedYield: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   eventId?: string;
   notes?: string;
 }
@@ -20677,6 +21970,52 @@ export function bindProductionBatchPlanInput(client: ProductionBatchPlanClientIn
 
 /** Invalidation targets after a successful ProductionBatch.plan. */
 export const ProductionBatchPlanInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatch",
+    "queryKeyHint": "queryKeys.productionBatch.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ProductionBatch.reconcilePlan ---
+export interface ProductionBatchReconcilePlanClientInput {
+  /** Bounds: 0..∞ */
+  plannedExact: number;
+  plannedRounded: number;
+  /** Allowed: "none" | "dish_allocation" | "event_total" | "production_group" | "purchase_pack" */
+  roundingScope?: "none" | "dish_allocation" | "event_total" | "production_group" | "purchase_pack";
+  portionSpecId?: string;
+  productionDate?: string;
+}
+
+export const ProductionBatchReconcilePlanCapability = {
+  capabilityId: "ProductionBatch.reconcilePlan",
+  entity: "ProductionBatch",
+  command: "reconcilePlan",
+  route: "/api/manifest/ProductionBatch/commands/reconcilePlan",
+  instanceCommand: true,
+  clientParameterNames: ["plannedExact","plannedRounded","roundingScope","portionSpecId","productionDate"],
+  serverParameterNames: [],
+  emits: ["ProductionBatchPlanReconciled"],
+} as const;
+
+/**
+ * Build command input for ProductionBatch.reconcilePlan.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProductionBatchReconcilePlanInput(client: ProductionBatchReconcilePlanClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProductionBatch.reconcilePlan. */
+export const ProductionBatchReconcilePlanInvalidation = [
   {
     "kind": "entityList",
     "entity": "ProductionBatch",
@@ -20735,6 +22074,207 @@ export const ProductionBatchStartLifecycle = [
     "property": "status",
     "from": "planned",
     "to": "in_progress",
+    "proven": true
+  }
+] as const;
+
+// --- ProductionBatchAllocation.allocate ---
+export interface ProductionBatchAllocationAllocateClientInput {
+  productionBatchId: string;
+  /** Bounds: 0..∞ */
+  allocatedQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  /** Bounds: 0..∞ */
+  formulaShare: number;
+  eventId?: string;
+  eventDishId?: string;
+  isSurplus?: boolean;
+}
+
+export const ProductionBatchAllocationAllocateCapability = {
+  capabilityId: "ProductionBatchAllocation.allocate",
+  entity: "ProductionBatchAllocation",
+  command: "allocate",
+  route: "/api/manifest/ProductionBatchAllocation/commands/allocate",
+  instanceCommand: true,
+  clientParameterNames: ["productionBatchId","allocatedQuantity","unit","formulaShare","eventId","eventDishId","isSurplus"],
+  serverParameterNames: [],
+  emits: ["ProductionBatchAllocated"],
+} as const;
+
+/**
+ * Build command input for ProductionBatchAllocation.allocate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProductionBatchAllocationAllocateInput(client: ProductionBatchAllocationAllocateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProductionBatchAllocation.allocate. */
+export const ProductionBatchAllocationAllocateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ProductionBatchAllocation.markPortioned ---
+export type ProductionBatchAllocationMarkPortionedClientInput = Record<string, never>;
+
+export const ProductionBatchAllocationMarkPortionedCapability = {
+  capabilityId: "ProductionBatchAllocation.markPortioned",
+  entity: "ProductionBatchAllocation",
+  command: "markPortioned",
+  route: "/api/manifest/ProductionBatchAllocation/commands/markPortioned",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for ProductionBatchAllocation.markPortioned.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProductionBatchAllocationMarkPortionedInput(client: ProductionBatchAllocationMarkPortionedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProductionBatchAllocation.markPortioned. */
+export const ProductionBatchAllocationMarkPortionedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for ProductionBatchAllocation.markPortioned. */
+export const ProductionBatchAllocationMarkPortionedLifecycle = [
+  {
+    "property": "status",
+    "from": "produced",
+    "to": "portioned",
+    "proven": true
+  }
+] as const;
+
+// --- ProductionBatchAllocation.markProduced ---
+export type ProductionBatchAllocationMarkProducedClientInput = Record<string, never>;
+
+export const ProductionBatchAllocationMarkProducedCapability = {
+  capabilityId: "ProductionBatchAllocation.markProduced",
+  entity: "ProductionBatchAllocation",
+  command: "markProduced",
+  route: "/api/manifest/ProductionBatchAllocation/commands/markProduced",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for ProductionBatchAllocation.markProduced.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProductionBatchAllocationMarkProducedInput(client: ProductionBatchAllocationMarkProducedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProductionBatchAllocation.markProduced. */
+export const ProductionBatchAllocationMarkProducedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for ProductionBatchAllocation.markProduced. */
+export const ProductionBatchAllocationMarkProducedLifecycle = [
+  {
+    "property": "status",
+    "from": "planned",
+    "to": "produced",
+    "proven": true
+  }
+] as const;
+
+// --- ProductionBatchAllocation.release ---
+export interface ProductionBatchAllocationReleaseClientInput {
+  reason: string;
+}
+
+export const ProductionBatchAllocationReleaseCapability = {
+  capabilityId: "ProductionBatchAllocation.release",
+  entity: "ProductionBatchAllocation",
+  command: "release",
+  route: "/api/manifest/ProductionBatchAllocation/commands/release",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for ProductionBatchAllocation.release.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProductionBatchAllocationReleaseInput(client: ProductionBatchAllocationReleaseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProductionBatchAllocation.release. */
+export const ProductionBatchAllocationReleaseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProductionBatchAllocation",
+    "queryKeyHint": "queryKeys.productionBatchAllocation.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for ProductionBatchAllocation.release. */
+export const ProductionBatchAllocationReleaseLifecycle = [
+  {
+    "property": "status",
+    "from": "planned",
+    "to": "released",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "produced",
+    "to": "released",
     "proven": true
   }
 ] as const;
@@ -22019,8 +23559,8 @@ export interface PurchaseNeedCreateClientInput {
   ingredientId: string;
   /** Bounds: 1..∞ */
   requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   purchasingWeekStart?: string;
   preferredVendorId?: string;
 }
@@ -22290,8 +23830,8 @@ export const PurchaseNeedReleaseCancelledDraftInvalidation = [
 export interface PurchaseNeedReviseRequiredClientInput {
   /** Bounds: 0..∞ */
   requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const PurchaseNeedReviseRequiredCapability = {
@@ -26041,6 +27581,188 @@ export const StaffMessageSendInvalidation = [
   }
 ] as const;
 
+// --- Station.define ---
+export interface StationDefineClientInput {
+  name: string;
+  sortOrder?: number;
+  aliases?: string[];
+}
+
+export const StationDefineCapability = {
+  capabilityId: "Station.define",
+  entity: "Station",
+  command: "define",
+  route: "/api/manifest/Station/commands/define",
+  instanceCommand: true,
+  clientParameterNames: ["name","sortOrder","aliases"],
+  serverParameterNames: [],
+  emits: ["StationDefined"],
+} as const;
+
+/**
+ * Build command input for Station.define.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStationDefineInput(client: StationDefineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Station.define. */
+export const StationDefineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Station.reinstate ---
+export type StationReinstateClientInput = Record<string, never>;
+
+export const StationReinstateCapability = {
+  capabilityId: "Station.reinstate",
+  entity: "Station",
+  command: "reinstate",
+  route: "/api/manifest/Station/commands/reinstate",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for Station.reinstate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStationReinstateInput(client: StationReinstateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Station.reinstate. */
+export const StationReinstateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for Station.reinstate. */
+export const StationReinstateLifecycle = [
+  {
+    "property": "status",
+    "from": "retired",
+    "to": "active",
+    "proven": true
+  }
+] as const;
+
+// --- Station.rename ---
+export interface StationRenameClientInput {
+  name: string;
+  sortOrder?: number;
+  aliases?: string[];
+}
+
+export const StationRenameCapability = {
+  capabilityId: "Station.rename",
+  entity: "Station",
+  command: "rename",
+  route: "/api/manifest/Station/commands/rename",
+  instanceCommand: true,
+  clientParameterNames: ["name","sortOrder","aliases"],
+  serverParameterNames: [],
+  emits: ["StationRenamed"],
+} as const;
+
+/**
+ * Build command input for Station.rename.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStationRenameInput(client: StationRenameClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Station.rename. */
+export const StationRenameInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Station.retire ---
+export interface StationRetireClientInput {
+  reason: string;
+}
+
+export const StationRetireCapability = {
+  capabilityId: "Station.retire",
+  entity: "Station",
+  command: "retire",
+  route: "/api/manifest/Station/commands/retire",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for Station.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStationRetireInput(client: StationRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Station.retire. */
+export const StationRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Station",
+    "queryKeyHint": "queryKeys.station.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for Station.retire. */
+export const StationRetireLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "retired",
+    "proven": true
+  }
+] as const;
+
 // --- StockCountLine.confirmLedgerMatch ---
 export type StockCountLineConfirmLedgerMatchClientInput = Record<string, never>;
 
@@ -26095,8 +27817,8 @@ export interface StockCountLineFreezeClientInput {
   inventoryItemId: string;
   locationId: string;
   ingredientId: string;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const StockCountLineFreezeCapability = {
@@ -26379,8 +28101,8 @@ export interface StockTransferRecordClientInput {
   destinationLocationId: string;
   /** Bounds: 1..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   notes?: string;
 }
 
@@ -28952,8 +30674,8 @@ export interface VendorOrderEnsureWeeklyDraftClientInput {
   ingredientDemandId: string;
   ingredientId: string;
   requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   orderSequence: number;
 }
 
@@ -29455,8 +31177,8 @@ export interface VendorOrderLineAddLineClientInput {
   ingredientId: string;
   /** Bounds: 1..∞ */
   orderedQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Bounds: 0..∞ */
   unitCost: number;
   ingredientDemandId?: string;
@@ -29618,8 +31340,8 @@ export interface VendorOrderLineEnsureWeeklyLineClientInput {
   onHand: number;
   /** Bounds: 0..∞ */
   contributionQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   purchaseNeedId: string;
   ingredientDemandId: string;
   pendingSupply?: number;
@@ -29903,8 +31625,8 @@ export interface VendorOrderLineDemandLinkClientInput {
   vendorOrderId: string;
   /** Bounds: 0..∞ */
   contributionQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
 }
 
 export const VendorOrderLineDemandLinkCapability = {
@@ -31142,8 +32864,8 @@ export interface WasteRecordRecordClientInput {
   locationId: string;
   /** Bounds: 1..∞ */
   quantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Allowed: "spoilage" | "prep_error" | "overproduction" | "dropped" | "date_expired" | "quality_reject" | "other" */
   reason: "spoilage" | "prep_error" | "overproduction" | "dropped" | "date_expired" | "quality_reject" | "other";
   eventId?: string;
@@ -31295,8 +33017,8 @@ export interface WeeklyPurchasingConfigRouteNeedClientInput {
   ingredientDemandId: string;
   ingredientId: string;
   requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle";
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
   /** Must not be "". */
   purchasingWeekStart: string & { readonly __nonEmpty?: true };
   preferredVendorId?: string;
@@ -31550,6 +33272,10 @@ export const ALL_CAPABILITY_IDS = [
   "Component.retract",
   "Component.reviseDraft",
   "Component.setServesPerYield",
+  "Component.setStorageWindow",
+  "ComponentComponent.add",
+  "ComponentComponent.adjustQuantity",
+  "ComponentComponent.remove",
   "ComponentImport.approveReview",
   "ComponentImport.beginFinalization",
   "ComponentImport.beginReview",
@@ -31576,6 +33302,9 @@ export const ALL_CAPABILITY_IDS = [
   "ComponentIngredient.adjustQuantity",
   "ComponentIngredient.remove",
   "ComponentIngredient.setWasteFactor",
+  "ComponentPortionSpec.define",
+  "ComponentPortionSpec.retire",
+  "ComponentPortionSpec.revise",
   "ComponentSnapshot.capture",
   "ComponentStep.add",
   "ComponentStep.remove",
@@ -31605,6 +33334,7 @@ export const ALL_CAPABILITY_IDS = [
   "Delivery.standDownWithEvent",
   "Delivery.startTransit",
   "Dish.classifyAllergens",
+  "Dish.classifyKind",
   "Dish.clearPrimaryImage",
   "Dish.introduce",
   "Dish.linkAsEdition",
@@ -31619,6 +33349,7 @@ export const ALL_CAPABILITY_IDS = [
   "Dish.updatePortioning",
   "DishComponent.attach",
   "DishComponent.detach",
+  "DishComponent.setPortionSpec",
   "DishContainer.define",
   "DishContainer.refreshActiveKey",
   "DishContainer.reinstate",
@@ -31631,6 +33362,9 @@ export const ALL_CAPABILITY_IDS = [
   "DishTask.backfillActiveKey",
   "DishTask.retire",
   "DishTask.revise",
+  "DishTask.specifyWork",
+  "DishTaskMaterial.link",
+  "DishTaskMaterial.unlink",
   "EmailNotificationSubscription.configure",
   "EmailNotificationSubscription.updateSubscriptions",
   "Equipment.reactivate",
@@ -31696,6 +33430,8 @@ export const ALL_CAPABILITY_IDS = [
   "EventDishComponentSeed.refreshRecipeSync",
   "EventDishComponentSeed.retire",
   "EventDishComponentSeed.seed",
+  "EventDishLineOverride.apply",
+  "EventDishLineOverride.revoke",
   "EventGuest.assignTable",
   "EventGuest.checkIn",
   "EventGuest.invite",
@@ -31707,6 +33443,7 @@ export const ALL_CAPABILITY_IDS = [
   "EventIngredientContribution.retire",
   "EventIngredientContribution.retirePreviousUnit",
   "EventIngredientContribution.revise",
+  "EventIngredientContribution.supersede",
   "EventLayoutSection.add",
   "EventLayoutSection.remove",
   "EventLayoutSection.update",
@@ -31732,8 +33469,11 @@ export const ALL_CAPABILITY_IDS = [
   "EventTimelineActivity.useCalculatedTiming",
   "EventTimelineComment.post",
   "EventTimelineComment.remove",
+  "ExternalRecordLink.decide",
   "ExternalRecordLink.discard",
   "ExternalRecordLink.link",
+  "ExternalRecordLink.observe",
+  "ExternalRecordLink.recordApplied",
   "ExternalRecordLink.resolveConflict",
   "ExternalRecordLink.retire",
   "ExternalRecordLink.unlinkExternalRecord",
@@ -31742,6 +33482,9 @@ export const ALL_CAPABILITY_IDS = [
   "ImportArtifact.classify",
   "ImportArtifact.recordParse",
   "ImportArtifact.register",
+  "ImportConflict.raise",
+  "ImportConflict.settle",
+  "ImportConflict.updateSource",
   "ImportDataset.activate",
   "ImportDataset.deactivate",
   "ImportDataset.recordLastImport",
@@ -31826,6 +33569,8 @@ export const ALL_CAPABILITY_IDS = [
   "Invoice.setDeposit",
   "Invoice.stageClientMerge",
   "Invoice.writeOff",
+  "ItemUnitMapping.record",
+  "ItemUnitMapping.retire",
   "Lead.capture",
   "Lead.confirmConversion",
   "Lead.confirmProposalSent",
@@ -31932,14 +33677,17 @@ export const ALL_CAPABILITY_IDS = [
   "PrepTask.complete",
   "PrepTask.linkRecipe",
   "PrepTask.markBlocked",
+  "PrepTask.markOverride",
   "PrepTask.open",
   "PrepTask.reconcileRemainingWork",
   "PrepTask.refreshGenerated",
   "PrepTask.refreshRecipeTemplate",
   "PrepTask.release",
   "PrepTask.replaceRecipeComponent",
+  "PrepTask.resolveChoice",
   "PrepTask.retireWithTemplate",
   "PrepTask.revise",
+  "PrepTask.setChoice",
   "PrepTask.standDown",
   "PrepTask.start",
   "PrepTask.unblock",
@@ -31948,10 +33696,17 @@ export const ALL_CAPABILITY_IDS = [
   "PrepTaskDependency.declare",
   "PrepTaskDependency.releaseRetiredRequirement",
   "PrepTaskDependency.satisfy",
+  "PrepTaskMaterial.link",
+  "PrepTaskMaterial.unlink",
   "ProductionBatch.cancel",
   "ProductionBatch.complete",
   "ProductionBatch.plan",
+  "ProductionBatch.reconcilePlan",
   "ProductionBatch.start",
+  "ProductionBatchAllocation.allocate",
+  "ProductionBatchAllocation.markPortioned",
+  "ProductionBatchAllocation.markProduced",
+  "ProductionBatchAllocation.release",
   "Proposal.accept",
   "Proposal.decline",
   "Proposal.draft",
@@ -32064,6 +33819,10 @@ export const ALL_CAPABILITY_IDS = [
   "StaffMessage.markRead",
   "StaffMessage.remove",
   "StaffMessage.send",
+  "Station.define",
+  "Station.reinstate",
+  "Station.rename",
+  "Station.retire",
   "StockCountLine.confirmLedgerMatch",
   "StockCountLine.freeze",
   "StockCountLine.reconcileVariance",

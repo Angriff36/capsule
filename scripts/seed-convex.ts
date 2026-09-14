@@ -77,6 +77,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Component_createViaDraft, { "name": "Component 1", "category": "demo-category-1", "cuisine": "demo-cuisine-1", "description": "demo-description-1", "instructions": "demo-instructions-1", "yieldQuantity": 1, "yieldUnit": "demo-yieldUnit-1", "servesPerYield": 1, "batchMultiplier": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Component_createViaDraft, { "name": "Component 2", "category": "demo-category-2", "cuisine": "demo-cuisine-2", "description": "demo-description-2", "instructions": "demo-instructions-2", "yieldQuantity": 2, "yieldUnit": "demo-yieldUnit-2", "servesPerYield": 2, "batchMultiplier": 2 } as any);
+  // ComponentComponent has multiple initialization commands (add, remove); using the selected initialization command: add.
+  // ComponentComponent → api.mutations.ComponentComponent_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ComponentComponent_createViaAdd, { "componentId": "componentId-component-component-1", "childComponentId": "childComponentId-component-component-1", "quantity": 1, "unit": "demo-unit-1", "sortOrder": 1, "wasteFactor": 1, "quantityBasis": "demo-quantityBasis-1", "prepNotes": "demo-prepNotes-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ComponentComponent_createViaAdd, { "componentId": "componentId-component-component-2", "childComponentId": "childComponentId-component-component-2", "quantity": 2, "unit": "demo-unit-2", "sortOrder": 2, "wasteFactor": 2, "quantityBasis": "demo-quantityBasis-2", "prepNotes": "demo-prepNotes-2" } as any);
   // ComponentImport → api.mutations.ComponentImport_createViaUpload
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentImport_createViaUpload, { "sourceKind": "demo-sourceKind-1", "sourceFilename": "ComponentImport 1", "rawSourceText": "demo-rawSourceText-1", "sourceByteCount": 1, "sourceFingerprint": "demo-sourceFingerprint-1", "csvSheetText": "demo-csvSheetText-1", "csvLinesText": "demo-csvLinesText-1" } as any);
@@ -94,6 +100,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ComponentIngredient_createViaAdd, { "componentId": "componentId-component-ingredient-1", "ingredientId": "ingredientId-component-ingredient-1", "quantity": 1, "unit": "demo-unit-1", "sortOrder": 1, "wasteFactor": 1, "prepNotes": "demo-prepNotes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentIngredient_createViaAdd, { "componentId": "componentId-component-ingredient-2", "ingredientId": "ingredientId-component-ingredient-2", "quantity": 2, "unit": "demo-unit-2", "sortOrder": 2, "wasteFactor": 2, "prepNotes": "demo-prepNotes-2" } as any);
+  // ComponentPortionSpec has multiple initialization commands (define, retire); using the selected initialization command: define.
+  // ComponentPortionSpec → api.mutations.ComponentPortionSpec_createViaDefine
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ComponentPortionSpec_createViaDefine, { "componentId": "componentId-component-portion-spec-1", "name": "ComponentPortionSpec 1", "pieceQuantity": 1, "pieceUnit": "demo-pieceUnit-1", "piecesPerBatch": 1, "source": "demo-source-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ComponentPortionSpec_createViaDefine, { "componentId": "componentId-component-portion-spec-2", "name": "ComponentPortionSpec 2", "pieceQuantity": 2, "pieceUnit": "demo-pieceUnit-2", "piecesPerBatch": 2, "source": "demo-source-2" } as any);
   // ComponentSnapshot → api.mutations.ComponentSnapshot_createViaCapture
   rowsAttempted += 1;
   await client.mutation(api.mutations.ComponentSnapshot_createViaCapture, { "componentId": "componentId-component-snapshot-1", "versionNumber": 1, "capturedByName": "ComponentSnapshot 1", "changeSummary": "demo-changeSummary-1", "snapshot": "demo-snapshot-1" } as any);
@@ -158,6 +170,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.DishTask_createViaAdd, { "dishId": "dishId-dish-task-1", "name": "DishTask 1", "category": "demo-category-1", "taskType": "demo-taskType-1", "defaultQuantity": 1, "defaultUnit": "demo-defaultUnit-1", "station": "demo-station-1", "sortOrder": 1, "componentId": "componentId-dish-task-1", "ingredientId": "ingredientId-dish-task-1", "instructions": "demo-instructions-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.DishTask_createViaAdd, { "dishId": "dishId-dish-task-2", "name": "DishTask 2", "category": "demo-category-2", "taskType": "demo-taskType-2", "defaultQuantity": 2, "defaultUnit": "demo-defaultUnit-2", "station": "demo-station-2", "sortOrder": 2, "componentId": "componentId-dish-task-2", "ingredientId": "ingredientId-dish-task-2", "instructions": "demo-instructions-2" } as any);
+  // DishTaskMaterial has multiple initialization commands (link, unlink); using the selected initialization command: link.
+  // DishTaskMaterial → api.mutations.DishTaskMaterial_createViaLink
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DishTaskMaterial_createViaLink, { "dishTaskId": "dishTaskId-dish-task-material-1", "dishIngredientId": "dishIngredientId-dish-task-material-1", "dishComponentId": "dishComponentId-dish-task-material-1", "dishContainerId": "dishContainerId-dish-task-material-1", "workQuantity": 1, "workUnit": "demo-workUnit-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DishTaskMaterial_createViaLink, { "dishTaskId": "dishTaskId-dish-task-material-2", "dishIngredientId": "dishIngredientId-dish-task-material-2", "dishComponentId": "dishComponentId-dish-task-material-2", "dishContainerId": "dishContainerId-dish-task-material-2", "workQuantity": 2, "workUnit": "demo-workUnit-2" } as any);
   // EmailNotificationSubscription → api.mutations.EmailNotificationSubscription_createViaConfigure
   rowsAttempted += 1;
   await client.mutation(api.mutations.EmailNotificationSubscription_createViaConfigure, { "eventUpdates": false, "invoiceReminders": false, "lowStockAlerts": false, "shiftChanges": false } as any);
@@ -212,18 +230,24 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.EventDishComponentSeed_createViaSeed, { "eventId": "eventId-event-dish-component-seed-1", "eventDishId": "eventDishId-event-dish-component-seed-1", "dishId": "dishId-event-dish-component-seed-1", "componentId": "componentId-event-dish-component-seed-1", "servings": 1, "yieldQuantity": 1, "batchMultiplier": 1, "purchasingWeekStart": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventDishComponentSeed_createViaSeed, { "eventId": "eventId-event-dish-component-seed-2", "eventDishId": "eventDishId-event-dish-component-seed-2", "dishId": "dishId-event-dish-component-seed-2", "componentId": "componentId-event-dish-component-seed-2", "servings": 2, "yieldQuantity": 2, "batchMultiplier": 2, "purchasingWeekStart": 1767355200000 } as any);
+  // EventDishLineOverride has multiple initialization commands (apply, revoke); using the selected initialization command: apply.
+  // EventDishLineOverride → api.mutations.EventDishLineOverride_createViaApply
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventDishLineOverride_createViaApply, { "eventDishId": "eventDishId-event-dish-line-override-1", "eventId": "eventId-event-dish-line-override-1", "kind": "demo-kind-1", "targetDishIngredientId": "targetDishIngredientId-event-dish-line-override-1", "targetDishComponentId": "targetDishComponentId-event-dish-line-override-1", "targetDishContainerId": "targetDishContainerId-event-dish-line-override-1", "targetDishTaskId": "targetDishTaskId-event-dish-line-override-1", "ingredientId": "ingredientId-event-dish-line-override-1", "componentId": "componentId-event-dish-line-override-1", "quantity": 1, "unit": "demo-unit-1", "portionsAffected": 1, "reason": "demo-reason-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.EventDishLineOverride_createViaApply, { "eventDishId": "eventDishId-event-dish-line-override-2", "eventId": "eventId-event-dish-line-override-2", "kind": "demo-kind-2", "targetDishIngredientId": "targetDishIngredientId-event-dish-line-override-2", "targetDishComponentId": "targetDishComponentId-event-dish-line-override-2", "targetDishContainerId": "targetDishContainerId-event-dish-line-override-2", "targetDishTaskId": "targetDishTaskId-event-dish-line-override-2", "ingredientId": "ingredientId-event-dish-line-override-2", "componentId": "componentId-event-dish-line-override-2", "quantity": 2, "unit": "demo-unit-2", "portionsAffected": 2, "reason": "demo-reason-2" } as any);
   // EventGuest has multiple initialization commands (invite, withdraw); using the selected initialization command: invite.
   // EventGuest → api.mutations.EventGuest_createViaInvite
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventGuest_createViaInvite, { "eventId": "eventId-event-guest-1", "name": "EventGuest 1", "email": "user1@example.com", "phone": "demo-phone-1", "dietaryRestrictions": "demo-dietaryRestrictions-1", "allergenRestrictions": "demo-allergenRestrictions-1", "accessibilityNeeds": "demo-accessibilityNeeds-1", "specialMealRequired": false } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventGuest_createViaInvite, { "eventId": "eventId-event-guest-2", "name": "EventGuest 2", "email": "user2@example.com", "phone": "demo-phone-2", "dietaryRestrictions": "demo-dietaryRestrictions-2", "allergenRestrictions": "demo-allergenRestrictions-2", "accessibilityNeeds": "demo-accessibilityNeeds-2", "specialMealRequired": false } as any);
-  // EventIngredientContribution has multiple initialization commands (record, retire); using the selected initialization command: record.
+  // EventIngredientContribution has multiple initialization commands (record, retire, supersede); using the selected initialization command: record.
   // EventIngredientContribution → api.mutations.EventIngredientContribution_createViaRecord
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventIngredientContribution_createViaRecord, { "eventId": "eventId-event-ingredient-contribution-1", "eventDishId": "eventDishId-event-ingredient-contribution-1", "dishId": "dishId-event-ingredient-contribution-1", "componentId": "componentId-event-ingredient-contribution-1", "ingredientId": "ingredientId-event-ingredient-contribution-1", "quantity": 1, "quantityPerServing": 1, "unit": "demo-unit-1", "servings": 1, "purchasingWeekStart": 1767268800000 } as any);
+  await client.mutation(api.mutations.EventIngredientContribution_createViaRecord, { "eventId": "eventId-event-ingredient-contribution-1", "eventDishId": "eventDishId-event-ingredient-contribution-1", "dishId": "dishId-event-ingredient-contribution-1", "componentId": "componentId-event-ingredient-contribution-1", "ingredientId": "ingredientId-event-ingredient-contribution-1", "quantity": 1, "quantityPerServing": 1, "unit": "demo-unit-1", "servings": 1, "purchasingWeekStart": 1767268800000, "sourceKey": "demo-sourceKey-1", "exactQuantity": 1, "roundedQuantity": 1, "quantityBasis": "demo-quantityBasis-1", "unitStatus": "demo-unitStatus-1", "ownership": "demo-ownership-1", "sourceDishIngredientId": "sourceDishIngredientId-event-ingredient-contribution-1", "sourceDishComponentId": "sourceDishComponentId-event-ingredient-contribution-1", "componentPath": "demo-componentPath-1", "productionBatchId": "productionBatchId-event-ingredient-contribution-1", "productionBatchAllocationId": "productionBatchAllocationId-event-ingredient-contribution-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.EventIngredientContribution_createViaRecord, { "eventId": "eventId-event-ingredient-contribution-2", "eventDishId": "eventDishId-event-ingredient-contribution-2", "dishId": "dishId-event-ingredient-contribution-2", "componentId": "componentId-event-ingredient-contribution-2", "ingredientId": "ingredientId-event-ingredient-contribution-2", "quantity": 2, "quantityPerServing": 2, "unit": "demo-unit-2", "servings": 2, "purchasingWeekStart": 1767355200000 } as any);
+  await client.mutation(api.mutations.EventIngredientContribution_createViaRecord, { "eventId": "eventId-event-ingredient-contribution-2", "eventDishId": "eventDishId-event-ingredient-contribution-2", "dishId": "dishId-event-ingredient-contribution-2", "componentId": "componentId-event-ingredient-contribution-2", "ingredientId": "ingredientId-event-ingredient-contribution-2", "quantity": 2, "quantityPerServing": 2, "unit": "demo-unit-2", "servings": 2, "purchasingWeekStart": 1767355200000, "sourceKey": "demo-sourceKey-2", "exactQuantity": 2, "roundedQuantity": 2, "quantityBasis": "demo-quantityBasis-2", "unitStatus": "demo-unitStatus-2", "ownership": "demo-ownership-2", "sourceDishIngredientId": "sourceDishIngredientId-event-ingredient-contribution-2", "sourceDishComponentId": "sourceDishComponentId-event-ingredient-contribution-2", "componentPath": "demo-componentPath-2", "productionBatchId": "productionBatchId-event-ingredient-contribution-2", "productionBatchAllocationId": "productionBatchAllocationId-event-ingredient-contribution-2" } as any);
   // EventLayoutSection has multiple initialization commands (add, remove); using the selected initialization command: add.
   // EventLayoutSection → api.mutations.EventLayoutSection_createViaAdd
   rowsAttempted += 1;
@@ -258,6 +282,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip ExternalRecordLink row "external-record-link-1": no non-blank create args
   // skip ExternalRecordLink row "external-record-link-2": no non-blank create args
   // skip ImportArtifact: no creation command in IR (2 rows unused)
+  // ImportConflict → api.mutations.ImportConflict_createViaRaise
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ImportConflict_createViaRaise, { "externalRecordLinkId": "externalRecordLinkId-import-conflict-1", "field": "demo-field-1", "appliedValue": "demo-appliedValue-1", "capsuleValue": "demo-capsuleValue-1", "sourceValue": "demo-sourceValue-1", "sourceVersion": "demo-sourceVersion-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ImportConflict_createViaRaise, { "externalRecordLinkId": "externalRecordLinkId-import-conflict-2", "field": "demo-field-2", "appliedValue": "demo-appliedValue-2", "capsuleValue": "demo-capsuleValue-2", "sourceValue": "demo-sourceValue-2", "sourceVersion": "demo-sourceVersion-2" } as any);
   // skip ImportDataset: no creation command in IR (2 rows unused)
   // skip ImportRun: no creation command in IR (2 rows unused)
   // Incident → api.mutations.Incident_createViaReport
@@ -315,6 +344,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   rowsAttempted += 1;
   await client.mutation(api.mutations.Invoice_createViaIssue, { "clientId": "clientId-invoice-2", "eventId": "eventId-invoice-2", "invoiceNumber": "demo-invoiceNumber-2", "subtotal": 2, "taxAmount": 2, "discountAmount": 2, "total": 2, "lineItems": "demo-lineItems-2", "taxBreakdown": "demo-taxBreakdown-2", "paymentTermsDays": 2, "dueDate": 1767355200000, "notes": "demo-notes-2", "currencyCode": "demo-currencyCode-2", "exchangeRate": 2 } as any);
   // skip InvoiceNumberSequence: no creation command in IR (2 rows unused)
+  // ItemUnitMapping has multiple initialization commands (record, retire); using the selected initialization command: record.
+  // ItemUnitMapping → api.mutations.ItemUnitMapping_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ItemUnitMapping_createViaRecord, { "ingredientId": "ingredientId-item-unit-mapping-1", "componentId": "componentId-item-unit-mapping-1", "kind": "demo-kind-1", "unit": "demo-unit-1", "equalsQuantity": 1, "equalsUnit": "demo-equalsUnit-1", "fromBasis": "demo-fromBasis-1", "toBasis": "demo-toBasis-1", "source": "demo-source-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ItemUnitMapping_createViaRecord, { "ingredientId": "ingredientId-item-unit-mapping-2", "componentId": "componentId-item-unit-mapping-2", "kind": "demo-kind-2", "unit": "demo-unit-2", "equalsQuantity": 2, "equalsUnit": "demo-equalsUnit-2", "fromBasis": "demo-fromBasis-2", "toBasis": "demo-toBasis-2", "source": "demo-source-2" } as any);
   // Lead → api.mutations.Lead_createViaCapture
   rowsAttempted += 1;
   await client.mutation(api.mutations.Lead_createViaCapture, { "leadType": "demo-leadType-1", "companyName": "Lead 1", "givenName": "Lead 1", "familyName": "Lead 1", "email": "user1@example.com", "phone": "demo-phone-1", "source": "demo-source-1", "referralSourceId": "referralSourceId-lead-1", "estimatedValue": 1, "probability": 1, "notes": "demo-notes-1" } as any);
@@ -425,11 +460,23 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PrepTaskDependency_createViaDeclare, { "dependentTaskId": "dependentTaskId-prep-task-dependency-1", "predecessorTaskId": "predecessorTaskId-prep-task-dependency-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PrepTaskDependency_createViaDeclare, { "dependentTaskId": "dependentTaskId-prep-task-dependency-2", "predecessorTaskId": "predecessorTaskId-prep-task-dependency-2" } as any);
+  // PrepTaskMaterial has multiple initialization commands (link, unlink); using the selected initialization command: link.
+  // PrepTaskMaterial → api.mutations.PrepTaskMaterial_createViaLink
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PrepTaskMaterial_createViaLink, { "prepTaskId": "prepTaskId-prep-task-material-1", "eventIngredientContributionId": "eventIngredientContributionId-prep-task-material-1", "productionBatchAllocationId": "productionBatchAllocationId-prep-task-material-1", "dishIngredientId": "dishIngredientId-prep-task-material-1", "dishComponentId": "dishComponentId-prep-task-material-1", "workQuantity": 1, "workUnit": "demo-workUnit-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PrepTaskMaterial_createViaLink, { "prepTaskId": "prepTaskId-prep-task-material-2", "eventIngredientContributionId": "eventIngredientContributionId-prep-task-material-2", "productionBatchAllocationId": "productionBatchAllocationId-prep-task-material-2", "dishIngredientId": "dishIngredientId-prep-task-material-2", "dishComponentId": "dishComponentId-prep-task-material-2", "workQuantity": 2, "workUnit": "demo-workUnit-2" } as any);
   // ProductionBatch → api.mutations.ProductionBatch_createViaPlan
   rowsAttempted += 1;
   await client.mutation(api.mutations.ProductionBatch_createViaPlan, { "componentId": "componentId-production-batch-1", "eventId": "eventId-production-batch-1", "plannedYield": 1, "yieldUnit": "demo-yieldUnit-1", "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ProductionBatch_createViaPlan, { "componentId": "componentId-production-batch-2", "eventId": "eventId-production-batch-2", "plannedYield": 2, "yieldUnit": "demo-yieldUnit-2", "notes": "demo-notes-2" } as any);
+  // ProductionBatchAllocation has multiple initialization commands (allocate, release); using the selected initialization command: allocate.
+  // ProductionBatchAllocation → api.mutations.ProductionBatchAllocation_createViaAllocate
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ProductionBatchAllocation_createViaAllocate, { "productionBatchId": "productionBatchId-production-batch-allocation-1", "eventId": "eventId-production-batch-allocation-1", "eventDishId": "eventDishId-production-batch-allocation-1", "allocatedQuantity": 1, "unit": "demo-unit-1", "formulaShare": 1, "isSurplus": false } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ProductionBatchAllocation_createViaAllocate, { "productionBatchId": "productionBatchId-production-batch-allocation-2", "eventId": "eventId-production-batch-allocation-2", "eventDishId": "eventDishId-production-batch-allocation-2", "allocatedQuantity": 2, "unit": "demo-unit-2", "formulaShare": 2, "isSurplus": false } as any);
   // Proposal → api.mutations.Proposal_createViaDraft
   rowsAttempted += 1;
   await client.mutation(api.mutations.Proposal_createViaDraft, { "clientId": "clientId-proposal-1", "eventId": "eventId-proposal-1", "proposalNumber": "demo-proposalNumber-1", "title": "Proposal 1", "eventDate": 1767268800000, "eventEndDate": 1767268800000, "eventType": "demo-eventType-1", "guestCount": 1, "venueName": "Proposal 1", "venueAddress": "demo-venueAddress-1", "subtotal": 1, "taxAmount": 1, "discountAmount": 1, "total": 1, "expiresAt": 1767268800000, "notes": "demo-notes-1", "terms": "demo-terms-1", "visibleSections": "demo-visibleSections-1" } as any);
@@ -561,6 +608,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.StaffMessage_createViaSend, { "recipientPersonId": "recipientPersonId-staff-message-1", "eventId": "eventId-staff-message-1", "body": "demo-body-1", "mentionedPersonIds": "demo-mentionedPersonIds-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.StaffMessage_createViaSend, { "recipientPersonId": "recipientPersonId-staff-message-2", "eventId": "eventId-staff-message-2", "body": "demo-body-2", "mentionedPersonIds": "demo-mentionedPersonIds-2" } as any);
+  // Station → api.mutations.Station_createViaDefine
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Station_createViaDefine, { "name": "Station 1", "sortOrder": 1, "aliases": "demo-aliases-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.Station_createViaDefine, { "name": "Station 2", "sortOrder": 2, "aliases": "demo-aliases-2" } as any);
   // StockCountLine → api.mutations.StockCountLine_createViaFreeze
   rowsAttempted += 1;
   await client.mutation(api.mutations.StockCountLine_createViaFreeze, { "stockCountSessionId": "stockCountSessionId-stock-count-line-1", "inventoryItemId": "inventoryItemId-stock-count-line-1", "locationId": "locationId-stock-count-line-1", "ingredientId": "ingredientId-stock-count-line-1", "unit": "demo-unit-1" } as any);
@@ -808,6 +860,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "ComponentComponent",
+      "createMutation": "ComponentComponent_createViaAdd",
+      "rowCount": 2
+    },
+    {
       "entity": "ComponentImport",
       "createMutation": "ComponentImport_createViaUpload",
       "rowCount": 2
@@ -820,6 +877,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ComponentIngredient",
       "createMutation": "ComponentIngredient_createViaAdd",
+      "rowCount": 2
+    },
+    {
+      "entity": "ComponentPortionSpec",
+      "createMutation": "ComponentPortionSpec_createViaDefine",
       "rowCount": 2
     },
     {
@@ -883,6 +945,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "DishTaskMaterial",
+      "createMutation": "DishTaskMaterial_createViaLink",
+      "rowCount": 2
+    },
+    {
       "entity": "EmailNotificationSubscription",
       "createMutation": "EmailNotificationSubscription_createViaConfigure",
       "rowCount": 2
@@ -938,6 +1005,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "EventDishLineOverride",
+      "createMutation": "EventDishLineOverride_createViaApply",
+      "rowCount": 2
+    },
+    {
       "entity": "EventGuest",
       "createMutation": "EventGuest_createViaInvite",
       "rowCount": 2
@@ -980,6 +1052,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ImportArtifact",
       "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ImportConflict",
+      "createMutation": "ImportConflict_createViaRaise",
       "rowCount": 2
     },
     {
@@ -1045,6 +1122,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "InvoiceNumberSequence",
       "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ItemUnitMapping",
+      "createMutation": "ItemUnitMapping_createViaRecord",
       "rowCount": 2
     },
     {
@@ -1158,8 +1240,18 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "PrepTaskMaterial",
+      "createMutation": "PrepTaskMaterial_createViaLink",
+      "rowCount": 2
+    },
+    {
       "entity": "ProductionBatch",
       "createMutation": "ProductionBatch_createViaPlan",
+      "rowCount": 2
+    },
+    {
+      "entity": "ProductionBatchAllocation",
+      "createMutation": "ProductionBatchAllocation_createViaAllocate",
       "rowCount": 2
     },
     {
@@ -1290,6 +1382,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "StaffMessage",
       "createMutation": "StaffMessage_createViaSend",
+      "rowCount": 2
+    },
+    {
+      "entity": "Station",
+      "createMutation": "Station_createViaDefine",
       "rowCount": 2
     },
     {

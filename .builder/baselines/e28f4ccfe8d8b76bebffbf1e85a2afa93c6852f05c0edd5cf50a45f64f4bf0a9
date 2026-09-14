@@ -266,7 +266,7 @@ export const ComponentSchema = z.object({
   recipeSourceText: z.string().nullable().optional(),
   versionNumber: z.number().int().default(1),
   yieldQuantity: z.number().min(1).default(1),
-  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("portion"),
+  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("portion"),
   servesPerYield: z.number().int().min(1).nullable().optional().default(1),
   batchMultiplier: z.number().min(1).nullable().optional().default(1),
   status: z.enum(["draft", "published", "retired"]).default("draft"),
@@ -274,6 +274,8 @@ export const ComponentSchema = z.object({
   publishedAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
   retirementReason: z.string().nullable().optional(),
+  storageWindowDays: z.number().int().nullable().optional(),
+  storageWindowSource: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -288,6 +290,26 @@ export const ComponentComputedSchema = ComponentSchema.extend({
 
 export type Component = z.infer<typeof ComponentSchema>;
 export type ComponentWithComputed = z.infer<typeof ComponentComputedSchema>;
+
+// Entity: ComponentComponent
+export const ComponentComponentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  componentId: z.string().uuid(),
+  childComponentId: z.string().uuid(),
+  quantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  sortOrder: z.number().int().default(0),
+  wasteFactor: z.number().nullable().optional().default(1),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).nullable().optional(),
+  prepNotes: z.string().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ComponentComponent = z.infer<typeof ComponentComponentSchema>;
 
 // Entity: ComponentImport
 export const ComponentImportSchema = z.object({
@@ -307,7 +329,7 @@ export const ComponentImportSchema = z.object({
   parsedCuisine: z.string().nullable().optional(),
   parsedInstructions: z.string().nullable().optional(),
   parsedYieldQuantity: z.number().nullable().optional(),
-  parsedYieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).nullable().optional(),
+  parsedYieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
   parsedBatchMultiplier: z.number().nullable().optional(),
   parsedLineCount: z.number().int().default(0),
   resolvedLineCount: z.number().int().default(0),
@@ -339,7 +361,7 @@ export const ComponentImportLineSchema = z.object({
   sourceOrder: z.number().int().default(0),
   sourceLine: z.string().default(""),
   parsedQuantity: z.number().nullable().optional(),
-  parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).nullable().optional(),
+  parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
   parsedIngredientName: z.string().nullable().optional(),
   preparationNote: z.string().nullable().optional(),
   matchStatus: z.enum(["unresolved", "exact", "possible", "new", "confirmed_existing", "confirmed_new"]).default("unresolved"),
@@ -361,10 +383,11 @@ export const ComponentIngredientSchema = z.object({
   componentId: z.string().uuid(),
   ingredientId: z.string().uuid(),
   quantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   sortOrder: z.number().int().default(0),
   wasteFactor: z.number().nullable().optional().default(1),
   prepNotes: z.string().nullable().optional(),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -379,6 +402,24 @@ export const ComponentIngredientComputedSchema = ComponentIngredientSchema.exten
 
 export type ComponentIngredient = z.infer<typeof ComponentIngredientSchema>;
 export type ComponentIngredientWithComputed = z.infer<typeof ComponentIngredientComputedSchema>;
+
+// Entity: ComponentPortionSpec
+export const ComponentPortionSpecSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  componentId: z.string().uuid(),
+  name: z.string().default(""),
+  pieceQuantity: z.number().default(1),
+  pieceUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("ounce"),
+  piecesPerBatch: z.number().nullable().optional(),
+  source: z.string().nullable().optional(),
+  definedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ComponentPortionSpec = z.infer<typeof ComponentPortionSpecSchema>;
 
 // Entity: ComponentSnapshot
 export const ComponentSnapshotSchema = z.object({
@@ -546,7 +587,7 @@ export const DishSchema = z.object({
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
   portionSize: z.number().default(1),
-  portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("portion"),
+  portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("portion"),
   dietaryTags: z.array(z.string()).optional().default([]),
   allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   status: z.enum(["active", "retired"]).default("active"),
@@ -558,6 +599,7 @@ export const DishSchema = z.object({
   canonicalDishId: z.string().uuid().nullable().optional(),
   editionNumber: z.number().int().nullable().optional().default(1),
   mergedIntoDishId: z.string().uuid().nullable().optional(),
+  kind: z.enum(["food", "supply", "service", "package"]).nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -583,6 +625,9 @@ export const DishComponentSchema = z.object({
   yieldQuantity: z.number().default(1),
   batchMultiplier: z.number().default(1),
   role: z.string().nullable().optional(),
+  portionSpecId: z.string().uuid().nullable().optional(),
+  pieceCount: z.number().nullable().optional(),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).nullable().optional(),
   attachedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -602,7 +647,7 @@ export const DishContainerSchema = z.object({
   serviceMethod: z.enum(["cooked_on_site", "cooked_at_kitchen", "brought_hot", "cold_service"]).default("cooked_at_kitchen"),
   servingsPerContainer: z.number().int().min(1).default(1),
   baseQuantity: z.number().int().min(0).default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   equipmentNotes: z.string().nullable().optional(),
   handlingNotes: z.string().nullable().optional(),
   sortOrder: z.number().int().min(0).optional().default(0),
@@ -623,10 +668,12 @@ export const DishIngredientSchema = z.object({
   dishId: z.string().uuid(),
   ingredientId: z.string().uuid(),
   quantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   sortOrder: z.number().int().default(0),
   wasteFactor: z.number().nullable().optional().default(1),
   prepNotes: z.string().nullable().optional(),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).nullable().optional(),
+  quantityBasisSource: z.string().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -653,12 +700,19 @@ export const DishTaskSchema = z.object({
   category: z.string().default("finish_at_event"),
   taskType: z.string().default("manual"),
   defaultQuantity: z.number().nullable().optional(),
-  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).nullable().optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
   station: z.string().nullable().optional(),
   sortOrder: z.number().int().min(0).optional().default(0),
   componentId: z.string().uuid().nullable().optional(),
   ingredientId: z.string().uuid().nullable().optional(),
   instructions: z.string().nullable().optional(),
+  stage: z.enum(["kitchen", "at_event", "pack"]).nullable().optional(),
+  resolution: z.enum(["resolved", "choice_pending", "content_missing"]).nullable().optional(),
+  choiceOptions: z.array(z.string()).nullable().optional(),
+  leadTimeMinDays: z.number().int().nullable().optional(),
+  leadTimeMaxDays: z.number().int().nullable().optional(),
+  sequenceAfterDishTaskId: z.string().uuid().nullable().optional(),
+  stationId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "retired"]).default("active"),
   activeAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
@@ -668,6 +722,24 @@ export const DishTaskSchema = z.object({
 });
 
 export type DishTask = z.infer<typeof DishTaskSchema>;
+
+// Entity: DishTaskMaterial
+export const DishTaskMaterialSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  dishTaskId: z.string().uuid(),
+  dishIngredientId: z.string().uuid().nullable().optional(),
+  dishComponentId: z.string().uuid().nullable().optional(),
+  dishContainerId: z.string().uuid().nullable().optional(),
+  workQuantity: z.number().nullable().optional(),
+  workUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
+  linkedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DishTaskMaterial = z.infer<typeof DishTaskMaterialSchema>;
 
 // Entity: EmailNotificationSubscription
 export const EmailNotificationSubscriptionSchema = z.object({
@@ -1016,6 +1088,32 @@ export const EventDishComponentSeedSchema = z.object({
 
 export type EventDishComponentSeed = z.infer<typeof EventDishComponentSeedSchema>;
 
+// Entity: EventDishLineOverride
+export const EventDishLineOverrideSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventDishId: z.string().uuid(),
+  eventId: z.string().uuid(),
+  kind: z.enum(["add", "remove", "replace", "adjust"]).default("adjust"),
+  targetDishIngredientId: z.string().uuid().nullable().optional(),
+  targetDishComponentId: z.string().uuid().nullable().optional(),
+  targetDishContainerId: z.string().uuid().nullable().optional(),
+  targetDishTaskId: z.string().uuid().nullable().optional(),
+  ingredientId: z.string().uuid().nullable().optional(),
+  componentId: z.string().uuid().nullable().optional(),
+  quantity: z.number().nullable().optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
+  portionsAffected: z.number().min(0).default(0),
+  reason: z.string().default(""),
+  appliedAt: z.coerce.date().nullable().optional(),
+  revokedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventDishLineOverride = z.infer<typeof EventDishLineOverrideSchema>;
+
 // Entity: EventGuest
 export const EventGuestSchema = z.object({
   id: z.string().uuid(),
@@ -1061,10 +1159,23 @@ export const EventIngredientContributionSchema = z.object({
   ingredientId: z.string().uuid(),
   quantity: z.number().default(0),
   quantityPerServing: z.number().nullable().optional(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   servings: z.number().default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   recordedAt: z.coerce.date().nullable().optional(),
+  sourceKey: z.string().nullable().optional(),
+  exactQuantity: z.number().nullable().optional(),
+  roundedQuantity: z.number().nullable().optional(),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).nullable().optional(),
+  unitStatus: z.string().nullable().optional(),
+  ownership: z.string().nullable().optional(),
+  sourceDishIngredientId: z.string().uuid().nullable().optional(),
+  sourceDishComponentId: z.string().uuid().nullable().optional(),
+  componentPath: z.array(z.string()).nullable().optional(),
+  productionBatchId: z.string().uuid().nullable().optional(),
+  productionBatchAllocationId: z.string().uuid().nullable().optional(),
+  supersededAt: z.coerce.date().nullable().optional(),
+  supersededBySourceKey: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1204,8 +1315,23 @@ export const ExternalRecordLinkSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]).default("tpp_legacy"),
   recordType: z.string().default(""),
   externalId: z.string().default(""),
-  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list"]).default("contact"),
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]).default("contact"),
   capsuleId: z.string().default(""),
+  sourceAccount: z.string().nullable().optional(),
+  role: z.string().nullable().optional(),
+  ordinal: z.number().int().nullable().optional(),
+  linkKey: z.string().nullable().optional(),
+  decision: z.enum(["suggested", "approved", "rejected"]).nullable().optional(),
+  suggestedBy: z.string().nullable().optional(),
+  decidedByUserId: z.string().nullable().optional(),
+  decidedAt: z.coerce.date().nullable().optional(),
+  appliedValues: z.string().nullable().optional(),
+  appliedSourceVersion: z.string().nullable().optional(),
+  appliedAt: z.coerce.date().nullable().optional(),
+  appliedImportRunId: z.string().nullable().optional(),
+  sourceVersion: z.string().nullable().optional(),
+  lastSeenAt: z.coerce.date().nullable().optional(),
+  lastSeenImportRunId: z.string().nullable().optional(),
   verified: z.boolean().default(false),
   lastVerifiedAt: z.coerce.date().nullable().optional(),
   verifiedByUserId: z.string().nullable().optional(),
@@ -1245,13 +1371,35 @@ export const ImportArtifactSchema = z.object({
 
 export type ImportArtifact = z.infer<typeof ImportArtifactSchema>;
 
+// Entity: ImportConflict
+export const ImportConflictSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  externalRecordLinkId: z.string().uuid(),
+  field: z.string().default(""),
+  appliedValue: z.string().nullable().optional(),
+  capsuleValue: z.string().nullable().optional(),
+  sourceValue: z.string().nullable().optional(),
+  sourceVersion: z.string().nullable().optional(),
+  status: z.enum(["pending", "keep_capsule", "take_source", "manual"]).default("pending"),
+  resolvedByUserId: z.string().nullable().optional(),
+  resolvedAt: z.coerce.date().nullable().optional(),
+  resolvedOnSourceVersion: z.string().nullable().optional(),
+  raisedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ImportConflict = z.infer<typeof ImportConflictSchema>;
+
 // Entity: ImportDataset
 export const ImportDatasetSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]).default("events"),
-  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list"]).default("event_record"),
+  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]).default("event_record"),
   config: z.string().default("{}"),
   active: z.boolean().default(true),
   importOrder: z.number().int().min(1).default(1),
@@ -1338,7 +1486,7 @@ export const IngredientSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   name: z.string().default(""),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   isGlutenFree: z.boolean().optional().default(false),
   costPerUnit: z.number().min(0).default(0),
@@ -1387,7 +1535,7 @@ export const IngredientDemandSchema = z.object({
   ingredientId: z.string().uuid(),
   preferredVendorId: z.string().uuid().nullable().optional(),
   requiredQuantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   servings: z.number().nullable().optional(),
   dishId: z.string().uuid().nullable().optional(),
   sourceComponentLineQuantity: z.number().nullable().optional(),
@@ -1419,7 +1567,7 @@ export const IngredientPriceObservationSchema = z.object({
   vendorOrderLineId: z.string().uuid(),
   receiptQuantity: z.number().default(0),
   cumulativeReceivedQuantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   unitPrice: z.number().min(0).default(0),
   observedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -1487,7 +1635,7 @@ export const InventoryItemSchema = z.object({
   ingredientId: z.string().uuid(),
   locationId: z.string().uuid(),
   quantityOnHand: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   parLevel: z.number().min(0).default(0),
   reorderThreshold: z.number().min(0).default(0),
   unitCost: z.number().min(0).default(0),
@@ -1526,7 +1674,7 @@ export const InventoryLotSchema = z.object({
   locationId: z.string().uuid(),
   receiptQuantity: z.number().default(0),
   cumulativeReceivedQuantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   unitCost: z.number().min(0).default(0),
   receivedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -1620,6 +1768,28 @@ export const InvoiceNumberSequenceSchema = z.object({
 });
 
 export type InvoiceNumberSequence = z.infer<typeof InvoiceNumberSequenceSchema>;
+
+// Entity: ItemUnitMapping
+export const ItemUnitMappingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  ingredientId: z.string().uuid().nullable().optional(),
+  componentId: z.string().uuid().nullable().optional(),
+  kind: z.enum(["pack", "density", "portion", "yield"]).default("pack"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  equalsQuantity: z.number().default(1),
+  equalsUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  fromBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).nullable().optional(),
+  toBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).nullable().optional(),
+  source: z.string().nullable().optional(),
+  confirmedByUserId: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ItemUnitMapping = z.infer<typeof ItemUnitMappingSchema>;
 
 // Entity: Lead
 export const LeadSchema = z.object({
@@ -1907,7 +2077,7 @@ export const PackListItemSchema = z.object({
   associationSource: z.string().nullable().optional(),
   requiredQuantity: z.number().default(0),
   packedQuantity: z.number().min(0).default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   status: z.enum(["pending", "listed", "packed", "missing"]).default("pending"),
   listedAt: z.coerce.date().nullable().optional(),
   packedAt: z.coerce.date().nullable().optional(),
@@ -2118,7 +2288,7 @@ export const PrepTaskSchema = z.object({
   recipeTemplateStation: z.string().nullable().optional(),
   quantity: z.number().default(0),
   completedQuantity: z.number().nullable().optional(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   station: z.string().nullable().optional(),
   dueAt: z.coerce.date().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
@@ -2132,6 +2302,12 @@ export const PrepTaskSchema = z.object({
   cancellationReason: z.string().nullable().optional(),
   blockedAt: z.coerce.date().nullable().optional(),
   blockReason: z.string().nullable().optional(),
+  overrideOfDishTaskId: z.string().uuid().nullable().optional(),
+  overrideReason: z.string().nullable().optional(),
+  resolution: z.enum(["resolved", "choice_pending", "content_missing"]).nullable().optional(),
+  choiceOptions: z.array(z.string()).nullable().optional(),
+  chosenOption: z.string().nullable().optional(),
+  stationId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2175,6 +2351,25 @@ export const PrepTaskDependencySchema = z.object({
 
 export type PrepTaskDependency = z.infer<typeof PrepTaskDependencySchema>;
 
+// Entity: PrepTaskMaterial
+export const PrepTaskMaterialSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  prepTaskId: z.string().uuid(),
+  eventIngredientContributionId: z.string().uuid().nullable().optional(),
+  productionBatchAllocationId: z.string().uuid().nullable().optional(),
+  dishIngredientId: z.string().uuid().nullable().optional(),
+  dishComponentId: z.string().uuid().nullable().optional(),
+  workQuantity: z.number().nullable().optional(),
+  workUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).nullable().optional(),
+  linkedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PrepTaskMaterial = z.infer<typeof PrepTaskMaterialSchema>;
+
 // Entity: ProductionBatch
 export const ProductionBatchSchema = z.object({
   id: z.string().uuid(),
@@ -2184,7 +2379,13 @@ export const ProductionBatchSchema = z.object({
   eventId: z.string().uuid().nullable().optional(),
   plannedYield: z.number().default(0),
   actualYield: z.number().nullable().optional(),
-  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("portion"),
+  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("portion"),
+  plannedExact: z.number().nullable().optional(),
+  plannedRounded: z.number().nullable().optional(),
+  surplusQuantity: z.number().nullable().optional(),
+  roundingScope: z.enum(["none", "dish_allocation", "event_total", "production_group", "purchase_pack"]).nullable().optional(),
+  portionSpecId: z.string().uuid().nullable().optional(),
+  productionDate: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["planned", "in_progress", "completed", "cancelled"]).default("planned"),
   plannedAt: z.coerce.date().nullable().optional(),
@@ -2197,6 +2398,29 @@ export const ProductionBatchSchema = z.object({
 });
 
 export type ProductionBatch = z.infer<typeof ProductionBatchSchema>;
+
+// Entity: ProductionBatchAllocation
+export const ProductionBatchAllocationSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  productionBatchId: z.string().uuid(),
+  eventId: z.string().uuid().nullable().optional(),
+  eventDishId: z.string().uuid().nullable().optional(),
+  allocatedQuantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("portion"),
+  formulaShare: z.number().default(0),
+  isSurplus: z.boolean().default(false),
+  status: z.enum(["planned", "produced", "portioned", "released"]).default("planned"),
+  allocatedAt: z.coerce.date().nullable().optional(),
+  producedAt: z.coerce.date().nullable().optional(),
+  portionedAt: z.coerce.date().nullable().optional(),
+  releaseReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ProductionBatchAllocation = z.infer<typeof ProductionBatchAllocationSchema>;
 
 // Entity: Proposal
 export const ProposalSchema = z.object({
@@ -2365,7 +2589,7 @@ export const PurchaseNeedSchema = z.object({
   ingredientId: z.string().uuid(),
   preferredVendorId: z.string().uuid().nullable().optional(),
   requiredQuantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   vendorOrderId: z.string().uuid().nullable().optional(),
   vendorOrderLineId: z.string().uuid().nullable().optional(),
@@ -2814,6 +3038,23 @@ export const StaffMessageSchema = z.object({
 
 export type StaffMessage = z.infer<typeof StaffMessageSchema>;
 
+// Entity: Station
+export const StationSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  sortOrder: z.number().int().min(0).default(0),
+  aliases: z.array(z.string()).nullable().optional(),
+  status: z.enum(["active", "retired"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type Station = z.infer<typeof StationSchema>;
+
 // Entity: StockCountLine
 export const StockCountLineSchema = z.object({
   id: z.string().uuid(),
@@ -2823,7 +3064,7 @@ export const StockCountLineSchema = z.object({
   inventoryItemId: z.string().uuid(),
   locationId: z.string().uuid(),
   ingredientId: z.string().uuid(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   expectedQuantity: z.number().default(0),
   countedQuantity: z.number().default(0),
   varianceQuantity: z.number().default(0),
@@ -2873,7 +3114,7 @@ export const StockTransferSchema = z.object({
   sourceLocationId: z.string().uuid(),
   destinationLocationId: z.string().uuid(),
   quantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   notes: z.string().nullable().optional(),
   transferredAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -3328,7 +3569,7 @@ export const VendorOrderLineSchema = z.object({
   supplyWeekStart: z.coerce.date().nullable().optional(),
   pendingSupplyQuantity: z.number().nullable().optional(),
   stockAppliedQuantity: z.number().nullable().optional(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   unitCost: z.number().min(0).default(0),
   lineTotalAmount: z.number().nullable().optional(),
   discrepancyQuantity: z.number().nullable().optional(),
@@ -3361,7 +3602,7 @@ export const VendorOrderLineDemandSchema = z.object({
   ingredientDemandId: z.string().uuid(),
   vendorOrderId: z.string().uuid(),
   contributionQuantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   linkedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -3551,7 +3792,7 @@ export const WasteRecordSchema = z.object({
   eventId: z.string().uuid().nullable().optional(),
   inventoryItemId: z.string().uuid().nullable().optional(),
   quantity: z.number().default(0),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   reason: z.enum(["spoilage", "prep_error", "overproduction", "dropped", "date_expired", "quality_reject", "other"]).default("other"),
   unitCost: z.number().min(0).default(0),
   status: z.enum(["pending", "recorded", "voided"]).default("pending"),
@@ -3906,7 +4147,7 @@ export type ClientOutreachTaskOpenParams = z.infer<typeof ClientOutreachTaskOpen
 export const ComponentDraftParamsSchema = z.object({
   name: z.string(),
   yieldQuantity: z.number(),
-  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   servesPerYield: z.number().int().optional(),
   batchMultiplier: z.number().optional(),
   category: z.string().optional(),
@@ -3945,7 +4186,7 @@ export type ComponentRetractParams = z.infer<typeof ComponentRetractParamsSchema
 export const ComponentReviseDraftParamsSchema = z.object({
   name: z.string(),
   yieldQuantity: z.number(),
-  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   batchMultiplier: z.number(),
   servesPerYield: z.number().int().optional(),
   category: z.string().optional(),
@@ -3962,6 +4203,43 @@ export const ComponentSetServesPerYieldParamsSchema = z.object({
 });
 
 export type ComponentSetServesPerYieldParams = z.infer<typeof ComponentSetServesPerYieldParamsSchema>;
+
+// Command: setStorageWindow on Component
+export const ComponentSetStorageWindowParamsSchema = z.object({
+  storageWindowDays: z.number().int(),
+  source: z.string().optional(),
+});
+
+export type ComponentSetStorageWindowParams = z.infer<typeof ComponentSetStorageWindowParamsSchema>;
+
+// Command: add on ComponentComponent
+export const ComponentComponentAddParamsSchema = z.object({
+  componentId: z.string().min(1),
+  childComponentId: z.string().min(1),
+  quantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  sortOrder: z.number().optional(),
+  wasteFactor: z.number().optional(),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).optional(),
+  prepNotes: z.string().optional(),
+});
+
+export type ComponentComponentAddParams = z.infer<typeof ComponentComponentAddParamsSchema>;
+
+// Command: adjustQuantity on ComponentComponent
+export const ComponentComponentAdjustQuantityParamsSchema = z.object({
+  quantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+});
+
+export type ComponentComponentAdjustQuantityParams = z.infer<typeof ComponentComponentAdjustQuantityParamsSchema>;
+
+// Command: remove on ComponentComponent
+export const ComponentComponentRemoveParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type ComponentComponentRemoveParams = z.infer<typeof ComponentComponentRemoveParamsSchema>;
 
 // Command: approveReview on ComponentImport
 export const ComponentImportApproveReviewParamsSchema = z.object({});
@@ -4016,7 +4294,7 @@ export const ComponentImportRecordParseParamsSchema = z.object({
   parsedCuisine: z.string().optional(),
   parsedInstructions: z.string().optional(),
   parsedYieldQuantity: z.number().optional(),
-  parsedYieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  parsedYieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   parsedBatchMultiplier: z.number().optional(),
 });
 
@@ -4043,7 +4321,7 @@ export const ComponentImportReviseReviewParamsSchema = z.object({
   parsedCuisine: z.string().optional(),
   parsedInstructions: z.string().optional(),
   parsedYieldQuantity: z.number().optional(),
-  parsedYieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  parsedYieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   parsedBatchMultiplier: z.number().optional(),
 });
 
@@ -4102,7 +4380,7 @@ export type ComponentImportLineResetResolutionParams = z.infer<typeof ComponentI
 export const ComponentImportLineReviseMeasurementsParamsSchema = z.object({
   expectedReviewRevision: z.number().int(),
   parsedQuantity: z.number().optional(),
-  parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   preparationNote: z.string().optional(),
   parsedIngredientName: z.string().optional(),
 });
@@ -4115,7 +4393,7 @@ export const ComponentImportLineStageParamsSchema = z.object({
   sourceOrder: z.number().int(),
   sourceLine: z.string(),
   parsedQuantity: z.number().optional(),
-  parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  parsedUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   parsedIngredientName: z.string().optional(),
   preparationNote: z.string().optional(),
 });
@@ -4141,7 +4419,7 @@ export const ComponentIngredientAddParamsSchema = z.object({
   componentId: z.string().min(1),
   ingredientId: z.string().min(1),
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   sortOrder: z.number().optional(),
   wasteFactor: z.number().optional(),
   prepNotes: z.string().optional(),
@@ -4152,7 +4430,7 @@ export type ComponentIngredientAddParams = z.infer<typeof ComponentIngredientAdd
 // Command: adjustQuantity on ComponentIngredient
 export const ComponentIngredientAdjustQuantityParamsSchema = z.object({
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
 });
 
 export type ComponentIngredientAdjustQuantityParams = z.infer<typeof ComponentIngredientAdjustQuantityParamsSchema>;
@@ -4170,6 +4448,36 @@ export const ComponentIngredientSetWasteFactorParamsSchema = z.object({
 });
 
 export type ComponentIngredientSetWasteFactorParams = z.infer<typeof ComponentIngredientSetWasteFactorParamsSchema>;
+
+// Command: define on ComponentPortionSpec
+export const ComponentPortionSpecDefineParamsSchema = z.object({
+  componentId: z.string().min(1),
+  name: z.string(),
+  pieceQuantity: z.number(),
+  pieceUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  piecesPerBatch: z.number().optional(),
+  source: z.string().optional(),
+});
+
+export type ComponentPortionSpecDefineParams = z.infer<typeof ComponentPortionSpecDefineParamsSchema>;
+
+// Command: retire on ComponentPortionSpec
+export const ComponentPortionSpecRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type ComponentPortionSpecRetireParams = z.infer<typeof ComponentPortionSpecRetireParamsSchema>;
+
+// Command: revise on ComponentPortionSpec
+export const ComponentPortionSpecReviseParamsSchema = z.object({
+  name: z.string(),
+  pieceQuantity: z.number(),
+  pieceUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  piecesPerBatch: z.number().optional(),
+  source: z.string().optional(),
+});
+
+export type ComponentPortionSpecReviseParams = z.infer<typeof ComponentPortionSpecReviseParamsSchema>;
 
 // Command: capture on ComponentSnapshot
 export const ComponentSnapshotCaptureParamsSchema = z.object({
@@ -4394,6 +4702,13 @@ export const DishClassifyAllergensParamsSchema = z.object({
 
 export type DishClassifyAllergensParams = z.infer<typeof DishClassifyAllergensParamsSchema>;
 
+// Command: classifyKind on Dish
+export const DishClassifyKindParamsSchema = z.object({
+  kind: z.enum(["food", "supply", "service", "package"]),
+});
+
+export type DishClassifyKindParams = z.infer<typeof DishClassifyKindParamsSchema>;
+
 // Command: clearPrimaryImage on Dish
 export const DishClearPrimaryImageParamsSchema = z.object({});
 
@@ -4403,7 +4718,7 @@ export type DishClearPrimaryImageParams = z.infer<typeof DishClearPrimaryImagePa
 export const DishIntroduceParamsSchema = z.object({
   name: z.string(),
   portionSize: z.number(),
-  portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   description: z.string().optional(),
   category: z.string().optional(),
   course: z.string().optional(),
@@ -4488,7 +4803,7 @@ export type DishSetPrimaryImageParams = z.infer<typeof DishSetPrimaryImageParams
 // Command: updatePortioning on Dish
 export const DishUpdatePortioningParamsSchema = z.object({
   portionSize: z.number(),
-  portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
 });
 
 export type DishUpdatePortioningParams = z.infer<typeof DishUpdatePortioningParamsSchema>;
@@ -4512,6 +4827,15 @@ export const DishComponentDetachParamsSchema = z.object({
 
 export type DishComponentDetachParams = z.infer<typeof DishComponentDetachParamsSchema>;
 
+// Command: setPortionSpec on DishComponent
+export const DishComponentSetPortionSpecParamsSchema = z.object({
+  portionSpecId: z.string().min(1),
+  pieceCount: z.number(),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).optional(),
+});
+
+export type DishComponentSetPortionSpecParams = z.infer<typeof DishComponentSetPortionSpecParamsSchema>;
+
 // Command: define on DishContainer
 export const DishContainerDefineParamsSchema = z.object({
   dishId: z.string().min(1),
@@ -4519,7 +4843,7 @@ export const DishContainerDefineParamsSchema = z.object({
   serviceMethod: z.enum(["cooked_on_site", "cooked_at_kitchen", "brought_hot", "cold_service"]),
   servingsPerContainer: z.number().int(),
   baseQuantity: z.number().int().optional(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   equipmentNotes: z.string().optional(),
   handlingNotes: z.string().optional(),
   sortOrder: z.number().int().optional(),
@@ -4550,7 +4874,7 @@ export const DishContainerReviseParamsSchema = z.object({
   serviceMethod: z.enum(["cooked_on_site", "cooked_at_kitchen", "brought_hot", "cold_service"]),
   servingsPerContainer: z.number().int(),
   baseQuantity: z.number().int().optional(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   equipmentNotes: z.string().optional(),
   handlingNotes: z.string().optional(),
   sortOrder: z.number().int().optional(),
@@ -4563,7 +4887,7 @@ export const DishIngredientAddParamsSchema = z.object({
   dishId: z.string().min(1),
   ingredientId: z.string().min(1),
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   sortOrder: z.number().optional(),
   wasteFactor: z.number().optional(),
   prepNotes: z.string().optional(),
@@ -4574,7 +4898,7 @@ export type DishIngredientAddParams = z.infer<typeof DishIngredientAddParamsSche
 // Command: adjustQuantity on DishIngredient
 export const DishIngredientAdjustQuantityParamsSchema = z.object({
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
 });
 
 export type DishIngredientAdjustQuantityParams = z.infer<typeof DishIngredientAdjustQuantityParamsSchema>;
@@ -4593,7 +4917,7 @@ export const DishTaskAddParamsSchema = z.object({
   category: z.string().optional(),
   taskType: z.string().optional(),
   defaultQuantity: z.number().optional(),
-  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   station: z.string().optional(),
   sortOrder: z.number().optional(),
   componentId: z.string().min(1).optional(),
@@ -4622,7 +4946,7 @@ export const DishTaskReviseParamsSchema = z.object({
   category: z.string().optional(),
   taskType: z.string().optional(),
   defaultQuantity: z.number().optional(),
-  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   station: z.string().optional(),
   sortOrder: z.number().optional(),
   componentId: z.string().min(1).optional(),
@@ -4632,6 +4956,38 @@ export const DishTaskReviseParamsSchema = z.object({
 });
 
 export type DishTaskReviseParams = z.infer<typeof DishTaskReviseParamsSchema>;
+
+// Command: specifyWork on DishTask
+export const DishTaskSpecifyWorkParamsSchema = z.object({
+  stage: z.enum(["kitchen", "at_event", "pack"]).optional(),
+  resolution: z.enum(["resolved", "choice_pending", "content_missing"]).optional(),
+  choiceOptions: z.array(z.string()).optional(),
+  leadTimeMinDays: z.number().int().optional(),
+  leadTimeMaxDays: z.number().int().optional(),
+  sequenceAfterDishTaskId: z.string().uuid().optional(),
+  stationId: z.string().uuid().optional(),
+});
+
+export type DishTaskSpecifyWorkParams = z.infer<typeof DishTaskSpecifyWorkParamsSchema>;
+
+// Command: link on DishTaskMaterial
+export const DishTaskMaterialLinkParamsSchema = z.object({
+  dishTaskId: z.string().min(1),
+  dishIngredientId: z.string().min(1).optional(),
+  dishComponentId: z.string().min(1).optional(),
+  dishContainerId: z.string().min(1).optional(),
+  workQuantity: z.number().optional(),
+  workUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
+});
+
+export type DishTaskMaterialLinkParams = z.infer<typeof DishTaskMaterialLinkParamsSchema>;
+
+// Command: unlink on DishTaskMaterial
+export const DishTaskMaterialUnlinkParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type DishTaskMaterialUnlinkParams = z.infer<typeof DishTaskMaterialUnlinkParamsSchema>;
 
 // Command: configure on EmailNotificationSubscription
 export const EmailNotificationSubscriptionConfigureParamsSchema = z.object({
@@ -5181,6 +5537,32 @@ export const EventDishComponentSeedSeedParamsSchema = z.object({
 
 export type EventDishComponentSeedSeedParams = z.infer<typeof EventDishComponentSeedSeedParamsSchema>;
 
+// Command: apply on EventDishLineOverride
+export const EventDishLineOverrideApplyParamsSchema = z.object({
+  eventDishId: z.string().min(1),
+  eventId: z.string().min(1),
+  kind: z.enum(["add", "remove", "replace", "adjust"]),
+  portionsAffected: z.number(),
+  reason: z.string(),
+  targetDishIngredientId: z.string().uuid().optional(),
+  targetDishComponentId: z.string().uuid().optional(),
+  targetDishContainerId: z.string().uuid().optional(),
+  targetDishTaskId: z.string().uuid().optional(),
+  ingredientId: z.string().min(1).optional(),
+  componentId: z.string().min(1).optional(),
+  quantity: z.number().optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
+});
+
+export type EventDishLineOverrideApplyParams = z.infer<typeof EventDishLineOverrideApplyParamsSchema>;
+
+// Command: revoke on EventDishLineOverride
+export const EventDishLineOverrideRevokeParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EventDishLineOverrideRevokeParams = z.infer<typeof EventDishLineOverrideRevokeParamsSchema>;
+
 // Command: assignTable on EventGuest
 export const EventGuestAssignTableParamsSchema = z.object({
   tableAssignment: z.string(),
@@ -5233,11 +5615,22 @@ export const EventIngredientContributionRecordParamsSchema = z.object({
   dishId: z.string().min(1),
   ingredientId: z.string().min(1),
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   servings: z.number(),
   quantityPerServing: z.number().optional(),
   componentId: z.string().min(1).optional(),
   purchasingWeekStart: z.coerce.date().optional(),
+  sourceKey: z.string().optional(),
+  exactQuantity: z.number().optional(),
+  roundedQuantity: z.number().optional(),
+  quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).optional(),
+  unitStatus: z.string().optional(),
+  ownership: z.string().optional(),
+  sourceDishIngredientId: z.string().uuid().optional(),
+  sourceDishComponentId: z.string().uuid().optional(),
+  componentPath: z.array(z.string()).optional(),
+  productionBatchId: z.string().min(1).optional(),
+  productionBatchAllocationId: z.string().uuid().optional(),
 });
 
 export type EventIngredientContributionRecordParams = z.infer<typeof EventIngredientContributionRecordParamsSchema>;
@@ -5256,7 +5649,7 @@ export type EventIngredientContributionRetireParams = z.infer<typeof EventIngred
 
 // Command: retirePreviousUnit on EventIngredientContribution
 export const EventIngredientContributionRetirePreviousUnitParamsSchema = z.object({
-  currentUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  currentUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
 });
 
 export type EventIngredientContributionRetirePreviousUnitParams = z.infer<typeof EventIngredientContributionRetirePreviousUnitParamsSchema>;
@@ -5268,6 +5661,14 @@ export const EventIngredientContributionReviseParamsSchema = z.object({
 });
 
 export type EventIngredientContributionReviseParams = z.infer<typeof EventIngredientContributionReviseParamsSchema>;
+
+// Command: supersede on EventIngredientContribution
+export const EventIngredientContributionSupersedeParamsSchema = z.object({
+  reason: z.string(),
+  supersededBySourceKey: z.string().optional(),
+});
+
+export type EventIngredientContributionSupersedeParams = z.infer<typeof EventIngredientContributionSupersedeParamsSchema>;
 
 // Command: add on EventLayoutSection
 export const EventLayoutSectionAddParamsSchema = z.object({
@@ -5492,6 +5893,14 @@ export const EventTimelineCommentRemoveParamsSchema = z.object({});
 
 export type EventTimelineCommentRemoveParams = z.infer<typeof EventTimelineCommentRemoveParamsSchema>;
 
+// Command: decide on ExternalRecordLink
+export const ExternalRecordLinkDecideParamsSchema = z.object({
+  decision: z.enum(["suggested", "approved", "rejected"]),
+  decidedByUserId: z.string(),
+});
+
+export type ExternalRecordLinkDecideParams = z.infer<typeof ExternalRecordLinkDecideParamsSchema>;
+
 // Command: discard on ExternalRecordLink
 export const ExternalRecordLinkDiscardParamsSchema = z.object({
   reason: z.string(),
@@ -5504,7 +5913,7 @@ export const ExternalRecordLinkLinkParamsSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]),
   recordType: z.string(),
   externalId: z.string(),
-  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list"]),
+  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]),
   capsuleId: z.string(),
   verified: z.boolean().optional(),
   verifiedByUserId: z.string().optional(),
@@ -5513,9 +5922,34 @@ export const ExternalRecordLinkLinkParamsSchema = z.object({
   effectiveEndDate: z.coerce.date().optional(),
   rawSourceData: z.string().optional(),
   metadata: z.string().optional(),
+  sourceAccount: z.string().optional(),
+  role: z.string().optional(),
+  ordinal: z.number().int().optional(),
+  linkKey: z.string().optional(),
+  decision: z.enum(["suggested", "approved", "rejected"]).optional(),
+  suggestedBy: z.string().optional(),
+  sourceVersion: z.string().optional(),
 });
 
 export type ExternalRecordLinkLinkParams = z.infer<typeof ExternalRecordLinkLinkParamsSchema>;
+
+// Command: observe on ExternalRecordLink
+export const ExternalRecordLinkObserveParamsSchema = z.object({
+  sourceVersion: z.string().optional(),
+  rawSourceData: z.string().optional(),
+  importRunId: z.string().optional(),
+});
+
+export type ExternalRecordLinkObserveParams = z.infer<typeof ExternalRecordLinkObserveParamsSchema>;
+
+// Command: recordApplied on ExternalRecordLink
+export const ExternalRecordLinkRecordAppliedParamsSchema = z.object({
+  appliedValues: z.string(),
+  appliedSourceVersion: z.string().optional(),
+  importRunId: z.string().optional(),
+});
+
+export type ExternalRecordLinkRecordAppliedParams = z.infer<typeof ExternalRecordLinkRecordAppliedParamsSchema>;
 
 // Command: resolveConflict on ExternalRecordLink
 export const ExternalRecordLinkResolveConflictParamsSchema = z.object({
@@ -5587,6 +6021,35 @@ export const ImportArtifactRegisterParamsSchema = z.object({
 
 export type ImportArtifactRegisterParams = z.infer<typeof ImportArtifactRegisterParamsSchema>;
 
+// Command: raise on ImportConflict
+export const ImportConflictRaiseParamsSchema = z.object({
+  externalRecordLinkId: z.string().min(1),
+  field: z.string(),
+  appliedValue: z.string().optional(),
+  capsuleValue: z.string().optional(),
+  sourceValue: z.string().optional(),
+  sourceVersion: z.string().optional(),
+});
+
+export type ImportConflictRaiseParams = z.infer<typeof ImportConflictRaiseParamsSchema>;
+
+// Command: settle on ImportConflict
+export const ImportConflictSettleParamsSchema = z.object({
+  resolution: z.enum(["pending", "keep_capsule", "take_source", "manual"]),
+  resolvedByUserId: z.string(),
+});
+
+export type ImportConflictSettleParams = z.infer<typeof ImportConflictSettleParamsSchema>;
+
+// Command: updateSource on ImportConflict
+export const ImportConflictUpdateSourceParamsSchema = z.object({
+  sourceValue: z.string(),
+  sourceVersion: z.string().optional(),
+  capsuleValue: z.string().optional(),
+});
+
+export type ImportConflictUpdateSourceParams = z.infer<typeof ImportConflictUpdateSourceParamsSchema>;
+
 // Command: activate on ImportDataset
 export const ImportDatasetActivateParamsSchema = z.object({});
 
@@ -5607,7 +6070,7 @@ export type ImportDatasetRecordLastImportParams = z.infer<typeof ImportDatasetRe
 // Command: register on ImportDataset
 export const ImportDatasetRegisterParamsSchema = z.object({
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]),
-  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list"]),
+  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task"]),
   config: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
@@ -5794,7 +6257,7 @@ export type IngredientDiscontinueParams = z.infer<typeof IngredientDiscontinuePa
 // Command: introduce on Ingredient
 export const IngredientIntroduceParamsSchema = z.object({
   name: z.string(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   costPerUnit: z.number(),
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
   category: z.string().optional(),
@@ -5878,7 +6341,7 @@ export type IngredientUpdateCostingParams = z.infer<typeof IngredientUpdateCosti
 // Command: updateDetails on Ingredient
 export const IngredientUpdateDetailsParamsSchema = z.object({
   name: z.string(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   category: z.string().optional(),
 });
 
@@ -5889,7 +6352,7 @@ export const IngredientDemandCalculateParamsSchema = z.object({
   eventId: z.string().min(1),
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   servings: z.number().optional(),
   dishId: z.string().min(1).optional(),
   sourceComponentLineQuantity: z.number().optional(),
@@ -5939,7 +6402,7 @@ export const IngredientDemandSyncFromContributionsParamsSchema = z.object({
   eventId: z.string().min(1),
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   purchasingWeekStart: z.coerce.date().optional(),
   total_gram: z.number().optional(),
   total_kilogram: z.number().optional(),
@@ -5965,7 +6428,7 @@ export const IngredientPriceObservationRecordParamsSchema = z.object({
   vendorOrderLineId: z.string().min(1),
   receiptQuantity: z.number(),
   cumulativeReceivedQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   unitPrice: z.number(),
 });
 
@@ -6049,7 +6512,7 @@ export type InventoryItemAdjustQuantityParams = z.infer<typeof InventoryItemAdju
 export const InventoryItemOpenParamsSchema = z.object({
   ingredientId: z.string().min(1),
   locationId: z.string().min(1),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   quantityOnHand: z.number().optional(),
   parLevel: z.number().optional(),
   reorderThreshold: z.number().optional(),
@@ -6063,7 +6526,7 @@ export const InventoryItemReceiveDeliveryParamsSchema = z.object({
   ingredientId: z.string().min(1),
   locationId: z.string().min(1),
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   unitCost: z.number(),
 });
 
@@ -6136,7 +6599,7 @@ export const InventoryLotRecordParamsSchema = z.object({
   locationId: z.string().min(1),
   receiptQuantity: z.number(),
   cumulativeReceivedQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   unitCost: z.number(),
 });
 
@@ -6285,6 +6748,28 @@ export const InvoiceWriteOffParamsSchema = z.object({
 });
 
 export type InvoiceWriteOffParams = z.infer<typeof InvoiceWriteOffParamsSchema>;
+
+// Command: record on ItemUnitMapping
+export const ItemUnitMappingRecordParamsSchema = z.object({
+  kind: z.enum(["pack", "density", "portion", "yield"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  equalsQuantity: z.number(),
+  equalsUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  ingredientId: z.string().min(1).optional(),
+  componentId: z.string().min(1).optional(),
+  fromBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).optional(),
+  toBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).optional(),
+  source: z.string().optional(),
+});
+
+export type ItemUnitMappingRecordParams = z.infer<typeof ItemUnitMappingRecordParamsSchema>;
+
+// Command: retire on ItemUnitMapping
+export const ItemUnitMappingRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type ItemUnitMappingRetireParams = z.infer<typeof ItemUnitMappingRetireParamsSchema>;
 
 // Command: capture on Lead
 export const LeadCaptureParamsSchema = z.object({
@@ -6700,7 +7185,7 @@ export const PackListItemAddItemParamsSchema = z.object({
   packListId: z.string().min(1),
   description: z.string(),
   requiredQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   dishId: z.string().min(1).optional(),
   productionBatchId: z.string().min(1).optional(),
 });
@@ -6743,7 +7228,7 @@ export const PackListItemEnsureContainerParamsSchema = z.object({
   dishId: z.string().min(1),
   description: z.string(),
   quantityServings: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
 });
 
 export type PackListItemEnsureContainerParams = z.infer<typeof PackListItemEnsureContainerParamsSchema>;
@@ -7143,13 +7628,23 @@ export const PrepTaskMarkBlockedParamsSchema = z.object({
 
 export type PrepTaskMarkBlockedParams = z.infer<typeof PrepTaskMarkBlockedParamsSchema>;
 
+// Command: markOverride on PrepTask
+export const PrepTaskMarkOverrideParamsSchema = z.object({
+  overrideOfDishTaskId: z.string().uuid(),
+  reason: z.string(),
+  name: z.string().optional(),
+  specialInstructions: z.string().optional(),
+});
+
+export type PrepTaskMarkOverrideParams = z.infer<typeof PrepTaskMarkOverrideParamsSchema>;
+
 // Command: open on PrepTask
 export const PrepTaskOpenParamsSchema = z.object({
   eventDishId: z.string().min(1),
   eventId: z.string().min(1),
   name: z.string(),
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   ingredientId: z.string().min(1).optional(),
   ingredientDemandId: z.string().min(1).optional(),
   componentId: z.string().min(1).optional(),
@@ -7176,7 +7671,7 @@ export type PrepTaskReconcileRemainingWorkParams = z.infer<typeof PrepTaskReconc
 // Command: refreshGenerated on PrepTask
 export const PrepTaskRefreshGeneratedParamsSchema = z.object({
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   specialInstructions: z.string().optional(),
 });
 
@@ -7202,6 +7697,13 @@ export const PrepTaskReplaceRecipeComponentParamsSchema = z.object({
 
 export type PrepTaskReplaceRecipeComponentParams = z.infer<typeof PrepTaskReplaceRecipeComponentParamsSchema>;
 
+// Command: resolveChoice on PrepTask
+export const PrepTaskResolveChoiceParamsSchema = z.object({
+  choice: z.string(),
+});
+
+export type PrepTaskResolveChoiceParams = z.infer<typeof PrepTaskResolveChoiceParamsSchema>;
+
 // Command: retireWithTemplate on PrepTask
 export const PrepTaskRetireWithTemplateParamsSchema = z.object({
   expectedVersion: z.number().int(),
@@ -7213,7 +7715,7 @@ export type PrepTaskRetireWithTemplateParams = z.infer<typeof PrepTaskRetireWith
 export const PrepTaskReviseParamsSchema = z.object({
   name: z.string().optional(),
   quantity: z.number().optional(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
   category: z.string().optional(),
   taskType: z.string().optional(),
   specialInstructions: z.string().optional(),
@@ -7222,6 +7724,14 @@ export const PrepTaskReviseParamsSchema = z.object({
 });
 
 export type PrepTaskReviseParams = z.infer<typeof PrepTaskReviseParamsSchema>;
+
+// Command: setChoice on PrepTask
+export const PrepTaskSetChoiceParamsSchema = z.object({
+  choiceOptions: z.array(z.string()),
+  resolution: z.enum(["resolved", "choice_pending", "content_missing"]).optional(),
+});
+
+export type PrepTaskSetChoiceParams = z.infer<typeof PrepTaskSetChoiceParamsSchema>;
 
 // Command: standDown on PrepTask
 export const PrepTaskStandDownParamsSchema = z.object({
@@ -7280,6 +7790,26 @@ export const PrepTaskDependencySatisfyParamsSchema = z.object({});
 
 export type PrepTaskDependencySatisfyParams = z.infer<typeof PrepTaskDependencySatisfyParamsSchema>;
 
+// Command: link on PrepTaskMaterial
+export const PrepTaskMaterialLinkParamsSchema = z.object({
+  prepTaskId: z.string().min(1),
+  eventIngredientContributionId: z.string().uuid().optional(),
+  productionBatchAllocationId: z.string().uuid().optional(),
+  dishIngredientId: z.string().min(1).optional(),
+  dishComponentId: z.string().min(1).optional(),
+  workQuantity: z.number().optional(),
+  workUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
+});
+
+export type PrepTaskMaterialLinkParams = z.infer<typeof PrepTaskMaterialLinkParamsSchema>;
+
+// Command: unlink on PrepTaskMaterial
+export const PrepTaskMaterialUnlinkParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type PrepTaskMaterialUnlinkParams = z.infer<typeof PrepTaskMaterialUnlinkParamsSchema>;
+
 // Command: cancel on ProductionBatch
 export const ProductionBatchCancelParamsSchema = z.object({
   reason: z.string(),
@@ -7298,17 +7828,58 @@ export type ProductionBatchCompleteParams = z.infer<typeof ProductionBatchComple
 export const ProductionBatchPlanParamsSchema = z.object({
   componentId: z.string().min(1),
   plannedYield: z.number(),
-  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   eventId: z.string().min(1).optional(),
   notes: z.string().optional(),
 });
 
 export type ProductionBatchPlanParams = z.infer<typeof ProductionBatchPlanParamsSchema>;
 
+// Command: reconcilePlan on ProductionBatch
+export const ProductionBatchReconcilePlanParamsSchema = z.object({
+  plannedExact: z.number(),
+  plannedRounded: z.number(),
+  roundingScope: z.enum(["none", "dish_allocation", "event_total", "production_group", "purchase_pack"]).optional(),
+  portionSpecId: z.string().min(1).optional(),
+  productionDate: z.coerce.date().optional(),
+});
+
+export type ProductionBatchReconcilePlanParams = z.infer<typeof ProductionBatchReconcilePlanParamsSchema>;
+
 // Command: start on ProductionBatch
 export const ProductionBatchStartParamsSchema = z.object({});
 
 export type ProductionBatchStartParams = z.infer<typeof ProductionBatchStartParamsSchema>;
+
+// Command: allocate on ProductionBatchAllocation
+export const ProductionBatchAllocationAllocateParamsSchema = z.object({
+  productionBatchId: z.string().min(1),
+  allocatedQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  formulaShare: z.number(),
+  eventId: z.string().min(1).optional(),
+  eventDishId: z.string().min(1).optional(),
+  isSurplus: z.boolean().optional(),
+});
+
+export type ProductionBatchAllocationAllocateParams = z.infer<typeof ProductionBatchAllocationAllocateParamsSchema>;
+
+// Command: markPortioned on ProductionBatchAllocation
+export const ProductionBatchAllocationMarkPortionedParamsSchema = z.object({});
+
+export type ProductionBatchAllocationMarkPortionedParams = z.infer<typeof ProductionBatchAllocationMarkPortionedParamsSchema>;
+
+// Command: markProduced on ProductionBatchAllocation
+export const ProductionBatchAllocationMarkProducedParamsSchema = z.object({});
+
+export type ProductionBatchAllocationMarkProducedParams = z.infer<typeof ProductionBatchAllocationMarkProducedParamsSchema>;
+
+// Command: release on ProductionBatchAllocation
+export const ProductionBatchAllocationReleaseParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type ProductionBatchAllocationReleaseParams = z.infer<typeof ProductionBatchAllocationReleaseParamsSchema>;
 
 // Command: accept on Proposal
 export const ProposalAcceptParamsSchema = z.object({
@@ -7555,7 +8126,7 @@ export const PurchaseNeedCreateParamsSchema = z.object({
   ingredientDemandId: z.string().min(1),
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   purchasingWeekStart: z.coerce.date().optional(),
   preferredVendorId: z.string().min(1).optional(),
 });
@@ -7595,7 +8166,7 @@ export type PurchaseNeedReleaseCancelledDraftParams = z.infer<typeof PurchaseNee
 // Command: reviseRequired on PurchaseNeed
 export const PurchaseNeedReviseRequiredParamsSchema = z.object({
   requiredQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).optional(),
 });
 
 export type PurchaseNeedReviseRequiredParams = z.infer<typeof PurchaseNeedReviseRequiredParamsSchema>;
@@ -8212,6 +8783,36 @@ export const StaffMessageSendParamsSchema = z.object({
 
 export type StaffMessageSendParams = z.infer<typeof StaffMessageSendParamsSchema>;
 
+// Command: define on Station
+export const StationDefineParamsSchema = z.object({
+  name: z.string(),
+  sortOrder: z.number().int().optional(),
+  aliases: z.array(z.string()).optional(),
+});
+
+export type StationDefineParams = z.infer<typeof StationDefineParamsSchema>;
+
+// Command: reinstate on Station
+export const StationReinstateParamsSchema = z.object({});
+
+export type StationReinstateParams = z.infer<typeof StationReinstateParamsSchema>;
+
+// Command: rename on Station
+export const StationRenameParamsSchema = z.object({
+  name: z.string(),
+  sortOrder: z.number().int().optional(),
+  aliases: z.array(z.string()).optional(),
+});
+
+export type StationRenameParams = z.infer<typeof StationRenameParamsSchema>;
+
+// Command: retire on Station
+export const StationRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type StationRetireParams = z.infer<typeof StationRetireParamsSchema>;
+
 // Command: confirmLedgerMatch on StockCountLine
 export const StockCountLineConfirmLedgerMatchParamsSchema = z.object({});
 
@@ -8223,7 +8824,7 @@ export const StockCountLineFreezeParamsSchema = z.object({
   inventoryItemId: z.string().min(1),
   locationId: z.string().min(1),
   ingredientId: z.string().min(1),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
 });
 
 export type StockCountLineFreezeParams = z.infer<typeof StockCountLineFreezeParamsSchema>;
@@ -8274,7 +8875,7 @@ export const StockTransferRecordParamsSchema = z.object({
   sourceLocationId: z.string().min(1),
   destinationLocationId: z.string().min(1),
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   notes: z.string().optional(),
 });
 
@@ -8780,7 +9381,7 @@ export const VendorOrderEnsureWeeklyDraftParamsSchema = z.object({
   ingredientDemandId: z.string().min(1),
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   orderSequence: z.number().int(),
 });
 
@@ -8851,7 +9452,7 @@ export const VendorOrderLineAddLineParamsSchema = z.object({
   vendorOrderId: z.string().min(1),
   ingredientId: z.string().min(1),
   orderedQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   unitCost: z.number(),
   ingredientDemandId: z.string().min(1).optional(),
   locationId: z.string().min(1).optional(),
@@ -8880,7 +9481,7 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
   weekNeed: z.number(),
   onHand: z.number(),
   contributionQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   purchaseNeedId: z.string().uuid(),
   ingredientDemandId: z.string().min(1),
   pendingSupply: z.number().optional(),
@@ -8937,7 +9538,7 @@ export const VendorOrderLineDemandLinkParamsSchema = z.object({
   ingredientDemandId: z.string().min(1),
   vendorOrderId: z.string().min(1),
   contributionQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
 });
 
 export type VendorOrderLineDemandLinkParams = z.infer<typeof VendorOrderLineDemandLinkParamsSchema>;
@@ -9224,7 +9825,7 @@ export const WasteRecordRecordParamsSchema = z.object({
   ingredientId: z.string().min(1),
   locationId: z.string().min(1),
   quantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   reason: z.enum(["spoilage", "prep_error", "overproduction", "dropped", "date_expired", "quality_reject", "other"]),
   eventId: z.string().min(1).optional(),
   inventoryItemId: z.string().min(1).optional(),
@@ -9255,7 +9856,7 @@ export const WeeklyPurchasingConfigRouteNeedParamsSchema = z.object({
   ingredientDemandId: z.string().min(1),
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
-  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   purchasingWeekStart: z.coerce.date(),
   preferredVendorId: z.string().min(1).optional(),
 });

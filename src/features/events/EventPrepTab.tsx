@@ -18,6 +18,7 @@ import { suspectRowsFromRecipeLines } from "./eventMenuSuspectQuantity";
 
 import { EventPrepList } from "./EventPrepList";
 import { EventPrepWorkNotice } from "./EventPrepWorkNotice";
+import { EventUnresolvedMaterialsNotice } from "./EventUnresolvedMaterialsNotice";
 
 type Props = {
   eventId: string;
@@ -167,6 +168,7 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
         </p>
       ) : null}
       <EventPrepWorkNotice eventId={eventId} />
+      <EventUnresolvedMaterialsNotice eventId={eventId} />
       {eventDishes === undefined ||
       prepTasks === undefined ||
       dishes === undefined ? (

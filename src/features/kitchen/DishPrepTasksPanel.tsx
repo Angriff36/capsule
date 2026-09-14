@@ -4,9 +4,18 @@ import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDishTask,
   useDishTaskRetire,
+  useListDishComponent,
+  useListDishIngredient,
   useListDishTask,
+  useListDishTaskMaterial,
   useListComponent,
+  useListIngredient,
 } from "../../lib/manifest-convex-react";
+import {
+  DishPrepTaskWorkControls,
+  type PrepMaterialOption,
+  type PrepMaterialRow,
+} from "./DishPrepTaskWorkControls";
 import { RecipeNotes, readableRecipeAmount } from "./RecipeNotes";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
@@ -66,6 +75,10 @@ const QUANTITY_MODES: { value: PrepQuantityEntryMode; label: string }[] = [
 export function DishPrepTasksPanel({ dishId }: Props) {
   const tasks = useListDishTask();
   const components = useListComponent();
+  const ingredients = useListIngredient();
+  const dishIngredients = useListDishIngredient();
+  const dishComponents = useListDishComponent();
+  const taskMaterials = useListDishTaskMaterial();
   const addTask = useCreateDishTask();
   const retireTask = useDishTaskRetire();
 
@@ -98,6 +111,37 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         task.status === "active",
     )
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+
+  // The ingredient and recipe lines of THIS dish are the only things a prep
+  // step can act on, so the picker is built from them.
+  const materialOptions: PrepMaterialOption[] = [
+    ...(dishIngredients ?? [])
+      .filter((line) => line.deletedAt == null && line.dishId === dishId)
+      .map((line) => ({
+        id: String(line._id),
+        kind: "ingredient" as const,
+        label:
+          ingredients?.find((entry) => entry._id === line.ingredientId)?.name ??
+          "Unknown ingredient",
+      })),
+    ...(dishComponents ?? [])
+      .filter((line) => line.deletedAt == null && line.dishId === dishId)
+      .map((line) => ({
+        id: String(line._id),
+        kind: "component" as const,
+        label:
+          components?.find((entry) => entry._id === line.componentId)?.name ??
+          "Unknown recipe",
+      })),
+  ];
+  const materialsByTask = new Map<string, PrepMaterialRow[]>();
+  for (const material of taskMaterials ?? []) {
+    if (material.deletedAt != null || material.linkedAt == null) continue;
+    const key = String(material.dishTaskId);
+    const list = materialsByTask.get(key) ?? [];
+    list.push(material);
+    materialsByTask.set(key, list);
+  }
 
   function clearAddFields() {
     setTaskName("");
@@ -231,6 +275,12 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                       : ""}
                   </p>
                   <RecipeNotes text={task.instructions} title={task.name} />
+                  <DishPrepTaskWorkControls
+                    task={task}
+                    materials={materialsByTask.get(String(task._id)) ?? []}
+                    options={materialOptions}
+                    prompt={prompt}
+                  />
                 </div>
                 <div className="flex items-center gap-3">
                   {component ? (

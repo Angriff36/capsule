@@ -27,6 +27,35 @@ enum UnitOfMeasure {
   batch
   melon
   bottle
+  // Revision-2 culinary model (2026-09-14): units the TPP catalog and printed
+  // sheets use that the catalog could not express. fluid_ounce is volume;
+  // ounce stays mass. Count units (piece, slice, pizza, package, case, can,
+  // tub) convert only through an ItemUnitMapping on the specific item.
+  fluid_ounce
+  piece
+  slice
+  pizza
+  package
+  case
+  can
+  tub
+}
+
+// Quantity basis a food requirement line is stated in. Import sets it only
+// from source evidence; "unknown" is a real state, never a silent default.
+enum QuantityBasis {
+  as_purchased
+  as_produced
+  raw
+  cooked
+  unknown
+}
+
+enum ItemUnitMappingKind {
+  pack
+  density
+  portion
+  yield
 }
 
 // US major food allergens (Big-8) plus sesame (FASTER Act). Evidence stored
@@ -439,4 +468,95 @@ event IngredientPrimaryImageSet: "ingredient.primary_image_set" {
 event IngredientPrimaryImageCleared: "ingredient.primary_image_cleared" {
   ingredientId: string
   tenantId: string
+}
+
+// Revision-2 culinary model (2026-09-14). Item-specific meaning of a count
+// unit (case, tub, slice), a density (volume -> mass) or a preparation yield
+// (raw -> cooked). Person-entered with a source; the demand engine refuses to
+// convert without one and reports the line as unresolved instead.
+entity ItemUnitMapping mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property ingredientId: uuid?
+  property componentId: uuid?
+  property required kind: ItemUnitMappingKind = "pack"
+  property required unit: UnitOfMeasure = "each"
+  property required equalsQuantity: decimal(12, 6) = 1
+  property required equalsUnit: UnitOfMeasure = "each"
+  property fromBasis: QuantityBasis?
+  property toBasis: QuantityBasis?
+  property source: string?
+  property confirmedByUserId: string?
+  property recordedAt: datetime?
+
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  constraint mappingQuantityPositive: self.recordedAt == null or self.equalsQuantity > 0 "Mapping quantity must be positive"
+
+  default policy itemUnitMappingRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may read unit mappings"
+  default policy itemUnitMappingWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may write unit mappings through commands"
+  default policy itemUnitMappingExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Kitchen, inventory and managers may execute unit mapping commands"
+
+  command record(
+    kind: ItemUnitMappingKind,
+    unit: UnitOfMeasure,
+    equalsQuantity: decimal(12, 6),
+    equalsUnit: UnitOfMeasure,
+    optional ingredientId: uuid,
+    optional componentId: uuid,
+    optional fromBasis: QuantityBasis,
+    optional toBasis: QuantityBasis,
+    optional source: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    constraint recordMappingTarget: ingredientId != null or componentId != null "A unit mapping needs an ingredient or a recipe"
+    constraint recordMappingPositive: equalsQuantity > 0 "Mapping quantity must be positive"
+    mutate ingredientId = ingredientId
+    mutate componentId = componentId
+    mutate kind = kind
+    mutate unit = unit
+    mutate equalsQuantity = equalsQuantity
+    mutate equalsUnit = equalsUnit
+    mutate fromBasis = fromBasis
+    mutate toBasis = toBasis
+    mutate source = source
+    mutate confirmedByUserId = user.id
+    mutate recordedAt = now()
+    emit ItemUnitMappingRecorded {
+      itemUnitMappingId: self.id
+      tenantId: self.tenantId
+      kind: kind
+      unit: unit
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint retireMappingReason: length(trim(reason)) > 0 "Reason is required"
+    mutate deletedAt = now()
+    emit ItemUnitMappingRetired {
+      itemUnitMappingId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  store ItemUnitMapping in durable
+}
+
+event ItemUnitMappingRecorded: "item_unit_mapping.recorded" {
+  itemUnitMappingId: string
+  tenantId: string
+  kind: ItemUnitMappingKind
+  unit: UnitOfMeasure
+}
+
+event ItemUnitMappingRetired: "item_unit_mapping.retired" {
+  itemUnitMappingId: string
+  tenantId: string
+  reason: string
 }
