@@ -349,6 +349,7 @@ export function ComponentDetailPage() {
         instructions: optional(data.get("instructions")),
         version: component.version,
       });
+      await reconcileEvents(component._id);
       draftForm.clear();
       setEditing(false);
     });

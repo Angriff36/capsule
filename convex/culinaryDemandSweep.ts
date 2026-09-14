@@ -3,6 +3,10 @@
 // reaching that recipe. Direct one-level component edits already cascade
 // through src/procurement/event-purchasing.manifest; nested ComponentComponent
 // lines do not.
+//
+// Walks parent/dish/event indexes (not whole-tenant collects). One public
+// call reconciles a few events so generated demand writes keep the caller's
+// auth. The client hook repeats until the cursor is done.
 
 import { v } from "convex/values";
 import { api } from "./_generated/api";
@@ -20,26 +24,40 @@ const LIVE_EVENT_STAGES = new Set([
   "final",
 ]);
 
+const EVENT_BATCH = 3;
+
 export const reconcileLiveEventsForComponent = mutation({
-  args: { componentId: v.id("components") },
+  args: {
+    componentId: v.id("components"),
+    cursor: v.optional(v.number()),
+  },
   returns: v.object({
     eventIds: v.array(v.string()),
     reconciled: v.number(),
+    nextCursor: v.number(),
+    hasMore: v.boolean(),
   }),
   handler: async (ctx, args) => {
     const tenantId = requireTenant(await getAuthContext(ctx));
-    const recipeIds = await ancestorRecipeIds(
+    const eventIds = await liveEventIdsUsingRecipes(
       ctx,
       tenantId,
-      String(args.componentId),
+      await ancestorRecipeIds(ctx, tenantId, String(args.componentId)),
     );
-    const eventIds = await liveEventIdsUsingRecipes(ctx, tenantId, recipeIds);
-    for (const eventId of eventIds) {
+    const cursor = args.cursor ?? 0;
+    const batch = eventIds.slice(cursor, cursor + EVENT_BATCH);
+    for (const eventId of batch) {
       await ctx.runMutation(api.culinaryDemand.reconcileEventDemand, {
         eventId: eventId as Id<"events">,
       });
     }
-    return { eventIds, reconciled: eventIds.length };
+    const nextCursor = cursor + batch.length;
+    return {
+      eventIds: batch,
+      reconciled: batch.length,
+      nextCursor,
+      hasMore: nextCursor < eventIds.length,
+    };
   },
 });
 
@@ -48,23 +66,20 @@ async function ancestorRecipeIds(
   tenantId: string,
   startId: string,
 ): Promise<Set<string>> {
-  const lines = await ctx.db
-    .query("componentComponents")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
-  const parents = new Map<string, string[]>();
-  for (const line of lines) {
-    if (line.deletedAt != null || line.addedAt == null) continue;
-    const child = String(line.childComponentId);
-    const list = parents.get(child) ?? [];
-    list.push(String(line.componentId));
-    parents.set(child, list);
-  }
   const found = new Set<string>([startId]);
   const stack = [startId];
   while (stack.length) {
     const current = stack.pop() as string;
-    for (const parent of parents.get(current) ?? []) {
+    const parents = await ctx.db
+      .query("componentComponents")
+      .withIndex("by_childComponentId", (q) =>
+        q.eq("childComponentId", current as Id<"components">),
+      )
+      .collect();
+    for (const line of parents) {
+      if (line.tenantId !== tenantId) continue;
+      if (line.deletedAt != null || line.addedAt == null) continue;
+      const parent = String(line.componentId);
       if (found.has(parent)) continue;
       found.add(parent);
       stack.push(parent);
@@ -78,45 +93,39 @@ async function liveEventIdsUsingRecipes(
   tenantId: string,
   recipeIds: Set<string>,
 ): Promise<string[]> {
-  const dishLinks = await ctx.db
-    .query("dishComponents")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
-  const dishIds = new Set(
-    dishLinks
-      .filter(
-        (link) =>
-          link.deletedAt == null &&
-          link.attachedAt != null &&
-          recipeIds.has(String(link.componentId)),
+  const dishIds = new Set<string>();
+  for (const recipeId of recipeIds) {
+    const links = await ctx.db
+      .query("dishComponents")
+      .withIndex("by_componentId", (q) =>
+        q.eq("componentId", recipeId as Id<"components">),
       )
-      .map((link) => String(link.dishId)),
-  );
-  if (dishIds.size === 0) return [];
-  const eventDishes = await ctx.db
-    .query("eventDishes")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
-  const candidateEventIds = new Set(
-    eventDishes
-      .filter(
-        (row) =>
-          row.deletedAt == null &&
-          row.removedAt == null &&
-          dishIds.has(String(row.dishId)),
-      )
-      .map((row) => String(row.eventId)),
-  );
-  const events = await ctx.db
-    .query("events")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
-  return events
-    .filter(
-      (event) =>
+      .collect();
+    for (const link of links) {
+      if (link.tenantId !== tenantId) continue;
+      if (link.deletedAt != null || link.attachedAt == null) continue;
+      dishIds.add(String(link.dishId));
+    }
+  }
+  const eventIds = new Set<string>();
+  for (const dishId of dishIds) {
+    const rows = await ctx.db
+      .query("eventDishes")
+      .withIndex("by_dishId", (q) => q.eq("dishId", dishId as Id<"dishes">))
+      .collect();
+    for (const row of rows) {
+      if (row.tenantId !== tenantId) continue;
+      if (row.deletedAt != null || row.removedAt != null) continue;
+      const event = await ctx.db.get(row.eventId);
+      if (
+        event &&
         event.deletedAt == null &&
-        candidateEventIds.has(String(event._id)) &&
-        LIVE_EVENT_STAGES.has(String(event.stage)),
-    )
-    .map((event) => String(event._id));
+        event.tenantId === tenantId &&
+        LIVE_EVENT_STAGES.has(String(event.stage))
+      ) {
+        eventIds.add(String(event._id));
+      }
+    }
+  }
+  return [...eventIds];
 }

@@ -8,8 +8,8 @@ import {
 } from "@clerk/react";
 import { useAction } from "convex/react";
 import { useCallback, useEffect, useState } from "react";
-import { api } from "../../lib/api";
-import { waitForSessionTenantClaim } from "./sessionTenantClaim";
+import { api } from "../lib/api";
+import { waitForSessionTenantClaim } from "./auth/sessionTenantClaim";
 import { GateShell } from "./GateShell";
 
 type LinkOutcome =

@@ -65,6 +65,7 @@ export function ComponentSubRecipesPanel({
         unit: String(data.get("unit") ?? "each"),
         sortOrder: rows.length,
       });
+      await reconcileEvents(componentId);
       form.reset();
     } catch (cause) {
       setError(

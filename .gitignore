@@ -41,6 +41,9 @@ generated/ir/
 .claude/scheduled_tasks.lock
 .claude/loop-tick.log
 
+# Git Bash copy so Windows CreateProcess finds cwd before WSL System32 bash
+/bash.exe
+
 # Local kitchen reference (photos/CSVs; may include large binaries)
 work/
 

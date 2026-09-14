@@ -1012,7 +1012,7 @@ export const addNestedRecipeLine = mutation({
       seen.add(current);
       for (const next of children.get(current) ?? []) stack.push(next);
     }
-    const created: { docId?: string } | null = await ctx.runMutation(
+    return await ctx.runMutation(
       api.mutations.ComponentComponent_createViaAdd,
       {
         componentId: String(args.componentId),
@@ -1025,10 +1025,5 @@ export const addNestedRecipeLine = mutation({
         prepNotes: args.prepNotes,
       },
     );
-    await ctx.runMutation(
-      api.culinaryDemandSweep.reconcileLiveEventsForComponent,
-      { componentId: args.componentId },
-    );
-    return created;
   },
 });

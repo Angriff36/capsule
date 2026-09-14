@@ -13,8 +13,8 @@ import {
 import { SessionPersistenceBoundary } from "./SessionPersistenceBoundary";
 import { PasswordSignIn } from "./PasswordSignIn";
 import { PushRevokeOnSignout } from "./PushRevokeOnSignout";
-import { ClaimGate } from "./auth/ClaimGate";
-import { CapsuleWordmark, GateShell } from "./auth/GateShell";
+import { ClaimGate } from "./ClaimGate";
+import { CapsuleWordmark, GateShell } from "./GateShell";
 
 /** True once VITE_CLERK_PUBLISHABLE_KEY exists in the (uncommitted) local env. */
 export function isAuthConfigured(

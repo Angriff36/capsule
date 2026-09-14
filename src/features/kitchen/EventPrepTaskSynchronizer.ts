@@ -1,5 +1,5 @@
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
-import { EQUIPMENT_FIXED_TASK_TYPE } from "./PrepTemplateQuantityCoordinator";
+import { quantityForDishTask } from "./prepTaskQuantity";
 import { recipeUnitRatio } from "../../lib/recipeUnitConversion";
 import { prepWorkBalance } from "../../lib/prepWorkBalance";
 import type {
@@ -407,14 +407,11 @@ export class EventPrepTaskSynchronizer {
   }
 
   private quantityFor(template: EventPrepDishTask, servings: number) {
-    const quantity = template.defaultQuantity ?? servings;
-    if (quantity <= 0 || servings <= 0) {
-      throw new Error("Event prep quantities must be positive");
-    }
-    if (template.taskType === EQUIPMENT_FIXED_TASK_TYPE) {
-      return quantity;
-    }
-    return template.defaultQuantity == null ? servings : quantity * servings;
+    return quantityForDishTask(
+      template.taskType,
+      template.defaultQuantity,
+      servings,
+    );
   }
 
   private instructionsFor(

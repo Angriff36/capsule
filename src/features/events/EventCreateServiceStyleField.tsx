@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useCreateServiceStyle } from "../../lib/manifest-convex-react";
+import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
 import {
   EventCreateServiceStyleResolver,
   type ListedServiceStyleRow,
@@ -20,11 +20,13 @@ export function EventCreateServiceStyleField({
   rows: readonly ListedServiceStyleRow[] | undefined;
   form: string;
 }) {
-  const createServiceStyle = useCreateServiceStyle();
+  const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [busy, setBusy] = useState(false);
   const options = serviceStyleSelectOptions(rows);
   const builtIn = usingBuiltInServiceStyles(rows);
-  const resolver = new EventCreateServiceStyleResolver(createServiceStyle);
+  const resolver = new EventCreateServiceStyleResolver(
+    ensureBuiltInServiceStyle,
+  );
   const missing = resolver.missing(rows);
 
   useEffect(() => {

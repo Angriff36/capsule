@@ -7,10 +7,10 @@
  * is always the derived per-guest rate. Persist that rate — never a default 1.
  */
 
-export type PrepQuantityEntryMode = "per_guest" | "batch_total" | "fixed";
+export { EQUIPMENT_FIXED_TASK_TYPE } from "./prepTaskQuantity";
+import { EQUIPMENT_FIXED_TASK_TYPE } from "./prepTaskQuantity";
 
-/** Stored on DishTask.taskType so event fan-out does not × guest count (#320). */
-export const EQUIPMENT_FIXED_TASK_TYPE = "equipment_fixed";
+export type PrepQuantityEntryMode = "per_guest" | "batch_total" | "fixed";
 
 export const PREP_QUANTITY_SCALE = 4;
 
@@ -75,7 +75,7 @@ export function prepTemplateWantsQuantity(
     return text !== "" && Number(text) !== 0;
   }
   if (mode === "fixed") {
-    return fieldText(batchTotalRaw) !== "";
+    return true;
   }
   return fieldText(batchTotalRaw) !== "" || fieldText(batchServingsRaw) !== "";
 }

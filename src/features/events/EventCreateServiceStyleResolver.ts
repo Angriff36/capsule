@@ -49,7 +49,12 @@ export class EventCreateServiceStyleResolver {
   ): ServiceStyleCatalogRow[] {
     const have = new Set(
       (rows ?? [])
-        .filter((row) => row.deletedAt == null)
+        .filter(
+          (row) =>
+            row.deletedAt == null &&
+            row.status === "active" &&
+            Boolean(row.code),
+        )
         .map((row) => row.code)
         .filter((code): code is string => Boolean(code)),
     );

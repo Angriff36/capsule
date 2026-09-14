@@ -1,20 +1,20 @@
 import { useUser } from "@clerk/react";
 import { useAction, useQuery } from "convex/react";
 import { type ReactNode, useEffect, useState } from "react";
-import { api } from "../../lib/api";
+import { api } from "../lib/api";
 import {
   OfflineAuthProvider,
   OfflineReadOnlyBanner,
-} from "../../lib/offlineAuthContext";
+} from "../lib/offlineAuthContext";
 import {
   offlineAuthRestorePolicy,
   offlineAuthSnapshotStore,
   type StoredAuthStatus,
-} from "../../lib/offlineAuthSnapshot";
+} from "../lib/offlineAuthSnapshot";
 import {
   type AuthStatusSnapshot,
   workspaceMembershipPolicy,
-} from "./WorkspaceMembershipPolicy";
+} from "./auth/WorkspaceMembershipPolicy";
 import { GateShell } from "./GateShell";
 import { MembershipRequired } from "./MembershipRequired";
 

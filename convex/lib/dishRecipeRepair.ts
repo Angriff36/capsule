@@ -5,6 +5,10 @@ import type { Id } from "../_generated/dataModel";
 import { getAuthContext, requireTenant } from "./authContext";
 import { requireKitchenAccess } from "./kitchenAccessGate";
 import {
+  EQUIPMENT_FIXED_TASK_TYPE,
+  quantityForDishTask,
+} from "./prepTaskQuantity";
+import {
   readMaterializationReceipt,
   writeMaterializationReceipt,
 } from "./materializationReceipt";
@@ -678,9 +682,15 @@ export async function repairDishRecipe(
           dishTaskId: task._id,
           name: task.name,
           quantity:
-            task.defaultQuantity != null
-              ? task.defaultQuantity * eventDish.quantityServings
-              : 1,
+            task.taskType === EQUIPMENT_FIXED_TASK_TYPE
+              ? quantityForDishTask(
+                  task.taskType,
+                  task.defaultQuantity,
+                  eventDish.quantityServings,
+                )
+              : task.defaultQuantity != null
+                ? task.defaultQuantity * eventDish.quantityServings
+                : 1,
           unit: task.defaultUnit ?? "each",
           componentId: task.componentId ?? undefined,
           category: task.category,

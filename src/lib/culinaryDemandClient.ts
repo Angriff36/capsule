@@ -44,8 +44,17 @@ export function useReconcileLiveEventsForComponent() {
   const mutate = useMutation(
     api.culinaryDemandSweep.reconcileLiveEventsForComponent,
   );
-  return (componentId: string) =>
-    mutate({ componentId: componentId as Id<"components"> });
+  return async (componentId: string) => {
+    let cursor = 0;
+    for (;;) {
+      const page = await mutate({
+        componentId: componentId as Id<"components">,
+        cursor,
+      });
+      if (!page.hasMore) return page;
+      cursor = page.nextCursor;
+    }
+  };
 }
 
 /** Kitchen wording for each unresolved kind the demand engine reports. */

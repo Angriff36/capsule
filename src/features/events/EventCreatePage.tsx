@@ -6,7 +6,6 @@ import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateClient,
   useCreateEvent,
-  useCreateServiceStyle,
   useCreateVenue,
   useGetEventTemplate,
   useGetProposal,
@@ -30,6 +29,7 @@ import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
+import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
 import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
 import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
@@ -165,7 +165,7 @@ export function EventCreatePage() {
   const createClient = useCreateClient();
   const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
-  const createServiceStyle = useCreateServiceStyle();
+  const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [clientId, setClientId] = useState(prefillClientId);
   const [venueId, setVenueId] = useState("");
   const [showClient, setShowClient] = useState(false);
@@ -447,7 +447,7 @@ export function EventCreatePage() {
         eventTypeRaw: String(data.get("eventType") ?? ""),
         occasionId,
         serviceStyleId: await new EventCreateServiceStyleResolver(
-          createServiceStyle,
+          ensureBuiltInServiceStyle,
         ).resolve(serviceStyleId, serviceStyles),
         salespersonId,
         referralSourceId,
