@@ -13,6 +13,20 @@ if [ "${VERCEL_ENV:-}" = "production" ]; then
   # package.json `build` also runs this file so a Vite-preset override
   # cannot ship UI-only (QA 191: frontend 3dd95bb1, mule search still
   # hyphen-split leftover).
+  # Cutover 2026-09-14: production backend is the SELF-HOSTED Convex on the
+  # Hermes box. When CONVEX_SELF_HOSTED_URL is set in the Vercel environment,
+  # the build is UI-only (backend code is deployed to the self-hosted instance
+  # directly, never through Vercel) and Convex Cloud is not touched.
+  if [ -n "${CONVEX_SELF_HOSTED_URL:-}" ]; then
+    echo "capsule vercel-build: self-hosted backend mode — UI-only build (no Convex Cloud deploy)"
+    bun scripts/check-deployment-config.ts \
+      --environment production \
+      --expected-deployment "" \
+      --require VITE_CONVEX_URL,VITE_CLERK_PUBLISHABLE_KEY \
+      --no-env-files
+    vite build
+    exit 0
+  fi
   echo "capsule vercel-build: production convex deploy + vite build"
   # PR12-01 / AC-028 — production config gate. The build env is the one
   # place the real production frontend env is visible before deploy, so a
