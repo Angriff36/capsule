@@ -2,6 +2,7 @@ import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { getAuthContext, requireTenant } from "./authContext";
+import { quantityForDishTask } from "./prepTaskQuantity";
 import { prepWorkBalance } from "../../src/lib/prepWorkBalance";
 
 export interface PrepWorkReconciliationResult {
@@ -142,8 +143,11 @@ async function planEventPrepWork(
           (task.ingredientId ?? null) !== (template.ingredientId ?? null)),
     );
     const unit = template.defaultUnit ?? "portion";
-    const requiredQuantity =
-      (template.defaultQuantity ?? 1) * selection.quantityServings;
+    const requiredQuantity = quantityForDishTask(
+      template.taskType,
+      template.defaultQuantity,
+      selection.quantityServings,
+    );
     const balance = prepWorkBalance(
       requiredQuantity,
       unit,

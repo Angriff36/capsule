@@ -60,7 +60,20 @@ export function EventEquipmentReserveForm({
             </option>
           ))}
         </select>
-        {equipment.length < 5 ? (
+        {equipment.length === 0 ? (
+          <span className="field-hint" data-testid="equipment-empty-catalog">
+            Nothing in the equipment catalog yet, so this list is empty. Open{" "}
+            <Link
+              to="/facilities/equipment"
+              target="_blank"
+              rel="noopener"
+              className="underline font-medium"
+            >
+              Facilities → Equipment
+            </Link>{" "}
+            and add kit (or paste a pack list). This form stays here.
+          </span>
+        ) : equipment.length < 5 ? (
           <span className="field-hint" data-testid="equipment-thin-catalog">
             Only {equipment.length} item{equipment.length === 1 ? "" : "s"} in
             the catalog. Add the real kit in{" "}

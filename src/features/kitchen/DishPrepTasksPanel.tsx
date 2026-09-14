@@ -22,6 +22,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import {
+  EQUIPMENT_FIXED_TASK_TYPE,
   PrepTemplateQuantityCoordinator,
   prepTemplateQuantityMeta,
   type PrepQuantityEntryMode,
@@ -69,6 +70,7 @@ const UNITS = [
 const QUANTITY_MODES: { value: PrepQuantityEntryMode; label: string }[] = [
   { value: "per_guest", label: "Per guest" },
   { value: "batch_total", label: "Total for batch" },
+  { value: "fixed", label: "Fixed — same no matter the guest count" },
 ];
 
 /** Dish-level prep task templates with component hyperlinks when linked. */
@@ -182,6 +184,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         station: station.trim() || undefined,
         defaultQuantity: qtySave.defaultQuantity,
         defaultUnit: qtySave.defaultQuantity != null ? unit : undefined,
+        taskType: qtySave.taskType,
         instructions: instructions.trim() || undefined,
         sortOrder: rows.length,
       });
@@ -270,9 +273,11 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                 <div>
                   <p className="text-lg font-medium text-ink">{task.name}</p>
                   <p className="recipe-prep-meta">
-                    {qtyMeta
-                      ? `${readableRecipeAmount(task.defaultQuantity!, String(task.defaultUnit ?? ""))} per guest`
-                      : ""}
+                    {task.taskType === EQUIPMENT_FIXED_TASK_TYPE && qtyMeta
+                      ? `${readableRecipeAmount(task.defaultQuantity!, String(task.defaultUnit ?? ""))} — same for every guest count`
+                      : qtyMeta
+                        ? `${readableRecipeAmount(task.defaultQuantity!, String(task.defaultUnit ?? ""))} per guest`
+                        : ""}
                   </p>
                   <RecipeNotes text={task.instructions} title={task.name} />
                   <DishPrepTaskWorkControls
@@ -371,7 +376,24 @@ export function DishPrepTasksPanel({ dishId }: Props) {
               ))}
             </select>
           </label>
-          {quantityMode === "per_guest" ? (
+          {quantityMode === "fixed" ? (
+            <label className="block text-sm sm:col-span-2">
+              <span className="meta-term">Fixed amount</span>
+              <input
+                name="batchTotal"
+                type="text"
+                inputMode="decimal"
+                placeholder="53"
+                value={batchTotalQty}
+                onChange={(event) => setBatchTotalQty(event.target.value)}
+                className="input mt-1"
+              />
+              <span className="mt-1 block text-xs text-ink-3">
+                Fryer oil, one infusion kit per container — this number does not
+                grow when the guest count changes.
+              </span>
+            </label>
+          ) : quantityMode === "per_guest" ? (
             <label className="block text-sm">
               <span className="meta-term">Per guest (0 = one each)</span>
               <input

@@ -26,7 +26,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Use the stage tabs to see what's coming up or needs approval.",
       "Click an event to manage its menu, staff, timeline, and money.",
-      "Use New event to book something new.",
+      "Use New event to book something new, or Import from BEO / worksheet to paste the binder instead of typing it.",
     ],
   },
   {
@@ -37,6 +37,17 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Review the menu, staff, and timeline.",
       "Update details as the booking firms up.",
       "Use the stage actions to move it forward.",
+    ],
+  },
+  {
+    prefix: "/events/import",
+    title: "Import an event from its BEO",
+    purpose:
+      "Paste the BEO or worksheet text (or drop TPP CSVs) and Capsule drafts the event for you to review.",
+    steps: [
+      "Paste the printed binder text or drop the TPP files.",
+      "Check the preview and pick existing client, venue, and dishes when they already exist.",
+      "Create the event, then walk the tabs — notes, staffing, and pack list should already be there.",
     ],
   },
   {

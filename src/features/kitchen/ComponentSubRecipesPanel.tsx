@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { formatCountNoun } from "../../lib/format";
-import { useAddNestedRecipeLine } from "../../lib/culinaryDemandClient";
+import {
+  useAddNestedRecipeLine,
+  useReconcileLiveEventsForComponent,
+} from "../../lib/culinaryDemandClient";
 import {
   useComponentComponentRemove,
   useListComponent,
@@ -23,6 +26,7 @@ export function ComponentSubRecipesPanel({
   const recipes = useListComponent();
   const addLine = useAddNestedRecipeLine();
   const removeLine = useComponentComponentRemove();
+  const reconcileEvents = useReconcileLiveEventsForComponent();
   const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +65,7 @@ export function ComponentSubRecipesPanel({
         unit: String(data.get("unit") ?? "each"),
         sortOrder: rows.length,
       });
+      await reconcileEvents(componentId);
       form.reset();
     } catch (cause) {
       setError(
@@ -92,6 +97,7 @@ export function ComponentSubRecipesPanel({
     setError(null);
     try {
       await removeLine({ docId: id, reason, version });
+      await reconcileEvents(componentId);
     } catch (cause) {
       setError(
         cause instanceof Error

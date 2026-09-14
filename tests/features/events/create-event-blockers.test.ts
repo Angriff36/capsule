@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { EventCreateServiceStyleResolver } from "../../../src/features/events/EventCreateServiceStyleResolver";
 import { eventCreateDisabledReason } from "../../../src/features/events/eventCreateGuards";
 import {
   SERVICE_STYLE_CATALOG,
@@ -31,6 +32,26 @@ describe("service style catalog fallback", () => {
       { _id: "ss1", name: "Full Service", status: "active", sortOrder: 0 },
     ]);
     expect(live).toEqual([{ id: "ss1", name: "Full Service" }]);
+  });
+
+  it("treats an inactive catalog row as missing so ensure can reactivate it", () => {
+    const resolver = new EventCreateServiceStyleResolver(async () => ({
+      docId: "new-id",
+    }));
+    expect(
+      resolver.missing([
+        {
+          _id: "ss-old",
+          name: "Full Service",
+          code: "full-service",
+          status: "inactive",
+        },
+      ]),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "full-service" }),
+      ]),
+    );
   });
 
   it("does not treat catalog codes as persistable serviceStyleId values", () => {
@@ -83,8 +104,13 @@ describe("create form uses the shared service style vocabulary", () => {
       "src/features/events/EventCreatePage.tsx",
       "utf8",
     );
-    expect(page).toContain("serviceStyleSelectOptions");
-    expect(page).toContain("Select a service style");
+    const field = readFileSync(
+      "src/features/events/EventCreateServiceStyleField.tsx",
+      "utf8",
+    );
+    expect(page).toContain("EventCreateServiceStyleField");
+    expect(field).toContain("serviceStyleSelectOptions");
+    expect(field).toContain("Select a service style");
     const seed = readFileSync("scripts/seed-catalogs.ts", "utf8");
     expect(seed).toContain("SERVICE_STYLE_CATALOG");
     expect(seed).toContain("serviceStyleCatalog");
@@ -128,12 +154,17 @@ describe("empty catalogs show an explicit state and do not block create", () => 
       "src/features/events/EventCreatePage.tsx",
       "utf8",
     );
+    const field = readFileSync(
+      "src/features/events/EventCreateServiceStyleField.tsx",
+      "utf8",
+    );
     expect(page).toContain("No occasions yet");
-    expect(page).toContain("built-in service styles");
     expect(page).toContain(
       "occasions !== undefined && activeOccasions.length === 0",
     );
-    expect(page.match(/to="\/admin\/catalogs"/g)?.length).toBe(2);
+    expect(page).toContain('to="/admin/catalogs"');
+    expect(field).toContain("Add the standard list");
+    expect(field).toContain("not in your catalog yet");
   });
 
   it("empty catalogs do not block create — both selectors stay optional", () => {
@@ -147,8 +178,12 @@ describe("empty catalogs show an explicit state and do not block create", () => 
       '<option value="">Select an occasion</option>',
     );
     expect(occasionSelect).not.toContain("required");
+    const field = readFileSync(
+      "src/features/events/EventCreateServiceStyleField.tsx",
+      "utf8",
+    );
     const styleSelect =
-      page.match(/Service style\s*<select[\s\S]*?<\/select>/)?.[0] ?? "";
+      field.match(/Service style\s*<select[\s\S]*?<\/select>/)?.[0] ?? "";
     expect(styleSelect).toContain(
       '<option value="">Select a service style</option>',
     );

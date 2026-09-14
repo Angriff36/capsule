@@ -63,7 +63,7 @@ describe("isAuthConfigured", () => {
 });
 
 describe("AuthGate duplicate-email recovery", () => {
-  const source = readFileSync("src/app/AuthGate.tsx", "utf8");
+  const source = readFileSync("src/app/MembershipRequired.tsx", "utf8");
   const authLink = readFileSync("convex/authLink.ts", "utf8");
   const authContext = readFileSync("convex/lib/authContext.ts", "utf8");
 

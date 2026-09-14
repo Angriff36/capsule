@@ -1,29 +1,20 @@
-import {
-  OrganizationSwitcher,
-  SignOutButton,
-  useOrganization,
-  useOrganizationList,
-  useSession,
-  useUser,
-} from "@clerk/react";
+import { useUser } from "@clerk/react";
+import { type ReactNode } from "react";
 import {
   Authenticated,
   AuthLoading,
   AuthRefreshing,
   Unauthenticated,
-  useAction,
-  useQuery,
 } from "convex/react";
-import { type ReactNode, useCallback, useEffect, useState } from "react";
-import { api } from "../lib/api";
+import {
+  offlineAuthRestorePolicy,
+  offlineAuthSnapshotStore,
+} from "../lib/offlineAuthSnapshot";
 import { SessionPersistenceBoundary } from "./SessionPersistenceBoundary";
 import { PasswordSignIn } from "./PasswordSignIn";
 import { PushRevokeOnSignout } from "./PushRevokeOnSignout";
-import {
-  type AuthStatusSnapshot,
-  workspaceMembershipPolicy,
-} from "./auth/WorkspaceMembershipPolicy";
-import { waitForSessionTenantClaim } from "./auth/sessionTenantClaim";
+import { ClaimGate } from "./ClaimGate";
+import { CapsuleWordmark, GateShell } from "./GateShell";
 
 /** True once VITE_CLERK_PUBLISHABLE_KEY exists in the (uncommitted) local env. */
 export function isAuthConfigured(
@@ -37,9 +28,7 @@ export function AuthGate({ children }: { children?: ReactNode }) {
     <SessionPersistenceBoundary>
       <PushRevokeOnSignout />
       <AuthLoading>
-        <GateShell title="Checking your session…">
-          <p className="text-ink-2">Signing you in.</p>
-        </GateShell>
+        <OfflineAuthLoadingFallback>{children}</OfflineAuthLoadingFallback>
       </AuthLoading>
       <Unauthenticated>
         <SignInScreen />
@@ -59,61 +48,29 @@ export function AuthGate({ children }: { children?: ReactNode }) {
   );
 }
 
-function ClaimGate({ children }: { children?: ReactNode }) {
-  const { user } = useUser();
-  const status = useQuery(api.authStatus.getAuthStatus, {});
-  if (status === undefined || status.accountId !== user?.id) {
-    return (
-      <GateShell title="Loading workspace…">
-        <p className="text-ink-2">Confirming your workspace membership.</p>
-      </GateShell>
-    );
+function OfflineAuthLoadingFallback({
+  children,
+}: {
+  readonly children?: ReactNode;
+}) {
+  const { user, isLoaded } = useUser();
+  const online =
+    typeof navigator === "undefined" ? true : navigator.onLine !== false;
+  const snapshot = user?.id ? offlineAuthSnapshotStore.read(user.id) : null;
+  if (
+    isLoaded &&
+    offlineAuthRestorePolicy.canRestore({
+      clerkUserId: user?.id,
+      liveAccountId: undefined,
+      snapshot,
+      online,
+    })
+  ) {
+    return <ClaimGate>{children}</ClaimGate>;
   }
-  if (!workspaceMembershipPolicy.isReady(status as AuthStatusSnapshot)) {
-    return <MembershipRequired />;
-  }
-  if (!status.personId) {
-    return <AccountProfileSetup key={`${user?.id}:${status.tenantId}`} />;
-  }
-  return <>{children}</>;
-}
-
-function AccountProfileSetup() {
-  const ensureProfile = useAction(api.authLink.ensureAccountProfile);
-  const [attempt, setAttempt] = useState(0);
-  const [failed, setFailed] = useState(false);
-  useEffect(() => {
-    let active = true;
-    setFailed(false);
-    void ensureProfile({})
-      .then((result) => {
-        if (active && !result.linked) setFailed(true);
-      })
-      .catch(() => {
-        if (active) setFailed(true);
-      });
-    return () => {
-      active = false;
-    };
-  }, [ensureProfile, attempt]);
   return (
-    <GateShell
-      title={failed ? "Couldn’t open your profile" : "Opening Capsule…"}
-    >
-      <p role="status" className="text-ink-2">
-        {failed
-          ? "Your sign-in is saved. We couldn’t load your Capsule account. Try again without signing out."
-          : "Loading your account and workspace."}
-      </p>
-      {failed && (
-        <button
-          className="btn btn-primary mt-4 min-h-11"
-          type="button"
-          onClick={() => setAttempt((value) => value + 1)}
-        >
-          Try again
-        </button>
-      )}
+    <GateShell title="Checking your session…">
+      <p className="text-ink-2">Signing you in.</p>
     </GateShell>
   );
 }
@@ -126,186 +83,6 @@ function SignInScreen() {
         <PasswordSignIn />
       </div>
     </div>
-  );
-}
-
-type LinkOutcome =
-  | "linking"
-  | "already"
-  | "matched"
-  | "unauthenticated"
-  | "not_configured"
-  | "provider_error"
-  | "no_email"
-  | "email_unverified"
-  | "no_match"
-  | "ambiguous"
-  | "released"
-  | "needs_admin_link"
-  | "error";
-
-/**
- * Signed in, but no tenant/role yet. First try to link this sign-in to the
- * Person that carries the same verified email (convex/authLink.ts). When that
- * works the auth-status query re-renders and the app opens on its own. When it
- * cannot, say exactly why and what the manager must do — no identity-provider
- * screens, no ids to paste.
- */
-function MembershipRequired() {
-  const { user } = useUser();
-  const { session } = useSession();
-  const { organization } = useOrganization();
-  // Legacy org-based sign-ins (no linked Person yet) that have memberships
-  // but no active organization still need a way to pick one. Selecting a
-  // workspace must actually setActive so the JWT tenant hint reaches the
-  // self-link pick — the Clerk popover alone was a no-op on an already-
-  // displayed org while the gate stayed up.
-  const { userMemberships, setActive } = useOrganizationList({
-    userMemberships: { infinite: false, pageSize: 10 },
-  });
-  const memberships = userMemberships?.data ?? [];
-  const hasOrgMemberships = memberships.length > 0;
-  const activeOrgId = organization?.id ?? "";
-  // Display only — the server re-reads the verified email from the provider.
-  const email = user?.primaryEmailAddress?.emailAddress ?? null;
-  const linkSelf = useAction(api.authLink.ensureAccountProfile);
-  const [outcome, setOutcome] = useState<LinkOutcome>("linking");
-  const attempt = useCallback(() => {
-    setOutcome("linking");
-    linkSelf({})
-      .then((result) => setOutcome(result.reason))
-      .catch(() => setOutcome("error"));
-  }, [linkSelf]);
-  const readSessionToken = useCallback(async () => {
-    if (!session) return null;
-    return await session.getToken({ skipCache: true });
-  }, [session]);
-  useEffect(() => {
-    if (!activeOrgId) {
-      attempt();
-      return;
-    }
-    let cancelled = false;
-    void waitForSessionTenantClaim({
-      organizationId: activeOrgId,
-      getToken: readSessionToken,
-    }).then((ready) => {
-      if (!cancelled && ready) attempt();
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [attempt, activeOrgId, readSessionToken]);
-
-  const openWorkspace = useCallback(
-    async (organizationId: string) => {
-      setOutcome("linking");
-      if (!setActive) {
-        setOutcome("error");
-        return;
-      }
-      try {
-        await setActive({ organization: organizationId });
-      } catch {
-        setOutcome("error");
-        return;
-      }
-      const jwtReady = await waitForSessionTenantClaim({
-        organizationId,
-        getToken: readSessionToken,
-      });
-      if (!jwtReady) {
-        setOutcome("error");
-        return;
-      }
-      attempt();
-    },
-    [attempt, setActive, readSessionToken],
-  );
-
-  const who = email ? (
-    <>
-      You are signed in as <span className="font-mono">{email}</span>.
-    </>
-  ) : (
-    "You are signed in."
-  );
-  const copy: Record<LinkOutcome, string> = {
-    linking: "Matching your sign-in to your staff profile…",
-    already: "Your profile is linked. Opening Capsule…",
-    matched: "Your profile is linked. Opening Capsule…",
-    unauthenticated: "Your session ended. Sign in again.",
-    not_configured:
-      "Self-link is not set up on this deployment yet (CLERK_SECRET_KEY). Ask your manager to link your account under Team roles.",
-    provider_error:
-      "The sign-in service could not be reached to confirm your email. Tap Try again in a moment.",
-    no_email:
-      "Your sign-in has no email address, so it cannot be matched to a staff profile. Sign in with an email or Google account.",
-    email_unverified:
-      "Your email is not verified yet. Check your inbox for the verification message, then tap Try again.",
-    no_match:
-      "No staff profile uses this email yet. Ask your manager to add you under Administration → Permissions → Team roles with this exact email, then tap Try again.",
-    ambiguous:
-      "More than one staff profile uses this email. Open the workspace you want, then tap Try again if it does not open on its own.",
-    released:
-      "An admin unlinked this sign-in from your staff profile. Ask them to link it again under Administration → Permissions → Team roles.",
-    needs_admin_link:
-      "Ask your manager to email you a sign-in from Administration → Permissions → Team roles.",
-    error: "The link could not be checked. Tap Try again.",
-  };
-
-  return (
-    <GateShell title="One more step">
-      <p className="leading-relaxed text-ink-2">
-        {who} {copy[outcome]}
-      </p>
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          className="btn btn-primary min-h-11"
-          disabled={outcome === "linking"}
-          onClick={attempt}
-        >
-          Try again
-        </button>
-        <SignOutButton>
-          <button type="button" className="btn btn-ghost min-h-11">
-            Sign out
-          </button>
-        </SignOutButton>
-      </div>
-      {hasOrgMemberships ? (
-        <div className="mt-4 flex flex-col gap-3">
-          <span className="text-sm text-ink-3">
-            Or open the workspace your account already belongs to:
-          </span>
-          <div className="flex flex-wrap items-center gap-2">
-            {memberships.map((membership) => {
-              const orgId = membership.organization.id;
-              const role = String(membership.role ?? "").replace(/^org:/, "");
-              const selected = orgId === activeOrgId;
-              return (
-                <button
-                  key={orgId}
-                  type="button"
-                  className={
-                    selected
-                      ? "btn btn-primary min-h-11"
-                      : "btn btn-ghost min-h-11"
-                  }
-                  disabled={outcome === "linking"}
-                  onClick={() => void openWorkspace(orgId)}
-                >
-                  {membership.organization.name}
-                  {role ? ` / ${role}` : ""}
-                </button>
-              );
-            })}
-          </div>
-          <OrganizationSwitcher hidePersonal afterSelectOrganizationUrl="/" />
-        </div>
-      ) : null}
-    </GateShell>
   );
 }
 
@@ -333,36 +110,5 @@ export function AuthSetupRequired() {
         </li>
       </ol>
     </GateShell>
-  );
-}
-
-function GateShell({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="grid min-h-dvh place-items-center bg-canvas px-6">
-      <div className="card max-w-130 px-6 py-6">
-        <CapsuleWordmark />
-        <h1 className="mt-5 text-xl font-semibold tracking-tight">{title}</h1>
-        <div className="mt-2">{children}</div>
-      </div>
-    </div>
-  );
-}
-
-function CapsuleWordmark() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-sm font-bold text-white">
-        C
-      </span>
-      <span className="text-base font-semibold tracking-[0.14em] uppercase">
-        Capsule
-      </span>
-    </div>
   );
 }

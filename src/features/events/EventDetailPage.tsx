@@ -9,6 +9,7 @@ import {
   normalizeCurrencyCode,
   relativeDays,
 } from "../../lib/format";
+import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
@@ -158,7 +159,7 @@ function EventDetailContent({
   // (edit panels, planning notes) on a phone via "Edit" / "See all".
   const mobileOverview =
     mobile && activeTab === "overview" && searchParams.get("full") !== "1";
-  const clients = useListClient();
+  const clients = useHeldQueryRows("clients", useListClient());
   const organizations = useListOrganization();
   // Same functional-currency rule as the phone Money card and Finance.
   const currencyCode = normalizeCurrencyCode(
@@ -170,15 +171,18 @@ function EventDetailContent({
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
-  const dishes = useListDish();
+  const dishes = useHeldQueryRows("dishes", useListDish());
   const eventId = event?._id ?? "skip";
   const eventAssignments = useEventAssignmentRows(eventId);
   const staffNeeds = useEventStaffNeedRows(eventId);
   const shifts = useEventShiftRows(eventId);
-  const eventDishes = useListEventDish();
-  const timelineActivities = useListEventTimelineActivity();
-  const people = useListPerson();
-  const venues = useListVenue();
+  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
+  const timelineActivities = useHeldQueryRows(
+    "eventTimelineActivities",
+    useListEventTimelineActivity(),
+  );
+  const people = useHeldQueryRows("people", useListPerson());
+  const venues = useHeldQueryRows("venues", useListVenue());
   const { branding } = useTenantBranding();
   const submitForApproval = useEventSubmitForApproval();
   const approve = useEventApprove();

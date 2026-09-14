@@ -29,11 +29,9 @@ import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
-import {
-  persistableServiceStyleId,
-  serviceStyleSelectOptions,
-  usingBuiltInServiceStyles,
-} from "./serviceStyleCatalog";
+import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
+import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
+import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
 import {
@@ -167,6 +165,7 @@ export function EventCreatePage() {
   const createClient = useCreateClient();
   const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
+  const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [clientId, setClientId] = useState(prefillClientId);
   const [venueId, setVenueId] = useState("");
   const [showClient, setShowClient] = useState(false);
@@ -227,13 +226,10 @@ export function EventCreatePage() {
   const activeOccasions = (occasions ?? [])
     .filter((occasion) => occasion.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-  const serviceStyleOptions = serviceStyleSelectOptions(serviceStyles);
-  // Empty catalogs (B2): once the lists have loaded, an empty occasion list and
-  // the built-in service-style fallback each get a one-line fix-it hint under
-  // the select instead of a silent blank dropdown.
+  // Empty catalogs (B2): once the lists have loaded, an empty occasion list
+  // gets a one-line fix-it hint under the select instead of a silent blank.
   const occasionsEmpty =
     occasions !== undefined && activeOccasions.length === 0;
-  const builtInServiceStyles = usingBuiltInServiceStyles(serviceStyles);
   const salespeople = (people ?? [])
     .filter(
       (person) =>
@@ -450,7 +446,9 @@ export function EventCreatePage() {
         title: String(data.get("title") ?? ""),
         eventTypeRaw: String(data.get("eventType") ?? ""),
         occasionId,
-        serviceStyleId: persistableServiceStyleId(serviceStyleId),
+        serviceStyleId: await new EventCreateServiceStyleResolver(
+          ensureBuiltInServiceStyle,
+        ).resolve(serviceStyleId, serviceStyles),
         salespersonId,
         referralSourceId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
@@ -684,43 +682,12 @@ export function EventCreatePage() {
             count={4}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
-              <div>
-                <label className="field-label">
-                  Service style
-                  <select
-                    name="serviceStyleId"
-                    value={serviceStyleId}
-                    onChange={(event) => setServiceStyleId(event.target.value)}
-                    className="input"
-                    form="event-create-form"
-                  >
-                    <option value="">Select a service style</option>
-                    {serviceStyleOptions.map((serviceStyle) => (
-                      <option key={serviceStyle.id} value={serviceStyle.id}>
-                        {serviceStyle.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                {builtInServiceStyles ? (
-                  <p className="mt-1 text-xs leading-relaxed text-ink-3">
-                    Showing the built-in service styles as labels only — they
-                    are not saved on the event until they exist as catalog rows.
-                    Open{" "}
-                    <Link
-                      to="/admin/catalogs"
-                      target="_blank"
-                      rel="noopener"
-                      className="underline font-medium"
-                    >
-                      Admin → Catalogs
-                    </Link>{" "}
-                    and click “Add the standard list” (Buffet – Cook Onsite,
-                    Plated, Family Style, …). Opens in a new tab; this form
-                    stays put.
-                  </p>
-                ) : null}
-              </div>
+              <EventCreateServiceStyleField
+                value={serviceStyleId}
+                onChange={setServiceStyleId}
+                rows={serviceStyles}
+                form="event-create-form"
+              />
               <label className="field-label sm:col-span-2">
                 Accessibility needs
                 <input

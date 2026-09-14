@@ -63,10 +63,8 @@ export const reserve = mutation({
     ) {
       throw new ConvexError("Equipment is unavailable in this workspace.");
     }
-    if (equipment.status !== "active" || equipment.registeredAt == null) {
-      throw new ConvexError(
-        "Only active, registered equipment can be reserved.",
-      );
+    if (equipment.status !== "active") {
+      throw new ConvexError("Only active equipment can be reserved.");
     }
     if (!event || event.tenantId !== tenantId || event.deletedAt != null) {
       throw new ConvexError("Event is unavailable in this workspace.");
