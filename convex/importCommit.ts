@@ -115,6 +115,28 @@ import {
   type TppVenueRecord,
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
+import { buildLinkKey } from "./lib/culinaryModel/importMapping";
+
+/**
+ * Canonical ExternalRecordLink key for an import-commit identity. Commit links
+ * carry no sourceAccount/role/ordinal, so they take buildLinkKey's defaults.
+ * Lookups go through the `by_linkKey` index: a `by_tenantId` + `.filter` scan
+ * read every tenant link row per imported row (17 GB Database I/O, 2026-09).
+ */
+function commitLinkKey(args: {
+  sourceSystem: string;
+  recordType: string;
+  externalId: string;
+}): string {
+  return buildLinkKey({
+    sourceSystem: args.sourceSystem,
+    sourceAccount: null,
+    recordType: args.recordType,
+    externalId: args.externalId,
+    role: null,
+    ordinal: 0,
+  });
+}
 
 /** Import access matches `importCoordinator.canImport` (managers + system). */
 function canImport(role: string): boolean {
@@ -165,14 +187,14 @@ export const findLink = internalQuery({
     externalId: v.string(),
   },
   handler: async (ctx, args): Promise<Doc<"externalRecordLinks"> | null> => {
+    // The index narrows to the rows with this exact identity (any tenant);
+    // the filter only checks tenant + liveness on that handful.
     return await ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .withIndex("by_linkKey", (q) => q.eq("linkKey", commitLinkKey(args)))
       .filter((q) =>
         q.and(
-          q.eq(q.field("sourceSystem"), args.sourceSystem),
-          q.eq(q.field("recordType"), args.recordType),
-          q.eq(q.field("externalId"), args.externalId),
+          q.eq(q.field("tenantId"), args.tenantId),
           q.eq(q.field("deletedAt"), null),
           q.or(
             q.eq(q.field("conflictStatus"), "resolved"),
@@ -279,14 +301,13 @@ export const upsertLink = internalMutation({
     resolutionNote: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<Id<"externalRecordLinks">> => {
+    const linkKey = commitLinkKey(args);
     const existing = await ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .withIndex("by_linkKey", (q) => q.eq("linkKey", linkKey))
       .filter((q) =>
         q.and(
-          q.eq(q.field("sourceSystem"), args.sourceSystem),
-          q.eq(q.field("recordType"), args.recordType),
-          q.eq(q.field("externalId"), args.externalId),
+          q.eq(q.field("tenantId"), args.tenantId),
           q.eq(q.field("deletedAt"), null),
         ),
       )
@@ -314,6 +335,7 @@ export const upsertLink = internalMutation({
         args.sourceSystem as Doc<"externalRecordLinks">["sourceSystem"],
       recordType: args.recordType,
       externalId: args.externalId,
+      linkKey,
       capsuleEntity:
         args.capsuleEntity as Doc<"externalRecordLinks">["capsuleEntity"],
       capsuleId: args.capsuleId,
@@ -331,6 +353,50 @@ export const upsertLink = internalMutation({
       updatedAt: now,
       version: 0,
     });
+  },
+});
+
+/**
+ * One-time migration: stamp the canonical linkKey on link rows written before
+ * findLink/upsertLink read `by_linkKey` (those rows are invisible to the index
+ * until stamped). One page per run — Convex allows one paginate per function —
+ * then it schedules the next page. Run once per deployment after deploy and
+ * before the next import:
+ *   bunx convex run importCommit:backfillLinkKeys '{}'
+ * Rows that already carry a linkKey are untouched, so a re-run is a no-op.
+ */
+export const backfillLinkKeys = internalMutation({
+  args: {
+    cursor: v.optional(v.union(v.string(), v.null())),
+    batchSize: v.optional(v.number()),
+  },
+  handler: async (ctx, args): Promise<{ patched: number; isDone: boolean }> => {
+    const page = await ctx.db.query("externalRecordLinks").paginate({
+      numItems: args.batchSize ?? 200,
+      cursor: args.cursor ?? null,
+    });
+    let patched = 0;
+    for (const link of page.page) {
+      if (link.linkKey) continue;
+      await ctx.db.patch(link._id, {
+        linkKey: buildLinkKey({
+          sourceSystem: link.sourceSystem,
+          sourceAccount: link.sourceAccount,
+          recordType: link.recordType,
+          externalId: link.externalId,
+          role: link.role,
+          ordinal: link.ordinal,
+        }),
+      });
+      patched += 1;
+    }
+    if (!page.isDone) {
+      await ctx.scheduler.runAfter(0, internal.importCommit.backfillLinkKeys, {
+        cursor: page.continueCursor,
+        batchSize: args.batchSize,
+      });
+    }
+    return { patched, isDone: page.isDone };
   },
 });
 
