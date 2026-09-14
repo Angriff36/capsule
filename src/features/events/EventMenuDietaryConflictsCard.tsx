@@ -15,9 +15,29 @@ type DishRow = {
   name: string;
   description?: string | null;
   recipeInstructions?: string | null;
-  allergenSummary?: string | null;
+  /** Allergen codes (`tree_nuts`, `crustacean_shellfish`, …) — a list, not prose. */
+  allergenSummary?: readonly string[] | string | null;
   dietaryTags?: readonly string[] | null;
 };
+
+/**
+ * Allergen codes as words the text matcher can read: "tree_nuts" → "tree nuts".
+ * The catalog stores a list; a plain string is tolerated in case older rows
+ * or a hand-written caller pass one.
+ */
+export function allergenSummaryText(
+  summary: DishRow["allergenSummary"],
+): string {
+  const codes = Array.isArray(summary)
+    ? summary
+    : typeof summary === "string"
+      ? [summary]
+      : [];
+  return codes
+    .map((code) => String(code).replaceAll("_", " ").trim())
+    .filter(Boolean)
+    .join(", ");
+}
 
 type LinkRow = { dishId: string; deletedAt?: number | null };
 
@@ -93,8 +113,9 @@ export function menuDishTextSources(
     const texts: { label: string; text: string }[] = [];
     if (dish.description)
       texts.push({ label: "description", text: dish.description });
-    if (dish.allergenSummary) {
-      texts.push({ label: "allergen summary", text: dish.allergenSummary });
+    const allergenText = allergenSummaryText(dish.allergenSummary);
+    if (allergenText) {
+      texts.push({ label: "allergen summary", text: allergenText });
     }
     for (const link of inputs.dishIngredients) {
       if (link.dishId !== dish._id || link.deletedAt != null) continue;
