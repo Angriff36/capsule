@@ -22,6 +22,7 @@ import {
   useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
+import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import type { Id } from "../../lib/api";
 import {
   CateringPackagePicker,
@@ -104,8 +105,8 @@ const MENU_ROW_COLUMNS =
 
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const event = useGetEvent(eventId);
-  const dishes = useListDish();
-  const eventDishes = useListEventDish();
+  const dishes = useHeldQueryRows("dishes", useListDish());
+  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
   const eventGuests = useListEventGuest();
   const reviewFlags = useEventReviewFlags(eventId);
   const dishIngredients = useListDishIngredient();
