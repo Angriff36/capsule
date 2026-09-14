@@ -3,7 +3,7 @@
 # Examples:
 #   ./loop.sh                                   # Build mode, unlimited iterations
 #   ./loop.sh 20                                # Build mode, max 20 iterations
-#   ./loop.sh plan                              # Full plan mode, unlimited iterations
+#   ./loop.sh plan                              # Full plan mode, default 3 iterations (#271)
 #   ./loop.sh plan 5                            # Full plan mode, max 5 iterations
 #   ./loop.sh plan-work "user auth" --branch ralph/user-auth
 #                                               # Scoped plan on a work branch
