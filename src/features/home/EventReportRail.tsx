@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { TPP_REPORT_CATALOG } from "../reports/tpp/catalog";
 import type { TppReportDefinition } from "../reports/tpp/types";
 import { eventDetailPath } from "../events/eventRoutes";
@@ -169,6 +169,14 @@ export function EventReportRail({
   useEffect(() => {
     setActive(null);
   }, [eventId]);
+
+  // The rail sits in the shell now: leaving a screen (a calendar double-click
+  // opens the event page) closes it. Declared before the request effect so a
+  // request on the same render still opens it.
+  const { pathname } = useLocation();
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
 
   // A request (calendar pick, tooltip View / Print) is acted on once and
   // cleared, so a later remount never replays it or reopens the print dialog.

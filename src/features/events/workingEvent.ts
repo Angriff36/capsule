@@ -49,6 +49,9 @@ export function setWorkingEvent(id: string | null | undefined): void {
   const next = id != null && isPlausibleConvexId(id) ? id : null;
   if (next === readId()) return;
   memoryId = next;
+  // A report request belongs to one event; a switch drops it so it can never
+  // replay (and print) when that event comes back.
+  if (railRequest && railRequest.eventId !== next) railRequest = null;
   try {
     if (next) sessionStorage.setItem(STORAGE_KEY, next);
     else sessionStorage.removeItem(STORAGE_KEY);
