@@ -11,6 +11,7 @@ import { parseProductionWorksheet } from "./parseProductionWorksheet";
 import { readPdfTextLines } from "./pdfTextReader";
 import { readXlsxWorkbook } from "./xlsxReader";
 import { XlsxReportGrid } from "./xlsxReportGrid";
+import { packetEvidenceFromText } from "../eventPacket/packetContract";
 
 /**
  * Turns raw report files into one event bundle.
@@ -52,6 +53,12 @@ export function detectWorkbookSource(
 
 function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   const lower = file.name.toLowerCase();
+  if (file.contents.toString("utf8", 0, 128).trimStart().startsWith("{")) {
+    const packetEvidence = packetEvidenceFromText(
+      file.contents.toString("utf8"),
+    );
+    if (packetEvidence) return { source: "eventPacket", packetEvidence };
+  }
 
   if (lower.endsWith(".pdf")) {
     return parseBattleBoard(readPdfTextLines(file.contents));

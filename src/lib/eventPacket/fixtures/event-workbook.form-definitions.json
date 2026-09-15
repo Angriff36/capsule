@@ -1,0 +1,3050 @@
+{
+  "schemaVersion": "event-workbook-form-definitions/1",
+  "purpose": "Source-derived form inventory for review and renderer integration, not approval answers. Labels are concise normalized source prompts; sourceText carries complete verbatim sanitized wording and continuation lines.",
+  "defaultAnswer": null,
+  "sourceAuthority": "Static training/templates describe verification work; external actions require separately authorized commands.",
+  "sections": [
+    {
+      "key": "final-lock.info",
+      "sourceKind": "ops_final_lock_template",
+      "title": "INFO",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.info.verify-service-style",
+          "label": "Verify service style",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.info.verify-guest-count",
+          "label": "Verify guest count",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.menu",
+      "sourceKind": "ops_final_lock_template",
+      "title": "EVENT MENU",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.menu.menu-in-correct-order",
+          "label": "Menu in correct order",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.menu.all-quantities-of-items-correct",
+          "label": "All quantities of items correct",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.menu.no-or-items",
+          "label": "No *** or ... items",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.menu.menu-production-checked-for-notes",
+          "label": "Menu production checked for notes",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.timeline",
+      "sourceKind": "ops_final_lock_template",
+      "title": "TIMELINE",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.timeline.staff-scheduled-on-time",
+          "label": "Staff scheduled on time",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.timeline.enter-nlt",
+          "label": "Enter NLT",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.timeline.enter-staff-arrival-onsite-time",
+          "label": "Enter staff arrival onsite time",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.timeline.serve-times-correct",
+          "label": "Serve times correct",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.notes",
+      "sourceKind": "ops_final_lock_template",
+      "title": "NOTES",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.notes.check-notes-and-edit-to-amplify",
+          "label": "Check notes and edit to amplify",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.notes.linens-for-tables-black-white-ivory",
+          "label": "Linens for tables black white ivory",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.notes.linen-napkins-for-baskets-trays",
+          "label": "Linen napkins for baskets trays",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.notes.verify-setup-diagrams-needed-or-not-for-service",
+          "label": "Verify setup diagrams needed or not for service",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.packlist",
+      "sourceKind": "ops_final_lock_template",
+      "title": "PACKLIST",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.packlist.add-servingware-type-notes",
+          "label": "Add servingware type notes",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.check-unusually-high-quantities",
+          "label": "Check unusually high quantities",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.check-x-items-removed",
+          "label": "Check X items removed",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.check-equivalent-items-packed-assigned",
+          "label": "Check equivalent items packed assigned",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.check-equipment-needed-and-add",
+          "label": "Check equipment needed and add",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.handwashing",
+          "label": "Handwashing",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.tent-and-flooring",
+          "label": "Tent and flooring",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.plasticware-in-other-inventory-items-if-needed",
+          "label": "Plasticware in Other Inventory Items if needed",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.packlist.vehicles-and-equipment-assigned",
+          "label": "Vehicles and equipment assigned",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.equipment",
+      "sourceKind": "ops_final_lock_template",
+      "title": "EQUIP",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.equipment.check-dropbox-for-rentals-file",
+          "label": "Check Dropbox for rentals file",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.equipment.check-decor-from-good-shuffle",
+          "label": "Check decor from Good Shuffle",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.equipment.check-coordinating-serving-items-for-service-type",
+          "label": "Check coordinating serving items for service type",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.beverage",
+      "sourceKind": "ops_final_lock_template",
+      "title": "BEV",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.beverage.check-beverage-items-requiring-attention",
+          "label": "Check beverage items requiring attention",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.bar",
+      "sourceKind": "ops_final_lock_template",
+      "title": "BAR",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.bar.check-all-necessary-bar-items-on-packlist",
+          "label": "Check all necessary bar items on packlist",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "final-lock.wrapup",
+      "sourceKind": "ops_final_lock_template",
+      "title": "WRAP UP",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " EVENT NUMBER  _______________________  EVENT  DATE _____________ \n INFO \n VERIFY SERVICE STYLE.  C.O.S. / B. H. / P.C / D.O / PLATE / FAM / VEND \n VERIFY GUEST COUNT  ____________ \n EVENT MENU \n MENU IN CORRECT ORDER  (  Y  ) \n ALL QUANTITIES OF ITEMS CORRECT  (  Y  ) \n CHECK THAT THERE ARE NO *** OR … ITEMS  (  Y  ) \n MENU PRODUCTION CHECKED FOR NOTES  (  Y  ) \n TIMELINE \n STAFF SCHEDULED ON TIME  _______ \n ENTER NLT  (  Y  ) \n ENTER STAFF ARRIVAL ONSITE TIME  (  Y  ) \n SERVE TIMES CORRECT`  (3 HRS PRIOR TO SERVICE FOR FS) \n ` (1.5 HRS PRIOR TO SERVICE FOR LS) \n NOTES \n CHECK OVER NOTES AND EDIT TO AMPLIFY  (  Y  ) \n LINENS FOR TABLES  (BLACK / WHITE / IVORY)  (  Y  ) \n LINEN NAPKINS FOR BASKETS / TRAYS  (  Y  ) \n VERIFY SETUP DIAGRAMS NEEDED OR NOT FOR SERVICE  (  Y ) \n PACKLIST \n ADD NOTES ON SERVINWARE TYPE  (  Y  ) \n CHECK QTY ON ITEMS FOR ANYTHING REALLY HIGH  (  Y  ) \n CHECK THAT “X - “ ITEMS ARE REMOVED  (  Y  ) \n CHECK THAT ‘EQUIVALENT’ ITEMS ARE PACKED/ASSIGNED  (  Y  ) \n CHECK PACKLIST FOR EQUIPMENT NEEDED AND ADD  (  Y  ) \n HANDWASHING  (  Y  ) \n TENT AND FLOORING  (  Y  ) \n CHECK THAT PLASTICWARE IS IN OTHER INV ITEMS (IF NEEDED)  (  Y  ) \n CHECK THAT VEHICLES ARE ASSIGNED AND EQUIPMENT IS ASSIGNED  (  Y  ) \n EQUIP \n CHECK DROPBOX FOR RENTALS IN FILE  (  Y  ) \n CHECK DECOR FROM GOOD SHUFFLE  (  Y  ) \n CHECK COORDINATING SERVING ITEMS FOR SERVICE TYPE  (  Y  ) \n BEV \n CHECK THAT THERE ARE NO ITEMS IN THERE THAT NEED ADDRESSED  (  Y  ) \n BAR \n CHECK THAT ALL NECESSARY ITEMS ARE ON PACKLIST FOR BAR  (  Y  ) \n WRAP UP \n MARK EVENT STATUS TO FINAL  (  Y  ) \n EXPORT TO NOWSTA  (  Y  ) \n BUILD BINDER  (  Y  ) "
+        }
+      ],
+      "items": [
+        {
+          "key": "final-lock.wrapup.mark-event-status-final",
+          "label": "Mark event status Final",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.wrapup.export-to-nowsta",
+          "label": "Export to Nowsta",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "final-lock.wrapup.build-binder",
+          "label": "Build binder",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.basic",
+      "sourceKind": "quartermaster_template",
+      "title": "BASIC EVENT INFO",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " MANGIA CATERING CO. \n Operations Quartermaster \n Pre-Production Meeting Review \n Complete one form per event before Wednesday's production meeting. Print and bring to the meeting. \n Documents to pull from TPP:  Event Worksheet, Equipment  Assignment, Vehicle Assignment Sheet \n BASIC EVENT INFO \n Event #  Event Date \n Client / Event Name  Guest Count \n Event Type  Full Service     Bring Hot     Drop Off     Action Station     Vending     Custom \n Venue / Location  Depart Time \n LOGISTICS & TIMELINE \n Confirm all times from the Event Worksheet. Flag any departure from standard parameters — these must be discussed \n at the meeting. \n Depart Time  Vehicle #  Driver \n On-Site Arrival  Set-Up Time \n (hours) \n Event Start  Event End \n Load-Out / Depart Venue  Return to HQ (est.) \n Is this event outside standard drive time (more than 1 hour one way)?  Y  /  N \n Does this event require an early-out or split set-up shift?  Y  /  N \n Is there a loading dock, freight elevator, or special access requirement at this venue?  Y  /  N \n Are there parking or staging restrictions that affect vehicle placement?  Y  /  N \n Notes / Exceptions to Communicate at Meeting: "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.basic.event-number",
+          "label": "Event number",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.basic.event-date",
+          "label": "Event date",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        },
+        {
+          "key": "quartermaster.basic.client-event-name",
+          "label": "Client event name",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.basic.guest-count",
+          "label": "Guest count",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.basic.event-type",
+          "label": "Event type",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.basic.venue-location",
+          "label": "Venue location",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.basic.depart-time",
+          "label": "Depart time",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.logistics",
+      "sourceKind": "quartermaster_template",
+      "title": "LOGISTICS & TIMELINE",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " MANGIA CATERING CO. \n Operations Quartermaster \n Pre-Production Meeting Review \n Complete one form per event before Wednesday's production meeting. Print and bring to the meeting. \n Documents to pull from TPP:  Event Worksheet, Equipment  Assignment, Vehicle Assignment Sheet \n BASIC EVENT INFO \n Event #  Event Date \n Client / Event Name  Guest Count \n Event Type  Full Service     Bring Hot     Drop Off     Action Station     Vending     Custom \n Venue / Location  Depart Time \n LOGISTICS & TIMELINE \n Confirm all times from the Event Worksheet. Flag any departure from standard parameters — these must be discussed \n at the meeting. \n Depart Time  Vehicle #  Driver \n On-Site Arrival  Set-Up Time \n (hours) \n Event Start  Event End \n Load-Out / Depart Venue  Return to HQ (est.) \n Is this event outside standard drive time (more than 1 hour one way)?  Y  /  N \n Does this event require an early-out or split set-up shift?  Y  /  N \n Is there a loading dock, freight elevator, or special access requirement at this venue?  Y  /  N \n Are there parking or staging restrictions that affect vehicle placement?  Y  /  N \n Notes / Exceptions to Communicate at Meeting: "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.logistics.depart-time",
+          "label": "Depart time",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.vehicle-number",
+          "label": "Vehicle number",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.driver",
+          "label": "Driver",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.onsite-arrival",
+          "label": "Onsite arrival",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.setup-time-hours",
+          "label": "Setup time hours",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.event-start",
+          "label": "Event start",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.event-end",
+          "label": "Event end",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.load-out-depart-venue",
+          "label": "Load out depart venue",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.return-to-hq-estimate",
+          "label": "Return to HQ estimate",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.drive-over-one-hour-one-way",
+          "label": "Drive over one hour one way",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.early-out-or-split-setup-shift",
+          "label": "Early out or split setup shift",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.loading-dock-freight-elevator-or-special-access",
+          "label": "Loading dock freight elevator or special access",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.parking-staging-restrictions",
+          "label": "Parking staging restrictions",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.logistics.exceptions-for-meeting",
+          "label": "Exceptions for meeting",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.staffing",
+      "sourceKind": "quartermaster_template",
+      "title": "STAFFING & VEHICLE ASSIGNMENT",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        2
+      ],
+      "sourceText": [
+        {
+          "page": 2,
+          "text": " STAFFING & VEHICLE ASSIGNMENT \n Come to the meeting prepared with proposed vehicle and staffing assignments. Anything outside standard parameters \n must be flagged. \n Vehicle Assigned  Trailer Needed?  Ops Lead / Driver  Support Staff \n Y  /  N \n Does this event require specialty uniform or dress code beyond standard Mangia attire?  Y  /  N \n Are any staff assigned to roles outside their normal responsibilities?  Y  /  N \n Is there an early-out for any staff member on this event?  Y  /  N \n Does the event require Nowsta shifts to be updated before Thursday noon?  Y  /  N \n Staffing Notes / Open Questions: \n EQUIPMENT \n All events default to standard Mangia equipment. Flag any deviation from standard — due to guest count, service style, \n venue access, or culinary requests. Bring your proposed alternatives to the meeting. \n Does this event require non-standard serving-ware or buffet presentation?  Y  /  N \n Is the cooking location in the field kitchen, trailer, or an unusual setup?  Y  /  N \n Does guest count or service style require additional equipment beyond the standard \n packlist? \n Y  /  N \n Is there Design Studio decor required for this event?  Y  /  N \n Are there any overbooked or conflicting equipment items that need resolution?  Y  /  N \n Equipment Deviations / Changes Needed: \n Item / Category  Change / Note "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.staffing.vehicle-assigned",
+          "label": "Vehicle assigned",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.trailer-needed",
+          "label": "Trailer needed",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.ops-lead-driver",
+          "label": "Ops lead driver",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.support-staff",
+          "label": "Support staff",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.specialty-uniform-dress-code",
+          "label": "Specialty uniform dress code",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.staff-outside-normal-responsibilities",
+          "label": "Staff outside normal responsibilities",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.staff-early-out",
+          "label": "Staff early out",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.nowsta-updates-before-thursday-noon",
+          "label": "Nowsta updates before Thursday noon",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.staffing.staffing-notes-open-questions",
+          "label": "Staffing notes open questions",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.equipment",
+      "sourceKind": "quartermaster_template",
+      "title": "EQUIPMENT",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        2,
+        3
+      ],
+      "sourceText": [
+        {
+          "page": 2,
+          "text": " STAFFING & VEHICLE ASSIGNMENT \n Come to the meeting prepared with proposed vehicle and staffing assignments. Anything outside standard parameters \n must be flagged. \n Vehicle Assigned  Trailer Needed?  Ops Lead / Driver  Support Staff \n Y  /  N \n Does this event require specialty uniform or dress code beyond standard Mangia attire?  Y  /  N \n Are any staff assigned to roles outside their normal responsibilities?  Y  /  N \n Is there an early-out for any staff member on this event?  Y  /  N \n Does the event require Nowsta shifts to be updated before Thursday noon?  Y  /  N \n Staffing Notes / Open Questions: \n EQUIPMENT \n All events default to standard Mangia equipment. Flag any deviation from standard — due to guest count, service style, \n venue access, or culinary requests. Bring your proposed alternatives to the meeting. \n Does this event require non-standard serving-ware or buffet presentation?  Y  /  N \n Is the cooking location in the field kitchen, trailer, or an unusual setup?  Y  /  N \n Does guest count or service style require additional equipment beyond the standard \n packlist? \n Y  /  N \n Is there Design Studio decor required for this event?  Y  /  N \n Are there any overbooked or conflicting equipment items that need resolution?  Y  /  N \n Equipment Deviations / Changes Needed: \n Item / Category  Change / Note "
+        },
+        {
+          "page": 3,
+          "text": " Design Studio Decor Required (if applicable): \n RENTALS \n Confirm all rental orders are placed and delivery logistics are locked. Any rental that is not delivered to HQ or that must \n travel with us must be flagged. \n Rental Vendor  Delivery to HQ?  Delivery Date  Return With Us? \n Y  /  N  Y  /  N \n Y  /  N  Y  /  N \n Are all rental orders placed and confirmed with vendor?  Y  /  N \n Are there any rental items that need to be picked up (not delivered to HQ)?  Y  /  N \n Are we responsible for returning any rental items directly to the vendor after the event?  Y  /  N \n Rental Notes / Open Items: \n PACKLIST & BINDER STATUS \n This section confirms event documentation is on track. These must be complete by the deadlines stated — not after. \n Is the TPP packlist current and ready to send to the warehouse?  Y  /  N \n Has the Event Worksheet been reviewed and confirmed accurate?  Y  /  N \n Are there any packlist items that need to be updated based on this event's specific \n needs? \n Y  /  N \n Is the event binder on track to be printed and posted by EOD Thursday?  Y  /  N \n Are there items on the packlist that are overbooked or unavailable — needing a solution \n before packing begins? \n Y  /  N \n Packlist / Binder Notes: "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.equipment.nonstandard-servingware-buffet-presentation",
+          "label": "Nonstandard servingware buffet presentation",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.equipment.field-kitchen-trailer-unusual-cooking-setup",
+          "label": "Field kitchen trailer unusual cooking setup",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.equipment.additional-equipment-for-guest-count-or-service-style",
+          "label": "Additional equipment for guest count or service style",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.equipment.design-studio-decor-required",
+          "label": "Design Studio decor required",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.equipment.overbooked-conflicting-equipment",
+          "label": "Overbooked conflicting equipment",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.equipment.equipment-deviations-item-category-change-note",
+          "label": "Equipment deviations item category change note",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.equipment.design-studio-decor-details",
+          "label": "Design Studio decor details",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.rentals",
+      "sourceKind": "quartermaster_template",
+      "title": "RENTALS",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        3
+      ],
+      "sourceText": [
+        {
+          "page": 3,
+          "text": " Design Studio Decor Required (if applicable): \n RENTALS \n Confirm all rental orders are placed and delivery logistics are locked. Any rental that is not delivered to HQ or that must \n travel with us must be flagged. \n Rental Vendor  Delivery to HQ?  Delivery Date  Return With Us? \n Y  /  N  Y  /  N \n Y  /  N  Y  /  N \n Are all rental orders placed and confirmed with vendor?  Y  /  N \n Are there any rental items that need to be picked up (not delivered to HQ)?  Y  /  N \n Are we responsible for returning any rental items directly to the vendor after the event?  Y  /  N \n Rental Notes / Open Items: \n PACKLIST & BINDER STATUS \n This section confirms event documentation is on track. These must be complete by the deadlines stated — not after. \n Is the TPP packlist current and ready to send to the warehouse?  Y  /  N \n Has the Event Worksheet been reviewed and confirmed accurate?  Y  /  N \n Are there any packlist items that need to be updated based on this event's specific \n needs? \n Y  /  N \n Is the event binder on track to be printed and posted by EOD Thursday?  Y  /  N \n Are there items on the packlist that are overbooked or unavailable — needing a solution \n before packing begins? \n Y  /  N \n Packlist / Binder Notes: "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.rentals.rental-vendor",
+          "label": "Rental vendor",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.rentals.delivery-to-hq",
+          "label": "Delivery to HQ",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.rentals.delivery-date",
+          "label": "Delivery date",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        },
+        {
+          "key": "quartermaster.rentals.return-with-us",
+          "label": "Return with us",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.rentals.all-orders-placed-confirmed",
+          "label": "All orders placed confirmed",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.rentals.rental-pickup-required",
+          "label": "Rental pickup required",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.rentals.direct-vendor-return-responsibility",
+          "label": "Direct vendor return responsibility",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.rentals.rental-notes-open-items",
+          "label": "Rental notes open items",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.packlist-binder",
+      "sourceKind": "quartermaster_template",
+      "title": "PACKLIST & BINDER STATUS",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        3
+      ],
+      "sourceText": [
+        {
+          "page": 3,
+          "text": " Design Studio Decor Required (if applicable): \n RENTALS \n Confirm all rental orders are placed and delivery logistics are locked. Any rental that is not delivered to HQ or that must \n travel with us must be flagged. \n Rental Vendor  Delivery to HQ?  Delivery Date  Return With Us? \n Y  /  N  Y  /  N \n Y  /  N  Y  /  N \n Are all rental orders placed and confirmed with vendor?  Y  /  N \n Are there any rental items that need to be picked up (not delivered to HQ)?  Y  /  N \n Are we responsible for returning any rental items directly to the vendor after the event?  Y  /  N \n Rental Notes / Open Items: \n PACKLIST & BINDER STATUS \n This section confirms event documentation is on track. These must be complete by the deadlines stated — not after. \n Is the TPP packlist current and ready to send to the warehouse?  Y  /  N \n Has the Event Worksheet been reviewed and confirmed accurate?  Y  /  N \n Are there any packlist items that need to be updated based on this event's specific \n needs? \n Y  /  N \n Is the event binder on track to be printed and posted by EOD Thursday?  Y  /  N \n Are there items on the packlist that are overbooked or unavailable — needing a solution \n before packing begins? \n Y  /  N \n Packlist / Binder Notes: "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.packlist-binder.tpp-packlist-current-and-ready-for-warehouse",
+          "label": "TPP packlist current and ready for warehouse",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.packlist-binder.worksheet-reviewed-accurate",
+          "label": "Worksheet reviewed accurate",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.packlist-binder.event-specific-packlist-updates",
+          "label": "Event specific packlist updates",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.packlist-binder.binder-printed-posted-by-eod-thursday",
+          "label": "Binder printed posted by EOD Thursday",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.packlist-binder.overbooked-unavailable-packlist-items",
+          "label": "Overbooked unavailable packlist items",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.packlist-binder.packlist-binder-notes",
+          "label": "Packlist binder notes",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.concern",
+      "sourceKind": "quartermaster_template",
+      "title": "MY BIGGEST CONCERN ON THIS EVENT",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        4
+      ],
+      "sourceText": [
+        {
+          "page": 4,
+          "text": " MY BIGGEST CONCERN ON THIS EVENT \n Required. Every Ops representative comes to the meeting with one clearly stated concern. This is how the team \n protects each other. \n My biggest concern on this event is: \n ADDITIONAL QUESTIONS FOR THE MEETING \n List any open questions that require input from Sales, Culinary, or Management. If you don't have questions, write \n 'None.' — blank is not acceptable. \n POST-MEETING ACTION ITEMS — OPERATIONS \n These are the Ops deliverables that must be completed following every Wednesday production meeting. \n Non-negotiable deadlines. \n By \n NoonThursda \n y \n ☐   Nowsta event shifts updated and posted \n ☐   Vehicle and equipment assignments confirmed in TPP \n ☐   Event binder started — Worksheet + Packlist printed \n By \n EODThursday  ☐   TPP Packlist updated with any changes from the meeting \n ☐   Packlist printed and sent to warehouse to begin packing \n ☐   Event binder complete and posted on binder rack \n ☐   Rental delivery confirmed — any pickup logistics communicated to driver \n ByFriday  ☐   Vehicles pre-loaded with non-food equipment \n ☐   Trailer hooked and confirmed if assigned to this event "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.concern.required-biggest-concern",
+          "label": "Required biggest concern",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.questions",
+      "sourceKind": "quartermaster_template",
+      "title": "ADDITIONAL QUESTIONS FOR THE MEETING",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        4
+      ],
+      "sourceText": [
+        {
+          "page": 4,
+          "text": " MY BIGGEST CONCERN ON THIS EVENT \n Required. Every Ops representative comes to the meeting with one clearly stated concern. This is how the team \n protects each other. \n My biggest concern on this event is: \n ADDITIONAL QUESTIONS FOR THE MEETING \n List any open questions that require input from Sales, Culinary, or Management. If you don't have questions, write \n 'None.' — blank is not acceptable. \n POST-MEETING ACTION ITEMS — OPERATIONS \n These are the Ops deliverables that must be completed following every Wednesday production meeting. \n Non-negotiable deadlines. \n By \n NoonThursda \n y \n ☐   Nowsta event shifts updated and posted \n ☐   Vehicle and equipment assignments confirmed in TPP \n ☐   Event binder started — Worksheet + Packlist printed \n By \n EODThursday  ☐   TPP Packlist updated with any changes from the meeting \n ☐   Packlist printed and sent to warehouse to begin packing \n ☐   Event binder complete and posted on binder rack \n ☐   Rental delivery confirmed — any pickup logistics communicated to driver \n ByFriday  ☐   Vehicles pre-loaded with non-food equipment \n ☐   Trailer hooked and confirmed if assigned to this event "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.questions.questions-for-sales-culinary-management-or-explicit-none",
+          "label": "Questions for Sales Culinary Management or explicit None",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.noon-thursday",
+      "sourceKind": "quartermaster_template",
+      "title": "POST MEETING BY NOON THURSDAY",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        4
+      ],
+      "sourceText": [
+        {
+          "page": 4,
+          "text": " MY BIGGEST CONCERN ON THIS EVENT \n Required. Every Ops representative comes to the meeting with one clearly stated concern. This is how the team \n protects each other. \n My biggest concern on this event is: \n ADDITIONAL QUESTIONS FOR THE MEETING \n List any open questions that require input from Sales, Culinary, or Management. If you don't have questions, write \n 'None.' — blank is not acceptable. \n POST-MEETING ACTION ITEMS — OPERATIONS \n These are the Ops deliverables that must be completed following every Wednesday production meeting. \n Non-negotiable deadlines. \n By \n NoonThursda \n y \n ☐   Nowsta event shifts updated and posted \n ☐   Vehicle and equipment assignments confirmed in TPP \n ☐   Event binder started — Worksheet + Packlist printed \n By \n EODThursday  ☐   TPP Packlist updated with any changes from the meeting \n ☐   Packlist printed and sent to warehouse to begin packing \n ☐   Event binder complete and posted on binder rack \n ☐   Rental delivery confirmed — any pickup logistics communicated to driver \n ByFriday  ☐   Vehicles pre-loaded with non-food equipment \n ☐   Trailer hooked and confirmed if assigned to this event "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.noon-thursday.nowsta-shifts-updated-posted",
+          "label": "Nowsta shifts updated posted",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.noon-thursday.vehicle-equipment-assignments-confirmed-in-tpp",
+          "label": "Vehicle equipment assignments confirmed in TPP",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.noon-thursday.binder-started-worksheet-packlist-printed",
+          "label": "Binder started worksheet packlist printed",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.eod-thursday",
+      "sourceKind": "quartermaster_template",
+      "title": "POST MEETING BY EOD THURSDAY",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        4
+      ],
+      "sourceText": [
+        {
+          "page": 4,
+          "text": " MY BIGGEST CONCERN ON THIS EVENT \n Required. Every Ops representative comes to the meeting with one clearly stated concern. This is how the team \n protects each other. \n My biggest concern on this event is: \n ADDITIONAL QUESTIONS FOR THE MEETING \n List any open questions that require input from Sales, Culinary, or Management. If you don't have questions, write \n 'None.' — blank is not acceptable. \n POST-MEETING ACTION ITEMS — OPERATIONS \n These are the Ops deliverables that must be completed following every Wednesday production meeting. \n Non-negotiable deadlines. \n By \n NoonThursda \n y \n ☐   Nowsta event shifts updated and posted \n ☐   Vehicle and equipment assignments confirmed in TPP \n ☐   Event binder started — Worksheet + Packlist printed \n By \n EODThursday  ☐   TPP Packlist updated with any changes from the meeting \n ☐   Packlist printed and sent to warehouse to begin packing \n ☐   Event binder complete and posted on binder rack \n ☐   Rental delivery confirmed — any pickup logistics communicated to driver \n ByFriday  ☐   Vehicles pre-loaded with non-food equipment \n ☐   Trailer hooked and confirmed if assigned to this event "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.eod-thursday.tpp-packlist-updated-with-meeting-changes",
+          "label": "TPP packlist updated with meeting changes",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.eod-thursday.packlist-printed-sent-to-warehouse",
+          "label": "Packlist printed sent to warehouse",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.eod-thursday.binder-complete-posted-on-rack",
+          "label": "Binder complete posted on rack",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.eod-thursday.rental-delivery-pickup-logistics-confirmed-communicated",
+          "label": "Rental delivery pickup logistics confirmed communicated",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.friday",
+      "sourceKind": "quartermaster_template",
+      "title": "POST MEETING BY FRIDAY",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        4,
+        5
+      ],
+      "sourceText": [
+        {
+          "page": 4,
+          "text": " MY BIGGEST CONCERN ON THIS EVENT \n Required. Every Ops representative comes to the meeting with one clearly stated concern. This is how the team \n protects each other. \n My biggest concern on this event is: \n ADDITIONAL QUESTIONS FOR THE MEETING \n List any open questions that require input from Sales, Culinary, or Management. If you don't have questions, write \n 'None.' — blank is not acceptable. \n POST-MEETING ACTION ITEMS — OPERATIONS \n These are the Ops deliverables that must be completed following every Wednesday production meeting. \n Non-negotiable deadlines. \n By \n NoonThursda \n y \n ☐   Nowsta event shifts updated and posted \n ☐   Vehicle and equipment assignments confirmed in TPP \n ☐   Event binder started — Worksheet + Packlist printed \n By \n EODThursday  ☐   TPP Packlist updated with any changes from the meeting \n ☐   Packlist printed and sent to warehouse to begin packing \n ☐   Event binder complete and posted on binder rack \n ☐   Rental delivery confirmed — any pickup logistics communicated to driver \n ByFriday  ☐   Vehicles pre-loaded with non-food equipment \n ☐   Trailer hooked and confirmed if assigned to this event "
+        },
+        {
+          "page": 5,
+          "text": " ☐   Final readiness check — zero open items before the weekend \n ☐   Slack update to management confirming event is pack-ready \n Initial & Date When Complete: \n Place completed form in the event production binder. \n Mangia Catering Co.  |  Operations Quartermaster  |  Pre-Production Meeting Review  |  2026 "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.friday.vehicles-preloaded-nonfood-equipment",
+          "label": "Vehicles preloaded nonfood equipment",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.friday.trailer-hooked-confirmed-if-assigned",
+          "label": "Trailer hooked confirmed if assigned",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.friday.final-readiness-zero-open-items",
+          "label": "Final readiness zero open items",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "quartermaster.friday.management-slack-pack-ready-update",
+          "label": "Management Slack pack ready update",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "quartermaster.signoff",
+      "sourceKind": "quartermaster_template",
+      "title": "INITIAL & DATE WHEN COMPLETE",
+      "humanOwner": "Operations representative",
+      "sourceDocumentId": "liberty-6837-quartermaster_template-01",
+      "sourcePages": [
+        5
+      ],
+      "sourceText": [
+        {
+          "page": 5,
+          "text": " ☐   Final readiness check — zero open items before the weekend \n ☐   Slack update to management confirming event is pack-ready \n Initial & Date When Complete: \n Place completed form in the event production binder. \n Mangia Catering Co.  |  Operations Quartermaster  |  Pre-Production Meeting Review  |  2026 "
+        }
+      ],
+      "items": [
+        {
+          "key": "quartermaster.signoff.operations-initials",
+          "label": "Operations initials",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        },
+        {
+          "key": "quartermaster.signoff.completion-date",
+          "label": "Completion date",
+          "humanOwner": "Operations representative",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        }
+      ]
+    },
+    {
+      "key": "field.task",
+      "sourceKind": "event_forms_template",
+      "title": "Event Task Breakdown",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        1
+      ],
+      "sourceText": [
+        {
+          "page": 1,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Event Task Breakdown - Buffet \n This form tells exactly what is expected of Mangia at an event. It is not everything as things may come up.  Use to assign who is \n doing what and who is responsible for what tasks. \n OUR RESPONSIBILITIES \n Serving Ware is….. \n Plasticware  or  Rented  or  Client Provided \n Y / N  Take rentals with us \n Y / N  Leave rentals onsite \n SETUP \n Y / N  Setup guest tables/chairs \n Y / N  Setting tables with ﬂatware/china \n Y / N  Fill water on tables \n Y / N  Setup buﬀet tables for buﬀet \n Y / N  Setup tables for appetizers \n Y / N  Setup table for beverages \n APPETIZERS \n Y / N  Stationary apps \n Y / N  Apps on their own table \n Y / N  Apps using main buﬀet table \n Y / N  Pass apps \n MAIN SERVICE \n Y / N  Set out beverage dispensers \n Y / N  Serving buﬀet \n Y / N  Self serve buﬀet \n Y / N  Bus after dinner service (plates, silverware,  napkins) \n Y / N  Full bus (clear ALL glassware at end of event) \n DESSERT \n Y / N  Setup cake / dessert \n Y / N  Cut cake / Serve dessert \n Y / N  Dessert Coﬀee Bar "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.task.servingware-plastic-rented-client-provided",
+          "label": "Servingware plastic rented client provided",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.take-rentals-with-us",
+          "label": "Take rentals with us",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.leave-rentals-onsite",
+          "label": "Leave rentals onsite",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.setup-guest-tables-chairs",
+          "label": "Setup guest tables chairs",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.set-tables-flatware-china",
+          "label": "Set tables flatware china",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.fill-table-water",
+          "label": "Fill table water",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.setup-buffet-tables",
+          "label": "Setup buffet tables",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.setup-appetizer-tables",
+          "label": "Setup appetizer tables",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.setup-beverage-table",
+          "label": "Setup beverage table",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.stationary-appetizers",
+          "label": "Stationary appetizers",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.appetizers-on-own-table",
+          "label": "Appetizers on own table",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.appetizers-using-buffet-table",
+          "label": "Appetizers using buffet table",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.pass-appetizers",
+          "label": "Pass appetizers",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.set-out-beverage-dispensers",
+          "label": "Set out beverage dispensers",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.serving-buffet",
+          "label": "Serving buffet",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.self-serve-buffet",
+          "label": "Self serve buffet",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.bus-after-dinner",
+          "label": "Bus after dinner",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.full-bus-all-glassware",
+          "label": "Full bus all glassware",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.setup-cake-dessert",
+          "label": "Setup cake dessert",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.cut-cake-serve-dessert",
+          "label": "Cut cake serve dessert",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.task.dessert-coffee-bar",
+          "label": "Dessert coffee bar",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.leaving-shop",
+      "sourceKind": "event_forms_template",
+      "title": "Leaving The Shop Checklist",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        2
+      ],
+      "sourceText": [
+        {
+          "page": 2,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Leaving The Shop Checklist \n Form is to be filled out and used by the event lead BEFORE leaving the Mangia Commissary with an event. \n PAPERWORK \n Y  Make sure every item on the packlist is clearly  checked off.  If any doubt \n you must physically check the item(s) in question. \n Y  Make sure you have Nowsta sheet \n Y  Make sure decor checklist is in binder \n Y  Make sure your staff name badges are in binder \n WALK THROUGH \n Y  Verify event pallet that is assigned to event is  empty \n Y  Verify the garage event space is empty (if one  is assigned) \n Y  Check over loading area that no items are left  behind \n Y  If no one is left at the shop make sure it’s fully  locked down and lights are \n oﬀ. This includes warehouse and garage doors \n TEAM \n Y  2 minute chat with the team. Go over the driving  plan and arrival plan. \n . \n IN VEHICLE \n Y  Vehicle checklist is complete (including trailer) \n Y  Check over vehicle(s) for equipment loading and  securement \n Y  Check all doors are shut / secure on vehicles /  trailers \n Y  Check that you have enough fuel for event \n Y  All items are secured and stored \n Y  Navigation is pulled up and set up \n Have anything you think should be on this form? Tell us what they are below! "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.leaving-shop.every-packlist-item-checked-physically-verify-doubts",
+          "label": "Every packlist item checked physically verify doubts",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.nowsta-sheet-present",
+          "label": "Nowsta sheet present",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.decor-checklist-present",
+          "label": "Decor checklist present",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.staff-name-badges-present",
+          "label": "Staff name badges present",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.assigned-event-pallet-empty",
+          "label": "Assigned event pallet empty",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.assigned-garage-space-empty",
+          "label": "Assigned garage space empty",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.loading-area-clear",
+          "label": "Loading area clear",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.shop-warehouse-garage-locked-lights-off-if-last-out",
+          "label": "Shop warehouse garage locked lights off if last out",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.team-driving-arrival-plan-briefing",
+          "label": "Team driving arrival plan briefing",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.vehicle-trailer-checklist-complete",
+          "label": "Vehicle trailer checklist complete",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.equipment-loading-securement",
+          "label": "Equipment loading securement",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.doors-secure",
+          "label": "Doors secure",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.enough-fuel",
+          "label": "Enough fuel",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.items-secured-stored",
+          "label": "Items secured stored",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.navigation-ready",
+          "label": "Navigation ready",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-shop.suggested-additions",
+          "label": "Suggested additions",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.arrival",
+      "sourceKind": "event_forms_template",
+      "title": "Event Arrival Checklist",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        3
+      ],
+      "sourceText": [
+        {
+          "page": 3,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Event Arrival Checklist \n Form is to be filled out and used by the event lead upon arriving at the event. The purpose of this form is to get a lay of the land and \n get info that will become necessary later.   This process should take 5 minutes, on average. \n PERSON IN CHARGE QUESTIONS \n Y  Verify the person in charge.  Check additional  PIC. \n Y  Go over our responsibilities on ‘Event Task Breakdown’  with client/PIC \n Y  Verify timelines with PIC \n Y  Ask client/PIC if they have any questions for  us \n Y  Check bathroom location \n Y  Check water location (if any) \n Y  Verify serve/buffet locations \n Y  Do ‘360’ walk around venue/area to get a ‘lay of  the land’ \n After Event Plan \n Y  Go over plan for rentals at end of night with PIC \n Y  Check if we will disturb event leaving with equipment \n Have anything you think should be on this form? Tell us what they are below! "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.arrival.verify-pic-and-additional-pic",
+          "label": "Verify PIC and additional PIC",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.review-task-responsibilities-with-pic",
+          "label": "Review task responsibilities with PIC",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.verify-timelines",
+          "label": "Verify timelines",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.pic-questions",
+          "label": "PIC questions",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.bathroom-location",
+          "label": "Bathroom location",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.water-location",
+          "label": "Water location",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.serve-buffet-locations",
+          "label": "Serve buffet locations",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.360-venue-walkthrough",
+          "label": "360 venue walkthrough",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.rental-end-of-night-plan",
+          "label": "Rental end of night plan",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.departure-disturbance-plan",
+          "label": "Departure disturbance plan",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.arrival.suggested-additions",
+          "label": "Suggested additions",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.muda",
+      "sourceKind": "event_forms_template",
+      "title": "Event Food MUDA",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        4
+      ],
+      "sourceText": [
+        {
+          "page": 4,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Event Food MUDA \n This form is to track and document leftover food or food waste at events. Please be as \n PRECISE as possible. Use scales at the event to get correct numbers or weight back at \n the kitchen. If you do not know a number, do not list it.  Guessing causes harm. \n Event \n What would you estimate was the attendance at the event (Use leftover plates and plasticware \n as a general guide if needed)?  ________________________________________________________ \n Waste \n Any waste due to employee error or mistake?  (YES)  /  (NO)  _______________________________ \n ___________________________________________________________________________________ \n Appetizers \n Were appetizers used at your event?  (YES)  /  (NO) \n What type of appetizers were at the event?  (STATIONARY)  (PASSED)   (DISPLAYS) \n LIST ITEM THEN SERVINGS LEFTOVER  LIST ITEM THEN SERVINGS LEFTOVER \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n Main Items \n How were leftovers handled (circle one) \n GIVEN TO CLIENT  THROWN AWAY  BROUGHT TO KITCHEN \n List leftovers below.  This includes items left for clients and those brought to the kitchen. \n LIST ITEM THEN WEIGHT LEFTOVER  LIST ITEM THEN WEIGHT LEFTOVER \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ \n ______________________________________  ______________________________________ "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.muda.attendance-estimate",
+          "label": "Attendance estimate",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.muda.employee-error-waste-yes-no-and-detail",
+          "label": "Employee error waste yes no and detail",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.muda.appetizers-used",
+          "label": "Appetizers used",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.muda.appetizer-type-stationary-passed-displays",
+          "label": "Appetizer type stationary passed displays",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.muda.appetizer-item-and-servings-leftover-rows",
+          "label": "Appetizer item and servings leftover rows",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.muda.main-leftovers-given-client-thrown-away-brought-kitchen",
+          "label": "Main leftovers given client thrown away brought kitchen",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.muda.main-item-and-weight-leftover-rows",
+          "label": "Main item and weight leftover rows",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.bins",
+      "sourceKind": "event_forms_template",
+      "title": "Bin Organization Sheet",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        5
+      ],
+      "sourceText": [
+        {
+          "page": 5,
+          "text": " Event Number:________________________Event Date: ____________________________ \n BIN ORGANIZATION SHEET \n Write the bin number used for each section. \n At the end of the event,  circle  bin numbers that contain dirty dishes to \n aid with unloading at the shop. \n (RED)  BOH \n Bins:  _____  _____  _____ \n _____  _____  _____ \n _____  _____  _____ \n (GREEN)  FOH - TO BUFFET \n Bins:  _____  _____  _____ \n _____  _____  _____ \n _____  _____  _____ \n (YELLOW)  FOH - TO KITCHEN \n Bins:  _____  _____  _____ \n _____  _____  _____ \n _____  _____  _____ \n (BLUE)  MISC EQUIPMENT \n Bins:  _____  _____  _____ \n _____  _____  _____ "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.bins.red-boh-bin-numbers",
+          "label": "RED BOH bin numbers",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.bins.green-foh-to-buffet-bin-numbers",
+          "label": "GREEN FOH to buffet bin numbers",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.bins.yellow-foh-to-kitchen-bin-numbers",
+          "label": "YELLOW FOH to kitchen bin numbers",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.bins.blue-miscellaneous-equipment-bin-numbers",
+          "label": "BLUE miscellaneous equipment bin numbers",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.bins.circle-dirty-bin-numbers-after-event",
+          "label": "Circle dirty bin numbers after event",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.after-event",
+      "sourceKind": "event_forms_template",
+      "title": "After Event Form",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        6
+      ],
+      "sourceText": [
+        {
+          "page": 6,
+          "text": " Event Number:________________________Event Date: ____________________________ \n After Event Form \n To be ﬁlled out immediately following the event.  Lead of the event is to ﬁll out.  Get input from other staﬀ while ﬁlling this out. \n Who is ﬁlling this out/event lead?  ______________________________________ \n *Positives on Food Prep  (List at Least 1) _______________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n Negatives on Food Prep ______________________________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n *Positives on Day Of Food Cook  (List at Least 1)________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n Negatives on Day Of Food Cook _______________________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n *Positives on Packing  (List at Least 1)  _________________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n Negatives on Packing ________________________________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n Any equipment breakage / issues? ____________________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n Anything else? _______________________________________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n ______________________________________________________________________________ \n PLEASE USE BACK OF THIS PAGE IF YOU NEED MORE SPACE FOR NOTES "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.after-event.lead-completing-form",
+          "label": "Lead completing form",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.food-prep-positives-at-least-one",
+          "label": "Food prep positives at least one",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.food-prep-negatives",
+          "label": "Food prep negatives",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.day-of-cooking-positives-at-least-one",
+          "label": "Day of cooking positives at least one",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.day-of-cooking-negatives",
+          "label": "Day of cooking negatives",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.packing-positives-at-least-one",
+          "label": "Packing positives at least one",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.packing-negatives",
+          "label": "Packing negatives",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.equipment-breakage-issues",
+          "label": "Equipment breakage issues",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.after-event.other-notes",
+          "label": "Other notes",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.return",
+      "sourceKind": "event_forms_template",
+      "title": "Event Return Checklist",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        7
+      ],
+      "sourceText": [
+        {
+          "page": 7,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Event Return Checklist \n This checklist outlines what is to be done upon return of an event.  Some events do not \n require all tasks to be completed. \n On those events please write “N/A” on tasks that not apply. \n Trailer \n ___  Trailer is unloaded completely. \n ___  Trailer is swept/mopped out. \n ___  Walls/windows wiped down. \n ___  Inside/outside of door wiped down. \n ___  Vehicle/Trailer parked properly and fully locked up. \n Vehicle \n ___  Vehicle cleaned out of all personal belongings \n ___  Check for stains/spills in the vehicle and clean up what you can. Note any large \n mess. \n ___  Vehicle parked properly and locked. \n Storing Items \n ___  Food to the kitchen.  Leftovers thrown away or saved according to leftover food \n policy. \n ___  Cambros cleaned and wiped down.  Leave doors cracked so they dry out. \n ___  Kits left on pallet in event space.  NO DIRTY DISHES / TOWELS in kit. \n ___  Inspect all bins.  If dry and clean (inside and out) place in the bin return location. \n If dirty inside/out rinse oﬀ and place out to dry. \n ___  Place clean items, equipment, ﬁeld kitchen items, etc in event space. \n Sign ﬂipped to red. \n ___  Design Studio bins taken to design studio and placed in return location.  Do not \n remove items from bins. \n ___  Tables cleaned/wiped down and placed in table location.  Sort by FOH, BOH, 4’ \n ___  All hand wash items are washed and left out to dry in their appropriate location. \n ___  All other dishes are taken to the dish room and placed in correct locations. \n ___  Coolers hand cleaned and left out to dry. \n Wrapping Up \n ___  Tables/counters in kitchen wiped down as needed. \n ___  Any liquid spills cleaned up.  This goes for kitchen and warehouse. \n ___  Trash is taken out to dumpster. \n ___  Keys are returned for all trucks/trailers used at event \n (don’t check oﬀ until they are physically returned to the hanging location). \n ___  Make sure all name badges are returned and placed in the \n bottom of the binder shelf "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.return.trailer-unloaded",
+          "label": "Trailer unloaded",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.trailer-swept-mopped",
+          "label": "Trailer swept mopped",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.walls-windows-wiped",
+          "label": "Walls windows wiped",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.door-inside-outside-wiped",
+          "label": "Door inside outside wiped",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.vehicle-trailer-parked-locked",
+          "label": "Vehicle trailer parked locked",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.vehicle-personal-belongings-removed",
+          "label": "Vehicle personal belongings removed",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.vehicle-stains-spills-cleaned-large-mess-noted",
+          "label": "Vehicle stains spills cleaned large mess noted",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.vehicle-parked-locked",
+          "label": "Vehicle parked locked",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.food-leftover-policy",
+          "label": "Food leftover policy",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.cambros-cleaned-doors-cracked",
+          "label": "Cambros cleaned doors cracked",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.kits-on-pallet-no-dirty-dishes-towels",
+          "label": "Kits on pallet no dirty dishes towels",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.bins-inspected-cleaned-dried-returned",
+          "label": "Bins inspected cleaned dried returned",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.clean-equipment-in-event-space-sign-red",
+          "label": "Clean equipment in event space sign red",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.design-studio-bins-returned-intact",
+          "label": "Design Studio bins returned intact",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.tables-cleaned-sorted",
+          "label": "Tables cleaned sorted",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.handwash-items-washed-dried",
+          "label": "Handwash items washed dried",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.dishes-to-proper-dish-room-locations",
+          "label": "Dishes to proper dish room locations",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.coolers-cleaned-dried",
+          "label": "Coolers cleaned dried",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.kitchen-tables-counters-wiped",
+          "label": "Kitchen tables counters wiped",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.kitchen-warehouse-spills-cleaned",
+          "label": "Kitchen warehouse spills cleaned",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.trash-dumpster",
+          "label": "Trash dumpster",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.keys-physically-returned-hanging-location",
+          "label": "Keys physically returned hanging location",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.return.name-badges-bottom-binder-shelf",
+          "label": "Name badges bottom binder shelf",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.packing",
+      "sourceKind": "event_forms_template",
+      "title": "Event Packing Checklist",
+      "humanOwner": "Warehouse packer",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        8
+      ],
+      "sourceText": [
+        {
+          "page": 8,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Event Packing Checklist \n Use this checklist to look over an event for packing.  The goal of this checklist is not to just check off \n items, but to get you, the packer, familiar with the event so you can properly pack and prepare the event. \n This checklist should take 5 minutes to complete.  When done, place behind the packlist in the binder. \n USE THE BINDER TO REVIEW THE INFO BELOW \n Event Questions \n Who is doing the packing / filling out this form? \n Where will food be cooked?  ___Cook Onsite  ___Cook at Kitchen \n How many guests?  ________ \n Use the chart below.  What size type event would this be?  ________ \n 0-25 (XS)  |  25-75 (Small)  |  75-125 (Reg)  |  125-200 (Large)  |  200+ (XL) \n Apps \n Are there passed apps?  (  Y  /  N  ) \n Are there stationary apps?  (  Y  /  N  ) \n Service \n Are we serving buffet?  (  Y  /  N  ) \n Are we serving stations?  (  Y  /  N  ) \n Are there beverages?  (  Y  /  N  ) \n Is there a bar?  (  Y  /  N  ) \n Buffets \n How many buffets are there?  ________ \n How many sides are being served on each table?  ________ \n Are any items self served?  These items need nice serveware  (  Y  /  N  ) \n Any items have requests for serving vessels/utensils?  (  Y  /  N  ) \n DID YOU READ NOTES ON WORKSHEET?  (  Y  /  N  ) \n Use the packing worksheet to write notes/info that is needed to affect your packing. \n Review/Check \n Tableware (renting or plasticware - check that it’s assigned)  Checked?  _______ \n Packlist checks - Make sure there are not “check” items.  Checked?  _______ \n Packing Details \n Item Style/Theme  _____________________________________________________ \n What style of serving utensils? _____________________________________________ \n Anything special to know that would affect packing? \n ______________________________________________________________________ \n ______________________________________________________________________ "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.packing.packer-name",
+          "label": "Packer name",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.cooking-location",
+          "label": "Cooking location",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.guest-count",
+          "label": "Guest count",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.event-size-using-printed-size-chart",
+          "label": "Event size using printed size chart",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.passed-appetizers",
+          "label": "Passed appetizers",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.stationary-appetizers",
+          "label": "Stationary appetizers",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.serving-buffet",
+          "label": "Serving buffet",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.serving-stations",
+          "label": "Serving stations",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.beverages",
+          "label": "Beverages",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.bar",
+          "label": "Bar",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.number-of-buffets",
+          "label": "Number of buffets",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.sides-each-table",
+          "label": "Sides each table",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.self-served-items-require-nice-servingware",
+          "label": "Self served items require nice servingware",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.serving-vessel-utensil-requests",
+          "label": "Serving vessel utensil requests",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.worksheet-notes-read",
+          "label": "Worksheet notes read",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.tableware-assigned-checked",
+          "label": "Tableware assigned checked",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.no-check-items-on-packlist",
+          "label": "No check items on packlist",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.item-style-theme",
+          "label": "Item style theme",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.serving-utensil-style",
+          "label": "Serving utensil style",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.packing.special-packing-notes",
+          "label": "Special packing notes",
+          "humanOwner": "Warehouse packer",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.buffet-drawing",
+      "sourceKind": "event_forms_template",
+      "title": "Buffet Drawing Templates",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        9
+      ],
+      "sourceText": [
+        {
+          "page": 9,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Buffet Drawing Templates \n Mangia has a certain way of setting up buffets to ensure efficient serving.  This form \n outlays the general setting for a buffet.  While some items will vary on each buffet the \n general theory remains.  Use your judgment to set up the buffet onsite in accordance to \n the Mangia way shown here.  Pizza buffets follow the same layout as shown below. \n Notes: \n For hot items, in chafers, the veggie items go first (closest to plates), the starch items go \n second, the proteins go third. We put less expensive items first.  Rice would go before \n mac n cheese.  Chicken would go before tri tip. \n Veggies example - veggie mix, carrots, green beans, etc.  Starch example - mac n \n cheese, potatoes, rice, etc.  Protein example - chicken, pork, beef, etc. \n For most buffets we will have three hot items, a salad, a bread, and a butter.  If you \n have more hots or more colds set them up using the same process above.  You can run \n chafers over into the second table as needed. If you have cold sides like potato salad, \n mac salad, place BEFORE the salad. \n Arrange items to fill in the table.  We do not want open table space.  Say you only have \n 2 hots - set up just one buffet table (not two).  Or if you must do two tables you can \n rotate chafers 90 degrees to fill up space. \n UTENSILS \n What to use: \n We want to use the best utensil to efficiently serve food in a timely manner.  In addition we want \n to be mindful of the serving size. \n Check with lead: \n Verify the serving utensil plan with leads for BOH to make sure you are on the same page. Use \n the back of this page to write the utensil plan down! \n Examples: \n Standard Tongs - Pulled Pork, Tri Tip, Shredded Beef, Chicken \n Small Tongs - Bread, Relish, Pickles \n Spatulas - Salmon, Pizza \n Spoons - Mac and Cheese, Mashed Potato, Cubed Chicken \n Slotted Spoons - Veggies, Black Beans, Pinto Beans \n Tablespoons - BBQ Sauce, Mayo, Olives \n"
+        }
+      ],
+      "items": [
+        {
+          "key": "field.buffet-drawing.buffet-applicability",
+          "label": "Buffet applicability",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.buffet-drawing.buffet-setup-drawing",
+          "label": "Buffet setup drawing",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.buffet-drawing.utensil-plan-confirmed-with-boh-lead",
+          "label": "Utensil plan confirmed with BOH lead",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.buffet-drawing.utensil-plan-notes",
+          "label": "Utensil plan notes",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ],
+      "visualContent": {
+        "required": true,
+        "description": "Two-table buffet diagram showing cutlery, butter, bread, salad, three chafers and plates/flow. Source page graphic is not in extracted text. Preserve source drawing or faithful reconstruction; applicability is not approved."
+      }
+    },
+    {
+      "key": "field.leaving-event",
+      "sourceKind": "event_forms_template",
+      "title": "Leaving The Event Checklist",
+      "humanOwner": "Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        10
+      ],
+      "sourceText": [
+        {
+          "page": 10,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Leaving The Event Checklist \n Form is to be filled out at the event before the departure \n SITE INSPECTION \n Y  Walk the venue, inspect service areas to ensure  no items were left behind \n Y  Inspect the field kitchen area, all items are packed,  loaded. \n No trash / debris remains in our service area. \n RENTALS \n Y  Ensure no MANGIA items are in rental stack / pile \n Y  Glassware is upwards and sorted in designated crate \n Y  Flatware is sorted in designated crate, plastic  is sealed in crate \n Y  Verify all rentals are stacked and organized neatly. \n Y  Verify all rented linens are in PURPLE linen bag \n Y  All furniture (tables, chairs, etc) are protected  from rain/sprinklers \n TEAM \n Y  All staff return name tags, aprons, towels, etc. \n Y  All staff sign out on Nowsta if they are departing  site and clocking out \n VEHICLE / TRAILERS \n Y  Check over vehicle(s) for equipment loading and  securement \n Y  Check all doors / windows are shut / secure on  vehicles / trailers \n Y  All items are tied down, secured and safe \n Have anything you think should be on this form? Tell us what they are below! "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.leaving-event.venue-service-areas-clear",
+          "label": "Venue service areas clear",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.field-kitchen-packed-loaded-no-debris",
+          "label": "Field kitchen packed loaded no debris",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.no-mangia-items-with-rentals",
+          "label": "No Mangia items with rentals",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.glassware-upwards-sorted-crates",
+          "label": "Glassware upwards sorted crates",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.flatware-sorted-sealed",
+          "label": "Flatware sorted sealed",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.rentals-neatly-stacked",
+          "label": "Rentals neatly stacked",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.rented-linens-purple-bag",
+          "label": "Rented linens purple bag",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.furniture-protected-weather-sprinklers",
+          "label": "Furniture protected weather sprinklers",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.staff-name-tags-aprons-towels-returned",
+          "label": "Staff name tags aprons towels returned",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.nowsta-signout-for-departing-clock-out-staff",
+          "label": "Nowsta signout for departing clock out staff",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.vehicle-loading-securement",
+          "label": "Vehicle loading securement",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.vehicle-trailer-doors-windows-secure",
+          "label": "Vehicle trailer doors windows secure",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.all-items-tied-down",
+          "label": "All items tied down",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.leaving-event.suggested-additions",
+          "label": "Suggested additions",
+          "humanOwner": "Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.takeoff-documents",
+      "sourceKind": "event_forms_template",
+      "title": "Before Takeoff Checklist: Document Control",
+      "humanOwner": "Event lead with Warehouse lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        11
+      ],
+      "sourceText": [
+        {
+          "page": 11,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Before Takeoff Checklist \n Form is to be filled out by Event Lead with Warehouse Lead before event is marked “ready” on Event Tracker \n DOCUMENT CONTROL \n Verify the following documents are in the event binder: \n ☐  Event Worksheet \n ☐  Event Menu \n ☐  Event Pack List \n ☐  Pack List by Item (reference) \n ☐  Nowsta Time Sheet \n ☐  Goodshuffle Pull Sheet \n ☐  Venue Layout Photos \n ☐  Setup Diagrams (if applicable) \n ☐  Event Task Breakdown Checklist \n ☐  Leaving Shop Checklist \n ☐  Event Arrival Checklist \n ☐  Event Food MUDA Form \n ☐  Bin Organization Sheet \n ☐  After Event Form \n ☐  Event Return Checklist \n ☐  Event Packing Checklist \n ☐  Buffet Drawing Template \n ☐  Leaving the Event Checklist \n ☐  Binder has (1) Worksheet in Front Cover Slip \n ☐  Binder has Event Number in Wet Erase on Binder Spine \n Binder Complete and Posted on Event Binder Rack: ☐  Yes ☐  No \n CONTINUE BTCL CHECKLIST ON NEXT PAGE "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.takeoff-documents.event-worksheet",
+          "label": "Event Worksheet",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-menu",
+          "label": "Event Menu",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-pack-list",
+          "label": "Event Pack List",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.pack-list-by-item-reference",
+          "label": "Pack List by Item reference",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.nowsta-time-sheet",
+          "label": "Nowsta Time Sheet",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.goodshuffle-pull-sheet",
+          "label": "Goodshuffle Pull Sheet",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.venue-layout-photos",
+          "label": "Venue Layout Photos",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.setup-diagrams-if-applicable",
+          "label": "Setup Diagrams if applicable",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-task-breakdown-checklist",
+          "label": "Event Task Breakdown Checklist",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.leaving-shop-checklist",
+          "label": "Leaving Shop Checklist",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-arrival-checklist",
+          "label": "Event Arrival Checklist",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-food-muda-form",
+          "label": "Event Food MUDA Form",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.bin-organization-sheet",
+          "label": "Bin Organization Sheet",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.after-event-form",
+          "label": "After Event Form",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-return-checklist",
+          "label": "Event Return Checklist",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-packing-checklist",
+          "label": "Event Packing Checklist",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.buffet-drawing-template",
+          "label": "Buffet Drawing Template",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.leaving-event-checklist",
+          "label": "Leaving Event Checklist",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.worksheet-front-cover-slip",
+          "label": "Worksheet front cover slip",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.event-number-wet-erase-spine",
+          "label": "Event number wet erase spine",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-documents.binder-complete-posted-rack-yes-no",
+          "label": "Binder complete posted rack yes no",
+          "humanOwner": "Event lead with Warehouse lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        }
+      ]
+    },
+    {
+      "key": "field.takeoff-readiness",
+      "sourceKind": "event_forms_template",
+      "title": "Before Takeoff Checklist: Equipment People Departure",
+      "humanOwner": "Warehouse lead and Event lead",
+      "sourceDocumentId": "liberty-6837-event_forms_template-01",
+      "sourcePages": [
+        12
+      ],
+      "sourceText": [
+        {
+          "page": 12,
+          "text": " Event Number:________________________Event Date: ____________________________ \n Before Takeoff Checklist \n Form is to be filled out by warehouse lead before event is marked “ready” on Event Tracker \n EQUIPMENT + KIT VERIFICATION \n ☐  Pack list fully checked, no unchecked boxes remain \n ☐  All special notes highlighted AND actioned \n ☐  Correct vessel style verified per notes \n ☐  Aprons match staff count (extra if noted) \n ☐  Cater Kit / Emergency Kit \n ☐  Bin Organization Sheet completed \n ☐  Vehicle assignment confirmed + staged \n PEOPLE + COMMUNICATION \n ☐  Name tags placed in binder \n ☐  Slack notes prepared if needed and slacked to Event Slack Channel \n ☐  Event Tracker status set to FULLY PACKED \n READINESS TO DEPART \n ☐  Event pallet empty \n ☐  Garage event space empty \n ☐  Loading area clear \n ☐  Vehicle is ready (Clean, Essentials are verified (Battery charger, jump pack, broom, \n etc) \n ☐  Fuel OK \n ☐  Load is secure, nothing untied or stacked where it could fall over and be damaged \n We have physically inspected each action of this  before  takeoff checklist  and certify \n that this event is ready for take off: \n _________________________  ____________ \n Warehouse / Operations Team Name  Date \n _________________________  ____________ \n Event Lead Team Name  Date "
+        }
+      ],
+      "items": [
+        {
+          "key": "field.takeoff-readiness.packlist-fully-checked",
+          "label": "Packlist fully checked",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.special-notes-highlighted-actioned",
+          "label": "Special notes highlighted actioned",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.vessel-style-verified",
+          "label": "Vessel style verified",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.aprons-match-staff-count-extras",
+          "label": "Aprons match staff count extras",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.cater-emergency-kit",
+          "label": "Cater emergency kit",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.bin-sheet-completed",
+          "label": "Bin sheet completed",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.vehicle-assignment-confirmed-staged",
+          "label": "Vehicle assignment confirmed staged",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.name-tags-in-binder",
+          "label": "Name tags in binder",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.event-slack-notes-prepared-posted-if-needed",
+          "label": "Event Slack notes prepared posted if needed",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.tracker-fully-packed",
+          "label": "Tracker FULLY PACKED",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.event-pallet-empty",
+          "label": "Event pallet empty",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.garage-event-space-empty",
+          "label": "Garage event space empty",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.loading-area-clear",
+          "label": "Loading area clear",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.vehicle-clean-essentials-verified",
+          "label": "Vehicle clean essentials verified",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.fuel-ok",
+          "label": "Fuel OK",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.load-secure",
+          "label": "Load secure",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "unanswered_human_input"
+        },
+        {
+          "key": "field.takeoff-readiness.warehouse-operations-team-name",
+          "label": "Warehouse Operations Team Name",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        },
+        {
+          "key": "field.takeoff-readiness.warehouse-operations-date",
+          "label": "Warehouse Operations Date",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        },
+        {
+          "key": "field.takeoff-readiness.event-lead-team-name",
+          "label": "Event Lead Team Name",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        },
+        {
+          "key": "field.takeoff-readiness.event-lead-date",
+          "label": "Event Lead Date",
+          "humanOwner": "Warehouse lead and Event lead",
+          "answer": null,
+          "requiresRecordedVerification": true,
+          "answerType": "signature_or_date"
+        }
+      ]
+    },
+    {
+      "key": "training.identity-menu",
+      "sourceKind": "training_reference",
+      "title": "Identity Menu",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        3,
+        4
+      ],
+      "sourceText": [
+        {
+          "page": 3,
+          "text": " If you are on a single screen, you'll rotate through these. On a dual monitor, split them so TPP is \n always visible. \n The reason we insist on this setup: when the Ops Final Lock checklist says  Check Dropbox for \n rentals  , you should be one click from the answer,  not three minutes of hunting. Speed and \n accuracy come from preparation. \n Part 3: The Ops Final Lock, Line by Line \n Open the event in TPP. Work through the  Ops Final  Lock  checklist in the same order as the \n document. The sections below match the checklist headers exactly. \n Section 1: INFO \n What you verify: \n -  Service style (C.O.S. / B.H. / P.C. / D.O. / Plate / Fam / Vend) \n -  Guest count \n How:  Click the  Info  tab inside TPP. Cross-check the  service style against the checklist options. \n The service style determines what equipment you'll pack, what vehicle you'll use, what kit you'll \n pull. Mark it on the paper checklist. Verify the guest count against what sales locked in. \n Red flag logic:  If anything in this section is blank,  missing, or inconsistent, stop. Do not \n continue forward. Raise the flag with the salesperson or the sales office. An event that wasn't \n finished by sales cannot be finished by ops. Do not paper over their gap. \n Section 2: EVENT MENU \n What you verify: \n -  Menu items are in the correct order \n -  All quantities are correct \n -  No items are marked  ***  or  ... \n -  Menu Production is checked for notes \n -  All items are in the correct category for the service style \n How:  Open the menu inside the event. Our house order  is:  mains first, then sides, then \n dessert/place settings last.  Pizza → bread → salad  → drinks → dessert is a correct flow. \n Dessert before the mains is not. "
+        },
+        {
+          "page": 4,
+          "text": " Walk the quantities against the guest count. If the guest count is 130 and you see an item priced \n at 500, something broke. Raise the flag. \n The  ***  and  ...  markers mean an item is an  empty shell  — no description, no proposal note, \n no pack list attachment, no recipe. If you push an event through with a  ***  or  ...  item, the \n warehouse packs nothing for it and the kitchen orders nothing for it. This is one of the \n highest-impact errors you can catch at this stage. \n \"Menu Production checked for notes\" means you read the line notes on each item. Notes tell \n you things like  \"French fries served in cone, not  tray\"  — the culinary team needs to pack the \n cone. Or  \"Caesar dressing on the side, add extra bowl.\"  If the note exists, the team has to know. \n For category: a cook-on-site event should have cook-on-site items, not drop-off items. If the \n categories don't match the service style, something got miscoded upstream. Flag it. \n Section 3: TIMELINE \n What you verify: \n -  Staff scheduled ON time \n -  NLT (No Later Than) entered \n -  Staff arrival onsite time entered \n -  Serve times are correct (  3 hours prior to service  for full-service, 1.5 hours prior for \n limited-service  ) \n How:  TPP is our source of truth for timing. Even though  Nowsta also holds the schedule, we \n enter the timing here first, so the field team and ops team can look at one place and get the real \n answer. \n The math: \n -  Start from the event serve time (say, 11:30 AM buffet open). \n -  Back out 3 hours for full-service arrival (so staff onsite at 8:30 AM). \n -  Back out travel time to get  departure from shop  (if  it's a 30-minute drive, they leave shop \n at 8:00 AM). \n -  Back out 1 hour to load (staff scheduled ON at 7:00 AM). \n If you don't know the drive time, check Google Maps. Do not estimate. For larger events with \n more equipment or more vehicles, give the load window more than one hour. \n The  staff OFF time  gets similar treatment. Typical:  1 hour after event end for cleanup and \n reload, plus travel time back, plus unload at shop. Build the schedule so the crew isn't still on \n the clock figuring things out at 9 PM when sales said the event ends at 6. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.identity-menu.service-identity-guest-count-menu-order-quantities-placeholders-category-production-notes",
+          "label": "Service identity guest count; menu order quantities placeholders category production notes",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.timeline",
+      "sourceKind": "training_reference",
+      "title": "Timeline",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        4
+      ],
+      "sourceText": [
+        {
+          "page": 4,
+          "text": " Walk the quantities against the guest count. If the guest count is 130 and you see an item priced \n at 500, something broke. Raise the flag. \n The  ***  and  ...  markers mean an item is an  empty shell  — no description, no proposal note, \n no pack list attachment, no recipe. If you push an event through with a  ***  or  ...  item, the \n warehouse packs nothing for it and the kitchen orders nothing for it. This is one of the \n highest-impact errors you can catch at this stage. \n \"Menu Production checked for notes\" means you read the line notes on each item. Notes tell \n you things like  \"French fries served in cone, not  tray\"  — the culinary team needs to pack the \n cone. Or  \"Caesar dressing on the side, add extra bowl.\"  If the note exists, the team has to know. \n For category: a cook-on-site event should have cook-on-site items, not drop-off items. If the \n categories don't match the service style, something got miscoded upstream. Flag it. \n Section 3: TIMELINE \n What you verify: \n -  Staff scheduled ON time \n -  NLT (No Later Than) entered \n -  Staff arrival onsite time entered \n -  Serve times are correct (  3 hours prior to service  for full-service, 1.5 hours prior for \n limited-service  ) \n How:  TPP is our source of truth for timing. Even though  Nowsta also holds the schedule, we \n enter the timing here first, so the field team and ops team can look at one place and get the real \n answer. \n The math: \n -  Start from the event serve time (say, 11:30 AM buffet open). \n -  Back out 3 hours for full-service arrival (so staff onsite at 8:30 AM). \n -  Back out travel time to get  departure from shop  (if  it's a 30-minute drive, they leave shop \n at 8:00 AM). \n -  Back out 1 hour to load (staff scheduled ON at 7:00 AM). \n If you don't know the drive time, check Google Maps. Do not estimate. For larger events with \n more equipment or more vehicles, give the load window more than one hour. \n The  staff OFF time  gets similar treatment. Typical:  1 hour after event end for cleanup and \n reload, plus travel time back, plus unload at shop. Build the schedule so the crew isn't still on \n the clock figuring things out at 9 PM when sales said the event ends at 6. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.timeline.staff-on-nlt-arrival-serve-staff-off-known-travel-and-load-windows",
+          "label": "Staff on NLT arrival serve staff off; known travel and load windows",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.notes",
+      "sourceKind": "training_reference",
+      "title": "Notes",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        5
+      ],
+      "sourceText": [
+        {
+          "page": 5,
+          "text": " Section 4: SETUP NOTES \n What you verify: \n -  Notes are checked and \"edited to amplify\" \n -  Linen color (black / white / ivory) is called out for tables \n -  Linen color for baskets / trays is called out \n -  Setup diagrams — is one needed? Is it in Dropbox? \n How:  The notes field is the  North Star for the field  team.  By the time they arrive on site, they \n should be able to look at the notes and understand the who, what, when, where, why of the \n event without calling you. \n Sales writes the first version of these notes. You  edit to amplify  — this is the phrase you'll hear \n often. It means: fill the gaps, kill the redundancy, add the detail the field team needs. \n Examples of what belongs here: \n -  \"5 gluten-free meals\" \n -  \"Plan B for rain — guests inside building under tent\" \n -  \"Black linens for tables\" \n -  \"Rustic kit: wood platters, white marble bowls, hammered serving ware\" \n -  \"Setup diagram: Dropbox > green number 1\" \n As you read through,  capture any detail that will  affect packing  , because the packlist is \n coming up next and you'll need this information in your head. Some ops people keep a scratch \n pad on the side for this. Do what works for you. \n If the event needs a setup diagram (plated meals, multi-station events, complex venues), verify \n it exists in Dropbox. Then take a screen grab or export and  post it into the event's Slack \n channel.  The field team should not have to go digging  through Dropbox on their phones the \n morning of. \n Section 5: PACKLIST \n This is the most important section in the entire process.  Most of what can go wrong at an \n event traces back to a packlist error. Slow down here. Don't rush. \n What you verify: \n -  Notes added on servingware type \n -  Quantities checked — flag anything unusually high \n -  X -  items removed "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.notes.amplified-notes-linen-colors-venue-diagrams",
+          "label": "Amplified notes linen colors venue diagrams",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.packlist",
+      "sourceKind": "training_reference",
+      "title": "Packlist",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        5,
+        6,
+        7
+      ],
+      "sourceText": [
+        {
+          "page": 5,
+          "text": " Section 4: SETUP NOTES \n What you verify: \n -  Notes are checked and \"edited to amplify\" \n -  Linen color (black / white / ivory) is called out for tables \n -  Linen color for baskets / trays is called out \n -  Setup diagrams — is one needed? Is it in Dropbox? \n How:  The notes field is the  North Star for the field  team.  By the time they arrive on site, they \n should be able to look at the notes and understand the who, what, when, where, why of the \n event without calling you. \n Sales writes the first version of these notes. You  edit to amplify  — this is the phrase you'll hear \n often. It means: fill the gaps, kill the redundancy, add the detail the field team needs. \n Examples of what belongs here: \n -  \"5 gluten-free meals\" \n -  \"Plan B for rain — guests inside building under tent\" \n -  \"Black linens for tables\" \n -  \"Rustic kit: wood platters, white marble bowls, hammered serving ware\" \n -  \"Setup diagram: Dropbox > green number 1\" \n As you read through,  capture any detail that will  affect packing  , because the packlist is \n coming up next and you'll need this information in your head. Some ops people keep a scratch \n pad on the side for this. Do what works for you. \n If the event needs a setup diagram (plated meals, multi-station events, complex venues), verify \n it exists in Dropbox. Then take a screen grab or export and  post it into the event's Slack \n channel.  The field team should not have to go digging  through Dropbox on their phones the \n morning of. \n Section 5: PACKLIST \n This is the most important section in the entire process.  Most of what can go wrong at an \n event traces back to a packlist error. Slow down here. Don't rush. \n What you verify: \n -  Notes added on servingware type \n -  Quantities checked — flag anything unusually high \n -  X -  items removed "
+        },
+        {
+          "page": 6,
+          "text": " -  Equivalent  items packed and assigned \n -  Equipment needed added (handwashing, tent, flooring, etc.) \n -  Plasticware in Other Inventory Items (if applicable) \n -  Vehicles assigned, equipment assigned \n How: \n Open the packlist inside the event. Keep it sorted  by category  as your default view. Category \n sort groups items the way the warehouse is physically organized, so the packer is walking the \n building in logical order. You can sort alphabetically if you're hunting one item, but always return \n to category view. \n Also, select the show all blue button and load entire list. This allows you to see the association if \n the pack list item. \n Add notes on servingware type.  If the notes said \"rustic  kit with wood platters and white \n marble bowls,\" go down the packlist and tag the serving items accordingly: serving board → \n wood board; small bowl → white marble bowl. If the note applies to three of the same item, you \n don't have to write it three times — TPP prints it in one section. \n Check quantities.  Look for anomalies. 500 linens on  a 130-person event is wrong. 10 chafers \n on a plated dinner for 40 is wrong. A running mental check: does this quantity make sense for \n the guest count and service style? \n Watch for doubles.  Sometimes the same item gets associated  twice. Unpack the duplicate. \n Every duplicated rolled utensil at $1.50 × 100 = real money wasted. Clean inventory discipline \n here is how margin stays healthy. \n X -  items.  These are placeholder or excluded items.  Remove them before print. If you see  X - \n and something beside it like  X - Equivalent needed  ,  that means we need the equivalent \n item packed (e.g.,  X - Wood-fired pizza oven equivalent  → we need a pizzeria \n trailer). Don't just delete blind. Read before you cut. \n Equipment check.  Handwashing, tent, flooring. Even  if these are usually on the standard \n packlist, verify every time. Use the  Pack List Report  view (separate screen) and Ctrl-F / Cmd-F \n for the word — \"tent\", \"handwashing\", \"tarp\". If it's missing, add it: \n Event → Manage → search item → verify correct variant (e.g., for a 10x20 tent on \n soft surface, you need two 10x10 tarp equivalents) → set quantity → Add to Pack \n List. \n Then go back to the packlist and confirm the item is now there.  Trust but verify. Always. "
+        },
+        {
+          "page": 7,
+          "text": " Plasticware.  If plasticware is in play, make sure it's in Other Inventory Items. \n Vehicles and equipment assigned.  Check the  Event Tracker  in Google Drive. Each event row \n should have: \n -  Event date \n -  Event number \n -  NLT \n -  Event type / name \n -  Truck assignment \n -  Trailer assignment (if applicable) \n This sheet is displayed in the ops warehouse. The whole team sees it. No one person should be \n the bottleneck on \"which truck is going to which event.\" \n Section 6: EQUIP \n What you verify: \n -  Dropbox checked for rentals file \n -  Decor from Good Shuffle verified \n -  Coordinating serving items match service type \n How:  Most rental coordination is now done by sales  on the front end — they drop the rustic kit \n into the Good Shuffle order and print it themselves. Your job is to  verify it's there  , not to create \n it. \n If the event notes say something like  \"Event Rents  providing X, Y, Z\"  , that's your cue to check \n Dropbox for the Event Rents file. If the notes don't mention rentals, rentals are probably not \n involved — but still look. \n If decor is missing (kit not added to Good Shuffle, for example), ping sales in Slack on the event \n channel: \n \"Can you add Rustic Kit to GU Law event?\" \n Keep the loop tight. Don't escalate without giving the owner a chance to fix it first. \n Coordinating serving items: if we're doing a plated meal, do we have trays and tray jacks? If \n we're doing stations, do we have the station equipment? This is the judgment layer. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.packlist.servingware-quantities-duplicates-placeholders-equivalents-equipment-handwashing-tent-flooring-tarp-plasticware-assignments",
+          "label": "Servingware quantities duplicates placeholders equivalents equipment handwashing tent flooring tarp plasticware assignments",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.equipment",
+      "sourceKind": "training_reference",
+      "title": "Equipment",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        7
+      ],
+      "sourceText": [
+        {
+          "page": 7,
+          "text": " Plasticware.  If plasticware is in play, make sure it's in Other Inventory Items. \n Vehicles and equipment assigned.  Check the  Event Tracker  in Google Drive. Each event row \n should have: \n -  Event date \n -  Event number \n -  NLT \n -  Event type / name \n -  Truck assignment \n -  Trailer assignment (if applicable) \n This sheet is displayed in the ops warehouse. The whole team sees it. No one person should be \n the bottleneck on \"which truck is going to which event.\" \n Section 6: EQUIP \n What you verify: \n -  Dropbox checked for rentals file \n -  Decor from Good Shuffle verified \n -  Coordinating serving items match service type \n How:  Most rental coordination is now done by sales  on the front end — they drop the rustic kit \n into the Good Shuffle order and print it themselves. Your job is to  verify it's there  , not to create \n it. \n If the event notes say something like  \"Event Rents  providing X, Y, Z\"  , that's your cue to check \n Dropbox for the Event Rents file. If the notes don't mention rentals, rentals are probably not \n involved — but still look. \n If decor is missing (kit not added to Good Shuffle, for example), ping sales in Slack on the event \n channel: \n \"Can you add Rustic Kit to GU Law event?\" \n Keep the loop tight. Don't escalate without giving the owner a chance to fix it first. \n Coordinating serving items: if we're doing a plated meal, do we have trays and tray jacks? If \n we're doing stations, do we have the station equipment? This is the judgment layer. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.equipment.dropbox-rentals-good-shuffle-decor-coordinating-serving-items",
+          "label": "Dropbox rentals Good Shuffle decor coordinating serving items",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.beverage-bar-wrap",
+      "sourceKind": "training_reference",
+      "title": "Beverage Bar Wrap",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        8
+      ],
+      "sourceText": [
+        {
+          "page": 8,
+          "text": " Section 7: BEV (Beverage) \n Usually blank unless we're doing bar service. If there are beverage items flagged for attention, \n address them. If not, move on. \n Section 8: BAR \n If there's a bar, there's a whole separate training and process. For most events this section is a \n one-line confirm. \n Section 9: WRAP UP \n What you do: \n 1.  Mark event status to Final.  Click Final in TPP. The  event turns dark green on the \n calendar. Enter today's date as the Final Approval Date. \n 2.  Export to Nowsta.  Click the Nowsta button in TPP.  It exports the shift structure to \n Nowsta with call times, but without the actual staff assigned yet. Confirmation message: \n \"Your event has been exported.\" \n 3.  Mark \"Binder — Ready to Build\"  on the Event Tracker  so the warehouse knows it's \n coming. \n At this point, the Ops Final Lock itself is done. Now you build the binder. \n Part 4: Binder Creation \n Every event leaves the shop with a physical binder. The binder is the field team's playbook. If \n the internet goes down, the phone dies, or the chef walks in cold, the binder tells them \n everything they need to know. \n Binder color code \n -  Red binder  → cooked on site (full service) \n -  Green binder  → limited service, cook at kitchen \n -  Blue clipboard  → drop-offs \n -  Blue half-inch binder  → bar service \n Grab the right color. Don't improvise. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.beverage-bar-wrap.beverage-bar-applicability-current-final-approval-date-nowsta-export-tracker-binder-state",
+          "label": "Beverage bar applicability; current Final approval date Nowsta export tracker binder state",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.binder",
+      "sourceKind": "training_reference",
+      "title": "Binder",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        8,
+        9
+      ],
+      "sourceText": [
+        {
+          "page": 8,
+          "text": " Section 7: BEV (Beverage) \n Usually blank unless we're doing bar service. If there are beverage items flagged for attention, \n address them. If not, move on. \n Section 8: BAR \n If there's a bar, there's a whole separate training and process. For most events this section is a \n one-line confirm. \n Section 9: WRAP UP \n What you do: \n 1.  Mark event status to Final.  Click Final in TPP. The  event turns dark green on the \n calendar. Enter today's date as the Final Approval Date. \n 2.  Export to Nowsta.  Click the Nowsta button in TPP.  It exports the shift structure to \n Nowsta with call times, but without the actual staff assigned yet. Confirmation message: \n \"Your event has been exported.\" \n 3.  Mark \"Binder — Ready to Build\"  on the Event Tracker  so the warehouse knows it's \n coming. \n At this point, the Ops Final Lock itself is done. Now you build the binder. \n Part 4: Binder Creation \n Every event leaves the shop with a physical binder. The binder is the field team's playbook. If \n the internet goes down, the phone dies, or the chef walks in cold, the binder tells them \n everything they need to know. \n Binder color code \n -  Red binder  → cooked on site (full service) \n -  Green binder  → limited service, cook at kitchen \n -  Blue clipboard  → drop-offs \n -  Blue half-inch binder  → bar service \n Grab the right color. Don't improvise. "
+        },
+        {
+          "page": 9,
+          "text": " Binder prep \n -  Wet erase marker → label the white spine with the  event number  . Make it as large and \n spaced-out as possible so the warehouse can read it from across the room. Example: \n 6423  . \n -  Pre-stock: pens, dividers, Sharpie, chalk marker, regular pen, business cards, injury \n report sheet, phone number sheet, accident reporting form. These go in every binder, \n every time. Ops restocks the bulk pile. \n What to print \n One copy per document unless otherwise noted.  Print  everything before you assemble. \n 1.  Worksheet  — TPP > Event > Worksheet. This particular  event called for  2 copies \n (check the event — some call for 2). Print > Ops Printer >  2  > Collate on. \n 2.  Event Menu  — TPP > Reports > Event Menu. The front-of-house  team's at-a-glance for \n what's being served. \n 3.  Pack List (by Item Type)  — This is the  reference packlist  .  Shows every item built out \n by dish. For example, a Farmer's Market Pizza lists spatula, pizza boxes, dough, pesto, \n semolina — everything that makes the pizza. When this prints,  the ops person writes \n REF  in the header  so the packer knows this is not  the one they pack off of. This is the \n cross-reference. \n 4.  Pack List (by Category)  — This is the  packing packlist  .  Change the report parameters \n to  Category  . Same data, grouped by warehouse category  so the packer walks the \n building efficiently. This is the one they check off as they pack. \n 5.  Event Forms One Print  — The multi-form document in  Google Drive. See Part 5 below \n — you fill parts of this out  before  printing. \n 6.  Nowsta Timesheet PDF  — In Nowsta, find the event →  Timesheet PDF. Prints team \n call times and phone numbers. \n 7.  Good Shuffle Pull Sheet  — Sales sends this to the  ops printer. If they haven't, prompt \n them on Slack:  \"Send Good Shuffle to Ops Printer when  complete.\" \n For remote venues, also print: \n -  Venue map (Google Maps screenshot) \n -  Setup diagram / venue drawings from Dropbox \n When in doubt, print more, not less. In the field without signal, paper wins. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.binder.binder-colors-physical-stock-copies-all-required-reports-and-assets",
+          "label": "Binder colors physical stock copies all required reports and assets",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.field-forms",
+      "sourceKind": "training_reference",
+      "title": "Field Forms",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        10,
+        11
+      ],
+      "sourceText": [
+        {
+          "page": 10,
+          "text": " Part 5: Filling Out the Event Forms One Print \n The Event Forms One Print is a multi-section document. Some sections you fill  before printing \n (because they're ops decisions). Some sections are filled  in the field  by the event lead. Know \n which is which. \n Sections YOU fill before printing \n Event Task Breakdown (Tab 1):  Walk through each line  and mark Y or N based on the event's \n actual scope. Examples: \n -  Servingware:  Plasticware / Rented / Client Provided  — underline the right one. \n -  Take rentals with us: Y/N \n -  Leave rentals onsite: Y/N \n -  Setup guest tables/chairs: Y/N \n -  Setting tables with flatware/china: Y/N \n -  Fill water goblets: Y/N \n -  Setup buffet tables: Y/N \n -  Setup tables for appetizers: Y/N \n -  Setup table for beverages: Y/N (note: if beverages go on the buffet table, mark N here) \n -  Stationary apps / Apps on their own table / Apps using main buffet / Pass apps \n -  Set out beverage dispensers: Y/N \n -  Serving buffet / Self-serve buffet \n -  Bus after dinner / Full bus \n -  Dessert: setup / cut / serve / coffee bar \n The rule of thumb:  we always serve buffets unless  indicated otherwise.  We do not \n self-serve. We bus after dinner but we do not full-bus unless the contract says so. \n If a line doesn't apply (e.g., no appetizers), mark N. If a line is a no-op for the whole event (e.g., \n no dessert), N everything in that block. \n This form is a quick-glance for staff who arrive on site but weren't part of the loadout team. It \n has to be unambiguous. \n Sections the FIELD LEAD fills (do not pre-fill) \n -  Leaving the Shop Checklist  — filled before departing  the commissary \n -  Event Arrival Checklist  — filled on arrival at the  venue (5 min walkthrough) \n -  Event Food MUDA  — filled after the event to track  waste \n -  Bin Organization Sheet  — fill bin numbers before loadout,  circle dirty bins after \n -  After Event Form  — filled by the event lead immediately  post-event "
+        },
+        {
+          "page": 11,
+          "text": " -  Event Return Checklist  — filled at shop after return \n -  Event Packing Checklist  — filled by the packer \n -  Buffet Drawing Template  — use for setup; we have a  standard buffet flow \n -  Leaving the Event Checklist  — filled before departing  the venue \n -  Before Takeoff Checklist (BTCL)  — filled by Event  Lead  with  Warehouse Lead before \n event is marked \"ready\" on Event Tracker. This one has two signatures. \n Your job on these sections is to make sure they're  in the binder, printed clean, blank and \n ready  for the field team to use. \n The buffet standard (reference) \n Even though the field team runs the buffet, know the standard so you can spot a weird event: \n -  Hot items in chafers:  veggies first (closest to plates),  starches second, proteins third. \n Cheaper items first (rice before mac & cheese, chicken before tri tip). \n -  Standard buffet:  3 hots, a salad, a bread, a butter. \n -  Cold sides:  place before the salad. \n -  Arrangement:  fill the table. No open space. If you  have only 2 hots, use one buffet \n table, not two. Rotate chafers 90° if needed to fill. \n Part 6: Assembling the Binder \n Once everything is printed: \n 1.  Three-hole punch  every document that goes in the binder  rings. \n 2.  Packing dockets  (color-coded sleeves): the packlist  goes in a red sleeve for full-service \n / cook-on-site, green for limited service / cook at kitchen. Bar and equipment packing \n have their own sleeves. \n 3.  Packing docket goes to the warehouse shelf  so the  packer can find it. The rest of the \n documents go into the binder itself. \n 4.  Worksheet  goes in the front cover slip of the binder  (one worksheet, clearly visible from \n outside). \n 5.  Event number on the spine  in wet erase. \n 6.  Binder goes on the Event Binder Rack. \n When packing is done \n -  The packer takes the packlist off the shelf, walks the warehouse, checks each item. \n -  When done, the packlist goes  into the binder on the  event rack. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.field-forms.ops-task-answers-blank-field-owned-forms-buffet-layout",
+          "label": "Ops task answers; blank field owned forms; buffet layout",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.packing-signatures",
+      "sourceKind": "training_reference",
+      "title": "Packing Signatures",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        11,
+        12
+      ],
+      "sourceText": [
+        {
+          "page": 11,
+          "text": " -  Event Return Checklist  — filled at shop after return \n -  Event Packing Checklist  — filled by the packer \n -  Buffet Drawing Template  — use for setup; we have a  standard buffet flow \n -  Leaving the Event Checklist  — filled before departing  the venue \n -  Before Takeoff Checklist (BTCL)  — filled by Event  Lead  with  Warehouse Lead before \n event is marked \"ready\" on Event Tracker. This one has two signatures. \n Your job on these sections is to make sure they're  in the binder, printed clean, blank and \n ready  for the field team to use. \n The buffet standard (reference) \n Even though the field team runs the buffet, know the standard so you can spot a weird event: \n -  Hot items in chafers:  veggies first (closest to plates),  starches second, proteins third. \n Cheaper items first (rice before mac & cheese, chicken before tri tip). \n -  Standard buffet:  3 hots, a salad, a bread, a butter. \n -  Cold sides:  place before the salad. \n -  Arrangement:  fill the table. No open space. If you  have only 2 hots, use one buffet \n table, not two. Rotate chafers 90° if needed to fill. \n Part 6: Assembling the Binder \n Once everything is printed: \n 1.  Three-hole punch  every document that goes in the binder  rings. \n 2.  Packing dockets  (color-coded sleeves): the packlist  goes in a red sleeve for full-service \n / cook-on-site, green for limited service / cook at kitchen. Bar and equipment packing \n have their own sleeves. \n 3.  Packing docket goes to the warehouse shelf  so the  packer can find it. The rest of the \n documents go into the binder itself. \n 4.  Worksheet  goes in the front cover slip of the binder  (one worksheet, clearly visible from \n outside). \n 5.  Event number on the spine  in wet erase. \n 6.  Binder goes on the Event Binder Rack. \n When packing is done \n -  The packer takes the packlist off the shelf, walks the warehouse, checks each item. \n -  When done, the packlist goes  into the binder on the  event rack. "
+        },
+        {
+          "page": 12,
+          "text": " -  Someone (Event Lead + Warehouse Lead) runs the  Before Takeoff Checklist  and \n signs off. \n -  Event Tracker status → FULLY PACKED → READY. \n At that point, the loop is closed. The event is fully prepped to ship. \n Part 7: Communicating as You Go \n Mangia runs on Slack. The two habits to build day one: \n One channel per event.  Naming convention:  event-number  event-name  , e.g. \n 6423-GU-Law  . When you find a setup diagram, screen-grab  it and post it in the channel. When \n you need sales to add a kit to Good Shuffle, ask in the channel. Keep everything in one place so \n the field team doesn't have to chase. \n Reply in threads.  When a conversation starts on an  event, keep it threaded. It keeps the main \n channel clean and the history readable. \n Part 8: Glossary \n These are the terms and tools you'll hear on day one. Memorize them. \n TPP — Total Party Planner.  Our catering management  software. Events, menus, packlists, \n timelines, client contacts all live here. This is the source of truth. \n Sales Lock.  The point at which sales has finalized  the event contract, menu, guest count, and \n timing. Event is ready for ops review. \n Ops Final Lock.  Your job. The final review from the  ops side before the event is marked Final \n and goes to production. \n Final / Print Ready.  The event has passed Ops Final  Lock, all documents are printed, binder is \n built, Nowsta is exported, warehouse can pack. \n NLT — No Later Than.  The latest departure time from  the shop for the event. Built backward \n from serve time. \n Packlist.  The full list of equipment, servingware,  ingredients, and assets being packed for the \n event. Two views:  by item type  (reference) and  by  category  (packing). "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.packing-signatures.physical-assembly-warehouse-packlist-and-two-person-before-takeoff-signatures",
+          "label": "Physical assembly warehouse packlist and two person Before Takeoff signatures",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    },
+    {
+      "key": "training.quick-reference",
+      "sourceKind": "training_reference",
+      "title": "Quick Reference",
+      "humanOwner": "Operations reviewer",
+      "sourceDocumentId": "liberty-6837-training_reference-01",
+      "sourcePages": [
+        14,
+        15,
+        16
+      ],
+      "sourceText": [
+        {
+          "page": 14,
+          "text": " MUDA.  Japanese lean-manufacturing term for waste.  The MUDA form tracks food waste at \n events. \n BTCL — Before Takeoff Checklist.  Final two-signature  checklist (Event Lead + Warehouse \n Lead) before the event is marked ready. \n Part 9: Your Week-One Quick-Reference Card \n Keep this at your desk. This is the compressed version of Part 3. \n Before you start a lock block \n Print Ops Final Lock checklist (one per event) \n Open: TPP, Google Drive, Dropbox, Slack, Event Tracker, Event Forms One Print, \n Nowsta \n Go to TPP Week View, find light-green events \n INFO \n Service style correct \n Guest count matches sales \n EVENT MENU \n Order correct (mains → sides → dessert) \n Quantities match guest count \n No  ***  or  ...  items \n Production notes read and understood \n Categories match service style \n TIMELINE \n Staff ON time entered (1 hr load + travel + 3 hrs for FS / 1.5 hrs for LS before serve) \n NLT entered \n Arrival onsite time entered \n Staff OFF time entered \n NOTES \n Notes edited to amplify "
+        },
+        {
+          "page": 15,
+          "text": " Linen color noted (black / white / ivory) \n Basket/tray linens noted \n Setup diagram confirmed in Dropbox \n Diagram posted in Slack event channel \n PACKLIST (slow down here) \n Servingware notes added (wood boards, white marble bowls, etc.) \n Quantities sanity-checked against guest count \n No duplicated items \n X -  items removed or resolved \n Equivalent needed  items packed \n Handwashing confirmed on list (Ctrl-F) \n Tent + flooring confirmed (Ctrl-F) \n Tarps confirmed if soft surface (Ctrl-F) \n Plasticware in Other Inv Items (if applicable) \n Vehicle + trailer assigned on Event Tracker \n EQUIP \n Dropbox checked for rental file (if notes mention rentals) \n Good Shuffle has correct kit (ping sales if missing) \n Coordinating serving items match service type \n BEV / BAR \n Beverage items addressed (or N/A) \n Bar items addressed (or N/A) \n WRAP UP \n Event status → Final (TPP) \n Final Approval Date entered \n Exported to Nowsta \n Event Tracker → Binder Ready to Build \n BINDER \n Correct color binder grabbed \n Spine labeled with event number (wet erase) \n Pre-stocked (pens, dividers, injury report, phone sheet) \n Worksheet (× 2 if indicated) → front cover slip "
+        },
+        {
+          "page": 16,
+          "text": " Event Menu printed \n Packlist by Item Type printed + marked  REF \n Packlist by Category printed (this is the packer's copy) \n Event Forms One Print — Task Breakdown filled, printed \n Nowsta Timesheet PDF printed \n Good Shuffle Pull Sheet (sent by sales) \n Setup diagrams printed (if remote/complex venue) \n Packlist → color-coded packing docket → warehouse shelf \n Binder → Event Binder Rack \n DONE \n Event Tracker status → Ready to pack \n Part 10: Principles to Work By \n A few things to hold onto as you grow into this role. \n Trust but verify.  Sales may have done their job perfectly.  The packlist may look complete. The \n rentals may already be ordered. Verify anyway. You are the last line. \n When in doubt, check.  It's always cheaper to double-check  than to ship something missing. A \n 30-second Ctrl-F beats a 6 AM call from a field lead asking where the tarps are. \n Stay in your silo — but own it fully.  This process  is not the place to reopen menu decisions, \n renegotiate the contract, or rewrite the client's notes. It is the place to make sure everything that \n was decided is actually executed correctly. Own the execution. \n Raise flags early.  If something is broken upstream  (missing info, contradictory notes, \n star-star-star items), stop, name it, and escalate. Don't paper over it. A broken event caught now \n is a thousand times cheaper than a broken event caught at the venue. \n Protect the brand.  Every piece of equipment that goes  out, every minute of timing, every detail \n on that binder is part of the Mangia experience. You are the final person touching the event \n before it goes out the door. Treat it like the finished product it is. \n Welcome to the team. "
+        }
+      ],
+      "items": [
+        {
+          "key": "training.quick-reference.full-training-quick-reference",
+          "label": "Full training quick reference",
+          "humanOwner": "Operations reviewer",
+          "answer": null,
+          "requiresRecordedVerification": true
+        }
+      ]
+    }
+  ]
+}

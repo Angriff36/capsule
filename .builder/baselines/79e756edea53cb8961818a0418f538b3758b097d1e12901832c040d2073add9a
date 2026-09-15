@@ -254,6 +254,10 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.EventLayoutSection_createViaAdd, { "eventId": "eventId-event-layout-section-1", "type": "demo-type-1", "instructions": "demo-instructions-1", "sortOrder": 1 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventLayoutSection_createViaAdd, { "eventId": "eventId-event-layout-section-2", "type": "demo-type-2", "instructions": "demo-instructions-2", "sortOrder": 2 } as any);
+  // skip EventPacketArtifact: no creation command in IR (2 rows unused)
+  // skip EventPacketIssue: no creation command in IR (2 rows unused)
+  // skip EventPacketResolution: no creation command in IR (2 rows unused)
+  // skip EventPacketRevision: no creation command in IR (2 rows unused)
   // EventStaffNeed has multiple initialization commands (changeCoverage, postOpen); using the selected initialization command: postOpen.
   // EventStaffNeed → api.mutations.EventStaffNeed_createViaPostOpen
   rowsAttempted += 1;
@@ -1024,6 +1028,26 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "EventLayoutSection",
       "createMutation": "EventLayoutSection_createViaAdd",
+      "rowCount": 2
+    },
+    {
+      "entity": "EventPacketArtifact",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EventPacketIssue",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EventPacketResolution",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EventPacketRevision",
+      "createMutation": null,
       "rowCount": 2
     },
     {

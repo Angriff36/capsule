@@ -694,6 +694,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   hasMany deliveries: Delivery
   hasMany assignments: EventAssignment
   hasMany timelineActivities: EventTimelineActivity
+  hasMany packetArtifacts: EventPacketArtifact
+  hasMany packetIssues: EventPacketIssue
+  hasMany packetResolutions: EventPacketResolution
+  hasMany packetRevisions: EventPacketRevision
   hasMany layoutSections: EventLayoutSection
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
@@ -995,6 +999,19 @@ entity Event mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       previousHeadcount: previousHeadcount
       newHeadcount: newHeadcount
+    }
+  }
+
+  // Service corrections stay available during live operations; packet review
+  // must use this command so the native reference and event audit agree.
+  command changeServiceStyle(serviceStyleId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate serviceStyleId = serviceStyleId
+    emit EventServiceStyleChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      serviceStyleId: serviceStyleId
     }
   }
 
@@ -1943,6 +1960,12 @@ event EventVenueChanged: "event.venue_changed" {
   venueName: string?
   venueAddress: string?
   venueCapacity: number?
+}
+
+event EventServiceStyleChanged: "event.service_style_changed" {
+  eventId: string
+  tenantId: string
+  serviceStyleId: string
 }
 
 event EventHeadcountChanged: "event.headcount_changed" {

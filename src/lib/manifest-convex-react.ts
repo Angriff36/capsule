@@ -167,6 +167,7 @@ import {
   EventChangePricingParamsSchema,
   EventChangePrimaryContactParamsSchema,
   EventChangeRequirementsParamsSchema,
+  EventChangeServiceStyleParamsSchema,
   EventChangeVenueParamsSchema,
   EventCloseOutParamsSchema,
   EventCloseoutCaptureParamsSchema,
@@ -3022,6 +3023,16 @@ export function useEventChangeRequirements() {
   };
 }
 
+/** Mutation hook for Event.changeServiceStyle. */
+export function useEventChangeServiceStyle() {
+  const mutate = useMutation(api.mutations.Event_changeServiceStyle);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventChangeServiceStyleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Event.changeVenue. */
 export function useEventChangeVenue() {
   const mutate = useMutation(api.mutations.Event_changeVenue);
@@ -3820,6 +3831,46 @@ export function useCreateEventLayoutSection() {
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
+}
+
+/** Reactive list for EventPacketArtifact. */
+export function useListEventPacketArtifact() {
+  return useQuery(api.queries.listEventPacketArtifact);
+}
+
+/** Reactive get-by-id for EventPacketArtifact. Pass "skip" to suspend. */
+export function useGetEventPacketArtifact(id: string | "skip") {
+  return useQuery(api.queries.getEventPacketArtifact, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Reactive list for EventPacketIssue. */
+export function useListEventPacketIssue() {
+  return useQuery(api.queries.listEventPacketIssue);
+}
+
+/** Reactive get-by-id for EventPacketIssue. Pass "skip" to suspend. */
+export function useGetEventPacketIssue(id: string | "skip") {
+  return useQuery(api.queries.getEventPacketIssue, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Reactive list for EventPacketResolution. */
+export function useListEventPacketResolution() {
+  return useQuery(api.queries.listEventPacketResolution);
+}
+
+/** Reactive get-by-id for EventPacketResolution. Pass "skip" to suspend. */
+export function useGetEventPacketResolution(id: string | "skip") {
+  return useQuery(api.queries.getEventPacketResolution, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Reactive list for EventPacketRevision. */
+export function useListEventPacketRevision() {
+  return useQuery(api.queries.listEventPacketRevision);
+}
+
+/** Reactive get-by-id for EventPacketRevision. Pass "skip" to suspend. */
+export function useGetEventPacketRevision(id: string | "skip") {
+  return useQuery(api.queries.getEventPacketRevision, id === "skip" ? "skip" : { id: id as any });
 }
 
 /** Reactive list for EventStaffNeed. */
@@ -10795,4 +10846,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1145 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1154 as const;

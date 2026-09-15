@@ -8,6 +8,11 @@
  * @module
  */
 
+import type {
+  ApiFromModules,
+  FilterApi,
+  FunctionReference,
+} from "convex/server";
 import type * as apiKeys from "../apiKeys.js";
 import type * as archiveDisposition from "../archiveDisposition.js";
 import type * as archiveInventory from "../archiveInventory.js";
@@ -66,6 +71,8 @@ import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
 import type * as lib_eventCancellation from "../lib/eventCancellation.js";
 import type * as lib_eventCreateServiceStyleEnsure from "../lib/eventCreateServiceStyleEnsure.js";
+import type * as lib_eventPacket_commands from "../lib/eventPacket/commands.js";
+import type * as lib_eventPacket_reconcileNative from "../lib/eventPacket/reconcileNative.js";
 import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperations.js";
 import type * as lib_eventTimingOperations from "../lib/eventTimingOperations.js";
 import type * as lib_fdcNutrientMapper from "../lib/fdcNutrientMapper.js";
@@ -161,12 +168,14 @@ import type * as vehicleAssignment from "../vehicleAssignment.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
 import type * as workforceScheduling from "../workforceScheduling.js";
 
-import type {
-  ApiFromModules,
-  FilterApi,
-  FunctionReference,
-} from "convex/server";
-
+/**
+ * A utility for referencing Convex functions in your app's API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 declare const fullApi: ApiFromModules<{
   apiKeys: typeof apiKeys;
   archiveDisposition: typeof archiveDisposition;
@@ -226,6 +235,8 @@ declare const fullApi: ApiFromModules<{
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
   "lib/eventCancellation": typeof lib_eventCancellation;
   "lib/eventCreateServiceStyleEnsure": typeof lib_eventCreateServiceStyleEnsure;
+  "lib/eventPacket/commands": typeof lib_eventPacket_commands;
+  "lib/eventPacket/reconcileNative": typeof lib_eventPacket_reconcileNative;
   "lib/eventStaffingOperations": typeof lib_eventStaffingOperations;
   "lib/eventTimingOperations": typeof lib_eventTimingOperations;
   "lib/fdcNutrientMapper": typeof lib_fdcNutrientMapper;
@@ -321,31 +332,11 @@ declare const fullApi: ApiFromModules<{
   webhookIntegrations: typeof webhookIntegrations;
   workforceScheduling: typeof workforceScheduling;
 }>;
-
-/**
- * A utility for referencing Convex functions in your app's public API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
- * ```
- */
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">
 >;
-
-/**
- * A utility for referencing Convex functions in your app's internal API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = internal.myModule.myFunction;
- * ```
- */
 export declare const internal: FilterApi<
   typeof fullApi,
   FunctionReference<any, "internal">
 >;
-
-export declare const components: {};
