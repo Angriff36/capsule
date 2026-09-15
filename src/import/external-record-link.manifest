@@ -84,9 +84,12 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   // Core mapping fields
   property required sourceSystem: ExternalSourceSystem = "tpp_legacy"
   property required recordType: string = ""
-  property required externalId: string = ""
+  // No placeholder default: the identity fields are populated only by link(),
+  // which makes link() the allocating command (the Builder had chosen discard,
+  // so no governed link create existed; #371).
+  property required externalId: string
   property required capsuleEntity: CapsuleEntityType = "contact"
-  property required capsuleId: string = ""
+  property required capsuleId: string
   // Revision-2 identity (2026-09-14). One legacy record may map to several
   // Capsule records, one link per role; ordinal separates several records of
   // one role from one source row. Nullable so pre-field links validate; the

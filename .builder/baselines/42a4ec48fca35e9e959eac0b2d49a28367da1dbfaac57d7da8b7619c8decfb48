@@ -4236,12 +4236,12 @@ export function useExternalRecordLinkVerifyLink() {
   };
 }
 
-/** Governed creation hook for ExternalRecordLink.discard. */
+/** Governed creation hook for ExternalRecordLink.link. */
 export function useCreateExternalRecordLink() {
-  const mutate = useMutation(api.mutations.ExternalRecordLink_createViaDiscard);
+  const mutate = useMutation(api.mutations.ExternalRecordLink_createViaLink);
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
-    const parsed = ExternalRecordLinkDiscardParamsSchema.parse(params) as Record<string, unknown>;
+    const parsed = ExternalRecordLinkLinkParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };

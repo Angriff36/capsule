@@ -277,10 +277,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-1", "activityId": "activityId-event-timeline-comment-1", "authorPersonId": "authorPersonId-event-timeline-comment-1", "authorName": "EventTimelineComment 1", "body": "demo-body-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.EventTimelineComment_createViaPost, { "eventId": "eventId-event-timeline-comment-2", "activityId": "activityId-event-timeline-comment-2", "authorPersonId": "authorPersonId-event-timeline-comment-2", "authorName": "EventTimelineComment 2", "body": "demo-body-2" } as any);
-  // ExternalRecordLink has multiple initialization commands (discard, unlinkExternalRecord); using the selected initialization command: discard.
-  // ExternalRecordLink → api.mutations.ExternalRecordLink_createViaDiscard
-  // skip ExternalRecordLink row "external-record-link-1": no non-blank create args
-  // skip ExternalRecordLink row "external-record-link-2": no non-blank create args
+  // ExternalRecordLink has multiple initialization commands (discard, link, unlinkExternalRecord, updateCapsuleId); using the selected initialization command: link.
+  // ExternalRecordLink → api.mutations.ExternalRecordLink_createViaLink
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ExternalRecordLink_createViaLink, { "sourceSystem": "demo-sourceSystem-1", "recordType": "demo-recordType-1", "externalId": "externalId-external-record-link-1", "capsuleEntity": "demo-capsuleEntity-1", "capsuleId": "capsuleId-external-record-link-1", "sourceAccount": "demo-sourceAccount-1", "role": "demo-role-1", "ordinal": 1, "linkKey": "demo-linkKey-1", "decision": "demo-decision-1", "suggestedBy": "demo-suggestedBy-1", "sourceVersion": "demo-sourceVersion-1", "verified": false, "verifiedByUserId": "verifiedByUserId-external-record-link-1", "sourceImportRunId": "sourceImportRunId-external-record-link-1", "effectiveStartDate": 1767268800000, "effectiveEndDate": 1767268800000, "rawSourceData": "demo-rawSourceData-1", "metadata": "demo-metadata-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ExternalRecordLink_createViaLink, { "sourceSystem": "demo-sourceSystem-2", "recordType": "demo-recordType-2", "externalId": "externalId-external-record-link-2", "capsuleEntity": "demo-capsuleEntity-2", "capsuleId": "capsuleId-external-record-link-2", "sourceAccount": "demo-sourceAccount-2", "role": "demo-role-2", "ordinal": 2, "linkKey": "demo-linkKey-2", "decision": "demo-decision-2", "suggestedBy": "demo-suggestedBy-2", "sourceVersion": "demo-sourceVersion-2", "verified": false, "verifiedByUserId": "verifiedByUserId-external-record-link-2", "sourceImportRunId": "sourceImportRunId-external-record-link-2", "effectiveStartDate": 1767355200000, "effectiveEndDate": 1767355200000, "rawSourceData": "demo-rawSourceData-2", "metadata": "demo-metadata-2" } as any);
   // skip ImportArtifact: no creation command in IR (2 rows unused)
   // ImportConflict → api.mutations.ImportConflict_createViaRaise
   rowsAttempted += 1;
@@ -1046,7 +1048,7 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "ExternalRecordLink",
-      "createMutation": "ExternalRecordLink_createViaDiscard",
+      "createMutation": "ExternalRecordLink_createViaLink",
       "rowCount": 2
     },
     {
