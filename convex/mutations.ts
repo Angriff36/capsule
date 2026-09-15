@@ -19281,7 +19281,7 @@ async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSyst
     if (!((sourceSystem != null))) throw new Error("Source system is required");
     if (!((((externalId).trim()).length > 0))) throw new Error("External ID is required");
     if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
-    if (!(((verified === false) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
+    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
     if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("Effective start date must be before or equal to end date");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -19421,7 +19421,7 @@ export const ExternalRecordLink_createViaLink = mutation({
     if (!((sourceSystem != null))) throw new Error("Source system is required");
     if (!((((externalId).trim()).length > 0))) throw new Error("External ID is required");
     if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
-    if (!(((verified === false) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
+    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
     if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("Effective start date must be before or equal to end date");
     const doc: Record<string, any> = {
       ...__draft,
