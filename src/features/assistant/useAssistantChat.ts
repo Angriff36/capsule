@@ -48,12 +48,16 @@ export function useAssistantChat() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const convoRef = useRef<ServerMessage[]>([]);
+  const runIdRef = useRef(0);
 
   const send = useCallback(
     async (text: string, files?: AssistantFile[]) => {
       const trimmed = text.trim();
       const attached = files ?? [];
       if (busy || (trimmed.length === 0 && attached.length === 0)) return;
+      const runId = runIdRef.current + 1;
+      runIdRef.current = runId;
+      const isActive = () => runIdRef.current === runId;
       setError(null);
       setBusy(true);
       convoRef.current = [
@@ -75,9 +79,11 @@ export function useAssistantChat() {
       ]);
       try {
         for (let round = 0; round <= MAX_ROUNDS; round++) {
+          if (!isActive()) return;
           const res: AssistantTurnResult = await runTurn({
             messages: convoRef.current,
           });
+          if (!isActive()) return;
           // Every assistant turn — final answers included — enters the
           // conversation, or multi-turn follow-ups lose what was said.
           const serverToolCalls = res.toolCalls.map((c) => ({
@@ -144,7 +150,9 @@ export function useAssistantChat() {
             break;
           }
           for (const call of res.toolCalls) {
+            if (!isActive()) return;
             const result = await executeAssistantToolCall(convex, call);
+            if (!isActive()) return;
             convoRef.current = [
               ...convoRef.current,
               { role: "tool", content: result, toolCallId: call.id },
@@ -162,13 +170,30 @@ export function useAssistantChat() {
           }
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : String(err));
+        if (isActive())
+          setError(err instanceof Error ? err.message : String(err));
       } finally {
-        setBusy(false);
+        if (isActive()) setBusy(false);
       }
     },
     [busy, convex, runTurn],
   );
+
+  const stop = useCallback(() => {
+    if (!busy) return;
+    runIdRef.current += 1;
+    const stoppedContent = "Stopped.";
+    const stopped: ServerMessage = {
+      role: "assistant",
+      content: stoppedContent,
+    };
+    convoRef.current = [...convoRef.current, stopped];
+    setMessages((m) => [
+      ...m,
+      { id: newId(), role: "assistant", content: stoppedContent },
+    ]);
+    setBusy(false);
+  }, [busy]);
 
   const reset = useCallback(() => {
     if (busy) return;
@@ -177,5 +202,5 @@ export function useAssistantChat() {
     setError(null);
   }, [busy]);
 
-  return { messages, busy, error, send, reset };
+  return { messages, busy, error, send, stop, reset };
 }

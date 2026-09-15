@@ -131,7 +131,7 @@ export const resolveFiles = internalQuery({
     files: v.array(
       v.object({
         storageId: v.string(),
-        kind: v.union(v.literal("image"), v.literal("text")),
+        kind: v.union(v.literal("image"), v.literal("text"), v.literal("pdf")),
       }),
     ),
   },

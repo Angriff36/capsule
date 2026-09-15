@@ -42,7 +42,7 @@ export function AssistantSettingsPage() {
     try {
       if (existing) {
         await configureConfig({
-          docId: existing.docId,
+          docId: existing._id,
           baseUrl,
           apiKey,
           model,

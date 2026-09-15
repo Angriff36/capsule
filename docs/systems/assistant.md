@@ -28,15 +28,17 @@ One chat drawer, mounted app-wide (`Ctrl+J` or the topbar sparkle button).
 - **UI** — `src/features/assistant/AssistantPanel.tsx` + `useAssistantChat.ts`
   (browser-in-the-loop, max 8 tool rounds, conversation is session-local and
   not persisted).
-- **Attachments** — images (≤5 MB) and text files (≤200 KB) upload through the
-  governed storage seam (`api.fileStorage.generateUploadUrl` → storageId) and
-  are bound to the uploader via the `AssistantUpload` entity
+- **Attachments** — images (≤5 MB), PDFs (≤20 MB), and text files (≤200 KB)
+  upload through the governed storage seam (`api.fileStorage.generateUploadUrl`
+  → storageId) and are bound to the uploader via the `AssistantUpload` entity
   (`assistantConfig.registerUpload`). The turn action resolves every referenced
   storage id through `assistantConfig.resolveFiles` (internal), which allows
   only blobs a live row in the caller's tenant references OR blobs the caller
   registered — knowing a storage id grants nothing (PR12-05 model). Only the
   newest user turn inlines files; older turns keep text placeholders. Images
-  become data URLs (vision-capable model required).
+  become data URLs (vision-capable model required). PDFs use the optional
+  `ASSISTANT_MARKITDOWN_URL` converter first, which preserves headings, tables,
+  and lists as Markdown; the built-in PDF text extractor remains the fallback.
 - **Ops Final Lock** — the system prompt carries the Ops Final Lock checklist
   (INFO / MENU / TIMELINE back-out math / SETUP NOTES amplify / PACKLIST
   checks / EQUIP / WRAP UP with explicit-confirm finalize), so "run an ops
@@ -55,6 +57,13 @@ caller subject.
 Deployment env vars (`ASSISTANT_LLM_BASE_URL` / `_API_KEY` / `_MODEL` via
 `npx convex env set`) are the fallback when no row exists. Missing both → the
 assistant replies with a clear "not configured" message.
+
+`ASSISTANT_MARKITDOWN_URL` is also a Convex deployment environment variable.
+The local Vite dev server exposes a bridge at
+`http://127.0.0.1:7811/api/assistant/markitdown` when the global `markitdown`
+executable is available. A production deployment must point this variable at a
+deployed MarkItDown service; a developer-machine global install is not
+available inside production Convex actions.
 
 ## Truths kept honest
 

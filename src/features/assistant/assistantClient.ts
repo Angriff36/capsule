@@ -28,6 +28,7 @@ const MAX_RESULT_CHARS = 6000;
 /** Upload limits — the turn action re-checks byte size server-side. */
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 export const MAX_TEXT_BYTES = 200 * 1024;
+export const MAX_PDF_BYTES = 20 * 1024 * 1024;
 
 const TEXT_EXTENSIONS = new Set([
   "txt",
@@ -44,7 +45,8 @@ const TEXT_EXTENSIONS = new Set([
 
 export function classifyFile(
   file: File,
-): { ok: true; kind: "image" | "text" } | { ok: false; reason: string } {
+):
+  { ok: true; kind: "image" | "text" | "pdf" } | { ok: false; reason: string } {
   const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
   if (file.type.startsWith("image/")) {
     if (file.size > MAX_IMAGE_BYTES) {
@@ -54,6 +56,15 @@ export function classifyFile(
       };
     }
     return { ok: true, kind: "image" };
+  }
+  if (file.type === "application/pdf" || extension === "pdf") {
+    if (file.size > MAX_PDF_BYTES) {
+      return {
+        ok: false,
+        reason: `${file.name} is over 20 MB — split it into smaller PDFs.`,
+      };
+    }
+    return { ok: true, kind: "pdf" };
   }
   if (file.type.startsWith("text/") || TEXT_EXTENSIONS.has(extension)) {
     if (file.size > MAX_TEXT_BYTES) {
@@ -66,7 +77,7 @@ export function classifyFile(
   }
   return {
     ok: false,
-    reason: `${file.name}: unsupported. Images (≤5 MB) and text files (≤200 KB) work; PDFs are not supported yet.`,
+    reason: `${file.name}: unsupported. Images (≤5 MB), PDFs (≤20 MB), and text files (≤200 KB) work.`,
   };
 }
 
@@ -74,7 +85,7 @@ export function classifyFile(
 export async function uploadAssistantFile(
   convex: ConvexReactClient,
   file: File,
-  kind: "image" | "text",
+  kind: "image" | "text" | "pdf",
 ): Promise<AssistantFile> {
   const uploadUrl = await convex.mutation(
     // Authenticated upload URL from the authored file-storage seam.
