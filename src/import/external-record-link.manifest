@@ -166,8 +166,9 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     optional suggestedBy: string,
     optional sourceVersion: string
   ) {
+    // No `self.createdAt == null` guard: timestamps fill createdAt into the
+    // draft before guards run, so that guard failed on every create (#371).
     guard self.deletedAt == null
-    guard self.createdAt == null
     constraint linkSourceSystemPresent: sourceSystem != null "Source system is required"
     constraint linkExternalIdPresent: length(trim(externalId)) > 0 "External ID is required"
     constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"

@@ -164,6 +164,15 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
         .split('if [ "${VERCEL_ENV:-}" = "production" ]; then')[1]
         ?.split("else")[0] ?? "";
     expect(prod).toContain("convex deploy --cmd 'vite build'");
-    expect(prod).not.toMatch(/^\s*vite build\s*$/m);
+    // Cutover 2026-09-14: a UI-only build is allowed ONLY inside the
+    // self-hosted branch, which is gated on CONVEX_SELF_HOSTED_URL.
+    const selfHostedGate = 'if [ -n "${CONVEX_SELF_HOSTED_URL:-}" ]; then';
+    expect(prod).toContain(selfHostedGate);
+    const [beforeGate, afterGate = ""] = prod.split(selfHostedGate);
+    const selfHostedBlock = afterGate.split("\n  fi\n")[0] ?? "";
+    const outsideGate = beforeGate + afterGate.slice(selfHostedBlock.length);
+    expect(selfHostedBlock).toMatch(/^\s*vite build\s*$/m);
+    expect(selfHostedBlock).toContain("exit 0");
+    expect(outsideGate).not.toMatch(/^\s*vite build\s*$/m);
   });
 });
