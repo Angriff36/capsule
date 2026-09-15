@@ -13,6 +13,7 @@ import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTrackerPage } from "../features/events/EventTrackerPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
+import { WorkingEventRouteSync } from "../features/events/workingEvent";
 import { HomeCalendarPage } from "../features/home/HomeCalendarPage";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
@@ -597,6 +598,7 @@ export function App() {
   return (
     <AppErrorBoundary>
       <AuthGate>
+        <WorkingEventRouteSync />
         <Routes>
           {/* Staff-facing mobile view lives outside AppShell so admin nav never renders. */}
           <Route

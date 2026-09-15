@@ -21,6 +21,7 @@ import {
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
+import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
 import { ActionMenu, TableSkeleton } from "../../ui/primitives";
@@ -89,7 +90,8 @@ export function KitchenDashboardPage() {
   const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
 
   const [horizonOffset, setHorizonOffset] = useState(0);
-  const [selectedEventId, setSelectedEventId] = useState("");
+  const workingEventId = useWorkingEventId();
+  const [selectedEventId, setSelectedEventId] = useState(workingEventId ?? "");
   const [filter, setFilter] = useState<CommandDeckFilter>("all");
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [armedPersonId, setArmedPersonId] = useState<string | null>(null);
@@ -143,6 +145,16 @@ export function KitchenDashboardPage() {
       setSelectedEventId("");
     }
   }, [horizonEvents, selectedEventId]);
+
+  // The board follows the working event. "Every service" is this screen's
+  // own choice and leaves the working event alone.
+  useEffect(() => {
+    setSelectedEventId(workingEventId ?? "");
+  }, [workingEventId]);
+  const pickEvent = (id: string) => {
+    setSelectedEventId(id);
+    if (id) setWorkingEvent(id);
+  };
 
   const selectedEvent = horizonEvents.find((e) => e._id === selectedEventId);
   const crewRows = model.crewLoad(horizonEvents.map((e) => e._id));
@@ -1122,7 +1134,7 @@ export function KitchenDashboardPage() {
             id="kcd-m-service"
             className="input h-11 min-w-0 flex-1"
             value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
+            onChange={(e) => pickEvent(e.target.value)}
           >
             <option value="">Every service</option>
             {horizonEvents.map((e) => (
@@ -1595,7 +1607,7 @@ export function KitchenDashboardPage() {
               <span>Event</span>
               <select
                 value={selectedEventId}
-                onChange={(e) => setSelectedEventId(e.target.value)}
+                onChange={(e) => pickEvent(e.target.value)}
                 aria-label="Filter by event"
               >
                 <option value="">Every service</option>

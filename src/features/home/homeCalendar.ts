@@ -100,7 +100,7 @@ export interface CalendarSources {
   invoices: Doc<"invoices">[];
 }
 
-function shortRef(id: string): string {
+export function shortRef(id: string): string {
   return `#${id.slice(-6).toUpperCase()}`;
 }
 

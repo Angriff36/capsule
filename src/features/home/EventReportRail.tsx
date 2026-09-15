@@ -3,10 +3,16 @@ import { Link } from "react-router-dom";
 import { TPP_REPORT_CATALOG } from "../reports/tpp/catalog";
 import type { TppReportDefinition } from "../reports/tpp/types";
 import { eventDetailPath } from "../events/eventRoutes";
+import {
+  clearReportRailRequest,
+  type ReportRailRequest,
+} from "../events/workingEvent";
 import { EventReportView } from "./EventReportView";
 import type { CalendarEventFacts } from "./homeCalendar";
+import "./EventReportRail.css";
 
 const STORAGE_KEY = "capsule.eventReportRail.reports";
+const LIST_CHANGED = "capsule:event-report-list";
 
 /**
  * Every catalog report the rail can run with nothing but the event: it takes
@@ -67,13 +73,15 @@ function writeStoredIds(scope: string, ids: string[]) {
   }
 }
 
+/** What the rail needs to know about an event. */
+export type ReportRailEvent = Pick<
+  CalendarEventFacts,
+  "id" | "title" | "eventNumber" | "client" | "startsAt" | "endsAt"
+>;
+
 type Active = { definition: TppReportDefinition; print: boolean };
 
-export type EventReportLaunch = {
-  eventId: string;
-  reportId: string;
-  print: boolean;
-};
+type ListChange = { scope: string; ids: string[] };
 
 export function useEventReportList(storageScope: string) {
   const [ids, setIds] = useState<string[]>(
@@ -82,6 +90,17 @@ export function useEventReportList(storageScope: string) {
 
   useEffect(() => {
     setIds(readStoredIds(storageScope) ?? DEFAULT_REPORT_IDS);
+  }, [storageScope]);
+
+  // Home's tooltip and the shell rail each hold a copy of the list; an edit
+  // in one must reach the other.
+  useEffect(() => {
+    const onChange = (event: Event) => {
+      const detail = (event as CustomEvent<ListChange>).detail;
+      if (detail?.scope === storageScope) setIds(detail.ids);
+    };
+    window.addEventListener(LIST_CHANGED, onChange);
+    return () => window.removeEventListener(LIST_CHANGED, onChange);
   }, [storageScope]);
 
   const chosen = useMemo(
@@ -95,36 +114,38 @@ export function useEventReportList(storageScope: string) {
   );
 
   const toggle = (id: string) => {
-    setIds((current) => {
-      const next = current.includes(id)
-        ? current.filter((entry) => entry !== id)
-        : [...current, id];
-      writeStoredIds(storageScope, next);
-      return next;
-    });
+    const next = ids.includes(id)
+      ? ids.filter((entry) => entry !== id)
+      : [...ids, id];
+    writeStoredIds(storageScope, next);
+    window.dispatchEvent(
+      new CustomEvent<ListChange>(LIST_CHANGED, {
+        detail: { scope: storageScope, ids: next },
+      }),
+    );
   };
 
   return { ids, chosen, toggle };
 }
 
 /**
- * The tab pinned to the right edge of the screen. It carries the report list
- * for whichever event the calendar has selected: view a report in place, or
- * print it straight away. The list is the operator's own — edit it once and
- * the browser remembers.
+ * The tab pinned to the right edge of every screen. It carries the report
+ * list for the working event: view a report in place, or print it straight
+ * away. The list is the operator's own — edit it once and the browser
+ * remembers.
  */
 export function EventReportRail({
   event,
   reportIds,
   reports,
   onToggleReport,
-  launch,
+  request,
 }: {
-  event: CalendarEventFacts | null;
+  event: ReportRailEvent | null;
   reportIds: readonly string[];
   reports: readonly TppReportDefinition[];
   onToggleReport: (id: string) => void;
-  launch: EventReportLaunch | null;
+  request: ReportRailRequest | null;
 }) {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -142,28 +163,24 @@ export function EventReportRail({
     tabRef.current?.focus();
   };
 
-  // A new selection resets the rail to its list and opens it.
+  // A new event resets the rail to its list. It stays closed unless asked:
+  // opening an event page must not throw the drawer over it.
   const eventId = event?.id ?? null;
   useEffect(() => {
     setActive(null);
-    if (eventId) setOpen(true);
   }, [eventId]);
 
-  // A launch request is consumed once; a later re-render with the same
-  // request (event object refreshed, list reopened) must not replay it or
-  // reopen the print dialog.
-  const consumedLaunch = useRef<EventReportLaunch | null>(null);
+  // A request (calendar pick, tooltip View / Print) is acted on once and
+  // cleared, so a later remount never replays it or reopens the print dialog.
   useEffect(() => {
-    if (!launch || !event || launch.eventId !== event.id) return;
-    if (consumedLaunch.current === launch) return;
-    const definition = EVENT_REPORTS.find(
-      (candidate) => candidate.id === launch.reportId,
-    );
-    if (!definition) return;
-    consumedLaunch.current = launch;
-    setActive({ definition, print: launch.print });
+    if (!request || !event || request.eventId !== event.id) return;
+    clearReportRailRequest();
+    const definition = request.reportId
+      ? EVENT_REPORTS.find((candidate) => candidate.id === request.reportId)
+      : undefined;
+    setActive(definition ? { definition, print: request.print } : null);
     setOpen(true);
-  }, [event, launch]);
+  }, [event, request]);
 
   useEffect(() => {
     if (!open) return;

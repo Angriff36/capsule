@@ -24,7 +24,7 @@ function localDateInput(ms: number): string {
  */
 export function eventReportRequest(
   definition: TppReportDefinition,
-  event: CalendarEventFacts,
+  event: Pick<CalendarEventFacts, "id" | "startsAt" | "endsAt">,
 ): TppReportRequest | null {
   const form = new FormData();
   const day = startOfDay(event.startsAt ?? Date.now());
@@ -62,7 +62,7 @@ export function EventReportView({
   onBack,
 }: {
   definition: TppReportDefinition;
-  event: CalendarEventFacts;
+  event: Pick<CalendarEventFacts, "id" | "startsAt" | "endsAt">;
   autoPrint: boolean;
   onBack: () => void;
 }) {

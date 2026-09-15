@@ -10,6 +10,7 @@ import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { breadcrumbsForPath, type Breadcrumb } from "./breadcrumbs";
 import { RecentsMenu } from "./RecentsMenu";
 import { ThemeToggle } from "./Sidebar";
+import { WorkingEventChip } from "./WorkingEventChip";
 
 function useBreadcrumbs(): Breadcrumb[] {
   const { pathname } = useLocation();
@@ -98,6 +99,8 @@ export function Topbar({
           </span>
         ))}
       </nav>
+
+      <WorkingEventChip />
 
       <div className="ml-auto flex items-center gap-2">
         <button

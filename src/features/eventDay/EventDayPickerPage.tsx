@@ -5,6 +5,7 @@ import {
   type EventDayEventSummary,
 } from "../../lib/eventDayBriefing";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { useWorkingEventId } from "../events/workingEvent";
 
 function dayStart(at: number): number {
   const date = new Date(at);
@@ -55,12 +56,17 @@ function EventCard({
  */
 export function EventDayPickerPage() {
   const events = useEventDayEvents();
+  const workingId = useWorkingEventId();
   const todayStart = dayStart(Date.now());
 
   const rows = (events ?? []).filter(
     (row) => !["cancelled", "closed_out"].includes(String(row.stage)),
   );
-  const dated = rows.filter((row) => typeof row.startsAt === "number");
+  // The event the operator is already working sits first.
+  const working = rows.find((row) => row._id === workingId);
+  const dated = rows.filter(
+    (row) => typeof row.startsAt === "number" && row !== working,
+  );
   const upcoming = dated
     .filter((row) => dayStart(Number(row.startsAt)) >= todayStart)
     .sort((a, b) => Number(a.startsAt) - Number(b.startsAt));
@@ -87,10 +93,22 @@ export function EventDayPickerPage() {
               Your sign-in is not linked to a workspace yet — ask a manager to
               add you.
             </p>
-          ) : upcoming.length === 0 && past.length === 0 ? (
+          ) : !working && upcoming.length === 0 && past.length === 0 ? (
             <p className="evd-empty">No events on the calendar yet.</p>
           ) : (
             <>
+              {working ? (
+                <>
+                  <p className="evd-kicker">Your working event</p>
+                  <EventCard
+                    event={working}
+                    today={
+                      typeof working.startsAt === "number" &&
+                      dayStart(working.startsAt) === todayStart
+                    }
+                  />
+                </>
+              ) : null}
               {upcoming.map((row) => (
                 <EventCard
                   key={row._id}
