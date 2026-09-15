@@ -20,7 +20,7 @@ main capsule checkout, which this loop never touches).
 - Validation commands (also in `.ralph.env`): tests `bun run test`; lint
   `bun run typecheck && bun run format:check`; build `bunx vite build`.
   NEVER `bun run build` in this loop — it runs `scripts/vercel-build.sh`, which
-  deploys Convex. NEVER `npx convex deploy`. NEVER push `main` (this branch only).
+  deploys Convex when `VERCEL_ENV=production`. NEVER `npx convex deploy`. NEVER push `main` (this branch only).
 - Tests: capsule's "don't add tests unless the owner asks" rule is satisfied for
   this loop by the ACCEPTANCE_TESTS.md contract — add the focused test each
   `AC-###` requires, in capsule's existing style (`tests/*.test.ts`, proofs under
@@ -69,7 +69,7 @@ bun run test
 bun run test:coverage    # vitest + coverage ratchet
 bun run build
 bun run baseline:decay   # monthly hygiene checks
-bun run check            # toolchain + typecheck + format:check + secrets + test:coverage + build + baseline:decay
+bun run check            # toolchain + ownership + proof:emit + check:proof + manifest-registry + nine per-domain manifest gates + design-vocab + typecheck + format:check + secrets + test:coverage + build + baseline:decay
 bun run codegen          # convex codegen
 bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL
@@ -141,8 +141,9 @@ and `src/styles/**`.
   `DESIGN.md` is silent drift, not a design decision. That is exactly how the
   2026-08-24 divergence happened (909bc59, f8649bb).
 - Recorded, not-yet-resolved divergences live in
-  [design-contract-exceptions.json](design-contract-exceptions.json), one entry
-  per token with a reason. Do **not** add an entry to make a new change pass —
+  `design-contract-exceptions.json`, one entry per token with a reason; the file
+  is absent today (71e3d814 resolved and deleted the 2026-08-24 set).
+  Do **not** add an entry to make a new change pass —
   an entry records an owner decision that is still open, and adding one for
   fresh work is the silent override this rule forbids.
 
@@ -184,7 +185,7 @@ Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:bu
 
 `bun run check` verifies owned files still match the ownership ledger. Pre-commit rejects commits that touch owned paths without updating ownership.
 
-**Sibling Builder (`BUILDER_DIR`):** Capsule pre-push / `manifest:regen-check`
+**Sibling Builder (`BUILDER_DIR`):** Capsule pre-push / `manifest:regen:check`
 runs that checkout’s working tree. If you fix a Builder bug that Capsule’s
 regen gate needs (e.g. skip `.loop-worktrees` in `ManifestSourceTree`),
 **commit it in Builder immediately** as its own atomic commit. Do not leave it
@@ -333,21 +334,27 @@ its input keeps the receipt PARTIAL by design.
 loop or agent runs `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk
 settings without the human explicitly asking in the current conversation.
 
-**Pushing `main` deploys BOTH frontend and Convex backend** (since
-`cc24315`, 2026-07-24): `vercel.json`'s `buildCommand` is
-`convex deploy --cmd 'vite build'`, so every Vercel production build pushes
-Convex functions/schema to prod (`impartial-mule-193`) together with the UI.
+**Pushing `main` deploys the frontend, and the Convex Cloud backend unless the
+build runs in self-hosted backend mode** (Convex deploy since
+`cc24315`, 2026-07-24; self-hosted cutover `3c2b178d`, 2026-09-14):
+`vercel.json`'s `buildCommand` is `bash scripts/vercel-build.sh`, which runs
+`convex deploy --cmd 'vite build'`, so a Vercel production build pushes
+Convex functions/schema to prod together with the UI — except when
+`CONVEX_SELF_HOSTED_URL` is set in the Vercel environment, where the build is
+UI-only and Convex Cloud is not touched (backend code reaches the self-hosted
+instance directly, never through Vercel).
 A gate-approved `git push` to `main` therefore ships everything CI verified —
 no separate `npx convex deploy -y` step is needed for changes that ride a
-`main` push. (Before `cc24315`, Vercel shipped only the UI and new Convex
+`main` push, unless that build was UI-only. (Before `cc24315`, Vercel shipped only the UI and new Convex
 queries would Server Error until a manual deploy — that skew is why the
-buildCommand now deploys both; do not remove it.)
+build script still deploys both outside self-hosted mode; do not remove it.)
 
 When the human asks for a MANUAL deploy (no `main` push involved):
 
 1. Backend first, if `convex/` or manifests changed:
    `bun run manifest:regen` (manifest changes only) → `npx convex deploy -y`
-   → prod deployment `impartial-mule-193`.
+   → the production Convex backend (since the 2026-09-14 cutover that is the
+   self-hosted instance, not Convex Cloud `impartial-mule-193`).
 2. Frontend: `vercel deploy --prod --yes --archive=tgz`.
 
 Invariants agents must not break (each broke a real deploy once):
