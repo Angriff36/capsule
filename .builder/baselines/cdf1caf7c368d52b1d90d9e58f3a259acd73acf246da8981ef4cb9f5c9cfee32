@@ -9,7 +9,7 @@
     "bun": ">=1.3.4"
   },
   "scripts": {
-    "agent:enter-recipe": "bun scripts/capsule-enter-recipe.ts",
+    "agent:enter-component": "bun scripts/capsule-enter-component.ts",
     "agent:mcp": "bun scripts/capsule-mcp.ts",
     "agent:mint-jwt": "bun scripts/capsule-mint-agent-jwt.ts",
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
