@@ -41,6 +41,9 @@ generated/ir/
 .claude/scheduled_tasks.lock
 .claude/loop-tick.log
 
+# Git Bash copy so Windows CreateProcess finds cwd before WSL System32 bash
+/bash.exe
+
 # Local kitchen reference (photos/CSVs; may include large binaries)
 work/
 
@@ -64,6 +67,7 @@ storybook-static/
 .ralph-checkpoint
 .ralph-telemetry.jsonl
 .ralph-failures.md
+.ralph-plan-converged
 
 # Machine-local MCP tool config (points at a localhost server; never part of
 # a clean CI checkout)

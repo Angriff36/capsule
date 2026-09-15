@@ -44,6 +44,7 @@ import {
   unscheduledEvents,
   type CalendarEventFacts,
 } from "./homeCalendar";
+import { canAssignDeliveryVehicle } from "./vehicleRoleAccess";
 import "./HomeCalendar.css";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -92,6 +93,7 @@ function EventTooltip({
   vehicleBusyId,
   vehicleError,
   onVehicleChange,
+  canAssignVehicle,
   onEnter,
   onLeave,
   onFocus,
@@ -107,6 +109,7 @@ function EventTooltip({
   vehicles: readonly CalendarVehicleOption[];
   vehicleBusyId: string | null;
   vehicleError: string | null;
+  canAssignVehicle: boolean;
   onVehicleChange: (
     deliveryId: string,
     vehicleId: string,
@@ -162,7 +165,9 @@ function EventTooltip({
                           aria-label={`Vehicle for ${event.title}`}
                           value={delivery.vehicleId ?? ""}
                           disabled={
-                            !delivery.canChangeVehicle || vehicleBusyId != null
+                            !canAssignVehicle ||
+                            !delivery.canChangeVehicle ||
+                            vehicleBusyId != null
                           }
                           onChange={(domEvent) =>
                             onVehicleChange(
@@ -215,7 +220,9 @@ function EventTooltip({
                     aria-label={`Vehicle for ${delivery.destination}`}
                     value={delivery.vehicleId ?? ""}
                     disabled={
-                      !delivery.canChangeVehicle || vehicleBusyId != null
+                      !canAssignVehicle ||
+                      !delivery.canChangeVehicle ||
+                      vehicleBusyId != null
                     }
                     onChange={(domEvent) =>
                       onVehicleChange(
@@ -247,6 +254,11 @@ function EventTooltip({
         {vehicleError ? (
           <p className="home-cal-tooltip-error" role="alert">
             {vehicleError}
+          </p>
+        ) : null}
+        {!canAssignVehicle && event.deliveryAssignments.length > 0 ? (
+          <p className="home-cal-tooltip-note">
+            Logistics or a manager assigns vehicles.
           </p>
         ) : null}
         <section
@@ -734,6 +746,7 @@ export function HomeCalendarPage() {
           vehicles={vehicleOptions}
           vehicleBusyId={vehicleBusyId}
           vehicleError={vehicleError}
+          canAssignVehicle={canAssignDeliveryVehicle(authStatus?.role)}
           onVehicleChange={changeVehicle}
           onEnter={cancelTooltipHide}
           onLeave={hideTooltip}

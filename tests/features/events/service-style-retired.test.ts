@@ -48,11 +48,11 @@ describe("retired service styles", () => {
     expect(card).toContain("nameOf(useListServiceStyle(), serviceStyleId)");
     expect(card).toContain("rows?.find((row) => row._id === id)?.name");
 
-    // The create page feeds its picker only the filtered options.
+    // The create field feeds its picker only the filtered options.
     const page = readFileSync(
-      "src/features/events/EventCreatePage.tsx",
+      "src/features/events/EventCreateServiceStyleField.tsx",
       "utf8",
     );
-    expect(page).toContain("serviceStyleSelectOptions(serviceStyles)");
+    expect(page).toContain("serviceStyleSelectOptions(rows)");
   });
 });

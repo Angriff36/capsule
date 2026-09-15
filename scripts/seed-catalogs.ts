@@ -5,7 +5,8 @@
  * canonical service styles.
  *
  *   bun run agent:mint-jwt        # sign into Capsule UI first (target org selected)
- *   bun scripts/seed-catalogs.ts
+ *   bun run seed                  # generated demo rows; JWT attached via bunfig preload
+ *   bun scripts/seed-catalogs.ts  # Occasion / ServiceStyle / ReferralSource catalogs
  *
  * Targets CONVEX_URL || VITE_CONVEX_URL, authed via CAPSULE_AGENT_JWT
  * (reminted automatically when expired). Re-running skips existing codes.

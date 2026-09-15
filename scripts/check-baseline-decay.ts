@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 70; // 70 at the keep-signed-in release; .mcp.json and other machine-local tool files are excluded below and never appear in a clean CI checkout.
+const ROOT_CAP = 71; // 71 after bunfig.toml (Windows Git Bash preload, #338 workaround). bash.exe is local-only.
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
@@ -75,6 +75,9 @@ class BaselineDecayCheck {
       // release config checks and the Playwright CLI session file.
       ".env.production",
       ".playwright-cli",
+      // Git Bash copy so Windows CreateProcess finds cwd before WSL System32
+      // bash. Gitignored; planted by scripts/windowsGitBashPath.ts.
+      "bash.exe",
     ]);
     const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {

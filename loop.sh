@@ -3,7 +3,7 @@
 # Examples:
 #   ./loop.sh                                   # Build mode, unlimited iterations
 #   ./loop.sh 20                                # Build mode, max 20 iterations
-#   ./loop.sh plan                              # Full plan mode, unlimited iterations
+#   ./loop.sh plan                              # Full plan mode, default 3 iterations (#271)
 #   ./loop.sh plan 5                            # Full plan mode, max 5 iterations
 #   ./loop.sh plan-work "user auth" --branch ralph/user-auth
 #                                               # Scoped plan on a work branch
@@ -44,7 +44,10 @@ if [ "${1:-}" = "plan" ]; then
     # Full planning mode
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
-    MAX_ITERATIONS=${2:-0}
+    # Plan mode must converge. Unlimited plan ticks rewrite the same
+    # checklist forever (#271). Override with `./loop.sh plan 20`.
+    MAX_ITERATIONS=${2:-3}
+    rm -f .ralph-plan-converged
 elif [ "${1:-}" = "plan-work" ]; then
     # Scoped planning mode — scope the plan to one body of work at creation time
     if [ -z "${2:-}" ]; then
@@ -57,6 +60,7 @@ elif [ "${1:-}" = "plan-work" ]; then
     WORK_DESCRIPTION="$2"
     export WORK_SCOPE="$WORK_DESCRIPTION"
     MAX_ITERATIONS=${3:-5}  # Default 5 for scoped planning
+    rm -f .ralph-plan-converged
 elif [[ "${1:-}" =~ ^[0-9]+$ ]]; then
     # Build mode with max iterations
     MODE="build"
@@ -328,6 +332,16 @@ $(ralph_integration_prompt)"
         echo "Plan complete. Branch includes $RALPH_REMOTE/$RALPH_BASE_BRANCH; local preview check passed."
         echo "Worktree: $(git rev-parse --show-toplevel) | Branch: $CURRENT_BRANCH | Commit: $(git rev-parse --short HEAD)"
         echo "Branch pushed. This is not a production deployment."
+        break
+    fi
+
+    # Plan mode: the agent writes .ralph-plan-converged when a tick changes
+    # no remaining `- [ ]` tasks (#271). Stop instead of looping forever.
+    if { [ "$MODE" = "plan" ] || [ "$MODE" = "plan-work" ]; } &&
+        [ -f .ralph-plan-converged ] &&
+        [ "$EXIT_CODE" -eq 0 ] &&
+        [ "$PUSH_OK" -eq 1 ]; then
+        echo "Plan converged (.ralph-plan-converged). Start build mode next."
         break
     fi
 

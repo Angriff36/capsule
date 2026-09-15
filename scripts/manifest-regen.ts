@@ -19,6 +19,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
 import { BuilderManifestPinSync } from "./builder-manifest-pin.ts";
+import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -46,6 +47,12 @@ export function syncBuilderManifestPin(): void {
 
 export function runBuilder(args: string[]): number {
   syncBuilderManifestPin();
+  const rewritten = new ManifestLineEndingNormalizer(CAPSULE_ROOT).normalize();
+  if (rewritten > 0) {
+    console.log(
+      `manifest-regen: normalized ${rewritten} .manifest file(s) to LF`,
+    );
+  }
   const result = spawnSync("bun", [builderEntrypoint(), ...args], {
     stdio: "inherit",
   });

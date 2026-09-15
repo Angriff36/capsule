@@ -344,6 +344,12 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.home-cal-tooltip-note {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
 .home-cal-tooltip-error {
   grid-column: 1 / -1;
   margin-top: 0.5rem;

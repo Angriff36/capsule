@@ -17,6 +17,7 @@ import {
 } from "../../ui/icons";
 import { useNaturalLanguageSearch } from "../../features/search/useNaturalLanguageSearch";
 import { StatusChip } from "../../ui/primitives";
+import { eventImportPath } from "../../features/events/eventRoutes";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 
 interface Command {
@@ -94,6 +95,13 @@ export function CommandPalette({
               hint: "Create",
               icon: <PlusIcon />,
               run: go("/events/new"),
+            } satisfies Command,
+            {
+              key: "import-event",
+              label: "Import event from BEO",
+              hint: "Create",
+              icon: <PlusIcon />,
+              run: go(eventImportPath()),
             } satisfies Command,
           ]
         : []),

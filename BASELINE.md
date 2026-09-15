@@ -76,3 +76,10 @@ The battle-board release moves its `ui-design/` design file into
 (gitignored: `.mcp.json` localhost tool config, `.env.production` release
 scratch, `.playwright-cli` session state), so local runs count the same
 clean checkout CI sees. Cap in `scripts/check-baseline-decay.ts` matches.
+
+**Correction (2026-09-14, github-bugs ship):** Aim ≤71 — this branch adds
+root `bunfig.toml` so every `bun` process can preload the Git Bash PATH
+workaround without editing owned `package.json` (`#338` remainder). The
+gitignored `bash.exe` copy planted in the worktree on Windows is
+local-only and must not count. Cap in `scripts/check-baseline-decay.ts`
+matches.
