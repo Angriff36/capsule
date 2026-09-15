@@ -49,6 +49,7 @@ const portableSchema = z
     format: z.literal("event-packet-portable"),
     bundleVersion: z.literal(1),
     snapshot: z.unknown(),
+    activeFingerprints: z.array(z.string().regex(/^[a-f0-9]{64}$/)).optional(),
     artifacts: z.array(
       z
         .object({
@@ -81,6 +82,32 @@ export async function parsePortablePacket(input: unknown): Promise<{
     };
   });
   await verifyPacketArtifacts(snapshot, artifacts);
+  if (bundle.activeFingerprints) {
+    const active = new Set(bundle.activeFingerprints);
+    if (
+      active.size !== bundle.activeFingerprints.length ||
+      [...active].some(
+        (key) => !snapshot.artifacts.some((a) => a.fingerprint === key),
+      )
+    )
+      throw new Error("Invalid active source fingerprints");
+    return {
+      snapshot: {
+        ...snapshot,
+        artifacts: snapshot.artifacts.filter((a) => active.has(a.fingerprint)),
+        observations: snapshot.observations.filter((o) =>
+          o.evidence.every((e) => active.has(e.artifactFingerprint)),
+        ),
+        facts: [],
+        issues: [],
+        resolutions: [],
+        checklistVerifications: [],
+        revisions: [],
+        stage: "review",
+      },
+      artifacts: artifacts.filter((a) => active.has(a.fingerprint)),
+    };
+  }
   return { snapshot, artifacts };
 }
 
