@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import { BoundedDateInput } from "../../../ui/BoundedDateInputs";
+import { useWorkingEventId } from "../../events/workingEvent";
 import type { TppReportDefinition, TppReportOption } from "./types";
 
 export interface TppReportOptions {
@@ -37,6 +38,7 @@ export function TppReportParameters({
   errors: Readonly<Record<string, string>>;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const workingEventId = useWorkingEventId();
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -136,15 +138,33 @@ export function TppReportParameters({
               parameter.type === "enum"
                 ? parameter.options
                 : entityOptions(parameter.entity, options);
+            // An event report starts on the working event when it is listed.
+            const eventDefault =
+              parameter.type === "entity" &&
+              parameter.entity === "event" &&
+              workingEventId &&
+              values.some(
+                (option) => "id" in option && option.id === workingEventId,
+              )
+                ? workingEventId
+                : "";
             return (
               <label key={parameter.key}>
                 <span>{parameter.label}</span>
                 <select
+                  // Remount once options load so the default can apply.
+                  key={values.length > 0 ? "ready" : "loading"}
                   className="input"
                   name={parameter.key}
                   required={parameter.required}
                   multiple={parameter.multiple}
-                  defaultValue={parameter.multiple ? [] : ""}
+                  defaultValue={
+                    parameter.multiple
+                      ? eventDefault
+                        ? [eventDefault]
+                        : []
+                      : eventDefault
+                  }
                 >
                   <option value="">
                     {parameter.required

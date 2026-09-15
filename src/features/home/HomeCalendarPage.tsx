@@ -29,11 +29,8 @@ import {
   useAssignVehicle,
   useUnassignVehicle,
 } from "../facilities/vehicleAssignment";
-import {
-  EventReportRail,
-  useEventReportList,
-  type EventReportLaunch,
-} from "./EventReportRail";
+import { useEventReportList } from "./EventReportRail";
+import { openEventReports, useWorkingEventId } from "../events/workingEvent";
 import type { TppReportDefinition } from "../reports/tpp/types";
 import {
   buildCalendarFacts,
@@ -341,22 +338,16 @@ export function HomeCalendarPage() {
     const d = new Date(today);
     return { year: d.getFullYear(), month: d.getMonth() };
   });
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // The calendar's selection is the working event; the shell rail shows it.
+  const selectedId = useWorkingEventId();
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
   const [hover, setHover] = useState<Hover | null>(null);
   const [lockFilter, setLockFilter] = useState<Set<string>>(new Set());
-  const [reportLaunch, setReportLaunch] = useState<EventReportLaunch | null>(
-    null,
-  );
   const [vehicleBusyId, setVehicleBusyId] = useState<string | null>(null);
   const [vehicleError, setVehicleError] = useState<string | null>(null);
   const tooltipHideTimer = useRef<number | null>(null);
   const storageScope = authStatus?.personId ?? "anonymous";
-  const {
-    ids: reportIds,
-    chosen: reports,
-    toggle: toggleReport,
-  } = useEventReportList(storageScope);
+  const { chosen: reports } = useEventReportList(storageScope);
 
   const vehicleOptions = useMemo<CalendarVehicleOption[]>(
     () =>
@@ -493,8 +484,7 @@ export function HomeCalendarPage() {
     definition: TppReportDefinition,
     print: boolean,
   ) => {
-    setSelectedId(event.id);
-    setReportLaunch({ eventId: event.id, reportId: definition.id, print });
+    openEventReports(event.id, definition.id, print);
     setHover(null);
   };
   const changeVehicle = (
@@ -545,7 +535,7 @@ export function HomeCalendarPage() {
         data-selected={selectedId === event.id || undefined}
         data-continues={continues || undefined}
         onClick={() => {
-          setSelectedId(event.id);
+          openEventReports(event.id);
           setHover(null);
         }}
         onDoubleClick={() => navigate(eventDetailPath(event.id))}
@@ -754,13 +744,6 @@ export function HomeCalendarPage() {
           onBlur={hideTooltip}
         />
       ) : null}
-      <EventReportRail
-        event={selected}
-        reportIds={reportIds}
-        reports={reports}
-        onToggleReport={toggleReport}
-        launch={reportLaunch}
-      />
     </div>
   );
 }

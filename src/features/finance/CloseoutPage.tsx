@@ -35,11 +35,16 @@ import {
   closeoutListedCost,
   isCloseoutListProfitPending,
 } from "./eventCostSummary";
+import {
+  useWorkingEventScope,
+  WorkingEventScopeNote,
+} from "../events/WorkingEventScope";
 
 const policy = new CloseoutLifecyclePolicy();
 const payloadBuilder = new CloseoutCapturePayloadBuilder();
 
 export function CloseoutPage() {
+  const eventScope = useWorkingEventScope();
   const closeouts = useListEventCloseout();
   const events = useListEvent();
   const invoices = useListInvoice();
@@ -61,9 +66,14 @@ export function CloseoutPage() {
   const activeCloseouts = (closeouts ?? []).filter(
     (row) => row.deletedAt == null,
   );
+  const scopedCloseouts = activeCloseouts.filter(
+    (row) =>
+      eventScope.scopeId == null ||
+      String(row.eventId ?? "") === eventScope.scopeId,
+  );
   const visibleRows = showFinalized
-    ? activeCloseouts
-    : activeCloseouts.filter((row) => String(row.status) !== "finalized");
+    ? scopedCloseouts
+    : scopedCloseouts.filter((row) => String(row.status) !== "finalized");
   const closedOutEventIds = new Set(
     activeCloseouts.map((row) => String(row.eventId)),
   );
@@ -119,7 +129,11 @@ export function CloseoutPage() {
 
   const openCapture = () => {
     setDraft(null);
-    setSelectedEventId(null);
+    setSelectedEventId(
+      capturableEvents.some((event) => event._id === eventScope.workingId)
+        ? eventScope.workingId
+        : null,
+    );
     setShowCapture(true);
   };
 
@@ -240,6 +254,7 @@ export function CloseoutPage() {
         />
       ) : null}
 
+      <WorkingEventScopeNote scope={eventScope} noun="closeouts" />
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>

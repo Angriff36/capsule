@@ -16,6 +16,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { setWorkingEvent, workingEventId } from "../events/workingEvent";
 import {
   distributeTipPool,
   formatTipPayrollNote,
@@ -51,7 +52,7 @@ export function TipDistributionPage() {
   const people = useListPerson();
   const shifts = useListShift();
   const createPayrollInput = useCreatePayrollInput();
-  const [eventId, setEventId] = useState("");
+  const [eventId, setEventId] = useState(() => workingEventId() ?? "");
   const [total, setTotal] = useState("0.00");
   const [method, setMethod] = useState<TipPoolingMethod>("equal");
   const [excluded, setExcluded] = useState<Record<string, boolean>>({});
@@ -278,6 +279,7 @@ export function TipDistributionPage() {
             value={eventId}
             onChange={(event) => {
               setEventId(event.target.value);
+              if (event.target.value) setWorkingEvent(event.target.value);
               setExcluded({});
               setHoursByPerson({});
               setNotice(null);

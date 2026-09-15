@@ -32,6 +32,10 @@ import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { useActionNotice } from "../../ui/action-result";
+import {
+  useWorkingEventScope,
+  WorkingEventScopeNote,
+} from "../events/WorkingEventScope";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -41,6 +45,7 @@ const toEpoch = (value: FormDataEntryValue | null) => {
 };
 
 export function DeliveriesPage() {
+  const eventScope = useWorkingEventScope();
   const deliveries = useListDelivery();
   const packLists = useListPackList();
   const events = useListEvent();
@@ -65,9 +70,16 @@ export function DeliveriesPage() {
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeRows = (deliveries ?? []).filter((row) => row.deletedAt == null);
+  // Only the list follows the working event; the one-run-per-pack check in
+  // submit must still see every event's deliveries.
+  const scopedRows = activeRows.filter(
+    (row) =>
+      eventScope.scopeId == null ||
+      String(row.eventId ?? "") === eventScope.scopeId,
+  );
   const visibleRows = showTerminal
-    ? activeRows
-    : activeRows.filter(
+    ? scopedRows
+    : scopedRows.filter(
         (row) =>
           String(row.status) !== "cancelled" &&
           String(row.status) !== "delivered" &&
@@ -353,6 +365,7 @@ export function DeliveriesPage() {
         </form>
       ) : null}
 
+      <WorkingEventScopeNote scope={eventScope} noun="deliveries" />
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
