@@ -21,7 +21,14 @@ import {
   assistantToolDefs,
   executionSpecFor,
 } from "./lib/assistantToolSurface";
+// @ts-expect-error pdfjs-dist ships no type declarations for its worker entry.
+import * as pdfjsWorker from "pdfjs-dist/legacy/build/pdf.worker.mjs";
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+
+// pdfjs loads its worker through a dynamic import the Convex bundle cannot
+// follow, so every PDF failed with "Cannot find module pdf.worker.mjs".
+// Handing it the bundled worker module keeps extraction in-process.
+(globalThis as { pdfjsWorker?: unknown }).pdfjsWorker = pdfjsWorker;
 
 const toolCallValidator = v.object({
   id: v.string(),

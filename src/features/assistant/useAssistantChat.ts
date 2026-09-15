@@ -182,14 +182,52 @@ export function useAssistantChat() {
   const stop = useCallback(() => {
     if (!busy) return;
     runIdRef.current += 1;
+    // A stop during a tool round leaves tool_calls without results, and
+    // providers reject that history on every later turn. Answer each open
+    // call the same way the round limit does.
+    const convo = convoRef.current;
+    let callIndex = -1;
+    for (let i = convo.length - 1; i >= 0; i--) {
+      if (convo[i].role === "assistant") {
+        callIndex = i;
+        break;
+      }
+    }
+    const answered = new Set(
+      convo
+        .slice(callIndex + 1)
+        .filter((m) => m.role === "tool")
+        .map((m) => m.toolCallId),
+    );
+    const open =
+      callIndex >= 0
+        ? (convo[callIndex].toolCalls ?? []).filter(
+            (call) => !answered.has(call.id),
+          )
+        : [];
+    const skipped = JSON.stringify({
+      skipped: true,
+      reason: "stopped by user; a step already sent may have completed",
+    });
     const stoppedContent = "Stopped.";
-    const stopped: ServerMessage = {
-      role: "assistant",
-      content: stoppedContent,
-    };
-    convoRef.current = [...convoRef.current, stopped];
+    convoRef.current = [
+      ...convo,
+      ...open.map((call): ServerMessage => ({
+        role: "tool",
+        content: skipped,
+        toolCallId: call.id,
+      })),
+      { role: "assistant", content: stoppedContent },
+    ];
     setMessages((m) => [
       ...m,
+      ...open.map((call): AssistantUiMessage => ({
+        id: newId(),
+        role: "tool",
+        content: skipped,
+        toolCallId: call.id,
+        toolName: call.name,
+      })),
       { id: newId(), role: "assistant", content: stoppedContent },
     ]);
     setBusy(false);
