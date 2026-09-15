@@ -17,10 +17,17 @@ import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { useActionNotice } from "../../ui/action-result";
+import {
+  useWorkingEventScope,
+  WorkingEventScopeNote,
+} from "../events/WorkingEventScope";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const policy = new LogisticsLifecyclePolicy();
 
 export function PackListsPage() {
+  const eventScope = useWorkingEventScope();
+  const workingId = useWorkingEventId();
   const packLists = useListPackList();
   const events = useListEvent();
   const createPackList = useCreatePackList();
@@ -36,7 +43,12 @@ export function PackListsPage() {
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
-  const activeRows = (packLists ?? []).filter((row) => row.deletedAt == null);
+  const activeRows = (packLists ?? []).filter(
+    (row) =>
+      row.deletedAt == null &&
+      (eventScope.scopeId == null ||
+        String(row.eventId ?? "") === eventScope.scopeId),
+  );
   const visibleRows = showCancelled
     ? activeRows
     : activeRows.filter((row) => String(row.status) !== "cancelled");
@@ -154,7 +166,13 @@ export function PackListsPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Event
-              <select name="eventId" className="input" required>
+              <select
+                key={events?.length ? "events-ready" : "events-loading"}
+                name="eventId"
+                className="input"
+                defaultValue={workingId ?? ""}
+                required
+              >
                 <option value="">Select event</option>
                 {(events ?? [])
                   .filter((item) => item.deletedAt == null)
@@ -186,6 +204,7 @@ export function PackListsPage() {
         </form>
       ) : null}
 
+      <WorkingEventScopeNote scope={eventScope} noun="pack lists" />
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>

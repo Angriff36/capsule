@@ -32,6 +32,10 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { InvoiceIssueForm } from "./InvoiceIssueForm";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { useActionNotice } from "../../ui/action-result";
+import {
+  useWorkingEventScope,
+  WorkingEventScopeNote,
+} from "../events/WorkingEventScope";
 
 const policy = new CommercialLifecyclePolicy();
 
@@ -55,9 +59,13 @@ const clientLabel = (row: {
 };
 
 export function InvoicesPage() {
+  const eventScope = useWorkingEventScope();
   const [searchParams, setSearchParams] = useSearchParams();
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
-  const prefillEventId = searchParams.get("eventId")?.trim() || "";
+  const prefillEventId =
+    searchParams.get("event")?.trim() ||
+    searchParams.get("eventId")?.trim() ||
+    "";
   const openFromLink = searchParams.get("issue") === "1";
   const invoices = useListInvoice();
   const clients = useListClient();
@@ -87,7 +95,11 @@ export function InvoicesPage() {
   const activeRows = (invoices ?? []).filter((row) => row.deletedAt == null);
   const scopedRows =
     !prefillClientId && !prefillEventId
-      ? activeRows
+      ? activeRows.filter(
+          (row) =>
+            eventScope.scopeId == null ||
+            String(row.eventId ?? "") === eventScope.scopeId,
+        )
       : activeRows.filter((row) => {
           if (prefillClientId && String(row.clientId) !== prefillClientId) {
             return false;
@@ -117,6 +129,7 @@ export function InvoicesPage() {
     const next = new URLSearchParams(searchParams);
     next.delete("issue");
     next.delete("clientId");
+    next.delete("event");
     next.delete("eventId");
     setSearchParams(next, { replace: true });
   };
@@ -358,11 +371,14 @@ export function InvoicesPage() {
           busy={busy === "issue-invoice"}
           onSubmit={submitIssue}
           defaultClientId={prefillClientId}
-          defaultEventId={prefillEventId}
+          defaultEventId={prefillEventId || eventScope.workingId || ""}
           functionalCurrencyCode={functionalCurrencyCode}
         />
       ) : null}
 
+      {!prefillClientId && !prefillEventId ? (
+        <WorkingEventScopeNote scope={eventScope} noun="invoices" />
+      ) : null}
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>

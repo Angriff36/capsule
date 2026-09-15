@@ -7,6 +7,7 @@ import {
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
+import { useWorkingEventId } from "../events/workingEvent";
 
 export const WASTE_REASON_LABELS: Record<string, string> = {
   spoilage: "Spoilage",
@@ -19,6 +20,7 @@ export const WASTE_REASON_LABELS: Record<string, string> = {
 };
 
 export function WasteRecordForm({ onClose }: { onClose: () => void }) {
+  const workingId = useWorkingEventId();
   const items = useListInventoryItem();
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
@@ -134,7 +136,12 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
         </label>
         <label className="field-label">
           Event
-          <select name="eventId" className="input">
+          <select
+            key={events?.length ? "events-ready" : "events-loading"}
+            name="eventId"
+            className="input"
+            defaultValue={workingId ?? ""}
+          >
             <option value="">No event · kitchen operations</option>
             {(events ?? [])
               .filter((item) => item.deletedAt == null)

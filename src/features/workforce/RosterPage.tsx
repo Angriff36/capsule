@@ -29,6 +29,7 @@ import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { useWorkingEventId } from "../events/workingEvent";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
   DEFAULT_OVERTIME_THRESHOLD_HOURS,
@@ -77,6 +78,7 @@ function initialOvertimeThreshold(): number {
 }
 
 export function RosterPage() {
+  const workingId = useWorkingEventId();
   const assignments = useListEventAssignment();
   const shifts = useListShift();
   const scheduleNotices = useListWeeklyScheduleNotice();
@@ -475,7 +477,13 @@ export function RosterPage() {
             <div className="supply-form-grid">
               <label className="field-label">
                 Event
-                <select name="eventId" className="input" required>
+                <select
+                  key={events?.length ? "events-ready" : "events-loading"}
+                  name="eventId"
+                  className="input"
+                  defaultValue={workingId ?? ""}
+                  required
+                >
                   <option value="">Select event</option>
                   {(events ?? [])
                     .filter((item) => item.deletedAt == null)
@@ -674,7 +682,12 @@ export function RosterPage() {
               </label>
               <label className="field-label">
                 Event (optional)
-                <select name="eventId" className="input">
+                <select
+                  key={events?.length ? "events-ready" : "events-loading"}
+                  name="eventId"
+                  className="input"
+                  defaultValue={workingId ?? ""}
+                >
                   <option value="">No event</option>
                   {(events ?? [])
                     .filter((item) => item.deletedAt == null)

@@ -9,7 +9,7 @@ const CLOSED_STATUSES = new Set(["paid", "voided", "written_off"]);
 
 /** Where finance issues a new invoice already scoped to this event. */
 export function eventIssueInvoicePath(eventId: string): string {
-  return `/finance/invoices?eventId=${encodeURIComponent(eventId)}&issue=1`;
+  return `/finance/invoices?event=${encodeURIComponent(eventId)}&issue=1`;
 }
 
 function invoiceDetailPath(invoiceId: string): string {

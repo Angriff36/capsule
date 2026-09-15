@@ -31,6 +31,7 @@ import {
   timeRecordLedgerState,
   type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const policy = new WorkforceLifecyclePolicy();
 
@@ -64,6 +65,7 @@ export function TimeSheetClockInForm({
   defaultClockInLocal: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const workingId = useWorkingEventId();
   return (
     <form
       className="supply-form"
@@ -98,7 +100,13 @@ export function TimeSheetClockInForm({
         </label>
         <label className="field-label">
           Event
-          <select name="eventId" className="input" data-testid="clock-in-event">
+          <select
+            key={events.length ? "events-ready" : "events-loading"}
+            name="eventId"
+            className="input"
+            defaultValue={workingId ?? ""}
+            data-testid="clock-in-event"
+          >
             <option value="">No event · unassigned</option>
             {events.map((item) => (
               <option key={item._id} value={item._id}>

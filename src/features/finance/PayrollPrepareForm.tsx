@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { usePersonPeriodLaborSummary } from "../facilities/useLaborSummary";
 import { localDayEndExclusive, localDayStart } from "./payrollPeriod";
+import { useWorkingEventId } from "../events/workingEvent";
 
 export { PayrollPreparePayloadBuilder } from "./PayrollPreparePayloadBuilder";
 
@@ -33,6 +34,7 @@ export function PayrollPrepareForm({
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const workingId = useWorkingEventId();
   const [personId, setPersonId] = useState("");
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
@@ -197,7 +199,12 @@ export function PayrollPrepareForm({
       ) : null}
       <label className="field-label">
         Event (optional)
-        <select className="input" name="eventId" defaultValue="">
+        <select
+          key={events.length ? "events-ready" : "events-loading"}
+          className="input"
+          name="eventId"
+          defaultValue={workingId ?? ""}
+        >
           <option value="">No linked event</option>
           {events
             .filter((event) => event.deletedAt == null)

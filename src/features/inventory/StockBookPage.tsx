@@ -30,6 +30,7 @@ import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
 import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -944,6 +945,7 @@ function SupplyStockForm({
   onSubmit,
   onClose,
 }: any) {
+  const workingId = useWorkingEventId();
   const [stockIngredientId, setStockIngredientId] = useState("");
   const stockIngredient =
     kind === "stock" && stockIngredientId
@@ -1207,7 +1209,13 @@ function SupplyStockForm({
             </label>
             <label className="field-label">
               Event
-              <select name="eventId" className="input" required>
+              <select
+                key={events.length ? "events-ready" : "events-loading"}
+                name="eventId"
+                className="input"
+                defaultValue={workingId ?? ""}
+                required
+              >
                 <option value="">Select event</option>
                 {events
                   .filter((item: any) => item.deletedAt == null)
