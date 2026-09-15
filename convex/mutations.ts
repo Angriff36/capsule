@@ -19268,55 +19268,6 @@ export const ExternalRecordLink_discard = mutation({
   },
 });
 
-export const ExternalRecordLink_createViaDiscard = mutation({
-  args: {
-    reason: v.string(),
-    idempotencyKey: v.optional(v.string())
-  },
-  handler: async (ctx, args: any) => {
-    if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
-      if (__cached !== undefined) return __cached;
-    }
-    const __auth = (await getAuthContext(ctx)) as any;
-    const user = __auth;
-    const { reason } = args;
-    const __draft: Record<string, any> = {
-      tenantId: __auth.tenantId,
-      sourceSystem: "tpp_legacy",
-      recordType: "",
-      externalId: "",
-      capsuleEntity: "contact",
-      capsuleId: "",
-      verified: false,
-      conflictStatus: "pending_conflict",
-      createdAt: Date.now(),
-      updatedAt: Date.now()
-    };
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may write external record links through commands");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may execute external record link commands");
-    if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Discard reason is required");
-    const doc: Record<string, any> = {
-      ...__draft,
-      version: 1,
-    };
-    doc.deletedAt = Date.now();
-    doc.effectiveEndDate = ((doc.effectiveEndDate != null) ? doc.effectiveEndDate : Date.now());
-    const docId = await ctx.db.insert("externalRecordLinks", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, externalRecordLinkId: docId, tenantId: doc.tenantId, reason: reason, _subject: { entity: "ExternalRecordLink", command: "discard", id: docId } };
-    const __manifestEvent0 = { type: "ExternalRecordDiscarded", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: doc.tenantId, reason: reason }, createdAt: Date.now() };
-    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
-    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "discard", emitIndex: 0 });
-    const __result = { docId };
-    if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_createViaDiscard", __result);
-    }
-    return __result;
-  },
-});
-
 async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSystem, recordType, externalId, capsuleEntity, capsuleId, verified, verifiedByUserId, sourceImportRunId, effectiveStartDate, effectiveEndDate, rawSourceData, metadata, sourceAccount, role, ordinal, linkKey, decision, suggestedBy, sourceVersion, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -19330,7 +19281,7 @@ async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSyst
     if (!((sourceSystem != null))) throw new Error("Source system is required");
     if (!((((externalId).trim()).length > 0))) throw new Error("External ID is required");
     if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
-    if (!(((verified === false) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
+    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
     if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("Effective start date must be before or equal to end date");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -19403,6 +19354,110 @@ export const ExternalRecordLink_link = mutation({
     const __result = await __runExternalRecordLinkLink(ctx, args);
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_link", __result);
+    }
+    return __result;
+  },
+});
+
+export const ExternalRecordLink_createViaLink = mutation({
+  args: {
+    sourceSystem: v.any(),
+    recordType: v.string(),
+    externalId: v.string(),
+    capsuleEntity: v.any(),
+    capsuleId: v.string(),
+    verified: v.optional(v.boolean()),
+    verifiedByUserId: v.optional(v.string()),
+    sourceImportRunId: v.optional(v.string()),
+    effectiveStartDate: v.optional(v.number()),
+    effectiveEndDate: v.optional(v.number()),
+    rawSourceData: v.optional(v.string()),
+    metadata: v.optional(v.string()),
+    sourceAccount: v.optional(v.string()),
+    role: v.optional(v.string()),
+    ordinal: v.optional(v.number()),
+    linkKey: v.optional(v.string()),
+    decision: v.optional(v.any()),
+    suggestedBy: v.optional(v.string()),
+    sourceVersion: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
+  },
+  handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = __auth;
+    const { sourceSystem, recordType, externalId, capsuleEntity, capsuleId, verified, verifiedByUserId, sourceImportRunId, effectiveStartDate, effectiveEndDate, rawSourceData, metadata, sourceAccount, role, ordinal, linkKey, decision, suggestedBy, sourceVersion } = args;
+    const __draft: Record<string, any> = {
+      tenantId: __auth.tenantId,
+      verified: args.verified !== undefined ? args.verified : false,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      capsuleEntity: args.capsuleEntity,
+      capsuleId: args.capsuleId,
+      decision: args.decision,
+      effectiveEndDate: args.effectiveEndDate,
+      effectiveStartDate: args.effectiveStartDate,
+      externalId: args.externalId,
+      linkKey: args.linkKey,
+      metadata: args.metadata,
+      ordinal: args.ordinal,
+      rawSourceData: args.rawSourceData,
+      recordType: args.recordType,
+      role: args.role,
+      sourceAccount: args.sourceAccount,
+      sourceImportRunId: args.sourceImportRunId,
+      sourceSystem: args.sourceSystem,
+      sourceVersion: args.sourceVersion,
+      suggestedBy: args.suggestedBy,
+      verifiedByUserId: args.verifiedByUserId
+    };
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may write external record links through commands");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may execute external record link commands");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((sourceSystem != null))) throw new Error("Source system is required");
+    if (!((((externalId).trim()).length > 0))) throw new Error("External ID is required");
+    if (!((((capsuleId).trim()).length > 0))) throw new Error("Capsule ID is required");
+    if (!((((verified == null) || (verified === false)) || ((verifiedByUserId != null) && (((verifiedByUserId).trim()).length > 0))))) throw new Error("Verified status requires a verifying user");
+    if (!((((effectiveStartDate == null) || (effectiveEndDate == null)) || (effectiveStartDate <= effectiveEndDate)))) throw new Error("Effective start date must be before or equal to end date");
+    const doc: Record<string, any> = {
+      ...__draft,
+      version: 1,
+    };
+    doc.sourceSystem = sourceSystem;
+    doc.recordType = ((recordType != null) ? recordType : "");
+    doc.externalId = externalId;
+    doc.capsuleEntity = capsuleEntity;
+    doc.capsuleId = capsuleId;
+    doc.verified = ((verified != null) ? verified : false);
+    doc.verifiedByUserId = verifiedByUserId;
+    doc.lastVerifiedAt = (((verified != null) && verified) ? Date.now() : null);
+    doc.sourceImportRunId = sourceImportRunId;
+    doc.effectiveStartDate = effectiveStartDate;
+    doc.effectiveEndDate = effectiveEndDate;
+    doc.rawSourceData = rawSourceData;
+    doc.metadata = metadata;
+    doc.conflictStatus = "pending_conflict";
+    doc.sourceAccount = sourceAccount;
+    doc.role = role;
+    doc.ordinal = ((ordinal != null) ? ordinal : 0);
+    doc.linkKey = linkKey;
+    doc.decision = ((decision != null) ? decision : "suggested");
+    doc.suggestedBy = suggestedBy;
+    doc.sourceVersion = sourceVersion;
+    doc.lastSeenAt = Date.now();
+    doc.lastSeenImportRunId = sourceImportRunId;
+    const docId = await ctx.db.insert("externalRecordLinks", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, externalRecordLinkId: docId, tenantId: doc.tenantId, sourceSystem: sourceSystem, recordType: ((recordType != null) ? recordType : ""), externalId: externalId, capsuleEntity: capsuleEntity, capsuleId: capsuleId, verified: ((verified != null) ? verified : false), sourceImportRunId: sourceImportRunId, _subject: { entity: "ExternalRecordLink", command: "link", id: docId } };
+    const __manifestEvent0 = { type: "ExternalRecordLinked", entity: "ExternalRecordLink", entityId: docId, payload: { externalRecordLinkId: docId, tenantId: doc.tenantId, sourceSystem: sourceSystem, recordType: ((recordType != null) ? recordType : ""), externalId: externalId, capsuleEntity: capsuleEntity, capsuleId: capsuleId, verified: ((verified != null) ? verified : false), sourceImportRunId: sourceImportRunId }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "link", emitIndex: 0 });
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ExternalRecordLink_createViaLink", __result);
     }
     return __result;
   },

@@ -84,9 +84,12 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   // Core mapping fields
   property required sourceSystem: ExternalSourceSystem = "tpp_legacy"
   property required recordType: string = ""
-  property required externalId: string = ""
+  // No placeholder default: the identity fields are populated only by link(),
+  // which makes link() the allocating command (the Builder had chosen discard,
+  // so no governed link create existed; #371).
+  property required externalId: string
   property required capsuleEntity: CapsuleEntityType = "contact"
-  property required capsuleId: string = ""
+  property required capsuleId: string
   // Revision-2 identity (2026-09-14). One legacy record may map to several
   // Capsule records, one link per role; ordinal separates several records of
   // one role from one source row. Nullable so pre-field links validate; the
@@ -172,7 +175,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
     constraint linkSourceSystemPresent: sourceSystem != null "Source system is required"
     constraint linkExternalIdPresent: length(trim(externalId)) > 0 "External ID is required"
     constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"
-    constraint linkVerifiedRequiresUser: verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "Verified status requires a verifying user"
+    constraint linkVerifiedRequiresUser: verified == null or verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "Verified status requires a verifying user"
     constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "Effective start date must be before or equal to end date"
     mutate sourceSystem = sourceSystem
     mutate recordType = recordType != null ? recordType : ""
