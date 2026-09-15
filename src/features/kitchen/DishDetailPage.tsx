@@ -26,7 +26,6 @@ import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
 import { DishComponentsPanel } from "./DishComponentsPanel";
 import { DishIngredientsPanel } from "./DishIngredientsPanel";
 import { DishPlateCostFact } from "./DishPlateCostFact";
-import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { RecipeNotes } from "./RecipeNotes";
 import "./DishRecipe.css";
 import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
@@ -115,13 +114,17 @@ export function DishDetailPage() {
       ) : null}
       {undoHost}
       {host}
-      <header className="culinary-header-compact">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
+      <header className="recipe-sheet-header">
+        <div className="recipe-sheet-title-row">
+          <div className="recipe-sheet-identity">
             <p className="eyebrow">
-              Dish · Edition {dish.editionNumber ?? 1} · Rev {dish.version}
+              Dish recipe · Edition {dish.editionNumber ?? 1} · Rev{" "}
+              {dish.version}
             </p>
             <h1 className="dish-recipe-title">{dish.name}</h1>
+            {dish.description ? (
+              <p className="recipe-sheet-description">{dish.description}</p>
+            ) : null}
           </div>
           <details className="recipe-management">
             <summary>Dish actions</summary>
@@ -150,13 +153,19 @@ export function DishDetailPage() {
             </div>
           </details>
         </div>
-        <dl className="dish-recipe-facts">
+        <dl className="recipe-sheet-facts">
           <div>
             <dt>Status</dt>
             <dd>
               <StatusChip status={String(dish.status)} />
             </dd>
           </div>
+          {dish.recipeSourceYield?.trim() ? (
+            <div>
+              <dt>Yield</dt>
+              <dd>{dish.recipeSourceYield}</dd>
+            </div>
+          ) : null}
           <div>
             <dt>Portion</dt>
             <dd>
@@ -164,204 +173,214 @@ export function DishDetailPage() {
             </dd>
           </div>
           <DishPlateCostFact dishId={dish._id} />
-          <div>
-            <dt>Category</dt>
-            <dd>{dish.category || "—"}</dd>
-          </div>
-          <div>
-            <dt>Course</dt>
-            <dd>{dish.course || "—"}</dd>
-          </div>
-          <div>
-            <dt>Service</dt>
-            <dd>{dish.serviceStyle || "—"}</dd>
-          </div>
-          <div>
-            <dt>Allergens</dt>
-            <dd>
-              <AllergenIconRow codes={dish.allergenSummary} />
-            </dd>
-          </div>
-          <div>
-            <dt>Dietary</dt>
-            <dd data-testid="dish-dietary-tags">
-              {dish.dietaryTags && dish.dietaryTags.length > 0
-                ? dish.dietaryTags.join(", ")
-                : "—"}
-            </dd>
-          </div>
+          {dish.category ? (
+            <div>
+              <dt>Category</dt>
+              <dd>{dish.category}</dd>
+            </div>
+          ) : null}
+          {dish.course ? (
+            <div>
+              <dt>Course</dt>
+              <dd>{dish.course}</dd>
+            </div>
+          ) : null}
+          {dish.serviceStyle ? (
+            <div>
+              <dt>Service</dt>
+              <dd>{dish.serviceStyle}</dd>
+            </div>
+          ) : null}
+          {dish.allergenSummary?.length ? (
+            <div>
+              <dt>Allergens</dt>
+              <dd>
+                <AllergenIconRow codes={dish.allergenSummary} />
+              </dd>
+            </div>
+          ) : null}
+          {dish.dietaryTags?.length ? (
+            <div>
+              <dt>Dietary</dt>
+              <dd data-testid="dish-dietary-tags">
+                {dish.dietaryTags.join(", ")}
+              </dd>
+            </div>
+          ) : null}
         </dl>
       </header>
 
-      {dish.description ? (
-        <p className="culinary-lead">{dish.description}</p>
-      ) : (
-        <p className="text-base text-ink-3">
-          No customer-facing description yet.
-        </p>
-      )}
+      <div className="recipe-reading-grid" aria-label="Recipe">
+        <DishIngredientsPanel dishId={dish._id} />
 
-      {dish.primaryImageStorageId ? (
-        <DishPrimaryImage
-          storageId={dish.primaryImageStorageId}
-          alt={dish.name}
-          size="hero"
-          className="mt-4"
-        />
-      ) : null}
-      <details className="recipe-add-editor">
-        <summary>
-          {dish.primaryImageStorageId ? "Edit photo" : "Add photo"}
-        </summary>
-        <DishPrimaryImageUploader
-          dishId={dish._id}
-          dishVersion={dish.version}
-          dishName={dish.name}
-          storageId={dish.primaryImageStorageId}
-          onError={setFailure}
-        />
-      </details>
-
-      {dish.recipeInstructions ? (
-        <section className="culinary-section">
-          <div className="flex flex-wrap items-center gap-3.5">
-            <h2 className="text-sm font-bold uppercase tracking-[0.09em] text-ink">
-              Recipe
-            </h2>
-            <i aria-hidden="true" className="h-px flex-1 bg-ink" />
-            <span className="text-sm text-ink-3">
-              Recipe yield: {dish.recipeSourceYield}
-            </span>
-          </div>
-          <RecipeNotes text={dish.recipeInstructions} />
-        </section>
-      ) : null}
-
-      <DishIngredientsPanel dishId={dish._id} />
-
-      <DishPrepTasksPanel dishId={dish._id} />
-
-      <DishComponentsPanel dishId={dish._id} />
-
-      <DishContainersPanel dishId={dish._id} />
-
-      <details className="recipe-management recipe-record-history">
-        <summary>Editions &amp; duplicates ({nameMatches.length})</summary>
-        <section className="culinary-section">
+        <section className="culinary-section recipe-method-section">
           <div className="culinary-section-heading">
-            <h2>Editions &amp; duplicates</h2>
-            <span>{nameMatches.length} similar names</span>
+            <h2>Instructions / method</h2>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              className="btn btn-ghost"
-              disabled={busy != null}
-              onClick={() =>
-                void run("createEdition", async () => {
-                  const createdId = await createDish({
-                    name: dish.name,
-                    portionSize: dish.portionSize,
-                    portionUnit: dish.portionUnit,
-                    description: dish.description ?? undefined,
-                    category: dish.category ?? undefined,
-                    course: dish.course ?? undefined,
-                    serviceStyle: dish.serviceStyle ?? undefined,
-                    dietaryTags: dish.dietaryTags,
-                    allergenSummary: dish.allergenSummary,
-                  });
-                  if (typeof createdId !== "string") return;
-                  await linkAsEdition({
-                    docId: createdId,
-                    sourceDishId:
-                      culinaryCanonicalMatcher.resolveCanonicalId(dish),
-                    editionNumber: (dish.editionNumber ?? 1) + 1,
-                  });
-                  window.location.assign(dishPath(createdId));
-                })
-              }
-            >
-              Create new edition
-            </button>
-          </div>
-          {nameMatches.length ? (
-            <ul className="mt-3 divide-y divide-line">
-              {nameMatches.map((match) => (
-                <li
-                  key={match._id}
-                  className="flex flex-wrap items-center justify-between gap-2 py-2"
-                >
-                  <Link
-                    to={dishPath(match._id)}
-                    className="text-base hover:underline"
-                  >
-                    {match.name} · ed. {match.editionNumber ?? 1}
-                  </Link>
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    disabled={busy != null}
-                    onClick={() => {
-                      void (async () => {
-                        const reason = (
-                          await prompt.askReason({
-                            title: "Merge dishes",
-                            description: `Merge "${dish.name}" into "${match.name}".`,
-                            label: "Reason",
-                            confirmLabel: "Merge dishes",
-                            tone: "danger",
-                          })
-                        )?.trim();
-                        if (!reason) return;
-                        await run("mergeInto", async () => {
-                          await mergeInto({
-                            docId: dish._id,
-                            version: dish.version,
-                            targetDishId: match._id,
-                            reason,
-                          });
-                        });
-                      })();
-                    }}
-                  >
-                    Merge this into that
-                  </button>
-                </li>
-              ))}
-            </ul>
+          {dish.recipeInstructions ? (
+            <div className="recipe-method-copy">
+              <RecipeNotes text={dish.recipeInstructions} />
+            </div>
           ) : (
-            <p className="mt-2 text-base text-ink-3">
-              No similarly named dishes.
-            </p>
+            <div className="recipe-empty">
+              <p>No recipe method recorded.</p>
+              <span>
+                The cooking or finishing instructions have not been entered for
+                this dish.
+              </span>
+            </div>
           )}
         </section>
+      </div>
+
+      <details className="recipe-secondary-disclosure recipe-image-disclosure">
+        <summary>
+          {dish.primaryImageStorageId ? "Recipe photo" : "Add recipe photo"}
+        </summary>
+        <div className="recipe-secondary-content">
+          <DishPrimaryImageUploader
+            dishId={dish._id}
+            dishVersion={dish.version}
+            dishName={dish.name}
+            storageId={dish.primaryImageStorageId}
+            onError={setFailure}
+          />
+        </div>
       </details>
 
-      <section className="culinary-section">
-        <div className="culinary-section-heading">
-          <h2>Event uses</h2>
-          <span>{formatCountNoun(eventUses.length, "event")}</span>
+      <details className="recipe-secondary-disclosure recipe-operations-disclosure">
+        <summary>
+          <span>Kitchen operations</span>
+          <small>
+            Prep tasks, components, containers, history, and event uses
+          </small>
+        </summary>
+        <div className="recipe-secondary-content">
+          <DishPrepTasksPanel dishId={dish._id} />
+
+          <DishComponentsPanel dishId={dish._id} />
+
+          <DishContainersPanel dishId={dish._id} />
+
+          <details className="recipe-management recipe-record-history">
+            <summary>Editions &amp; duplicates ({nameMatches.length})</summary>
+            <section className="culinary-section">
+              <div className="culinary-section-heading">
+                <h2>Editions &amp; duplicates</h2>
+                <span>{nameMatches.length} similar names</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  disabled={busy != null}
+                  onClick={() =>
+                    void run("createEdition", async () => {
+                      const createdId = await createDish({
+                        name: dish.name,
+                        portionSize: dish.portionSize,
+                        portionUnit: dish.portionUnit,
+                        description: dish.description ?? undefined,
+                        category: dish.category ?? undefined,
+                        course: dish.course ?? undefined,
+                        serviceStyle: dish.serviceStyle ?? undefined,
+                        dietaryTags: dish.dietaryTags,
+                        allergenSummary: dish.allergenSummary,
+                      });
+                      if (typeof createdId !== "string") return;
+                      await linkAsEdition({
+                        docId: createdId,
+                        sourceDishId:
+                          culinaryCanonicalMatcher.resolveCanonicalId(dish),
+                        editionNumber: (dish.editionNumber ?? 1) + 1,
+                      });
+                      window.location.assign(dishPath(createdId));
+                    })
+                  }
+                >
+                  Create new edition
+                </button>
+              </div>
+              {nameMatches.length ? (
+                <ul className="mt-3 divide-y divide-line">
+                  {nameMatches.map((match) => (
+                    <li
+                      key={match._id}
+                      className="flex flex-wrap items-center justify-between gap-2 py-2"
+                    >
+                      <Link
+                        to={dishPath(match._id)}
+                        className="text-base hover:underline"
+                      >
+                        {match.name} · ed. {match.editionNumber ?? 1}
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-ghost"
+                        disabled={busy != null}
+                        onClick={() => {
+                          void (async () => {
+                            const reason = (
+                              await prompt.askReason({
+                                title: "Merge dishes",
+                                description: `Merge "${dish.name}" into "${match.name}".`,
+                                label: "Reason",
+                                confirmLabel: "Merge dishes",
+                                tone: "danger",
+                              })
+                            )?.trim();
+                            if (!reason) return;
+                            await run("mergeInto", async () => {
+                              await mergeInto({
+                                docId: dish._id,
+                                version: dish.version,
+                                targetDishId: match._id,
+                                reason,
+                              });
+                            });
+                          })();
+                        }}
+                      >
+                        Merge this into that
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-base text-ink-3">
+                  No similarly named dishes.
+                </p>
+              )}
+            </section>
+          </details>
+
+          <section className="culinary-section">
+            <div className="culinary-section-heading">
+              <h2>Event uses</h2>
+              <span>{formatCountNoun(eventUses.length, "event")}</span>
+            </div>
+            {eventUses.length ? (
+              <ul className="dish-uses">
+                {eventUses.map(({ entry, event }) => (
+                  <li
+                    key={entry._id}
+                    className="flex items-center justify-between border-b border-line py-3"
+                  >
+                    <span>{event!.title ?? event!.name}</span>
+                    <span className="font-mono text-sm text-ink-3">
+                      {entry.quantityServings} servings · {entry.course || "—"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="recipe-empty">
+                <p>No events currently include this dish.</p>
+              </div>
+            )}
+          </section>
         </div>
-        {eventUses.length ? (
-          <ul className="dish-uses">
-            {eventUses.map(({ entry, event }) => (
-              <li
-                key={entry._id}
-                className="flex items-center justify-between border-b border-line py-3"
-              >
-                <span>{event!.title ?? event!.name}</span>
-                <span className="font-mono text-sm text-ink-3">
-                  {entry.quantityServings} servings · {entry.course || "—"}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="recipe-empty">
-            <p>No events currently include this dish.</p>
-          </div>
-        )}
-      </section>
+      </details>
     </article>
   );
 }
