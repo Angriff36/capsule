@@ -34,6 +34,10 @@ function SparkIcon() {
   );
 }
 
+function fileIcon(kind: AssistantFile["kind"]): string {
+  return kind === "image" ? "🖼" : kind === "pdf" ? "📑" : "📄";
+}
+
 function ToolCallChip({ name, content }: { name: string; content: string }) {
   let failed = false;
   try {
@@ -62,7 +66,7 @@ export function AssistantPanel({
   open: boolean;
   onClose: () => void;
 }) {
-  const { messages, busy, error, send, reset } = useAssistantChat();
+  const { messages, busy, error, send, stop, reset } = useAssistantChat();
   const convex = useConvex();
   const [draft, setDraft] = useState("");
   const [pendingFiles, setPendingFiles] = useState<AssistantFile[]>([]);
@@ -177,7 +181,7 @@ export function AssistantPanel({
                     key={f.storageId}
                     className="mt-0.5 text-2xs text-ink-3"
                   >
-                    {f.kind === "image" ? "🖼" : "📄"} {f.name}
+                    {fileIcon(f.kind)} {f.name}
                   </span>
                 ))}
               </div>
@@ -207,7 +211,11 @@ export function AssistantPanel({
             </div>
           );
         })}
-        {busy && <div className="my-2 text-xs text-ink-3">Thinking…</div>}
+        {busy && (
+          <div role="status" className="my-2 text-xs text-ink-3">
+            Thinking…
+          </div>
+        )}
         {error != null && (
           <div className="my-2 rounded-sm border border-warn/40 bg-warn-soft px-2.5 py-1.5 text-xs text-warn">
             {error}
@@ -223,7 +231,7 @@ export function AssistantPanel({
                 key={f.storageId}
                 className="flex items-center gap-1 rounded-full border border-line bg-inset px-2 py-0.5 text-xs text-ink-2"
               >
-                {f.kind === "image" ? "🖼" : "📄"} {f.name}
+                {fileIcon(f.kind)} {f.name}
                 <button
                   type="button"
                   aria-label={`Remove ${f.name}`}
@@ -253,8 +261,8 @@ export function AssistantPanel({
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={busy}
-            aria-label="Attach a file"
-            title="Attach an image or text file (drag-drop works too)"
+            aria-label="Attach files"
+            title="Attach images, text files, or PDFs (drag-drop works too)"
             className="grid h-9 w-9 shrink-0 cursor-pointer place-items-center rounded-sm border border-line bg-canvas text-ink-3 transition-colors hover:border-line-2 hover:text-ink disabled:opacity-40"
           >
             <svg
@@ -276,7 +284,7 @@ export function AssistantPanel({
             type="file"
             multiple
             className="hidden"
-            accept="image/*,.txt,.md,.csv,.json,.tsv,.log,.yml,.yaml,.xml,.html"
+            accept="image/*,application/pdf,.pdf,.txt,.md,.csv,.json,.tsv,.log,.yml,.yaml,.xml,.html"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               void acceptFiles(e.target.files);
               e.target.value = "";
@@ -296,16 +304,35 @@ export function AssistantPanel({
             disabled={busy}
             className="min-h-0 flex-1 resize-none rounded-sm border border-line bg-canvas px-2.5 py-1.5 text-sm text-ink placeholder:text-ink-3 focus:border-brand/50 focus:outline-none disabled:opacity-50"
           />
-          <button
-            type="button"
-            onClick={submit}
-            disabled={
-              busy || (draft.trim().length === 0 && pendingFiles.length === 0)
-            }
-            className="cursor-pointer rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-default disabled:opacity-40"
-          >
-            Send
-          </button>
+          {busy ? (
+            <button
+              type="button"
+              onClick={stop}
+              aria-label="Stop assistant"
+              title="Stop assistant"
+              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-warn bg-panel px-3.5 text-sm font-medium text-warn transition-colors hover:bg-warn-soft"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <rect x="2" y="2" width="8" height="8" rx="1" />
+              </svg>
+              Stop
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={submit}
+              disabled={draft.trim().length === 0 && pendingFiles.length === 0}
+              className="cursor-pointer rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-default disabled:opacity-40"
+            >
+              Send
+            </button>
+          )}
         </div>
       </footer>
     </aside>

@@ -16,10 +16,19 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import {
   assistantToolDefs,
   executionSpecFor,
 } from "./lib/assistantToolSurface";
+// @ts-expect-error pdfjs-dist ships no type declarations for its worker entry.
+import * as pdfjsWorker from "pdfjs-dist/legacy/build/pdf.worker.mjs";
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
+
+// pdfjs loads its worker through a dynamic import the Convex bundle cannot
+// follow, so every PDF failed with "Cannot find module pdf.worker.mjs".
+// Handing it the bundled worker module keeps extraction in-process.
+(globalThis as { pdfjsWorker?: unknown }).pdfjsWorker = pdfjsWorker;
 
 const toolCallValidator = v.object({
   id: v.string(),
@@ -31,7 +40,7 @@ const fileValidator = v.object({
   storageId: v.string(),
   name: v.string(),
   mime: v.string(),
-  kind: v.union(v.literal("image"), v.literal("text")),
+  kind: v.union(v.literal("image"), v.literal("text"), v.literal("pdf")),
 });
 
 const messageValidator = v.object({
@@ -46,7 +55,7 @@ export interface AssistantFile {
   storageId: string;
   name: string;
   mime: string;
-  kind: "image" | "text";
+  kind: "image" | "text" | "pdf";
 }
 
 export interface AssistantToolCall {
@@ -116,7 +125,94 @@ function systemPrompt(): string {
   ].join("\n");
 }
 
-/** Images become inline data URLs; text files are inlined as text blocks. */
+const MAX_PDF_BYTES = 20 * 1024 * 1024;
+const MAX_PDF_TEXT_CHARS = 200_000;
+const MAX_PDF_PAGES = 100;
+
+type PdfTextResult = {
+  text: string;
+  pageCount: number | null;
+  truncated: boolean;
+};
+
+async function convertPdfWithMarkItDown(
+  bytes: Uint8Array,
+): Promise<PdfTextResult | null> {
+  const converterUrl = process.env.ASSISTANT_MARKITDOWN_URL?.trim();
+  if (!converterUrl) return null;
+  try {
+    const response = await fetch(converterUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/pdf",
+      },
+      body: Buffer.from(bytes),
+    });
+    if (!response.ok) {
+      console.error(
+        `assistantTurn: MarkItDown converter returned ${response.status}`,
+      );
+      return null;
+    }
+    const markdown = (await response.text()).trim();
+    if (!markdown) return null;
+    return {
+      text: markdown.slice(0, MAX_PDF_TEXT_CHARS),
+      pageCount: null,
+      truncated: markdown.length > MAX_PDF_TEXT_CHARS,
+    };
+  } catch (error) {
+    console.error(
+      `assistantTurn: MarkItDown converter unavailable: ${String(error)}`,
+    );
+    return null;
+  }
+}
+
+async function extractPdfText(bytes: Uint8Array): Promise<{
+  text: string;
+  pageCount: number | null;
+  truncated: boolean;
+}> {
+  if (bytes.byteLength > MAX_PDF_BYTES) {
+    throw new Error("PDF exceeds the 20 MB assistant limit.");
+  }
+  const markItDownResult = await convertPdfWithMarkItDown(bytes);
+  if (markItDownResult != null) return markItDownResult;
+
+  const loadingTask = getDocument({ data: bytes, useSystemFonts: true });
+  const document = await loadingTask.promise;
+  let text = "";
+  try {
+    const pageLimit = Math.min(document.numPages, MAX_PDF_PAGES);
+    for (let pageNumber = 1; pageNumber <= pageLimit; pageNumber += 1) {
+      const page = await document.getPage(pageNumber);
+      try {
+        const content = await page.getTextContent();
+        const pageText = content.items
+          .map((item) => ("str" in item ? item.str : ""))
+          .filter((value) => value.length > 0)
+          .join(" ");
+        if (pageText.length > 0) {
+          text += `${text.length > 0 ? "\n\n" : ""}Page ${pageNumber}\n${pageText}`;
+        }
+      } finally {
+        page.cleanup();
+      }
+      if (text.length >= MAX_PDF_TEXT_CHARS) break;
+    }
+    return {
+      text: text.slice(0, MAX_PDF_TEXT_CHARS),
+      pageCount: document.numPages,
+      truncated:
+        text.length > MAX_PDF_TEXT_CHARS || document.numPages > pageLimit,
+    };
+  } finally {
+    await document.destroy();
+  }
+}
+
+/** Images become inline data URLs; text files and PDFs become text blocks. */
 async function buildUserContent(
   m: {
     content?: string;
@@ -124,18 +220,21 @@ async function buildUserContent(
   },
   urls: Record<string, string | null>,
   inline: boolean,
+  readStorage: (storageId: string) => Promise<Blob | null>,
 ): Promise<string | Array<ContentPart>> {
   const files = m.files ?? [];
   if (files.length === 0) return m.content ?? "";
   const parts: Array<ContentPart> = [];
   if (m.content) parts.push({ type: "text", text: m.content });
   for (const file of files) {
+    const kindLabel =
+      file.kind === "image" ? "image" : file.kind === "pdf" ? "PDF" : "file";
     // Only the newest user turn re-reads files — older turns keep a
     // placeholder so multi-turn vision threads don't re-send megabytes.
     if (!inline) {
       parts.push({
         type: "text",
-        text: `[attached ${file.kind === "image" ? "image" : "file"}: ${file.name} — already shared earlier in this conversation]`,
+        text: `[attached ${kindLabel}: ${file.name} — already shared earlier in this conversation]`,
       });
       continue;
     }
@@ -143,31 +242,52 @@ async function buildUserContent(
     if (!url) {
       parts.push({
         type: "text",
-        text: `[attached ${file.kind === "image" ? "image" : "file"} ${file.name} is not available to you]`,
+        text: `[attached ${kindLabel} ${file.name} is not available to you]`,
       });
       continue;
     }
-    const response = await fetch(url);
-    const bytes = Buffer.from(await response.arrayBuffer());
-    if (file.kind === "image") {
-      if (bytes.length > 5 * 1024 * 1024) {
+    try {
+      const blob = await readStorage(file.storageId);
+      if (!blob) throw new Error("Stored file is no longer available.");
+      const bytes = Buffer.from(await blob.arrayBuffer());
+      if (file.kind === "image") {
+        if (bytes.length > 5 * 1024 * 1024) {
+          parts.push({
+            type: "text",
+            text: `[attached image ${file.name} is too large to read]`,
+          });
+          continue;
+        }
+        parts.push({
+          type: "image_url",
+          image_url: {
+            url: `data:${file.mime};base64,${bytes.toString("base64")}`,
+          },
+        });
+      } else if (file.kind === "pdf") {
+        const extracted = await extractPdfText(new Uint8Array(bytes));
+        if (extracted.text.trim().length === 0) {
+          parts.push({
+            type: "text",
+            text: `[Attached PDF "${file.name}" has no extractable text. It may be scanned or image-only.]`,
+          });
+        } else {
+          parts.push({
+            type: "text",
+            text: `Attached PDF "${file.name}"${extracted.pageCount == null ? "" : ` (${extracted.pageCount} pages)`}:\n${extracted.text}${extracted.truncated ? "\n…(truncated)" : ""}`,
+          });
+        }
+      } else {
+        const text = bytes.subarray(0, 200_000).toString("utf8");
         parts.push({
           type: "text",
-          text: `[attached image ${file.name} is too large to read]`,
+          text: `Attached file "${file.name}":\n${text}${bytes.length > 200_000 ? "\n…(truncated)" : ""}`,
         });
-        continue;
       }
-      parts.push({
-        type: "image_url",
-        image_url: {
-          url: `data:${file.mime};base64,${bytes.toString("base64")}`,
-        },
-      });
-    } else {
-      const text = bytes.subarray(0, 200_000).toString("utf8");
+    } catch {
       parts.push({
         type: "text",
-        text: `Attached file "${file.name}":\n${text}${bytes.length > 200_000 ? "\n…(truncated)" : ""}`,
+        text: `[attached ${kindLabel} ${file.name} could not be read]`,
       });
     }
   }
@@ -273,7 +393,12 @@ export const turn = action({
       if (m.role === "user") {
         wire.push({
           role: "user",
-          content: await buildUserContent(m, urlMap, i === lastUserIndex),
+          content: await buildUserContent(
+            m,
+            urlMap,
+            i === lastUserIndex,
+            (storageId) => ctx.storage.get(storageId as Id<"_storage">),
+          ),
         });
       } else if (m.role === "assistant") {
         wire.push({
