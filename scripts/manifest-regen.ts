@@ -18,6 +18,7 @@ import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
+import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
 import { BuilderManifestPinSync } from "./builder-manifest-pin.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
 
@@ -64,8 +65,12 @@ if (import.meta.main) {
   const status = runBuilder(["generate", "convex", "--apply", ...passthrough]);
   if (status !== 0) process.exit(status);
   // Builder emits checkRole(user.role). Re-apply org capability enforcement
-  // and refresh ownership digests so `bun run check` stays green.
-  const touched = applyOrgCapabilityCheckRole(CAPSULE_ROOT);
+  // and the event service-style target guard, then refresh ownership digests
+  // so `bun run check` stays green.
+  const touched = [
+    ...applyOrgCapabilityCheckRole(CAPSULE_ROOT),
+    ...applyEventServiceStyleReferenceGuard(CAPSULE_ROOT),
+  ];
   if (touched.length > 0) {
     console.log(
       `manifest-regen: applied org-capability checkRole patch (${touched.join(", ")})`,

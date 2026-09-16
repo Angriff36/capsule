@@ -7,7 +7,10 @@
  * agent coordinator.
  */
 
+import type { PacketEvidence } from "../eventPacket/packetContract";
+
 export type EventBundleSource =
+  | "eventPacket"
   | "beo"
   | "eventWorksheet"
   | "proposal"
@@ -170,6 +173,8 @@ export interface BundleNotes {
 }
 
 export interface EventBundle {
+  /** Untrusted imported packet evidence; never a native create/update command payload. */
+  packetEvidence?: PacketEvidence;
   header: BundleHeader;
   client: BundlePerson;
   otherContacts: BundlePerson[];

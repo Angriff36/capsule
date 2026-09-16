@@ -19,6 +19,7 @@ import { EventStageActionsCard } from "./EventStageActionsCard";
 import { EventTimelineCommentsPanel } from "./EventTimelineCommentsPanel";
 import { EventWeatherPanel } from "./EventWeatherPanel";
 import { EventReviewFlagsSection } from "./review-flags/EventReviewFlagsSection";
+import { EventPacketPanel } from "./packet/EventPacketPanel";
 import { eventDetailPath } from "./eventRoutes";
 import "./EventOverview.css";
 
@@ -105,6 +106,7 @@ export function EventOverviewTab({
             onAction={onAction}
           />
           <EventReviewFlagsSection eventId={eventId} />
+          <EventPacketPanel eventId={eventId} />
           <EventDetailsCard
             clientId={clientId}
             clients={clients}

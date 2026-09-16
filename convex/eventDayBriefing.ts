@@ -21,6 +21,10 @@ import { v } from "convex/values";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
+import {
+  readCurrentPacket,
+  projectPacketReadiness,
+} from "./lib/eventPacket/reconcileNative";
 
 /** Same envelope handling as the generated __decryptDoc, per field. */
 async function decryptField(
@@ -160,6 +164,8 @@ export const getBriefing = query({
     if (!event || event.tenantId !== auth.tenantId || event.deletedAt != null)
       return null;
     const tenantId = auth.tenantId;
+    const currentPacket = await readCurrentPacket(ctx, tenantId, id);
+    const packetReadiness = projectPacketReadiness(currentPacket.snapshot);
 
     const [
       assignments,
@@ -342,6 +348,7 @@ export const getBriefing = query({
       .map((item: any) => ({ _id: item._id, name: item.name ?? null }));
 
     return {
+      packetReadiness,
       event: {
         _id: event._id,
         deletedAt: event.deletedAt ?? null,

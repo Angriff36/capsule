@@ -16,7 +16,29 @@ import {
   dishAllergenClaim,
   type DishAllergenReport,
 } from "../kitchen/dishAllergens";
-import type { EventDayInputs } from "./eventDayModel";
+import type { EventDayInputs, EventDaySection } from "./eventDayModel";
+
+export function PacketSectionCaution({
+  section,
+}: {
+  section: EventDaySection;
+}) {
+  if (!section.urgentAction && !section.openIssueCount) return null;
+  return (
+    <div role="status" className="evd-note">
+      <p className="evd-kicker">
+        Needs attention
+        {section.openIssueCount
+          ? ` · ${section.openIssueCount} open ${section.openIssueCount === 1 ? "issue" : "issues"}`
+          : ""}
+      </p>
+      <p>
+        {section.urgentAction ??
+          "Check this section with the manager before service."}
+      </p>
+    </div>
+  );
+}
 
 /**
  * Read-only sheet bodies, one per map section. Everything a crew member

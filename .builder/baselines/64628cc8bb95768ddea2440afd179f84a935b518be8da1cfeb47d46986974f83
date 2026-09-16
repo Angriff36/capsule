@@ -1198,6 +1198,76 @@ export const EventLayoutSectionSchema = z.object({
 
 export type EventLayoutSection = z.infer<typeof EventLayoutSectionSchema>;
 
+// Entity: EventPacketArtifact
+export const EventPacketArtifactSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid().optional(),
+  fingerprint: z.string().optional(),
+  storageId: z.string().optional(),
+  purpose: z.string().optional(),
+  name: z.string().optional(),
+  mimeType: z.string().optional(),
+  byteSize: z.number().int().min(0).optional(),
+  uploadedBy: z.string().optional(),
+  metadataJson: z.string().nullable().optional(),
+  observationsJson: z.string().nullable().optional(),
+  contextJson: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventPacketArtifact = z.infer<typeof EventPacketArtifactSchema>;
+
+// Entity: EventPacketIssue
+export const EventPacketIssueSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid().optional(),
+  issueKey: z.string().optional(),
+  issueJson: z.string().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventPacketIssue = z.infer<typeof EventPacketIssueSchema>;
+
+// Entity: EventPacketResolution
+export const EventPacketResolutionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  eventId: z.string().uuid().optional(),
+  decisionId: z.string().optional(),
+  issueKey: z.string().optional(),
+  actor: z.string().optional(),
+  decidedAt: z.coerce.date().optional(),
+  decisionJson: z.string().optional(),
+  verificationJson: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventPacketResolution = z.infer<typeof EventPacketResolutionSchema>;
+
+// Entity: EventPacketRevision
+export const EventPacketRevisionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  eventId: z.string().uuid().optional(),
+  snapshotFingerprint: z.string().optional(),
+  pdfStorageId: z.string().optional(),
+  snapshotStorageId: z.string().optional(),
+  stage: z.string().optional(),
+  createdBy: z.string().optional(),
+  supersededBy: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventPacketRevision = z.infer<typeof EventPacketRevisionSchema>;
+
 // Entity: EventStaffNeed
 export const EventStaffNeedSchema = z.object({
   id: z.string().uuid(),
@@ -5172,6 +5242,13 @@ export const EventChangeRequirementsParamsSchema = z.object({
 });
 
 export type EventChangeRequirementsParams = z.infer<typeof EventChangeRequirementsParamsSchema>;
+
+// Command: changeServiceStyle on Event
+export const EventChangeServiceStyleParamsSchema = z.object({
+  serviceStyleId: z.string().min(1),
+});
+
+export type EventChangeServiceStyleParams = z.infer<typeof EventChangeServiceStyleParamsSchema>;
 
 // Command: changeVenue on Event
 export const EventChangeVenueParamsSchema = z.object({

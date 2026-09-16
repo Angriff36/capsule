@@ -9,6 +9,20 @@
  */
 import { useQuery } from "convex/react";
 import { api } from "./api";
+import type { Section } from "./eventPacket/model";
+
+/** Server-built public cautions only; source evidence and decisions never cross this boundary. */
+export type EventDayPacketReadiness = {
+  ready: boolean;
+  requiredOpenIssueCount: number;
+  finalSignoffsComplete: boolean;
+  sections: {
+    section: Section;
+    status: "ready" | "review" | "blocked";
+    openIssueCount: number;
+    urgentAction: string | null;
+  }[];
+};
 
 export type EventDayEventSummary = {
   _id: string;
@@ -243,6 +257,7 @@ export type EventDayMe = {
 };
 
 export type EventDayBriefing = {
+  packetReadiness: EventDayPacketReadiness;
   event: EventDayEvent;
   venue: EventDayVenue | null;
   assignments: EventDayAssignment[];

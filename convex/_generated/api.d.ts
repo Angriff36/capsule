@@ -66,6 +66,8 @@ import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
 import type * as lib_eventCancellation from "../lib/eventCancellation.js";
 import type * as lib_eventCreateServiceStyleEnsure from "../lib/eventCreateServiceStyleEnsure.js";
+import type * as lib_eventPacket_commands from "../lib/eventPacket/commands.js";
+import type * as lib_eventPacket_reconcileNative from "../lib/eventPacket/reconcileNative.js";
 import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperations.js";
 import type * as lib_eventTimingOperations from "../lib/eventTimingOperations.js";
 import type * as lib_fdcNutrientMapper from "../lib/fdcNutrientMapper.js";
@@ -226,6 +228,8 @@ declare const fullApi: ApiFromModules<{
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
   "lib/eventCancellation": typeof lib_eventCancellation;
   "lib/eventCreateServiceStyleEnsure": typeof lib_eventCreateServiceStyleEnsure;
+  "lib/eventPacket/commands": typeof lib_eventPacket_commands;
+  "lib/eventPacket/reconcileNative": typeof lib_eventPacket_reconcileNative;
   "lib/eventStaffingOperations": typeof lib_eventStaffingOperations;
   "lib/eventTimingOperations": typeof lib_eventTimingOperations;
   "lib/fdcNutrientMapper": typeof lib_fdcNutrientMapper;

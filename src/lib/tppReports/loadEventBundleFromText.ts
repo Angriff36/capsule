@@ -6,6 +6,7 @@ import type {
 } from "./eventBundle";
 import { mergeEventBundle } from "./mergeEventBundle";
 import { parseBeoText } from "./parseBeoText";
+import { packetEvidenceFromText } from "../eventPacket/packetContract";
 
 /**
  * The browser's way in: pasted BEO / worksheet text plus any TPP CSV exports
@@ -28,6 +29,7 @@ export interface TextBundleLoadResult {
 export function loadEventBundleFromText(input: {
   pastedText?: string;
   csvFiles?: readonly TextReportSource[];
+  packetFiles?: readonly TextReportSource[];
 }): TextBundleLoadResult {
   const parts: EventBundlePart[] = [];
   const recognized: TextBundleLoadResult["recognized"] = [];
@@ -40,10 +42,16 @@ export function loadEventBundleFromText(input: {
     recognized.push({ name: "Pasted text", source: part.source });
   }
 
-  for (const file of input.csvFiles ?? []) {
+  for (const file of [
+    ...(input.csvFiles ?? []),
+    ...(input.packetFiles ?? []),
+  ]) {
     let part: EventBundlePart | undefined;
     try {
-      part = parseCsvReportText(file.text);
+      const packetEvidence = packetEvidenceFromText(file.text);
+      part = packetEvidence
+        ? { source: "eventPacket", packetEvidence }
+        : parseCsvReportText(file.text);
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
       unrecognized.push(`${file.name} (${reason})`);

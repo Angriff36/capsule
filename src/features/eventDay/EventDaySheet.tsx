@@ -11,6 +11,7 @@ import {
   TimelineSheet,
   VehiclesSheet,
   VenueSheet,
+  PacketSectionCaution,
   type EventDayDetailData,
 } from "./EventDaySheetSections";
 
@@ -87,6 +88,7 @@ export function EventDaySheet({ section, data, onClose }: Props) {
           </span>
         </div>
         <div className="evd-sheet-body">
+          <PacketSectionCaution section={section} />
           {section.key === "venue" ? <VenueSheet data={data} /> : null}
           {section.key === "staffing" ? <StaffingSheet data={data} /> : null}
           {section.key === "timeline" ? <TimelineSheet data={data} /> : null}
