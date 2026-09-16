@@ -1,5 +1,8 @@
 import { jsPDF } from "jspdf";
-import type { Workbook } from "./buildWorkbook";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import type { Workbook, WorkbookOverlay } from "./buildWorkbook";
+import overlaysMeta from "./fixtures/event-forms-one-print.overlays.json";
+import { EVENT_FORMS_ONE_PRINT_B64 } from "./fixtures/event-forms-one-print.b64";
 export interface LayoutRecord {
   page: number;
   section: string;
@@ -15,22 +18,32 @@ export interface LayoutAudit {
   records: LayoutRecord[];
   violations: string[];
   normalizations: string[];
+  /** Total pages after verbatim template pages are merged in. */
+  mergedPageCount: number;
+  /** Overlay anchors not found on their original page (must stay empty). */
+  unmatchedOverlays: string[];
 }
 export interface RenderedWorkbook {
   bytes: Uint8Array;
   audit: LayoutAudit;
 }
+interface PageInsertion {
+  afterPage: number;
+  file: "event-forms-one-print";
+  page: number;
+  overlays: WorkbookOverlay[];
+}
 /** Explicit ASCII fallbacks prevent built-in PDF font missing glyphs. Unknown characters stay visible as codepoints. */
 export function printableText(input: string): string {
   return input
     .normalize("NFKC")
-    .replace(/[\u2010-\u2015\u2212]/g, "-")
-    .replace(/[\u2018\u2019]/g, "'")
-    .replace(/[\u201c\u201d]/g, '"')
-    .replace(/\u2026/g, "...")
-    .replace(/\u2022/g, "-")
-    .replace(/\u2610/g, "[ ]")
-    .replace(/\u00a0/g, " ")
+    .replace(/[‐-―−]/g, "-")
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/…/g, "...")
+    .replace(/•/g, "-")
+    .replace(/☐/g, "[ ]")
+    .replace(/ /g, " ")
     .replace(/\r/g, "")
     .replace(/\t/g, " ")
     .replace(
@@ -74,12 +87,16 @@ export function validateLayout(
   }
   return violations;
 }
+// Space-less: pdfjs splits styled words ("bu ff et"), so row labels and
+// anchors compare with every non-alphanumeric character removed.
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 export async function renderWorkbook(
   workbook: Workbook,
 ): Promise<RenderedWorkbook> {
   const doc = new jsPDF({ unit: "pt", format: "letter", compress: true });
   const records: LayoutRecord[] = [],
     normalizations: string[] = [];
+  const insertions: PageInsertion[] = [];
   let page = 0,
     y = 0,
     section = "";
@@ -174,61 +191,24 @@ export async function renderWorkbook(
     y += kind === "issue" ? 4 : 6;
   };
   for (const s of workbook.sections) {
+    const sourcePage = s.blocks.find(
+      (b) => b.kind === "sourcePage",
+    )?.sourcePage;
+    if (sourcePage) {
+      // The original form page is embedded verbatim later; nothing is drawn
+      // and no generated chrome (header, footer, banners) touches it.
+      insertions.push({
+        afterPage: page,
+        file: sourcePage.file,
+        page: sourcePage.page,
+        overlays: sourcePage.overlays,
+      });
+      continue;
+    }
     section = s.id;
     newPage();
     paragraph(s.title, 16, "title", true);
     for (const b of s.blocks) {
-      if (b.kind === "diagram") {
-        paragraph(b.text, 9, "text", true);
-        ensure(127);
-        const diagramTop = y;
-        doc.setDrawColor(68, 91, 103);
-        doc.setFillColor(240, 245, 246);
-        const labels = [
-          "Plates",
-          "Veggie chafer",
-          "Starch chafer",
-          "Protein chafer",
-          "Salad",
-          "Bread",
-          "Butter",
-          "Cutlery",
-        ];
-        for (let i = 0; i < 8; i++) {
-          const col = i % 4,
-            row = Math.floor(i / 4),
-            x = left + col * 133,
-            top = y + row * 54;
-          doc.setFillColor(240, 245, 246);
-          doc.roundedRect(x, top, 121, 32, 3, 3, "FD");
-          doc.setTextColor(32, 43, 52);
-          doc.setFont("helvetica", "bold");
-          doc.setFontSize(9);
-          doc.text(labels[i], x + 8, top + 19);
-          if (col < 3) {
-            doc.line(x + 122, top + 16, x + 131, top + 16);
-            doc.line(x + 128, top + 13, x + 131, top + 16);
-            doc.line(x + 128, top + 19, x + 131, top + 16);
-          }
-        }
-        doc.setFontSize(8);
-        doc.text(
-          "Service flow: top row left to right, then lower row left to right.",
-          left,
-          y + 107,
-        );
-        records.push({
-          page,
-          section,
-          kind: "diagram",
-          x: left,
-          y: diagramTop,
-          width: 520,
-          height: 112,
-        });
-        y += 124;
-        continue;
-      }
       paragraph(
         b.text,
         b.kind === "form" ? 9.5 : b.small ? 8.4 : 10,
@@ -237,28 +217,130 @@ export async function renderWorkbook(
       );
     }
   }
-  const count = page;
-  for (let p = 1; p <= count; p++) {
-    doc.setPage(p);
-    page = p;
-    section = "footer";
-    put(
-      `Revision ${workbook.revision} | ${workbook.status} | Page ${p} / ${count}`,
-      left,
-      752,
-      8,
-      "footer",
-    );
+  const generatedCount = page;
+  // Merge the original Event Forms One Print pages in binder order and draw
+  // only the event-specific overlay values on top of them.
+  const merged = await PDFDocument.load(doc.output("arraybuffer"));
+  const template = await PDFDocument.load(
+    base64Bytes(EVENT_FORMS_ONE_PRINT_B64),
+  );
+  interface PageAnchors {
+    header: {
+      eventNumber: { x: number; y: number };
+      eventDate: { x: number; y: number };
+    };
+    rows: { y: number; yn: { x: number; y: number }; label: string }[];
+    choices: { label: string; x: number; y: number }[];
   }
-  const audit = {
-    pageCount: count,
+  const meta = overlaysMeta as { pages: PageAnchors[] };
+  const copied = await merged.copyPages(
+    template,
+    insertions.map((i) => i.page - 1),
+  );
+  const font = await merged.embedFont(StandardFonts.Helvetica);
+  const bold = await merged.embedFont(StandardFonts.HelveticaBold);
+  const ink = rgb(0.13, 0.2, 0.28);
+  const unmatched: string[] = [];
+  let offset = 0;
+  for (const [i, entry] of insertions.entries()) {
+    const target = copied[i];
+    const anchors = meta.pages[entry.page - 1];
+    for (const o of entry.overlays) {
+      if (o.kind === "text") {
+        if (!o.value?.trim()) continue;
+        const a =
+          o.anchor === "Event Number"
+            ? anchors?.header?.eventNumber
+            : anchors?.header?.eventDate;
+        if (!a) {
+          unmatched.push(`page ${entry.page}: ${o.anchor}`);
+          continue;
+        }
+        target.drawText(printableText(o.value), {
+          x: a.x,
+          y: a.y,
+          size: 11,
+          font,
+          color: ink,
+        });
+      } else if (o.kind === "yn") {
+        const row = anchors?.rows?.find((r) =>
+          norm(r.label).startsWith(norm(o.anchor)),
+        );
+        if (!row) {
+          unmatched.push(`page ${entry.page}: ${o.anchor}`);
+          continue;
+        }
+        target.drawText("X", {
+          x: o.answer === "no" ? row.yn.x + 16.8 : row.yn.x + 1.2,
+          y: row.yn.y + 0.5,
+          size: 10,
+          font: bold,
+          color: ink,
+        });
+      } else {
+        const choice = anchors?.choices?.find((c) => c.label === o.option);
+        if (!choice) {
+          unmatched.push(`page ${entry.page}: ${o.option}`);
+          continue;
+        }
+        target.drawText("X", {
+          x: choice.x,
+          y: choice.y + 0.5,
+          size: 10,
+          font: bold,
+          color: ink,
+        });
+      }
+    }
+    merged.insertPage(entry.afterPage + offset, target);
+    offset++;
+  }
+  // Footer page numbers count the merged binder; source-form pages stay
+  // chrome-free, so only generated pages carry the footer.
+  const finalCount = merged.getPageCount();
+  const finalIndexOf = new Map<number, number>();
+  {
+    let generatedSeen = 0,
+      insertedSeen = 0;
+    for (const entry of insertions) {
+      while (generatedSeen < entry.afterPage) {
+        finalIndexOf.set(generatedSeen + 1, generatedSeen + 1 + insertedSeen);
+        generatedSeen++;
+      }
+      insertedSeen++;
+    }
+    while (generatedSeen < generatedCount) {
+      finalIndexOf.set(generatedSeen + 1, generatedSeen + 1 + insertedSeen);
+      generatedSeen++;
+    }
+  }
+  for (const [generatedPage, finalPage] of finalIndexOf)
+    merged
+      .getPage(finalPage - 1)
+      .drawText(
+        printableText(
+          `Revision ${workbook.revision} | ${workbook.status} | Page ${finalPage} / ${finalCount}`,
+        ),
+        { x: left, y: 33.4, size: 8, font, color: rgb(0.63, 0.66, 0.69) },
+      );
+  const audit: LayoutAudit = {
+    pageCount: generatedCount,
     records,
-    violations: validateLayout(records, count),
+    violations: validateLayout(records, generatedCount),
     normalizations,
+    mergedPageCount: finalCount,
+    unmatchedOverlays: unmatched,
   };
   if (audit.violations.length)
     throw new Error(
       `Workbook layout failed: ${audit.violations.slice(0, 6).join("; ")}`,
     );
-  return { bytes: new Uint8Array(doc.output("arraybuffer")), audit };
+  return { bytes: new Uint8Array(await merged.save()), audit };
+}
+function base64Bytes(b64: string): Uint8Array {
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
 }

@@ -27,6 +27,55 @@ describe("measured operational workbook", () => {
     );
     expect(w.completeness.formPages).toBe(18);
   });
+  it("embeds the original Event Forms One Print pages verbatim and overlays only event data", () => {
+    const w = buildWorkbook(blank());
+    const pages: Record<string, number> = {};
+    for (const s of w.sections.filter((s) => s.id.startsWith("field."))) {
+      const sp = s.blocks.find((b) => b.kind === "sourcePage")?.sourcePage;
+      expect(sp?.file).toBe("event-forms-one-print");
+      pages[s.id] = sp!.page;
+    }
+    expect(pages).toEqual({
+      "field.task": 1,
+      "field.leaving-shop": 2,
+      "field.arrival": 3,
+      "field.muda": 4,
+      "field.bins": 5,
+      "field.after-event": 6,
+      "field.return": 7,
+      "field.packing": 8,
+      "field.buffet-drawing": 9,
+      "field.leaving-event": 10,
+      "field.takeoff-documents": 11,
+      "field.takeoff-readiness": 12,
+    });
+    // Field-use pages carry only the event number/date overlay; no action
+    // numbers, banners or recreated form text.
+    for (const s of w.sections.filter((s) => s.id.startsWith("field."))) {
+      expect(s.blocks).toHaveLength(1);
+      const sp = s.blocks[0].sourcePage!;
+      expect(
+        sp.overlays.filter((o) => o.kind === "yn" || o.kind === "choice"),
+      ).toHaveLength(s.id === "field.task" ? sp.overlays.length - 2 : 0);
+    }
+  });
+  it("pre-fills known data and keeps truly unknown fields blank, not NEEDS REVIEW", () => {
+    const s = blank();
+    s.observations = [
+      {
+        id: "a",
+        fieldKey: "menu.corn.quantity",
+        value: 30,
+        unit: "Each",
+        evidence: [],
+        observedAt: "2026-09-15T00:00:00Z",
+      },
+    ];
+    const w = buildWorkbook(s);
+    const text = JSON.stringify(w);
+    expect(text).toContain("30 Each");
+    expect(text).not.toContain("NEEDS REVIEW: not verified");
+  });
   it("prints only confirmed facts and explicitly labels candidate observations", () => {
     const s = blank();
     s.facts = [
@@ -92,9 +141,11 @@ describe("measured operational workbook", () => {
     const r = await renderWorkbook(w);
     expect(r.bytes.slice(0, 4)).toEqual(new Uint8Array([37, 80, 68, 70]));
     expect(r.audit.violations).toEqual([]);
-    expect(r.audit.pageCount).toBeGreaterThanOrEqual(18);
+    expect(r.audit.unmatchedOverlays).toEqual([]);
+    expect(r.audit.pageCount).toBeGreaterThanOrEqual(17);
     expect(r.audit.pageCount).toBeLessThan(55);
-    expect(r.audit.records.some((r) => r.kind === "diagram")).toBe(true);
+    // All 12 original form pages are present in the merged binder.
+    expect(r.audit.mergedPageCount).toBe(r.audit.pageCount + 12);
   });
 });
 import { reconcile } from "../src/lib/eventPacket/reconcile";
@@ -146,8 +197,10 @@ it("renders READY only after clean facts, all checks and both recorded signoffs"
     w.sections.filter((s) => s.id.startsWith("field.")),
   );
   expect(field).not.toContain("Recorded verifications");
-  expect(field).toContain("Warehouse / Operations Team Name");
-  expect(field).toContain("Event Lead Team Name");
+  // Field forms are the original pages; the signatures stay on the source
+  // page, not in recreated workbook text.
+  const takeoff = w.sections.filter((s) => s.id.startsWith("field.takeoff"));
+  for (const s of takeoff) expect(s.blocks[0].kind).toBe("sourcePage");
 }, 60000);
 it("retains eight packing items, original production units, both visits and source form text", async () => {
   const sources: ExtractedSource[] = fixture.documents.map((d) => {
@@ -195,12 +248,16 @@ it("retains eight packing items, original production units, both visits and sour
     "250",
     "300",
     "500",
-    "PURPLE",
-    "Cambros",
-    "0-25 (XS)",
-    "physically returned",
   ])
     expect(text).toContain(v);
+  // Field-execution form wording lives on the original pages, not in the
+  // recreated workbook text.
+  expect(text).not.toContain("PURPLE");
+  expect(text).not.toContain("physically returned");
+  expect(text).not.toContain("Cambros");
+  expect(text).not.toContain("0-25 (XS)");
+  // Packlist rows print their real source quantities, not NEEDS REVIEW.
+  expect(text).not.toContain("Quantity: NEEDS REVIEW: not verified");
   const cover = w.sections[0].blocks.map((b) => b.text).join("\n");
   const issues = s.issues.filter((i) => i.required && i.status === "open");
   expect(w.sections[0].blocks.filter((b) => b.kind === "issue")).toHaveLength(

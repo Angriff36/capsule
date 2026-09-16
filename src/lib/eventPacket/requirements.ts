@@ -151,22 +151,14 @@ const custom: [string, string, string, boolean][] = [
     false,
   ],
 ];
-// Field-use measurements and arrival/return forms are intentionally blank before departure.
+// Required checks are genuine PRE-PRINT decisions only: the Ops Final Lock
+// content review (not its post-lock wrap-up steps) and the service-plan
+// applicability decision. Quartermaster Thursday/Friday process steps and the
+// field-execution forms (Leaving the Shop, Before Takeoff, ...) stay printed
+// on their forms but never block workbook readiness.
 const predeparture = (key: string) =>
-  key.startsWith("final-lock.") ||
-  [
-    "quartermaster.packlist-binder",
-    "quartermaster.concern",
-    "quartermaster.questions",
-    "quartermaster.noon-thursday",
-    "quartermaster.eod-thursday",
-    "quartermaster.friday",
-    "quartermaster.signoff",
-    "field.leaving-shop",
-    "field.buffet-drawing",
-    "field.takeoff-documents",
-    "field.takeoff-readiness",
-  ].includes(key);
+  (key.startsWith("final-lock.") && !key.startsWith("final-lock.wrapup")) ||
+  key === "field.buffet-drawing";
 export const requirements: Requirement[] = [
   ...forms.sections
     .filter((s) => predeparture(s.key))

@@ -7,10 +7,26 @@ import type {
 import { readiness } from "./reconcile";
 import { canMarkNotApplicable, requirements } from "./requirements";
 import forms from "./fixtures/event-workbook.form-definitions.json";
+/** A value drawn on top of an original form page at its fixed source anchor. */
+export interface WorkbookOverlay {
+  /** Original-page anchor: "header" for the Event Number/Date line, or a form row label prefix for Y/N answers. */
+  anchor: string;
+  kind: "text" | "yn" | "choice";
+  value?: string;
+  answer?: "yes" | "no";
+  /** For kind "choice": the option text to mark (Serving Ware line). */
+  option?: string;
+}
+export interface WorkbookSourcePage {
+  file: "event-forms-one-print";
+  page: number;
+  overlays: WorkbookOverlay[];
+}
 export interface WorkbookBlock {
-  kind: "text" | "heading" | "issue" | "form" | "diagram";
+  kind: "text" | "heading" | "issue" | "form" | "sourcePage";
   text: string;
   small?: boolean;
+  sourcePage?: WorkbookSourcePage;
 }
 export interface WorkbookSection {
   id: string;
@@ -57,7 +73,19 @@ export function buildWorkbook(
     if (f?.status === "not_applicable")
       return `Verified not applicable [${ref(f.evidence)}]`;
     const obs = snapshot.observations.filter((o) => o.fieldKey === key);
-    return `NEEDS REVIEW: ${obs.length ? obs.map((o) => `${value(o.value)}${o.unit ? ` ${o.unit}` : ""} [${ref(o.evidence)}]`).join(" | ") : "not verified"}`;
+    const variants = new Set(
+      obs.map((o) => `${JSON.stringify(o.value)}|${o.unit ?? ""}`),
+    );
+    // Conflicting sources stay explicit review items; a single source value is
+    // known data and prints (rule: known data must be pre-filled). Truly
+    // unknown fields stay blank for their owner.
+    if (f?.status === "conflicted" || variants.size > 1)
+      return `NEEDS REVIEW: ${obs.length ? obs.map((o) => `${value(o.value)}${o.unit ? ` ${o.unit}` : ""} [${ref(o.evidence)}]`).join(" | ") : "not verified"}`;
+    if (obs.length) {
+      const o = obs[0];
+      return `${value(o.value)}${o.unit ? ` ${o.unit}` : ""} [${ref(o.evidence)}]`;
+    }
+    return "";
   };
   const keys = Array.from(
     new Set(
@@ -168,7 +196,7 @@ export function buildWorkbook(
       `${status}\nInvoice ${snapshot.identity.invoiceNumber} | ${snapshot.identity.eventDate}\n${field("eventTitle")}`,
     ),
     text(
-      `Revision ${revision} | Inputs current through ${generatedAt}\n${open.length} required open actions. Continue through all action-sheet pages. Safe facts are sourced; review candidates are not instructions. Blank field forms require their named owner.`,
+      `Revision ${revision} | Inputs current through ${generatedAt}\n${open.length} required open pre-print actions. Known values are printed from native data and imported sources; blanks are unresolved; field forms stay blank for their named owner.`,
     ),
     ...open.map((i) => ({
       kind: "issue" as const,
@@ -204,6 +232,22 @@ export function buildWorkbook(
         markers((i) => ["serviceStyle", "guestCount"].includes(i.fieldKey)),
       ),
   );
+  add("timeline", "Timeline / both visits", [
+    ...markers((i) => i.section === "timeline"),
+    ...keys
+      .filter((k) => k.startsWith("timeline."))
+      .sort((a, b) => {
+        const time = (k: string) =>
+          String(
+            snapshot.observations.find(
+              (o) => o.fieldKey === k.replace(/\.notes$/, ".time"),
+            )?.value ?? "",
+          );
+        return time(a).localeCompare(time(b)) || a.localeCompare(b);
+      })
+      .map((k) => text(`${human(k)}: ${field(k)}`, k.startsWith("notes."))),
+    text(`Access: ${field("notes.access")}`),
+  ]);
   // Stored answers are historical until their current issue and evidence-bound
   // resolution prove that the verification still applies to this snapshot.
   const currentVerifications = snapshot.checklistVerifications.filter(
@@ -259,6 +303,142 @@ export function buildWorkbook(
         });
     }
   }
+  // Event Forms One Print pages are embedded verbatim from the supplied
+  // original PDF. The workbook overlays event-specific values at their fixed
+  // source anchors and adds no generated chrome to these pages.
+  const headerOverlays = (): WorkbookOverlay[] => [
+    {
+      anchor: "Event Number",
+      kind: "text",
+      value: snapshot.identity.invoiceNumber,
+    },
+    { anchor: "Event Date", kind: "text", value: snapshot.identity.eventDate },
+  ];
+  const sourcePageBlock = (
+    page: number,
+    overlays: WorkbookOverlay[],
+  ): WorkbookBlock => ({
+    kind: "sourcePage",
+    text: "",
+    sourcePage: { file: "event-forms-one-print", page, overlays },
+  });
+  // Safe Y/N derivations for the original Event Task Breakdown page: an
+  // answer overlays only when event data or source evidence states it;
+  // unresolved questions stay for the human to complete on the form.
+  const factValue = (key: string) => {
+    const f = snapshot.facts.find((x) => x.fieldKey === key);
+    if (f?.status === "confirmed" && f.value !== undefined)
+      return value(f.value);
+    const o = snapshot.observations.find((x) => x.fieldKey === key);
+    return o ? value(o.value) : "";
+  };
+  const ops = (name: string) => factValue(`ops.${name}`);
+  const service = factValue("serviceStyle");
+  const serviceNotes = factValue("notes.service");
+  const setupNotes = factValue("notes.setup");
+  const disposables = ops("mangiaDisposables");
+  const rentals = ops("eventRentals");
+  const placeSettings = ops("placeSettings");
+  const water = `${ops("waterOnsite")} ${ops("tablesideWater")}`;
+  const buffetPlates = `${ops("buffetColdPlates")} ${ops("buffetHotPlates")}`;
+  const stationaryApps = ops("stationaryApps");
+  const cocktailFood = ops("cocktailHourFood");
+  const beverages = `${ops("beveragesOnMenu")} ${ops("barService")}`;
+  const bussing = ops("bussing");
+  const dessert = ops("dessertService");
+  const known = (t: string) => t.trim().length > 0;
+  const taskOverlays: WorkbookOverlay[] = headerOverlays();
+  let servingwareChoice = "";
+  if (known(disposables)) {
+    if (/client|customer|no mangia/i.test(disposables))
+      servingwareChoice = "Client Provided";
+    else if (/rent/i.test(disposables)) servingwareChoice = "Rented";
+    else if (/mangia|disposable|plastic/i.test(disposables))
+      servingwareChoice = "Plasticware";
+  }
+  if (servingwareChoice)
+    taskOverlays.push({
+      anchor: "Serving Ware is",
+      kind: "choice",
+      option: servingwareChoice,
+      value: disposables,
+    });
+  const yn: [string, "yes" | "no"][] = [];
+  const say = (key: string, answer: "yes" | "no") => yn.push([key, answer]);
+  if (/take|bring|return with|pick ?up/i.test(rentals))
+    say("take-rentals-with-us", "yes");
+  if (/leave|stay|remain/i.test(rentals)) say("leave-rentals-onsite", "yes");
+  if (/(table|chair)/i.test(`${rentals} ${setupNotes}`))
+    say("setup-guest-tables-chairs", "yes");
+  if (known(placeSettings)) {
+    if (/china|flatware|glass/i.test(placeSettings))
+      say("set-tables-flatware-china", "yes");
+    else if (/disposable/i.test(placeSettings))
+      say("set-tables-flatware-china", "no");
+  }
+  if (known(water)) say("fill-table-water", /no/i.test(water) ? "no" : "yes");
+  if (known(buffetPlates) || /full service|buffet/i.test(service))
+    say("setup-buffet-tables", "yes");
+  else if (/drop ?off|limited/i.test(service)) say("setup-buffet-tables", "no");
+  if (known(cocktailFood) || known(stationaryApps))
+    say("setup-appetizer-tables", "yes");
+  if (known(stationaryApps)) {
+    say("stationary-appetizers", "yes");
+    say("appetizers-on-own-table", "yes");
+  }
+  if (/pass/i.test(`${cocktailFood} ${serviceNotes}`))
+    say("pass-appetizers", "yes");
+  if (known(beverages)) {
+    say("setup-beverage-table", "yes");
+    say("set-out-beverage-dispensers", "yes");
+  }
+  if (/full service/i.test(service)) {
+    say("serving-buffet", "yes");
+    say("self-serve-buffet", "no");
+  } else if (/drop ?off|self.?serve|limited/i.test(service)) {
+    say("serving-buffet", "no");
+    say("self-serve-buffet", "yes");
+  }
+  if (known(bussing)) {
+    if (/client|none|self/i.test(bussing)) say("bus-after-dinner", "no");
+    else if (/mangia|staff|full|yes/i.test(bussing))
+      say("bus-after-dinner", "yes");
+    if (/glass/i.test(bussing) && !/client|none|self/i.test(bussing))
+      say("full-bus-all-glassware", "yes");
+  }
+  if (known(dessert)) say("setup-cake-dessert", "yes");
+  if (/cut|slice|serve/i.test(dessert)) say("cut-cake-serve-dessert", "yes");
+  if (/coffee/i.test(`${dessert} ${beverages}`))
+    say("dessert-coffee-bar", "yes");
+  const taskAnchors: Record<string, string> = {
+    "take-rentals-with-us": "Take rentals with us",
+    "leave-rentals-onsite": "Leave rentals onsite",
+    "setup-guest-tables-chairs": "Setup guest tables/chairs",
+    "set-tables-flatware-china": "Setting tables with",
+    "fill-table-water": "Fill water on tables",
+    "setup-buffet-tables": "Setup buffet tables",
+    "setup-appetizer-tables": "Setup tables for appetizers",
+    "setup-beverage-table": "Setup table for beverages",
+    "stationary-appetizers": "Stationary apps",
+    "appetizers-on-own-table": "Apps on their own table",
+    "appetizers-using-buffet-table": "Apps using main buffet",
+    "pass-appetizers": "Pass apps",
+    "set-out-beverage-dispensers": "Set out beverage dispensers",
+    "serving-buffet": "Serving buffet",
+    "self-serve-buffet": "Self serve buffet",
+    "bus-after-dinner": "Bus after dinner service",
+    "full-bus-all-glassware": "Full bus",
+    "setup-cake-dessert": "Setup cake / dessert",
+    "cut-cake-serve-dessert": "Cut cake / Serve dessert",
+    "dessert-coffee-bar": "Dessert Coffee Bar",
+  };
+  for (const [key, answer] of yn)
+    taskOverlays.push({
+      anchor: taskAnchors[key] ?? key,
+      kind: "yn",
+      answer,
+      value: factValue("serviceStyle"),
+    });
   for (const p of pages.values()) {
     const fieldForm = p.kind === "event_forms_template";
     const id = fieldForm
@@ -271,6 +451,16 @@ export function buildWorkbook(
       : p.kind === "ops_final_lock_template"
         ? "Ops Final Lock - review draft"
         : `Quartermaster review - ${p.page} / 5`;
+    if (fieldForm) {
+      // Original page verbatim; header overlay always, pre-filled Y/N on the
+      // task breakdown. Field-use pages carry no other generated content.
+      add(id, title, [
+        id === "field.task"
+          ? sourcePageBlock(p.page, taskOverlays)
+          : sourcePageBlock(p.page, headerOverlays()),
+      ]);
+      continue;
+    }
     const clean = p.text
       .normalize("NFKC")
       .split("\n")
@@ -287,7 +477,7 @@ export function buildWorkbook(
       .join("\n");
     const blocks: WorkbookBlock[] = [
       text(
-        `Event ${snapshot.identity.invoiceNumber} | ${snapshot.identity.eventDate} | ${fieldForm ? "Field-use responses remain blank; owner completes at the appropriate time." : "Checks remain unanswered unless explicitly recorded below."}`,
+        `Event ${snapshot.identity.invoiceNumber} | ${snapshot.identity.eventDate} | Checks remain unanswered unless explicitly recorded below.`,
         true,
       ),
       ...markers(
@@ -295,22 +485,6 @@ export function buildWorkbook(
         true,
       ),
     ];
-    if (
-      id === "field.task" &&
-      open.some(
-        (i) => i.fieldKey === "serviceStyle" || i.key.includes("field.task"),
-      )
-    )
-      blocks.push(
-        text(
-          "NEEDS REVIEW: service applicability must be resolved. The source buffet task list is a reference; no buffet responsibility or servingware choice is selected.",
-        ),
-      );
-    if (id === "field.buffet-drawing")
-      blocks.push({
-        kind: "diagram",
-        text: `REFERENCE ONLY - ${open.some((i) => i.key.includes("buffet") || i.fieldKey === "serviceStyle") ? "applicability pending review" : "see recorded applicability decision"}. Recreated source buffet flow; not an event-approved layout.`,
-      });
     if (id === "final-lock" || id === "quartermaster.1")
       blocks.push(
         text(
@@ -335,19 +509,17 @@ export function buildWorkbook(
         "Initials: ____________________ Date: ____________________",
     };
     if (writingSpace[id]) blocks.push({ kind: "form", text: writingSpace[id] });
-    if (!fieldForm) {
-      const v = currentVerifications.filter((v) =>
-        p.keys.some((k) => v.checkKey.includes(k)),
+    const v = currentVerifications.filter((v) =>
+      p.keys.some((k) => v.checkKey.includes(k)),
+    );
+    if (v.length)
+      blocks.push(
+        text(
+          "Current recorded verifications (printed prompts above stay blank):\n" +
+            v.map(verificationText).join("\n"),
+          true,
+        ),
       );
-      if (v.length)
-        blocks.push(
-          text(
-            "Current recorded verifications (printed prompts above stay blank):\n" +
-              v.map(verificationText).join("\n"),
-            true,
-          ),
-        );
-    }
     add(id, title, blocks);
   }
   const fields = (prefix: string | readonly string[]) =>
@@ -443,28 +615,14 @@ export function buildWorkbook(
     }
     add(id, title, [
       text(
-        "CSV-derived views use the same source items. They do not substitute for missing TPP item-type/category reports. All quantities retain original units; candidates require review.",
+        sort === "category"
+          ? "PACKING COPY - real event rows grouped by warehouse category, for physical checkoff. Quantities keep their original units."
+          : "REFERENCE - real event rows by item type with original quantities, units and dish associations. Does not substitute for a missing TPP item-type report.",
       ),
       ...markers((i) => i.section === "packlist"),
       ...itemBlocks,
     ]);
   }
-  add("timeline", "Timeline / both visits", [
-    ...markers((i) => i.section === "timeline"),
-    ...keys
-      .filter((k) => k.startsWith("timeline."))
-      .sort((a, b) => {
-        const time = (k: string) =>
-          String(
-            snapshot.observations.find(
-              (o) => o.fieldKey === k.replace(/\.notes$/, ".time"),
-            )?.value ?? "",
-          );
-        return time(a).localeCompare(time(b)) || a.localeCompare(b);
-      })
-      .map((k) => text(`${human(k)}: ${field(k)}`, k.startsWith("notes."))),
-    text(`Access: ${field("notes.access")}`),
-  ]);
   for (const [id, title, prefix] of [
     [
       "staffing",

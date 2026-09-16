@@ -1,0 +1,362 @@
+{
+  "source": "EVENT FORMS ONE PRINT - Google Docs.pdf (SHA-256 4466dccd9f604711a6f3e697d523fbc9bb941920af034fe2664ed9a01086fc85)",
+  "pages": [
+    {
+      "page": 1,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [
+        {
+          "y": 560,
+          "yn": {
+            "x": 72,
+            "y": 560
+          },
+          "label": "takerentalswithus"
+        },
+        {
+          "y": 545,
+          "yn": {
+            "x": 72,
+            "y": 544.8
+          },
+          "label": "leaverentalsonsite"
+        },
+        {
+          "y": 499,
+          "yn": {
+            "x": 72,
+            "y": 499.5
+          },
+          "label": "setupguesttableschairs"
+        },
+        {
+          "y": 484,
+          "yn": {
+            "x": 72,
+            "y": 484.3
+          },
+          "label": "settingtableswithflatwarechina"
+        },
+        {
+          "y": 469,
+          "yn": {
+            "x": 72,
+            "y": 469.2
+          },
+          "label": "fillwaterontables"
+        },
+        {
+          "y": 454,
+          "yn": {
+            "x": 72,
+            "y": 454.1
+          },
+          "label": "setupbuffettablesforbuffet"
+        },
+        {
+          "y": 439,
+          "yn": {
+            "x": 72,
+            "y": 439
+          },
+          "label": "setuptablesforappetizers"
+        },
+        {
+          "y": 424,
+          "yn": {
+            "x": 72,
+            "y": 423.8
+          },
+          "label": "setuptableforbeverages"
+        },
+        {
+          "y": 363,
+          "yn": {
+            "x": 72,
+            "y": 363.4
+          },
+          "label": "stationaryapps"
+        },
+        {
+          "y": 348,
+          "yn": {
+            "x": 72,
+            "y": 348.2
+          },
+          "label": "appsontheirowntable"
+        },
+        {
+          "y": 333,
+          "yn": {
+            "x": 72,
+            "y": 333.1
+          },
+          "label": "appsusingmainbuffettable"
+        },
+        {
+          "y": 318,
+          "yn": {
+            "x": 72,
+            "y": 318
+          },
+          "label": "passapps"
+        },
+        {
+          "y": 273,
+          "yn": {
+            "x": 72,
+            "y": 272.6
+          },
+          "label": "setoutbeveragedispensers"
+        },
+        {
+          "y": 257,
+          "yn": {
+            "x": 72,
+            "y": 257.5
+          },
+          "label": "servingbuffet"
+        },
+        {
+          "y": 242,
+          "yn": {
+            "x": 72,
+            "y": 242.4
+          },
+          "label": "selfservebuffet"
+        },
+        {
+          "y": 227,
+          "yn": {
+            "x": 72,
+            "y": 227.2
+          },
+          "label": "busafterdinnerserviceplatessilverwarenapkins"
+        },
+        {
+          "y": 212,
+          "yn": {
+            "x": 72,
+            "y": 212.1
+          },
+          "label": "fullbusclearallglasswareatendofevent"
+        },
+        {
+          "y": 167,
+          "yn": {
+            "x": 72,
+            "y": 166.8
+          },
+          "label": "setupcakedessert"
+        },
+        {
+          "y": 152,
+          "yn": {
+            "x": 72,
+            "y": 151.6
+          },
+          "label": "cutcakeservedessert"
+        },
+        {
+          "y": 137,
+          "yn": {
+            "x": 72,
+            "y": 136.5
+          },
+          "label": "dessertcoffeebar"
+        }
+      ],
+      "choices": [
+        {
+          "label": "Plasticware",
+          "x": 62,
+          "y": 588.6
+        },
+        {
+          "label": "Rented",
+          "x": 139.3,
+          "y": 588.6
+        },
+        {
+          "label": "Client Provided",
+          "x": 193,
+          "y": 588.6
+        }
+      ]
+    },
+    {
+      "page": 2,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 3,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 4,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 5,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 6,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 7,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 8,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 9,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 10,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 11,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    },
+    {
+      "page": 12,
+      "header": {
+        "eventNumber": {
+          "x": 154.6,
+          "y": 745.8
+        },
+        "eventDate": {
+          "x": 366.2,
+          "y": 745.8
+        }
+      },
+      "rows": [],
+      "choices": []
+    }
+  ]
+}

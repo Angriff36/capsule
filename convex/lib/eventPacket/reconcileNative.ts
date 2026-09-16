@@ -173,6 +173,24 @@ export async function readCurrentPacket(
   add("notes.setup", event.operationalRequirements);
   add("notes.access", event.accessibilityNeeds);
   add("notes.service", event.serviceRequirements);
+  // Native service-plan values drive the Event Task Breakdown overlays.
+  for (const column of [
+    "mangiaDisposables",
+    "eventRentals",
+    "placeSettings",
+    "waterOnsite",
+    "tablesideWater",
+    "buffetColdPlates",
+    "buffetHotPlates",
+    "stationaryApps",
+    "cocktailHourFood",
+    "beveragesOnMenu",
+    "barService",
+    "bussing",
+    "dessertService",
+    "scullery",
+  ] as const)
+    add(`ops.${column}`, (event as any)[column]);
   const styles = await ctx.db
     .query("serviceStyles")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
