@@ -10,9 +10,7 @@
       "title": "INFO",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -44,9 +42,7 @@
       "title": "EVENT MENU",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -94,9 +90,7 @@
       "title": "TIMELINE",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -144,9 +138,7 @@
       "title": "NOTES",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -194,9 +186,7 @@
       "title": "PACKLIST",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -284,9 +274,7 @@
       "title": "EQUIP",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -326,9 +314,7 @@
       "title": "BEV",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -352,9 +338,7 @@
       "title": "BAR",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -378,9 +362,7 @@
       "title": "WRAP UP",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-ops_final_lock_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -420,9 +402,7 @@
       "title": "BASIC EVENT INFO",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -494,9 +474,7 @@
       "title": "LOGISTICS & TIMELINE",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -624,9 +602,7 @@
       "title": "STAFFING & VEHICLE ASSIGNMENT",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        2
-      ],
+      "sourcePages": [2],
       "sourceText": [
         {
           "page": 2,
@@ -714,10 +690,7 @@
       "title": "EQUIPMENT",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        2,
-        3
-      ],
+      "sourcePages": [2, 3],
       "sourceText": [
         {
           "page": 2,
@@ -793,9 +766,7 @@
       "title": "RENTALS",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        3
-      ],
+      "sourcePages": [3],
       "sourceText": [
         {
           "page": 3,
@@ -875,9 +846,7 @@
       "title": "PACKLIST & BINDER STATUS",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        3
-      ],
+      "sourcePages": [3],
       "sourceText": [
         {
           "page": 3,
@@ -941,9 +910,7 @@
       "title": "MY BIGGEST CONCERN ON THIS EVENT",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        4
-      ],
+      "sourcePages": [4],
       "sourceText": [
         {
           "page": 4,
@@ -967,9 +934,7 @@
       "title": "ADDITIONAL QUESTIONS FOR THE MEETING",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        4
-      ],
+      "sourcePages": [4],
       "sourceText": [
         {
           "page": 4,
@@ -993,9 +958,7 @@
       "title": "POST MEETING BY NOON THURSDAY",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        4
-      ],
+      "sourcePages": [4],
       "sourceText": [
         {
           "page": 4,
@@ -1035,9 +998,7 @@
       "title": "POST MEETING BY EOD THURSDAY",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        4
-      ],
+      "sourcePages": [4],
       "sourceText": [
         {
           "page": 4,
@@ -1085,10 +1046,7 @@
       "title": "POST MEETING BY FRIDAY",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        4,
-        5
-      ],
+      "sourcePages": [4, 5],
       "sourceText": [
         {
           "page": 4,
@@ -1140,9 +1098,7 @@
       "title": "INITIAL & DATE WHEN COMPLETE",
       "humanOwner": "Operations representative",
       "sourceDocumentId": "liberty-6837-quartermaster_template-01",
-      "sourcePages": [
-        5
-      ],
+      "sourcePages": [5],
       "sourceText": [
         {
           "page": 5,
@@ -1174,9 +1130,7 @@
       "title": "Event Task Breakdown",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        1
-      ],
+      "sourcePages": [1],
       "sourceText": [
         {
           "page": 1,
@@ -1360,9 +1314,7 @@
       "title": "Leaving The Shop Checklist",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        2
-      ],
+      "sourcePages": [2],
       "sourceText": [
         {
           "page": 2,
@@ -1506,9 +1458,7 @@
       "title": "Event Arrival Checklist",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        3
-      ],
+      "sourcePages": [3],
       "sourceText": [
         {
           "page": 3,
@@ -1612,9 +1562,7 @@
       "title": "Event Food MUDA",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        4
-      ],
+      "sourcePages": [4],
       "sourceText": [
         {
           "page": 4,
@@ -1686,9 +1634,7 @@
       "title": "Bin Organization Sheet",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        5
-      ],
+      "sourcePages": [5],
       "sourceText": [
         {
           "page": 5,
@@ -1744,9 +1690,7 @@
       "title": "After Event Form",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        6
-      ],
+      "sourcePages": [6],
       "sourceText": [
         {
           "page": 6,
@@ -1834,9 +1778,7 @@
       "title": "Event Return Checklist",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        7
-      ],
+      "sourcePages": [7],
       "sourceText": [
         {
           "page": 7,
@@ -2036,9 +1978,7 @@
       "title": "Event Packing Checklist",
       "humanOwner": "Warehouse packer",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        8
-      ],
+      "sourcePages": [8],
       "sourceText": [
         {
           "page": 8,
@@ -2214,9 +2154,7 @@
       "title": "Buffet Drawing Templates",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        9
-      ],
+      "sourcePages": [9],
       "sourceText": [
         {
           "page": 9,
@@ -2268,9 +2206,7 @@
       "title": "Leaving The Event Checklist",
       "humanOwner": "Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        10
-      ],
+      "sourcePages": [10],
       "sourceText": [
         {
           "page": 10,
@@ -2398,9 +2334,7 @@
       "title": "Before Takeoff Checklist: Document Control",
       "humanOwner": "Event lead with Warehouse lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        11
-      ],
+      "sourcePages": [11],
       "sourceText": [
         {
           "page": 11,
@@ -2584,9 +2518,7 @@
       "title": "Before Takeoff Checklist: Equipment People Departure",
       "humanOwner": "Warehouse lead and Event lead",
       "sourceDocumentId": "liberty-6837-event_forms_template-01",
-      "sourcePages": [
-        12
-      ],
+      "sourcePages": [12],
       "sourceText": [
         {
           "page": 12,
@@ -2762,10 +2694,7 @@
       "title": "Identity Menu",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        3,
-        4
-      ],
+      "sourcePages": [3, 4],
       "sourceText": [
         {
           "page": 3,
@@ -2792,9 +2721,7 @@
       "title": "Timeline",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        4
-      ],
+      "sourcePages": [4],
       "sourceText": [
         {
           "page": 4,
@@ -2817,9 +2744,7 @@
       "title": "Notes",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        5
-      ],
+      "sourcePages": [5],
       "sourceText": [
         {
           "page": 5,
@@ -2842,11 +2767,7 @@
       "title": "Packlist",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        5,
-        6,
-        7
-      ],
+      "sourcePages": [5, 6, 7],
       "sourceText": [
         {
           "page": 5,
@@ -2877,9 +2798,7 @@
       "title": "Equipment",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        7
-      ],
+      "sourcePages": [7],
       "sourceText": [
         {
           "page": 7,
@@ -2902,9 +2821,7 @@
       "title": "Beverage Bar Wrap",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        8
-      ],
+      "sourcePages": [8],
       "sourceText": [
         {
           "page": 8,
@@ -2927,10 +2844,7 @@
       "title": "Binder",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        8,
-        9
-      ],
+      "sourcePages": [8, 9],
       "sourceText": [
         {
           "page": 8,
@@ -2957,10 +2871,7 @@
       "title": "Field Forms",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        10,
-        11
-      ],
+      "sourcePages": [10, 11],
       "sourceText": [
         {
           "page": 10,
@@ -2987,10 +2898,7 @@
       "title": "Packing Signatures",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        11,
-        12
-      ],
+      "sourcePages": [11, 12],
       "sourceText": [
         {
           "page": 11,
@@ -3017,11 +2925,7 @@
       "title": "Quick Reference",
       "humanOwner": "Operations reviewer",
       "sourceDocumentId": "liberty-6837-training_reference-01",
-      "sourcePages": [
-        14,
-        15,
-        16
-      ],
+      "sourcePages": [14, 15, 16],
       "sourceText": [
         {
           "page": 14,

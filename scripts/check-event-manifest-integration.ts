@@ -34,9 +34,18 @@ function violation(
 }
 
 function referencesEventDocument(source: string): boolean {
-  return new RegExp(
+  const referencesEventTable = new RegExp(
     `(?:v\\.id\\(\\s*["'](?:${EVENT_TABLE_PATTERN})["']|Id<\\s*["'](?:${EVENT_TABLE_PATTERN})["']|ctx\\.db\\.(?:get|query|insert)\\(\\s*["'](?:${EVENT_TABLE_PATTERN})["'])`,
   ).test(source);
+  if (!referencesEventTable) return false;
+
+  const eventDocumentTarget =
+    /^(?:(?:[A-Za-z_$][\w$]*\.)?(?:event|eventGuest|guest|venue|client)Id|(?:event|eventGuest|guest|venue|client)\._id)$/i;
+  return [
+    ...source.matchAll(
+      /ctx\.db\.(?:patch|replace|delete)\s*\(\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)?)/g,
+    ),
+  ].some(([, target]) => target != null && eventDocumentTarget.test(target));
 }
 
 function inspectFeatureSource(

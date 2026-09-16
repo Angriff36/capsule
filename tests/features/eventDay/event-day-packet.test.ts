@@ -88,7 +88,7 @@ describe("Event Day packet readiness", () => {
         startsAt: null,
         endsAt: null,
         role: "server",
-        quantity: 1,
+        description: null,
       },
     ] as EventDayInputs["staffNeeds"];
     expect(deriveEventDay(input).ringLabel).toBe("Needs review");

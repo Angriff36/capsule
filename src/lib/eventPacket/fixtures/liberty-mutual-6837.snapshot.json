@@ -12,9 +12,7 @@
       "mimeType": "application/json",
       "kind": "beo",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "Banquet Event Order"
-      ],
+      "recognitionEvidence": ["Banquet Event Order"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -23,10 +21,7 @@
       "mimeType": "application/json",
       "kind": "worksheet",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "Event Worksheet",
-        "Invoice #"
-      ],
+      "recognitionEvidence": ["Event Worksheet", "Invoice #"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -35,10 +30,7 @@
       "mimeType": "application/json",
       "kind": "menu_production",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "Production Notes",
-        "Quantity/Unit"
-      ],
+      "recognitionEvidence": ["Production Notes", "Quantity/Unit"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -47,10 +39,7 @@
       "mimeType": "application/json",
       "kind": "packlist_csv",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "Pack List",
-        "Grouped by: Classification"
-      ],
+      "recognitionEvidence": ["Pack List", "Grouped by: Classification"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -59,11 +48,7 @@
       "mimeType": "application/json",
       "kind": "event_tracker",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "EVENT #",
-        "WAREHOUSE",
-        "SERVICE STYLE"
-      ],
+      "recognitionEvidence": ["EVENT #", "WAREHOUSE", "SERVICE STYLE"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -72,10 +57,7 @@
       "mimeType": "application/json",
       "kind": "event_menu",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "Event Menu",
-        "Prepared for"
-      ],
+      "recognitionEvidence": ["Event Menu", "Prepared for"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -96,9 +78,7 @@
       "mimeType": "application/json",
       "kind": "training",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "Ops Final Lock — Training Resource"
-      ],
+      "recognitionEvidence": ["Ops Final Lock — Training Resource"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -107,10 +87,7 @@
       "mimeType": "application/json",
       "kind": "ops_final_lock",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "VERIFY SERVICE STYLE",
-        "WRAP UP"
-      ],
+      "recognitionEvidence": ["VERIFY SERVICE STYLE", "WRAP UP"],
       "importedAt": "2026-09-15T00:00:00Z"
     },
     {
@@ -119,10 +96,7 @@
       "mimeType": "application/json",
       "kind": "quartermaster",
       "parserVersion": "event-packet/1",
-      "recognitionEvidence": [
-        "Quartermaster",
-        "Pre-Production"
-      ],
+      "recognitionEvidence": ["Quartermaster", "Pre-Production"],
       "importedAt": "2026-09-15T00:00:00Z"
     }
   ],
