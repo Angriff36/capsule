@@ -9,7 +9,7 @@ import {
   type EvidenceReference,
 } from "./model";
 import { reconcile } from "./reconcile";
-import { requirements } from "./requirements";
+import { canMarkNotApplicable, requirements } from "./requirements";
 export interface ResolveDecision {
   issueId: string;
   choice: FieldValue;
@@ -48,7 +48,10 @@ export async function resolveIssue(
       !["yes", "no", "not_applicable"].includes(decision.answer)
     )
       throw new Error("Explicit verification answer is required");
-    if (decision.answer === "not_applicable" && !requirement.allowNotApplicable)
+    if (
+      decision.answer === "not_applicable" &&
+      !canMarkNotApplicable(requirement, packet)
+    )
       throw new Error("This required check cannot be not applicable");
     checks = [
       ...checks.filter((c) => c.checkKey !== issue.key),

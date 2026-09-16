@@ -1,7 +1,6 @@
 // Private evidence and audit records, not another Event aggregate.
 // The authored eventPacket transaction seam checks manager capability, tenant,
 // byte ownership and native-domain commands before writing these records.
-use "./event.manifest"
 
 entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
   key [tenantId, id]

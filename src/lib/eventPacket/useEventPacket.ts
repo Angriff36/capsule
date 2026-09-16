@@ -11,6 +11,7 @@ export interface PacketView {
 }
 export interface PacketDecision {
   issueId: string;
+  evidenceFingerprint: string;
   choice: FieldValue;
   reason: string;
   observationId?: string;
@@ -20,12 +21,18 @@ export interface PacketDecision {
   kind?: "fact_choice" | "fact_entry" | "verification";
 }
 
+/** Server-resolved capability for the event workbook panel. */
+export function useEventPacketAccess(eventId: Id<"events">) {
+  return useQuery(api.lib.eventPacket.commands.canManagePacket, { eventId });
+}
+
 export function useEventPacket(eventId: Id<"events">) {
   const commands = api.lib.eventPacket.commands;
   const client = useConvex();
   const view = useQuery(commands.getPacket, { eventId }) as
     PacketView | undefined;
-  const uploadFile = useAction(commands.uploadPacketFile);
+  const generateUploadUrl = useMutation(commands.generatePacketUploadUrl);
+  const registerUpload = useAction(commands.registerPacketUpload);
   const importEvidence = useMutation(commands.importEvidence);
   const resolve = useMutation(commands.resolveOperationalIssue);
   const record = useMutation(commands.recordPacketRevision);
@@ -35,8 +42,27 @@ export function useEventPacket(eventId: Id<"events">) {
     name: string;
     purpose: "source" | "pdf" | "snapshot";
     inputFingerprint?: string;
-  }) =>
-    uploadFile({ eventId, ...file, bytes: new Uint8Array(file.bytes).buffer });
+  }) => {
+    const uploadUrl = await generateUploadUrl({ eventId });
+    const response = await fetch(uploadUrl, {
+      method: "POST",
+      headers: { "Content-Type": file.mimeType },
+      body: new Uint8Array(file.bytes).buffer,
+    });
+    if (!response.ok)
+      throw new Error(`Packet upload failed (${response.status})`);
+    const result = (await response.json()) as { storageId?: string };
+    if (!result.storageId)
+      throw new Error("Packet upload returned no storage id");
+    return registerUpload({
+      eventId,
+      storageId: result.storageId as Id<"_storage">,
+      name: file.name,
+      mimeType: file.mimeType,
+      purpose: file.purpose,
+      inputFingerprint: file.inputFingerprint,
+    });
+  };
   return {
     view,
     upload,

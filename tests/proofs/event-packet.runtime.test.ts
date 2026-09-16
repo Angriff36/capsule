@@ -158,6 +158,7 @@ describe("event packet native commands", () => {
       artifacts: [{ fingerprint, storageId: file.storageId }],
       timeZone: "America/Los_Angeles",
     });
+    const current = await manager.query(api.getPacket, { eventId });
     const target = await t.run((ctx) =>
       ctx.db.insert("serviceStyles", {
         tenantId: "tenant-a",
@@ -172,6 +173,9 @@ describe("event packet native commands", () => {
     await manager.mutation(api.resolveOperationalIssue, {
       eventId,
       issueId: "fact.serviceStyle",
+      evidenceFingerprint: current.snapshot.issues.find(
+        (i: any) => i.id === "fact.serviceStyle",
+      ).evidenceFingerprint,
       choice: "Drop Off",
       reason: "Confirmed with operations",
       observationId: "service-source",

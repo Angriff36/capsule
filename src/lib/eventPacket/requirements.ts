@@ -1,5 +1,5 @@
 import forms from "./fixtures/event-workbook.form-definitions.json";
-import type { Section } from "./model";
+import type { EventPacketSnapshot, Section } from "./model";
 export interface Requirement {
   key: string;
   fieldKey: string;
@@ -82,7 +82,7 @@ const custom: [string, string, string, boolean][] = [
     "assignment.vehicle",
     "vehicle",
     "Verify vehicle assignment and record the vehicle in the decision reason",
-    false,
+    true,
   ],
   [
     "assignment.trailer",
@@ -207,4 +207,20 @@ export const requirements: Requirement[] = [
     allowNotApplicable,
   })),
 ];
+
+/**
+ * A vehicle check may be marked not applicable only while the event has no
+ * active delivery record. Once a delivery exists, the check protects a real
+ * dispatch decision and must be answered explicitly.
+ */
+export function canMarkNotApplicable(
+  requirement: Requirement,
+  snapshot: Pick<EventPacketSnapshot, "facts">,
+): boolean {
+  if (!requirement.allowNotApplicable) return false;
+  if (requirement.key !== "check.assignment.vehicle") return true;
+  return !snapshot.facts.some((fact) =>
+    fact.fieldKey.startsWith("vehicle.native-"),
+  );
+}
 export { forms as formDefinitions };

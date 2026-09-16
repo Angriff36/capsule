@@ -8,6 +8,7 @@ import {
   type Section,
 } from "./model";
 import {
+  canMarkNotApplicable,
   requiredFacts,
   requirements,
   sectionFor,
@@ -141,7 +142,8 @@ export function readiness(
                     c.actor === d.actor &&
                     c.at === d.at &&
                     (c.answer === "yes" ||
-                      (c.answer === "not_applicable" && r.allowNotApplicable)),
+                      (c.answer === "not_applicable" &&
+                        canMarkNotApplicable(r, snapshot))),
                 ),
             ),
         ),
@@ -353,7 +355,8 @@ export async function reconcile(
       resolution.actor === check.actor &&
       resolution.at === check.at &&
       (check.answer === "yes" ||
-        (check.answer === "not_applicable" && r.allowNotApplicable));
+        (check.answer === "not_applicable" &&
+          canMarkNotApplicable(r, snapshot)));
     const relevant = checkObservations(r.key, r.section, snapshot.observations);
     const context = [
       "check.timeline.load-travel",

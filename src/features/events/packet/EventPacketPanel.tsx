@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Id } from "../../../lib/api";
 import {
   useEventPacket,
+  useEventPacketAccess,
   type PacketDecision,
 } from "../../../lib/eventPacket/useEventPacket";
 import { importSources } from "../../../lib/eventPacket/importSources";
@@ -13,44 +14,40 @@ import type {
   EventPacketSnapshot,
   PacketIssue,
 } from "../../../lib/eventPacket/model";
-import { requirements } from "../../../lib/eventPacket/requirements";
+import {
+  canMarkNotApplicable,
+  requirements,
+} from "../../../lib/eventPacket/requirements";
 import { readiness, fieldLabel } from "../../../lib/eventPacket/reconcile";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
-import { useAuthStatus } from "../../../lib/useAuthStatus";
 
 function valueText(value: unknown) {
   return Array.isArray(value)
     ? value.join(", ")
     : String(value ?? "Not recorded");
 }
-function openLink(url: string | null | undefined) {
-  if (url) window.open(url, "_blank", "noopener,noreferrer");
-  else
+function openBlank() {
+  const target = window.open("about:blank", "_blank");
+  if (target) target.opener = null;
+  return target;
+}
+function openLink(
+  url: string | null | undefined,
+  target: Window | null = null,
+) {
+  if (url) {
+    if (target) target.location.href = url;
+    else window.location.assign(url);
+  } else
     throw new Error(
       "This source file is not attached. Import its original file to inspect it.",
     );
 }
 
 export function EventPacketPanel({ eventId }: { eventId: Id<"events"> }) {
-  const auth = useAuthStatus();
-  if (
-    !auth ||
-    ![
-      "owner",
-      "admin",
-      "event_manager",
-      "manager",
-      "kitchen_manager",
-      "logistics_manager",
-      "inventory_manager",
-      "sales_manager",
-      "finance_manager",
-      "workforce_manager",
-      "system",
-    ].includes(auth.role)
-  )
-    return null;
+  const canManage = useEventPacketAccess(eventId);
+  if (canManage !== true) return null;
   return <ManagerPacketPanel eventId={eventId} />;
 }
 function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
@@ -178,16 +175,23 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
     await packet.importEvidence(imported, attached, timeZone);
     setFiles([]);
   };
-  const prepare = () =>
-    run(async () => {
-      await uploadAndImport();
-      const result = await packet.prepare();
-      const urls = await packet.revisionUrl(result.revisionId);
-      openLink(urls.pdfUrl);
-      setNotice(
-        `${result.reused ? "Current workbook opened" : "Workbook prepared"}. Open questions remain visible on the cover and affected pages. The matching snapshot is available below.`,
-      );
+  const prepare = () => {
+    const target = openBlank();
+    void run(async () => {
+      try {
+        await uploadAndImport();
+        const result = await packet.prepare();
+        const urls = await packet.revisionUrl(result.revisionId);
+        openLink(urls.pdfUrl, target);
+        setNotice(
+          `${result.reused ? "Current workbook opened" : "Workbook prepared"}. Open questions remain visible on the cover and affected pages. The matching snapshot is available below.`,
+        );
+      } catch (error) {
+        target?.close();
+        throw error;
+      }
     });
+  };
   return (
     <section
       className="border-t border-line pt-5"
@@ -196,11 +200,14 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-ink">Event workbook</h3>
-          <p className="mt-1 text-sm text-ink-2">
-            <strong>{readiness(snapshot) ? "READY" : "NEEDS ATTENTION"}</strong>{" "}
-            · {open.length} open items
-          </p>
+          <h3 className="section-rule">
+            <span>Event workbook</span>
+            <i aria-hidden="true" />
+            <em>
+              {readiness(snapshot) ? "READY" : "NEEDS ATTENTION"} ·{" "}
+              {open.length} open items
+            </em>
+          </h3>
         </div>
         <button className="btn btn-primary" disabled={busy} onClick={prepare}>
           {busy ? "Preparing…" : "Prepare workbook"}
@@ -275,29 +282,40 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
               ))}
             </select>
           </label>
-          <ul className="mt-3 divide-y divide-line">
-            {open
-              .filter((i) => section === "all" || i.section === section)
-              .map((issue) => (
-                <IssueRow
-                  key={`${issue.id}:${issue.evidenceFingerprint}`}
-                  issue={issue}
-                  snapshot={snapshot}
-                  targets={view.nativeTargets?.[issue.fieldKey] ?? []}
-                  busy={busy}
-                  onSave={(decision) =>
-                    run(async () => {
-                      await packet.resolve(decision);
-                    })
-                  }
-                  onSource={(fingerprint) =>
-                    run(async () =>
-                      openLink(await packet.sourceUrl(fingerprint)),
-                    )
-                  }
-                />
-              ))}
-          </ul>
+          <div className="attention-band mt-4">
+            <p className="px-4 pt-4 text-sm font-semibold text-ink">
+              Open decisions
+            </p>
+            <ul className="divide-y divide-line px-4 pb-4">
+              {open
+                .filter((i) => section === "all" || i.section === section)
+                .map((issue) => (
+                  <IssueRow
+                    key={`${issue.id}:${issue.evidenceFingerprint}`}
+                    issue={issue}
+                    snapshot={snapshot}
+                    targets={view.nativeTargets?.[issue.fieldKey] ?? []}
+                    busy={busy}
+                    onSave={(decision) =>
+                      run(async () => {
+                        await packet.resolve(decision);
+                      })
+                    }
+                    onSource={(fingerprint) => {
+                      const target = openBlank();
+                      return run(async () => {
+                        try {
+                          openLink(await packet.sourceUrl(fingerprint), target);
+                        } catch (error) {
+                          target?.close();
+                          throw error;
+                        }
+                      });
+                    }}
+                  />
+                ))}
+            </ul>
+          </div>
           <details className="mt-4">
             <summary>Source evidence ({snapshot.artifacts.length})</summary>
             <ul>
@@ -305,11 +323,20 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
                 <li key={artifact.fingerprint} className="py-2 text-sm">
                   <button
                     className="btn-link"
-                    onClick={() =>
-                      void run(async () =>
-                        openLink(await packet.sourceUrl(artifact.fingerprint)),
-                      )
-                    }
+                    onClick={() => {
+                      const target = openBlank();
+                      void run(async () => {
+                        try {
+                          openLink(
+                            await packet.sourceUrl(artifact.fingerprint),
+                            target,
+                          );
+                        } catch (error) {
+                          target?.close();
+                          throw error;
+                        }
+                      });
+                    }}
                   >
                     {artifact.name}
                   </button>{" "}
@@ -328,7 +355,8 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
                 >
                   <span>
                     {new Date(revision.createdAt).toLocaleString()} ·{" "}
-                    {revision.supersededBy ||
+                    {(revision.supersededBy &&
+                      view.latestRevision?.id !== revision.id) ||
                     (view.latestRevision?.id === revision.id &&
                       view.latestRevision.stale)
                       ? "Superseded / out of date"
@@ -336,25 +364,39 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
                   </span>
                   <button
                     className="btn-link"
-                    onClick={() =>
-                      void run(async () =>
-                        openLink(
-                          (await packet.revisionUrl(revision.id)).pdfUrl,
-                        ),
-                      )
-                    }
+                    onClick={() => {
+                      const target = openBlank();
+                      void run(async () => {
+                        try {
+                          openLink(
+                            (await packet.revisionUrl(revision.id)).pdfUrl,
+                            target,
+                          );
+                        } catch (error) {
+                          target?.close();
+                          throw error;
+                        }
+                      });
+                    }}
                   >
                     PDF
                   </button>
                   <button
                     className="btn-link"
-                    onClick={() =>
-                      void run(async () =>
-                        openLink(
-                          (await packet.revisionUrl(revision.id)).snapshotUrl,
-                        ),
-                      )
-                    }
+                    onClick={() => {
+                      const target = openBlank();
+                      void run(async () => {
+                        try {
+                          openLink(
+                            (await packet.revisionUrl(revision.id)).snapshotUrl,
+                            target,
+                          );
+                        } catch (error) {
+                          target?.close();
+                          throw error;
+                        }
+                      });
+                    }}
                   >
                     Snapshot
                   </button>
@@ -445,6 +487,7 @@ function IssueRow({
             if (value === undefined) return;
             void onSave({
               issueId: issue.id,
+              evidenceFingerprint: issue.evidenceFingerprint,
               choice: value,
               reason,
               ...(answer
@@ -473,11 +516,12 @@ function IssueRow({
                 <>
                   <option value="yes">Yes — verified</option>
                   <option value="no">No — still open</option>
-                  {requirement.allowNotApplicable && (
-                    <option value="not_applicable">
-                      Not applicable — explain why
-                    </option>
-                  )}
+                  {requirement &&
+                    canMarkNotApplicable(requirement, snapshot) && (
+                      <option value="not_applicable">
+                        Not applicable — explain why
+                      </option>
+                    )}
                 </>
               ) : (
                 <>

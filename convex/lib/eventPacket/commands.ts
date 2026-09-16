@@ -7,6 +7,7 @@ import {
   query,
   type MutationCtx,
   type QueryCtx,
+  type ActionCtx,
 } from "../../_generated/server";
 import type { Id } from "../../_generated/dataModel";
 import { getAuthContext, requireTenant } from "../authContext";
@@ -39,27 +40,53 @@ const roles = new Set([
   "sales_manager",
   "workforce_manager",
 ]);
+const nativeEditableField = (fieldKey: string) =>
+  [
+    "serviceStyle",
+    "guestCount",
+    "venue.name",
+    "venue.address",
+    "contact.name",
+    "contact.phone",
+    "contact.email",
+    "notes.setup",
+    "notes.access",
+    "notes.service",
+  ].includes(fieldKey) || /^menu\..*\.quantity$/.test(fieldKey);
+const hasManagementAccess = (auth: { role: string; disabledCapabilities: string[] }) =>
+  roles.has(auth.role) &&
+  !orgCapabilityDeniesAction("manageAccess", auth.disabledCapabilities);
 async function authorize(ctx: any, eventId: Id<"events">) {
   const auth = await getAuthContext(ctx);
   const tenantId = requireTenant(auth);
-  if (
-    !roles.has(auth.role) ||
-    orgCapabilityDeniesAction("manageAccess", auth.disabledCapabilities)
-  )
-    throw new Error("Management access required");
+  if (!hasManagementAccess(auth)) throw new Error("Management access required");
   if (ctx.db) await scopedEvent(ctx, tenantId, eventId);
   return { ...auth, tenantId };
 }
 const value = v.union(v.string(), v.number(), v.boolean(), v.array(v.string()));
 const clean = <T>(obj: T): T => JSON.parse(JSON.stringify(obj));
+export const canManagePacket = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, { eventId }) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !hasManagementAccess(auth)) return false;
+    await scopedEvent(ctx, auth.tenantId, eventId);
+    return true;
+  },
+});
 export const getPacket = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, { eventId }) => {
     const auth = await authorize(ctx, eventId);
     const current = await readCurrentPacket(ctx, auth.tenantId, eventId);
-    const latest = current.revisionRows.sort(
-      (a, b) => b.createdAt - a.createdAt,
-    )[0];
+    const latest = current.revisionRows
+      .slice()
+      .sort(
+        (a, b) =>
+          Number(b.snapshotFingerprint === current.currentFingerprint) -
+            Number(a.snapshotFingerprint === current.currentFingerprint) ||
+          b.createdAt - a.createdAt,
+      )[0];
     return clean({
       snapshot: current.snapshot,
       currentFingerprint: current.currentFingerprint,
@@ -119,6 +146,87 @@ export const registerFile = internalMutation({
     return { storageId: args.storageId, fingerprint: args.fingerprint };
   },
 });
+
+/** Short-lived upload URL; the browser sends source bytes directly to storage. */
+export const generatePacketUploadUrl = mutation({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, { eventId }) => {
+    await authorize(ctx, eventId);
+    return ctx.storage.generateUploadUrl();
+  },
+});
+
+async function registerPacketBytes(
+  ctx: any,
+  args: {
+    eventId: Id<"events">;
+    storageId: Id<"_storage">;
+    name: string;
+    mimeType: string;
+    purpose: "source" | "pdf" | "snapshot";
+    inputFingerprint?: string;
+  },
+  bytes: Uint8Array,
+): Promise<{ storageId: string; fingerprint: string }> {
+  const fingerprint = await fingerprintBytes(bytes);
+  let snapshotFingerprint: string | undefined =
+    args.purpose === "pdf" ? args.inputFingerprint : undefined;
+  if (args.purpose === "pdf" && !snapshotFingerprint)
+    throw new Error(
+      "PDF upload requires the fingerprint of the rendered snapshot",
+    );
+  if (args.purpose === "snapshot")
+    snapshotFingerprint = await fingerprintSnapshot(
+      parsePacketSnapshot(new TextDecoder().decode(bytes)),
+    );
+  if (
+    args.purpose === "pdf" &&
+    new TextDecoder().decode(bytes.slice(0, 5)) !== "%PDF-"
+  )
+    throw new Error("Expected a PDF file");
+  return ctx.runMutation(internal.lib.eventPacket.commands.registerFile, {
+    eventId: args.eventId,
+    fingerprint,
+    storageId: args.storageId,
+    name: args.name,
+    mimeType: args.mimeType,
+    byteSize: bytes.byteLength,
+    purpose: args.purpose,
+    ...(snapshotFingerprint ? { snapshotFingerprint } : {}),
+  });
+}
+
+/** Register a browser-uploaded blob after validating its exact bytes. */
+export const registerPacketUpload = action({
+  args: {
+    eventId: v.id("events"),
+    storageId: v.id("_storage"),
+    name: v.string(),
+    mimeType: v.string(),
+    purpose: v.union(
+      v.literal("source"),
+      v.literal("pdf"),
+      v.literal("snapshot"),
+    ),
+    inputFingerprint: v.optional(v.string()),
+  },
+  handler: async (
+    ctx: ActionCtx,
+    args,
+  ): Promise<{ storageId: string; fingerprint: string }> => {
+    await authorize(ctx, args.eventId);
+    const blob = await ctx.storage.get(args.storageId);
+    if (!blob) throw new Error("Uploaded packet file was not found");
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    try {
+      return await registerPacketBytes(ctx, args, bytes);
+    } catch (error) {
+      await ctx.storage.delete(args.storageId);
+      throw error;
+    }
+  },
+});
+
 export const uploadPacketFile = action({
   args: {
     eventId: v.id("events"),
@@ -140,40 +248,18 @@ export const uploadPacketFile = action({
     await ctx.runQuery(api.lib.eventPacket.commands.getPacket, {
       eventId: args.eventId,
     });
-    if (args.bytes.byteLength > 1_000_000)
-      throw new Error(
-        "This file exceeds the supported Convex request size; split the source file before uploading",
-      );
     const bytes = new Uint8Array(args.bytes);
-    const fingerprint = await fingerprintBytes(bytes);
-    let snapshotFingerprint: string | undefined =
-      args.purpose === "pdf" ? args.inputFingerprint : undefined;
-    if (args.purpose === "pdf" && !snapshotFingerprint)
-      throw new Error(
-        "PDF upload requires the fingerprint of the rendered snapshot",
-      );
-    if (args.purpose === "snapshot")
-      snapshotFingerprint = await fingerprintSnapshot(
-        parsePacketSnapshot(new TextDecoder().decode(bytes)),
-      );
-    if (
-      args.purpose === "pdf" &&
-      new TextDecoder().decode(bytes.slice(0, 5)) !== "%PDF-"
-    )
-      throw new Error("Expected a PDF file");
     const storageId = await ctx.storage.store(
       new Blob([bytes], { type: args.mimeType }),
     );
-    return ctx.runMutation(internal.lib.eventPacket.commands.registerFile, {
+    return registerPacketBytes(ctx, {
       eventId: args.eventId,
-      fingerprint,
       storageId,
       name: args.name,
       mimeType: args.mimeType,
-      byteSize: bytes.byteLength,
       purpose: args.purpose,
-      ...(snapshotFingerprint ? { snapshotFingerprint } : {}),
-    });
+      inputFingerprint: args.inputFingerprint,
+    }, bytes);
   },
 });
 export const importEvidence = mutation({
@@ -289,6 +375,7 @@ export const resolveOperationalIssue = mutation({
   args: {
     eventId: v.id("events"),
     issueId: v.string(),
+    evidenceFingerprint: v.string(),
     choice: value,
     reason: v.string(),
     observationId: v.optional(v.string()),
@@ -311,6 +398,10 @@ export const resolveOperationalIssue = mutation({
     let current = await readCurrentPacket(ctx, auth.tenantId, args.eventId);
     const issue = current.snapshot.issues.find((i) => i.id === args.issueId);
     if (!issue) throw new Error("Issue not found");
+    if (issue.evidenceFingerprint !== args.evidenceFingerprint)
+      throw new Error(
+        "This decision was reviewed against older evidence; refresh the event workbook and review the current issue",
+      );
     const fact = current.snapshot.facts.find(
       (f) => f.fieldKey === issue.fieldKey,
     );
@@ -326,6 +417,7 @@ export const resolveOperationalIssue = mutation({
       throw new Error("Choice does not match the selected source");
     if (
       !issue.key.startsWith("check.") &&
+      nativeEditableField(issue.fieldKey) &&
       (fact?.authority !== "native_finalized" ||
         canonicalJson(fact.value) !== canonicalJson(args.choice) ||
         (fact.unit !== args.unit && args.unit !== undefined))
@@ -449,9 +541,10 @@ export const resolveOperationalIssue = mutation({
         reason: args.reason,
         actor: auth.id,
         at,
+        observationId: args.observationId,
         answer: args.answer,
         unit: args.unit,
-        kind: args.answer ? "verification" : "fact_choice",
+        kind: args.kind ?? (args.answer ? "verification" : "fact_choice"),
       },
       current.snapshot.facts.filter((f) => f.authority === "native_finalized"),
     );
@@ -495,12 +588,25 @@ export const recordPacketRevision = mutation({
     const existing = current.revisionRows.find(
       (r) => r.snapshotFingerprint === args.inputFingerprint,
     );
-    if (existing)
+    if (existing) {
+      for (const row of current.revisionRows) {
+        if (row._id === existing._id && row.supersededBy)
+          await ctx.db.patch(row._id, {
+            supersededBy: undefined,
+            updatedAt: Date.now(),
+          });
+        else if (row._id !== existing._id && row.supersededBy !== existing._id)
+          await ctx.db.patch(row._id, {
+            supersededBy: existing._id,
+            updatedAt: Date.now(),
+          });
+      }
       return {
         id: existing._id,
         fingerprint: existing.snapshotFingerprint,
         reused: true,
       };
+    }
     const pdf = current.files.find(
       (f) => f.storageId === args.pdfStorageId && f.purpose === "pdf",
     );

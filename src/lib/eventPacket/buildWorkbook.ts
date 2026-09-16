@@ -5,7 +5,7 @@ import type {
   PacketIssue,
 } from "./model";
 import { readiness } from "./reconcile";
-import { requirements } from "./requirements";
+import { canMarkNotApplicable, requirements } from "./requirements";
 import forms from "./fixtures/event-workbook.form-definitions.json";
 export interface WorkbookBlock {
   kind: "text" | "heading" | "issue" | "form" | "diagram";
@@ -213,7 +213,8 @@ export function buildWorkbook(
         !requirement ||
         !(
           check.answer === "yes" ||
-          (check.answer === "not_applicable" && requirement.allowNotApplicable)
+          (check.answer === "not_applicable" &&
+            canMarkNotApplicable(requirement, snapshot))
         )
       )
         return false;

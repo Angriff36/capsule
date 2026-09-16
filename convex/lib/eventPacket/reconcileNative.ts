@@ -231,6 +231,7 @@ export async function readCurrentPacket(
     ["packLists", "packlist"],
   ] as const) {
     for (const row of await eventRows(ctx, table, tenantId, eventId)) {
+      if (table === "deliveries" && row.status === "cancelled") continue;
       const {
         tenantId: _tenant,
         _creationTime,
