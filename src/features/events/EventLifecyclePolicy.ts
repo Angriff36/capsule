@@ -119,13 +119,23 @@ const HEADCOUNT_REVISION_STAGES = new Set<string>([
 
 /** UI offer set derived from generated, proven Event stage transitions. */
 export class EventLifecyclePolicy {
-  availableActions(stage: string): EventLifecycleAction[] {
+  availableActions(
+    stage: string,
+    planning?: { plannedAt?: number | null },
+  ): EventLifecycleAction[] {
     return ACTIONS.filter((action) =>
       action.lifecycle.some(
         (transition) =>
           transition.property === "stage" && transition.from === stage,
       ),
-    ).map(({ lifecycle: _lifecycle, ...action }) => action);
+    )
+      .filter(
+        (action) =>
+          action.key !== "submitForApproval" ||
+          planning === undefined ||
+          planning.plannedAt != null,
+      )
+      .map(({ lifecycle: _lifecycle, ...action }) => action);
   }
 
   isEditableStage(stage: string): boolean {

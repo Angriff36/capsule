@@ -11752,7 +11752,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -11779,7 +11779,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
       approvedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, expectedHeadcount: __after.expectedHeadcount, startsAt: __after.startsAt, endsAt: __after.endsAt, quotedPrice: __after.quotedPrice, assignedToId: __after.assignedToId, _subject: { entity: "Event", command: "approve", id: docId } };
@@ -11900,7 +11900,7 @@ async function __runEventAssignOwner(ctx: MutationCtx, { docId, assignedToId, ve
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -11913,7 +11913,7 @@ async function __runEventAssignOwner(ctx: MutationCtx, { docId, assignedToId, ve
       assignedToId: assignedToId,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, assignedToId: assignedToId, startsAt: __after.startsAt, endsAt: __after.endsAt, _subject: { entity: "Event", command: "assignOwner", id: docId } };
@@ -11950,7 +11950,7 @@ async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: an
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     (doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
     (doc as any).prepTasks = (doc as any).prepTasks.filter((row: any) => row.tenantId === __auth.tenantId);
     (doc as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
@@ -11984,7 +11984,7 @@ async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: an
       executionStartedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "beginExecution", id: docId } };
@@ -12020,7 +12020,7 @@ async function __runEventCancel(ctx: MutationCtx, { docId, reason, version }: an
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12049,7 +12049,7 @@ async function __runEventCancel(ctx: MutationCtx, { docId, reason, version }: an
       cancelledAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, reason: reason, _subject: { entity: "Event", command: "cancel", id: docId } };
@@ -12102,7 +12102,7 @@ async function __runEventCaptureDraft(ctx: MutationCtx, { docId, title, clientId
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12147,7 +12147,7 @@ async function __runEventCaptureDraft(ctx: MutationCtx, { docId, title, clientId
       draftCapturedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "captureDraft", id: docId } };
@@ -12207,7 +12207,7 @@ async function __runEventChangeHeadcount(ctx: MutationCtx, { docId, newHeadcount
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12222,7 +12222,7 @@ async function __runEventChangeHeadcount(ctx: MutationCtx, { docId, newHeadcount
       expectedHeadcount: newHeadcount,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, previousHeadcount: previousHeadcount, newHeadcount: newHeadcount, _subject: { entity: "Event", command: "changeHeadcount", id: docId } };
@@ -12265,7 +12265,7 @@ async function __runEventChangePricing(ctx: MutationCtx, { docId, budgetAmount, 
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12281,7 +12281,7 @@ async function __runEventChangePricing(ctx: MutationCtx, { docId, budgetAmount, 
       quotedPrice: quotedPrice,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, budgetAmount: budgetAmount, quotedPrice: quotedPrice, _subject: { entity: "Event", command: "changePricing", id: docId } };
@@ -12319,7 +12319,7 @@ async function __runEventChangePrimaryContact(ctx: MutationCtx, { docId, primary
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12335,7 +12335,7 @@ async function __runEventChangePrimaryContact(ctx: MutationCtx, { docId, primary
       primaryContactPhone: primaryContactPhone,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "changePrimaryContact", id: docId } };
@@ -12374,7 +12374,7 @@ async function __runEventChangeRequirements(ctx: MutationCtx, { docId, accessibi
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12389,7 +12389,7 @@ async function __runEventChangeRequirements(ctx: MutationCtx, { docId, accessibi
       operationalRequirements: operationalRequirements,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, accessibilityNeeds: ((accessibilityNeeds != null) ? accessibilityNeeds : []), serviceRequirements: serviceRequirements, operationalRequirements: operationalRequirements, _subject: { entity: "Event", command: "changeRequirements", id: docId } };
@@ -12428,18 +12428,7 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const __targetServiceStyle = await ctx.db
-      .query("serviceStyles")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", __auth.tenantId))
-      .filter((q: any) => q.eq(q.field("_id"), serviceStyleId))
-      .first();
-    if (!__targetServiceStyle ||
-        __targetServiceStyle.tenantId !== __auth.tenantId ||
-        __targetServiceStyle.status !== "active" ||
-        __targetServiceStyle.deletedAt != null) {
-      throw new Error("Events must reference an active service style");
-    }
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12453,7 +12442,7 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
       serviceStyleId: serviceStyleId,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, serviceStyleId: serviceStyleId, _subject: { entity: "Event", command: "changeServiceStyle", id: docId } };
@@ -12490,7 +12479,7 @@ async function __runEventChangeVenue(ctx: MutationCtx, { docId, venueId, venueNa
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12507,7 +12496,7 @@ async function __runEventChangeVenue(ctx: MutationCtx, { docId, venueId, venueNa
       venueCapacity: venueCapacity,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, venueId: venueId, venueName: venueName, venueAddress: venueAddress, venueCapacity: venueCapacity, _subject: { entity: "Event", command: "changeVenue", id: docId } };
@@ -12547,7 +12536,7 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12574,7 +12563,7 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
       closedOutAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, expectedHeadcount: __after.expectedHeadcount, quotedPrice: __after.quotedPrice, budgetAmount: __after.budgetAmount, _subject: { entity: "Event", command: "closeOut", id: docId } };
@@ -12644,7 +12633,7 @@ async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __c
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12671,7 +12660,7 @@ async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __c
       completedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "complete", id: docId } };
@@ -12723,7 +12712,7 @@ async function __runEventConfigureRecurrence(ctx: MutationCtx, { docId, frequenc
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12754,7 +12743,7 @@ async function __runEventConfigureRecurrence(ctx: MutationCtx, { docId, frequenc
       recurrenceCompletedAt: null,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, frequency: frequency, endCondition: endCondition, recurrenceEndsAt: recurrenceEndsAt, occurrenceLimit: occurrenceLimit, nextStartsAt: nextStartsAt, _subject: { entity: "Event", command: "configureRecurrence", id: docId } };
@@ -12796,7 +12785,7 @@ async function __runEventConfigureTiming(ctx: MutationCtx, { docId, serviceStart
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12823,7 +12812,7 @@ async function __runEventConfigureTiming(ctx: MutationCtx, { docId, serviceStart
       timingConfiguredAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "configureTiming", id: docId } };
@@ -12866,7 +12855,7 @@ async function __runEventConfirmSalesLock(ctx: MutationCtx, { docId, version }: 
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12893,7 +12882,7 @@ async function __runEventConfirmSalesLock(ctx: MutationCtx, { docId, version }: 
       executionStartedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, startsAt: __after.startsAt, _subject: { entity: "Event", command: "confirmSalesLock", id: docId } };
@@ -12929,7 +12918,7 @@ async function __runEventFinalizeEvent(ctx: MutationCtx, { docId, version }: any
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -12956,7 +12945,7 @@ async function __runEventFinalizeEvent(ctx: MutationCtx, { docId, version }: any
       finalizedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, expectedHeadcount: __after.expectedHeadcount, quotedPrice: __after.quotedPrice, _subject: { entity: "Event", command: "finalizeEvent", id: docId } };
@@ -12992,7 +12981,7 @@ async function __runEventLockForSales(ctx: MutationCtx, { docId, version }: any,
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13024,7 +13013,7 @@ async function __runEventLockForSales(ctx: MutationCtx, { docId, version }: any,
       salesLockedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, expectedHeadcount: __after.expectedHeadcount, quotedPrice: __after.quotedPrice, startsAt: __after.startsAt, endsAt: __after.endsAt, _subject: { entity: "Event", command: "lockForSales", id: docId } };
@@ -13060,7 +13049,7 @@ async function __runEventNormalizePurchasingWeek(ctx: MutationCtx, { docId, vers
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13076,7 +13065,7 @@ async function __runEventNormalizePurchasingWeek(ctx: MutationCtx, { docId, vers
       purchasingWeekStart: nextPurchasingWeekStart,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, purchasingWeekStart: nextPurchasingWeekStart, previousPurchasingWeekStart: previousPurchasingWeekStart, _subject: { entity: "Event", command: "normalizePurchasingWeek", id: docId } };
@@ -13112,7 +13101,7 @@ async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, tit
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13169,7 +13158,7 @@ async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, tit
       plannedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: clientId, serviceStyleId: serviceStyleId, venueId: venueId, venueCapacity: venueCapacity, startsAt: startsAt, endsAt: endsAt, expectedHeadcount: expectedHeadcount, _subject: { entity: "Event", command: "planEngagement", id: docId } };
@@ -13326,7 +13315,7 @@ export const Event_createViaPlanEngagement = mutation({
     doc.referralSourceId = referralSourceId;
     doc.stage = "planning";
     doc.plannedAt = Date.now();
-    const __storedDoc = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], doc);
+    const __storedDoc = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], doc);
     const docId = await ctx.db.insert("events", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventId: docId, tenantId: doc.tenantId, clientId: clientId, serviceStyleId: serviceStyleId, venueId: venueId, venueCapacity: venueCapacity, startsAt: startsAt, endsAt: endsAt, expectedHeadcount: expectedHeadcount, _subject: { entity: "Event", command: "planEngagement", id: docId } };
     const __manifestEvent0 = { type: "EventPlanned", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: doc.tenantId, clientId: clientId, serviceStyleId: serviceStyleId, venueId: venueId, venueCapacity: venueCapacity, startsAt: startsAt, endsAt: endsAt, expectedHeadcount: expectedHeadcount }, createdAt: Date.now() };
@@ -13347,7 +13336,7 @@ async function __runEventReassignClient(ctx: MutationCtx, { docId, version }: an
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     const __rel_clientMergeAuthorization = await __resolveRelation(ctx, "clientMerges", [__auth.tenantId, doc.clientMergeAuthorizationId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
@@ -13373,7 +13362,7 @@ async function __runEventReassignClient(ctx: MutationCtx, { docId, version }: an
       clientId: doc.mergeTargetClientId,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, previousClientId: previousClientId, clientId: __after.mergeTargetClientId, _subject: { entity: "Event", command: "reassignClient", id: docId } };
@@ -13409,7 +13398,7 @@ async function __runEventReschedule(ctx: MutationCtx, { docId, startsAt, endsAt,
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13429,7 +13418,7 @@ async function __runEventReschedule(ctx: MutationCtx, { docId, startsAt, endsAt,
       purchasingWeekStart: nextPurchasingWeekStart,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, startsAt: startsAt, endsAt: endsAt, purchasingWeekStart: nextPurchasingWeekStart, previousPurchasingWeekStart: previousPurchasingWeekStart, _subject: { entity: "Event", command: "reschedule", id: docId } };
@@ -13470,7 +13459,7 @@ async function __runEventReturnToPlanning(ctx: MutationCtx, { docId, reason, ver
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13498,7 +13487,7 @@ async function __runEventReturnToPlanning(ctx: MutationCtx, { docId, reason, ver
       approvedAt: null,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, reason: reason, _subject: { entity: "Event", command: "returnToPlanning", id: docId } };
@@ -13535,7 +13524,7 @@ async function __runEventStageClientMerge(ctx: MutationCtx, { docId, clientMerge
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13550,7 +13539,7 @@ async function __runEventStageClientMerge(ctx: MutationCtx, { docId, clientMerge
       mergeTargetClientId: clientId,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "stageClientMerge", id: docId } };
@@ -13591,7 +13580,7 @@ async function __runEventStopRecurrence(ctx: MutationCtx, { docId, version }: an
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13606,7 +13595,7 @@ async function __runEventStopRecurrence(ctx: MutationCtx, { docId, version }: an
       recurrenceStoppedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, generatedCount: __after.recurrenceGeneratedCount, _subject: { entity: "Event", command: "stopRecurrence", id: docId } };
@@ -13642,7 +13631,7 @@ async function __runEventSubmitForApproval(ctx: MutationCtx, { docId, version }:
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13668,7 +13657,7 @@ async function __runEventSubmitForApproval(ctx: MutationCtx, { docId, version }:
       stage: "pending_approval",
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "submitForApproval", id: docId } };
@@ -13704,7 +13693,7 @@ async function __runEventUpdateDaySheet(ctx: MutationCtx, { docId, barService, c
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13731,7 +13720,7 @@ async function __runEventUpdateDaySheet(ctx: MutationCtx, { docId, barService, c
       buffetHotPlates: buffetHotPlates,
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "updateDaySheet", id: docId } };
@@ -13783,7 +13772,7 @@ async function __runEventUpdateImportDraft(ctx: MutationCtx, { docId, title, cli
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
@@ -13823,7 +13812,7 @@ async function __runEventUpdateImportDraft(ctx: MutationCtx, { docId, title, cli
       purchasingWeekStart: ((startsAt != null) ? (startsAt - ((startsAt - 374400000) % 604800000)) : doc.purchasingWeekStart),
       version: ((doc as any).version ?? 0) + 1
     };
-    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
+    const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "updateImportDraft", id: docId } };
@@ -54649,7 +54638,7 @@ export const Event_createViaCaptureDraft = mutation({
     doc.deletedAt = null;
     doc.plannedAt = null;
     doc.draftCapturedAt = Date.now();
-    const __storedDoc = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], doc);
+    const __storedDoc = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], doc);
     const docId = await ctx.db.insert("events", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventId: docId, tenantId: doc.tenantId, _subject: { entity: "Event", command: "captureDraft", id: docId } };
     const __manifestEvent0 = { type: "EventDraftCaptured", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: doc.tenantId }, createdAt: Date.now() };

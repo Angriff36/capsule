@@ -630,7 +630,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   property quotedPrice: money(12, 2)?
   property required stage: EventStage = "planning"
   // Source facts and reconciliation checkpoint remain on the native draft.
-  property importDraftJson: string?
+  property encrypted importDraftJson: string?
   property importSourceKey: string?
   property draftCapturedAt: datetime?
   property plannedAt: datetime?
