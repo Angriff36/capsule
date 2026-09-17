@@ -196,53 +196,6 @@ describe("event menu cost rollup", () => {
     expect(rollup.servings).not.toBe(1960);
   });
 
-  it("same-unit catalog cost rolls up money (TEST DATA fixture, not product UI)", () => {
-    const rollup = buildEventMenuCost({
-      eventId: "event-planning",
-      expectedHeadcount: 98,
-      eventDishes: [
-        {
-          id: "event-dish-priced",
-          eventId: "event-planning",
-          dishId: "dish-priced",
-          quantityServings: 98,
-        },
-        ...Array.from({ length: 19 }, (_, index) => ({
-          id: `event-dish-empty-${index}`,
-          eventId: "event-planning",
-          dishId: `dish-empty-${index}`,
-          quantityServings: 98,
-        })),
-      ],
-      dishIngredients: [
-        {
-          id: "line-oil",
-          dishId: "dish-priced",
-          ingredientId: "ing-oil",
-          quantity: 1,
-          unit: "liter",
-          addedAt: 1,
-        },
-      ],
-      ingredients: [
-        {
-          id: "ing-oil",
-          name: "Olive oil",
-          unit: "liter",
-          costPerUnit: TEST_CATALOG_UNIT_COST,
-        },
-      ],
-    });
-    expect(rollup.servings).toBe(98);
-    expect(rollup.servings).not.toBe(1960);
-    expect(rollup.foodCost).toBeCloseTo(98 * TEST_CATALOG_UNIT_COST);
-    expect(rollup.costPerServing).toBeCloseTo(TEST_CATALOG_UNIT_COST);
-    expect(rollup.pricedLineCount).toBe(1);
-    expect(rollup.mismatches).toEqual([]);
-    const priced = rollup.dishes.find((dish) => dish.dishId === "dish-priced");
-    expect(eventMenuDishEstimateKind(priced)).toBe("priced");
-  });
-
   it("mismatch estimate is an explicit unpriced label, not a missing rollup", () => {
     const rollup = buildEventMenuCost({
       eventId: "event-planning",

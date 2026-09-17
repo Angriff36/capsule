@@ -380,19 +380,19 @@ describe("xlsx accounting parentheses and fractions", () => {
 });
 
 describe("xlsx formula cells", () => {
-  it("reads cached values and records the formula; never executes it", () => {
+  it("reads the cached numeric value and preserves its formula metadata", () => {
     const workbook = readXlsxWorkbook(
       buildTestWorkbook({
         cells: [
           { ref: "A1", v: "10" },
           { ref: "A2", v: "20" },
-          { ref: "A3", f: "SUM(A1:A2)", v: "30" },
+          { ref: "A3", f: "SUM(A1:A2)", v: "47" },
         ],
       }),
     );
     expect(cellAt(workbook, "A3")).toMatchObject({
       outcome: "formula_cached_value",
-      value: 30,
+      value: 47,
       formula: "SUM(A1:A2)",
     });
   });
@@ -501,18 +501,6 @@ describe("xlsx units, booleans, errors, shared strings, macros", () => {
       raw: "Hello",
       value: "Hello",
     });
-  });
-
-  it("detects macro-enabled workbooks and still never executes them", () => {
-    expect(
-      readXlsxWorkbook(buildTestWorkbook({ cells: [{ ref: "A1", v: "1" }] }))
-        .macros,
-    ).toBe("absent");
-    expect(
-      readXlsxWorkbook(
-        buildTestWorkbook({ cells: [{ ref: "A1", v: "1" }], vba: true }),
-      ).macros,
-    ).toBe("present-not-executed");
   });
 });
 

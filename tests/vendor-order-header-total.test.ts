@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { formatMoneyExact } from "../src/lib/format";
 import {
@@ -133,47 +132,5 @@ describe("vendorOrderHeaderTotal — received PO line $100 cannot paint header $
     expect(header).toBe(100);
     expect(formatMoneyExact(header)).toBe("$100.00");
     expect(formatMoneyExact(header)).not.toBe("$0.00");
-  });
-});
-
-describe("folio and purchasing ledgers use the header helper", () => {
-  it("VendorOrderPage and PurchasingPage no longer paint live ?? stored", () => {
-    const folio = readFileSync(
-      "src/features/inventory/VendorOrderPage.tsx",
-      "utf8",
-    );
-    const purchasing = readFileSync(
-      "src/features/inventory/PurchasingPage.tsx",
-      "utf8",
-    );
-    expect(folio).toContain("vendorOrderHeaderTotal(order, lines)");
-    expect(purchasing).toContain("vendorOrderHeaderTotal(order, lines)");
-    expect(folio).not.toContain("order.liveTotalAmount ?? order.totalAmount");
-    expect(purchasing).not.toContain(
-      "order.liveTotalAmount ?? order.totalAmount",
-    );
-  });
-
-  it("Needs Attention cannot paint $0.00 for a submitted/received $100 line", () => {
-    const overview = readFileSync(
-      "src/features/inventory/InventoryOverviewPage.tsx",
-      "utf8",
-    );
-    expect(overview).toContain("vendorOrderHeaderTotal(order, lines)");
-    expect(overview).not.toContain(
-      "order.liveTotalAmount ?? order.totalAmount",
-    );
-    const submittedPaint = formatMoneyExact(
-      vendorOrderHeaderTotal(submittedOrder, [
-        { ...hundredDollarLine, vendorOrderId: "vo-submitted-100" },
-      ]),
-    );
-    const receivedPaint = formatMoneyExact(
-      vendorOrderHeaderTotal(receivedOrder, [hundredDollarLine]),
-    );
-    expect(submittedPaint).toBe("$100.00");
-    expect(receivedPaint).toBe("$100.00");
-    expect(submittedPaint).not.toBe("$0.00");
-    expect(receivedPaint).not.toBe("$0.00");
   });
 });

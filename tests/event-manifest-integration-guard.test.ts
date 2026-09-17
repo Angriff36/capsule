@@ -1,43 +1,12 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   inspectEventManifestIntegration,
   inspectEventSource,
 } from "../scripts/check-event-manifest-integration";
 
-const read = (relativePath: string) => readFileSync(relativePath, "utf8");
-
 describe("Event Manifest integration guard", () => {
   it("keeps the current authored Event integration on approved generated surfaces", () => {
     expect(inspectEventManifestIntegration()).toEqual([]);
-  });
-
-  it("routes Event feature writes through generated hooks", () => {
-    const detail = read("src/features/events/EventDetailPage.tsx");
-    const guests = read("src/features/events/EventGuestPanel.tsx");
-    const create = read("src/features/events/EventCreatePage.tsx");
-
-    expect(detail).toContain('from "../../lib/manifest-convex-react"');
-    expect(detail).toContain("useEventSubmitForApproval");
-    expect(detail).toContain("useEventChangeHeadcount");
-    expect(guests).toContain('from "../../lib/manifest-convex-react"');
-    expect(guests).toContain("useEventGuestRsvpConfirm");
-    expect(create).toContain('from "../../lib/manifest-convex-react"');
-    expect(create).toContain("useCreateEvent");
-    expect(guests).toContain("listEventGuestByEventId");
-  });
-
-  it("requires lifecycle availability to consume generated transition metadata", () => {
-    const lifecyclePolicy = read("src/features/events/EventLifecyclePolicy.ts");
-    const guestPolicy = read("src/features/events/EventGuestPolicy.ts");
-
-    expect(lifecyclePolicy).toContain(
-      'from "../../generated/manifest-wiring-bindings"',
-    );
-    expect(lifecyclePolicy).toContain("EventSubmitForApprovalLifecycle");
-    expect(lifecyclePolicy).toContain("EventApproveLifecycle");
-    expect(guestPolicy).toContain("EventGuestRsvpConfirmLifecycle");
-    expect(guestPolicy).toContain("EventGuestRsvpDeclineLifecycle");
   });
 
   it("rejects direct generated Convex imports from authored Event features", () => {

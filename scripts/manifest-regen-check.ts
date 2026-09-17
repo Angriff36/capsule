@@ -1,7 +1,7 @@
 /**
  * Pre-push gate: generated Builder output must be current before code leaves
- * this machine (owner policy 2026-07-19 — regen is a LOCAL gate; CI has no
- * Builder). Regenerates for real, including authored post-passes, and fails
+ * this machine, using the repository-local Builder. Regenerates for real,
+ * including authored post-passes, and fails
  * only if that leaves tracked files changed: run `bun run manifest:regen`,
  * commit the result, push again.
  *
@@ -17,28 +17,16 @@ import { dirname, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
-import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
-import { runBuilder } from "./manifest-regen.ts";
-import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
+import { regenerate } from "./manifest-regen.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const rewritten = new ManifestLineEndingNormalizer(CAPSULE_ROOT).normalize();
-if (rewritten > 0) {
-  console.log(
-    `manifest-regen-check: normalized ${rewritten} .manifest file(s) to LF`,
-  );
-}
-
-const status = runBuilder(["generate", "convex", "--apply"]);
+const status = regenerate();
 if (status !== 0) {
   console.error(
     "manifest-regen-check: Builder plan failed or has ownership conflicts (see above).",
   );
   process.exit(status);
 }
-applyOrgCapabilityCheckRole(CAPSULE_ROOT);
-applyEventServiceStyleReferenceGuard(CAPSULE_ROOT);
 
 // Scope the drift check to Builder-owned paths only (issue #375 follow-up):
 // a bare `git status --porcelain` also reports any unrelated uncommitted

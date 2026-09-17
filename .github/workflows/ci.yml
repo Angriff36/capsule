@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Verify generated output
+        run: bun run manifest:regen:check
+
       - name: Run repository check gate
         env:
           # Agent client construction needs a value; tests run against the

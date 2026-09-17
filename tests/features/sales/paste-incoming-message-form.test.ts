@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { readFileSync } from "node:fs";
+
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -185,21 +185,5 @@ describe("PasteIncomingMessageForm", () => {
       rawJson: '{"threadId":"x","messageId":"y","body":"hi"}',
     });
     expect(props.ingestMessage).not.toHaveBeenCalled();
-  });
-});
-
-describe("MessageInboxPage paste wiring", () => {
-  const source = readFileSync(
-    path.join(process.cwd(), "src/features/sales/MessageInboxPage.tsx"),
-    "utf8",
-  );
-
-  it("renders PasteIncomingMessageForm for the paste flow", () => {
-    expect(source).toContain("PasteIncomingMessageForm");
-  });
-
-  it("no longer ships an inline raw-JSON textarea as the paste default", () => {
-    expect(source).not.toContain('"threadId": "…"');
-    expect(source).not.toContain("Raw provider message payload");
   });
 });

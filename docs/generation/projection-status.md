@@ -81,3 +81,7 @@ A runtime proof must execute the source mutation and assert downstream document 
 ## Release rule
 
 Individual entity CRUD/lifecycle UI may use the generated contracts. Automated cross-system consequences may be described as structurally available, but they are not verified workflows until focused Convex runtime reaction tests pass. Fix future projection defects at the Manifest/Builder source, regenerate CapsuleX, and add a focused regression; never patch `C:\projects\capsule\convex\mutations.ts` by hand.
+
+## Test cleanup (2026-09-08)
+
+The source-shape reaction test referenced above was removed. Reaction evidence now comes from the runtime proofs in `tests/proofs/ingredient-demand-confirm.runtime.test.ts`, `tests/proofs/quality-check-fail-block.runtime.test.ts`, `tests/proofs/invoice-payment-lifecycle.runtime.test.ts`, and `tests/proofs/finance-cancellation-boundaries.runtime.test.ts`. The proof emitter retains the runtime bindings and no longer advertises the deleted structural test.

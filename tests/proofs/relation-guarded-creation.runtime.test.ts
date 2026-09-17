@@ -401,11 +401,34 @@ describe("relation-guarded governed creation", () => {
         vendorId,
         orderNumber: "PO-CROSS-TENANT",
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/Guard/);
 
     const rows = await tenantA.run((ctx) =>
       ctx.db.query("vendorOrders").collect(),
     );
     expect(rows).toEqual([]);
+
+    // The same vendor/payload works in its own tenant: rejection above is
+    // not an invalid vendor fixture or an unrelated command failure.
+    const tenantB = asRole(
+      proof,
+      S.tenantB,
+      "inventory_manager",
+      "inventory-manager-tenant-b",
+    );
+    const created = (await proof.executeCommand(
+      tenantB,
+      api.mutations.VendorOrder_createViaOpen,
+      {
+        vendorId,
+        orderNumber: "PO-CROSS-TENANT",
+      },
+    )) as { docId: string };
+    expect(
+      await tenantB.run((ctx) => ctx.db.get(created.docId as never)),
+    ).toMatchObject({
+      tenantId: S.tenantB,
+      vendorId,
+    });
   });
 });

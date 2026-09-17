@@ -1,0 +1,124 @@
+file,original_line,original_test,decision,behavior_tests
+tests/agent/capsule-event-prep-coordinator.test.ts,11,CapsuleEventPrepCoordinator registers the combined event dish and prep synchronization tool,REPLACE_OR_CONSOLIDATE,tests/agent/capsule-event-prep-coordinator.test.ts
+tests/authored-source-guards.test.ts,80,authored source regression guards keeps public client pages independent of Route-only useParams context,REMOVE_REDUNDANT,
+tests/clients-routes.test.ts,32,Clients CRM routes and lifecycle bindings wires clients routes in App.tsx,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/clients-routes.test.ts,47,Clients CRM routes and lifecycle bindings deep-links Client and signed Contract into invoice issue,REPLACE_OR_CONSOLIDATE,tests/crm-handoff-behavior.test.ts
+tests/clients-routes.test.ts,62,Clients CRM routes and lifecycle bindings deep-links accepted Proposal into Event create with client prefill,REPLACE_OR_CONSOLIDATE,tests/crm-handoff-behavior.test.ts
+tests/closeout-folio-residuals.test.ts,18,"closeout folio follows theme and lists draft numbers paints folio paper/ink from inherited --color-*, not cream",REMOVE_BROWSER_REQUIREMENT,
+tests/closeout-folio-residuals.test.ts,27,closeout folio follows theme and lists draft numbers names billed and draft invoices separately on the folio,REPLACE_OR_CONSOLIDATE,tests/finance-report-behavior.test.ts
+tests/closeout-folio-residuals.test.ts,32,closeout folio follows theme and lists draft numbers Event subtext does not repeat the Billed column,REMOVE_REDUNDANT,
+tests/command-palette-invoice-search.test.ts,98,"Ctrl-K settled invoice NL paints invoice hits searchAll uses parseSearchQuery and invoiceMatchesQuery, not hyphen-split includes",REPLACE_OR_CONSOLIDATE,tests/proofs/finance-cancellation-boundaries.runtime.test.ts
+tests/command-palette-invoice-search.test.ts,129,Ctrl-K settled invoice NL paints invoice hits queryInvoices paginates instead of take(120),REPLACE_OR_CONSOLIDATE,tests/proofs/finance-cancellation-boundaries.runtime.test.ts
+tests/command-palette-search-freshness.test.ts,56,Ctrl-K search is not one keystroke behind useNaturalLanguageSearch paints freshSearchHits from the live rawQuery,REPLACE_OR_CONSOLIDATE,tests/search-palette-behavior.test.ts
+tests/command-palette-search-freshness.test.ts,104,Ctrl-K search is not one keystroke behind CommandPalette withholds No matches. while search is pending,REPLACE_OR_CONSOLIDATE,tests/search-palette-behavior.test.ts
+tests/culinary-slice-contract.test.ts,7,Culinary planning slice contract wires the Kitchen route family to authored culinary screens,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/culinary-slice-contract.test.ts,22,Culinary planning slice contract uses generated reads and command hooks in authored feature code,REPLACE_OR_CONSOLIDATE,tests/features/kitchen/component-import-review.test.ts; tests/dish-editing-behavior.test.ts; tests/event-menu-behavior.test.ts
+tests/culinary-slice-contract.test.ts,79,Culinary planning slice contract uses governed generated creation hooks without an authored allocation seam,REMOVE_REDUNDANT,
+tests/culinary-slice-contract.test.ts,102,Culinary planning slice contract uses generated lifecycle metadata for menu/component publish offers,REMOVE_REDUNDANT,
+tests/date-input-year-bound.test.ts,131,EventCreatePage keeps #148 Starts prefill on the year-bounded input proposal Starts defaultValue survives on BoundedDateTimeLocalInput,REPLACE_OR_CONSOLIDATE,tests/event-create-behavior.test.ts
+tests/delivery-honesty.test.ts,61,immediate command and delivery honesty passes docId to proposal-template commands,REPLACE_OR_CONSOLIDATE,tests/crm-command-behavior.test.ts
+tests/delivery-honesty.test.ts,71,immediate command and delivery honesty labels status-only publication and sent-recording actions honestly,REPLACE_OR_CONSOLIDATE,tests/crm-command-behavior.test.ts
+tests/event-draft-po-coordinator.test.ts,173,EventDraftPoCoordinator does not call PurchaseNeed.create — that stays behind Event.approve,REMOVE_REDUNDANT,
+tests/event-equipment-dispatch-theme.test.ts,11,"dispatch board follows html theme tokens paints paper/ink from inherited --color-*, not hardcoded cream",REMOVE_BROWSER_REQUIREMENT,
+tests/event-manifest-integration-guard.test.ts,15,Event Manifest integration guard routes Event feature writes through generated hooks,REMOVE_REDUNDANT,
+tests/event-manifest-integration-guard.test.ts,30,Event Manifest integration guard requires lifecycle availability to consume generated transition metadata,REMOVE_REDUNDANT,
+tests/event-menu-cost-prep-po-chain.test.ts,16,"leftovers 1–6: event menu cost → prep → PO chain 1. event menu rolls food cost from catalog/receipt, not estimatedCost-only dash",REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-cost-prep-po-chain.test.ts,40,leftovers 1–6: event menu cost → prep → PO chain 2. recipe-unit vs stock-unit mismatch is warned and not silently converted,REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-cost-prep-po-chain.test.ts,51,leftovers 1–6: event menu cost → prep → PO chain 3. event menu shows cost + pan count and edits recipe in place,REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-cost-prep-po-chain.test.ts,91,leftovers 1–6: event menu cost → prep → PO chain 5. draft PO from event needs does not require approving the event,REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-cost-prep-po-chain.test.ts,108,leftovers 1–6: event menu cost → prep → PO chain 6. margin includes recipe-estimated food cost when no PO exists,REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-cost-prep-po-chain.test.ts,147,leftover returns fail this suite does not ship leftover stubs from the cost → prep → PO product,REMOVE_REDUNDANT,
+tests/event-menu-cost-prep-po-chain.test.ts,160,leftover returns fail this suite product helpers do not import the TPP catalog or hardcode 6.25,REMOVE_REDUNDANT,
+tests/event-menu-cost-prep-po-chain.test.ts,179,leftover returns fail this suite event menu shows encoded sell prices and flags the 196 lb radish,REMOVE_REDUNDANT,
+tests/event-menu-recipe-editor-leftovers.test.ts,220,218 leftover: Per serving focus ring owns keystrokes keeps digits on the qty field after a catalog pick,REMOVE_REDUNDANT,
+tests/event-menu-recipe-picker.test.ts,56,"event menu recipe ingredient picker is searchable, not a bare <select> of catalog names",REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-recipe-picker.test.ts,121,"event menu leftover paint and defaults defaults servings per pan to 20, not 25",REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-recipe-picker.test.ts,148,event menu recipe search key trap traps keydown on the recipe search and create-name fields,REMOVE_REDUNDANT,
+tests/event-menu-recipe-search-keys.test.ts,153,"event menu recipe search keeps typed keys create-ingredient form is always available, not a flaky toggle",REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-sell-price.test.ts,363,"suspect TPP quantities menu card and prep tab flag from recipe lines, not only task.name",REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-menu-tab-course-cost.test.ts,8,event menu tab course and cost lets a dish course be saved on the event menu tab,REPLACE_OR_CONSOLIDATE,tests/event-menu-behavior.test.ts
+tests/event-planning-foundation.test.ts,17,"Event planning foundation creates Client, Venue, Event, and EventGuest through generated commands",REMOVE_REDUNDANT,
+tests/event-planning-foundation.test.ts,141,Event planning foundation wires every supported guest command into the dossier,REPLACE_OR_CONSOLIDATE,tests/guest-commands-behavior.test.ts
+tests/event-reaction-projection.test.ts,15,Event lifecycle reaction projection keeps cancellation fan-out payload access flat,REPLACE_OR_CONSOLIDATE,tests/proofs/finance-cancellation-boundaries.runtime.test.ts
+tests/event-reaction-projection.test.ts,22,Event lifecycle reaction projection Event.approve foreach-creates PurchaseNeed; markReleased chains from PurchaseNeedOpened,REMOVE_REDUNDANT,
+tests/event-reaction-projection.test.ts,47,Event lifecycle reaction projection dispatches the known reaction paths through governed command runners,REMOVE_REDUNDANT,
+tests/features/admin/catalogs-page.test.ts,22,"admin catalogs page wires register, revise, deactivate, activate per catalog",REPLACE_OR_CONSOLIDATE,tests/catalogs-behavior.test.ts
+tests/features/admin/catalogs-page.test.ts,53,admin catalogs page is reachable: route and admin nav entry,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/features/admin/catalogs-page.test.ts,59,admin catalogs page event-create selectors read the live catalog lists,REMOVE_REDUNDANT,
+tests/features/admin/import-provenance-panel.test.ts,26,"import run detail: source provenance panel operator panel renders coordinates, raw value, date system, parser version, and normalized result",REPLACE_OR_CONSOLIDATE,tests/import-evidence-behavior.test.ts
+tests/features/admin/import-run-disposition.test.ts,20,import run detail: workbook disposition surface renders disposition counts and the unaccounted-record gate,REPLACE_OR_CONSOLIDATE,tests/import-evidence-behavior.test.ts
+tests/features/eventDay/event-day-notes-allergens.test.ts,57,"Event Day leftover: strip @capsule.menu notes wires Event Day, briefing, and PDFs through displayEventMenuNotes",REPLACE_OR_CONSOLIDATE,tests/service-menu-output-behavior.test.ts; tests/command-deck-filter-behavior.test.ts
+tests/features/eventDay/event-day-notes-allergens.test.ts,156,"Event Day leftover: empty allergen flags are unverified gates Event Day green No allergens on dishAllergenClaim, not empty flags",REPLACE_OR_CONSOLIDATE,tests/service-menu-output-behavior.test.ts; tests/command-deck-filter-behavior.test.ts
+tests/features/events/create-event-blockers.test.ts,57,create event client-required copy EventCreatePage shows Client is required when Create is disabled for a missing client,REPLACE_OR_CONSOLIDATE,tests/event-create-behavior.test.ts
+tests/features/events/create-event-blockers.test.ts,69,create event required Name marker marks primary contact Name as required on the create form,REPLACE_OR_CONSOLIDATE,tests/event-create-behavior.test.ts
+tests/features/events/create-event-blockers.test.ts,81,create form uses the shared service style vocabulary EventCreatePage populates the picker from serviceStyleSelectOptions,REPLACE_OR_CONSOLIDATE,tests/event-create-behavior.test.ts
+tests/features/events/create-event-blockers.test.ts,95,events index is not a Test Event deep-link create-form back link and App list route stay on /events,REMOVE_REDUNDANT,
+tests/features/events/create-event-blockers.test.ts,126,empty catalogs show an explicit state and do not block create both empty selectors show a one-line hint linking to Admin → Catalogs,REPLACE_OR_CONSOLIDATE,tests/event-create-behavior.test.ts
+tests/features/events/event-enhancements-card.test.ts,11,event overview enhancements card event detail lists live enhancements from the linked proposal,REPLACE_OR_CONSOLIDATE,tests/event-overview-behavior.test.ts
+tests/features/events/event-proposal-source-card.test.ts,13,event overview proposal source card event detail links the booking proposal and its accepted revision,REPLACE_OR_CONSOLIDATE,tests/event-overview-behavior.test.ts
+tests/features/events/event-staffing-filled-shift.test.ts,143,filled open shift shows who covered it wires filled needs into the Staffing tab and timeline roster,REPLACE_OR_CONSOLIDATE,tests/staffing-roster-behavior.test.ts
+tests/features/events/eventRoutes.test.ts,29,event menu URL alias App.tsx redirects /events/:id/menu to the menu tab,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/features/events/eventRoutes.test.ts,43,events index path App.tsx mounts the list at /events and does not redirect that path to a record,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/features/events/layout-trim.test.ts,59,layoutTrim wires the Layouts panel through the trim helpers,REPLACE_OR_CONSOLIDATE,tests/event-overview-behavior.test.ts
+tests/features/kitchen/prep-template-quantity.test.ts,78,prep template batch-total leftover: persist derived per-guest wires DishPrepTasksPanel through persist (leftover-return lock),REPLACE_OR_CONSOLIDATE,tests/dish-editing-behavior.test.ts
+tests/features/sales/paste-incoming-message-form.test.ts,197,MessageInboxPage paste wiring renders PasteIncomingMessageForm for the paste flow,REPLACE_OR_CONSOLIDATE,tests/inbox-paste-behavior.test.ts
+tests/features/sales/paste-incoming-message-form.test.ts,201,MessageInboxPage paste wiring no longer ships an inline raw-JSON textarea as the paste default,REMOVE_REDUNDANT,
+tests/features/sales/quote-submissions-review.test.ts,16,quote submissions review queue queue shows all seven submitted fields,REPLACE_OR_CONSOLIDATE,tests/quote-review-behavior.test.ts
+tests/features/sales/quote-submissions-review.test.ts,49,quote submissions review queue dismiss hides from the default queue and keeps the raw row,REPLACE_OR_CONSOLIDATE,tests/quote-review-behavior.test.ts
+tests/features/sales/quote-submissions-review.test.ts,68,quote submissions review queue queue shows free-text style and occasion answers,REPLACE_OR_CONSOLIDATE,tests/quote-review-behavior.test.ts
+tests/features/sales/quote-submissions-review.test.ts,76,quote submissions review queue offline notice when no organization,REPLACE_OR_CONSOLIDATE,tests/quote-review-behavior.test.ts
+tests/features/sales/quote-submissions-review.test.ts,92,quote submissions review queue queue and pipeline deep-link to the converted proposal,REPLACE_OR_CONSOLIDATE,tests/lead-pipeline-behavior.test.ts
+tests/features/sales/quote-submissions-review.test.ts,128,quote submissions review queue failed row shows checkpointed records,REPLACE_OR_CONSOLIDATE,tests/quote-review-behavior.test.ts
+tests/finance-money-truth.test.ts,383,"buildEventCostSummary — folio separates billed, collected, drafts CloseoutPage Gross profit cell uses costsPending, not grossProfit===0",REPLACE_OR_CONSOLIDATE,tests/finance-report-behavior.test.ts
+tests/finance-routes.test.ts,50,Finance routes and lifecycle bindings links invoice detail back to Client and Event sources,REPLACE_OR_CONSOLIDATE,tests/finance-ledger-behavior.test.ts
+tests/finance-routes.test.ts,60,Finance routes and lifecycle bindings deep-links EventCloseout rows into invoice issue,REPLACE_OR_CONSOLIDATE,tests/finance-report-behavior.test.ts
+tests/finance-routes.test.ts,69,Finance routes and lifecycle bindings wires finance routes in App.tsx,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/finance-routes.test.ts,179,Finance routes and lifecycle bindings locks the InvoicesPage sendable wiring to the balance-aware predicate,REPLACE_OR_CONSOLIDATE,tests/finance-ledger-behavior.test.ts
+tests/finance-routes.test.ts,200,Finance routes and lifecycle bindings locks the InvoiceDetailPage actions to the balance-aware predicate,REPLACE_OR_CONSOLIDATE,tests/finance-ledger-behavior.test.ts
+tests/finance-routes.test.ts,279,Finance routes and lifecycle bindings locks PaymentsPage to the settled-aware count and empty state,REPLACE_OR_CONSOLIDATE,tests/finance-ledger-behavior.test.ts
+tests/finance-routes.test.ts,330,Finance routes and lifecycle bindings keeps the server-side zero-balance send refusal (manifest + generated command),REPLACE_OR_CONSOLIDATE,tests/proofs/finance-cancellation-boundaries.runtime.test.ts
+tests/food-cost-ratio-copy.test.ts,18,"food-cost window ratio does not call $0 revenue a missing target Window ratio small print uses against-target copy, not concatenated target",REPLACE_OR_CONSOLIDATE,tests/finance-report-behavior.test.ts
+tests/food-cost-ratio-copy.test.ts,28,"food-cost window ratio does not call $0 revenue a missing target hero paper follows the theme panel, not cream",REMOVE_BROWSER_REQUIREMENT,
+tests/governed-creation-mappings.test.ts,5,governed creation mappings keeps every generated createVia selection stable,REMOVE_REDUNDANT,
+tests/inventory-reorder-copy.test.ts,9,inventory intro does not tell you to reorder the PAR list fails if the production intro/guide still says PAR is what to reorder,REPLACE_OR_CONSOLIDATE,tests/stock-book-behavior.test.ts; tests/low-stock-shared-predicate.test.ts
+tests/kitchen-command-deck-filter-progress.test.ts,77,"Kitchen Unassigned/Blocked filters count matching of total TaskPanel headline and dish copy follow the filter, not overall progress",REPLACE_OR_CONSOLIDATE,tests/command-deck-filter-behavior.test.ts
+tests/kitchen-command-deck-filter-progress.test.ts,90,Kitchen Unassigned/Blocked filters count matching of total Quick Assign does not say click Assign when the filter has nothing assignable,REPLACE_OR_CONSOLIDATE,tests/command-deck-filter-behavior.test.ts
+tests/kitchen-dish-keep-as-is.test.ts,76,Keep as-is must not remove a dish ingredient panel routes remove through applyDishIngredientRemoval after askConfirm,REPLACE_OR_CONSOLIDATE,tests/dish-editing-behavior.test.ts
+tests/kitchen-dish-keep-as-is.test.ts,88,Keep as-is must not remove a dish ingredient Kitchen dish ingredient line has qty + Save qty like the event-menu editor,REPLACE_OR_CONSOLIDATE,tests/dish-editing-behavior.test.ts
+tests/kitchen-dish-keep-as-is.test.ts,96,Keep as-is must not remove a dish ingredient Keep as-is is type=button dismiss and confirm-kind submit does not confirm,REPLACE_OR_CONSOLIDATE,tests/dish-editing-behavior.test.ts
+tests/kitchen-dish-keep-as-is.test.ts,136,Keep as-is must not remove a dish ingredient confirm button stays inert until armed (click-through lock),REPLACE_OR_CONSOLIDATE,tests/dish-editing-behavior.test.ts
+tests/lead-pipeline-value-input.test.ts,15,lead pipeline card VALUE input card editor VALUE is a named estimatedValue number field,REPLACE_OR_CONSOLIDATE,tests/lead-pipeline-behavior.test.ts
+tests/lead-pipeline-value-input.test.ts,21,lead pipeline card VALUE input VALUE column cannot shrink below 7.5rem (QA clip of 500000 → 500(),REMOVE_BROWSER_REQUIREMENT,
+tests/lead-pipeline-value-input.test.ts,30,lead pipeline card VALUE input Stage keeps a real min so a 268px column does not leave a 26px track,REMOVE_BROWSER_REQUIREMENT,
+tests/lead-pipeline-value-input.test.ts,46,lead pipeline card VALUE input hides number spinners so they do not eat the amount,REMOVE_REDUNDANT,
+tests/logistics-routes.test.ts,27,Logistics routes and lifecycle bindings wires logistics routes in App.tsx,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/logistics-routes.test.ts,75,pack-list URL aliases reach /logistics/packs App.tsx redirects those aliases instead of 404ing,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/low-stock-shared-predicate.test.ts,143,"home and stock book share one low-stock predicate stock book, home, overview, and the bell all call isBelowReorder",REPLACE_OR_CONSOLIDATE,tests/stock-book-behavior.test.ts; tests/low-stock-shared-predicate.test.ts
+tests/low-stock-shared-predicate.test.ts,195,first-land stock-row latch the hook uses the latch and retries the first paint,REPLACE_OR_CONSOLIDATE,tests/stock-book-behavior.test.ts
+tests/my-day-identity-resolver.test.ts,29,My Day signed-in identity paint chip and PageHeader cannot omit the signed-in Clerk name,REMOVE_REDUNDANT,
+tests/my-day-identity-resolver.test.ts,45,My Day signed-in identity paint bound view uses server identity without an unlinked Switch fallback,REMOVE_REDUNDANT,
+tests/my-day-identity-resolver.test.ts,52,My Day signed-in identity paint does not auto-store a person id on load,REMOVE_REDUNDANT,
+tests/my-day-identity-resolver.test.ts,56,My Day signed-in identity paint wide two-column layout stays on the bound frame,REMOVE_REDUNDANT,
+tests/payroll-export-preview.test.ts,154,preview source contract — no raw _id slices never falls back to the Capsule person _id for employeeId,REMOVE_REDUNDANT,
+tests/payroll-export-preview.test.ts,162,preview source contract — no raw _id slices fails if the preview still prints _id slices or a raw employeeId,REPLACE_OR_CONSOLIDATE,tests/payroll-preview-behavior.test.ts
+tests/person-auth-pick.test.ts,302,waitForSessionTenantClaim uses the default retry budget when none is given,REMOVE_REDUNDANT,
+tests/prep-board-presentation.test.ts,97,PrepBoardPage presentation uses an in-page reason workflow instead of blocking browser prompts,REPLACE_OR_CONSOLIDATE,tests/workforce-production-behavior.test.ts
+tests/quote-start-time.test.ts,5,"public quote form has a start time submits eventDate at the typed start, not midnight, and shows Start Time",REPLACE_OR_CONSOLIDATE,tests/quote-start-time.test.ts
+tests/reports-routes.test.ts,29,Reports routes and lifecycle bindings wires ReportsPage in App.tsx,REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/smoke-app-path.test.ts,12,smoke: signed-in workspace path unlocks the shell only when auth + membership claims are complete,REPLACE_OR_CONSOLIDATE,tests/workspace-entry-behavior.test.ts
+tests/stock-book-editor-focus.test.ts,73,Stock book Transfer editor is not a no-op above the row editor scrolls into view and focuses a field when it opens,REPLACE_OR_CONSOLIDATE,tests/stock-book-behavior.test.ts
+tests/stock-catalog-unit-display.test.ts,29,"existing stock rows paint the catalog unit, not a stale each stock book, inventory overview, and home alerts use the helper",REPLACE_OR_CONSOLIDATE,tests/stock-book-behavior.test.ts; tests/low-stock-shared-predicate.test.ts
+tests/supply-slice-contract.test.ts,7,"Demand, stock, and purchasing slice contract wires the Inventory route family to authored supply screens",REPLACE_OR_CONSOLIDATE,tests/app-route-behavior.test.ts
+tests/supply-slice-contract.test.ts,15,"Demand, stock, and purchasing slice contract uses generated reads and governed command hooks",REPLACE_OR_CONSOLIDATE,tests/demand-entry-behavior.test.ts; tests/stock-book-behavior.test.ts; tests/event-menu-behavior.test.ts
+tests/supply-slice-contract.test.ts,60,"Demand, stock, and purchasing slice contract uses only generated client surfaces and states approve→purchase handoff",REMOVE_REDUNDANT,
+tests/supply-slice-contract.test.ts,80,"Demand, stock, and purchasing slice contract derives authored lifecycle offers from generated metadata",REMOVE_REDUNDANT,
+tests/time-record-event-link.test.ts,89,TimeSheet Clock in form (issue #149) keeps the Clock in form fields in TimeSheetPage source,REMOVE_REDUNDANT,
+tests/time-record-event-link.test.ts,209,event association is not dropped on create fails closed if a caller drops eventId from the create payload,REMOVE_REDUNDANT,
+tests/time-record-event-link.test.ts,452,Time sheet break column (QA leftover after 197/201/202) TimeSheetPage paints TimeSheetBreakCell instead of 0 min fallback,REPLACE_OR_CONSOLIDATE,tests/workforce-production-behavior.test.ts
+tests/vendor-order-header-total.test.ts,140,folio and purchasing ledgers use the header helper VendorOrderPage and PurchasingPage no longer paint live ?? stored,REPLACE_OR_CONSOLIDATE,tests/purchasing-folio-behavior.test.ts
+tests/vendor-order-title.test.ts,38,"folio and purchasing ledgers use vendorOrderTitle VendorOrderPage H1 is vendorOrderTitle, not Unnumbered order",REPLACE_OR_CONSOLIDATE,tests/purchasing-folio-behavior.test.ts
+tests/vendor-order-title.test.ts,51,folio and purchasing ledgers use vendorOrderTitle PurchasingPage list titles use the same helper,REPLACE_OR_CONSOLIDATE,tests/purchasing-folio-behavior.test.ts
+tests/workspace-membership-policy.test.ts,70,AuthGate duplicate-email recovery does not send the duplicate-email wall only to Team roles,REPLACE_OR_CONSOLIDATE,tests/workspace-entry-behavior.test.ts
+tests/workspace-membership-policy.test.ts,76,AuthGate duplicate-email recovery source-guards linkBySubjectEmail and getAuthContext call pickLivePerson,REMOVE_REDUNDANT,
+tests/workspace-membership-policy.test.ts,89,AuthGate duplicate-email recovery openWorkspace awaits setActive then attempt only after JWT tenant matches,REPLACE_OR_CONSOLIDATE,tests/workspace-entry-behavior.test.ts
+tests/zip-archive-abuse.test.ts,415,ZipArchiveError writes nothing to the filesystem,REMOVE_REDUNDANT,

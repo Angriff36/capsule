@@ -313,41 +313,37 @@ async function queryInvoices(
       ? now - parsed.agedOverDays * DAY_MS
       : null;
 
-  // Invoices have no invoiceNumber index. take(120) missed billed
-  // INV-2026-QA1 and draft INV-8BJQS7 when they were not on the first page.
-  // Do not .filter(deletedAt === null) before paginate: optional deletedAt
-  // is undefined, not null, so every page emptied, scanned never moved, and
-  // the query spun until timeout (QA 193: Searching… 8–9s then No matches).
-  // Skip deleted rows in JS like addHit (`deletedAt != null`).
-  // Convex allows one .paginate() per function execution, so a page loop
-  // threw past the first 100 invoices (#303). Bounded async iteration keeps
-  // the same 2,500-row scan budget without a second cursor.
-  const MAX_SCANNED = 2_500;
+  // Search past the old 120-row cutoff without calling paginate repeatedly:
+  // Convex permits only one paginate call per query execution. Async iteration
+  // preserves the existing 2,500-row scan budget and stops once enough hits exist.
+  // Older imports may omit deletedAt; only an actual deletion timestamp hides them.
+  const MAX_SCANNED = 2500;
   const MAX_HITS = 15;
   const out: SearchHit[] = [];
   let scanned = 0;
-
-  for await (const inv of ctx.db
+  const invoices = ctx.db
     .query("invoices")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))) {
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId));
+  for await (const inv of invoices) {
     scanned += 1;
-    // Null status filter includes paid (QA Gallery INV-2026-QA1 is billed).
-    if (inv.deletedAt == null && keepInvoiceForSearch(inv, parsed, statuses)) {
-      const anchor = inv.dueDate ?? inv.issuedAt;
-      const oldEnough =
-        ageThreshold === null || (anchor != null && anchor <= ageThreshold);
-      if (oldEnough) {
-        out.push({
-          kind: "invoice",
-          id: String(inv._id),
-          label: invoiceSearchLabel(inv),
-          hint: invoiceHint(inv, now),
-          path: `/finance/invoices/${inv._id}`,
-          score: parsed.invoiceNumbers.length > 0 ? 0.9 : 0.5,
-        });
-      }
+    const anchor = inv.dueDate ?? inv.issuedAt;
+    const matchesAge =
+      ageThreshold === null || (anchor != null && anchor <= ageThreshold);
+    if (
+      inv.deletedAt == null &&
+      keepInvoiceForSearch(inv, parsed, statuses) &&
+      matchesAge
+    ) {
+      out.push({
+        kind: "invoice",
+        id: String(inv._id),
+        label: invoiceSearchLabel(inv),
+        hint: invoiceHint(inv, now),
+        path: `/finance/invoices/${inv._id}`,
+        score: parsed.invoiceNumbers.length > 0 ? 0.9 : 0.5,
+      });
     }
-    if (out.length >= MAX_HITS || scanned >= MAX_SCANNED) break;
+    if (scanned >= MAX_SCANNED || out.length >= MAX_HITS) break;
   }
   out.sort((a, b) => b.score - a.score);
   return out.slice(0, MAX_HITS);

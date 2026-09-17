@@ -1,4 +1,3 @@
-import { existsSync, readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -6,50 +5,8 @@ import { classifyCommandFailure } from "../src/features/events/CommandFailure";
 import { EventGuestPolicy } from "../src/features/events/EventGuestPolicy";
 import { EventLifecyclePolicy } from "../src/features/events/EventLifecyclePolicy";
 import { FailureBanner } from "../src/features/events/FailureBanner";
-import {
-  eventCreatePath,
-  eventDetailPath,
-} from "../src/features/events/eventRoutes";
-
-const read = (path: string) => readFileSync(path, "utf8");
 
 describe("Event planning foundation", () => {
-  it("creates Client, Venue, Event, and EventGuest through generated commands", () => {
-    const mutations = read("convex/mutations.ts");
-    const hooks = read("src/lib/manifest-convex-react.ts");
-    for (const mutation of [
-      "Client_createViaRegister",
-      "Venue_createViaRegister",
-      "Event_createViaPlanEngagement",
-      "EventGuest_createViaInvite",
-    ]) {
-      expect(mutations).toContain(`export const ${mutation} = mutation({`);
-    }
-    for (const hook of [
-      "useCreateClient",
-      "useCreateVenue",
-      "useCreateEvent",
-      "useCreateEventGuest",
-    ]) {
-      expect(hooks).toContain(`export function ${hook}()`);
-    }
-    expect(existsSync("convex/lib/eventPlanning.ts")).toBe(false);
-    expect(existsSync("src/features/events/eventPlanningApi.ts")).toBe(false);
-  });
-
-  it("navigates successful event creation directly to the real detail route", () => {
-    expect(eventDetailPath("event_123")).toBe("/events/event_123?tab=overview");
-    expect(eventCreatePath({ clientId: "client_9" })).toBe(
-      "/events/new?clientId=client_9",
-    );
-    expect(read("src/features/events/EventCreatePage.tsx")).toContain(
-      "navigate(eventDetailPath(created.docId))",
-    );
-    expect(read("src/app/App.tsx")).toContain(
-      '<Route path="/events/:id" element={<EventDetailPage />} />',
-    );
-  });
-
   it("derives every legal Event lifecycle offer from generated transitions", () => {
     const policy = new EventLifecyclePolicy();
     expect(
@@ -136,19 +93,5 @@ describe("Event planning foundation", () => {
     );
     expect(failure.detail).toContain("a95c55eb16003c2d");
     expect(failure.detail).not.toMatch(/lifecycle|refresh/i);
-  });
-
-  it("wires every supported guest command into the dossier", () => {
-    const panel = read("src/features/events/EventGuestPanel.tsx");
-    for (const hook of [
-      "useEventGuestAssignTable",
-      "useEventGuestCheckIn",
-      "useEventGuestRsvpConfirm",
-      "useEventGuestRsvpDecline",
-      "useEventGuestWithdraw",
-      "useCreateEventGuest",
-    ]) {
-      expect(panel).toContain(hook);
-    }
   });
 });

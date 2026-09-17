@@ -1,18 +1,9 @@
 #!/usr/bin/env bash
-# Vercel build entry — vercel.json buildCommand caps at 256 chars, so the
-# branch lives here. Production must keep deploying Convex together with the
-# UI (AGENTS.md invariant since cc24315; do not remove).
-#
-# Only main deploys (vercel.json ignoreCommand, owner rule 2026-08-25). Branch
-# pushes are chores: no Vercel build, no Convex prod deploy. Dev work talks to
-# the LOCAL Convex backend. `bun run check` also runs this file off Vercel;
-# that path is a plain vite build and deploys nothing.
+# Explicit production entrypoint used by Vercel and deploy:production.
+# bun run build is always a local frontend build, independent of environment.
 set -euo pipefail
 
 if [ "${VERCEL_ENV:-}" = "production" ]; then
-  # package.json `build` also runs this file so a Vite-preset override
-  # cannot ship UI-only (QA 191: frontend 3dd95bb1, mule search still
-  # hyphen-split leftover).
   # Cutover 2026-09-14: production backend is the SELF-HOSTED Convex on the
   # Hermes box. When CONVEX_SELF_HOSTED_URL is set in the Vercel environment,
   # the build is UI-only (backend code is deployed to the self-hosted instance
@@ -43,5 +34,6 @@ elif [ -n "${VERCEL:-}" ]; then
   echo "capsule vercel-build: refusing non-production Vercel build (VERCEL_ENV=${VERCEL_ENV:-unset}). Only main deploys."
   exit 1
 else
-  vite build
+  echo "capsule deploy:production: requires VERCEL_ENV=production. Use bun run build for a local build."
+  exit 1
 fi

@@ -33,10 +33,10 @@
       "sha256": "d5a6fc9970a1a90cd5bfd7cf6d8c53e4eb002c7a0a36881b1fb12c17546f06d1"
     },
     "package.json": {
-      "sha256": "9a52c6ce01196c2f9bb31ec027de36c9074ceea42897d83b8663c11471e07d82"
+      "sha256": "d5bb77b01c379397080e4c55bbc949b280829006dc682ef1bd3d9803f243aa99"
     },
     "PRESET.md": {
-      "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
+      "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
       "sha256": "64628cc8bb95768ddea2440afd179f84a935b518be8da1cfeb47d46986974f83"
@@ -53,9 +53,6 @@
     "src/lib/manifest-convex-react.ts": {
       "sha256": "646940999fc4fb087b59aca699183643a1a170dfad9f863c932a5bd3863fcd5f"
     },
-    "tests/manifest-convex.contract.test.ts": {
-      "sha256": "0c63ee2974d1111b39f8765f5de6b735e1d0723ba16cd1853b18c2d14f11afac"
-    },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
@@ -65,7 +62,7 @@
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "^3.6.55",
+      "@angriff36/manifest": "3.6.55",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },

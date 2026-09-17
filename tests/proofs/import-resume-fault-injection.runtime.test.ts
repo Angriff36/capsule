@@ -160,7 +160,7 @@ async function commit(
 }
 
 describe("runtime proof: import resume with fault injection (AC-024)", () => {
-  it("failure after any write resumes missing children without replacing newer edits", async () => {
+  it("resumes the injected partial imports without duplicate children or replacing newer edits", async () => {
     const tenantId = "tenant-import-resume-fault";
     const proof = harness();
     const owner = proof.asRole({

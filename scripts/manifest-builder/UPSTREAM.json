@@ -1,0 +1,6 @@
+{
+  "repository": "https://github.com/Angriff36/builder",
+  "commit": "87ba52c4019ffb107436a3be8ea3da5a7a576397",
+  "importedAt": "2026-09-08",
+  "scope": "Transitive source dependencies of scripts/builder.mts; no upstream UI, tests, dependencies, or Git metadata."
+}

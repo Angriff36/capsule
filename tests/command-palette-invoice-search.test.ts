@@ -6,7 +6,6 @@ import {
   invoiceMatchesQuery,
   invoiceSearchLabel,
   invoiceStatusFilter,
-  keepInvoiceForSearch,
   parseSearchQuery,
   shouldQueryInvoices,
 } from "../convex/lib/parseSearchQuery";
@@ -95,65 +94,15 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     ).toBe("#INV-8BD5QP — $900");
   });
 
-  it("searchAll uses parseSearchQuery and invoiceMatchesQuery, not hyphen-split includes", () => {
-    const search = readFileSync("convex/search.ts", "utf8");
-    expect(search).toContain("parseSearchQuery");
-    expect(search).toContain("invoiceSearchLabel");
-    expect(search).toContain('from "./lib/parseSearchQuery"');
-    expect(search).not.toContain("function parseQuery");
-    expect(search).not.toContain("num.includes(textTerm.toLowerCase())");
-  });
-
-  it("queryInvoices uses invoiceStatusFilter so paid INV-* lookup is not unpaid-only", () => {
-    // QA Gallery INV-2026-QA1 is billed. A helper-only assertion still
-    // passes if queryInvoices drops invoiceStatusFilter and always skips paid.
-    const hash = parseSearchQuery("#INV-2026-QA1", NOW);
-    const statuses = invoiceStatusFilter(hash);
-    expect(shouldQueryInvoices(hash)).toBe(true);
-    expect(statuses).toBeNull();
-    expect(keepInvoiceForSearch(qa1, hash, statuses)).toBe(true);
-
-    const unpaid = parseSearchQuery("unpaid invoices", NOW);
-    expect(keepInvoiceForSearch(qa1, unpaid, invoiceStatusFilter(unpaid))).toBe(
-      false,
-    );
-
-    const search = readFileSync("convex/search.ts", "utf8");
-    expect(search).toContain("invoiceStatusFilter(parsed)");
-    expect(search).toContain("shouldQueryInvoices(parsed)");
-    expect(search).toContain("keepInvoiceForSearch(inv, parsed, statuses)");
-    expect(search).not.toContain("unpaidStatuses");
-    expect(search).not.toContain("if (statuses && !statuses.has");
-  });
-
-  it("queryInvoices scans past the first page without a second paginate", () => {
-    // QA 191: billed INV-2026-QA1 / draft INV-8BJQS7 can sit past the
-    // first 120 tenant rows. Restoring .take(120) still passed helper tests.
-    // #303: Convex allows one .paginate() per execution, so a cursor loop
-    // threw past the first 100 invoices. Bounded async iteration instead.
-    const search = readFileSync("convex/search.ts", "utf8");
-    const start = search.indexOf("async function queryInvoices");
-    const end = search.indexOf("function invoiceHint", start);
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    const fn = search.slice(start, end);
-    expect(fn).not.toMatch(/\.paginate\(\s*\{/);
-    expect(fn).toContain("for await (const inv of ctx.db");
-    expect(fn).toContain("MAX_SCANNED");
-    expect(fn).not.toMatch(/\.take\(\s*120\s*\)/);
-    // QA 193: .filter(deletedAt === null) emptied pages (undefined ≠ null)
-    // and the scan spun 8–9s with no hits. Skip deleted in JS.
-    expect(fn).toContain("inv.deletedAt == null");
-    expect(fn).not.toContain('q.eq(q.field("deletedAt"), null)');
-  });
-
-  it("production build deploys Convex instead of a UI-only vite build", () => {
+  it("production configuration routes through the combined backend/frontend build script", () => {
     // QA 191 leftover: frontend 3dd95bb1 on mule, search still hyphen-split.
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
-      scripts: { build: string };
+      scripts: { build: string; "deploy:production": string };
     };
-    expect(pkg.scripts.build).toBe("bash scripts/vercel-build.sh");
-    expect(pkg.scripts.build).not.toBe("vite build");
+    expect(pkg.scripts.build).toBe("vite build");
+    expect(pkg.scripts["deploy:production"]).toBe(
+      "bash scripts/vercel-build.sh",
+    );
     const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as {
       buildCommand: string;
     };

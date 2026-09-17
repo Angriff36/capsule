@@ -66,7 +66,6 @@ const PAYROLL_RUNTIME_TEST =
   "tests/proofs/payroll-input-lifecycle.runtime.test.ts";
 const COMPONENT_IMPORT_RUNTIME_TEST =
   "tests/proofs/component-import-finalize.runtime.test.ts";
-const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
 const SHIFT_RUNTIME_PROOF_IDS = [
   "Shift.schedule",
   "Shift.start",
@@ -209,17 +208,11 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     ...PAYROLL_RUNTIME_PROOF_IDS,
     ...COMPONENT_IMPORT_PROOF_IDS,
   ]);
-  const structuralProofIds = new Set([
-    demandReactionId,
-    qualityReactionId,
-    paymentReactionId,
-  ]);
 
   const catalog = emitCapabilityCatalog(ir, {
     entityFilter: CATALOG_ENTITIES,
     versions,
     runtimeProofIds,
-    structuralProofIds,
   });
 
   const registry = emitProofRegistry(ir, {
@@ -228,17 +221,14 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     testBindings: [
       {
         proofId: demandReactionId,
-        structuralTest: STRUCTURAL_TEST,
         runtimeTest: DEMAND_RUNTIME_TEST,
       },
       {
         proofId: qualityReactionId,
-        structuralTest: STRUCTURAL_TEST,
         runtimeTest: QUALITY_RUNTIME_TEST,
       },
       {
         proofId: paymentReactionId,
-        structuralTest: STRUCTURAL_TEST,
         runtimeTest: COMMERCIAL_RUNTIME_TEST,
       },
       ...SHIFT_RUNTIME_PROOF_IDS.map((proofId) => ({

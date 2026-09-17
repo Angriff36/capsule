@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import type { IncomingMessage } from "node:http";
-import { tmpdir } from "node:os";
+import { availableParallelism, tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
@@ -239,6 +239,9 @@ export default defineConfig(({ mode }) => ({
   },
   test: {
     environment: "node",
+    // Each worker loads the generated Convex runtime. Oversubscribing large
+    // machines adds contention and makes otherwise fast proofs time out.
+    maxWorkers: Math.min(8, availableParallelism()),
     include: ["tests/**/*.test.ts"],
     environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
     server: { deps: { inline: ["convex-test"] } },

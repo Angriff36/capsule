@@ -89,7 +89,7 @@ describe("EventDetailPage unknown-record guard", () => {
     expect(markup).toContain("Event unavailable");
   });
 
-  it("keeps the loading state for a plausible id that has not resolved yet", () => {
+  it("does not report a missing event while a plausible id is still unresolved", () => {
     harness.eventResult = undefined;
     const markup = renderAt(`/events/${PLAUSIBLE_ID}`);
     expect(harness.getEventCalls).toContain(PLAUSIBLE_ID);

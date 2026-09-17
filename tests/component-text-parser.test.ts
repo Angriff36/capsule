@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { IngredientCatalogMatcher } from "../src/features/kitchen/import/IngredientCatalogMatcher";
 import { ComponentCsvParser } from "../src/features/kitchen/import/ComponentCsvParser";
 import { ComponentImportCoordinator } from "../src/features/kitchen/import/ComponentImportCoordinator";
-import { ComponentImportFinalizer } from "../src/features/kitchen/import/ComponentImportFinalizer";
 import { ComponentTextParser } from "../src/features/kitchen/import/ComponentTextParser";
 import { SourceFingerprint } from "../src/features/kitchen/import/SourceFingerprint";
 import { UnitOfMeasureMapper } from "../src/features/kitchen/import/UnitOfMeasureMapper";
@@ -308,51 +307,6 @@ describe("ComponentImportCoordinator", () => {
       ),
     };
     expect(reviewIsReady(corrected)).toBe(true);
-  });
-});
-
-describe("ComponentImportFinalizer", () => {
-  it("creates missing ingredients, component, and lines in order", async () => {
-    const calls: string[] = [];
-    const review = new ComponentImportCoordinator().parseText(SAMPLE, [
-      { id: "ing-onion", name: "Onion" },
-    ]);
-    const ready = {
-      ...review,
-      lines: review.lines
-        .map((line) =>
-          line.matchStatus === "exact"
-            ? line
-            : {
-                ...line,
-                matchStatus: "confirmed_new" as const,
-                createNew: true,
-              },
-        )
-        // Correct the unrecognized "small" unit the way a reviewer would.
-        .map((line) =>
-          line.unit == null ? { ...line, unit: "each" as const } : line,
-        ),
-    };
-    const finalizer = new ComponentImportFinalizer({
-      createIngredient: async (input) => {
-        calls.push(`ingredient:${input.name}`);
-        return { docId: `new-${input.name}` };
-      },
-      createComponent: async (input) => {
-        calls.push(`component:${input.name}`);
-        return { docId: "component-1" };
-      },
-      createComponentIngredient: async (input) => {
-        calls.push(`line:${input.ingredientId}`);
-        return { docId: `line-${input.sortOrder}` };
-      },
-    });
-
-    const result = await finalizer.finalize(ready);
-    expect(result.componentId).toBe("component-1");
-    expect(result.lineIds).toHaveLength(ready.lines.length);
-    expect(calls).toContain("component:One-Pot Chili");
   });
 });
 

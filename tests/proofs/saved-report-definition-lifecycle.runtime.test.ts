@@ -167,7 +167,7 @@ describe("runtime proof: SavedReportDefinition create → archive → restore", 
         api.mutations.SavedReportDefinition_archive,
         { docId: created.docId, version: 1 },
       ),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/SavedReportDefinition not found/);
 
     const stillActive = await owner.run(async (ctx) =>
       ctx.db.get(created.docId as never),

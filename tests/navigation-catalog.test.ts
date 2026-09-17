@@ -21,12 +21,6 @@ describe("NavigationCatalog", () => {
     );
   });
 
-  it("exposes every area — the planned/unshipped concept is retired", () => {
-    // 2026-07-28: every area has shipped; the shell no longer renders a
-    // "Future workspaces" drawer or planned-area placeholder pages.
-    expect(catalog.availableAreas()).toHaveLength(NAV_AREAS.length);
-  });
-
   it("resolves area from pathname prefixes", () => {
     expect(catalog.areaForPath("/events/abc")?.label).toBe("Events");
     expect(catalog.areaForPath("/")?.label).toBe("Home");

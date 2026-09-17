@@ -56,7 +56,7 @@ describe("KitchenDisplayPage actual yield", () => {
       input.dispatchEvent(new Event("input", { bubbles: true }));
     });
 
-  it("submits an operator-entered zero actual yield and its batch unit", async () => {
+  it("submits an operator-entered zero actual yield with the current batch version", async () => {
     harness.complete.mockResolvedValue(undefined);
     await act(async () =>
       root.render(

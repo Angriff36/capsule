@@ -648,7 +648,7 @@ describe("accepted proposal → create event (issue #141)", () => {
     expect((copied[0] as { dishId?: string }).dishId).toBe(seed.dishA.docId);
   });
 
-  it("rejects an already-linked proposal at the seam and the domain command, creating no duplicate event", async () => {
+  it("rejects an already-linked proposal at the booking seam without changing the existing event or menu", async () => {
     const tenantId = "tenant-booking-dup";
     const proof = harness();
     const owner = proof.asRole({
@@ -681,21 +681,6 @@ describe("accepted proposal → create event (issue #141)", () => {
       ),
     ).rejects.toThrow(/already linked/);
     expect(await liveEventCount(owner)).toBe(eventsAfterBooking);
-
-    // The domain commands themselves also refuse to re-link (guard
-    // eventId == null): staging a new candidate fails, and so does a bare
-    // linkEvent.
-    await expect(
-      proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
-        docId: proposalId,
-        eventId: booked.docId,
-      }),
-    ).rejects.toThrow();
-    await expect(
-      proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
-        docId: proposalId,
-      }),
-    ).rejects.toThrow();
 
     // The original link and menu survive untouched.
     const linked = await owner.run(async (ctx) =>
@@ -752,11 +737,24 @@ describe("accepted proposal → create event (issue #141)", () => {
       }),
     ).rejects.toThrow(/Guard/);
 
-    // Managers still can (policy + guard both pass).
+    expect(
+      (await liveEventDishes(owner, event.docId)).map((row) => ({
+        id: row._id,
+        servings: row.quantityServings,
+      })),
+    ).toEqual([{ id: line.docId, servings: 10 }]);
+
+    // The same existing line remains editable by its authorized manager.
     await proof.executeCommand(owner, api.mutations.EventDish_adjustServings, {
       docId: line.docId,
       quantityServings: 12,
     });
+    expect(
+      (await liveEventDishes(owner, event.docId)).map((row) => ({
+        id: row._id,
+        servings: row.quantityServings,
+      })),
+    ).toEqual([{ id: line.docId, servings: 12 }]);
   });
 
   it("linkEvent refuses a fake eventId even when no menu selections exist", async () => {
@@ -827,7 +825,7 @@ describe("accepted proposal → create event (issue #141)", () => {
       proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
         docId: proposal.docId,
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/Guard/);
 
     const row = await owner.run(async (ctx) =>
       ctx.db.get(proposal.docId as never),

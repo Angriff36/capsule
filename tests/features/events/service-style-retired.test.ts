@@ -1,16 +1,11 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   serviceStyleSelectOptions,
   usingBuiltInServiceStyles,
 } from "../../../src/features/events/serviceStyleCatalog";
 
-// Spec: dropdown-lists-and-their-admin-screen.md — "A retired service style
-// disappears from new-event selectors but remains on existing events and
-// imports." The imports half has no id-mapping surface yet (mapServiceStyle
-// is unimplemented); create and detail are the built paths this pins.
 describe("retired service styles", () => {
-  it("retired hidden on create, resolved on detail", () => {
+  it("excludes retired styles from new-event choices and falls back for a retired-only catalog", () => {
     const active = {
       _id: "k57qs3vq8x2r4m9d",
       name: "Full Service",
@@ -38,21 +33,5 @@ describe("retired service styles", () => {
     expect(
       serviceStyleSelectOptions([retired]).map((option) => option.id),
     ).not.toContain("mm82x1tq5y7w3e6f");
-
-    // Existing events keep resolving: EventDetailsCard looks the id up in the
-    // full live list (no status filter), so a since-retired style still names.
-    const card = readFileSync(
-      "src/features/events/EventDetailsCard.tsx",
-      "utf8",
-    );
-    expect(card).toContain("nameOf(useListServiceStyle(), serviceStyleId)");
-    expect(card).toContain("rows?.find((row) => row._id === id)?.name");
-
-    // The create field feeds its picker only the filtered options.
-    const page = readFileSync(
-      "src/features/events/EventCreateServiceStyleField.tsx",
-      "utf8",
-    );
-    expect(page).toContain("serviceStyleSelectOptions(rows)");
   });
 });

@@ -3,6 +3,7 @@
  * Windows would invoke the WSL bash stub instead of Git Bash (#338, #299).
  * Run via `bun scripts/check-toolchain.ts` (not part of tsc project graph).
  */
+import semver from "semver";
 import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -38,16 +39,13 @@ class ToolchainGate {
    *  version (#299). */
   private assertHostNodeMajor(): void {
     const nvmrc = readFileSync(resolve(this.root, ".nvmrc"), "utf8").trim();
-    const requiredMajor = Number.parseInt(nvmrc, 10);
     const host = this.hostNodeVersion();
-    const nodeMajor = Number.parseInt(host.split(".")[0] ?? "", 10);
-    if (
-      !Number.isFinite(requiredMajor) ||
-      !Number.isFinite(nodeMajor) ||
-      nodeMajor < requiredMajor
-    ) {
+    const { engines } = JSON.parse(
+      readFileSync(resolve(this.root, "package.json"), "utf8"),
+    );
+    if (!semver.valid(host) || !semver.satisfies(host, engines.node)) {
       throw new Error(
-        `Node >= ${requiredMajor} required on PATH (see .nvmrc / engines.node); host node reported ${host}.`,
+        `Node ${engines.node} required (recommended ${nvmrc}); running ${host}.`,
       );
     }
   }

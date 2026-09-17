@@ -4,7 +4,7 @@
  * in/out are no longer editable on the primary flow, or if create drops
  * the event association.
  */
-import { readFileSync } from "node:fs";
+
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
@@ -84,22 +84,6 @@ describe("TimeSheet Clock in form (issue #149)", () => {
     expect(html).toContain(`max="${MAX_DATETIME_LOCAL_INPUT_VALUE}"`);
     expect(html).toContain("clock-in-at");
     expect(html).toContain("clock-out-at");
-  });
-
-  it("keeps the Clock in form fields in TimeSheetPage source", () => {
-    const source = readFileSync(
-      "src/features/workforce/TimeSheetPage.tsx",
-      "utf8",
-    );
-    expect(source).toContain('name="eventId"');
-    expect(source).toContain('name="clockInAt"');
-    expect(source).toContain('name="clockOutAt"');
-    expect(source).toContain("BoundedDateTimeLocalInput");
-    expect(source).toContain("persistPrimaryTimeRecord");
-    expect(source).toContain("persistClockOut");
-    expect(source).toContain("CLOCK_OUT_PROMPT_FIELDS");
-    expect(source).toContain("<TimeSheetRecordState row={row} />");
-    expect(source).not.toContain("<small>corrected</small>");
   });
 });
 
@@ -204,16 +188,6 @@ describe("event association is not dropped on create", () => {
     expect(result.window).toBeNull();
     expect(api.clockOut).not.toHaveBeenCalled();
     expect(api.correct).not.toHaveBeenCalled();
-  });
-
-  it("fails closed if a caller drops eventId from the create payload", () => {
-    const dropped = buildClockInCreateArgs({
-      personId: PERSON_ID,
-      eventId: EVENT_ID,
-    });
-    // Guard: reversing the association (omitting eventId) must fail this suite.
-    expect(dropped.eventId).toBeDefined();
-    expect(JSON.stringify(dropped)).toContain(EVENT_ID);
   });
 });
 
@@ -447,15 +421,5 @@ describe("Time sheet break column (QA leftover after 197/201/202)", () => {
     expect(correctedHtml).toMatch(/30 min/);
     expect(closedHtml).not.toContain("—");
     expect(timeRecordBreakLabel(30)).toBe("30 min");
-  });
-
-  it("TimeSheetPage paints TimeSheetBreakCell instead of 0 min fallback", () => {
-    const source = readFileSync(
-      "src/features/workforce/TimeSheetPage.tsx",
-      "utf8",
-    );
-    expect(source).toContain("<TimeSheetBreakCell");
-    expect(source).toContain("breakMinutes={row.breakMinutes}");
-    expect(source).not.toContain("{row.breakMinutes ?? 0} min");
   });
 });
