@@ -20,6 +20,15 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   property required plannedYield: decimal(12, 4) = 0
   property actualYield: decimal(12, 4)?
   property required yieldUnit: UnitOfMeasure = "portion"
+  // Revision-2 culinary model (2026-09-14). Exact need across allocations,
+  // the rounded quantity the kitchen actually makes, and the difference. All
+  // optional so pre-field batches validate; null = not reconciled.
+  property plannedExact: decimal(12, 4)?
+  property plannedRounded: decimal(12, 4)?
+  property surplusQuantity: decimal(12, 4)?
+  property roundingScope: RoundingScope?
+  property portionSpecId: uuid?
+  property productionDate: datetime?
   property notes: string?
   property required status: ProductionBatchStatus = "planned"
   property plannedAt: datetime?
@@ -73,6 +82,38 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
       plannedYield: self.plannedAt != null ? self.plannedYield : plannedYield
       yieldUnit: self.plannedAt != null ? self.yieldUnit : yieldUnit
       status: "planned"
+    }
+  }
+
+  // Record the reconciled plan: exact need, rounded make quantity, surplus,
+  // and the scope the rounding was applied at. plannedYield follows the
+  // rounded quantity so the kitchen sees what it makes.
+  command reconcilePlan(
+    plannedExact: decimal(12, 4),
+    plannedRounded: decimal(12, 4),
+    optional roundingScope: RoundingScope,
+    optional portionSpecId: uuid,
+    optional productionDate: datetime
+  ) {
+    guard self.status == "planned"
+    guard self.plannedAt != null
+    guard self.deletedAt == null
+    constraint reconcileExactNonnegative: plannedExact >= 0 "Exact quantity cannot be negative"
+    constraint reconcileRoundedCoversExact: plannedRounded >= plannedExact "Rounded quantity cannot be below the exact need"
+    mutate plannedExact = plannedExact
+    mutate plannedRounded = plannedRounded
+    mutate surplusQuantity = plannedRounded - plannedExact
+    mutate plannedYield = plannedRounded
+    mutate roundingScope = roundingScope != null ? roundingScope : self.roundingScope
+    mutate portionSpecId = portionSpecId != null ? portionSpecId : self.portionSpecId
+    mutate productionDate = productionDate != null ? productionDate : self.productionDate
+    emit ProductionBatchPlanReconciled {
+      productionBatchId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      plannedExact: plannedExact
+      plannedRounded: plannedRounded
+      surplusQuantity: plannedRounded - plannedExact
     }
   }
 
@@ -200,3 +241,150 @@ on EventApproved fanOut EventDishComponentSeed where eventId = payload.eventId
     yieldUnit: "portion"
     eventId: payload.eventId
   }
+
+// Revision-2 culinary model (2026-09-14). Rounding happens at exactly one
+// scope; the other scopes carry the exact value.
+enum RoundingScope {
+  none
+  dish_allocation
+  event_total
+  production_group
+  purchase_pack
+}
+
+enum BatchAllocationStatus {
+  planned
+  produced
+  portioned
+  released
+}
+
+event ProductionBatchPlanReconciled: "production_batch.plan_reconciled" {
+  productionBatchId: string
+  tenantId: string
+  componentId: string
+  plannedExact: decimal(12, 4)
+  plannedRounded: decimal(12, 4)
+  surplusQuantity: decimal(12, 4)
+}
+
+// Ownership of every share of a shared batch: an event dish allocation or the
+// unassigned production surplus. Allocations sum to plannedExact; the surplus
+// row closes the ledger to plannedRounded. Batch completion marks allocations
+// produced; portioning and packing are separate PrepTasks that complete on
+// their own controls.
+entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required productionBatchId: uuid
+  property eventId: uuid?
+  property eventDishId: uuid?
+  property required allocatedQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "portion"
+  // Share of the batch formula this allocation owns (allocatedQuantity / batch
+  // yield). Ingredient contributions for the batch are split by this share.
+  property required formulaShare: decimal(12, 6) = 0
+  property required isSurplus: boolean = false
+  property required status: BatchAllocationStatus = "planned"
+  property allocatedAt: datetime?
+  property producedAt: datetime?
+  property portionedAt: datetime?
+  property releaseReason: string?
+
+  belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
+
+  constraint allocationQuantityNonnegative: self.allocatedAt == null or self.allocatedQuantity >= 0 "Allocated quantity cannot be negative"
+  constraint allocationOwner: self.allocatedAt == null or self.isSurplus == true or self.eventId != null "An allocation belongs to an event or is surplus"
+
+  transition status from "planned" to ["produced", "released"]
+  transition status from "produced" to ["portioned", "released"]
+  transition status from "portioned" to []
+  transition status from "released" to []
+
+  default policy productionBatchAllocationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read batch allocations"
+  default policy productionBatchAllocationWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write batch allocations through commands"
+  default policy productionBatchAllocationExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute batch allocation commands"
+
+  command allocate(
+    productionBatchId: uuid,
+    allocatedQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    formulaShare: decimal(12, 6),
+    optional eventId: uuid,
+    optional eventDishId: uuid,
+    optional isSurplus: boolean
+  ) {
+    guard self.allocatedAt == null
+    guard self.deletedAt == null
+    constraint allocateQuantity: allocatedQuantity >= 0 "Allocated quantity cannot be negative"
+    constraint allocateShare: formulaShare >= 0 "Formula share cannot be negative"
+    constraint allocateOwner: (isSurplus != null and isSurplus) or eventId != null "An allocation belongs to an event or is surplus"
+    mutate productionBatchId = productionBatchId
+    mutate eventId = eventId
+    mutate eventDishId = eventDishId
+    mutate allocatedQuantity = allocatedQuantity
+    mutate unit = unit
+    mutate formulaShare = formulaShare
+    mutate isSurplus = isSurplus != null ? isSurplus : false
+    mutate allocatedAt = now()
+    emit ProductionBatchAllocated {
+      productionBatchAllocationId: self.id
+      tenantId: self.tenantId
+      productionBatchId: productionBatchId
+      eventId: eventId
+      eventDishId: eventDishId
+      allocatedQuantity: allocatedQuantity
+      unit: unit
+      formulaShare: formulaShare
+      isSurplus: isSurplus != null ? isSurplus : false
+    }
+  }
+
+  // Batch completion marks the share produced. It never completes portioning
+  // or packing; those are PrepTasks with their own controls.
+  command markProduced() {
+    guard self.status == "planned"
+    guard self.deletedAt == null
+    mutate status = "produced"
+    mutate producedAt = now()
+  }
+
+  command markPortioned() {
+    guard self.status == "produced"
+    guard self.deletedAt == null
+    mutate status = "portioned"
+    mutate portionedAt = now()
+  }
+
+  command release(reason: string) {
+    guard self.status == "planned" or self.status == "produced"
+    guard self.deletedAt == null
+    constraint releaseAllocationReason: length(trim(reason)) > 0 "Release reason is required"
+    mutate status = "released"
+    mutate releaseReason = reason
+    mutate deletedAt = now()
+  }
+
+  store ProductionBatchAllocation in durable
+}
+
+event ProductionBatchAllocated: "production_batch_allocation.allocated" {
+  productionBatchAllocationId: string
+  tenantId: string
+  productionBatchId: string
+  eventId: string?
+  eventDishId: string?
+  allocatedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  formulaShare: decimal(12, 6)
+  isSurplus: boolean
+}
+
+// Completing the batch marks every planned share produced. Portioning and
+// packing tasks stay open.
+on ProductionBatchCompleted fanOut ProductionBatchAllocation where productionBatchId = payload.productionBatchId
+  run markProduced

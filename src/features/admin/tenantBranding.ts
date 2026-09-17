@@ -2,6 +2,7 @@ import { useOrganization } from "@clerk/react";
 import { useMemo } from "react";
 import type { Doc } from "../../lib/api";
 import { useListOrganization } from "../../lib/manifest-convex-react";
+import { useBrandLogoUrl } from "./brandLogoUpload";
 
 export const DEFAULT_BRAND_PRIMARY = "#233E35";
 export const DEFAULT_BRAND_ACCENT = "#BE773F";
@@ -44,14 +45,18 @@ export function brandColorRgb(hex: string): [number, number, number] {
 export function resolveTenantBranding(
   record: Doc<"organizations"> | null | undefined,
   clerkOrganization: ClerkOrganizationBrand | null | undefined,
+  storedLogoUrl?: string | null,
 ): TenantBranding {
   const configuredName = String(record?.brandDisplayName ?? "").trim();
   const domainName = String(record?.name ?? "").trim();
   const clerkName = String(clerkOrganization?.name ?? "").trim();
+  // The tenant's own upload (Convex storage) wins; the Clerk organization
+  // image is only a fallback for tenants that uploaded before #237.
   const logoUrl =
-    clerkOrganization?.hasImage && clerkOrganization.imageUrl
+    storedLogoUrl ||
+    (clerkOrganization?.hasImage && clerkOrganization.imageUrl
       ? clerkOrganization.imageUrl
-      : undefined;
+      : undefined);
 
   return {
     displayName:
@@ -80,16 +85,22 @@ export function useTenantBranding() {
       ) ?? organizations?.find((row) => row.deletedAt == null),
     [organizations],
   );
+  const storedLogoUrl = useBrandLogoUrl();
   const branding = useMemo(
-    () => resolveTenantBranding(record, clerkOrganization),
-    [record, clerkOrganization],
+    () => resolveTenantBranding(record, clerkOrganization, storedLogoUrl),
+    [record, clerkOrganization, storedLogoUrl],
   );
 
   return {
     branding,
     record,
     clerkOrganization,
-    loading: organizations === undefined || !clerkLoaded,
+    /** True when the logo shown comes from the tenant's own Convex upload. */
+    hasStoredLogo: Boolean(storedLogoUrl),
+    loading:
+      organizations === undefined ||
+      !clerkLoaded ||
+      storedLogoUrl === undefined,
   };
 }
 

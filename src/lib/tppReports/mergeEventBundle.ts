@@ -6,6 +6,7 @@ import {
   type EventBundlePart,
   type EventBundleSource,
 } from "./eventBundle";
+import { mergePacketEvidence } from "../eventPacket/packetContract";
 
 /**
  * Reconciles the seven TPP reports into one bundle.
@@ -183,6 +184,15 @@ export function mergeEventBundle(
   const bundle = emptyEventBundle();
   const ordered = orderParts(parts, FACT_ORDER);
   const warnings = parts.flatMap((part) => part.warnings ?? []);
+  const evidence = parts.flatMap((part) =>
+    part.packetEvidence ? [part.packetEvidence] : [],
+  );
+  if (evidence.length) {
+    bundle.packetEvidence = mergePacketEvidence(evidence);
+    warnings.push(
+      "Imported packet facts, approvals and revisions are unverified evidence. Review against the current native event before applying any change.",
+    );
+  }
 
   bundle.header = mergeFields(ordered, (part) => part.header);
   bundle.client = mergeFields(ordered, (part) => part.client);
@@ -198,7 +208,7 @@ export function mergeEventBundle(
   bundle.payments = parts.flatMap((part) => part.payments ?? []);
   bundle.staff = parts.flatMap((part) => part.staff ?? []);
   bundle.otherContacts = parts.flatMap((part) => part.otherContacts ?? []);
-  bundle.sources = parts.map((part) => part.source);
+  bundle.sources = [...new Set(parts.map((part) => part.source))];
 
   const invoices = new Set(
     parts

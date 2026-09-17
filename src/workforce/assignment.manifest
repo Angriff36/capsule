@@ -4,33 +4,10 @@
 
 use "./shift.manifest"
 
-// Vision cascade: when an event has an owner (assignedToId), ensure one lead
-// EventAssignment. fanOut Person where id = assignedToId is a no-op when the
-// owner is unset — approve must not invent staff.
-on EventApproved fanOut Person where id = payload.assignedToId
-  run EventAssignment.assign
-  match eventId = payload.eventId, personId = self.id
-  else create
-  params {
-    eventId: payload.eventId
-    personId: self.id
-    role: "event_lead"
-    startsAt: payload.startsAt
-    endsAt: payload.endsAt
-  }
-
-// Same seed when the owner is set/changed via Event.assignOwner.
-on EventOwnerAssigned fanOut Person where id = payload.assignedToId
-  run EventAssignment.assign
-  match eventId = payload.eventId, personId = self.id
-  else create
-  params {
-    eventId: payload.eventId
-    personId: self.id
-    role: "event_lead"
-    startsAt: payload.startsAt
-    endsAt: payload.endsAt
-  }
+// Event.assignedToId records the salesperson, not an on-site captain.
+// Source: event-worksheet.pdf p1 names the Sales Rep; p5 separately assigns
+// captains and crew. Ownership and approval must not invent field staffing.
+// EventAssignment and filled EventStaffNeed records describe actual crew.
 
 enum EventAssignmentStatus {
   assigned
@@ -53,6 +30,8 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   property required role: string = ""
   property startsAt: datetime?
   property endsAt: datetime?
+  // Explicit personal windows stay fixed; omitted times follow the crew plan.
+  property followsEventTiming: boolean?
   property encrypted notes: string?
   property required status: EventAssignmentStatus = "assigned"
   property assignedAt: datetime?
@@ -74,9 +53,9 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   transition status from "no_show" to []
   transition status from "unassigned" to []
 
-  default policy eventAssignmentRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read event assignments"
-  default policy eventAssignmentWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write event assignments through commands"
-  default policy eventAssignmentExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute event assignment commands"
+  default policy eventAssignmentRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may read shared event staffing"
+  default policy eventAssignmentWrite write: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may use commands to update shared event staffing"
+  default policy eventAssignmentExecute execute: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may use commands to update shared event staffing"
 
   command assign(
     eventId: uuid,
@@ -91,7 +70,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.event != null
     guard self.person != null and self.person.status == "active"
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     constraint assignEventMatch: eventId == self.eventId "Assign eventId must match the seeded event reference"
     constraint assignPersonMatch: personId == self.personId "Assign personId must match the seeded person reference"
     constraint assignRolePresent: length(trim(role)) > 0 "Assignment role is required"
@@ -102,6 +81,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     mutate startsAt = startsAt != null ? startsAt : self.startsAt
     mutate endsAt = endsAt != null ? endsAt : self.endsAt
     mutate notes = notes != null ? notes : self.notes
+    mutate followsEventTiming = startsAt == null and endsAt == null
     mutate assignedAt = now()
     emit EventAssignmentAssigned {
       eventAssignmentId: self.id
@@ -115,12 +95,54 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command planTiming(optional startsAt: datetime, optional endsAt: datetime, followsEventTiming: boolean, optional synchronizeShifts: boolean = true) {
+    // Recorded attendance is history; timing plans only change future work.
+    guard self.status == "assigned" or self.status == "confirmed"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and followsEventTiming == true and (self.followsEventTiming == true or (self.followsEventTiming == null and self.startsAt == null and self.endsAt == null)) and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess"))))
+    constraint planAssignmentDates: startsAt == null or endsAt == null or endsAt > startsAt "Shift end must be after its start"
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate followsEventTiming = followsEventTiming
+    emit EventAssignmentTimingChanged {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      synchronizeShifts: synchronizeShifts
+    }
+  }
+
+  // The originating approved swap is verified by the transactional event seam.
+  // Its recipient already accepted this work; do not ask them to confirm twice.
+  command applyApprovedShiftSwap(personId: uuid, shiftSwapRequestId: uuid, acceptedAt: datetime) {
+    guard self.status == "assigned" or self.status == "confirmed"
+    guard self.deletedAt == null
+    guard self.checkedInAt == null and self.checkedOutAt == null and self.noShowAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousPersonId = self.personId
+    mutate personId = personId
+    mutate status = "confirmed"
+    mutate confirmedAt = acceptedAt
+    mutate followsEventTiming = false
+    emit EventAssignmentShiftSwapApplied {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      previousPersonId: previousPersonId
+      personId: personId
+      shiftSwapRequestId: shiftSwapRequestId
+      acceptedAt: acceptedAt
+    }
+  }
+
+  // A linked Clerk subject and a Person ID are different identifiers.
+  // Only unlinked legacy identities retain the old Person-ID subject path.
   command confirm() {
     guard self.status == "assigned"
     guard self.assignedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "confirmed"
     mutate confirmedAt = now()
@@ -140,7 +162,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.assignedAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "checked_in"
     mutate checkedInAt = now()
@@ -160,7 +182,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.checkedInAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "checked_out"
     mutate checkedOutAt = now()
@@ -179,7 +201,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.status == "assigned" or self.status == "confirmed"
     guard self.assignedAt != null
     guard self.deletedAt == null
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     compute previousStatus = self.status
     mutate status = "no_show"
     mutate noShowAt = now()
@@ -198,7 +220,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
     guard self.status == "assigned" or self.status == "confirmed"
     guard self.assignedAt != null
     guard self.deletedAt == null
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     compute previousStatus = self.status
     mutate status = "unassigned"
     mutate unassignedAt = now()
@@ -234,6 +256,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   property description: string?
   property startsAt: datetime?
   property endsAt: datetime?
+  property followsEventTiming: boolean?
   property required status: EventStaffNeedStatus = "open"
   property claimedByPersonId: uuid?
   property filledByPersonId: uuid?
@@ -242,22 +265,33 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   property claimedAt: datetime?
   property filledAt: datetime?
   property cancelledAt: datetime?
+  property cancellationReason: string?
+  // Continuations retain the old request and link each new coverage window to it.
+  property previousStaffNeedId: uuid?
+  property continuationSlot: int?
+  property coverageContinuedAt: datetime?
+  property coverageReplacementPersonId: uuid?
+  property coverageStartsAt: datetime?
+  property coverageEndsAt: datetime?
+  property coverageWindowsJson: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo claimedBy: Person fields [tenantId, claimedByPersonId] references [tenantId, id]
   belongsTo filledBy: Person fields [tenantId, filledByPersonId] references [tenantId, id]
+  ref previousStaffNeed: EventStaffNeed fields [tenantId, previousStaffNeedId] references [tenantId, id]
+  ref coverageReplacementPerson: Person fields [tenantId, coverageReplacementPersonId] references [tenantId, id]
 
   constraint staffNeedRole: self.postedAt == null or length(trim(self.role)) > 0 "Staff need role is required once posted"
   constraint staffNeedWindow: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "Staff need end must be after its start"
 
   transition status from "open" to ["claimed", "filled", "cancelled"]
   transition status from "claimed" to ["filled", "open", "cancelled"]
-  transition status from "filled" to []
+  transition status from "filled" to ["cancelled"]
   transition status from "cancelled" to []
 
-  default policy eventStaffNeedRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read open staff needs"
-  default policy eventStaffNeedWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write staff needs through commands"
-  default policy eventStaffNeedExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute staff need commands"
+  default policy eventStaffNeedRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may read shared event staffing"
+  default policy eventStaffNeedWrite write: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may use commands to update shared event staffing"
+  default policy eventStaffNeedExecute execute: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may use commands to update shared event staffing"
 
   command postOpen(
     eventId: uuid,
@@ -265,11 +299,14 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     optional description: string,
     optional startsAt: datetime,
     optional endsAt: datetime,
-    optional notes: string
+    optional notes: string,
+    optional previousStaffNeedId: uuid,
+    optional continuationSlot: int,
+    optional followsEventTiming: boolean
   ) {
     guard self.postedAt == null
     guard self.deletedAt == null
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     constraint postOpenRole: length(trim(role)) > 0 "Staff need role is required"
     constraint postOpenWindow: startsAt == null or endsAt == null or endsAt > startsAt "Staff need end must be after its start"
     mutate eventId = eventId
@@ -277,7 +314,10 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     mutate description = description
     mutate startsAt = startsAt
     mutate endsAt = endsAt
+    mutate followsEventTiming = followsEventTiming != null ? followsEventTiming : (startsAt == null and endsAt == null)
     mutate notes = notes
+    mutate previousStaffNeedId = previousStaffNeedId
+    mutate continuationSlot = continuationSlot
     mutate status = "open"
     mutate postedAt = now()
     emit EventStaffNeedPosted {
@@ -288,7 +328,25 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command planTiming(optional startsAt: datetime, optional endsAt: datetime, followsEventTiming: boolean, optional synchronizeShifts: boolean = true) {
+    guard self.status != "cancelled"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and followsEventTiming == true and (self.followsEventTiming == true or (self.followsEventTiming == null and self.startsAt == null and self.endsAt == null)) and (roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess"))))
+    constraint planStaffNeedDates: startsAt == null or endsAt == null or endsAt > startsAt "Shift end must be after its start"
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate followsEventTiming = followsEventTiming
+    emit EventStaffNeedTimingChanged {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      synchronizeShifts: synchronizeShifts
+    }
+  }
+
   command claim(personId: uuid) {
+    // Staff volunteer themselves; managers may claim on a crew member's behalf.
+    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     guard self.status == "open"
     guard self.postedAt != null
     guard self.deletedAt == null
@@ -307,7 +365,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open" or self.status == "claimed"
     guard self.postedAt != null
     guard self.deletedAt == null
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     mutate filledByPersonId = personId
     mutate claimedByPersonId = personId
     mutate status = "filled"
@@ -320,7 +378,29 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command applyApprovedShiftSwap(personId: uuid, shiftSwapRequestId: uuid, acceptedAt: datetime) {
+    guard self.status == "filled"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousPersonId = self.filledByPersonId
+    mutate filledByPersonId = personId
+    mutate claimedByPersonId = personId
+    mutate claimedAt = acceptedAt
+    mutate filledAt = now()
+    mutate followsEventTiming = false
+    emit EventStaffNeedShiftSwapApplied {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      previousPersonId: previousPersonId
+      personId: personId
+      shiftSwapRequestId: shiftSwapRequestId
+      acceptedAt: acceptedAt
+    }
+  }
+
   command releaseClaim() {
+    guard self.claimedByPersonId == user.personId or (user.personId == null and self.claimedByPersonId == user.id) or roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     guard self.status == "claimed"
     guard self.deletedAt == null
     mutate claimedByPersonId = null
@@ -333,14 +413,51 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command changeCoverage(optional personId: uuid, optional startsAt: datetime, optional endsAt: datetime) {
+    guard self.status == "filled" or self.status == "cancelled"
+    guard self.postedAt != null and self.deletedAt == null
+    // Replays must not create another replacement for the same request.
+    guard self.coverageContinuedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    constraint changedCoverageWindow: startsAt == null or endsAt == null or endsAt > startsAt "Coverage end must be after its start"
+    compute wasCancelled = self.status == "cancelled"
+    mutate coverageContinuedAt = now()
+    mutate coverageReplacementPersonId = personId
+    mutate coverageStartsAt = startsAt
+    mutate coverageEndsAt = endsAt
+    mutate status = "cancelled"
+    mutate cancelledAt = self.cancelledAt != null ? self.cancelledAt : now()
+    mutate cancellationReason = wasCancelled ? self.cancellationReason : (personId == null ? "Reopened for coverage" : "Staff member replaced")
+    emit EventStaffNeedCoverageChangeRequested {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command prepareCoverageContinuation(windowsJson: string) {
+    // The callback proves this snapshot matches the connected coverage windows.
+    guard self.status == "cancelled" and self.coverageContinuedAt != null
+    guard self.coverageWindowsJson == null and self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
+    mutate coverageWindowsJson = windowsJson
+    emit EventStaffNeedCoverageContinuationPrepared {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
   command cancel(reason: string) {
-    guard self.status == "open" or self.status == "claimed"
+    // Removing a staffing requirement must also work after it has been filled.
+    // The callback retires future coverage while keeping recorded work intact.
+    guard self.status == "open" or self.status == "claimed" or self.status == "filled"
     guard self.deletedAt == null
-    guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
     constraint cancelStaffNeedReason: length(trim(reason)) > 0 "Cancel reason is required"
     mutate status = "cancelled"
     mutate cancelledAt = now()
-    mutate notes = reason
+    mutate cancellationReason = reason
     emit EventStaffNeedCancelled {
       staffNeedId: self.id
       tenantId: self.tenantId
@@ -361,6 +478,40 @@ event EventAssignmentAssigned: "event_assignment.assigned" {
   startsAt: datetime?
   endsAt: datetime?
   status: EventAssignmentStatus
+}
+
+event EventAssignmentTimingChanged: "event_assignment.timing_changed" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  synchronizeShifts: boolean?
+}
+
+event EventStaffNeedTimingChanged: "event_staff_need.timing_changed" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+  synchronizeShifts: boolean?
+}
+
+event EventAssignmentShiftSwapApplied: "event_assignment.shift_swap_applied" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  previousPersonId: string
+  personId: string
+  shiftSwapRequestId: string
+  acceptedAt: datetime
+}
+
+event EventStaffNeedShiftSwapApplied: "event_staff_need.shift_swap_applied" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+  previousPersonId: string
+  personId: string
+  shiftSwapRequestId: string
+  acceptedAt: datetime
 }
 
 event EventAssignmentConfirmed: "event_assignment.confirmed" {
@@ -445,4 +596,16 @@ event EventStaffNeedCancelled: "event_staff_need.cancelled" {
   tenantId: string
   eventId: string
   reason: string
+}
+
+event EventStaffNeedCoverageChangeRequested: "event_staff_need.coverage_change_requested" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventStaffNeedCoverageContinuationPrepared: "event_staff_need.coverage_continuation_prepared" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
 }

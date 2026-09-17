@@ -134,6 +134,7 @@ it.each([
 ])(
   "opens the actual %s record through App",
   async (prefix, hook, heading, record) => {
+    backend.values.set("brandLogo:getBrandLogoUrl", null);
     command("invoiceReminders:getSchedule", null);
     command("invoicePayments:getPaymentLink", null);
     backend.values.set(hook, { _id: recordId, version: 1, ...record });

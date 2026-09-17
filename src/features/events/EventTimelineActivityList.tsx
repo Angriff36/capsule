@@ -6,6 +6,7 @@ import {
   type TimelineAssigneeSelection,
 } from "./EventTimelineAssigneePicker";
 import { EventTimelineBlockQuestions } from "./EventTimelineBlockQuestions";
+import { ReviewFlagInline } from "./review-flags/ReviewFlagInline";
 import type { TimelineStaffOption } from "./eventTimelineStaffRoster";
 import { GanttStrip } from "./EventTimelineGanttStrip";
 import {
@@ -15,6 +16,7 @@ import {
   type TimelineAssigneeTeam,
 } from "./timelineAssigneeOptions";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { localDateTime } from "./eventDetailFormHelpers";
 
 type TimelineActivity = Doc<"eventTimelineActivities">;
 
@@ -177,7 +179,9 @@ export function EventTimelineActivityList({
 
                 <div className="w-24 shrink-0 text-right">
                   <p className="text-base font-semibold text-ink">
-                    {formatTime(activity.startsAt)}
+                    {activity.startsAt == null
+                      ? "Time not set"
+                      : formatTime(activity.startsAt)}
                     {activity.endsAt == null ? "" : " –"}
                   </p>
                   {activity.endsAt == null ? null : (
@@ -234,6 +238,13 @@ export function EventTimelineActivityList({
                 >
                   {editingId === activity._id ? "Close editor" : "Edit block"}
                 </button>
+                <ReviewFlagInline
+                  eventId={eventId}
+                  targetKind="timeline_activity"
+                  targetId={activity._id}
+                  targetLabel={activity.name}
+                  disabled={isBusy}
+                />
                 <button
                   type="button"
                   className="btn-link text-ink-3"
@@ -262,6 +273,7 @@ export function EventTimelineActivityList({
                     <BoundedDateTimeLocalInput
                       name="startsAt"
                       className="input"
+                      defaultValue={localDateTime(activity.startsAt)}
                     />
                   </label>
                   <label className="field-label">
@@ -269,6 +281,7 @@ export function EventTimelineActivityList({
                     <BoundedDateTimeLocalInput
                       name="endsAt"
                       className="input"
+                      defaultValue={localDateTime(activity.endsAt)}
                     />
                   </label>
                   <label className="field-label">

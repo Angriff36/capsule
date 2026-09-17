@@ -15,3 +15,5 @@
 IMPORTANT: Plan only. Do NOT implement anything. Do NOT assume functionality is missing; confirm with code search first. Treat `src/lib` as the project's standard library for shared utilities and components. Prefer consolidated, idiomatic implementations there over ad-hoc copies.
 
 ULTIMATE GOAL: We want to achieve the most valuable next release of `${PROJECT_NAME}` for the audience in @AUDIENCE_JTBD.md. Consider missing elements and plan accordingly. If an element is missing, search first to confirm it doesn't exist, then if needed author the specification at specs/FILENAME.md. If you create a new element then document the plan to implement it in @IMPLEMENTATION_PLAN.md using a subagent.
+
+CONVERGENCE: If this iteration changes no remaining `- [ ]` task lines in IMPLEMENTATION_PLAN.md (a drift check only), write `.ralph-plan-converged` containing one line `converged` and stop inventing new plan work. The parent `./loop.sh plan` loop exits when that file exists. Do not delete the marker.

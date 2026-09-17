@@ -14,15 +14,17 @@ export function CulinaryEntityLink({
   id,
   children,
   className,
+  prepTaskId,
 }: {
   kind: EntityKind;
   id: string;
   children: ReactNode;
   className?: string;
+  prepTaskId?: string;
 }) {
   const path =
     kind === "component"
-      ? componentPath(id)
+      ? componentPath(id, prepTaskId)
       : kind === "ingredient"
         ? ingredientPath(id)
         : kind === "dish"

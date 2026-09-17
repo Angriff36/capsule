@@ -89,6 +89,40 @@ clients. Every event carries the same channel as its **Team Chat** tab.
 
 ## Cross-system handoffs
 
+Shift creation uses the same generated `Shift.schedule` transaction from the
+UI scheduling compatibility seam and direct generated callers. Its
+`ShiftScheduled` callback reads approved time off and rejects overlapping
+half-open ranges atomically; pending, denied and deleted requests do not
+block scheduling. The seam no longer duplicates Shift insertion, encryption,
+training or certification validation. Existing-shift lookup is a no-op and
+manual split shifts remain available. This callback bridges the projection's
+nested-collection gap in issue #75; it is not a compiler fix.
+
+The source-backed operations branch now connects EventAssignment and filled
+EventStaffNeed commands to generated Shift commands in the same transaction
+(#358). Calculated windows follow the crew timeline; manual plans, split days,
+recorded work and accepted swaps preserve their specific source groups. A
+TimeRecord linked only through shiftId is still treated as recorded history.
+Approved swaps move the connected assignment and filled-need owners, reuse the
+recipient's acceptance and retain earlier swap history. Generated-runtime proof
+covers normal and direct legacy-repair paths; full app qualification, affected
+production-data repair and deployment remain required.
+
+Filled staffing requests may be cancelled when the position is no longer
+required. The request retains its former staff member, service notes and
+claim/fill history, with a separate cancellation reason. Its generated command
+releases connected future coverage, including manually adjusted windows, while
+other active roles and all recorded work remain. The event roster exposes this
+operation and the cancelled-request history names the former staff member.
+Replacement/reopening and authenticated production qualification are still being
+completed on the source-backed operations branch.
+
+Linked staff attendance, time records, availability and schedule notices use the
+trusted Person link (#359). Generated-runtime qualification covers seven crew
+roles. Own swap requests now also accept linked non-workforce crew; complete
+recipient-eligibility reads in My Day still need qualification. The older
+Person-ID-as-subject lifecycle fixture alone does not prove real staff behavior.
+
 Events own service context; Person owns operator identity; staffing records feed readiness explanations and PayrollInput. Incidents may link to a Shift. Logistics Delivery may reference a Person as driver, but Vehicle is not currently modeled.
 
 ## States and permissions
@@ -99,21 +133,31 @@ Open decisions include assignment role vocabulary, offer/decline states, coverag
 
 ## Current status
 
+Event.assignedToId is sales ownership, not a field-captain assignment. The
+EventOwnerAssigned/EventApproved owner-to-event_lead reactions were removed
+after comparing the actual create form and source worksheet (pages 1 and 5).
+Ownership changes and approval preserve explicitly assigned crew, including
+salespeople who also have a real operational role. See
+`codex-plans/source-backed-operations/sales-owner-staffing.md` for runtime and
+affected-data evidence. Calculated crew-to-shift propagation is implemented and
+qualified in isolated runtime; the complete staffing UI, existing-data repair,
+release and authenticated production verification are still required.
+
 Shipped (Slice 5) on `@angriff36/manifest` ≥ 3.6.20:
 
 - **Routes:** `/staff` → `/staff/roster` (EventAssignment + weekly Shift schedule), `/staff/swaps` (accepted swap review and assignment approval), `/staff/time` (TimeRecord + AvailabilityWindow), `/staff/time-off` (manager request review), `/staff/utilization` (confirmed hours, billable utilization, under-scheduling, and shift-demand reporting), `/staff/qualifications` (Qualification ledger), `/staff/training` (training library, completion ledger, and shift-type gates), and `/my` (phone-first schedule acknowledgement, shift swaps, time-off requests, and field work).
 - **Commands wired:** EventAssignment assign/confirm/checkIn/checkOut/markNoShow/unassign; Shift schedule/start/complete/cancel/markNoShow/stageApprovedSwap/applyApprovedSwap; ShiftSwapRequest propose/accept/decline/withdraw/approve/reject; WeeklyScheduleNotice publishSchedule/republishSchedule/acknowledge; TimeOffRequest submit/approve/decline; AvailabilityWindow declare/withdraw; TimeRecord clockIn/clockOut/correct; Qualification grant/revoke/expire; TrainingModule define/retire/reactivate; TrainingCompletion record; ShiftType define/retire/reactivate. Shift scheduling and swaps carry optional qualification and shift-type proof references; generated constraints validate both prerequisites.
 - **Shift swap integrity:** proposal submission is the requester's confirmation. The selected recipient must be an active, linked Person with no overlapping Shift or approved time off in the current UI view and must have replacement qualification/training proof when the Shift requires it. Recipient acceptance moves the request to manager review. Manager approval revalidates the durable Shift owner, recipient, and credential proofs; generated staged reactions then change `Shift.personId` and replacement proof ids in the approval transaction, so any stale or invalid reassignment rolls the whole approval back.
-- **Time-off enforcement:** request lifecycle and access policy are generated from Manifest. Because the current Convex projection cannot hydrate a Person's `hasMany` rows during governed creation, the roster uses the authored atomic `workforceScheduling.scheduleShift` seam to repeat `Shift.schedule` prerequisite checks and reject an approved time-off overlap in the same transaction. Later Shift lifecycle changes stay generated. Generated HTTP/MCP callers still need canonical overlap enforcement tracked in [#75](https://github.com/Angriff36/capsule/issues/75); the authored seam is the in-app bridge until that lands.
+- **Time-off enforcement:** generated Shift.schedule calls the transactional ShiftScheduled callback, which rejects approved-time-off overlap for generated and UI callers alike. The compatibility seam delegates new Shift writes to generated creation. The authored callback bridges nested-collection projection support in [#75](https://github.com/Angriff36/capsule/issues/75).
 - **Schedule publication:** the roster filters shifts by work week and publishes one durable staff summary per scheduled Person. Changed summaries are re-published and clear the prior receipt. Upcoming published weeks show managers a non-blocking warning naming staff who have not acknowledged; linked staff acknowledge from `/my`.
 - **Utilization reporting:** the read-only report aggregates closed/corrected TimeRecords and committed Shifts for a selected period. Event-linked confirmed time is billable, utilization is billable divided by total confirmed time, and the editable under-scheduling target stays an advisory browser preference rather than a domain guard.
 - **Certification alerts:** the live notification tray derives expired and 30-day expiry alerts from Qualification state and links HR/workforce managers to `/staff/qualifications`.
 - **Time-off alerts:** pending requests appear in the same live notification tray and link workforce managers directly to `/staff/time-off`; resolving the request removes the alert.
-- **Roles:** `workforce_manager` (workforceManageAccess) controls assignment, scheduling, corrections, and qualifications; `workforce_staff` self-service commands (confirm, check in/out, clock in/out, declare/withdraw) are scoped to the trusted user; other roles are denied by generated policy.
+- **Roles:** the own-record workforceSelfAccess capability honors the organization workforce switch, including for administrators. Workforce managers retain control of assignments, scheduling, corrections and qualifications. Linked staff across crew roles can read and act on their own assignments, shifts, time records, availability and schedule notices. Existing workforce-wide access remains; other-person records are not newly exposed to general crew. Person links take precedence over the unlinked legacy direct-ID identity path.
 - **Lifecycle:** action availability comes from generated lifecycle metadata (`WorkforceLifecyclePolicy` over `manifest-wiring-bindings`); no state literals in feature code, enforced by `bun run check:workforce-manifest`.
 - **Failure behavior:** command failures render through the governed failure banner (policy denial, guard block, constraint block, version conflict, unexpected).
 - **Proofs:** `tests/proofs/shift-lifecycle.runtime.test.ts` (createViaSchedule → start → complete, role denial, tenant isolation, seeded entirely through public generated mutations) and `tests/workforce-manifest-integration-guard.test.ts`. Proof-kit marks `Shift.schedule` / `Shift.start` / `Shift.complete` as `runtime_proven` via `bun run proof:emit` (`generated/proof/proof-registry.json`).
-- **Explicit limitations:** the IR declares no cross-entity reactions for workforce entities, so no automation runs off workforce events yet. Recurring availability, offer/decline states, assignment-role vocabulary, and coverage math remain open decisions. Payroll preparation is owned by [closeout-reporting.md](closeout-reporting.md). **Self-service identity gap (canonical source decision needed):** the `.manifest` self-service guards compare `self.personId == user.id`, but the authored auth seam sets `user.id` to the external auth subject (Clerk) while `Person.authSubjectId` — the declared link — is not consulted by any guard. Until the canonical source routes self-service through `authSubjectId`, staff self-service actions succeed only for managers (`workforceManageAccess`); the runtime proof exercises the guard by equating subject and person id.
+- **Remaining end-to-end work:** calculated crew-window propagation and owner-assignment reconciliation are tracked in #358/#361. Linked staff attendance and availability are qualified in isolated generated-runtime and My Day browser scenarios (#359); release and authenticated production verification remain. The full field-work, swap, report and affected-data workflows still require the original operations goal's complete-flow checks. Payroll preparation is owned by [closeout-reporting.md](closeout-reporting.md).
 
 ## References
 

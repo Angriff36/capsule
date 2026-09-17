@@ -11,6 +11,14 @@ export function formatTppDate(value: number | null | undefined): string {
   }).format(value);
 }
 
+export function formatTppDateTime(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) return "";
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(value);
+}
+
 export function formatTppMoney(
   value: number | null | undefined,
   currency = "USD",

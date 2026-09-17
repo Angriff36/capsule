@@ -2,6 +2,7 @@ import { Fragment, type FormEvent } from "react";
 import type { Id } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
+import { ReviewFlagInline } from "./review-flags/ReviewFlagInline";
 
 export const EQUIPMENT_CONDITIONS = [
   "excellent",
@@ -48,6 +49,7 @@ const CONDITION_RANK: Record<EquipmentCondition, number> = {
 };
 
 type Props = {
+  readonly eventId: string;
   readonly rows: readonly EquipmentSheetRow[];
   readonly busy: string | null;
   readonly draft: ChecklistDraft | null;
@@ -60,6 +62,7 @@ type Props = {
 
 /** Dispatch sheet: one row per reservation, outbound and return in-line. */
 export function EventEquipmentSheet({
+  eventId,
   rows,
   busy,
   draft,
@@ -145,16 +148,25 @@ export function EventEquipmentSheet({
                     <StatusChip status={row.status} />
                   </td>
                   <td className="equipment-sheet__numeric">
-                    {row.status === "reserved" ? (
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
+                    <div className="flex flex-wrap items-center justify-end gap-1">
+                      <ReviewFlagInline
+                        eventId={eventId}
+                        targetKind="equipment_reservation"
+                        targetId={row.id}
+                        targetLabel={`${row.name} ×${row.quantity}`}
                         disabled={busy != null}
-                        onClick={() => onRelease(row)}
-                      >
-                        Release
-                      </button>
-                    ) : null}
+                      />
+                      {row.status === "reserved" ? (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => onRelease(row)}
+                        >
+                          Release
+                        </button>
+                      ) : null}
+                    </div>
                   </td>
                 </tr>
                 {isEditing && draft ? (

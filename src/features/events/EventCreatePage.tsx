@@ -29,25 +29,33 @@ import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
-import {
-  persistableServiceStyleId,
-  serviceStyleSelectOptions,
-  usingBuiltInServiceStyles,
-} from "./serviceStyleCatalog";
+import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
+import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
+import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
-import { eventDetailPath, eventsIndexPath } from "./eventRoutes";
+import {
+  eventDetailPath,
+  eventImportPath,
+  eventsIndexPath,
+} from "./eventRoutes";
 import { proposalEventPrefill } from "./ProposalEventPrefill";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
-
-const VENUE_TYPES = [
-  ["client_site", "Client site"],
-  ["banquet_hall", "Banquet hall"],
-  ["outdoor", "Outdoor"],
-  ["office", "Office"],
-  ["private_home", "Private home"],
-  ["other", "Other"],
-] as const;
+import { SearchSelect } from "../../ui/SearchSelect";
+import {
+  InlineClientForm,
+  InlineDuplicateNotice,
+  InlineVenueForm,
+  type PendingInlineDuplicate,
+  type VenueTypeCode,
+} from "./EventCreateInlineForms";
+import { findLikelyDuplicates } from "./inlineRecordDuplicates";
+import { venueAddress, venueSummary } from "./venuePickerSummary";
+import {
+  coordinatesFromFields,
+  formatCoordinates,
+  venueCoordinates,
+} from "../facilities/venueCoordinates";
 
 // People who can be named as an event's salesperson/owner (Event.assignedToId).
 const SALES_PERSON_ROLES = new Set(["sales_staff", "sales_manager", "owner"]);
@@ -64,21 +72,6 @@ function eventFieldRules(data: FormData): Record<string, string> {
     return { endsAt: "End must be after the start time." };
   }
   return {};
-}
-
-function venueAddress(venue: Doc<"venues"> | undefined): string | undefined {
-  if (!venue) return undefined;
-  return (
-    [
-      venue.addressLine1,
-      venue.addressLine2,
-      venue.city,
-      venue.region,
-      venue.postalCode,
-    ]
-      .filter(Boolean)
-      .join(", ") || undefined
-  );
 }
 
 // Collapsible form block (native <details>) styled like Section. Uncontrolled:
@@ -172,6 +165,7 @@ export function EventCreatePage() {
   const createClient = useCreateClient();
   const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
+  const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [clientId, setClientId] = useState(prefillClientId);
   const [venueId, setVenueId] = useState("");
   const [showClient, setShowClient] = useState(false);
@@ -182,6 +176,13 @@ export function EventCreatePage() {
   const [serviceStyleId, setServiceStyleId] = useState("");
   const [salespersonId, setSalespersonId] = useState("");
   const [referralSourceId, setReferralSourceId] = useState("");
+  // Inline create paused on a look-alike record; the operator decides.
+  const [pendingDuplicate, setPendingDuplicate] =
+    useState<PendingInlineDuplicate | null>(null);
+  const [pendingArgs, setPendingArgs] = useState<Record<
+    string,
+    unknown
+  > | null>(null);
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
@@ -225,13 +226,10 @@ export function EventCreatePage() {
   const activeOccasions = (occasions ?? [])
     .filter((occasion) => occasion.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-  const serviceStyleOptions = serviceStyleSelectOptions(serviceStyles);
-  // Empty catalogs (B2): once the lists have loaded, an empty occasion list and
-  // the built-in service-style fallback each get a one-line fix-it hint under
-  // the select instead of a silent blank dropdown.
+  // Empty catalogs (B2): once the lists have loaded, an empty occasion list
+  // gets a one-line fix-it hint under the select instead of a silent blank.
   const occasionsEmpty =
     occasions !== undefined && activeOccasions.length === 0;
-  const builtInServiceStyles = usingBuiltInServiceStyles(serviceStyles);
   const salespeople = (people ?? [])
     .filter(
       (person) =>
@@ -278,50 +276,162 @@ export function EventCreatePage() {
     }
   };
 
+  const createClientNow = (args: Record<string, unknown>) =>
+    run("client", async () => {
+      const created = await createClient(args);
+      setClientId(created.docId);
+      setShowClient(false);
+      setPendingDuplicate(null);
+    });
+
   const submitClient = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const clientType = String(data.get("clientType")) as "company" | "person";
-    void run("client", async () => {
-      const args = cleanCommandArgs.from({
-        clientType,
-        companyName: optional(String(data.get("companyName") ?? "")),
-        givenName: optional(String(data.get("givenName") ?? "")),
-        familyName: optional(String(data.get("familyName") ?? "")),
-        email: optional(String(data.get("email") ?? "")),
-        phone: optional(String(data.get("phone") ?? "")),
-        paymentTermsDays: 30,
-        taxExempt: false,
-      });
-      const created = await createClient(args);
-      setClientId(created.docId);
-      setShowClient(false);
+    const companyName = optional(String(data.get("companyName") ?? ""));
+    const givenName = optional(String(data.get("givenName") ?? ""));
+    const familyName = optional(String(data.get("familyName") ?? ""));
+    const email = optional(String(data.get("email") ?? ""));
+    const args = cleanCommandArgs.from({
+      clientType,
+      companyName,
+      givenName,
+      familyName,
+      email,
+      phone: optional(String(data.get("phone") ?? "")),
+      paymentTermsDays: 30,
+      taxExempt: false,
     });
+    const typedName =
+      clientType === "company"
+        ? (companyName ?? "")
+        : [givenName, familyName].filter(Boolean).join(" ");
+    const matches = findLikelyDuplicates(
+      { name: typedName, email },
+      activeClients.map((client) => ({
+        _id: client._id,
+        name: clientDisplayName(client._id, [client]),
+        email: client.email,
+      })),
+    );
+    if (matches.length > 0) {
+      setPendingArgs(args);
+      setPendingDuplicate({
+        kind: "client",
+        typedName,
+        matches: matches.map((match) => ({
+          id: match._id,
+          label: match.name,
+          hint: match.email ?? null,
+        })),
+      });
+      return;
+    }
+    void createClientNow(args);
   };
+
+  const createVenueNow = (args: Record<string, unknown>) =>
+    run("venue", async () => {
+      const created = await createVenue(args);
+      setVenueId(created.docId);
+      setShowVenue(false);
+      setPendingDuplicate(null);
+    });
 
   const submitVenue = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    void run("venue", async () => {
-      const capacity = Number(data.get("capacity"));
-      if (!Number.isFinite(capacity) || capacity < 0) {
-        throw new Error("Venue capacity must be zero or greater.");
-      }
-      const args = cleanCommandArgs.from({
-        name: String(data.get("name") ?? "").trim(),
-        venueType: String(
-          data.get("venueType"),
-        ) as (typeof VENUE_TYPES)[number][0],
-        capacity,
-        addressLine1: optional(String(data.get("addressLine1") ?? "")),
-        city: optional(String(data.get("city") ?? "")),
-        region: optional(String(data.get("region") ?? "")),
-        postalCode: optional(String(data.get("postalCode") ?? "")),
-      });
-      const created = await createVenue(args);
-      setVenueId(created.docId);
-      setShowVenue(false);
+    const capacity = Number(data.get("capacity"));
+    if (!Number.isFinite(capacity) || capacity < 0) {
+      setFailure(
+        classifyCommandFailure(
+          new Error("Venue capacity must be zero or greater."),
+        ),
+      );
+      return;
+    }
+    const coordinates = coordinatesFromFields(
+      String(data.get("latitude") ?? ""),
+      String(data.get("longitude") ?? ""),
+    );
+    if (!coordinates.ok) {
+      setFailure(classifyCommandFailure(new Error(coordinates.error)));
+      return;
+    }
+    const name = String(data.get("name") ?? "").trim();
+    const args = cleanCommandArgs.from({
+      name,
+      venueType: String(data.get("venueType")) as VenueTypeCode,
+      capacity,
+      addressLine1: optional(String(data.get("addressLine1") ?? "")),
+      city: optional(String(data.get("city") ?? "")),
+      region: optional(String(data.get("region") ?? "")),
+      postalCode: optional(String(data.get("postalCode") ?? "")),
+      latitude: coordinates.value?.latitude,
+      longitude: coordinates.value?.longitude,
     });
+    const matches = findLikelyDuplicates(
+      { name },
+      activeVenues.map((venue) => ({ _id: venue._id, name: venue.name })),
+    );
+    if (matches.length > 0) {
+      setPendingArgs(args);
+      setPendingDuplicate({
+        kind: "venue",
+        typedName: name,
+        matches: matches.map((match) => {
+          const venue = activeVenues.find((row) => row._id === match._id);
+          return {
+            id: match._id,
+            label: match.name,
+            hint: venue ? venueSummary(venue) : null,
+          };
+        }),
+      });
+      return;
+    }
+    void createVenueNow(args);
+  };
+
+  const resolveDuplicate = {
+    useExisting: (id: string) => {
+      if (pendingDuplicate?.kind === "client") {
+        setClientId(id);
+        setShowClient(false);
+      } else {
+        setVenueId(id);
+        setShowVenue(false);
+      }
+      setPendingDuplicate(null);
+      setPendingArgs(null);
+    },
+    createAnyway: () => {
+      if (!pendingDuplicate || !pendingArgs) return;
+      const args = pendingArgs;
+      setPendingArgs(null);
+      void (pendingDuplicate.kind === "client"
+        ? createClientNow(args)
+        : createVenueNow(args));
+    },
+    dismiss: () => {
+      setPendingDuplicate(null);
+      setPendingArgs(null);
+    },
+  };
+
+  // Restore puts text back into named fields; the relation pickers are React
+  // state, so re-seed them from the same saved values (client, venue, occasion,
+  // service style, salesperson, referral source were lost before — #368 item 4).
+  const restoreDraft = () => {
+    const saved = draftForm.restore();
+    if (!saved) return;
+    const pick = (key: string) => saved.values[key]?.trim() ?? "";
+    if (pick("clientId")) setClientId(pick("clientId"));
+    if (pick("venueId")) setVenueId(pick("venueId"));
+    if (pick("occasionId")) setOccasionId(pick("occasionId"));
+    if (pick("serviceStyleId")) setServiceStyleId(pick("serviceStyleId"));
+    if (pick("salespersonId")) setSalespersonId(pick("salespersonId"));
+    if (pick("referralSourceId")) setReferralSourceId(pick("referralSourceId"));
   };
 
   const submitEvent = (event: FormEvent<HTMLFormElement>) => {
@@ -336,7 +446,9 @@ export function EventCreatePage() {
         title: String(data.get("title") ?? ""),
         eventTypeRaw: String(data.get("eventType") ?? ""),
         occasionId,
-        serviceStyleId: persistableServiceStyleId(serviceStyleId),
+        serviceStyleId: await new EventCreateServiceStyleResolver(
+          ensureBuiltInServiceStyle,
+        ).resolve(serviceStyleId, serviceStyles),
         salespersonId,
         referralSourceId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
@@ -386,13 +498,18 @@ export function EventCreatePage() {
       <PageHeader
         title="New event"
         lead="The essentials for a new booking — who it's for, where, when, and the budget."
+        actions={
+          <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
+            Have a BEO? Import it instead
+          </Link>
+        }
       />
 
       {failure ? <FailureBanner failure={failure} /> : null}
 
       <DraftRestoreBanner
         draft={draftForm.draft}
-        onRestore={draftForm.restore}
+        onRestore={restoreDraft}
         onDiscard={draftForm.discard}
       />
 
@@ -449,6 +566,7 @@ export function EventCreatePage() {
                 <label className="field-label">
                   Occasion
                   <select
+                    name="occasionId"
                     value={occasionId}
                     onChange={(event) => setOccasionId(event.target.value)}
                     className="input"
@@ -464,14 +582,18 @@ export function EventCreatePage() {
                 </label>
                 {occasionsEmpty ? (
                   <p className="mt-1 text-xs leading-relaxed text-ink-3">
-                    No occasions yet — add them in{" "}
+                    No occasions yet — open{" "}
                     <Link
                       to="/admin/catalogs"
+                      target="_blank"
+                      rel="noopener"
                       className="underline font-medium"
                     >
                       Admin → Catalogs
-                    </Link>
-                    .
+                    </Link>{" "}
+                    and click “Add the standard list” (Wedding, Corporate Event,
+                    …). Opens in a new tab; this form stays put and the list
+                    fills in here right away.
                   </p>
                 ) : null}
               </div>
@@ -560,36 +682,12 @@ export function EventCreatePage() {
             count={4}
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
-              <div>
-                <label className="field-label">
-                  Service style
-                  <select
-                    value={serviceStyleId}
-                    onChange={(event) => setServiceStyleId(event.target.value)}
-                    className="input"
-                    form="event-create-form"
-                  >
-                    <option value="">Select a service style</option>
-                    {serviceStyleOptions.map((serviceStyle) => (
-                      <option key={serviceStyle.id} value={serviceStyle.id}>
-                        {serviceStyle.name}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                {builtInServiceStyles ? (
-                  <p className="mt-1 text-xs leading-relaxed text-ink-3">
-                    Showing the four built-in service styles — add your own in{" "}
-                    <Link
-                      to="/admin/catalogs"
-                      className="underline font-medium"
-                    >
-                      Admin → Catalogs
-                    </Link>
-                    .
-                  </p>
-                ) : null}
-              </div>
+              <EventCreateServiceStyleField
+                value={serviceStyleId}
+                onChange={setServiceStyleId}
+                rows={serviceStyles}
+                form="event-create-form"
+              />
               <label className="field-label sm:col-span-2">
                 Accessibility needs
                 <input
@@ -667,6 +765,7 @@ export function EventCreatePage() {
               <label className="field-label">
                 Salesperson
                 <select
+                  name="salespersonId"
                   value={salespersonId}
                   onChange={(event) => setSalespersonId(event.target.value)}
                   className="input"
@@ -681,10 +780,29 @@ export function EventCreatePage() {
                     </option>
                   ))}
                 </select>
+                {people !== undefined && salespeople.length === 0 ? (
+                  <span
+                    className="field-hint"
+                    data-testid="salesperson-empty-hint"
+                  >
+                    Nobody has a sales role yet. This list shows people whose
+                    role is Sales staff, Sales manager or Owner — set that in{" "}
+                    <Link
+                      to="/admin"
+                      target="_blank"
+                      rel="noopener"
+                      className="underline font-medium"
+                    >
+                      Admin → Team roles
+                    </Link>{" "}
+                    (new tab; this form stays put).
+                  </span>
+                ) : null}
               </label>
               <label className="field-label">
                 Referral source
                 <select
+                  name="referralSourceId"
                   value={referralSourceId}
                   onChange={(event) => setReferralSourceId(event.target.value)}
                   className="input"
@@ -815,20 +933,24 @@ export function EventCreatePage() {
                 <>
                   <label className="field-label">
                     Account *
-                    <select
-                      value={clientId}
-                      onChange={(event) => setClientId(event.target.value)}
-                      className="input"
-                      required
+                    <SearchSelect
+                      name="clientId"
                       form="event-create-form"
-                    >
-                      <option value="">Select a client</option>
-                      {activeClients.map((client) => (
-                        <option key={client._id} value={client._id}>
-                          {clientDisplayName(client._id, activeClients)}
-                        </option>
-                      ))}
-                    </select>
+                      value={clientId}
+                      onChange={setClientId}
+                      required
+                      placeholder={`Search ${activeClients.length} clients by name or email…`}
+                      emptyText="No client matches — create one below."
+                      testId="event-create-client"
+                      options={activeClients.map((client) => ({
+                        id: client._id,
+                        label: clientDisplayName(client._id, activeClients),
+                        hint:
+                          [client.email, client.phone]
+                            .filter(Boolean)
+                            .join(" · ") || null,
+                      }))}
+                    />
                   </label>
                   {activeClients.length === 0 ? (
                     <p className="text-sm text-ink-3">
@@ -856,6 +978,15 @@ export function EventCreatePage() {
                 onSubmit={submitClient}
               />
             ) : null}
+            {pendingDuplicate?.kind === "client" ? (
+              <InlineDuplicateNotice
+                pending={pendingDuplicate}
+                busy={busy !== null}
+                onUseExisting={resolveDuplicate.useExisting}
+                onCreateAnyway={resolveDuplicate.createAnyway}
+                onDismiss={resolveDuplicate.dismiss}
+              />
+            ) : null}
           </Section>
 
           <Section title="Venue">
@@ -866,25 +997,27 @@ export function EventCreatePage() {
                 <>
                   <label className="field-label">
                     Place *
-                    <select
-                      value={venueId}
-                      onChange={(event) => setVenueId(event.target.value)}
-                      className="input"
-                      required
+                    <SearchSelect
+                      name="venueId"
                       form="event-create-form"
-                    >
-                      <option value="">Select a venue</option>
-                      {activeVenues.map((venue) => (
-                        <option key={venue._id} value={venue._id}>
-                          {venue.name}
-                        </option>
-                      ))}
-                    </select>
+                      value={venueId}
+                      onChange={setVenueId}
+                      required
+                      placeholder={`Search ${activeVenues.length} venues by name or address…`}
+                      emptyText="No venue matches — create one below."
+                      testId="event-create-venue"
+                      options={activeVenues.map((venue) => ({
+                        id: venue._id,
+                        label: venue.name,
+                        hint: venueSummary(venue),
+                      }))}
+                    />
                   </label>
-                  {selectedVenue ? (
+                  {selectedVenue &&
+                  Number(selectedVenue.capacity ?? 0) === 0 ? (
                     <p className="text-xs leading-relaxed text-ink-3">
-                      {venueAddress(selectedVenue) ?? "No address recorded"} ·
-                      capacity {selectedVenue.capacity}
+                      This venue has no capacity recorded — set it in Facilities
+                      → Venues if it matters for this booking.
                     </p>
                   ) : null}
                   {activeVenues.length === 0 ? (
@@ -904,6 +1037,15 @@ export function EventCreatePage() {
             </div>
             {showVenue ? (
               <InlineVenueForm busy={busy === "venue"} onSubmit={submitVenue} />
+            ) : null}
+            {pendingDuplicate?.kind === "venue" ? (
+              <InlineDuplicateNotice
+                pending={pendingDuplicate}
+                busy={busy !== null}
+                onUseExisting={resolveDuplicate.useExisting}
+                onCreateAnyway={resolveDuplicate.createAnyway}
+                onDismiss={resolveDuplicate.dismiss}
+              />
             ) : null}
           </Section>
 
@@ -927,124 +1069,5 @@ export function EventCreatePage() {
         </aside>
       </div>
     </div>
-  );
-}
-
-function InlineClientForm({
-  busy,
-  onSubmit,
-}: {
-  busy: boolean;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}) {
-  const [type, setType] = useState<"company" | "person">("company");
-  return (
-    <form onSubmit={onSubmit} className="space-y-2 border-t border-line p-3">
-      <label className="field-label">
-        Type
-        <select
-          name="clientType"
-          value={type}
-          onChange={(event) =>
-            setType(event.target.value as "company" | "person")
-          }
-          className="input"
-        >
-          <option value="company">Company</option>
-          <option value="person">Person</option>
-        </select>
-      </label>
-      {type === "company" ? (
-        <label className="field-label">
-          Company name
-          <input name="companyName" className="input" required />
-        </label>
-      ) : (
-        <div className="grid grid-cols-2 gap-2">
-          <label className="field-label">
-            Given name
-            <input name="givenName" className="input" required />
-          </label>
-          <label className="field-label">
-            Family name
-            <input name="familyName" className="input" />
-          </label>
-        </div>
-      )}
-      <div className="grid grid-cols-2 gap-2">
-        <label className="field-label">
-          Email
-          <input name="email" type="email" className="input" />
-        </label>
-        <label className="field-label">
-          Phone
-          <input name="phone" type="tel" className="input" />
-        </label>
-      </div>
-      <button className="btn btn-primary btn-sm" disabled={busy}>
-        {busy ? "Creating…" : "Create and select client"}
-      </button>
-    </form>
-  );
-}
-
-function InlineVenueForm({
-  busy,
-  onSubmit,
-}: {
-  busy: boolean;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}) {
-  return (
-    <form onSubmit={onSubmit} className="space-y-2 border-t border-line p-3">
-      <label className="field-label">
-        Venue name
-        <input name="name" className="input" required />
-      </label>
-      <div className="grid grid-cols-2 gap-2">
-        <label className="field-label">
-          Type
-          <select name="venueType" className="input">
-            {VENUE_TYPES.map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field-label">
-          Capacity
-          <input
-            name="capacity"
-            type="number"
-            min={0}
-            defaultValue={0}
-            className="input"
-            required
-          />
-        </label>
-      </div>
-      <label className="field-label">
-        Address
-        <input name="addressLine1" className="input" />
-      </label>
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <label className="field-label">
-          City
-          <input name="city" className="input" />
-        </label>
-        <label className="field-label">
-          Region
-          <input name="region" className="input" />
-        </label>
-        <label className="field-label">
-          Postal
-          <input name="postalCode" className="input" />
-        </label>
-      </div>
-      <button className="btn btn-primary btn-sm" disabled={busy}>
-        {busy ? "Creating…" : "Create and select venue"}
-      </button>
-    </form>
   );
 }

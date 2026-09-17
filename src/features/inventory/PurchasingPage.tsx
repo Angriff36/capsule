@@ -6,7 +6,6 @@ import {
   useCreateVendorOrder,
   useListEvent,
   useListIngredient,
-  useListIngredientDemand,
   useListIngredientPriceObservation,
   useListInventoryItem,
   useListPurchaseNeed,
@@ -34,17 +33,22 @@ import { formatDate, formatMoneyExact } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { PurchasingCommandForm } from "./PurchasingCommandForm";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
-import { suggestOrderQuantity } from "./reorderSuggestion";
+import { purchasingStockContext } from "./purchasingStockContext";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { vendorOrderTitle } from "./vendorOrderNumber";
 import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
+import {
+  useWorkingEventScope,
+  WorkingEventScopeNote,
+} from "../events/WorkingEventScope";
 
 const policy = new SupplyLifecyclePolicy();
 
 export function PurchasingPage() {
+  const eventScope = useWorkingEventScope();
   const needs = useListPurchaseNeed();
   const vendors = useListVendor();
   const orders = useListVendorOrder();
@@ -52,7 +56,6 @@ export function PurchasingPage() {
   const demandLinks = useListVendorOrderLineDemand();
   const ingredients = useListIngredient();
   const inventoryItems = useListInventoryItem();
-  const demands = useListIngredientDemand();
   const events = useListEvent();
   const vendorContacts = useListVendorContact();
   const priceObservations = useListIngredientPriceObservation();
@@ -78,6 +81,13 @@ export function PurchasingPage() {
     (item) => item.deletedAt == null,
   );
   const activeOrders = (orders ?? []).filter((item) => item.deletedAt == null);
+  // Only the orders table follows the working event; vendor scores and
+  // weekly drafts keep reading every order.
+  const shownOrders = activeOrders.filter(
+    (item) =>
+      eventScope.scopeId == null ||
+      String(item.eventId ?? "") === eventScope.scopeId,
+  );
   const vendorPerformance = useMemo(
     () =>
       computeVendorPerformance(
@@ -107,8 +117,8 @@ export function PurchasingPage() {
     events?.find((item) => item._id === id)?.title ?? "Unknown event";
   const vendorName = (id: string) =>
     vendors?.find((item) => item._id === id)?.name ?? "Unknown vendor";
-  const linkedLine = (need: any) =>
-    lines?.find((line) => {
+  const linkedLines = (need: { ingredientDemandId: string }) =>
+    lines?.filter((line) => {
       if (line.deletedAt != null || line.status === "cancelled") return false;
       if (line.ingredientDemandId === need.ingredientDemandId) return true;
       return demandLinks?.some(
@@ -118,8 +128,30 @@ export function PurchasingPage() {
           link.ingredientDemandId === need.ingredientDemandId,
       );
     });
-  const reorderSuggestion = (need: any) =>
-    suggestOrderQuantity(need, inventoryItems ?? [], demands ?? []);
+  const linkedLine = (need: { ingredientDemandId: string }) =>
+    linkedLines(need)?.[0];
+  const linkedOrders = (need: { ingredientDemandId: string }) => {
+    if (
+      lines === undefined ||
+      demandLinks === undefined ||
+      orders === undefined ||
+      vendors === undefined
+    )
+      return undefined;
+    return [
+      ...new Set(linkedLines(need)?.map((line) => line.vendorOrderId)),
+    ].map((id) => {
+      const order = orders.find((item) => item._id === id);
+      return {
+        id,
+        label: order
+          ? `${vendorName(order.vendorId)} ${order.orderNumber?.trim() || "order"}`
+          : "View linked order",
+      };
+    });
+  };
+  const stockContext = (need: { ingredientId: string; unit: string }) =>
+    purchasingStockContext(need, inventoryItems, Date.now());
   const needCanCancel = (need: any) =>
     policy
       .purchaseNeedActions(String(need.status))
@@ -498,7 +530,8 @@ export function PurchasingPage() {
         isNeedSelected={selection.isSelected}
         onToggleNeed={selection.toggle}
         linkedLine={linkedLine}
-        reorderSuggestion={reorderSuggestion}
+        stockContext={stockContext}
+        linkedOrders={linkedOrders}
         ingredientName={ingredientName}
         ingredients={ingredients}
         eventName={eventName}
@@ -513,17 +546,18 @@ export function PurchasingPage() {
         }}
       />
 
+      <WorkingEventScopeNote scope={eventScope} noun="purchase orders" />
       <section className="working-ledger mt-10">
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Order folios</p>
             <h2>All vendor orders</h2>
           </div>
-          <span>{activeOrders.length} orders</span>
+          <span>{shownOrders.length} orders</span>
         </div>
         {orders === undefined || vendors === undefined ? (
           <TableSkeleton rows={5} />
-        ) : activeOrders.length === 0 ? (
+        ) : shownOrders.length === 0 ? (
           <div className="document-empty">
             <p>No vendor orders yet</p>
             <span>
@@ -557,7 +591,7 @@ export function PurchasingPage() {
                 </tr>
               </thead>
               <tbody>
-                {activeOrders.map((order) => (
+                {shownOrders.map((order) => (
                   <tr key={order._id}>
                     <td>
                       <strong>{vendorOrderTitle(order)}</strong>

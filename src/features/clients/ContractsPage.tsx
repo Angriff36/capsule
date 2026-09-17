@@ -20,10 +20,12 @@ import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const policy = new CrmLifecyclePolicy();
 
 export function ContractsPage() {
+  const workingId = useWorkingEventId();
   const contracts = useListContract();
   const clients = useListClient();
   const events = useListEvent();
@@ -224,7 +226,14 @@ export function ContractsPage() {
             <>
               <label>
                 Event
-                <select name="eventId" required defaultValue="">
+                <select
+                  key={
+                    draftableEvents.length ? "events-ready" : "events-loading"
+                  }
+                  name="eventId"
+                  required
+                  defaultValue={workingId ?? ""}
+                >
                   <option value="" disabled>
                     Select event
                   </option>

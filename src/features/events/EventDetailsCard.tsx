@@ -22,6 +22,7 @@ import {
   UserIcon,
 } from "./eventDetailIcons";
 import { EventOverviewCard } from "./EventOverviewCard";
+import { eventVenueLabel } from "./eventVenueLabel";
 
 type Named = { _id: string; name: string };
 
@@ -61,6 +62,10 @@ export type EventDetailsCardProps = {
   readonly endsAt?: number | null;
   readonly expectedHeadcount?: number | null;
   readonly venue: { name: string } | null | undefined;
+  readonly venueId?: string | null;
+  /** Name snapshot the event stored at booking — shown while the venue list loads. */
+  readonly venueName?: string | null;
+  readonly venuesLoading?: boolean;
   readonly venueAddress?: string | null;
   readonly occasionId?: Id<"occasions"> | null;
   readonly serviceStyleId?: Id<"serviceStyles"> | null;
@@ -81,6 +86,9 @@ export function EventDetailsCard({
   endsAt,
   expectedHeadcount,
   venue,
+  venueId,
+  venueName,
+  venuesLoading = false,
   venueAddress,
   occasionId,
   serviceStyleId,
@@ -97,7 +105,12 @@ export function EventDetailsCard({
   const contact = [primaryContactName, primaryContactEmail]
     .filter(Boolean)
     .join(" · ");
-  const venueLine = [venue?.name, venueAddress].filter(Boolean).join(" · ");
+  const venueLine = [
+    eventVenueLabel({ venueId, venueName, venue, venuesLoading }),
+    venueAddress,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
     <EventOverviewCard
@@ -132,7 +145,7 @@ export function EventDetailsCard({
           {formatCount(expectedHeadcount)} guests
         </Fact>
         <Fact icon={<MapPinIcon width={14} height={14} />} label="Venue">
-          {venueLine || "No venue yet"}
+          {venueLine}
         </Fact>
         {occasion ? (
           <Fact icon={<StarIcon width={14} height={14} />} label="Occasion">

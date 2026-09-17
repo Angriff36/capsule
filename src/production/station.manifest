@@ -1,0 +1,93 @@
+// Revision-2 culinary model (2026-09-14). Controlled station records replace
+// spelling-dependent free text. The printed sheets group work by these
+// ("Finish at Kitchen", "Finish at Event", "Drop Off", "Side Items",
+// "Bev - Non Alcohol", "Action Station - Omelet", "Apps - Finish at Event").
+// Renaming a station never touches task rows; aliases keep imports matching.
+
+use "../foundation/base.manifest"
+
+enum StationStatus {
+  active
+  retired
+}
+
+entity Station mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required sortOrder: int = 0
+  property aliases: list<string>?
+  property required status: StationStatus = "active"
+  property definedAt: datetime?
+  property retiredAt: datetime?
+
+  constraint stationNamed: self.definedAt == null or length(trim(self.name)) > 0 "Station name is required"
+  constraint stationSortNonnegative: self.sortOrder >= 0 "Sort order cannot be negative"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy stationRead read: roleAllows(user.role, "staffAccess") "Employed staff may read stations"
+  default policy stationWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write stations through commands"
+  default policy stationExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute station commands"
+
+  command define(name: string, optional sortOrder: int, optional aliases: list<string>) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    constraint defineStationName: length(trim(name)) > 0 "Station name is required"
+    mutate name = name
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate aliases = aliases
+    mutate definedAt = now()
+    emit StationDefined {
+      stationId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command rename(name: string, optional sortOrder: int, optional aliases: list<string>) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    constraint renameStationName: length(trim(name)) > 0 "Station name is required"
+    mutate name = name
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    mutate aliases = aliases != null ? aliases : self.aliases
+    emit StationRenamed {
+      stationId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint retireStationReason: length(trim(reason)) > 0 "Reason is required"
+    mutate status = "retired"
+    mutate retiredAt = now()
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    mutate status = "active"
+    mutate retiredAt = null
+  }
+
+  store Station in durable
+}
+
+event StationDefined: "station.defined" {
+  stationId: string
+  tenantId: string
+  name: string
+}
+
+event StationRenamed: "station.renamed" {
+  stationId: string
+  tenantId: string
+  name: string
+}

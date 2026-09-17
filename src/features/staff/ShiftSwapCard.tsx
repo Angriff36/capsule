@@ -1,20 +1,20 @@
 import { useState, type FormEvent } from "react";
 import {
+  useRelatedSwapShifts,
+  useSwapCandidates,
+  useSwapNow,
+} from "../../lib/staffShiftSwaps";
+import {
   useCreateShiftSwapRequest,
   useListPerson,
-  useListQualification,
   useListShift,
   useListShiftSwapRequest,
-  useListShiftType,
-  useListTimeOffRequest,
-  useListTrainingCompletion,
   useShiftSwapRequestAccept,
   useShiftSwapRequestDecline,
   useShiftSwapRequestWithdraw,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, StatusChip } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "../workforce/WorkforceFailureBanner";
-import { evaluateShiftSwapCandidate } from "../workforce/shiftSwapEligibility";
 
 type ShiftSwapCardProps = {
   person: Record<string, any>;
@@ -42,17 +42,17 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
   const people = useListPerson();
   const shifts = useListShift();
   const requests = useListShiftSwapRequest();
-  const qualifications = useListQualification();
-  const trainingCompletions = useListTrainingCompletion();
-  const shiftTypes = useListShiftType();
-  const timeOffRequests = useListTimeOffRequest();
   const propose = useCreateShiftSwapRequest();
   const accept = useShiftSwapRequestAccept();
   const decline = useShiftSwapRequestDecline();
   const withdraw = useShiftSwapRequestWithdraw();
   const [openShiftId, setOpenShiftId] = useState<string | null>(null);
+  const [selectedRecipientId, setSelectedRecipientId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const relatedShifts = useRelatedSwapShifts();
+  const now = useSwapNow(shifts);
+  const candidateResult = useSwapCandidates(openShiftId, now);
 
   const activeRows = (requests ?? []).filter((row) => row.deletedAt == null);
   const myScheduledShifts = (shifts ?? [])
@@ -60,7 +60,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
       (row) =>
         row.deletedAt == null &&
         row.status === "scheduled" &&
-        row.startsAt > Date.now() &&
+        row.startsAt > now &&
         String(row.personId) === String(person._id),
     )
     .sort((left, right) => left.startsAt - right.startsAt);
@@ -78,7 +78,8 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
     return row ? `${row.givenName} ${row.familyName}` : "Staff member";
   };
   const shiftFor = (shiftId: string) =>
-    shifts?.find((row) => String(row._id) === shiftId);
+    shifts?.find((row) => String(row._id) === shiftId) ??
+    relatedShifts?.find((row) => row._id === shiftId);
   const run = (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
     setBusy(key);
@@ -94,23 +95,10 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const recipientPersonId = String(data.get("recipientPersonId") || "");
-    const recipient = people?.find(
-      (row) => String(row._id) === recipientPersonId,
+    const recipient = candidateResult?.candidates.find(
+      (row) => row.personId === recipientPersonId,
     );
     if (!recipient) return;
-    const eligibility = evaluateShiftSwapCandidate({
-      candidate: recipient,
-      shift,
-      shifts: shifts ?? [],
-      timeOffRequests: timeOffRequests ?? [],
-      qualifications: qualifications ?? [],
-      trainingCompletions: trainingCompletions ?? [],
-      shiftTypes: shiftTypes ?? [],
-    });
-    if (!eligibility.eligible) {
-      setFailure(new Error(eligibility.reasons.join(" ")));
-      return;
-    }
     run(`propose:${shift._id}`, async () => {
       await propose({
         shiftId: shift._id,
@@ -118,8 +106,8 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
         recipientPersonId,
         shiftTypeId: shift.shiftTypeId ?? undefined,
         sourceQualificationId: shift.requiredQualificationId ?? undefined,
-        targetQualificationId: eligibility.targetQualificationId,
-        targetTrainingCompletionId: eligibility.targetTrainingCompletionId,
+        targetQualificationId: recipient.targetQualificationId,
+        targetTrainingCompletionId: recipient.targetTrainingCompletionId,
         reason: String(data.get("reason") || "").trim() || undefined,
       });
       setOpenShiftId(null);
@@ -127,9 +115,6 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
   };
 
   const linked = person.authSubjectId != null;
-  const activePeople = (people ?? []).filter(
-    (row) => row.deletedAt == null && row.status === "active",
-  );
 
   return (
     <section className="card px-4 py-4" data-testid="shift-swap-card">
@@ -166,7 +151,10 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                 <p className="mt-0.5 text-sm text-ink-2">
                   {shift?.startsAt
                     ? dateTime.format(shift.startsAt)
-                    : "Shift unavailable"}
+                    : relatedShifts === undefined
+                      ? "Loading shift details…"
+                      : "Shift unavailable"}
+                  {shift?.endsAt ? ` – ${dateTime.format(shift.endsAt)}` : ""}
                   {shift?.role ? ` · ${shift.role}` : ""}
                 </p>
                 <div className="mt-3 flex gap-2">
@@ -223,20 +211,10 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                   String(request.status),
                 ),
             );
-            const candidates = activePeople
-              .map((candidate) => ({
-                candidate,
-                eligibility: evaluateShiftSwapCandidate({
-                  candidate,
-                  shift,
-                  shifts: shifts ?? [],
-                  timeOffRequests: timeOffRequests ?? [],
-                  qualifications: qualifications ?? [],
-                  trainingCompletions: trainingCompletions ?? [],
-                  shiftTypes: shiftTypes ?? [],
-                }),
-              }))
-              .filter((item) => item.eligibility.eligible);
+            const candidates =
+              openShiftId === shift._id
+                ? (candidateResult?.candidates ?? [])
+                : [];
             return (
               <article
                 key={shift._id}
@@ -260,11 +238,12 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                     <button
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null || !linked}
-                      onClick={() =>
+                      onClick={() => {
+                        setSelectedRecipientId("");
                         setOpenShiftId((value) =>
                           value === shift._id ? null : shift._id,
-                        )
-                      }
+                        );
+                      }}
                     >
                       Request swap
                     </button>
@@ -303,20 +282,32 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                       Coworker
                       <select
                         name="recipientPersonId"
+                        value={selectedRecipientId}
+                        onChange={(event) =>
+                          setSelectedRecipientId(event.target.value)
+                        }
                         className="input"
                         required
+                        disabled={candidateResult === undefined || busy != null}
                       >
                         <option value="">Choose eligible staff</option>
-                        {candidates.map(({ candidate }) => (
-                          <option key={candidate._id} value={candidate._id}>
-                            {candidate.givenName} {candidate.familyName}
+                        {candidates.map((candidate) => (
+                          <option
+                            key={candidate.personId}
+                            value={candidate.personId}
+                          >
+                            {candidate.name}
                           </option>
                         ))}
                       </select>
                     </label>
-                    {candidates.length === 0 ? (
-                      <p className="text-sm text-ink-3">
-                        No linked staff are free and credentialed for this time.
+                    {candidateResult === undefined ||
+                    candidates.length === 0 ? (
+                      <p className="text-sm text-ink-3" role="status">
+                        {candidateResult === undefined
+                          ? "Checking available coworkers…"
+                          : (candidateResult.unavailableReason ??
+                            "No linked staff are free and credentialed for this time.")}
                       </p>
                     ) : null}
                     <label className="field-label">

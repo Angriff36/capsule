@@ -26,7 +26,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Use the stage tabs to see what's coming up or needs approval.",
       "Click an event to manage its menu, staff, timeline, and money.",
-      "Use New event to book something new.",
+      "Use New event to book something new, or Import from BEO / worksheet to paste the binder instead of typing it.",
     ],
   },
   {
@@ -37,6 +37,17 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Review the menu, staff, and timeline.",
       "Update details as the booking firms up.",
       "Use the stage actions to move it forward.",
+    ],
+  },
+  {
+    prefix: "/events/import",
+    title: "Import an event from its BEO",
+    purpose:
+      "Paste the BEO or worksheet text (or drop TPP CSVs) and Capsule drafts the event for you to review.",
+    steps: [
+      "Paste the printed binder text or drop the TPP files.",
+      "Check the preview and pick existing client, venue, and dishes when they already exist.",
+      "Create the event, then walk the tabs — notes, staffing, and pack list should already be there.",
     ],
   },
   {
@@ -57,6 +68,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Create a template from your most common event shape.",
       "When booking, start from the template and adjust the details.",
+    ],
+  },
+  {
+    prefix: "/events/tracker",
+    title: "Event tracker",
+    purpose:
+      "The next two weeks as day lanes, so the things that change at the last minute can be changed right here.",
+    steps: [
+      "Drag a card to another day to move the event.",
+      "Change the time, guest count, venue, or owner on the card.",
+      "Use the lock button to move the event to the next stage.",
     ],
   },
   {

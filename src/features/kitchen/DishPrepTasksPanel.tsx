@@ -4,14 +4,25 @@ import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDishTask,
   useDishTaskRetire,
+  useListDishComponent,
+  useListDishIngredient,
   useListDishTask,
+  useListDishTaskMaterial,
   useListComponent,
+  useListIngredient,
 } from "../../lib/manifest-convex-react";
+import {
+  DishPrepTaskWorkControls,
+  type PrepMaterialOption,
+  type PrepMaterialRow,
+} from "./DishPrepTaskWorkControls";
+import { RecipeNotes, readableRecipeAmount } from "./RecipeNotes";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import {
+  EQUIPMENT_FIXED_TASK_TYPE,
   PrepTemplateQuantityCoordinator,
   prepTemplateQuantityMeta,
   type PrepQuantityEntryMode,
@@ -59,12 +70,17 @@ const UNITS = [
 const QUANTITY_MODES: { value: PrepQuantityEntryMode; label: string }[] = [
   { value: "per_guest", label: "Per guest" },
   { value: "batch_total", label: "Total for batch" },
+  { value: "fixed", label: "Fixed — same no matter the guest count" },
 ];
 
 /** Dish-level prep task templates with component hyperlinks when linked. */
 export function DishPrepTasksPanel({ dishId }: Props) {
   const tasks = useListDishTask();
   const components = useListComponent();
+  const ingredients = useListIngredient();
+  const dishIngredients = useListDishIngredient();
+  const dishComponents = useListDishComponent();
+  const taskMaterials = useListDishTaskMaterial();
   const addTask = useCreateDishTask();
   const retireTask = useDishTaskRetire();
 
@@ -97,6 +113,37 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         task.status === "active",
     )
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+
+  // The ingredient and recipe lines of THIS dish are the only things a prep
+  // step can act on, so the picker is built from them.
+  const materialOptions: PrepMaterialOption[] = [
+    ...(dishIngredients ?? [])
+      .filter((line) => line.deletedAt == null && line.dishId === dishId)
+      .map((line) => ({
+        id: String(line._id),
+        kind: "ingredient" as const,
+        label:
+          ingredients?.find((entry) => entry._id === line.ingredientId)?.name ??
+          "Unknown ingredient",
+      })),
+    ...(dishComponents ?? [])
+      .filter((line) => line.deletedAt == null && line.dishId === dishId)
+      .map((line) => ({
+        id: String(line._id),
+        kind: "component" as const,
+        label:
+          components?.find((entry) => entry._id === line.componentId)?.name ??
+          "Unknown recipe",
+      })),
+  ];
+  const materialsByTask = new Map<string, PrepMaterialRow[]>();
+  for (const material of taskMaterials ?? []) {
+    if (material.deletedAt != null || material.linkedAt == null) continue;
+    const key = String(material.dishTaskId);
+    const list = materialsByTask.get(key) ?? [];
+    list.push(material);
+    materialsByTask.set(key, list);
+  }
 
   function clearAddFields() {
     setTaskName("");
@@ -137,13 +184,12 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         station: station.trim() || undefined,
         defaultQuantity: qtySave.defaultQuantity,
         defaultUnit: qtySave.defaultQuantity != null ? unit : undefined,
+        taskType: qtySave.taskType,
         instructions: instructions.trim() || undefined,
         sortOrder: rows.length,
       });
       clearAddFields();
-      setNotice(
-        "Template added. Every event this dish is added to now opens this prep task.",
-      );
+      setNotice("Prep step added to the recipe and current event plans.");
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : "Could not add the template.",
@@ -160,7 +206,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   ) {
     const ok = await prompt.askConfirm({
       title: "Retire prep template",
-      description: `Retire "${name}"? New events using this dish will no longer open this prep task.`,
+      description: `Retire "${name}"? Unedited prep that has not started will be canceled on current events. Edited, underway, and completed work will be kept.`,
       confirmLabel: "Retire",
       tone: "danger",
     });
@@ -170,7 +216,9 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     setNotice(null);
     try {
       await retireTask({ docId: id, version, reason: "Removed from dish" });
-      setNotice("Template retired — it will not generate prep tasks again.");
+      setNotice(
+        "Prep template retired. Check event prep for any edited or underway work kept.",
+      );
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -185,7 +233,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   return (
     <section className="culinary-section">
       <div className="culinary-section-heading">
-        <h2>Prep task templates</h2>
+        <h2>Prep list</h2>
         <span>{formatCountNoun(rows.length, "task")}</span>
       </div>
 
@@ -202,12 +250,12 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       ) : rows.length === 0 ? (
         <div className="document-empty">
           <p>
-            No prep templates on this dish yet. Event prep is generated from
-            these when a dish is added to an event.
+            Add the steps cooks should perform. Capsule uses them to plan prep
+            for this dish’s events.
           </p>
         </div>
       ) : (
-        <ul className="divide-y divide-line">
+        <ol className="recipe-prep-list">
           {rows.map((task) => {
             const component = task.componentId
               ? components?.find((entry) => entry._id === task.componentId)
@@ -219,22 +267,25 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             return (
               <li
                 key={task._id}
-                className="flex flex-wrap items-center justify-between gap-2 py-3"
+                className="recipe-prep-row"
                 data-testid="dish-prep-template-row"
               >
                 <div>
                   <p className="text-lg font-medium text-ink">{task.name}</p>
-                  <p className="font-mono text-xs text-ink-3">
-                    {task.category} · {task.taskType}
-                    {task.station ? ` · ${task.station}` : ""}
-                    {qtyMeta ? ` · ${qtyMeta}` : ""}
+                  <p className="recipe-prep-meta">
+                    {task.taskType === EQUIPMENT_FIXED_TASK_TYPE && qtyMeta
+                      ? `${readableRecipeAmount(task.defaultQuantity!, String(task.defaultUnit ?? ""))} — same for every guest count`
+                      : qtyMeta
+                        ? `${readableRecipeAmount(task.defaultQuantity!, String(task.defaultUnit ?? ""))} per guest`
+                        : ""}
                   </p>
-                  {task.instructions ? (
-                    <p className="mt-1 text-sm text-ink-2">
-                      <span className="font-medium text-ink-3">Notes: </span>
-                      {task.instructions}
-                    </p>
-                  ) : null}
+                  <RecipeNotes text={task.instructions} title={task.name} />
+                  <DishPrepTaskWorkControls
+                    task={task}
+                    materials={materialsByTask.get(String(task._id)) ?? []}
+                    options={materialOptions}
+                    prompt={prompt}
+                  />
                 </div>
                 <div className="flex items-center gap-3">
                   {component ? (
@@ -246,153 +297,178 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                     </Link>
                   ) : task.componentId ? (
                     <span className="text-sm text-ink-3">Component linked</span>
-                  ) : (
-                    <span className="text-sm text-ink-3">No component</span>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    disabled={busy != null}
-                    onClick={() =>
-                      void onRetire(task._id, task.version, task.name)
-                    }
-                  >
-                    {busy === task._id ? "Working…" : "Remove"}
-                  </button>
+                  ) : null}
+                  <details className="recipe-row-editor">
+                    <summary aria-label={`Manage ${task.name}`}>Manage</summary>
+                    <p className="recipe-note">
+                      {task.category}
+                      {task.station ? ` · ${task.station}` : ""}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() =>
+                        void onRetire(task._id, task.version, task.name)
+                      }
+                    >
+                      {busy === task._id ? "Working…" : "Remove"}
+                    </button>
+                  </details>
                 </div>
               </li>
             );
           })}
-        </ul>
+        </ol>
       )}
 
-      <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Task</span>
-          <input
-            name="name"
-            className="input mt-1"
-            placeholder="BRINE AIRLINE CHICKEN"
-            required
-            value={taskName}
-            onChange={(event) => setTaskName(event.target.value)}
-          />
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Category</span>
-          <select
-            className="input mt-1"
-            value={category}
-            onChange={(event) => setCategory(event.target.value)}
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm">
-          <span className="meta-term">Station</span>
-          <input
-            name="station"
-            className="input mt-1"
-            placeholder="Apps - Passed - Finish at Event"
-            value={station}
-            onChange={(event) => setStation(event.target.value)}
-          />
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Quantity mode</span>
-          <select
-            className="input mt-1"
-            value={quantityMode}
-            onChange={(event) =>
-              setQuantityMode(event.target.value as PrepQuantityEntryMode)
-            }
-          >
-            {QUANTITY_MODES.map((mode) => (
-              <option key={mode.value} value={mode.value}>
-                {mode.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        {quantityMode === "per_guest" ? (
-          <label className="block text-sm">
-            <span className="meta-term">Per guest (0 = one each)</span>
+      <details className="recipe-add-editor">
+        <summary>Add prep step</summary>
+        <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Task</span>
             <input
-              name="defaultQuantity"
-              type="text"
-              inputMode="decimal"
-              placeholder="0.0313"
-              value={perGuestQty}
-              onChange={(event) => setPerGuestQty(event.target.value)}
+              name="name"
               className="input mt-1"
+              placeholder="BRINE AIRLINE CHICKEN"
+              required
+              value={taskName}
+              onChange={(event) => setTaskName(event.target.value)}
             />
           </label>
-        ) : (
-          <>
-            <label className="block text-sm">
-              <span className="meta-term">Total for batch</span>
+          <label className="block text-sm">
+            <span className="meta-term">Category</span>
+            <select
+              className="input mt-1"
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm">
+            <span className="meta-term">Station</span>
+            <input
+              name="station"
+              className="input mt-1"
+              placeholder="Apps - Passed - Finish at Event"
+              value={station}
+              onChange={(event) => setStation(event.target.value)}
+            />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Quantity mode</span>
+            <select
+              className="input mt-1"
+              value={quantityMode}
+              onChange={(event) =>
+                setQuantityMode(event.target.value as PrepQuantityEntryMode)
+              }
+            >
+              {QUANTITY_MODES.map((mode) => (
+                <option key={mode.value} value={mode.value}>
+                  {mode.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          {quantityMode === "fixed" ? (
+            <label className="block text-sm sm:col-span-2">
+              <span className="meta-term">Fixed amount</span>
               <input
                 name="batchTotal"
                 type="text"
                 inputMode="decimal"
-                placeholder="97.50"
+                placeholder="53"
                 value={batchTotalQty}
                 onChange={(event) => setBatchTotalQty(event.target.value)}
                 className="input mt-1"
               />
+              <span className="mt-1 block text-xs text-ink-3">
+                Fryer oil, one infusion kit per container — this number does not
+                grow when the guest count changes.
+              </span>
             </label>
+          ) : quantityMode === "per_guest" ? (
             <label className="block text-sm">
-              <span className="meta-term">Servings on sheet</span>
+              <span className="meta-term">Per guest (0 = one each)</span>
               <input
-                name="batchServings"
+                name="defaultQuantity"
                 type="text"
-                inputMode="numeric"
-                placeholder="260"
-                value={batchServings}
-                onChange={(event) => setBatchServings(event.target.value)}
+                inputMode="decimal"
+                placeholder="0.0313"
+                value={perGuestQty}
+                onChange={(event) => setPerGuestQty(event.target.value)}
                 className="input mt-1"
               />
             </label>
-          </>
-        )}
-        <label className="block text-sm">
-          <span className="meta-term">Unit</span>
-          <select
-            className="input mt-1"
-            value={unit}
-            onChange={(event) => setUnit(event.target.value)}
-          >
-            {UNITS.map((u) => (
-              <option key={u} value={u}>
-                {u}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="block text-sm sm:col-span-2">
-          <span className="meta-term">Notes</span>
-          <input
-            name="instructions"
-            className="input mt-1"
-            placeholder="Weight after cooked"
-            value={instructions}
-            onChange={(event) => setInstructions(event.target.value)}
-          />
-        </label>
-        <div className="sm:col-span-2">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={busy != null}
-          >
-            {busy === "add" ? "Adding…" : "Add prep template"}
-          </button>
-        </div>
-      </form>
+          ) : (
+            <>
+              <label className="block text-sm">
+                <span className="meta-term">Total for batch</span>
+                <input
+                  name="batchTotal"
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="97.50"
+                  value={batchTotalQty}
+                  onChange={(event) => setBatchTotalQty(event.target.value)}
+                  className="input mt-1"
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="meta-term">Servings on sheet</span>
+                <input
+                  name="batchServings"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="260"
+                  value={batchServings}
+                  onChange={(event) => setBatchServings(event.target.value)}
+                  className="input mt-1"
+                />
+              </label>
+            </>
+          )}
+          <label className="block text-sm">
+            <span className="meta-term">Unit</span>
+            <select
+              className="input mt-1"
+              value={unit}
+              onChange={(event) => setUnit(event.target.value)}
+            >
+              {UNITS.map((u) => (
+                <option key={u} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            <span className="meta-term">Notes</span>
+            <input
+              name="instructions"
+              className="input mt-1"
+              placeholder="Weight after cooked"
+              value={instructions}
+              onChange={(event) => setInstructions(event.target.value)}
+            />
+          </label>
+          <div className="sm:col-span-2">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={busy != null}
+            >
+              {busy === "add" ? "Adding…" : "Add prep template"}
+            </button>
+          </div>
+        </form>
+      </details>
     </section>
   );
 }

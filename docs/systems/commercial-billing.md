@@ -82,7 +82,7 @@ Roles: finance staff/managers (`financeAccess`) own invoice and payment commands
 
 ## Cross-system handoffs
 
-Commercial documents link to Client and optional Event. Settled Payment applies to Invoice. Issued CreditMemo records against the paid source invoice and optionally applies to a same-client open target invoice in the same generated transaction; carry-forward credit remains available on the client account. Event cancellation voids eligible unpaid invoices (generated fan-out). Proposal acceptance cannot currently create an Event, and Contract signing cannot confirm one; the UI must make those follow-up steps explicit rather than imply automation.
+Commercial documents link to Client and optional Event. Settled Payment applies to Invoice. Issued CreditMemo records against the paid source invoice and optionally applies to a same-client open target invoice in the same generated transaction; carry-forward credit remains available on the client account. Event cancellation selects live, same-tenant unpaid draft/sent/viewed/overdue invoices and invokes the existing generated Invoice.markVoided command in the parent transaction. Paid, partial, voided and written-off invoices, their amounts, and all payments remain unchanged; cancellation does not generate a refund. Isolated source-branch qualification covers actual payment settlement followed by event cancellation. Live repair and deployed verification remain outstanding. Proposal acceptance and contract confirmation behavior require their own current-source verification.
 
 Invoice reminder automation is an authored Convex delivery seam because its
 per-invoice due dates are dynamic and its Stripe/Resend calls are outbound side

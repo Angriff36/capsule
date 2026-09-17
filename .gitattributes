@@ -27,6 +27,7 @@
 *.gz binary
 
 # Builder / regen-sensitive paths (explicit LF pin; same as `*` above)
+src/**/*.manifest text eol=lf
 convex/** text eol=lf
 generated/** text eol=lf
 src/generated/** text eol=lf

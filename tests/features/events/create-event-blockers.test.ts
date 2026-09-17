@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { EventCreateServiceStyleResolver } from "../../../src/features/events/EventCreateServiceStyleResolver";
 import { eventCreateDisabledReason } from "../../../src/features/events/eventCreateGuards";
 import {
   SERVICE_STYLE_CATALOG,
@@ -28,6 +29,26 @@ describe("service style catalog fallback", () => {
       { _id: "ss1", name: "Full Service", status: "active", sortOrder: 0 },
     ]);
     expect(live).toEqual([{ id: "ss1", name: "Full Service" }]);
+  });
+
+  it("treats an inactive catalog row as missing so ensure can reactivate it", () => {
+    const resolver = new EventCreateServiceStyleResolver(async () => ({
+      docId: "new-id",
+    }));
+    expect(
+      resolver.missing([
+        {
+          _id: "ss-old",
+          name: "Full Service",
+          code: "full-service",
+          status: "inactive",
+        },
+      ]),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "full-service" }),
+      ]),
+    );
   });
 
   it("does not treat catalog codes as persistable serviceStyleId values", () => {

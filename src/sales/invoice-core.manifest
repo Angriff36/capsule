@@ -100,9 +100,17 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   default policy invoiceWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may write invoices through commands"
   default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may execute invoice commands"
 
+  // invoiceNumber is what finance typed. When it is absent the number is
+  // "INV-<invoiceSequence + 1>" — the EventApproved cascade passes
+  // invoiceSequence: 0, so the row is written as the placeholder "INV-1" and
+  // InvoiceIssued carries autoNumbered: true; the authored numbering seam
+  // replaces it in the same transaction with the tenant's persisted sequence
+  // (invoice-number-sequence.manifest). An auto-issued draft therefore never
+  // carries the raw event document id (#136, #165).
   command issue(
     clientId: uuid,
-    invoiceNumber: string,
+    optional invoiceNumber: string,
+    optional invoiceSequence: int,
     subtotal: money(12, 2),
     taxAmount: money(12, 2),
     discountAmount: money(12, 2),
@@ -122,16 +130,17 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     guard self.client != null
     constraint issueClientMatch: clientId == self.clientId "Issue clientId must match the seeded client reference"
     constraint issueEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Issue eventId must match the seeded event reference when both are set"
-    constraint issueNumber: length(trim(invoiceNumber)) > 0 "Invoice number is required"
+    constraint issueNumber: (invoiceNumber != null and length(trim(invoiceNumber)) > 0) or invoiceSequence != null "Invoice number is required"
     constraint issueMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "Invoice money amounts cannot be negative"
     constraint issueTotalMatch: total == subtotal + taxAmount - discountAmount "Invoice total must equal subtotal plus tax minus discount"
     constraint issueCurrencyCode: currencyCode == null or length(trim(currencyCode)) == 3 "Currency code must be a three-letter ISO 4217 code"
     constraint issueExchangeRate: exchangeRate == null or exchangeRate > 0 "Exchange rate must be greater than zero"
     compute normalizedCurrencyCode = currencyCode != null ? toUpperCase(currencyCode) : null
     compute resolvedExchangeRate = exchangeRate != null ? exchangeRate : 1.0
+    compute resolvedInvoiceNumber = invoiceNumber != null ? invoiceNumber : "INV-" + (invoiceSequence + 1)
     mutate clientId = clientId
     mutate eventId = eventId != null ? eventId : self.eventId
-    mutate invoiceNumber = invoiceNumber
+    mutate invoiceNumber = resolvedInvoiceNumber
     mutate subtotal = subtotal
     mutate taxAmount = taxAmount
     mutate discountAmount = discountAmount
@@ -153,11 +162,35 @@ entity Invoice mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       clientId: clientId
       eventId: eventId != null ? eventId : self.eventId
-      invoiceNumber: invoiceNumber
+      invoiceNumber: resolvedInvoiceNumber
+      autoNumbered: invoiceNumber == null
       total: total
       amountDue: total
       currencyCode: normalizedCurrencyCode
       exchangeRate: resolvedExchangeRate
+    }
+  }
+
+  // Invoice numbers stay unique per tenant through the authored numbering seam
+  // (convex/lib/invoiceNumbering.ts), which runs on InvoiceIssued and on
+  // InvoiceNumberAssigned: the cascade's auto-numbered placeholder "INV-1"
+  // is replaced here with the tenant's persisted
+  // InvoiceNumberSequence (invoice-number-sequence.manifest) + 1; an explicit
+  // number — supplied at issue or assigned manually by finance through this
+  // command — that duplicates a live invoice is rejected instead, and an
+  // explicit "INV-<n>" advances the sequence. The Convex projection does not
+  // enforce `property unique`, and a command cannot read sibling rows, so the
+  // lookups are the seam's — the write is this governed command's.
+  command assignNumber(invoiceNumber: string) {
+    guard self.deletedAt == null
+    guard self.issuedAt != null
+    guard self.sentAt == null
+    constraint assignNumberPresent: length(trim(invoiceNumber)) > 0 "Invoice number is required"
+    mutate invoiceNumber = invoiceNumber
+    emit InvoiceNumberAssigned {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      invoiceNumber: invoiceNumber
     }
   }
 
@@ -454,10 +487,18 @@ event InvoiceIssued: "invoice.issued" {
   clientId: string
   eventId: string?
   invoiceNumber: string
+  // True when the number came from invoiceSequence rather than the caller.
+  autoNumbered: boolean
   total: money(12, 2)
   amountDue: money(12, 2)
   currencyCode: string?
   exchangeRate: decimal(18, 8)?
+}
+
+event InvoiceNumberAssigned: "invoice.number_assigned" {
+  invoiceId: string
+  tenantId: string
+  invoiceNumber: string
 }
 
 event InvoiceSent: "invoice.sent" {

@@ -1,0 +1,79 @@
+// Private evidence and audit records, not another Event aggregate.
+// The authored eventPacket transaction seam checks manager capability, tenant,
+// byte ownership and native-domain commands before writing these records.
+
+entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, eventId, fingerprint, purpose]
+  timestamps
+  property indexed eventId: uuid
+  property indexed fingerprint: string
+  property indexed storageId: string
+  property purpose: string
+  property name: string
+  property mimeType: string
+  property byteSize: int
+  property uploadedBy: string
+  property metadataJson: string?
+  property observationsJson: string?
+  property contextJson: string?
+  constraint packetArtifactSize: self.byteSize >= 0 "Source byte size cannot be negative"
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  default policy packetArtifactRead read: roleAllows(user.role, "eventPacketSeamOnly") "Source bytes and private evidence require the scoped packet seam"
+  default policy packetArtifactWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Only the scoped packet transaction writes source records"
+  default policy packetArtifactExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Packet records have no direct generated commands"
+  store EventPacketArtifact in durable
+}
+
+entity EventPacketIssue mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, eventId, issueKey]
+  timestamps
+  property indexed eventId: uuid
+  property issueKey: string
+  property issueJson: string
+  constraint packetIssueKey: length(trim(self.issueKey)) > 0 "An issue needs a stable key"
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  default policy packetIssueRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private issue evidence is projected through the packet seam"
+  default policy packetIssueWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Reconciliation owns issue lifecycle"
+  default policy packetIssueExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Packet issues have no direct generated commands"
+  store EventPacketIssue in durable
+}
+
+entity EventPacketResolution mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, eventId, decisionId]
+  timestamps
+  property indexed eventId: uuid
+  property decisionId: string
+  property issueKey: string
+  property actor: string
+  property decidedAt: datetime
+  property decisionJson: string
+  property verificationJson: string?
+  constraint packetDecisionActor: length(trim(self.actor)) > 0 "A decision needs its authenticated actor"
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  default policy packetResolutionRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private approvals remain behind manager review"
+  default policy packetResolutionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Authenticated transactional decisions are immutable"
+  default policy packetResolutionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Decisions have no direct generated commands"
+  store EventPacketResolution in durable
+}
+
+entity EventPacketRevision mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, eventId, snapshotFingerprint]
+  timestamps
+  property indexed eventId: uuid
+  property snapshotFingerprint: string
+  property pdfStorageId: string
+  property snapshotStorageId: string
+  property stage: string
+  property createdBy: string
+  property supersededBy: string?
+  constraint packetRevisionFingerprint: length(trim(self.snapshotFingerprint)) > 0 "A print needs its exact input fingerprint"
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  default policy packetRevisionRead read: roleAllows(user.role, "eventPacketSeamOnly") "PDF and source snapshots need scoped manager access"
+  default policy packetRevisionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Only exact-current immutable prints are recorded"
+  default policy packetRevisionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Print revisions have no direct generated commands"
+  store EventPacketRevision in durable
+}

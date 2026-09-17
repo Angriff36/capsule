@@ -35,6 +35,50 @@ Menu
   └── MenuDish[] → Dish      # required menu composition
 ```
 
+## Naming and mapping model (Revision 2, 2026-09-14)
+
+Kitchen-facing words map onto the existing entities; nothing was collapsed:
+
+| Kitchen word     | Entity                                            | Responsibility                                                                                  |
+| ---------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Ingredient       | Ingredient                                        | A thing we buy. Never carries work.                                                             |
+| Recipe           | Component                                         | A thing we make: batch formula, yield, method, portion specs. "Recipe" is the display word.     |
+| Sub-recipe       | ComponentComponent                                | A recipe used inside a recipe. A relationship, not a type. Cycles are rejected.                 |
+| Portion spec     | ComponentPortionSpec                              | A named output size (10 oz dough ball, 15 per batch). 5 oz and 10 oz stay distinct.             |
+| Food requirement | DishIngredient / DishComponent (per portion)      | The ONLY source of purchasing demand and food cost. Carries `quantityBasis`.                    |
+| Prep step        | DishTask + DishTaskMaterial                       | Work on a dish, linked to the requirement(s) it acts on. Work quantity is never demand.          |
+| Prep task        | PrepTask + PrepTaskMaterial                       | The event copy. `overrideOfDishTaskId` survives regeneration; `choice_pending` blocks claiming. |
+| Supply           | DishContainer, `Dish.kind = supply`               | Own quantities and pack tasks; never food demand.                                               |
+| Batch            | ProductionBatch + ProductionBatchAllocation       | Exact need, rounded make quantity, surplus; shares owned per event dish or as surplus.          |
+| Station          | Station                                           | Controlled records; free-text `station` columns stay as imported labels.                        |
+
+Demand has ONE calculation: `convex/lib/culinaryModel/demand.ts` (`expandEventDish`,
+`planSharedBatch`, `reconcileContributions`), exposed by the authored seam
+`convex/culinaryDemand.ts` (`eventDemandReview`, `reconcileEventDemand`,
+`planSharedRecipeBatch`, `componentContentReport`, `kitchenUnresolvedReport`,
+`addNestedRecipeLine`). Rules: units convert inside a dimension with documented
+factors (`units.ts`); crossing dimensions or leaving a count unit needs an
+`ItemUnitMapping`; a cooked basis needs a confirmed yield mapping; anything else is
+unresolved, stays visible (quantity 0, `exactQuantity` kept) and is excluded from the
+finalized purchasing total. Cost confidence (`costing.ts`) is one nested definition:
+known subtotal shown apart from the count of unknown lines; a recipe with no lines
+shows "cost unknown", never $0.00. Event overrides (`EventDishLineOverride`) and
+resolved choices change the effective requirement set; tasks never add demand.
+Shared batches write their ingredient shares once, owned per allocation; the surplus
+share is purchased once on the first event and labelled `batch_surplus`; completing a
+batch marks allocations produced and leaves portioning/packing tasks open. Grouping
+across events requires `Component.storageWindowDays`.
+
+Identity: `ExternalRecordLink` key is `(sourceSystem, sourceAccount, recordType,
+externalId, role, ordinal)`; dish usages are keyed by the parent TPP recipe row, the
+shared ingredient/recipe by the item. Three-way re-import (`importMapping.ts`):
+capsule == source reconciles without conflict and advances the applied baseline;
+all-three-differ raises an `ImportConflict` once; absence from a filtered export
+never supersedes. The TPP mapper (`tppImport.ts`) suggests links only; "Make" stays a
+recipe (even with no content), "Portion X" over one inventory row is a portioning
+pattern over that ingredient, never a recipe. Acceptance tests:
+`tests/culinary-model-acceptance.test.ts`.
+
 ## Primary workspace
 
 Use a **culinary book** rather than a dashboard:
@@ -46,10 +90,44 @@ Use a **culinary book** rather than a dashboard:
 
 ## Core workflows
 
+### Catering book packages
+
+The event Menu tab offers **Add catering package** with 52 offerings from the
+2026 Full Service Wedding Catering Book, 2026 Full Service Hors d'oeuvres Menu,
+Holiday Catering Book 2025, and 2026 Wedding Pizza Book. The authored catalog is
+`src/data/catering-packages.json`; every dish and package retains its book/page.
+Package choices and servings are editable before adding. Pizza varieties share
+the selected guest portions; duet entrees each serve the selected headcount.
+Choice counts are starting points, not restrictions on the operator.
+
+`applyCateringPackage` in `convex/lib/operationalTransactions.ts` authenticates
+menu management and delegates to `cateringPackageOperations.ts`. One transaction
+reuses matching live dishes or creates them, supplies a preparation template if
+none exists, and adds EventDish records through generated commands. Existing
+reactions create PrepTask and ingredient-demand records. Explicit per-dish
+servings also set the headcount override used by costing and purchasing.
+Receipts recover a lost acknowledgement without repeating writes.
+
+Existing recipes retain their quantities and procedures. Brochure-only dishes
+receive their description and a preparation task without invented ingredient
+weights, cooking times, or food costs. The result and event instructions identify
+missing ingredient quantities so incomplete purchasing totals remain visible.
+Bar packages create timeline activities and supply-kit packing lists; operators
+adjust activity times and consumable quantities to the event. Pizza Feast includes
+a chef's-choice cocktail-hour dish by default, replaceable with named selections.
+
+Local qualification on 2026-09-08 applied all 52 offerings successfully, exercised
+food and bar packages as event_manager and manager, verified receipt retries, and
+created the eight-dish Signature Buffet through the authenticated browser. The
+isolated backend used port 3220; desktop and 390px browser evidence is under
+`.artifacts/package-import/`. This qualification does not claim production data
+was imported or a deployment occurred.
+
 - Introduce and maintain Ingredient identity, unit, allergen classification, and cost; discontinue/reinstate.
 - Price Components from the newest confirmed `IngredientPriceObservation` created by a vendor-line receipt, falling back to the Ingredient catalog cost until a receipt exists.
 - Draft/revise/publish/retract/retire Component versions; manage ComponentStep method lines and ComponentIngredient BOM lines.
 - Introduce/revise/portion/classify/retire/reinstate Dishes; attach/detach Components via DishComponent.
+- Keep Dish preparation instructions separate from source-backed event service instructions; heating and serving reports use the latter and retain the workbook cell provenance.
 - Draft/revise/price/publish/unpublish/archive/restore Menus; add/update/remove MenuDish lines.
 - Select a Dish for an Event (EventDish) and adjust servings, course, service style, and instructions.
 - Open PrepTasks under an EventDish (optional Component link for MAKE lines).
@@ -58,6 +136,8 @@ Use a **culinary book** rather than a dashboard:
 ## Cross-system handoffs
 
 EventDish (and its PrepTasks) plus Component/Ingredient relationships drive demand, production batches, pack items, allergen checks, and costs. Culinary UI must show those downstream uses but route operational edits to Inventory, Production, Logistics, or Quality.
+
+**Service style is an operational instruction, not a duplicate key** — see [service-style-packaging.md](service-style-packaging.md). Drop Off packs disposable (to-go bowls, disposable utensils); Cook on Site / Finish at Kitchen packs hotel pans + real utensils. Pack-list templates select on `serviceStyleId`. Same-name dishes across service categories are deliberate variants; only merge name-identical dishes inside the SAME category.
 
 ## States and permissions
 
@@ -83,8 +163,11 @@ All culinary entities have generated list/detail/index queries and command hooks
 - ordered preferred-vendor management on Ingredient detail, with the first vendor feeding automatic weekly purchasing and the tenant vendor as fallback;
 - a vendor-filterable confirmed purchase-price ledger on Ingredient detail, plus newest-receipt pricing in the live Component cost panel;
 - a compact Component working document for draft revision, lifecycle commands, ingredient lines, method, and Dish usage;
+- Component detail reads live `ComponentStep` records in method order as well as free-text instructions. Identical prose is not repeated over the same steps; distinct prose and recorded step durations remain visible. Ingredients and method have explicit loading states. Recipe scaling is a local preview, accepts fractional and zero yields, and uses readable measurements without turning a small positive quantity into zero. Prep-link navigation, loading/empty/prose/step variants, scaling/reset and sibling ingredient-detail layout are qualified with isolated generated-runtime data at 390/900/1440px; authenticated production behavior still needs verification.
+- Prep recipe links from event prep, My Day, mobile event prep, the production board, and the kitchen deck carry `?prepTask=`. Component detail reads that task's live quantity and event, scales only compatible recorded units, and links back to event prep. A local preview remains independent until the cook selects **Use prep amount**; **Recipe batch** restores base quantities. Overrides belong to the component, task, and recipe unit. Missing or changed recipe relationships keep the recipe usable without applying unrelated quantities; completed/cancelled tasks show their recorded amount against the current recipe. Ingredients and method precede cost, nutrition, and import provenance.
 - generated-metadata lifecycle offers for Component, Ingredient, Dish, and Menu;
 - an Event menu composer that selects, adjusts, and removes EventDish records;
+- source-backed service instructions on Dish records, with the reviewed TPP repair command at `scripts/repair-tpp-service-instructions.ts`;
 - a component import workbench at `/kitchen/components/import` (paste/files → parse → review → finalize).
 
 Creation uses governed hooks generated by Manifest (`useCreateIngredient`, `useCreateComponent`, `useCreateComponentIngredient`, `useCreateDish`, `useCreateMenu`, and `useCreateEventDish`). Since 2026-09-06 the import page persists its review through the authored transactional seam (`createComponentImportReview` / `saveComponentImportReview` in `convex/lib/culinaryOperations.ts` via `src/features/kitchen/import/ComponentImportRepository.ts`): first save creates the durable import and links the URL with `?importId=`, later saves are revision-checked (a conflict keeps local edits and offers reload), and finalize on a durable review goes through the same one-transaction import path — initial match decisions, name corrections and removed lines ride the save transaction, and the resolution ledger counts a discard as a final outcome. The original source (paste text or the CSV pair, filename, import identity) renders read-only through `ComponentImportSourcePanel.tsx`, on the workbench and on Component detail for imports that completed. Limitation kept honest: browser-level qualification of these flows (desktop/360px, keyboard-only, live backend) is tracked by RR-5/AC-046, not claimed here.

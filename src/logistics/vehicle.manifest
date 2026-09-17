@@ -32,7 +32,18 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   property registeredAt: datetime?
   property statusChangedAt: datetime?
 
+  // Compliance: registration certificate and insurance policy. Optional at
+  // register time so existing workflows keep working; expiry dates drive the
+  // fleet-board compliance flags.
+  property registrationNumber: string?
+  property registrationExpiresAt: datetime?
+  property insuranceProvider: string?
+  property insurancePolicyNumber: string?
+  property insuranceExpiresAt: datetime?
+
   computed isOperational: boolean = self.operationalStatus == "available" or self.operationalStatus == "in_use"
+  computed registrationCurrent: boolean = self.registrationExpiresAt != null and self.registrationExpiresAt > now()
+  computed insuranceCurrent: boolean = self.insuranceExpiresAt != null and self.insuranceExpiresAt > now()
 
   constraint vehicleCapacityPositive: self.payloadCapacityKg > 0 "Vehicle payload capacity must be positive"
   constraint registeredVehicleComplete: self.registeredAt == null or (length(trim(self.make)) > 0 and length(trim(self.model)) > 0 and length(trim(self.registration)) > 0) "Registered vehicles require make, model, and registration"
@@ -134,6 +145,46 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command updateRegistration(
+    registrationNumber: string,
+    registrationExpiresAt: datetime
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint vehicleRegistrationNumber: length(trim(registrationNumber)) > 0 "Registration number is required"
+    constraint vehicleRegistrationExpiry: registrationExpiresAt > now() "Registration expiry must be in the future"
+    mutate registrationNumber = registrationNumber
+    mutate registrationExpiresAt = registrationExpiresAt
+    emit VehicleRegistrationUpdated {
+      vehicleId: self.id
+      tenantId: self.tenantId
+      registrationNumber: registrationNumber
+      registrationExpiresAt: registrationExpiresAt
+    }
+  }
+
+  command updateInsurance(
+    insuranceProvider: string,
+    insurancePolicyNumber: string,
+    insuranceExpiresAt: datetime
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint vehicleInsuranceProvider: length(trim(insuranceProvider)) > 0 "Insurance provider is required"
+    constraint vehicleInsurancePolicy: length(trim(insurancePolicyNumber)) > 0 "Insurance policy number is required"
+    constraint vehicleInsuranceExpiry: insuranceExpiresAt > now() "Insurance expiry must be in the future"
+    mutate insuranceProvider = insuranceProvider
+    mutate insurancePolicyNumber = insurancePolicyNumber
+    mutate insuranceExpiresAt = insuranceExpiresAt
+    emit VehicleInsuranceUpdated {
+      vehicleId: self.id
+      tenantId: self.tenantId
+      insuranceProvider: insuranceProvider
+      insurancePolicyNumber: insurancePolicyNumber
+      insuranceExpiresAt: insuranceExpiresAt
+    }
+  }
+
   store Vehicle in durable
 }
 
@@ -165,6 +216,235 @@ event VehicleOperationalStatusUpdated: "vehicle.operational_status_updated" {
   operationalStatus: VehicleOperationalStatus
   statusNote: string?
   statusChangedAt: datetime?
+}
+
+event VehicleRegistrationUpdated: "vehicle.registration_updated" {
+  vehicleId: string
+  tenantId: string
+  registrationNumber: string
+  registrationExpiresAt: datetime
+}
+
+event VehicleInsuranceUpdated: "vehicle.insurance_updated" {
+  vehicleId: string
+  tenantId: string
+  insuranceProvider: string
+  insurancePolicyNumber: string
+  insuranceExpiresAt: datetime
+}
+
+// Trailers are towed assets: no odometer, no fuel, no self-powered status.
+// They share the compliance lifecycle (registration + insurance) and are
+// attached to delivery runs like vehicles.
+enum TrailerOperationalStatus {
+  available
+  in_use
+  maintenance
+  out_of_service
+  retired
+}
+
+entity Trailer mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, registration]
+  timestamps
+  versionProperty version: number
+
+  property required searchable make: string = ""
+  property required searchable model: string = ""
+  property required registration: string = ""
+  property required payloadCapacityKg: int = 1
+  property required operationalStatus: TrailerOperationalStatus = "available"
+  property statusNote: string?
+  property registeredAt: datetime?
+  property statusChangedAt: datetime?
+
+  // Same compliance fields as vehicles.
+  property registrationNumber: string?
+  property registrationExpiresAt: datetime?
+  property insuranceProvider: string?
+  property insurancePolicyNumber: string?
+  property insuranceExpiresAt: datetime?
+
+  computed isOperational: boolean = self.operationalStatus == "available" or self.operationalStatus == "in_use"
+  computed registrationCurrent: boolean = self.registrationExpiresAt != null and self.registrationExpiresAt > now()
+  computed insuranceCurrent: boolean = self.insuranceExpiresAt != null and self.insuranceExpiresAt > now()
+
+  constraint trailerCapacityPositive: self.payloadCapacityKg > 0 "Trailer payload capacity must be positive"
+
+  transition operationalStatus from "available" to ["in_use", "maintenance", "out_of_service", "retired"]
+  transition operationalStatus from "in_use" to ["available", "maintenance", "out_of_service", "retired"]
+  transition operationalStatus from "maintenance" to ["available", "in_use", "out_of_service", "retired"]
+  transition operationalStatus from "out_of_service" to ["available", "in_use", "maintenance", "retired"]
+  transition operationalStatus from "retired" to ["available", "in_use", "maintenance", "out_of_service"]
+
+  default policy trailerRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read trailers"
+  default policy trailerWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write trailers through commands"
+  default policy trailerExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute trailer commands"
+
+  command register(
+    make: string,
+    model: string,
+    registration: string,
+    payloadCapacityKg: int,
+    operationalStatus: TrailerOperationalStatus,
+    optional statusNote: string
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerTrailerMake: length(trim(make)) > 0 "Trailer make is required"
+    constraint registerTrailerModel: length(trim(model)) > 0 "Trailer model is required"
+    constraint registerTrailerRegistration: length(trim(registration)) > 0 "Trailer registration is required"
+    constraint registerTrailerCapacity: payloadCapacityKg > 0 "Trailer payload capacity must be positive"
+    mutate make = make
+    mutate model = model
+    mutate registration = registration
+    mutate payloadCapacityKg = payloadCapacityKg
+    mutate operationalStatus = operationalStatus
+    mutate statusNote = statusNote
+    mutate registeredAt = now()
+    mutate statusChangedAt = now()
+    emit TrailerRegistered {
+      trailerId: self.id
+      tenantId: self.tenantId
+      make: make
+      model: model
+      registration: registration
+      payloadCapacityKg: payloadCapacityKg
+      operationalStatus: operationalStatus
+    }
+  }
+
+  command reviseDetails(
+    make: string,
+    model: string,
+    registration: string,
+    payloadCapacityKg: int
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint reviseTrailerMake: length(trim(make)) > 0 "Trailer make is required"
+    constraint reviseTrailerModel: length(trim(model)) > 0 "Trailer model is required"
+    constraint reviseTrailerRegistration: length(trim(registration)) > 0 "Trailer registration is required"
+    constraint reviseTrailerCapacity: payloadCapacityKg > 0 "Trailer payload capacity must be positive"
+    mutate make = make
+    mutate model = model
+    mutate registration = registration
+    mutate payloadCapacityKg = payloadCapacityKg
+    emit TrailerDetailsRevised {
+      trailerId: self.id
+      tenantId: self.tenantId
+      make: make
+      model: model
+      registration: registration
+      payloadCapacityKg: payloadCapacityKg
+    }
+  }
+
+  command updateOperationalStatus(
+    operationalStatus: TrailerOperationalStatus,
+    optional statusNote: string
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.operationalStatus
+    mutate operationalStatus = operationalStatus
+    mutate statusNote = statusNote
+    mutate statusChangedAt = now()
+    emit TrailerOperationalStatusUpdated {
+      trailerId: self.id
+      tenantId: self.tenantId
+      previousStatus: previousStatus
+      operationalStatus: operationalStatus
+      statusNote: statusNote
+      statusChangedAt: self.statusChangedAt
+    }
+  }
+
+  command updateRegistration(
+    registrationNumber: string,
+    registrationExpiresAt: datetime
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint trailerRegistrationNumber: length(trim(registrationNumber)) > 0 "Registration number is required"
+    constraint trailerRegistrationExpiry: registrationExpiresAt > now() "Registration expiry must be in the future"
+    mutate registrationNumber = registrationNumber
+    mutate registrationExpiresAt = registrationExpiresAt
+    emit TrailerRegistrationUpdated {
+      trailerId: self.id
+      tenantId: self.tenantId
+      registrationNumber: registrationNumber
+      registrationExpiresAt: registrationExpiresAt
+    }
+  }
+
+  command updateInsurance(
+    insuranceProvider: string,
+    insurancePolicyNumber: string,
+    insuranceExpiresAt: datetime
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint trailerInsuranceProvider: length(trim(insuranceProvider)) > 0 "Insurance provider is required"
+    constraint trailerInsurancePolicy: length(trim(insurancePolicyNumber)) > 0 "Insurance policy number is required"
+    constraint trailerInsuranceExpiry: insuranceExpiresAt > now() "Insurance expiry must be in the future"
+    mutate insuranceProvider = insuranceProvider
+    mutate insurancePolicyNumber = insurancePolicyNumber
+    mutate insuranceExpiresAt = insuranceExpiresAt
+    emit TrailerInsuranceUpdated {
+      trailerId: self.id
+      tenantId: self.tenantId
+      insuranceProvider: insuranceProvider
+      insurancePolicyNumber: insurancePolicyNumber
+      insuranceExpiresAt: insuranceExpiresAt
+    }
+  }
+
+  store Trailer in durable
+}
+
+event TrailerRegistered: "trailer.registered" {
+  trailerId: string
+  tenantId: string
+  make: string
+  model: string
+  registration: string
+  payloadCapacityKg: int
+  operationalStatus: TrailerOperationalStatus
+}
+
+event TrailerDetailsRevised: "trailer.details_revised" {
+  trailerId: string
+  tenantId: string
+  make: string
+  model: string
+  registration: string
+  payloadCapacityKg: int
+}
+
+event TrailerOperationalStatusUpdated: "trailer.operational_status_updated" {
+  trailerId: string
+  tenantId: string
+  previousStatus: TrailerOperationalStatus
+  operationalStatus: TrailerOperationalStatus
+  statusNote: string?
+  statusChangedAt: datetime?
+}
+
+event TrailerRegistrationUpdated: "trailer.registration_updated" {
+  trailerId: string
+  tenantId: string
+  registrationNumber: string
+  registrationExpiresAt: datetime
+}
+
+event TrailerInsuranceUpdated: "trailer.insurance_updated" {
+  trailerId: string
+  tenantId: string
+  insuranceProvider: string
+  insurancePolicyNumber: string
+  insuranceExpiresAt: datetime
 }
 
 // Maintenance schedules track service either by elapsed time (oil interval in

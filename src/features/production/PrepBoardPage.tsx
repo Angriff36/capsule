@@ -31,6 +31,7 @@ import {
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
+import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
 import {
   PrepActionReasonForm,
@@ -681,11 +682,20 @@ export function PrepBoardPage() {
                       </td>
                       <td>
                         <strong>{eventName(task.eventId)}</strong>
-                        <small>{task.eventId.slice(-8)}</small>
                       </td>
                       <td>
                         <strong>{taskLabel(task)}</strong>
                         <small>{eventDishLabel(task.eventDishId)}</small>
+                        {task.componentId ? (
+                          <CulinaryEntityLink
+                            kind="component"
+                            id={task.componentId}
+                            prepTaskId={task._id}
+                            className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
+                          >
+                            Recipe: {taskLabel(task)}
+                          </CulinaryEntityLink>
+                        ) : null}
                         {task.notes ? <small>{task.notes}</small> : null}
                       </td>
                       <td className="supply-number">

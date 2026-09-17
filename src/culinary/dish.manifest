@@ -17,6 +17,15 @@ entity Dish mixin TenantScoped, SoftDeletable {
 
   property required searchable name: string = ""
   property description: string?
+  // Kitchen recipe data is separate from the customer-facing description.
+  property recipeInstructions: string?
+  property recipeSourceText: string?
+  property recipeSourceYield: string?
+  property recipeSourceFingerprint: string?
+  // Reusable service guidance is separate from recipe preparation; event-only
+  // instructions remain on EventDish.
+  property serviceInstructions: string?
+  property serviceInstructionsSource: string?
   property category: string?
   property course: string?
   property serviceStyle: string?
@@ -40,6 +49,8 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property editionNumber: int? = 1
   // Soft merge pointer — keep row for reference integrity; pickers prefer the target.
   property mergedIntoDishId: uuid?
+  // Revision-2: food | supply | service | package. Null reads as food.
+  property kind: DishKind?
 
   hasMany ingredientLines: DishIngredient
   hasMany componentLines: DishComponent
@@ -59,9 +70,10 @@ entity Dish mixin TenantScoped, SoftDeletable {
 
   // salesAccess: sales browses the published catalog for proposal menu
   // selection (sales/proposal-dish-selection.manifest).
-  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") "Kitchen and sales staff may read dishes"
-  default policy dishWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dishes through commands"
-  default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish commands"
+  // Event managers compose package recipes as well as their event menu lines.
+  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, sales and managers may read dishes"
+  default policy dishWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write dishes through commands"
+  default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute dish commands"
 
   command introduce(
     name: string,
@@ -98,6 +110,17 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Revision-2: what this row is. Supplies never enter food purchasing.
+  command classifyKind(kind: DishKind) {
+    guard self.deletedAt == null
+    mutate kind = kind
+    emit DishKindClassified {
+      dishId: self.id
+      tenantId: self.tenantId
+      kind: kind
+    }
+  }
+
   command reviseDetails(
     name: string,
     optional description: string,
@@ -119,6 +142,33 @@ entity Dish mixin TenantScoped, SoftDeletable {
       dishId: self.id
       tenantId: self.tenantId
       name: name
+    }
+  }
+
+  command saveRecipe(instructions: string, sourceText: string, sourceYield: string, sourceFingerprint: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate recipeInstructions = instructions
+    mutate recipeSourceText = sourceText
+    mutate recipeSourceYield = sourceYield
+    mutate recipeSourceFingerprint = sourceFingerprint
+    emit DishRecipeSaved {
+      dishId: self.id
+      tenantId: self.tenantId
+      sourceFingerprint: sourceFingerprint
+    }
+  }
+
+  command saveServiceInstructions(instructions: string, source: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint serviceInstructionsSourcePresent: length(trim(source)) > 0 "Service instruction source is required"
+    mutate serviceInstructions = instructions
+    mutate serviceInstructionsSource = source
+    emit DishServiceInstructionsSaved {
+      dishId: self.id
+      tenantId: self.tenantId
+      source: source
     }
   }
 
@@ -285,6 +335,11 @@ entity DishIngredient mixin TenantScoped, SoftDeletable {
   // Waste / trim multiplier (1.0 = no waste). Applied before live cost.
   property wasteFactor: decimal(10, 4)? = 1
   property prepNotes: string?
+  // Revision-2: basis the per-portion quantity is stated in. Null means not
+  // classified (Capsule-entered lines are purchase basis by construction);
+  // an explicit "unknown" from import evidence blocks purchasing.
+  property quantityBasis: QuantityBasis?
+  property quantityBasisSource: string?
   property addedAt: datetime?
 
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
@@ -383,11 +438,17 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
   property required yieldQuantity: decimal(10, 2) = 1
   property required batchMultiplier: decimal(10, 4) = 1
   property role: string?
+  // Revision-2: a named output size of the recipe (10 oz dough ball) and how
+  // many pieces one portion of this dish uses. Null = the plain yield path.
+  property portionSpecId: uuid?
+  property pieceCount: decimal(12, 4)?
+  property quantityBasis: QuantityBasis?
   property attachedAt: datetime?
   property removedAt: datetime?
 
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
+  belongsTo portionSpec: ComponentPortionSpec fields [tenantId, portionSpecId] references [tenantId, id]
 
   default policy dishComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish component composition"
   default policy dishComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish component composition through commands"
@@ -426,6 +487,26 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Point this usage at a portion spec (pieces per portion) instead of the
+  // plain yield. pieceCount is the per-portion piece count as recorded (3.15
+  // stays 3.15; rounding is a separate, scoped rule).
+  command setPortionSpec(portionSpecId: uuid, pieceCount: decimal(12, 4), optional quantityBasis: QuantityBasis) {
+    guard self.attachedAt != null
+    guard self.deletedAt == null
+    constraint portionSpecPiecesPositive: pieceCount > 0 "Pieces per portion must be positive"
+    mutate portionSpecId = portionSpecId
+    mutate pieceCount = pieceCount
+    mutate quantityBasis = quantityBasis != null ? quantityBasis : self.quantityBasis
+    emit DishComponentPortionSpecSet {
+      dishComponentId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      componentId: self.componentId
+      portionSpecId: portionSpecId
+      pieceCount: pieceCount
+    }
+  }
+
   command detach(reason: string) {
     guard self.attachedAt != null
     guard self.deletedAt == null
@@ -447,6 +528,32 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
 enum DishTaskStatus {
   active
   retired
+}
+
+// Revision-2 culinary model (2026-09-14). "event" is a reserved word, so the
+// on-site stage is spelled at_event.
+enum DishTaskStage {
+  kitchen
+  at_event
+  pack
+}
+
+// resolved = the step is fully specified. choice_pending = the source says
+// "make OR portion" (or chef's choice) and nobody has picked. content_missing =
+// the step points at a recipe with no ingredients or no method on file.
+enum TaskResolution {
+  resolved
+  choice_pending
+  content_missing
+}
+
+// What a Dish row IS. Supplies (plasticware, place settings) and packages
+// print as dish headings on the sheet but must never enter food purchasing.
+enum DishKind {
+  food
+  supply
+  service
+  package
 }
 
 // Reusable work instruction for preparing or serving a Dish. This is a
@@ -474,6 +581,15 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   property componentId: uuid?
   property ingredientId: uuid?
   property instructions: string?
+  // Revision-2 work specification. All optional so existing rows validate;
+  // null stage/resolution read as kitchen/resolved on the sheet.
+  property stage: DishTaskStage?
+  property resolution: TaskResolution?
+  property choiceOptions: list<string>?
+  property leadTimeMinDays: int?
+  property leadTimeMaxDays: int?
+  property sequenceAfterDishTaskId: uuid?
+  property stationId: uuid?
   property required status: DishTaskStatus = "active"
   property activeAt: datetime?
   property retiredAt: datetime?
@@ -482,6 +598,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  hasMany materials: DishTaskMaterial
 
   constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "Dish task name is required"
   constraint dishTaskQuantityPositive: self.defaultQuantity == null or self.defaultQuantity > 0 "Dish task quantity must be positive"
@@ -490,9 +607,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish task templates"
-  default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish task templates through commands"
-  default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish task template commands"
+  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read dish task templates"
+  default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write dish task templates through commands"
+  default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute dish task template commands"
 
   command add(
     dishId: uuid,
@@ -505,7 +622,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional sortOrder: number,
     optional componentId: uuid,
     optional ingredientId: uuid,
-    optional instructions: string
+    optional instructions: string,
+    // Batched source repair links existing work before materializing missing rows.
+    optional synchronizePrep: boolean
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -527,7 +646,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate ingredientId = ingredientId
     mutate instructions = instructions
     mutate activeAt = now()
+    compute syncPrepRequested = synchronizePrep != null ? synchronizePrep : true
     emit DishTaskAdded {
+      synchronizePrep: syncPrepRequested
       dishTaskId: self.id
       tenantId: self.tenantId
       dishId: dishId
@@ -552,7 +673,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional sortOrder: number,
     optional componentId: uuid,
     optional ingredientId: uuid,
-    optional instructions: string
+    optional instructions: string,
+    // Batched source repair links existing work before materializing missing rows.
+    optional synchronizePrep: boolean
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -570,13 +693,46 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate componentId = componentId
     mutate ingredientId = ingredientId
     mutate instructions = instructions
+    compute syncPrepRequested = synchronizePrep != null ? synchronizePrep : true
     emit DishTaskRevised {
+      synchronizePrep: syncPrepRequested
       dishTaskId: self.id
       tenantId: self.tenantId
       dishId: self.dishId
       name: name
       category: self.category
       taskType: self.taskType
+    }
+  }
+
+  // Revision-2 work specification: stage, sequence, lead time, station and
+  // choice state. Every field keeps its stored value when omitted.
+  command specifyWork(
+    optional stage: DishTaskStage,
+    optional resolution: TaskResolution,
+    optional choiceOptions: list<string>,
+    optional leadTimeMinDays: int,
+    optional leadTimeMaxDays: int,
+    optional sequenceAfterDishTaskId: uuid,
+    optional stationId: uuid
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint specifyLeadTimeNonnegative: (leadTimeMinDays == null or leadTimeMinDays >= 0) and (leadTimeMaxDays == null or leadTimeMaxDays >= 0) "Lead time cannot be negative"
+    constraint specifySequenceNotSelf: sequenceAfterDishTaskId == null or sequenceAfterDishTaskId != self.id "A step cannot follow itself"
+    mutate stage = stage != null ? stage : self.stage
+    mutate resolution = resolution != null ? resolution : self.resolution
+    mutate choiceOptions = choiceOptions != null ? choiceOptions : self.choiceOptions
+    mutate leadTimeMinDays = leadTimeMinDays != null ? leadTimeMinDays : self.leadTimeMinDays
+    mutate leadTimeMaxDays = leadTimeMaxDays != null ? leadTimeMaxDays : self.leadTimeMaxDays
+    mutate sequenceAfterDishTaskId = sequenceAfterDishTaskId != null ? sequenceAfterDishTaskId : self.sequenceAfterDishTaskId
+    mutate stationId = stationId != null ? stationId : self.stationId
+    emit DishTaskWorkSpecified {
+      dishTaskId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      stage: stage != null ? stage : self.stage
+      resolution: resolution != null ? resolution : self.resolution
     }
   }
 
@@ -619,6 +775,12 @@ event DishDetailsRevised: "dish.details_revised" {
   dishId: string
   tenantId: string
   name: string
+}
+
+event DishServiceInstructionsSaved: "dish.service_instructions_saved" {
+  dishId: string
+  tenantId: string
+  source: string
 }
 
 event DishPortioningUpdated: "dish.portioning_updated" {
@@ -723,5 +885,119 @@ event DishComponentDetached: "dish_component.detached" {
   tenantId: string
   dishId: string
   componentId: string
+  reason: string
+}
+
+event DishKindClassified: "dish.kind_classified" {
+  dishId: string
+  tenantId: string
+  kind: DishKind
+}
+
+event DishComponentPortionSpecSet: "dish_component.portion_spec_set" {
+  dishComponentId: string
+  tenantId: string
+  dishId: string
+  componentId: string
+  portionSpecId: string
+  pieceCount: decimal(12, 4)
+}
+
+event DishTaskWorkSpecified: "dish_task.work_specified" {
+  dishTaskId: string
+  tenantId: string
+  dishId: string
+  stage: DishTaskStage?
+  resolution: TaskResolution?
+}
+
+// Revision-2 culinary model (2026-09-14). The link between a prep step and the
+// food requirement(s) it acts on. Several steps may act on one requirement
+// (cut potatoes, then par-steam the same potatoes) and one step may act on
+// several requirements (dredge bacon in brown sugar). The step quantity is
+// WORK; the requirement quantity is CONSUMPTION. Only requirements feed
+// purchasing.
+entity DishTaskMaterial mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required dishTaskId: uuid
+  property dishIngredientId: uuid?
+  property dishComponentId: uuid?
+  property dishContainerId: uuid?
+  property workQuantity: decimal(12, 4)?
+  property workUnit: UnitOfMeasure?
+  property linkedAt: datetime?
+
+  belongsTo dishTask: DishTask fields [tenantId, dishTaskId] references [tenantId, id]
+  belongsTo dishIngredient: DishIngredient fields [tenantId, dishIngredientId] references [tenantId, id]
+  belongsTo dishComponent: DishComponent fields [tenantId, dishComponentId] references [tenantId, id]
+  belongsTo dishContainer: DishContainer fields [tenantId, dishContainerId] references [tenantId, id]
+
+  constraint materialHasTarget: self.linkedAt == null or self.dishIngredientId != null or self.dishComponentId != null or self.dishContainerId != null "A task material must point at a requirement"
+
+  default policy dishTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read task materials"
+  default policy dishTaskMaterialWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write task materials through commands"
+  default policy dishTaskMaterialExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute task material commands"
+
+  command link(
+    dishTaskId: uuid,
+    optional dishIngredientId: uuid,
+    optional dishComponentId: uuid,
+    optional dishContainerId: uuid,
+    optional workQuantity: decimal(12, 4),
+    optional workUnit: UnitOfMeasure
+  ) {
+    guard self.linkedAt == null
+    guard self.deletedAt == null
+    constraint linkMaterialTarget: dishIngredientId != null or dishComponentId != null or dishContainerId != null "A task material must point at a requirement"
+    constraint linkWorkQuantity: workQuantity == null or workQuantity > 0 "Work quantity must be positive"
+    mutate dishTaskId = dishTaskId
+    mutate dishIngredientId = dishIngredientId
+    mutate dishComponentId = dishComponentId
+    mutate dishContainerId = dishContainerId
+    mutate workQuantity = workQuantity
+    mutate workUnit = workUnit
+    mutate linkedAt = now()
+    emit DishTaskMaterialLinked {
+      dishTaskMaterialId: self.id
+      tenantId: self.tenantId
+      dishTaskId: dishTaskId
+      dishIngredientId: dishIngredientId
+      dishComponentId: dishComponentId
+      dishContainerId: dishContainerId
+    }
+  }
+
+  command unlink(reason: string) {
+    guard self.linkedAt != null
+    guard self.deletedAt == null
+    constraint unlinkMaterialReason: length(trim(reason)) > 0 "Reason is required"
+    mutate deletedAt = now()
+    emit DishTaskMaterialUnlinked {
+      dishTaskMaterialId: self.id
+      tenantId: self.tenantId
+      dishTaskId: self.dishTaskId
+      reason: reason
+    }
+  }
+
+  store DishTaskMaterial in durable
+}
+
+event DishTaskMaterialLinked: "dish_task_material.linked" {
+  dishTaskMaterialId: string
+  tenantId: string
+  dishTaskId: string
+  dishIngredientId: string?
+  dishComponentId: string?
+  dishContainerId: string?
+}
+
+event DishTaskMaterialUnlinked: "dish_task_material.unlinked" {
+  dishTaskMaterialId: string
+  tenantId: string
+  dishTaskId: string
   reason: string
 }

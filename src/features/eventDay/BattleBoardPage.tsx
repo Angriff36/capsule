@@ -423,7 +423,7 @@ export function BattleBoardPage() {
                     <span className="bbd-time">
                       {row.startsAt != null
                         ? formatTime(row.startsAt)
-                        : formatTime(row.scheduledAt)}
+                        : "Time not set"}
                     </span>
                     <span className="bbd-main">
                       <span className="bbd-task">

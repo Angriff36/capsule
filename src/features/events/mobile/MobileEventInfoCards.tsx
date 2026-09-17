@@ -206,7 +206,7 @@ export function MobileMoneyCard({
   const seeAllTo =
     eventInvoices.length === 1 && eventInvoices[0]
       ? `/finance/invoices/${eventInvoices[0]._id}`
-      : `/finance/invoices?eventId=${event._id}`;
+      : `/finance/invoices?event=${event._id}`;
   return (
     <MobileSectionCard id="money" title="Money" seeAllTo={seeAllTo}>
       <dl className="grid grid-cols-3 gap-x-3 gap-y-2">

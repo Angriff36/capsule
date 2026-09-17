@@ -44,6 +44,7 @@ export function EventDayPage() {
   const data: EventDayDetailData | null = useMemo(() => {
     if (briefing == null) return null;
     return {
+      packetReadiness: briefing.packetReadiness,
       event: briefing.event,
       venue: briefing.venue ?? undefined,
       assignments: briefing.assignments,

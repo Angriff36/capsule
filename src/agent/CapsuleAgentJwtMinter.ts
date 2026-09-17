@@ -1,19 +1,35 @@
 import { createClerkClient } from "@clerk/backend";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { CapsuleAgentPersonFirstClaimCheck } from "./CapsuleAgentPersonFirstClaimCheck";
 
 export interface MintedAgentJwt {
   jwt: string;
   userId: string;
-  organizationId: string;
+  /** Clerk organization id, or null for a person-first (no-org) account. */
+  organizationId: string | null;
+  /** Tenant the server will act in — org.id, or the linked Person's tenant. */
+  tenantId: string;
+  /** Where the server takes role/tenant from for this token. */
+  roleSource: "idp" | "person";
   template: string;
   sessionId: string;
+}
+
+type ClerkClient = ReturnType<typeof createClerkClient>;
+
+interface ResolvedActor {
+  userId: string;
+  organizationId: string | null;
 }
 
 /**
  * Mints a Clerk JWT for Capsule agent command calls.
  * Prefers an existing active session that already has an organization
- * (so {{org.id}} / {{org.role}} resolve). Falls back to createSession.
+ * (so {{org.id}} / {{org.role}} resolve). A user with no organization is
+ * still minted: the server resolves tenant/role from the linked Person, and
+ * that is confirmed through authStatus.getAuthStatus before the token is
+ * accepted (#236).
  */
 export class CapsuleAgentJwtMinter {
   constructor(
@@ -21,6 +37,9 @@ export class CapsuleAgentJwtMinter {
     private readonly envLocalPath: string = resolve(
       process.cwd(),
       ".env.local",
+    ),
+    private readonly personFirstCheck: CapsuleAgentPersonFirstClaimCheck = new CapsuleAgentPersonFirstClaimCheck(
+      env,
     ),
   ) {}
 
@@ -55,12 +74,14 @@ export class CapsuleAgentJwtMinter {
       );
     }
 
-    this.assertClaims(jwt, template || "(session)", organizationId);
+    const authority = await this.resolveAuthority(jwt, userId, organizationId);
 
     return {
       jwt,
       userId,
       organizationId,
+      tenantId: authority.tenantId,
+      roleSource: authority.roleSource,
       template,
       sessionId,
     };
@@ -80,9 +101,7 @@ export class CapsuleAgentJwtMinter {
     writeFileSync(this.envLocalPath, next, "utf8");
   }
 
-  private async resolveActor(
-    clerk: ReturnType<typeof createClerkClient>,
-  ): Promise<{ userId: string; organizationId: string }> {
+  private async resolveActor(clerk: ClerkClient): Promise<ResolvedActor> {
     const configuredUser = this.env.CAPSULE_AGENT_USER_ID?.trim();
     const configuredOrg = this.env.CAPSULE_AGENT_ORG_ID?.trim();
 
@@ -91,78 +110,109 @@ export class CapsuleAgentJwtMinter {
     }
 
     if (configuredUser) {
-      const memberships = await clerk.users.getOrganizationMembershipList({
-        userId: configuredUser,
-        limit: 10,
-      });
-      const first = memberships.data[0];
-      if (!first) {
-        throw new Error(
-          `User ${configuredUser} has no organization membership — Capsule needs tenantId from org.id.`,
-        );
-      }
       return {
         userId: configuredUser,
-        organizationId: first.organization.id,
+        organizationId: await this.firstOrganizationId(clerk, configuredUser),
       };
     }
 
     const users = await clerk.users.getUserList({ limit: 20 });
+    let personFirstCandidate: string | null = null;
     for (const user of users.data) {
-      const memberships = await clerk.users.getOrganizationMembershipList({
-        userId: user.id,
-        limit: 5,
-      });
-      const first = memberships.data[0];
-      if (first) {
-        return { userId: user.id, organizationId: first.organization.id };
+      const organizationId = await this.firstOrganizationId(clerk, user.id);
+      if (organizationId) {
+        return { userId: user.id, organizationId };
       }
+      if (
+        !personFirstCandidate &&
+        (await this.hasActiveSession(clerk, user.id))
+      ) {
+        personFirstCandidate = user.id;
+      }
+    }
+    if (personFirstCandidate) {
+      return { userId: personFirstCandidate, organizationId: null };
     }
 
     throw new Error(
-      "No Clerk user with an organization membership found. " +
-        "Sign into Capsule UI once with an org, or set CAPSULE_AGENT_USER_ID + CAPSULE_AGENT_ORG_ID.",
+      "No Clerk user with an organization membership or an active Capsule session found. " +
+        "Sign into Capsule UI once, or set CAPSULE_AGENT_USER_ID (+ CAPSULE_AGENT_ORG_ID when the account has an org).",
     );
   }
 
-  private async resolveSessionId(
-    clerk: ReturnType<typeof createClerkClient>,
+  private async firstOrganizationId(
+    clerk: ClerkClient,
     userId: string,
-    organizationId: string,
+  ): Promise<string | null> {
+    const memberships = await clerk.users.getOrganizationMembershipList({
+      userId,
+      limit: 10,
+    });
+    return memberships.data[0]?.organization.id ?? null;
+  }
+
+  private async hasActiveSession(
+    clerk: ClerkClient,
+    userId: string,
+  ): Promise<boolean> {
+    const sessions = await clerk.sessions.getSessionList({
+      userId,
+      status: "active",
+    });
+    return sessions.data.length > 0;
+  }
+
+  private async resolveSessionId(
+    clerk: ClerkClient,
+    userId: string,
+    organizationId: string | null,
   ): Promise<string> {
     const sessions = await clerk.sessions.getSessionList({
       userId,
       status: "active",
     });
-    const withOrg = sessions.data.find(
-      (session) => session.lastActiveOrganizationId === organizationId,
-    );
-    if (withOrg) {
-      return withOrg.id;
+    if (organizationId) {
+      const withOrg = sessions.data.find(
+        (session) => session.lastActiveOrganizationId === organizationId,
+      );
+      if (withOrg) return withOrg.id;
     }
     const anyActive = sessions.data[0];
-    if (anyActive?.lastActiveOrganizationId) {
+    if (anyActive && (!organizationId || anyActive.lastActiveOrganizationId)) {
       return anyActive.id;
     }
 
-    // Last resort: brand-new session (org claims may be empty — assertClaims will fail loudly).
+    // Last resort: brand-new session. For an org account its org claims may be
+    // empty and resolveAuthority fails loudly; a person-first account is fine.
     const created = await clerk.sessions.createSession({ userId });
     return created.id;
   }
 
-  private assertClaims(
+  private async resolveAuthority(
     jwt: string,
-    template: string,
-    organizationId: string,
-  ): void {
+    userId: string,
+    organizationId: string | null,
+  ): Promise<{ tenantId: string; roleSource: "idp" | "person" }> {
     const claims = decodeJwtPayload(jwt);
-    const hasTenant =
-      typeof claims.tenantId === "string" && claims.tenantId.length > 0;
+    const tenantClaim =
+      typeof claims.tenantId === "string" && claims.tenantId.length > 0
+        ? claims.tenantId
+        : null;
     const hasRole = typeof claims.role === "string" && claims.role.length > 0;
-    if (hasTenant && hasRole) return;
+    if (tenantClaim && hasRole) {
+      return { tenantId: tenantClaim, roleSource: "idp" };
+    }
+
+    if (!organizationId) {
+      const tenantId = await this.personFirstCheck.assertAuthorized(
+        jwt,
+        userId,
+      );
+      return { tenantId, roleSource: "person" };
+    }
 
     throw new Error(
-      `Minted JWT missing role/tenantId (hasRole=${hasRole}, hasTenant=${hasTenant}). ` +
+      `Minted JWT missing role/tenantId (hasRole=${hasRole}, hasTenant=${tenantClaim !== null}). ` +
         `Open Capsule UI, select org ${organizationId}, then either re-run mint while that session is active, ` +
         `or in the browser console: await window.Clerk.session.getToken() ` +
         `and set CAPSULE_AGENT_JWT in .env.local. ` +

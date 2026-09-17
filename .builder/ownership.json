@@ -2,13 +2,13 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "644abe426eb7d1ca20d072b662c6e8537912ca5e20083d98187baf4283e94c63"
+      "sha256": "637bcd2ec840d0e40e2c05e49b479f7e34bc6574920bd828757b6a13a4ed19f1"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "9fac9e75944f35e4f113de83c30d13f0693b91e3720f6be6b022360ca06072e7"
+      "sha256": "61de7e37c720427c3d8a8537e05d4f6eb3a9f5131b0641963e14edea6422db59"
     },
     "convex/lib/authContext.ts": {
       "sha256": "ee98a50d1d9b7db6bed6f2aedfd9ba45fa0bc8e245abdc4a230dc84b6f0aa5ad",
@@ -18,51 +18,51 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "a63b2eea25d7dec478906f3fcd9dfc89287da943b459f0dcbc2e65475a23e4a6"
+      "sha256": "e5523d3ea8040de25ffd0db5a20dcb940840e14416f769bf488925240bcfb972"
     },
     "convex/queries.ts": {
-      "sha256": "4df891613244fc8a1635a32cf9cb33317db4b4def5bf7b3eb899af32e3721958"
+      "sha256": "08e9f697edf1fd03bdfb08d04f9f6b593d4de3f5ed212ceb98269ae9efc9e294"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "3f172d9f1f74b587db95fed7a7b591fb27678a23815740d0cfee10f4f571a307"
+      "sha256": "03a135a331a787386ab966a2c985b25f9a465e52961ebd73252689521b457387"
     },
     "manifest-context-summary.json": {
-      "sha256": "258166318137f243584095d667f268a133745625c9c76545787605503fb10f5c"
+      "sha256": "d5a6fc9970a1a90cd5bfd7cf6d8c53e4eb002c7a0a36881b1fb12c17546f06d1"
     },
     "package.json": {
-      "sha256": "e57d8fbdc2dd5f44c7142a5fa6d5a2a5cadf8704ead481fddbe6c32e3b5499bb"
+      "sha256": "d5bb77b01c379397080e4c55bbc949b280829006dc682ef1bd3d9803f243aa99"
     },
     "PRESET.md": {
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "37d05b184f4206b729ff66660af92c8ba791f194481abb7871a5dc6e7d696dd0"
+      "sha256": "64628cc8bb95768ddea2440afd179f84a935b518be8da1cfeb47d46986974f83"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "84352d4988e5760079eb65cc8c87c548c086c87cda83c7ba4b4c21cb083cb58e"
+      "sha256": "79e756edea53cb8961818a0418f538b3758b097d1e12901832c040d2073add9a"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "a3c88b677f4444a9e0fb96ff271a47aae8e592fe3ac247143f29767158f0465a"
+      "sha256": "dddeca17ae32f3c696af1b13272e1564d6ca897c1597792802b3921443e4b458"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "89a67c262a461b2eece641a96b0801af80d9da952092b38797141e356f48b593"
+      "sha256": "871c8daa1239e2de887a764715e82d4e2f276eaef711edc1f7b3bd6750a08651"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "f6e11a3b2a0bdbd294cf688e07b523d46ab910d37b2150a86cc71d2a2590db77"
+      "sha256": "646940999fc4fb087b59aca699183643a1a170dfad9f863c932a5bd3863fcd5f"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "edc4a6739028b052538f81eeb2d0c8bd9d39e57b7472d2067290f6046df383e2"
+      "sha256": "265b6c7e65c6de9157b7c0b2d5abc64fd7fce6a9ea31d3b35d93aecdeadf5b51"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "3.6.48",
+      "@angriff36/manifest": "3.6.55",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },
@@ -83,6 +83,7 @@
     "paths": [
       "manifest.config.yaml",
       "src/admin/announcement.manifest",
+      "src/admin/assistant.manifest",
       "src/admin/capability-setting.manifest",
       "src/admin/cutover-decision.manifest",
       "src/app.manifest",
@@ -121,6 +122,7 @@
       "src/logistics/pack-list.manifest",
       "src/logistics/packing.manifest",
       "src/logistics/vehicle.manifest",
+      "src/operations/event-packet.manifest",
       "src/operations/event-template.manifest",
       "src/operations/event.manifest",
       "src/operations/occasion.manifest",
@@ -136,10 +138,12 @@
       "src/procurement/vendor.manifest",
       "src/production/batch.manifest",
       "src/production/prep.manifest",
+      "src/production/station.manifest",
       "src/production/task-comment.manifest",
       "src/production/task.manifest",
       "src/quality/allergen-check.manifest",
       "src/quality/incident.manifest",
+      "src/quality/review-flag.manifest",
       "src/sales/client-communication.manifest",
       "src/sales/client-retention.manifest",
       "src/sales/contact-merge.manifest",
@@ -147,6 +151,7 @@
       "src/sales/contract.manifest",
       "src/sales/credit-memo.manifest",
       "src/sales/invoice-core.manifest",
+      "src/sales/invoice-number-sequence.manifest",
       "src/sales/invoice.manifest",
       "src/sales/lead.manifest",
       "src/sales/message-thread.manifest",

@@ -1,6 +1,7 @@
 import type { FormEvent } from "react";
 import { VENDOR_CONTACT_ROLES } from "./vendorContactRoles";
 import { suggestOrderNumber } from "./vendorOrderNumber";
+import { useWorkingEventId } from "../events/workingEvent";
 
 type VendorOption = {
   _id: string;
@@ -41,6 +42,7 @@ export function PurchasingCommandForm({
   onCancel,
   onSubmit,
 }: PurchasingCommandFormProps) {
+  const workingId = useWorkingEventId();
   return (
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
@@ -150,7 +152,12 @@ export function PurchasingCommandForm({
             </label>
             <label className="field-label">
               Event (optional)
-              <select name="eventId" className="input">
+              <select
+                key={events?.length ? "events-ready" : "events-loading"}
+                name="eventId"
+                className="input"
+                defaultValue={workingId ?? ""}
+              >
                 <option value="">General stock</option>
                 {(events ?? [])
                   .filter((event) => event.deletedAt == null)

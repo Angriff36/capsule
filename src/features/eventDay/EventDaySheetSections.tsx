@@ -16,7 +16,29 @@ import {
   dishAllergenClaim,
   type DishAllergenReport,
 } from "../kitchen/dishAllergens";
-import type { EventDayInputs } from "./eventDayModel";
+import type { EventDayInputs, EventDaySection } from "./eventDayModel";
+
+export function PacketSectionCaution({
+  section,
+}: {
+  section: EventDaySection;
+}) {
+  if (!section.urgentAction && !section.openIssueCount) return null;
+  return (
+    <div role="status" className="evd-note">
+      <p className="evd-kicker">
+        Needs attention
+        {section.openIssueCount
+          ? ` · ${section.openIssueCount} open ${section.openIssueCount === 1 ? "issue" : "issues"}`
+          : ""}
+      </p>
+      <p>
+        {section.urgentAction ??
+          "Check this section with the manager before service."}
+      </p>
+    </div>
+  );
+}
 
 /**
  * Read-only sheet bodies, one per map section. Everything a crew member
@@ -209,7 +231,7 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
   return (
     <div>
       {rows.map((row) => {
-        const at = row.startsAt ?? row.scheduledAt;
+        const at = row.startsAt;
         const who = formatAssigneeLabel({
           teams: row.assigneeTeams ?? [],
           personNames: (row.assigneePersonIds ?? []).map((id) =>
@@ -220,7 +242,7 @@ export function TimelineSheet({ data }: { data: EventDayDetailData }) {
         return (
           <Row
             key={row._id}
-            time={typeof at === "number" ? formatTime(at) : "—"}
+            time={typeof at === "number" ? formatTime(at) : "Time not set"}
             title={String(row.name)}
             sub={[who, String(row.siteNotes ?? "").trim()]
               .filter(Boolean)

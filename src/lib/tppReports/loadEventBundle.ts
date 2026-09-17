@@ -1,4 +1,4 @@
-import { readCsvRows } from "./csvRows";
+import { parseCsvReportText, parseRowReport } from "./csvReports";
 import type {
   EventBundle,
   EventBundlePart,
@@ -7,13 +7,11 @@ import type {
 import { mergeEventBundle } from "./mergeEventBundle";
 import { parseBattleBoard } from "./parseBattleBoard";
 import { parseBeoWorkbook } from "./parseBeoWorkbook";
-import { parseEventWorksheet } from "./parseEventWorksheet";
-import { parseOrderList } from "./parseOrderList";
-import { parsePackList } from "./parsePackList";
 import { parseProductionWorksheet } from "./parseProductionWorksheet";
-import { parseProposal } from "./parseProposal";
 import { readPdfTextLines } from "./pdfTextReader";
-import { readXlsxSheets } from "./xlsxReader";
+import { readXlsxWorkbook } from "./xlsxReader";
+import { XlsxReportGrid } from "./xlsxReportGrid";
+import { packetEvidenceFromText } from "../eventPacket/packetContract";
 
 /**
  * Turns raw report files into one event bundle.
@@ -37,21 +35,6 @@ export interface EventBundleLoadResult {
   unrecognized: string[];
 }
 
-function detectCsvSource(
-  rows: readonly (readonly string[])[],
-): EventBundleSource | undefined {
-  const head = rows
-    .slice(0, 12)
-    .map((row) => row.join(" ").toLowerCase())
-    .join(" | ");
-
-  if (head.includes("event worksheet")) return "eventWorksheet";
-  if (head.includes("pack list")) return "packList";
-  if (head.includes("order list")) return "orderList";
-  if (head.includes("prepared for")) return "proposal";
-  return undefined;
-}
-
 export function detectWorkbookSource(
   rows: readonly (readonly string[])[],
 ): EventBundleSource | undefined {
@@ -70,37 +53,33 @@ export function detectWorkbookSource(
 
 function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   const lower = file.name.toLowerCase();
+  if (file.contents.toString("utf8", 0, 128).trimStart().startsWith("{")) {
+    const packetEvidence = packetEvidenceFromText(
+      file.contents.toString("utf8"),
+    );
+    if (packetEvidence) return { source: "eventPacket", packetEvidence };
+  }
 
   if (lower.endsWith(".pdf")) {
     return parseBattleBoard(readPdfTextLines(file.contents));
   }
   if (lower.endsWith(".xlsx")) {
-    const sheets = readXlsxSheets(file.contents);
+    // Typed read: date cells print as M/D/YYYY and format-literal units ride
+    // along with their numbers, so a report exported as a workbook reads the
+    // same as the CSV TPP prints (issue #274).
+    const sheets = XlsxReportGrid.fromWorkbook(readXlsxWorkbook(file.contents));
     const rows = sheets.flatMap((sheet) => sheet.rows);
     const source = detectWorkbookSource(rows);
     if (source === "beo") return parseBeoWorkbook(sheets);
     if (source === "productionWorksheet") {
       return parseProductionWorksheet(sheets);
     }
-    return undefined;
+    // The row-shaped reports (worksheet, pack list, order list, proposal)
+    // are the same grid whether TPP exported CSV or a workbook.
+    return parseRowReport(rows);
   }
   if (!lower.endsWith(".csv")) return undefined;
-
-  const text = file.contents.toString("utf8");
-  const source = detectCsvSource(readCsvRows(text));
-  switch (source) {
-    case "eventWorksheet":
-      return parseEventWorksheet(readCsvRows(text));
-    case "packList":
-      // Classification headings are marked by indentation alone.
-      return parsePackList(readCsvRows(text, { keepIndentMarker: true }));
-    case "orderList":
-      return parseOrderList(readCsvRows(text));
-    case "proposal":
-      return parseProposal(readCsvRows(text));
-    default:
-      return undefined;
-  }
+  return parseCsvReportText(file.contents.toString("utf8"));
 }
 
 /** Read a set of TPP report files into one merged bundle. */

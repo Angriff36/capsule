@@ -420,7 +420,7 @@ Spacing changes with the mode of work. Overview pages use open intervals to crea
 - The global shell uses a fixed 72px desktop rail and a flexible route region.
 - The route region receives 18–22px of botanical frame before the working sheet.
 - The working sheet is capped at 1440px and uses 48px horizontal / 44px vertical desktop padding.
-- Home uses a `1.55fr / 0.68fr` journal grid: service brief left, decision ledger right.
+- Home is a seven-column month grid (six week rows) with a fixed right-edge report rail that slides over the sheet; the calendar never scrolls sideways. Today's service (`/today`) keeps the `1.55fr / 0.68fr` journal grid: service brief left, decision ledger right.
 - Supporting metrics use a four-column ruled strip, collapsing to two columns on mobile.
 - Service and catalog lists use full-width rows with a strong leading identifier and quiet trailing state.
 - Detail pages use a full-width reading flow; secondary information may form an inset side region only when it remains subordinate.
@@ -561,7 +561,7 @@ A quiet, document-like closeout surface that compares governed planned and actua
 
 | System               | Primary artifact                      | Default archetype                   | Distinctive composition                                                 |
 | -------------------- | ------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------- |
-| Home                 | Today's operational attention         | Operational journal                 | One next service or exception ledger, then a ruled outlook              |
+| Home                 | The month's events                    | Calendar + report rail              | Events on their days, coloured by sales lock; hover facts; right-edge report rail. Today's journal lives at /today |
 | Events               | Governed event plan                   | Pipeline + event dossier            | Stage spine, service brief, readiness, linked work                      |
 | Culinary             | Recipe, dish, menu                    | Book + detail document              | Catalog index, full-width recipe sections, event menu composition       |
 | Inventory            | Demand and stock position             | Working ledger                      | Demand/available/reserved/shortage alignment by ingredient and location |
@@ -652,7 +652,7 @@ Owner approval: 2026-09-04. The Capsule Unslop profile is an avoid-focused revie
 | Small Mobile  |      <520px | Masthead actions stack, title scale reduces, one-column controls     |
 | Mobile        |   520–767px | Rail becomes mobile menu, sheet frame reduces to 10px, ledgers stack |
 | Tablet        |  768–1024px | Primary/secondary journal columns collapse, full sheet remains       |
-| Desktop       | 1024–1440px | 72px rail, split journal grid, four-column outlook strip             |
+| Desktop       | 1024–1440px | 72px rail, month calendar + report rail on Home, split journal grid elsewhere, four-column outlook strip |
 | Large Desktop |     >1440px | Sheet caps at 1440px and botanical frame expands around it           |
 
 ### Touch Targets

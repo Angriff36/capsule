@@ -1,7 +1,7 @@
 /** One timeline block's times after a reorder. */
 export type RemappedTimelineSlot = {
   readonly id: string;
-  readonly startsAt: number;
+  readonly startsAt: number | undefined;
   readonly endsAt: number | undefined;
   readonly sortOrder: number;
 };
@@ -10,6 +10,7 @@ type TimedActivity = {
   readonly _id: string;
   readonly startsAt?: number | null;
   readonly endsAt?: number | null;
+  readonly completedAt?: number | null;
 };
 
 /**
@@ -30,6 +31,22 @@ export class TimelineSlotRemapper {
       .map((id) => activitiesById.get(id))
       .filter((row): row is TimedActivity => row != null);
     if (previous.length === 0 || nextOrderedIds.length === 0) return [];
+
+    // A missing time is not an epoch anchor or a zero-length time slot.
+    // Performed work also retains its recorded plan when order changes.
+    if (
+      previous.some((row) => row.startsAt == null || row.completedAt != null)
+    ) {
+      return nextOrderedIds.map((id, sortOrder) => {
+        const row = activitiesById.get(id);
+        return {
+          id,
+          startsAt: row?.startsAt ?? undefined,
+          endsAt: row?.endsAt ?? undefined,
+          sortOrder,
+        };
+      });
+    }
 
     const gaps = this.gapsBetween(previous);
     const anchorStart = Number(previous[0]?.startsAt ?? 0);

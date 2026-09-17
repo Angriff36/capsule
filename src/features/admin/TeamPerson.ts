@@ -7,6 +7,11 @@ export type TeamPerson = {
   status: string;
   authSubjectId?: string | null;
   employeeNumber?: string | null;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  region?: string | null;
+  postalCode?: string | null;
   deletedAt?: unknown;
   version?: number;
 };

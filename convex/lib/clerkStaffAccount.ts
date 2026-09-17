@@ -102,6 +102,51 @@ export class ClerkStaffAccountDirectory {
     };
   }
 
+  /**
+   * Move a staff account to a new primary email (profile email correction,
+   * #270). Adds the address pre-verified — the manager is vouching for it the
+   * same way hire does — makes it primary, then drops the old addresses so
+   * the invitation and password reset go to one mailbox.
+   */
+  async changePrimaryEmail(userId: string, email: string): Promise<void> {
+    const wanted = email.trim().toLowerCase();
+    const userUrl = `https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`;
+    const user = await this.request<ClerkUserPayload>(userUrl);
+    const addresses = user.email_addresses ?? [];
+    const current = addresses.find(
+      (row) => (row.email_address ?? "").trim().toLowerCase() === wanted,
+    );
+    let primaryId = current?.id;
+    if (!primaryId) {
+      const added = await this.request<ClerkEmailAddress>(
+        "https://api.clerk.com/v1/email_addresses",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            user_id: userId,
+            email_address: wanted,
+            verified: true,
+            primary: true,
+          }),
+        },
+      );
+      primaryId = added.id;
+    } else if (user.primary_email_address_id !== primaryId) {
+      await this.request(userUrl, {
+        method: "PATCH",
+        body: JSON.stringify({ primary_email_address_id: primaryId }),
+      });
+    }
+    for (const row of addresses) {
+      if (row.id && row.id !== primaryId) {
+        await this.request(
+          `https://api.clerk.com/v1/email_addresses/${encodeURIComponent(row.id)}`,
+          { method: "DELETE" },
+        );
+      }
+    }
+  }
+
   async setPassword(userId: string, password: string): Promise<void> {
     await this.request<ClerkUserPayload>(
       `https://api.clerk.com/v1/users/${encodeURIComponent(userId)}`,

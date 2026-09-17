@@ -9,7 +9,7 @@ export const KITCHEN_SECTION_SINGULAR: Record<KitchenSection, string> = {
 };
 
 export const KITCHEN_SECTIONS: readonly {
-  key: KitchenSection | "prep";
+  key: KitchenSection | "prep" | "unresolved";
   label: string;
   path: string;
 }[] = [
@@ -18,10 +18,14 @@ export const KITCHEN_SECTIONS: readonly {
   { key: "dishes", label: "Dishes", path: "/kitchen/dishes" },
   { key: "menus", label: "Menus", path: "/kitchen/menus" },
   { key: "prep", label: "Command deck", path: "/kitchen/prep" },
+  { key: "unresolved", label: "Unresolved", path: "/kitchen/unresolved" },
 ] as const;
 
-export function componentPath(id: string) {
-  return `/kitchen/components/${id}`;
+export function componentPath(id: string, prepTaskId?: string) {
+  const path = `/kitchen/components/${id}`;
+  return prepTaskId
+    ? `${path}?prepTask=${encodeURIComponent(prepTaskId)}`
+    : path;
 }
 
 export function ingredientPath(id: string) {

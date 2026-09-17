@@ -15,6 +15,7 @@ import {
   inDateRange,
   isLiveTenantRow,
   requireReportTenant,
+  resolveReportEventVenue,
 } from "./shared";
 
 const REPORT_IDS = new Set(TPP_FINANCIAL_REPORTS.map((report) => report.id));
@@ -149,12 +150,21 @@ export const run = query({
         .take(REPORT_ROW_LIMIT),
     ]);
     const events = await Promise.all(
-      rawEvents.map((event) =>
-        decryptReportFields(
+      rawEvents.map(async (event) =>
+        resolveReportEventVenue(
           ctx,
-          "Event",
-          ["primaryContactName", "primaryContactEmail", "primaryContactPhone"],
-          event,
+          tenantId,
+          await decryptReportFields(
+            ctx,
+            "Event",
+            [
+              "primaryContactName",
+              "primaryContactEmail",
+              "primaryContactPhone",
+            ],
+            event,
+          ),
+          false,
         ),
       ),
     );

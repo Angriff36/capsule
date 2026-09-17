@@ -34,9 +34,69 @@ function violation(
 }
 
 function referencesEventDocument(source: string): boolean {
-  return new RegExp(
+  const referencesEventTable = new RegExp(
     `(?:v\\.id\\(\\s*["'](?:${EVENT_TABLE_PATTERN})["']|Id<\\s*["'](?:${EVENT_TABLE_PATTERN})["']|ctx\\.db\\.(?:get|query|insert)\\(\\s*["'](?:${EVENT_TABLE_PATTERN})["'])`,
   ).test(source);
+  if (!referencesEventTable) return false;
+
+  const eventIdVariables = new Set<string>();
+  const eventIdTypes = new Set(['Id<"events">']);
+  const isEventIdType = (typeText: string) =>
+    typeText
+      .split("|")
+      .map((part) => part.trim())
+      .filter((part) => part !== "null" && part !== "undefined")
+      .every((part) => eventIdTypes.has(part));
+
+  for (const [, alias, definition] of source.matchAll(
+    /\btype\s+([A-Za-z_$][\w$]*)\s*=\s*([^;\n]+)/g,
+  )) {
+    if (isEventIdType(definition)) eventIdTypes.add(alias);
+  }
+  for (const [, name, typeName] of source.matchAll(
+    /\b([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*(?:\s*\|\s*(?:null|undefined))*)/g,
+  )) {
+    if (isEventIdType(typeName)) eventIdVariables.add(name);
+  }
+
+  // Preserve event identity through simple local aliases so the guard does
+  // not rely on a particular variable name (while packet records such as
+  // `file._id` remain distinguishable from an Event document id).
+  for (let changed = true; changed;) {
+    changed = false;
+    for (const [, alias, sourceName] of source.matchAll(
+      /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*([A-Za-z_$][\w$]*)\b/g,
+    ))
+      if (eventIdVariables.has(sourceName) && !eventIdVariables.has(alias)) {
+        eventIdVariables.add(alias);
+        changed = true;
+      }
+  }
+
+  // These names are the untyped argument conventions used by the existing
+  // authored seams. Typed Id<"events"> declarations above are the primary
+  // signal and cover arbitrary names such as `id`.
+  for (const name of [
+    "eventId",
+    "eventGuestId",
+    "guestId",
+    "venueId",
+    "clientId",
+  ])
+    eventIdVariables.add(name);
+
+  const eventDocumentTarget = (target: string) => {
+    if (eventIdVariables.has(target)) return true;
+    const member = target.match(/^([A-Za-z_$][\w$]*)\._id$/);
+    return (
+      !!member && /^(event|eventGuest|guest|venue|client)$/i.test(member[1])
+    );
+  };
+  return [
+    ...source.matchAll(
+      /ctx\.db\.(?:patch|replace|delete)\s*\(\s*([A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)?)/g,
+    ),
+  ].some(([, target]) => target != null && eventDocumentTarget(target));
 }
 
 function inspectFeatureSource(

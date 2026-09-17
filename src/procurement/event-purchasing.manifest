@@ -82,12 +82,14 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
   property indexed required eventDishId: uuid
   property required dishId: uuid
   property indexed required componentId: uuid
+  property indexed recipeSyncComponentId: uuid?
   property required servings: decimal(12, 4) = 0
   property required yieldQuantity: decimal(10, 2) = 1
   property required batchMultiplier: decimal(10, 4) = 1
   property purchasingWeekStart: datetime?
   property seededAt: datetime?
 
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
 
   command seed(
@@ -106,10 +108,13 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
     mutate eventDishId = eventDishId
     mutate dishId = dishId
     mutate componentId = componentId
+    mutate recipeSyncComponentId = componentId
     mutate servings = servings
     mutate yieldQuantity = yieldQuantity
     mutate batchMultiplier = batchMultiplier
-    mutate purchasingWeekStart = purchasingWeekStart
+    // The event owns the purchasing week; a reschedule (#328) must not leave
+    // recipe-driven reseeds on the week the dish was first added.
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
     mutate seededAt = now()
     emit EventDishComponentSeeded {
       seedId: self.id
@@ -121,7 +126,34 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
       servings: servings
       yieldQuantity: yieldQuantity
       batchMultiplier: batchMultiplier
-      purchasingWeekStart: purchasingWeekStart
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  command refreshRecipeSync() {
+    mutate recipeSyncComponentId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.componentId : null
+  }
+
+  command retire() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+  }
+
+  command refresh() {
+    guard self.deletedAt == null
+    mutate servings = self.eventDish != null ? self.eventDish.quantityServings : self.servings
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
+    emit EventDishComponentSeeded {
+      seedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      dishId: self.dishId
+      componentId: self.componentId
+      servings: self.servings
+      yieldQuantity: self.yieldQuantity
+      batchMultiplier: self.batchMultiplier
+      purchasingWeekStart: self.purchasingWeekStart
     }
   }
 
@@ -141,12 +173,33 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   // a component. A dish is the recipe; only hand-made sub-preparations have a
   // component behind them.
   property componentId: uuid?
+  property indexed recipeSyncComponentId: uuid?
+  property indexed recipeSyncIngredientId: uuid?
   property required ingredientId: uuid
   property required quantity: decimal(12, 4) = 0
+  property quantityPerServing: decimal(12, 6)?
   property required unit: UnitOfMeasure = "each"
   property required servings: decimal(12, 4) = 0
   property purchasingWeekStart: datetime?
   property recordedAt: datetime?
+  // Revision-2 culinary model (2026-09-14). Rows written by the authored
+  // demand engine carry a stable sourceKey (event dish + requirement path) so
+  // replanning replaces them idempotently, plus the resolution the purchasing
+  // total needs: basis, unit status, ownership (event_dish | batch_allocation
+  // | batch_surplus) and the component path walked for nested recipes.
+  property indexed sourceKey: string?
+  property exactQuantity: decimal(12, 4)?
+  property roundedQuantity: decimal(12, 4)?
+  property quantityBasis: QuantityBasis?
+  property unitStatus: string?
+  property ownership: string?
+  property sourceDishIngredientId: uuid?
+  property sourceDishComponentId: uuid?
+  property componentPath: list<string>?
+  property productionBatchId: uuid?
+  property productionBatchAllocationId: uuid?
+  property supersededAt: datetime?
+  property supersededBySourceKey: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
@@ -164,22 +217,62 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     quantity: decimal(12, 4),
     unit: UnitOfMeasure,
     servings: decimal(12, 4),
+    optional quantityPerServing: decimal(12, 6),
     optional componentId: uuid,
-    optional purchasingWeekStart: datetime
+    optional purchasingWeekStart: datetime,
+    // Revision-2 engine fields. Reactions omit them; an omitted value keeps the
+    // stored one so a replayed reaction never wipes engine annotations.
+    optional sourceKey: string,
+    optional exactQuantity: decimal(12, 4),
+    optional roundedQuantity: decimal(12, 4),
+    optional quantityBasis: QuantityBasis,
+    optional unitStatus: string,
+    optional ownership: string,
+    optional sourceDishIngredientId: uuid,
+    optional sourceDishComponentId: uuid,
+    optional componentPath: list<string>,
+    optional productionBatchId: uuid,
+    optional productionBatchAllocationId: uuid
   ) {
     guard self.deletedAt == null
-    constraint recordQuantityPositive: quantity > 0 "Contribution quantity must be positive"
+    constraint recordQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
     constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
+    // A legacy reaction (no sourceKey) that matches a batch-owned share must
+    // leave it untouched: the batch owns that quantity, not the serving count.
+    compute batchKeep = sourceKey == null and (self.ownership == "batch_allocation" or self.ownership == "batch_surplus")
     mutate eventId = eventId
     mutate eventDishId = eventDishId
     mutate dishId = dishId
     mutate componentId = componentId
+    mutate recipeSyncComponentId = componentId
     mutate ingredientId = ingredientId
-    mutate quantity = quantity
-    mutate unit = unit
-    mutate servings = servings
-    mutate purchasingWeekStart = purchasingWeekStart
+    mutate recipeSyncIngredientId = ingredientId
+    mutate quantity = batchKeep ? self.quantity : quantity
+    mutate quantityPerServing = batchKeep ? self.quantityPerServing : (quantityPerServing != null ? quantityPerServing : (servings > 0 ? quantity / servings : self.quantityPerServing))
+    mutate unit = batchKeep ? self.unit : unit
+    mutate servings = batchKeep ? self.servings : servings
+    // The event owns the purchasing week (#328); the passed value is only a
+    // fallback for rows whose event cannot be resolved.
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : purchasingWeekStart
     mutate recordedAt = now()
+    // The engine always passes sourceKey. A legacy reaction never does: it
+    // then rewrites the quantity with the legacy formula, so every engine
+    // annotation is cleared rather than left stale; the next reconcile
+    // re-adopts the row by (component, ingredient, unit). Batch-owned rows
+    // (batchKeep) keep every annotation.
+    mutate sourceKey = sourceKey != null ? sourceKey : self.sourceKey
+    mutate exactQuantity = sourceKey != null ? exactQuantity : (batchKeep ? self.exactQuantity : null)
+    mutate roundedQuantity = sourceKey != null ? roundedQuantity : (batchKeep ? self.roundedQuantity : null)
+    mutate quantityBasis = sourceKey != null ? quantityBasis : (batchKeep ? self.quantityBasis : null)
+    mutate unitStatus = sourceKey != null ? unitStatus : (batchKeep ? self.unitStatus : null)
+    mutate ownership = sourceKey != null ? ownership : (batchKeep ? self.ownership : null)
+    mutate sourceDishIngredientId = sourceKey != null ? sourceDishIngredientId : (batchKeep ? self.sourceDishIngredientId : null)
+    mutate sourceDishComponentId = sourceKey != null ? sourceDishComponentId : (batchKeep ? self.sourceDishComponentId : null)
+    mutate componentPath = sourceKey != null ? componentPath : (batchKeep ? self.componentPath : [])
+    mutate productionBatchId = sourceKey != null ? productionBatchId : (batchKeep ? self.productionBatchId : null)
+    mutate productionBatchAllocationId = sourceKey != null ? productionBatchAllocationId : (batchKeep ? self.productionBatchAllocationId : null)
+    mutate supersededAt = batchKeep ? self.supersededAt : null
+    mutate supersededBySourceKey = batchKeep ? self.supersededBySourceKey : null
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
@@ -188,23 +281,33 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId
       quantity: quantity
       unit: unit
-      purchasingWeekStart: purchasingWeekStart
+      purchasingWeekStart: self.purchasingWeekStart
     }
+  }
+
+  command refreshRecipeSync() {
+    mutate recipeSyncComponentId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.componentId : null
+    mutate recipeSyncIngredientId = self.deletedAt == null and self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" ? self.ingredientId : null
   }
 
   command revise(quantity: decimal(12, 4), servings: decimal(12, 4)) {
     guard self.recordedAt != null
     guard self.deletedAt == null
-    constraint reviseQuantityPositive: quantity > 0 "Contribution quantity must be positive"
-    mutate quantity = quantity
-    mutate servings = servings
+    constraint reviseQuantityPositive: quantity >= 0 "Contribution quantity cannot be negative"
+    // Batch-owned shares are sized by their allocation, not by servings; a
+    // headcount change never rewrites them (replan the batch instead).
+    compute batchOwned = self.ownership == "batch_allocation" or self.ownership == "batch_surplus"
+    mutate quantityPerServing = self.quantityPerServing != null ? self.quantityPerServing : (self.servings > 0 ? self.quantity / self.servings : null)
+    mutate quantity = batchOwned ? self.quantity : quantity
+    mutate servings = batchOwned ? self.servings : servings
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
       eventDishId: self.eventDishId
       ingredientId: self.ingredientId
-      quantity: quantity
+      quantity: self.quantity
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
     }
@@ -216,6 +319,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     constraint retireReason: length(trim(reason)) > 0 "Retire reason is required"
     mutate deletedAt = now()
     mutate quantity = 0
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
@@ -224,6 +328,50 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       quantity: 0
       unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  // Revision-2: the demand engine replaces a superseded row (replan, override,
+  // choice) without losing where it came from. Quantity goes to zero so the
+  // aggregate re-sums; the sourceKey and the replacing key stay for tracing.
+  command supersede(reason: string, optional supersededBySourceKey: string) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint supersedeReason: length(trim(reason)) > 0 "Supersede reason is required"
+    mutate supersededAt = now()
+    mutate supersededBySourceKey = supersededBySourceKey
+    mutate deletedAt = now()
+    mutate quantity = 0
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      ingredientId: self.ingredientId
+      quantity: 0
+      unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  // Reactions may be ordered by target entity. Keep same-unit updates intact
+  // whether reseeding runs before or after this cleanup.
+  command retirePreviousUnit(currentUnit: UnitOfMeasure) {
+    guard self.deletedAt == null
+    compute changedUnit = self.unit != currentUnit
+    mutate deletedAt = changedUnit ? now() : self.deletedAt
+    mutate quantity = changedUnit ? 0 : self.quantity
+    mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
+      unit: currentUnit
       purchasingWeekStart: self.purchasingWeekStart
     }
   }
@@ -314,6 +462,7 @@ on EventDishAdded fanOut DishIngredient where dishId = payload.dishId
     componentId: null
     ingredientId: self.ingredientId
     quantity: self.quantity * payload.quantityServings
+    quantityPerServing: self.quantity
     unit: self.unit
     servings: payload.quantityServings
     purchasingWeekStart: payload.purchasingWeekStart
@@ -330,6 +479,7 @@ on EventDishComponentSeeded fanOut ComponentIngredient where componentId = paylo
     componentId: payload.componentId
     ingredientId: self.ingredientId
     quantity: (self.quantity * payload.batchMultiplier * payload.servings) / payload.yieldQuantity
+    quantityPerServing: (self.quantity * payload.batchMultiplier) / payload.yieldQuantity
     unit: self.unit
     servings: payload.servings
     purchasingWeekStart: payload.purchasingWeekStart
@@ -338,13 +488,16 @@ on EventDishComponentSeeded fanOut ComponentIngredient where componentId = paylo
 on EventDishServingsAdjusted fanOut EventIngredientContribution where eventDishId = payload.eventDishId
   run revise
   params {
-    quantity: (self.quantity / self.servings) * payload.quantityServings
+    quantity: (self.quantityPerServing != null ? self.quantityPerServing : (self.servings > 0 ? self.quantity / self.servings : 0)) * payload.quantityServings
     servings: payload.quantityServings
   }
 
 on EventHeadcountChanged fanOut EventDish where eventId = payload.eventId
-  run adjustServings
-  params { quantityServings: payload.newHeadcount }
+  run syncHeadcount
+  params {
+    previousHeadcount: payload.previousHeadcount
+    newHeadcount: payload.newHeadcount
+  }
 
 on EventDishRemoved fanOut EventIngredientContribution where eventDishId = payload.eventDishId
   run retire
@@ -357,13 +510,25 @@ on EventIngredientContributionRecorded run IngredientDemand.syncFromContribution
     eventId: payload.eventId
     ingredientId: payload.ingredientId
     requiredQuantity: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, of quantity)
+    total_gram: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "gram", of quantity)
+    total_kilogram: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "kilogram", of quantity)
+    total_ounce: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "ounce", of quantity)
+    total_pound: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "pound", of quantity)
+    total_milliliter: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "milliliter", of quantity)
+    total_liter: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "liter", of quantity)
+    total_teaspoon: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "teaspoon", of quantity)
+    total_tablespoon: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "tablespoon", of quantity)
+    total_cup: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "cup", of quantity)
+    total_pint: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "pint", of quantity)
+    total_quart: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "quart", of quantity)
+    total_gallon: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, unit == "gallon", of quantity)
     unit: payload.unit
     purchasingWeekStart: payload.purchasingWeekStart
   }
 
 on IngredientDemandCalculated fanOut PurchaseNeed where ingredientDemandId = payload.ingredientDemandId
   run reviseRequired
-  params { requiredQuantity: payload.requiredQuantity }
+  params { requiredQuantity: payload.requiredQuantity, unit: payload.unit }
 
 on PurchaseNeedOpened run WeeklyPurchasingConfig.routeNeed
   match tenantId = payload.tenantId
@@ -399,8 +564,12 @@ on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
   params {
     vendorOrderId: payload.vendorOrderId
     ingredientId: payload.ingredientId
-    weekNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "open", of requiredQuantity)
-    onHand: sum(InventoryItem where ingredientId == payload.ingredientId, of quantityOnHand)
+    weekNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, unit == payload.unit, status == "open", of requiredQuantity)
+    orderedNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, unit == payload.unit, status == "ordered", of requiredQuantity)
+    fulfilledNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, unit == payload.unit, status == "fulfilled", of requiredQuantity)
+    onHand: sum(InventoryItem where ingredientId == payload.ingredientId, unit == payload.unit, of quantityOnHand)
+    pendingSupply: sum(VendorOrderLine where ingredientId == payload.ingredientId, supplyWeekStart == payload.purchasingWeekStart, unit == payload.unit, of pendingSupplyQuantity)
+    stockClaimed: sum(VendorOrderLine where ingredientId == payload.ingredientId, unit == payload.unit, status == "added", of stockAppliedQuantity)
     contributionQuantity: payload.requiredQuantity
     unit: payload.unit
     purchaseNeedId: payload.purchaseNeedId
@@ -439,6 +608,7 @@ on EventDishConfirmedFromProposal fanOut DishIngredient where dishId = payload.s
     componentId: null
     ingredientId: self.ingredientId
     quantity: self.quantity * payload.quantityServings
+    quantityPerServing: self.quantity
     unit: self.unit
     servings: payload.quantityServings
     purchasingWeekStart: payload.purchasingWeekStart
@@ -448,7 +618,7 @@ on EventDishConfirmedFromProposal fanOut DishIngredient where dishId = payload.s
 // cascade only ever fires on EventDishAdded, so adding an ingredient to a dish
 // already on an event changes nothing and the operator has to remove and re-add
 // it to see demand — which is exactly what made the chain look dead.
-on DishIngredientAdded fanOut EventDish where dishId = payload.dishId
+on DishIngredientAdded fanOut EventDish where recipeSyncDishId = payload.dishId
   run EventIngredientContribution.record
   match eventDishId = self.id, componentId = null, ingredientId = payload.ingredientId, unit = payload.unit
   else create
@@ -459,13 +629,14 @@ on DishIngredientAdded fanOut EventDish where dishId = payload.dishId
     componentId: null
     ingredientId: payload.ingredientId
     quantity: payload.quantity * self.quantityServings
+    quantityPerServing: payload.quantity
     unit: payload.unit
     servings: self.quantityServings
     purchasingWeekStart: self.purchasingWeekStart
   }
 
 // Same for a corrected quantity — retyping 5 to 4 has to move demand.
-on DishIngredientQuantityAdjusted fanOut EventDish where dishId = payload.dishId
+on DishIngredientQuantityAdjusted fanOut EventDish where recipeSyncDishId = payload.dishId
   run EventIngredientContribution.record
   match eventDishId = self.id, componentId = null, ingredientId = payload.ingredientId, unit = payload.unit
   else create
@@ -476,6 +647,7 @@ on DishIngredientQuantityAdjusted fanOut EventDish where dishId = payload.dishId
     componentId: null
     ingredientId: payload.ingredientId
     quantity: payload.quantity * self.quantityServings
+    quantityPerServing: payload.quantity
     unit: payload.unit
     servings: self.quantityServings
     purchasingWeekStart: self.purchasingWeekStart
@@ -485,7 +657,7 @@ on DishIngredientQuantityAdjusted fanOut EventDish where dishId = payload.dishId
 // This is the hole that made the purchasing chain look dead for a whole day:
 // a component was attached, nothing happened, and the only way to see demand
 // was to remove the dish from the event and add it back.
-on DishComponentAttached fanOut EventDish where dishId = payload.dishId
+on DishComponentAttached fanOut EventDish where recipeSyncDishId = payload.dishId
   run EventDishComponentSeed.seed
   match eventDishId = self.id, componentId = payload.componentId
   else create
@@ -499,3 +671,74 @@ on DishComponentAttached fanOut EventDish where dishId = payload.dishId
     batchMultiplier: payload.batchMultiplier
     purchasingWeekStart: self.purchasingWeekStart
   }
+
+// Remove only this dish's contributions; other dishes may use the same component.
+on DishComponentDetached fanOut EventIngredientContribution where recipeSyncComponentId = payload.componentId
+  run retire
+  match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = payload.componentId, ingredientId = self.ingredientId, unit = self.unit
+  params { reason: payload.reason }
+
+on DishComponentDetached fanOut EventDishComponentSeed where recipeSyncComponentId = payload.componentId
+  run retire
+  match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = payload.componentId
+
+on DishIngredientRemoved fanOut EventIngredientContribution where recipeSyncIngredientId = payload.ingredientId
+  run retire
+  match eventDishId = self.eventDishId, dishId = payload.dishId, componentId = null, ingredientId = payload.ingredientId, unit = self.unit
+  params { reason: payload.reason }
+
+on ComponentIngredientRemoved fanOut EventIngredientContribution where recipeSyncComponentId = payload.componentId
+  run retire
+  match eventDishId = self.eventDishId, componentId = payload.componentId, ingredientId = payload.ingredientId, unit = payload.unit
+  params { reason: payload.reason }
+
+// Remove the old measurement before re-driving the component's current lines.
+// This also handles a recipe edit that changes the ingredient's unit.
+on ComponentIngredientQuantityAdjusted fanOut EventIngredientContribution where recipeSyncComponentId = payload.componentId
+  run retirePreviousUnit
+  match eventDishId = self.eventDishId, componentId = payload.componentId, ingredientId = payload.ingredientId, unit = payload.previousUnit
+  params { currentUnit: payload.unit }
+
+on ComponentIngredientQuantityAdjusted fanOut EventDishComponentSeed where recipeSyncComponentId = payload.componentId
+  run refresh
+
+on ComponentIngredientAdded fanOut EventDishComponentSeed where recipeSyncComponentId = payload.componentId
+  run refresh
+
+on VendorOrderSubmitted fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run commitSupply
+  params { purchasingWeekStart: payload.purchasingWeekStart }
+
+on VendorOrderApprovalRequested fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run commitSupply
+  params { purchasingWeekStart: payload.purchasingWeekStart }
+
+on VendorOrderCancelled fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run releaseSupply
+
+on VendorOrderChangesRequested fanOut VendorOrderLine where vendorOrderId = payload.vendorOrderId
+  run releaseSupply
+
+
+on EventCompleted fanOut EventDish where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCompleted fanOut EventDishComponentSeed where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCompleted fanOut EventIngredientContribution where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCancelled fanOut EventDish where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCancelled fanOut EventDishComponentSeed where eventId = payload.eventId
+  run refreshRecipeSync
+
+
+on EventCancelled fanOut EventIngredientContribution where eventId = payload.eventId
+  run refreshRecipeSync

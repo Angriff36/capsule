@@ -8,9 +8,13 @@ import { EventAllergenBriefingPage } from "../features/events/EventAllergenBrief
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
+import { EventImportPage } from "../features/events/import/EventImportPage";
 import { EventsListPage } from "../features/events/EventsListPage";
+import { EventTrackerPage } from "../features/events/EventTrackerPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
+import { WorkingEventRouteSync } from "../features/events/workingEvent";
+import { HomeCalendarPage } from "../features/home/HomeCalendarPage";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
@@ -18,6 +22,7 @@ import { IngredientDetailPage } from "../features/kitchen/IngredientDetailPage";
 import { ComponentImportPage } from "../features/kitchen/import/ComponentImportPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
 import { KitchenDashboardPage } from "../features/kitchen/KitchenDashboardPage";
+import { KitchenUnresolvedWorkPage } from "../features/kitchen/KitchenUnresolvedWorkPage";
 import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { ComponentDetailPage } from "../features/kitchen/ComponentDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
@@ -417,6 +422,11 @@ const ApiKeysPage = lazy(() =>
     default: module.ApiKeysPage,
   })),
 );
+const AssistantSettingsPage = lazy(() =>
+  import("../features/admin/AssistantSettingsPage").then((module) => ({
+    default: module.AssistantSettingsPage,
+  })),
+);
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
@@ -588,6 +598,7 @@ export function App() {
   return (
     <AppErrorBoundary>
       <AuthGate>
+        <WorkingEventRouteSync />
         <Routes>
           {/* Staff-facing mobile view lives outside AppShell so admin nav never renders. */}
           <Route
@@ -645,9 +656,12 @@ export function App() {
             }
           />
           <Route element={<AppShell />}>
-            <Route index element={<HomePage />} />
+            <Route index element={<HomeCalendarPage />} />
+            <Route path="/today" element={<HomePage />} />
             <Route path="/events" element={<EventsListPage />} />
+            <Route path="/events/tracker" element={<EventTrackerPage />} />
             <Route path="/events/new" element={<EventCreatePage />} />
+            <Route path="/events/import" element={<EventImportPage />} />
             <Route path="/events/templates" element={<EventTemplatesPage />} />
             <Route
               path="/events/capacity"
@@ -715,6 +729,10 @@ export function App() {
               element={<AllergenMatrixPage />}
             />
             <Route path="/kitchen/prep" element={<KitchenDashboardPage />} />
+            <Route
+              path="/kitchen/unresolved"
+              element={<KitchenUnresolvedWorkPage />}
+            />
             <Route
               path="/kitchen/yield"
               element={
@@ -1336,6 +1354,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PermissionsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/assistant"
+              element={
+                <SupplyRoute>
+                  <AssistantSettingsPage />
                 </SupplyRoute>
               }
             />

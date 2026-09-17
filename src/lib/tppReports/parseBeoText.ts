@@ -1,0 +1,543 @@
+import {
+  BEO_NOTE_HEADINGS,
+  bundleNotesFromSections,
+  splitBeoNoteSections,
+} from "./beoNoteSections";
+import type {
+  BundleMenuItem,
+  BundleStaffAssignment,
+  BundleTimelineEntry,
+  EventBundlePart,
+} from "./eventBundle";
+import {
+  parseAddressBlob,
+  parseClockMinutes,
+  parseCount,
+  parseEmail,
+  parsePhone,
+  parseReportDate,
+} from "./reportValues";
+
+/**
+ * Parses BEO / event-worksheet text that a person copied out of the PDF (or
+ * typed from the printed binder) and pasted into Capsule.
+ *
+ * Pasted text has none of the workbook's cell structure, so this reader works
+ * line by line: header facts are "Label: value" lines, a clock time at the
+ * start of a line is a timeline row, a serving count at the start of a line
+ * is a menu row, and "**" or "Note:" lines attach to the menu row above them.
+ * Anything it cannot place is left alone rather than guessed.
+ */
+
+const CLOCK = /\d{1,2}:\d{2}\s*[AaPp]\.?[Mm]\.?/;
+const LEADING_CLOCK = new RegExp(`^(${CLOCK.source})\\s*(.*)$`);
+const CLOCK_RANGE = new RegExp(
+  `(${CLOCK.source})\\s*(?:-|–|to)\\s*(${CLOCK.source})`,
+);
+const SERVING_UNIT =
+  /(?:x\s+|(?:servings?|serv|each|ea|pcs?|pieces?|portions?|ppl|people|guests?)\b\.?\s*)/i;
+const LEADING_SERVINGS_WITH_UNIT = new RegExp(
+  `^(\\d+(?:\\.\\d+)?)\\s*${SERVING_UNIT.source}(.+)$`,
+  "i",
+);
+const LEADING_SERVINGS_BARE = new RegExp(
+  `^(\\d+(?:\\.\\d+)?)\\s*(?:${SERVING_UNIT.source})?(.+)$`,
+  "i",
+);
+const TRAILING_SERVINGS = new RegExp(
+  `^(.+?)\\s+(?:\\(|-\\s*|–\\s*)?(\\d+(?:\\.\\d+)?)\\s*(?:${SERVING_UNIT.source})?\\)?\\s*$`,
+  "i",
+);
+const NOTE_LINE =
+  /^(?:\*+\s*|(?:note|notes|special instructions?)\s*:\s*|[-–•]\s+)(.+)$/i;
+/**
+ * Unmarked prose under a menu row is either the dish's catalog description
+ * ("Assorted cured meats and cheeses") or a line-cook instruction for this
+ * event ("Peppercorn cream sauce on the side", "blue rare for bride & groom").
+ * Directive words mark the instruction; it must stay on the event line, not
+ * change the shared catalog dish.
+ */
+const INSTRUCTION_CUE =
+  /\b(?:on the side|away from|own (?:tray|platter|plate)|separate(?:ly)?|bride|groom|rare|medium|well[- ]done|less done|more done|overcook|undercook|dry|no |not |without|hold (?:the )?|omit|extra|double|half|only|instead|swap|substitut|allerg|gluten|dairy|vegan|vegetarian|kosher|halal|nut[- ]free|must|please|do not|don't|make sure|be sure|keep|serve|cook|prep|cut|slice|plate|label|warm|hot|cold|chill|reheat|tasting|last time|client (?:wants|asked|prefers)|per client)\b/i;
+
+function looksLikeInstruction(text: string): boolean {
+  return INSTRUCTION_CUE.test(text);
+}
+const PRINTED_FOOTER = /^printed date/i;
+const PAGE_FOOTER = /^page \d+( of \d+)?$/i;
+
+type Section = "header" | "timeline" | "menu" | "staff" | "notes" | "other";
+
+const SECTION_HEADINGS: Array<{ pattern: RegExp; section: Section }> = [
+  {
+    pattern: /^(event\s+)?(timeline|schedule|itinerary)\b/i,
+    section: "timeline",
+  },
+  { pattern: /^time\s+(name|activity)\b/i, section: "timeline" },
+  { pattern: /^(event\s+)?(menu|event items?|food)\b/i, section: "menu" },
+  { pattern: /^time\s+event item\b/i, section: "menu" },
+  { pattern: /^(staff|staffing|labor|labour|crew|team)\b/i, section: "staff" },
+  { pattern: /^(notes|setup notes|event overview)\b/i, section: "notes" },
+  {
+    pattern: /^(pack ?list|packing list|equipment|rentals?)\b/i,
+    section: "other",
+  },
+];
+
+const HEADER_LABELS: Record<string, string[]> = {
+  invoice: ["invoice #", "invoice number", "invoice", "inv #", "event #"],
+  title: ["event title", "event name", "title", "event"],
+  date: ["event date", "date"],
+  time: ["event time", "time", "hours"],
+  guests: ["guest count", "guests", "headcount", "head count", "attendance"],
+  serviceStyle: ["service style", "style", "service"],
+  occasion: ["occasion"],
+  eventType: ["event type", "type"],
+  salesperson: ["salesperson", "sales person", "sales rep", "coordinator"],
+  contact: ["contact", "client", "customer", "host"],
+  location: ["location", "venue", "site"],
+  address: ["venue address", "site address", "address", "gps", "coordinates"],
+  phone: ["phone", "cell", "mobile"],
+  email: ["email", "e-mail"],
+  dietary: [
+    "allergies",
+    "allergy",
+    "allergens",
+    "dietary restrictions",
+    "dietary notes",
+    "dietary",
+    "restrictions",
+  ],
+};
+
+interface ReadLine {
+  text: string;
+  lower: string;
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * "Label: value", "Label #: value", "Label   value" or "Label" alone (value on
+ * the next line).
+ */
+function labelPattern(label: string): RegExp {
+  return new RegExp(
+    `^${escapeRegExp(label)}(?:(?:\\s*[:#])+\\s*|\\s{2,}|\\s*$)(.*)$`,
+    "i",
+  );
+}
+
+function readLines(text: string): ReadLine[] {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.replace(/\t/g, "  ").trim())
+    .filter(
+      (line) =>
+        line.length > 0 &&
+        !PRINTED_FOOTER.test(line) &&
+        !PAGE_FOOTER.test(line),
+    )
+    .map((line) => ({ text: line, lower: line.toLowerCase() }));
+}
+
+/** Longer labels win over shorter ones ("Event Date" before "Date"). */
+function labelValue(lines: ReadLine[], key: string): string | undefined {
+  const labels = [...(HEADER_LABELS[key] ?? [])].sort(
+    (a, b) => b.length - a.length,
+  );
+  for (const label of labels) {
+    const pattern = labelPattern(label);
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index]!;
+      if (!line.lower.startsWith(label)) continue;
+      const match = line.text.match(pattern);
+      if (!match) continue;
+      const value = match[1]!.trim();
+      if (value.length > 0) return value;
+      const next = lines[index + 1]?.text;
+      if (next && !isSectionHeading(next) && !looksLikeLabel(next)) {
+        return next;
+      }
+    }
+  }
+  return undefined;
+}
+
+function looksLikeLabel(text: string): boolean {
+  return Object.values(HEADER_LABELS).some((labels) =>
+    labels.some((label) => labelPattern(label).test(text)),
+  );
+}
+
+function isSectionHeading(text: string): Section | undefined {
+  if (text.length > 48 || /[:#]\s*\S/.test(text)) return undefined;
+  for (const { pattern, section } of SECTION_HEADINGS) {
+    if (pattern.test(text)) return section;
+  }
+  return undefined;
+}
+
+function readTimelineLine(text: string): BundleTimelineEntry | undefined {
+  const match = text.match(LEADING_CLOCK);
+  if (!match) return undefined;
+  const minutes = parseClockMinutes(match[1]);
+  const rest = (match[2] ?? "").replace(/^[-–:]\s*/, "").trim();
+  if (minutes === undefined || rest.length === 0) return undefined;
+  // Two or more spaces separate the name from its note in printed tables.
+  const [name, ...noteParts] = rest.split(/\s{2,}/);
+  const notes = noteParts.join(" ").trim();
+  const entry: BundleTimelineEntry = { name: name!.trim(), minutes };
+  if (notes.length > 0) entry.notes = notes;
+  return entry;
+}
+
+function readMenuLine(
+  text: string,
+  options: { allowBareCount: boolean },
+): BundleMenuItem | undefined {
+  const leading = text.match(
+    options.allowBareCount ? LEADING_SERVINGS_BARE : LEADING_SERVINGS_WITH_UNIT,
+  );
+  if (leading) {
+    const quantity = Number(leading[1]);
+    const name = leading[2]!.trim();
+    if (Number.isFinite(quantity) && name.length > 1) {
+      return { name, quantityServings: quantity };
+    }
+  }
+  const trailing = text.match(TRAILING_SERVINGS);
+  if (trailing) {
+    const quantity = Number(trailing[2]);
+    const name = trailing[1]!.trim();
+    if (Number.isFinite(quantity) && name.length > 1 && !CLOCK.test(name)) {
+      return { name, quantityServings: quantity };
+    }
+  }
+  return undefined;
+}
+
+function readStaffLine(text: string): BundleStaffAssignment | undefined {
+  const range = text.match(CLOCK_RANGE);
+  const withoutRange = range ? text.replace(range[0], "  ") : text;
+  const unassigned = /\*?\bunassigned\b\*?|\btbd\b|\bopen\b(?=\s*$)/i;
+  let name: string;
+  let role: string | undefined;
+  if (unassigned.test(withoutRange)) {
+    name = "Unassigned";
+    role = withoutRange.replace(unassigned, " ").replace(/\s{2,}/g, " ");
+  } else {
+    const parts = withoutRange
+      .split(/\s+[-–]\s+|\s{2,}/)
+      .map((part) => part.trim())
+      .filter(Boolean);
+    if (parts.length < 2) return undefined;
+    name = parts[0]!;
+    role = parts.slice(1).join(" - ");
+  }
+  role = role.replace(/^[\s\-–:]+|[\s\-–:]+$/g, "").trim();
+  if (!role) return undefined;
+  const entry: BundleStaffAssignment = { name, role };
+  const start = parseClockMinutes(range?.[1]);
+  const end = parseClockMinutes(range?.[2]);
+  if (start !== undefined) entry.startMinutes = start;
+  if (end !== undefined) entry.endMinutes = end;
+  return entry;
+}
+
+function readContact(value: string | undefined): {
+  name?: string;
+  email?: string;
+  phone?: string;
+} {
+  if (value === undefined) return {};
+  const email = parseEmail(value);
+  const phoneText = value.match(/\(?\d{3}\)?[\s.-]*\d{3}[\s.-]*\d{4}/)?.[0];
+  const name = value
+    .replace(email ?? "", " ")
+    .replace(phoneText ?? "", " ")
+    .replace(/\b(cell|home|work|phone|email)\s*:?/gi, " ")
+    .replace(/[|,;]+\s*$/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim()
+    .replace(/[|,;]+$/, "")
+    .trim();
+  return { name: name || undefined, email, phone: parsePhone(phoneText) };
+}
+
+/** "47.01359° N, 116.52979° W" / "47.01359, -116.52979" → decimal degrees. */
+const GPS_PAIR =
+  /(-?\d{1,2}\.\d{3,})\s*°?\s*([NSns])?\s*,?\s*(-?\d{1,3}\.\d{3,})\s*°?\s*([EWew])?/;
+
+function readCoordinates(
+  text: string,
+): { latitude: number; longitude: number; matched: string } | undefined {
+  const match = text.match(GPS_PAIR);
+  if (!match) return undefined;
+  let latitude = Number(match[1]);
+  let longitude = Number(match[3]);
+  if (match[2]?.toLowerCase() === "s") latitude = -Math.abs(latitude);
+  if (match[4]?.toLowerCase() === "w") longitude = -Math.abs(longitude);
+  if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return undefined;
+  return { latitude, longitude, matched: match[0] };
+}
+
+/**
+ * A BEO that prints "Venue: Singh Campsite" on one line and "Address: 47.01359°
+ * N, 116.52979° W" (or a street address) on the next: fold the address line
+ * into the venue when the venue line did not already carry one.
+ */
+function readVenueWithAddress(
+  location: string | undefined,
+  addressLine: string | undefined,
+): EventBundlePart["venue"] {
+  const venue: NonNullable<EventBundlePart["venue"]> =
+    readVenue(location) ?? {};
+  if (!addressLine) return venue;
+  const coordinates = readCoordinates(addressLine);
+  if (coordinates && venue.latitude === undefined) {
+    venue.latitude = coordinates.latitude;
+    venue.longitude = coordinates.longitude;
+  }
+  const street = coordinates
+    ? addressLine.replace(coordinates.matched, " ").trim()
+    : addressLine;
+  if (street.length > 0 && venue.addressLine1 === undefined) {
+    const address = parseAddressBlob(street);
+    venue.addressLine1 = address?.addressLine1;
+    venue.city = address?.city;
+    venue.region = address?.region;
+    venue.postalCode = address?.postalCode;
+  }
+  return venue;
+}
+
+function readVenue(location: string | undefined): EventBundlePart["venue"] {
+  if (!location) return {};
+  const beforeContact = location.replace(/venue contact:[\s\S]*$/i, "").trim();
+  const coordinates = readCoordinates(beforeContact);
+  const withoutCoordinates = coordinates
+    ? beforeContact.replace(coordinates.matched, " ").trim()
+    : beforeContact;
+  const name = withoutCoordinates
+    .split(/\s*\d/)[0]
+    ?.replace(/[,\-–]\s*$/, "")
+    .trim();
+  const address = parseAddressBlob(
+    name
+      ? withoutCoordinates.slice(name.length).replace(/^[,\s]+/, "")
+      : undefined,
+  );
+  return {
+    name: name || withoutCoordinates,
+    addressLine1: address?.addressLine1,
+    city: address?.city,
+    region: address?.region,
+    postalCode: address?.postalCode,
+    latitude: coordinates?.latitude,
+    longitude: coordinates?.longitude,
+  };
+}
+
+const SMALL_WORDS = new Set([
+  "and",
+  "or",
+  "of",
+  "the",
+  "a",
+  "an",
+  "&",
+  "/",
+  "-",
+  "–",
+  "with",
+  "to",
+  "for",
+]);
+
+/**
+ * "Cocktail Hour", "Dinner Buffet", "DESSERTS" are course headings; "Assorted
+ * cured meats and cheeses" is the description of the row above.
+ */
+function looksLikeCourseHeading(text: string): boolean {
+  if (/\d/.test(text) || text.length > 40 || /[.;!?]/.test(text)) return false;
+  const words = text.replace(/:$/, "").split(/\s+/).filter(Boolean);
+  if (words.length === 0 || words.length > 5) return false;
+  return words.every(
+    (word) => SMALL_WORDS.has(word.toLowerCase()) || /^[A-Z(]/.test(word),
+  );
+}
+
+interface Body {
+  timeline: BundleTimelineEntry[];
+  menu: BundleMenuItem[];
+  staff: BundleStaffAssignment[];
+  noteLines: string[];
+}
+
+function readBody(lines: ReadLine[]): Body {
+  const body: Body = { timeline: [], menu: [], staff: [], noteLines: [] };
+  let section: Section = "header";
+  let course: string | undefined;
+
+  for (const line of lines) {
+    // The BEO's own note headings ("Menu / Culinary Notes", "Equipment &
+    // Rentals") are prose sections, not the menu or pack-list tables.
+    if (
+      BEO_NOTE_HEADINGS.some((noteHeading) => line.text.startsWith(noteHeading))
+    ) {
+      section = "notes";
+      body.noteLines.push(line.text);
+      continue;
+    }
+    const heading = isSectionHeading(line.text);
+    if (heading) {
+      section = heading;
+      course = undefined;
+      if (heading === "notes") body.noteLines.push(line.text);
+      continue;
+    }
+    if (section === "notes") {
+      body.noteLines.push(line.text);
+      continue;
+    }
+    if (section === "staff") {
+      const member = readStaffLine(line.text);
+      if (member) body.staff.push(member);
+      continue;
+    }
+    if (section === "menu") {
+      readMenuBodyLine(line.text, body.menu, {
+        course,
+        setCourse: (next) => {
+          course = next;
+        },
+      });
+      continue;
+    }
+
+    const timelineEntry = readTimelineLine(line.text);
+    if (timelineEntry) {
+      body.timeline.push(timelineEntry);
+      continue;
+    }
+    // No "Menu" heading yet: still catch unmistakable serving rows.
+    if (!looksLikeLabel(line.text)) {
+      const item = readMenuLine(line.text, { allowBareCount: false });
+      if (item) body.menu.push(item);
+    }
+  }
+  return body;
+}
+
+function readMenuBodyLine(
+  text: string,
+  menu: BundleMenuItem[],
+  courseState: { course?: string; setCourse: (next?: string) => void },
+): void {
+  // The BEO menu table leads each row with its serving time; drop it.
+  const withoutClock = text.replace(LEADING_CLOCK, "$2").trim();
+  const current = menu.at(-1);
+  const note = withoutClock.match(NOTE_LINE);
+  if (note && current) {
+    const instruction = note[1]!.trim();
+    current.specialInstructions = current.specialInstructions
+      ? `${current.specialInstructions} ${instruction}`
+      : instruction;
+    return;
+  }
+  const item = readMenuLine(withoutClock, { allowBareCount: true });
+  if (item) {
+    if (courseState.course !== undefined) item.course = courseState.course;
+    menu.push(item);
+    return;
+  }
+  // "Allergies: NO ONIONS" printed under the menu is a header fact the
+  // header pass reads, not a course or a description of the row above.
+  if (looksLikeLabel(withoutClock)) return;
+  // A short title-case line starts a new course; prose describes the row above.
+  if (looksLikeCourseHeading(withoutClock)) {
+    courseState.setCourse(withoutClock.replace(/:$/, ""));
+    return;
+  }
+  if (!current) return;
+  if (looksLikeInstruction(withoutClock)) {
+    current.specialInstructions = current.specialInstructions
+      ? `${current.specialInstructions} ${withoutClock}`
+      : withoutClock;
+  } else if (current.description === undefined) {
+    current.description = withoutClock;
+  }
+}
+
+/** Parse pasted BEO / worksheet text into its bundle contribution. */
+export function parseBeoText(text: string): EventBundlePart {
+  const lines = readLines(text);
+  const body = readBody(lines);
+  const warnings: string[] = [];
+
+  const eventTime = labelValue(lines, "time");
+  const timeRange = eventTime?.match(CLOCK_RANGE);
+  const contact = readContact(labelValue(lines, "contact"));
+  const sections = splitBeoNoteSections(body.noteLines.join("\n"));
+  const notes = bundleNotesFromSections(sections);
+  if (Object.keys(sections).length === 0 && body.noteLines.length > 1) {
+    notes.eventOverview = body.noteLines.slice(1).join("\n");
+  }
+
+  const eventDate = parseReportDate(labelValue(lines, "date"));
+  if (eventDate === undefined) {
+    warnings.push(
+      'Pasted text: no event date was found. Add a line like "Event Date: 9/26/2026".',
+    );
+  }
+  if (body.menu.length === 0 && body.timeline.length === 0) {
+    warnings.push(
+      'Pasted text: no menu rows ("30 Serving Dish name") or timeline rows ("5:00 PM Guests arrive") were recognized.',
+    );
+  }
+
+  const salesperson = labelValue(lines, "salesperson");
+  const salespersonEmail = parseEmail(salesperson);
+  const invoiceNumber = labelValue(lines, "invoice")?.match(/\d+/)?.[0];
+  const title = labelValue(lines, "title");
+  const dietary = labelValue(lines, "dietary");
+  if (dietary) notes.dietary = dietary;
+  return {
+    source: "beo",
+    header: {
+      invoiceNumber,
+      // "Event #: 5935" satisfies the bare "event" label too; a number is
+      // the invoice, not a title.
+      title: title && !/^\d+$/.test(title) ? title : undefined,
+      eventDate,
+      startMinutes: parseClockMinutes(timeRange?.[1] ?? eventTime),
+      endMinutes: parseClockMinutes(timeRange?.[2]),
+      guestCount: parseCount(labelValue(lines, "guests")),
+      serviceStyle: labelValue(lines, "serviceStyle"),
+      occasion: labelValue(lines, "occasion")?.replace(/^\*+/, ""),
+      eventType: labelValue(lines, "eventType"),
+      salespersonName: salesperson
+        ?.replace(salespersonEmail ?? "", "")
+        .match(/^[A-Za-z'.\- ]+/)?.[0]
+        ?.trim(),
+      salespersonEmail,
+    },
+    client: {
+      name: contact.name,
+      email: contact.email ?? parseEmail(labelValue(lines, "email")),
+      phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
+    },
+    venue: readVenueWithAddress(
+      labelValue(lines, "location"),
+      labelValue(lines, "address"),
+    ),
+    timeline: body.timeline,
+    menu: body.menu,
+    staff: body.staff,
+    notes,
+    warnings,
+  };
+}

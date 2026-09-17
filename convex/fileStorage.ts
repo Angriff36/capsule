@@ -92,7 +92,8 @@ export const listForParent = query({
  * live-only. URL retrieval needs an authorized parent record (PR12-05);
  * a bare storage id, or one only another tenant references, is not enough.
  */
-async function storageReferencedByTenant(
+/** Also used by convex/assistantConfig.ts to scope assistant attachments. */
+export async function storageReferencedByTenant(
   ctx: QueryCtx,
   tenantId: string,
   storageId: string,

@@ -1,6 +1,9 @@
 import type { EventBundle } from "../lib/tppReports/eventBundle";
 import { toEpochMillis } from "../lib/tppReports/reportValues";
-import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
+import type {
+  CapsuleEventBundleContext,
+  CapsuleEventBundleDirectory,
+} from "./CapsuleEventBundleExistingState";
 import { centsToDollars, type PlannedStep } from "./CapsuleEventBundleShared";
 
 /**
@@ -31,6 +34,22 @@ function paymentMethod(
 
 function dateEpoch(date: string | undefined): number | undefined {
   return date === undefined ? undefined : toEpochMillis(date, 0);
+}
+
+/**
+ * The deposit is set on a fresh invoice, and on an invoice a prior run issued
+ * but never got to deposit (a failed run can stop between the two). An invoice
+ * whose deposit the loader did not read, or whose deposit is already paid, is
+ * left alone.
+ */
+function depositStillMissing(
+  known: CapsuleEventBundleDirectory["invoices"][number] | undefined,
+  depositCents: number | undefined,
+): boolean {
+  if (depositCents === undefined || depositCents <= 0) return false;
+  if (!known) return true;
+  if (known.depositAmountCents === undefined || known.depositPaid) return false;
+  return (known.depositAmountCents ?? 0) <= 0;
 }
 
 export function planBillingSteps(input: {
@@ -85,19 +104,19 @@ export function planBillingSteps(input: {
           .join(" "),
       },
     });
-    if (totals.depositCents !== undefined && totals.depositCents > 0) {
-      steps.push({
-        capabilityId: "Invoice.setDeposit",
-        ref: "invoice-deposit",
-        label: "Set the deposit on the invoice",
-        idempotencySuffix: `invoice-deposit:${invoice}`,
-        resolveRefs: ["docId"],
-        args: {
-          docId: "invoice",
-          depositAmount: centsToDollars(totals.depositCents),
-        },
-      });
-    }
+  }
+  if (depositStillMissing(knownInvoice, totals.depositCents)) {
+    steps.push({
+      capabilityId: "Invoice.setDeposit",
+      ref: "invoice-deposit",
+      label: "Set the deposit on the invoice",
+      idempotencySuffix: `invoice-deposit:${invoice}`,
+      resolveRefs: ["docId"],
+      args: {
+        docId: "invoice",
+        depositAmount: centsToDollars(totals.depositCents ?? 0),
+      },
+    });
   }
   const matchedPayments = new Set<string>();
   bundle.payments.forEach((payment, index) => {

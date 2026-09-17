@@ -349,14 +349,32 @@ export function MyDayPage() {
   const unacknowledgedNotices = myScheduleNotices.filter(
     (notice) => !notice.acknowledgedAt,
   ).length;
-  const myTasks = (tasks ?? [])
-    .filter(
-      (task) =>
-        task.deletedAt == null &&
-        ["pending", "claimed", "in_progress", "blocked"].includes(
-          String(task.status),
-        ) &&
-        (task.dueAt == null || task.dueAt <= endOfToday.getTime()),
+  // Shared work belongs here only when I am working that event today.
+  // A shift can cross midnight; a date-less scheduled shift is not today's work.
+  const myWorkEventIds = new Set(
+    myShifts
+      .filter(
+        (shift) =>
+          shift.eventId != null &&
+          shift.startsAt != null &&
+          shift.startsAt <= endOfToday.getTime() &&
+          (shift.endsAt ?? shift.startsAt) >= startOfToday.getTime(),
+      )
+      .map((shift) => shift.eventId!),
+  );
+  if (openRecord?.eventId) myWorkEventIds.add(openRecord.eventId);
+  const myRelevantTasks = (tasks ?? []).filter(
+    (task) =>
+      task.deletedAt == null &&
+      (task.assignedToId === me._id ||
+        (task.assignedToId == null && myWorkEventIds.has(task.eventId))) &&
+      (task.dueAt == null || task.dueAt <= endOfToday.getTime()),
+  );
+  const myTasks = myRelevantTasks
+    .filter((task) =>
+      ["pending", "claimed", "in_progress", "blocked"].includes(
+        String(task.status),
+      ),
     )
     .sort(
       (a, b) =>
@@ -365,7 +383,10 @@ export function MyDayPage() {
     );
 
   const packingLists = (packLists ?? []).filter(
-    (list) => list.deletedAt == null && String(list.status) === "packing",
+    (list) =>
+      list.deletedAt == null &&
+      String(list.status) === "packing" &&
+      myWorkEventIds.has(list.eventId),
   );
   const listName = (id: string) =>
     packingLists.find((list) => list._id === id)?.name ?? "Pack list";
@@ -717,12 +738,12 @@ export function MyDayPage() {
                 {myTasks.length === 0 ? (
                   <EmptyState
                     title="No prep tasks due today"
-                    hint="Tasks the kitchen assigns for today land here."
+                    hint="Your assigned prep and unclaimed work for today's shifts appear here."
                   />
                 ) : (
                   <MyDayPrepList
                     tasks={myTasks}
-                    allTasks={tasks ?? []}
+                    allTasks={myRelevantTasks}
                     dishes={dishes}
                     eventDishes={eventDishes}
                     events={events}
@@ -753,9 +774,6 @@ export function MyDayPage() {
                       </p>
                       <ul className="mt-3 flex flex-col gap-3">
                         {myScheduleNotices.map((notice) => {
-                          const canAcknowledge =
-                            notice.recipientAuthSubjectId != null &&
-                            notice.recipientAuthSubjectId === user?.id;
                           return (
                             <li
                               key={notice._id}
@@ -790,7 +808,7 @@ export function MyDayPage() {
                                   Acknowledged {dayLabel(notice.acknowledgedAt)}{" "}
                                   at {timeLabel(notice.acknowledgedAt)}
                                 </p>
-                              ) : canAcknowledge ? (
+                              ) : (
                                 <button
                                   className={BLOCK_BTN}
                                   data-testid="acknowledge-schedule-action"
@@ -811,11 +829,6 @@ export function MyDayPage() {
                                     ? "Acknowledging…"
                                     : "Acknowledge schedule"}
                                 </button>
-                              ) : (
-                                <p className="schedule-notice-link-help">
-                                  Ask a manager to link this staff profile to
-                                  your sign-in before acknowledging.
-                                </p>
                               )}
                             </li>
                           );
@@ -831,8 +844,8 @@ export function MyDayPage() {
               <Section title="Pack list items" count={openPackItems.length}>
                 {openPackItems.length === 0 ? (
                   <EmptyState
-                    title="Nothing is waiting to be packed"
-                    hint="Items from active pack lists appear here when packing starts."
+                    title="No packing items for your shifts"
+                    hint="Active packing lists for events you're working today appear here."
                   />
                 ) : (
                   <ul className="flex flex-col divide-y divide-line-2 px-4">

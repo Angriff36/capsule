@@ -160,7 +160,7 @@ enum AvailabilityWindowKind {
 }
 
 // One-shot availability interval for a Person. Workers declare/withdraw their
-// own windows via trusted user.id; managers may act for others.
+// own windows via the trusted linked Person; managers may act for others.
 entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -183,9 +183,9 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["withdrawn"]
   transition status from "withdrawn" to []
 
-  default policy availabilityRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read availability windows"
-  default policy availabilityWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write availability through commands"
-  default policy availabilityExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute availability commands"
+  default policy availabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read availability windows"
+  default policy availabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write availability through commands"
+  default policy availabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute availability commands"
 
   command declare(
     personId: uuid,
@@ -198,7 +198,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard user.id != null
-    guard personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     constraint declarePersonMatch: personId == self.personId "Declare personId must match the seeded person reference"
     constraint declareDates: endsAt > startsAt "Availability end must be after its start"
     mutate personId = personId
@@ -223,7 +223,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     guard self.declaredAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "withdrawn"
     mutate withdrawnAt = now()
@@ -288,9 +288,9 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["withdrawn"]
   transition status from "withdrawn" to []
 
-  default policy recurringAvailabilityRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read recurring availability"
-  default policy recurringAvailabilityWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write recurring availability through commands"
-  default policy recurringAvailabilityExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute recurring availability commands"
+  default policy recurringAvailabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read recurring availability"
+  default policy recurringAvailabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write recurring availability through commands"
+  default policy recurringAvailabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute recurring availability commands"
 
   command declare(
     personId: uuid,
@@ -303,7 +303,7 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard user.id != null
-    guard personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     constraint declarePersonMatch: personId == self.personId "Declare personId must match the seeded person reference"
     constraint declareDayOfWeek: dayOfWeek >= 0 and dayOfWeek <= 6 "Day of week must be 0 (Sunday) through 6 (Saturday)"
     constraint declareMinutes: startMinute >= 0 and endMinute <= 1440 and endMinute > startMinute "Time band must fall within the day and end after it starts"
@@ -329,7 +329,7 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
     guard self.declaredAt != null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.personId == user.personId or (user.personId == null and self.personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     compute previousStatus = self.status
     mutate status = "withdrawn"
     mutate withdrawnAt = now()

@@ -1,0 +1,39 @@
+{
+  "name": "BBQ Chicken Brine",
+  "key": "82f670dcc90b3a8a717c4208146ee3b1e6c78928df9cc7d3726621c8628c0053",
+  "yieldQuantity": 1,
+  "yieldUnit": "batch",
+  "ingredients": [
+    {
+      "name": "Cooking Water",
+      "quantity": 2,
+      "unit": "quart",
+      "source": "work/recipes/BBQ_Chicken_Brine.txt; corroborated by work/recipes/IMG_20250821_172310473.jpg"
+    },
+    {
+      "name": "Kosher Salt",
+      "quantity": 2,
+      "unit": "tablespoon",
+      "source": "work/recipes/BBQ_Chicken_Brine.txt; corroborated by work/recipes/IMG_20250821_172310473.jpg"
+    },
+    {
+      "name": "Brown Sugar",
+      "quantity": 0.25,
+      "unit": "cup",
+      "source": "work/recipes/BBQ_Chicken_Brine.txt; corroborated by work/recipes/IMG_20250821_172310473.jpg"
+    },
+    {
+      "name": "Spice - Thyme",
+      "quantity": 1,
+      "unit": "tablespoon",
+      "source": "work/recipes/BBQ_Chicken_Brine.txt; corroborated by work/recipes/IMG_20250821_172310473.jpg"
+    },
+    {
+      "name": "Garlic",
+      "quantity": 1,
+      "unit": "tablespoon",
+      "source": "work/recipes/BBQ_Chicken_Brine.txt; corroborated by work/recipes/IMG_20250821_172310473.jpg"
+    }
+  ],
+  "instructions": "One batch is for 5 pounds of airline chicken breast.\nBring 2 cups of the measured water to a boil and thoroughly dissolve the salt and sugar.\nCombine with the remaining cold water, fresh whole garlic cloves, and thyme.\nPour over the chicken, completely submerging it."
+}

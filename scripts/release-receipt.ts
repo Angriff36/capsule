@@ -32,16 +32,11 @@ import {
   type ReleaseReceiptInput,
 } from "../src/lib/releaseReceipt";
 import type { DeploymentConfigReport } from "../src/lib/deploymentConfigCheck";
+import { inspectVercelDeployment } from "./vercelInspectDeployment";
 
 /** Owner deployment map (CLAUDE.md): capsule production Convex deployment. */
 const DEFAULT_EXPECTED_DEPLOYMENT = "impartial-mule-193";
 const COMMAND_DISPATCH_COUNT_PATTERN = /\bref: api\./g;
-const NON_TERMINAL_READY_STATES = new Set([
-  "QUEUED",
-  "BUILDING",
-  "INITIALIZING",
-]);
-
 interface Options {
   sha?: string;
   url?: string;
@@ -124,55 +119,6 @@ function run(
   });
   if (result.error || result.stdout == null) return null;
   return { stdout: result.stdout, status: result.status };
-}
-
-const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
-
-async function vercelInspect(
-  url: string,
-  waitSeconds: number,
-): Promise<ReleaseReceiptInput["vercel"]["deployment"]> {
-  const tokenArgs = process.env.VERCEL_TOKEN
-    ? ["-t", process.env.VERCEL_TOKEN]
-    : [];
-  const inspect = () =>
-    run("vercel", ["inspect", url, "--json", ...tokenArgs], 60_000);
-  const parse = (stdout: string): Record<string, unknown> | null => {
-    try {
-      return JSON.parse(stdout) as Record<string, unknown>;
-    } catch {
-      return null;
-    }
-  };
-  let latest = inspect();
-  const deadline = Date.now() + waitSeconds * 1000;
-  while (latest && waitSeconds > 0) {
-    const state = parse(latest.stdout)?.readyState;
-    if (typeof state !== "string" || !NON_TERMINAL_READY_STATES.has(state)) {
-      break;
-    }
-    if (Date.now() >= deadline) break;
-    await sleep(20_000);
-    latest = inspect();
-  }
-  if (!latest) return null;
-  const parsed = parse(latest.stdout);
-  if (!parsed) return null;
-  const meta = (parsed.meta ?? {}) as Record<string, unknown>;
-  const commitSha =
-    typeof meta.gitCommitSha === "string"
-      ? meta.gitCommitSha
-      : typeof meta.githubCommitSha === "string"
-        ? meta.githubCommitSha
-        : null;
-  return {
-    uid: typeof parsed.uid === "string" ? parsed.uid : null,
-    url: typeof parsed.url === "string" ? parsed.url : null,
-    readyState:
-      typeof parsed.readyState === "string" ? parsed.readyState : null,
-    commitSha,
-  };
 }
 
 async function probeCommandRegistry(canonicalUrl: string): Promise<{
@@ -335,7 +281,11 @@ async function main(argv: readonly string[]): Promise<number> {
     null;
 
   const deployment = options.url
-    ? await vercelInspect(options.url, options.waitSeconds)
+    ? await inspectVercelDeployment(
+        options.url,
+        options.waitSeconds,
+        integratedSha,
+      )
     : null;
   const workflow = options.url
     ? await probeCommandRegistry(options.url)

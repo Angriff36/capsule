@@ -16,6 +16,12 @@ import {
 } from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import {
+  CandidateEmailMismatchNotice,
+  type CandidateEmailMismatch,
+} from "./CandidateEmailMismatchNotice";
+import { CandidateRevokeHireControl } from "./CandidateRevokeHireControl";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -72,6 +78,10 @@ export function CandidatesPage() {
   const candidates = useListCandidate();
   const interviews = useListInterview();
   const people = useListPerson();
+  const authStatus = useAuthStatus();
+  const viewerIsAdmin = ["admin", "owner", "system"].includes(
+    authStatus?.role ?? "",
+  );
 
   const createCandidate = useCreateCandidate();
   const advance = useCandidateAdvance();
@@ -90,6 +100,9 @@ export function CandidatesPage() {
     text: string;
     tone: "ok" | "warn";
   } | null>(null);
+  // A hired candidate whose row email drifted from the linked profile (#270).
+  const [emailMismatch, setEmailMismatch] =
+    useState<CandidateEmailMismatch | null>(null);
   // Candidates whose matched profile is INACTIVE: the next Hire click carries
   // explicit restore intent ("Restore and resend").
   const [restoreReady, setRestoreReady] = useState<Set<string>>(new Set());
@@ -193,6 +206,7 @@ export function CandidatesPage() {
   }) => {
     setFailure(null);
     setNotice(null);
+    setEmailMismatch(null);
     setBusy(true);
     const linkedPerson =
       candidate.hiredPersonId != null
@@ -222,6 +236,15 @@ export function CandidatesPage() {
         setNotice({
           text: `Hired ${candidate.fullName}. The candidate has no usable email, so no sign-in could be created — add them under Administration → Permissions → Team roles.`,
           tone: "warn",
+        });
+        return;
+      }
+      if (result.kind === "email_mismatch") {
+        setEmailMismatch({
+          candidateName: candidate.fullName,
+          personId: result.personId,
+          personEmail: result.personEmail,
+          candidateEmail: result.candidateEmail,
         });
         return;
       }
@@ -332,6 +355,31 @@ export function CandidatesPage() {
         >
           {notice.text}
         </output>
+      ) : null}
+      {emailMismatch ? (
+        <CandidateEmailMismatchNotice
+          mismatch={emailMismatch}
+          onError={setFailure}
+          onResolved={(warning) => {
+            const pending = emailMismatch;
+            setEmailMismatch(null);
+            if (warning) {
+              setNotice({ text: warning, tone: "warn" });
+              return;
+            }
+            const candidate = liveCandidates.find(
+              (row) => row.hiredPersonId === pending.personId,
+            );
+            if (candidate) {
+              void hireCandidate({
+                _id: candidate._id,
+                fullName: candidate.fullName,
+                version: candidate.version,
+                hiredPersonId: candidate.hiredPersonId,
+              });
+            }
+          }}
+        />
       ) : null}
 
       {/* KM interview-tool import (spec §9.3 "map the KM JSON into the model"). */}
@@ -467,6 +515,21 @@ export function CandidatesPage() {
                   </div>
                 </div>
 
+                {candidate.stage === "hired" &&
+                candidate.hiredPersonId != null ? (
+                  <CandidateRevokeHireControl
+                    candidateId={candidate._id}
+                    candidateName={candidate.fullName}
+                    version={candidate.version}
+                    canTerminate={viewerIsAdmin}
+                    busy={busy}
+                    onDone={(text) => {
+                      setFailure(null);
+                      setNotice({ text, tone: "warn" });
+                    }}
+                    onError={setFailure}
+                  />
+                ) : null}
                 <div className="supply-form-grid">
                   <label className="field-label">
                     Move to stage
@@ -493,10 +556,15 @@ export function CandidatesPage() {
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      disabled={busy || candidate.hiredPersonId != null}
+                      disabled={
+                        busy ||
+                        (candidate.stage === "hired" &&
+                          candidate.hiredPersonId != null)
+                      }
                       title={
+                        candidate.stage === "hired" &&
                         candidate.hiredPersonId != null
-                          ? "Reopening is disabled while a team profile is linked (issue #269). Change their status under Administration → Permissions → Team roles."
+                          ? "This hire has a team profile — use Revoke hire above so their profile is handled in the same step."
                           : undefined
                       }
                       onClick={(e) => {
@@ -516,13 +584,6 @@ export function CandidatesPage() {
                     >
                       Move
                     </button>
-                    {candidate.hiredPersonId != null ? (
-                      <p className="text-sm text-ink-2 mt-2">
-                        Reopening is disabled while a team profile is linked
-                        (issue #269). Change their status under Administration →
-                        Permissions → Team roles.
-                      </p>
-                    ) : null}
                   </label>
                   <label className="field-label">
                     Rejection note (optional)

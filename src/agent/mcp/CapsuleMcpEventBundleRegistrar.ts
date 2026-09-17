@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { z } from "zod";
+import { suggestCatalogMatches } from "../CapsuleEventBundleCatalogMatch";
 import { CapsuleEventBundleCoordinator } from "../CapsuleEventBundleCoordinator";
 import type { CapsuleEventBundleContext } from "../CapsuleEventBundleExistingState";
 import { CapsuleEventBundleStateLoader } from "../CapsuleEventBundleStateLoader";
@@ -10,6 +11,7 @@ import {
   loadEventBundle,
   type EventBundleFile,
 } from "../../lib/tppReports/loadEventBundle";
+import type { EventBundle } from "../../lib/tppReports/eventBundle";
 import { CapsuleMcpTextResult } from "./CapsuleMcpTextResult";
 
 /**
@@ -51,6 +53,7 @@ export class CapsuleMcpEventBundleRegistrar {
   ) {}
 
   private async context(
+    bundle: EventBundle,
     eventId: string | undefined,
     readTenant: boolean,
   ): Promise<CapsuleEventBundleContext> {
@@ -59,6 +62,13 @@ export class CapsuleMcpEventBundleRegistrar {
     context.directory = await this.stateLoader.loadDirectory();
     if (eventId !== undefined) {
       context.existing = await this.stateLoader.loadExisting(eventId);
+    } else {
+      // A bundle for a client, venue or dish already in Capsule reuses the
+      // record (exact name) instead of registering a twin (#241).
+      context.catalog = suggestCatalogMatches(
+        bundle,
+        await this.stateLoader.loadCatalogCandidates(),
+      );
     }
     return context;
   }
@@ -86,7 +96,7 @@ export class CapsuleMcpEventBundleRegistrar {
         );
         const preview = new CapsuleEventBundleCoordinator(
           this.executor,
-        ).preview(bundle, await this.context(existingEventId, true));
+        ).preview(bundle, await this.context(bundle, existingEventId, true));
 
         return this.text.format({
           ok: true,
@@ -127,8 +137,9 @@ export class CapsuleMcpEventBundleRegistrar {
           this.executor,
         ).enter({
           bundle,
+          tenantId: await this.stateLoader.loadTenantId(),
           acceptWarnings,
-          context: await this.context(existingEventId, true),
+          context: await this.context(bundle, existingEventId, true),
         });
 
         return this.text.format({

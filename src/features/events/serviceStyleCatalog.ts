@@ -1,7 +1,11 @@
 /**
- * Canonical Service Style vocabulary (TPP master + Josh's four styles).
- * Shared by the create-event picker fallback and scripts/seed-catalogs.ts
- * so the UI never invents a parallel enum.
+ * Canonical Service Style vocabulary: Josh's four umbrella styles first (the
+ * TPP migration mapping; Event timing hints key off "Full Service" /
+ * "Limited Service"), then the granular styles TPP actually writes on a BEO
+ * (#368 item 8 — "Buffet - Cook Onsite" was being flattened to "Full Service"
+ * and the fact that it is a buffet cooked on site was lost). Shared by the
+ * create-event picker fallback, the Admin → Catalogs "Add the standard list"
+ * button and scripts/seed-catalogs.ts so the UI never invents a parallel enum.
  */
 export type ServiceStyleCatalogRow = {
   name: string;
@@ -33,6 +37,49 @@ export const SERVICE_STYLE_CATALOG: readonly ServiceStyleCatalogRow[] = [
     code: "vending",
     description:
       "Vending and food-truck service. TPP: Vending, Food Truck Window.",
+  },
+  // Granular TPP styles — what the BEO actually says. Pick one of these when
+  // the umbrella style above would lose the detail the kitchen needs.
+  {
+    name: "Buffet – Cook Onsite",
+    code: "buffet-cook-onsite",
+    description: "Buffet service, food cooked at the venue. TPP: C.O.S.",
+  },
+  {
+    name: "Buffet – Bring Hot",
+    code: "buffet-bring-hot",
+    description: "Buffet service, food arrives hot from the kitchen. TPP: B.H.",
+  },
+  {
+    name: "Plated",
+    code: "plated",
+    description: "Seated, plated courses served by staff. TPP: Plate.",
+  },
+  {
+    name: "Family Style",
+    code: "family-style",
+    description: "Shared platters brought to each table. TPP: Fam.",
+  },
+  {
+    name: "Private Chef",
+    code: "private-chef",
+    description: "Chef cooks and serves in the client's space. TPP: P.C.",
+  },
+  {
+    name: "Action Station",
+    code: "action-station",
+    description: "Chef-attended stations finished in front of guests.",
+  },
+  {
+    name: "Ready To Heat",
+    code: "ready-to-heat",
+    description:
+      "Delivered cold with reheating instructions. TPP: Ready To Heat - CPU / Delivery.",
+  },
+  {
+    name: "Pickup",
+    code: "pickup",
+    description: "Client collects from the kitchen. TPP: Pickup.",
   },
 ];
 

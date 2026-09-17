@@ -178,6 +178,29 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Automatic stand-down never changes completed logistics history.
+  command standDownWithEvent() {
+    guard self.status == "scheduled" or self.status == "in_transit"
+    guard self.deletedAt == null
+    // The parent event cancellation supplies the authorization and reason.
+    guard self.event != null and self.event.stage == "cancelled"
+    compute reason = self.event.cancellationReason != null ? self.event.cancellationReason : "Event cancelled"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit DeliveryCancelled {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.eventId
+      driverId: self.driverId
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
   store Delivery in durable
 }
 
@@ -259,9 +282,8 @@ event DeliveryVehicleUnassigned: "delivery.vehicle_unassigned" {
 }
 
 // EventCancelled → cancel scheduled/in-transit deliveries for that event.
-on EventCancelled fanOut Delivery where eventId = payload.eventId
-  run cancel
-  params { reason: payload.reason }
+// The transactional operational callback selects unfinished records before
+// invoking Delivery.standDownWithEvent. Settled history is not mutated.
 
 // Vision cascade: packed pack list ensures one Delivery schedule (match else create).
 on PackListPacked run Delivery.schedule

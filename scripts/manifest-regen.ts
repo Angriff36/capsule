@@ -4,6 +4,8 @@ import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
+import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
+import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -23,6 +25,7 @@ export function builderEntrypoint(): string {
 }
 
 export function runBuilder(args: string[]): number {
+  new ManifestLineEndingNormalizer(CAPSULE_ROOT).normalize();
   const result = spawnSync(process.execPath, [builderEntrypoint(), ...args], {
     stdio: "inherit",
     cwd: CAPSULE_ROOT,
@@ -30,17 +33,21 @@ export function runBuilder(args: string[]): number {
   return result.status ?? 1;
 }
 
-if (import.meta.main) {
-  const passthrough = process.argv.slice(2);
+export function regenerate(passthrough: string[] = []): number {
   const status = runBuilder(["generate", "convex", "--apply", ...passthrough]);
-  if (status !== 0) process.exit(status);
+  if (status !== 0) return status;
   // Builder emits checkRole(user.role). Re-apply org capability enforcement
-  // and refresh ownership digests so `bun run check` stays green.
-  const touched = applyOrgCapabilityCheckRole(CAPSULE_ROOT);
+  // and the service-style reference guard, refreshing ownership digests.
+  const touched = [
+    ...applyOrgCapabilityCheckRole(CAPSULE_ROOT),
+    ...applyEventServiceStyleReferenceGuard(CAPSULE_ROOT),
+  ];
   if (touched.length > 0) {
     console.log(
-      `manifest-regen: applied org-capability checkRole patch (${touched.join(", ")})`,
+      `manifest-regen: applied generated runtime patches (${touched.join(", ")})`,
     );
   }
-  process.exit(0);
+  return 0;
 }
+
+if (import.meta.main) process.exit(regenerate(process.argv.slice(2)));

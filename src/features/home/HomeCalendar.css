@@ -1,0 +1,452 @@
+/* Home calendar. Lock colours are the app's own state palette: open = graphite,
+   approved = info blue, locked = brand orange, live = ok green, done = mute,
+   cancelled = danger. One variable per status keeps chip, legend, pill and
+   tooltip in step. */
+.home-cal,
+.event-tracker {
+  --lock-open: var(--color-ink-3);
+  --lock-open-soft: var(--color-mute-soft);
+  --lock-approved: var(--color-info);
+  --lock-approved-soft: var(--color-info-soft);
+  --lock-locked: var(--color-brand);
+  --lock-locked-soft: var(--color-brand-soft);
+  --lock-live: var(--color-ok);
+  --lock-live-soft: var(--color-ok-soft);
+  --lock-done: var(--color-ink-3);
+  --lock-done-soft: var(--color-inset);
+  --lock-cancelled: var(--color-danger);
+  --lock-cancelled-soft: var(--color-danger-soft);
+}
+
+.home-cal {
+  padding-bottom: 2.5rem;
+}
+
+[data-lock="open"] {
+  --lock: var(--lock-open);
+  --lock-soft: var(--lock-open-soft);
+}
+[data-lock="approved"] {
+  --lock: var(--lock-approved);
+  --lock-soft: var(--lock-approved-soft);
+}
+[data-lock="locked"] {
+  --lock: var(--lock-locked);
+  --lock-soft: var(--lock-locked-soft);
+}
+[data-lock="live"] {
+  --lock: var(--lock-live);
+  --lock-soft: var(--lock-live-soft);
+}
+[data-lock="done"] {
+  --lock: var(--lock-done);
+  --lock-soft: var(--lock-done-soft);
+}
+[data-lock="cancelled"] {
+  --lock: var(--lock-cancelled);
+  --lock-soft: var(--lock-cancelled-soft);
+}
+
+.home-cal-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  padding: 0.125rem;
+  background: var(--color-panel);
+}
+
+.home-cal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.375rem 1rem;
+  margin-top: 1.25rem;
+  padding: 0.625rem 0;
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.home-cal-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-pill);
+  padding: 0.125rem 0.5rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink-3);
+  transition:
+    color 120ms ease,
+    background 120ms ease;
+}
+.home-cal-legend-item[data-active] {
+  color: var(--color-ink);
+}
+.home-cal-legend-item[aria-pressed="true"] {
+  background: var(--lock-soft);
+}
+.home-cal-legend-item > i {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--lock);
+  opacity: 0.35;
+}
+.home-cal-legend-item[data-active] > i {
+  opacity: 1;
+}
+
+.home-cal-grid {
+  margin-top: 1rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ledger);
+  overflow: hidden;
+  background: var(--color-panel);
+}
+
+.home-cal-weekdays,
+.home-cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.home-cal-weekdays > div {
+  padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-inset);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.home-cal-week + .home-cal-week {
+  border-top: 1px solid var(--color-line);
+}
+
+.home-cal-day {
+  display: flex;
+  flex-direction: column;
+  min-height: 8.25rem;
+  min-width: 0;
+  padding: 0.375rem;
+}
+.home-cal-day + .home-cal-day {
+  border-left: 1px solid var(--color-line);
+}
+.home-cal-day[data-out] {
+  background: var(--color-inset);
+}
+.home-cal-day[data-out] .home-cal-day-head > span {
+  color: var(--color-ink-3);
+}
+.home-cal-day[data-today] {
+  box-shadow: inset 0 0 0 2px var(--color-brand);
+}
+.home-cal-day[data-today] .home-cal-day-head > span {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+
+.home-cal-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.125rem 0.25rem;
+}
+.home-cal-day-head > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.home-cal-day-head > small {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-3);
+}
+
+.home-cal-day-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.home-cal-chip {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.125rem 0.375rem 0.125rem 0.3rem;
+  background: var(--lock-soft);
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    transform 120ms ease;
+}
+.home-cal-chip:hover,
+.home-cal-chip:focus-visible {
+  border-color: var(--lock);
+}
+.home-cal-chip[data-selected] {
+  border-color: var(--lock);
+  box-shadow: 0 0 0 2px var(--lock-soft);
+}
+.home-cal-chip[data-lock="cancelled"] .home-cal-chip-title {
+  text-decoration: line-through;
+  color: var(--color-ink-3);
+}
+.home-cal-chip[data-continues] {
+  opacity: 0.8;
+}
+.home-cal-chip > i {
+  width: 0.375rem;
+  height: 1.05rem;
+  border-radius: var(--radius-pill);
+  background: var(--lock);
+}
+.home-cal-chip-time {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
+.home-cal-chip-title {
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-cal-more {
+  align-self: flex-start;
+  padding: 0 0.3rem;
+  font-size: var(--text-sm);
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.home-cal-unscheduled {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+/* Tooltip: fixed so a chip on the last row never clips inside the grid. */
+.home-cal-tooltip {
+  position: fixed;
+  z-index: 60;
+  max-width: calc(100vw - 16px);
+  border: 1px solid var(--color-line-2);
+  border-top: 3px solid var(--lock);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.875rem;
+  background: var(--color-panel);
+  box-shadow: 0 16px 40px -16px rgb(15 15 17 / 0.4);
+  pointer-events: auto;
+}
+.home-cal-tooltip-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.375rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.home-cal-tooltip-head > strong {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  line-height: 1.15;
+  color: var(--color-ink);
+}
+.home-cal-lock-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  padding: 0.125rem 0.5rem;
+  background: var(--lock);
+  color: var(--color-on-brand);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.home-cal-tooltip-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(15rem, 1.1fr);
+  gap: 0.75rem 1rem;
+}
+.home-cal-tooltip dl {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+.home-cal-tooltip dl > div {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr);
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+}
+.home-cal-tooltip dt {
+  color: var(--color-ink-3);
+}
+.home-cal-tooltip dd {
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+.home-cal-tooltip-select {
+  width: 100%;
+  min-width: 0;
+  height: 2rem;
+  padding-inline: 0.5rem;
+  font-size: var(--text-xs);
+}
+.home-cal-tooltip-vehicles {
+  min-width: 0;
+  border-left: 1px solid var(--color-line);
+  padding-left: 1rem;
+}
+.home-cal-tooltip-vehicles > ul {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+.home-cal-tooltip-vehicles li {
+  display: grid;
+  gap: 0.25rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--color-line);
+}
+.home-cal-tooltip-vehicles li > span {
+  overflow: hidden;
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-cal-tooltip-note {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+.home-cal-tooltip-error {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+.home-cal-tooltip-reports {
+  min-width: 0;
+  border-left: 1px solid var(--color-line);
+  padding-left: 1rem;
+}
+.home-cal-tooltip-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.home-cal-tooltip-section-head strong {
+  color: var(--color-ink);
+  font-size: var(--text-sm);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.home-cal-tooltip-section-head span {
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.home-cal-tooltip-reports > ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 0.75rem;
+}
+.home-cal-tooltip-reports li {
+  display: grid;
+  min-width: 0;
+  gap: 0.3rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--color-line);
+}
+.home-cal-tooltip-reports li > span {
+  overflow: hidden;
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.home-cal-tooltip-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+.home-cal-tooltip-actions .btn {
+  min-width: 0;
+  padding-inline: 0.4rem;
+}
+.home-cal-tooltip-reports > p {
+  margin-top: 0.5rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .home-cal-tooltip-body {
+    grid-template-columns: 1fr;
+  }
+  .home-cal-tooltip-reports {
+    border-top: 1px solid var(--color-line);
+    border-left: none;
+    padding-top: 0.75rem;
+    padding-left: 0;
+  }
+  .home-cal-tooltip-vehicles {
+    border-top: 1px solid var(--color-line);
+    border-left: none;
+    padding-top: 0.75rem;
+    padding-left: 0;
+  }
+  .home-cal-day {
+    min-height: 5.5rem;
+  }
+  .home-cal-chip-time {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-cal-chip,
+  .home-cal-legend-item,
+  .tracker-lane,
+  .tracker-card {
+    transition: none;
+  }
+}

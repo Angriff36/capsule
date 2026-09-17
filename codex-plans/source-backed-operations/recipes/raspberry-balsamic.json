@@ -1,0 +1,58 @@
+{
+  "name": "Salad Dressing - Raspberry Balsamic Vinaigrette",
+  "key": "700eb26d3c99bf320a4b867887d31f172a19f554c09f0fc9874a387dbca38e07",
+  "yieldQuantity": 3,
+  "yieldUnit": "quart",
+  "quantityPerServing": 0.0625,
+  "ingredients": [
+    {
+      "name": "Raspberry Jam",
+      "quantity": 0.75,
+      "unit": "quart",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 24 Oz - Fld"
+    },
+    {
+      "name": "Balsamic Vinegar",
+      "quantity": 1,
+      "unit": "cup",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 1 Cup - Fld"
+    },
+    {
+      "name": "Red Wine Vinegar",
+      "quantity": 0.5,
+      "unit": "cup",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 1/2 Cup"
+    },
+    {
+      "name": "Honey",
+      "quantity": 1,
+      "unit": "cup",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 1 Cup"
+    },
+    {
+      "name": "Spice - Cinnamon",
+      "quantity": 1,
+      "unit": "tablespoon",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 1 Tblsp - Dry"
+    },
+    {
+      "name": "Lemon Juice",
+      "quantity": 1,
+      "unit": "tablespoon",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 1 Tblsp - Fld"
+    },
+    {
+      "name": "Eggs",
+      "quantity": 6,
+      "unit": "each",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 6 Each"
+    },
+    {
+      "name": "Olive Oil",
+      "quantity": 1.5,
+      "unit": "quart",
+      "source": "Salad_Dressing.xlsx sheet1 rows343-350; 1 1/2 Quart"
+    }
+  ],
+  "instructions": "Combine all ingredients except oils and mix with an immersion blender. Slowly add oils while continuing to mix."
+}

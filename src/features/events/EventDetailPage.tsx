@@ -9,6 +9,7 @@ import {
   normalizeCurrencyCode,
   relativeDays,
 } from "../../lib/format";
+import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
@@ -32,12 +33,16 @@ import {
   useListClient,
   useListOrganization,
   useListDish,
-  useListEventAssignment,
   useListEventDish,
   useListEventTimelineActivity,
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import {
+  useEventAssignmentRows,
+  useEventShiftRows,
+  useEventStaffNeedRows,
+} from "../../lib/eventScopedQueries";
 import { useTrackRecent } from "../../lib/recents";
 import {
   ArrowLeftIcon,
@@ -48,6 +53,7 @@ import {
   UsersIcon,
 } from "../../ui/icons";
 import { MapPinIcon, TagIcon } from "./eventDetailIcons";
+import { eventVenueLabel } from "./eventVenueLabel";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import {
@@ -87,6 +93,7 @@ import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
 import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
+import { EventTimelineStaffRoster } from "./eventTimelineStaffRoster";
 import { FailureBanner } from "./FailureBanner";
 import { MobileEventOverview } from "./mobile/MobileEventOverview";
 import { RecurringEventPanel } from "./RecurringEventPanel";
@@ -96,6 +103,7 @@ import {
   parseEventDetailTab,
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
+import type { Doc } from "../../lib/api";
 
 function HeroFact({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -112,15 +120,46 @@ function HeroFact({ label, children }: { label: string; children: ReactNode }) {
 
 export function EventDetailPage() {
   const { id } = useParams();
+  const event = useRouteRecord(useGetEvent, id);
+  const { loadingTooLong } = useSlowQuery(event);
+
+  if (event === undefined) {
+    return (
+      <QueryLoadState
+        title="Event data is not loading"
+        detail="The workspace did not return this event. Check the session or backend connection, then retry."
+        loadingTooLong={loadingTooLong}
+      />
+    );
+  }
+  if (event === null || event.deletedAt != null) {
+    return (
+      <ErrorState
+        title="Event unavailable"
+        detail="It may not exist, may have been deleted, or your role may not permit access."
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
+
+  return <EventDetailContent event={event} id={id} />;
+}
+
+function EventDetailContent({
+  event,
+  id,
+}: {
+  event: Doc<"events">;
+  id: string | undefined;
+}) {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
-  const event = useRouteRecord(useGetEvent, id);
   const mobile = useMobileViewport();
   // Phones get the nine-card overview; `full=1` opens the desktop overview
   // (edit panels, planning notes) on a phone via "Edit" / "See all".
   const mobileOverview =
     mobile && activeTab === "overview" && searchParams.get("full") !== "1";
-  const clients = useListClient();
+  const clients = useHeldQueryRows("clients", useListClient());
   const organizations = useListOrganization();
   // Same functional-currency rule as the phone Money card and Finance.
   const currencyCode = normalizeCurrencyCode(
@@ -132,12 +171,18 @@ export function EventDetailPage() {
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
-  const dishes = useListDish();
-  const eventAssignments = useListEventAssignment();
-  const eventDishes = useListEventDish();
-  const timelineActivities = useListEventTimelineActivity();
-  const people = useListPerson();
-  const venues = useListVenue();
+  const dishes = useHeldQueryRows("dishes", useListDish());
+  const eventId = event?._id ?? "skip";
+  const eventAssignments = useEventAssignmentRows(eventId);
+  const staffNeeds = useEventStaffNeedRows(eventId);
+  const shifts = useEventShiftRows(eventId);
+  const eventDishes = useHeldQueryRows("eventDishes", useListEventDish());
+  const timelineActivities = useHeldQueryRows(
+    "eventTimelineActivities",
+    useListEventTimelineActivity(),
+  );
+  const people = useHeldQueryRows("people", useListPerson());
+  const venues = useHeldQueryRows("venues", useListVenue());
   const { branding } = useTenantBranding();
   const submitForApproval = useEventSubmitForApproval();
   const approve = useEventApprove();
@@ -163,27 +208,6 @@ export function EventDetailPage() {
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
-  const { loadingTooLong } = useSlowQuery(event);
-
-  if (event === undefined) {
-    return (
-      <QueryLoadState
-        title="Event data is not loading"
-        detail="The workspace did not return this event. Check the session or backend connection, then retry."
-        loadingTooLong={loadingTooLong}
-      />
-    );
-  }
-  if (event === null || event.deletedAt != null) {
-    return (
-      <ErrorState
-        title="Event unavailable"
-        detail="It may not exist, may have been deleted, or your role may not permit access."
-        onRetry={() => window.location.reload()}
-      />
-    );
-  }
-
   const version = typeof event.version === "number" ? event.version : undefined;
   const canRevise = eventLifecyclePolicy.isEditableStage(String(event.stage));
   const canChangeHeadcount = eventLifecyclePolicy.canChangeHeadcount(
@@ -202,6 +226,12 @@ export function EventDetailPage() {
       venue.deletedAt == null,
   );
   const venue = venues?.find((row) => row._id === event.venueId);
+  const venueLabel = eventVenueLabel({
+    venueId: event.venueId,
+    venueName: event.venueName,
+    venue,
+    venuesLoading: venues === undefined,
+  });
 
   const setTab = (tab: EventDetailTab) => {
     const next = new URLSearchParams(searchParams);
@@ -253,11 +283,20 @@ export function EventDetailPage() {
     (action) => action !== primaryAction && action.kind !== "danger",
   );
   const dangerActions = lifecycle.filter((action) => action.kind === "danger");
+  const staffingRoster = EventTimelineStaffRoster.staffingRosterEntries({
+    eventId: event._id,
+    assignments: eventAssignments,
+    staffNeeds,
+    shifts,
+    people,
+  });
   const beoReady =
     !busy &&
     clients !== undefined &&
     dishes !== undefined &&
     eventAssignments !== undefined &&
+    staffNeeds !== undefined &&
+    shifts !== undefined &&
     eventDishes !== undefined &&
     people !== undefined &&
     timelineActivities !== undefined;
@@ -295,17 +334,7 @@ export function EventDetailPage() {
           activity.scheduledAt != null &&
           activity.deletedAt == null,
       ),
-      staff: (eventAssignments ?? [])
-        .filter(
-          (assignment) =>
-            assignment.deletedAt == null &&
-            assignment.eventId === event._id &&
-            assignment.status !== "unassigned",
-        )
-        .map((assignment) => ({
-          assignment,
-          person: people?.find((person) => person._id === assignment.personId),
-        })),
+      staff: staffingRoster,
       branding,
     })
       .then(() => {
@@ -321,12 +350,8 @@ export function EventDetailPage() {
       selection.deletedAt == null &&
       selection.removedAt == null,
   ).length;
-  const staffCount = (eventAssignments ?? []).filter(
-    (assignment) =>
-      assignment.eventId === event._id &&
-      assignment.deletedAt == null &&
-      assignment.status !== "unassigned",
-  ).length;
+  const staffCount = new Set(staffingRoster.map((entry) => entry.personId))
+    .size;
   const timelineCount = (timelineActivities ?? []).filter(
     (activity) => activity.eventId === event._id && activity.deletedAt == null,
   ).length;
@@ -452,9 +477,7 @@ export function EventDetailPage() {
             <HeroFact label="Headcount">
               {formatCount(event.expectedHeadcount)} guests
             </HeroFact>
-            <HeroFact label="Venue">
-              {venue ? venue.name : "No venue yet"}
-            </HeroFact>
+            <HeroFact label="Venue">{venueLabel}</HeroFact>
             <HeroFact label="Client">
               {clientDisplayName(event.clientId, clients)}
             </HeroFact>
@@ -464,7 +487,7 @@ export function EventDetailPage() {
             {formatMoney(event.budgetAmount, currencyCode)} /{" "}
             {formatMoney(event.quotedPrice, currencyCode)}
           </p>
-          <div className="mobile-actions mt-4 flex items-center gap-2">
+          <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
             {headerActions}
           </div>
         </section>
@@ -521,7 +544,7 @@ export function EventDetailPage() {
                       {venue.name}
                     </Link>
                   ) : (
-                    "No venue yet"
+                    venueLabel
                   )}
                 </span>
                 <span className="inline-flex items-center gap-1.5">
@@ -619,7 +642,7 @@ export function EventDetailPage() {
             dishes={dishes}
             eventDishes={eventDishes}
             activities={timelineActivities}
-            assignments={eventAssignments}
+            staffingRoster={staffingRoster}
             people={people}
           />
         </EventTabErrorBoundary>
@@ -709,7 +732,7 @@ export function EventDetailPage() {
             primaryContactName={event.primaryContactName}
             primaryContactEmail={event.primaryContactEmail}
             primaryContactPhone={event.primaryContactPhone}
-            accessibilityNeeds={event.accessibilityNeeds}
+            accessibilityNeeds={event.accessibilityNeeds?.join(", ")}
             serviceRequirements={event.serviceRequirements}
             operationalRequirements={event.operationalRequirements}
           />
@@ -757,7 +780,7 @@ export function EventDetailPage() {
             recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
             recurrenceNextStartsAt={event.recurrenceNextStartsAt}
             recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-            recurrenceActive={event.recurrenceActive}
+            recurrenceActive={event.recurrenceActive ?? undefined}
             recurrenceStoppedAt={event.recurrenceStoppedAt}
             recurrenceCompletedAt={event.recurrenceCompletedAt}
             recurrenceTemplateEventId={event.recurrenceTemplateEventId}

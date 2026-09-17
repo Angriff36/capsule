@@ -1,0 +1,60 @@
+[
+  {
+    "name": "Whipped Butter",
+    "fingerprint": "bb79c52600478a4675cd20d1bd2b0ffcea70367732316cd1708646d1ed319aad",
+    "source": "TPP Side_Items.xlsx sheet1 rows664-679; one dry ounce ready whipped butter per portion",
+    "description": "One-ounce portion of whipped butter.",
+    "raw": "Whipped Butter\nRecipe Yields: | 1 Oz - Dry\nDescription:\nQty | Measure | Preparation | Ingredient\n1 | Oz - Dry | Portion whipped butter\nSub Recipes(s)\nPortion whipped butter\nYields: 1 Oz - Dry\nQty | Measure | Preparation | Ingredient\n1/16 | Pound | Whipped Butter ***",
+    "instructions": "Portion whipped butter.",
+    "yieldText": "1 Oz - Dry",
+    "portionSize": 1,
+    "portionUnit": "ounce",
+    "tasks": [
+      {
+        "name": "Portion whipped butter",
+        "quantity": 1,
+        "unit": "ounce",
+        "instructions": "Portion whipped butter."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Whipped Butter",
+        "quantity": 0.0625,
+        "unit": "pound",
+        "source": "Side_Items.xlsx sheet1 A679=1/16, B679=Pound, E679=Whipped Butter ***; portion at A671=1, B671=Oz - Dry"
+      }
+    ],
+    "components": [],
+    "notes": []
+  },
+  {
+    "name": "Green Onions",
+    "fingerprint": "a831df2ac76133c2c492de3bae1fdb7f51ae3f66f3e70825b8e548fa5a0fe969",
+    "source": "TPP Side_Dish.xlsx sheet1 rows1-16; half a dry ounce diced green onions per serving",
+    "description": "Half-ounce portion of diced green onions.",
+    "raw": "Green Onions\nRecipe Yields: | 1 Serving\nDescription:\nQty | Measure | Preparation | Ingredient\n1/2 | Oz - Dry | Dice and portion green onions\nSub Recipes(s)\nDice and portion green onions\nYields: 1/2 Oz - Dry\nQty | Measure | Preparation | Ingredient\n1/32 | Pound | Green Onions",
+    "instructions": "Dice and portion green onions.",
+    "yieldText": "1 Serving",
+    "portionSize": 0.5,
+    "portionUnit": "ounce",
+    "tasks": [
+      {
+        "name": "Dice and portion green onions",
+        "quantity": 0.5,
+        "unit": "ounce",
+        "instructions": "Dice and portion green onions."
+      }
+    ],
+    "ingredients": [
+      {
+        "name": "Green Onions",
+        "quantity": 0.03125,
+        "unit": "pound",
+        "source": "Side_Dish.xlsx sheet1 A16=1/32, B16=Pound, E16=Green Onions; A8=1/2, B8=Oz - Dry"
+      }
+    ],
+    "components": [],
+    "notes": []
+  }
+]

@@ -7,6 +7,7 @@ import {
 import { EventProposalEnhancementsCard } from "../clients/EventProposalEnhancementsCard";
 import { EventProposalSourceCard } from "../clients/EventProposalSourceCard";
 import { EventDetailsCard } from "./EventDetailsCard";
+import { EventInvoiceCard } from "./EventInvoiceCard";
 import type {
   EventLifecycleAction,
   EventLifecycleActionKey,
@@ -17,6 +18,8 @@ import { EventSetupProgress } from "./EventSetupProgress";
 import { EventStageActionsCard } from "./EventStageActionsCard";
 import { EventTimelineCommentsPanel } from "./EventTimelineCommentsPanel";
 import { EventWeatherPanel } from "./EventWeatherPanel";
+import { EventReviewFlagsSection } from "./review-flags/EventReviewFlagsSection";
+import { EventPacketPanel } from "./packet/EventPacketPanel";
 import { eventDetailPath } from "./eventRoutes";
 import "./EventOverview.css";
 
@@ -27,6 +30,8 @@ type OverviewEvent = {
   hasMenuDishes?: boolean;
   hasStaffAssigned?: boolean;
   eventType: string;
+  venueId?: Id<"venues"> | null;
+  venueName?: string | null;
   venueAddress?: string | null;
   occasionId?: Id<"occasions"> | null;
   serviceStyleId?: Id<"serviceStyles"> | null;
@@ -100,6 +105,8 @@ export function EventOverviewTab({
             busy={reviseProps.busy}
             onAction={onAction}
           />
+          <EventReviewFlagsSection eventId={eventId} />
+          <EventPacketPanel eventId={eventId} />
           <EventDetailsCard
             clientId={clientId}
             clients={clients}
@@ -108,6 +115,9 @@ export function EventOverviewTab({
             endsAt={endsAt}
             expectedHeadcount={expectedHeadcount}
             venue={venue}
+            venueId={event.venueId}
+            venueName={event.venueName}
+            venuesLoading={reviseProps.venuesLoading}
             venueAddress={event.venueAddress}
             occasionId={event.occasionId}
             serviceStyleId={event.serviceStyleId}
@@ -126,6 +136,7 @@ export function EventOverviewTab({
             marginHref={eventDetailPath(eventId, "margin")}
             locked={!reviseProps.canRevise}
           />
+          <EventInvoiceCard eventId={eventId} currencyCode={currencyCode} />
           <EventWeatherPanel venue={venue} />
         </div>
 

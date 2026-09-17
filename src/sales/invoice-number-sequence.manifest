@@ -1,0 +1,25 @@
+// Per-tenant high-water mark for auto-minted invoice numbers ("INV-<n>").
+// One row per tenant. Generated commands must not read or write these rows:
+// the authored numbering seam (convex/lib/invoiceNumbering.ts) is the only
+// owner, running inside the issuing command's transaction after that command's
+// own auth and role checks. The EventApproved cascade issues the placeholder
+// "INV-1" (autoNumbered); the seam mints lastNumber + 1, skipping any number
+// an invoice (live or deleted) has ever held, and advances this row, so a
+// deleted invoice's number is never re-issued and two concurrent issuances
+// cannot mint the same number (Convex OCC serializes the two writes to this
+// row). A tenant that predates the row starts at 0 — the seam never scans the
+// tenant's invoice history. An explicit or manually assigned "INV-<n>" above
+// the row moves it up.
+
+entity InvoiceNumberSequence mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+
+  property required lastNumber: int
+
+  default policy invoiceNumberSequenceRead read: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice number sequences are private implementation records"
+  default policy invoiceNumberSequenceWrite write: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice number sequences are managed only by the numbering seam"
+  default policy invoiceNumberSequenceExecute execute: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice number sequences expose no generated commands"
+
+  store InvoiceNumberSequence in durable
+}

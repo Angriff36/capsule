@@ -1,40 +1,5 @@
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
 import { EventMenuReservationSync } from "./EventMenuReservationSync";
-import { EventPrepCoordinator } from "./EventPrepCoordinator";
-
-type DishTaskRow = {
-  _id: string;
-  dishId: string;
-  name: string;
-  defaultQuantity?: number | null;
-  defaultUnit?: string | null;
-  category?: string | null;
-  taskType?: string | null;
-  sortOrder?: number | null;
-  componentId?: string | null;
-  ingredientId?: string | null;
-  instructions?: string | null;
-  status: string;
-};
-
-type PrepTaskRow = {
-  _id: string;
-  eventDishId: string;
-  eventId: string;
-  dishId?: string | null;
-  dishTaskId?: string | null;
-  name: string;
-  quantity: number;
-  unit: string;
-  ingredientId?: string | null;
-  ingredientDemandId?: string | null;
-  componentId?: string | null;
-  specialInstructions?: string | null;
-  isGenerated: boolean;
-  status: string;
-  version: number;
-  deletedAt?: number | null;
-};
 
 type DemandRow = {
   _id: string;
@@ -44,21 +9,6 @@ type DemandRow = {
   unit: string;
   status: string;
   version: number;
-  deletedAt?: number | null;
-};
-
-type IngredientRow = {
-  _id: string;
-  unit: string;
-  name?: string | null;
-};
-
-type DishIngredientRow = {
-  _id: string;
-  dishId: string;
-  ingredientId: string;
-  quantity: number;
-  unit: string;
   deletedAt?: number | null;
 };
 
@@ -102,48 +52,19 @@ type EventDishOverride = {
 };
 
 type Catalogs = {
-  dishTasks: readonly DishTaskRow[];
-  prepTasks: readonly PrepTaskRow[];
-  ingredients: readonly IngredientRow[];
   demands: readonly DemandRow[];
-  dishComponents: readonly {
-    dishId: string;
-    componentId: string;
-    deletedAt?: number | null;
-    attachedAt?: number | null;
-  }[];
-  components: readonly {
-    _id: string;
-    yieldQuantity: number;
-    batchMultiplier: number;
-    deletedAt?: number | null;
-  }[];
-  componentIngredients: readonly {
-    componentId: string;
-    ingredientId: string;
-    quantity: number;
-    unit: string;
-    deletedAt?: number | null;
-    addedAt?: number | null;
-  }[];
-  eventDishes: readonly {
-    _id: string;
-    eventId: string;
-    dishId: string;
-    quantityServings: number;
-    specialInstructions?: string | null;
-    deletedAt?: number | null;
-  }[];
   inventoryItems: readonly InventoryItemRow[];
   inventoryLots: readonly InventoryLotRow[];
   inventoryReservations: readonly InventoryReservationRow[];
-  dishIngredients: readonly DishIngredientRow[];
 };
 
 type Ports = {
-  // Convex mutation hooks are loosely typed at the call site.
-  createTask: (input: never) => Promise<{ docId: string }>;
-  refreshGeneratedTask: (input: never) => Promise<unknown>;
+  reconcilePrep: (eventDishId: string) => Promise<{
+    created: number;
+    updated: number;
+    unresolved: { name: string; reason: string }[];
+    notice?: string;
+  }>;
   createReservation: (input: {
     inventoryItemId: string;
     inventoryLotId?: string;
@@ -167,55 +88,24 @@ export class EventMenuSyncController {
   ) {}
 
   static requireCatalogs(input: {
-    dishTasks: readonly DishTaskRow[] | undefined;
-    prepTasks: readonly PrepTaskRow[] | undefined;
-    ingredients: readonly IngredientRow[] | undefined;
-    demands: readonly DemandRow[] | undefined;
-    dishComponents: Catalogs["dishComponents"] | undefined;
-    components: Catalogs["components"] | undefined;
-    componentIngredients: Catalogs["componentIngredients"] | undefined;
-    eventDishes: Catalogs["eventDishes"] | undefined;
-    inventoryItems: readonly InventoryItemRow[] | undefined;
-    inventoryLots: readonly InventoryLotRow[] | undefined;
-    inventoryReservations: readonly InventoryReservationRow[] | undefined;
-    dishIngredients: readonly DishIngredientRow[] | undefined;
+    [K in keyof Catalogs]: Catalogs[K] | undefined;
   }): Catalogs {
     if (
-      input.dishTasks === undefined ||
-      input.prepTasks === undefined ||
-      input.ingredients === undefined ||
       input.demands === undefined ||
-      input.dishComponents === undefined ||
-      input.components === undefined ||
-      input.componentIngredients === undefined ||
-      input.eventDishes === undefined ||
       input.inventoryItems === undefined ||
       input.inventoryLots === undefined ||
-      input.inventoryReservations === undefined ||
-      input.dishIngredients === undefined
-    ) {
-      throw new Error("Event menu sync catalogs are still loading");
-    }
+      input.inventoryReservations === undefined
+    )
+      throw new Error("Stock sync catalogs are still loading");
     return {
-      dishTasks: input.dishTasks,
-      prepTasks: input.prepTasks,
-      ingredients: input.ingredients,
       demands: input.demands,
-      dishComponents: input.dishComponents,
-      components: input.components,
-      componentIngredients: input.componentIngredients,
-      eventDishes: input.eventDishes,
       inventoryItems: input.inventoryItems,
       inventoryLots: input.inventoryLots,
       inventoryReservations: input.inventoryReservations,
-      dishIngredients: input.dishIngredients,
     };
   }
 
-  async syncComponentDemands(
-    eventId: string,
-    _override?: EventDishOverride,
-  ): Promise<EventStockShortage[]> {
+  async syncComponentDemands(eventId: string): Promise<EventStockShortage[]> {
     // IngredientDemand is Manifest-owned (EventDish → contributions → sync).
     // Host only reconciles inventory reservations from live demand rows.
     const demandTargets = this.catalogs.demands
@@ -275,83 +165,18 @@ export class EventMenuSyncController {
     taskCount: number;
     noOpReason?: string;
   }> {
-    const prep = this.prepCoordinator();
-    const syncResult = await prep.sync({
-      eventDish,
-      dishIngredients: this.catalogs.dishIngredients.map((line) => ({
-        id: line._id,
-        dishId: line.dishId,
-        ingredientId: line.ingredientId,
-        name:
-          this.catalogs.ingredients.find(
-            (ingredient) => ingredient._id === line.ingredientId,
-          )?.name ?? null,
-        quantity: Number(line.quantity),
-        unit: line.unit as never,
-        deletedAt: line.deletedAt,
-      })),
-      templates: this.catalogs.dishTasks.map((task) => ({
-        id: task._id,
-        dishId: task.dishId,
-        name: task.name,
-        defaultQuantity: task.defaultQuantity,
-        defaultUnit: (task.defaultUnit ??
-          this.catalogs.ingredients.find(
-            (ingredient) => ingredient._id === task.ingredientId,
-          )?.unit ??
-          "portion") as never,
-        category: task.category ?? undefined,
-        taskType: task.taskType ?? undefined,
-        sortOrder: task.sortOrder ?? undefined,
-        componentId: task.componentId,
-        ingredientId: task.ingredientId,
-        instructions: task.instructions,
-        status: task.status,
-      })),
-      tasks: this.catalogs.prepTasks.map((task) => ({
-        id: task._id,
-        eventDishId: task.eventDishId,
-        eventId: task.eventId,
-        dishId: task.dishId,
-        dishTaskId: task.dishTaskId,
-        name: task.name,
-        quantity: Number(task.quantity),
-        unit: task.unit as never,
-        ingredientId: task.ingredientId,
-        ingredientDemandId: task.ingredientDemandId,
-        componentId: task.componentId,
-        specialInstructions: task.specialInstructions,
-        isGenerated: task.isGenerated,
-        status: task.status,
-        version: task.version,
-        deletedAt: task.deletedAt,
-      })),
-      demands: this.catalogs.demands.map((demand) => ({
-        id: demand._id,
-        eventId: demand.eventId,
-        ingredientId: demand.ingredientId,
-        requiredQuantity: Number(demand.requiredQuantity),
-        unit: demand.unit as never,
-        status: demand.status,
-        version: demand.version,
-      })),
-      skipDemand: true,
-    });
-    const shortages = await this.syncComponentDemands(
-      eventDish.eventId,
-      eventDish,
-    );
+    // The server reads the current menu line, templates and complete work groups
+    // atomically. Reactive browser catalogs can be stale after a serving change.
+    const result = await this.ports.reconcilePrep(eventDish.id);
+    const shortages = await this.syncComponentDemands(eventDish.eventId);
     return {
       shortages,
-      taskCount: syncResult.taskCount,
-      noOpReason: syncResult.noOpReason,
+      taskCount: result.created + result.updated,
+      noOpReason: result.unresolved.length
+        ? result.unresolved
+            .map((step) => `${step.name}: ${step.reason}`)
+            .join(" ")
+        : result.notice,
     };
-  }
-
-  private prepCoordinator() {
-    return new EventPrepCoordinator({
-      createTask: this.ports.createTask as never,
-      refreshGeneratedTask: this.ports.refreshGeneratedTask as never,
-    });
   }
 }

@@ -105,7 +105,11 @@ trap abort_release INT TERM
 # production config. The hard gate for the real production env runs inside
 # scripts/vercel-build.sh (VERCEL_ENV=production). set -e aborts here,
 # before any merge, when the release shell carries conflicting values.
-bun scripts/check-deployment-config.ts --environment production --no-env-files
+# Bun auto-loads .env/.env.local into process.env before the script runs, so
+# --no-env-files alone still sees the dev values on a developer machine.
+# Point Bun at an empty env file so only the real shell env is visible.
+mkdir -p .artifacts && : > .artifacts/release-empty.env
+bun --env-file=.artifacts/release-empty.env scripts/check-deployment-config.ts --environment production --no-env-files
 
 git checkout -q main
 subject="[release] $branch (reviewed by $reviewer)"

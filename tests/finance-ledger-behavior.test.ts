@@ -74,6 +74,7 @@ it("updates invoice-detail send eligibility with the live balance and links to t
     version: 7,
   };
   backend.values.set("useGetInvoice", invoice);
+  backend.values.set("brandLogo:getBrandLogoUrl", null);
   backend.values.set("useListClient", [
     { _id: "client-a", companyName: "Garden Club", clientType: "company" },
   ]);

@@ -21,6 +21,7 @@ import {
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
+import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
 import { ActionMenu, TableSkeleton } from "../../ui/primitives";
@@ -65,6 +66,7 @@ import { KitchenPrepAssignManager } from "./command-deck/KitchenPrepAssignManage
 import "./command-deck/KitchenCommandDeck.css";
 import "./command-deck/KitchenCommandDeckSurfaces.css";
 import { useEventMenuSync } from "./useEventMenuSync";
+import { EventPrepWorkNotice } from "../events/EventPrepWorkNotice";
 
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
@@ -88,7 +90,8 @@ export function KitchenDashboardPage() {
   const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
 
   const [horizonOffset, setHorizonOffset] = useState(0);
-  const [selectedEventId, setSelectedEventId] = useState("");
+  const workingEventId = useWorkingEventId();
+  const [selectedEventId, setSelectedEventId] = useState(workingEventId ?? "");
   const [filter, setFilter] = useState<CommandDeckFilter>("all");
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [armedPersonId, setArmedPersonId] = useState<string | null>(null);
@@ -142,6 +145,16 @@ export function KitchenDashboardPage() {
       setSelectedEventId("");
     }
   }, [horizonEvents, selectedEventId]);
+
+  // The board follows the working event. "Every service" is this screen's
+  // own choice and leaves the working event alone.
+  useEffect(() => {
+    setSelectedEventId(workingEventId ?? "");
+  }, [workingEventId]);
+  const pickEvent = (id: string) => {
+    setSelectedEventId(id);
+    if (id) setWorkingEvent(id);
+  };
 
   const selectedEvent = horizonEvents.find((e) => e._id === selectedEventId);
   const crewRows = model.crewLoad(horizonEvents.map((e) => e._id));
@@ -248,33 +261,33 @@ export function KitchenDashboardPage() {
 
   /** Build prep for one service from its event menu. */
   const onSyncPrepFor = (eventId: string) => {
-    void run(
-      `sync:${eventId}`,
-      async () => {
-        const rows = model.selections(eventId);
-        if (rows.length === 0) {
-          throw new Error(
-            "No dishes on this event, so Sync prep has nothing to create.",
-          );
-        }
-        const reasons: string[] = [];
-        let created = 0;
-        await runBulkItems(rows, async (row) => {
-          const result = await syncPrepForDish({
-            id: row._id,
-            eventId,
-            dishId: row.dishId,
-            quantityServings: Number(row.quantityServings) || 1,
-          });
-          created += result.taskCount;
-          if (result.noOpReason) reasons.push(result.noOpReason);
+    void run(`sync:${eventId}`, async () => {
+      const rows = model.selections(eventId);
+      if (rows.length === 0) {
+        throw new Error(
+          "No dishes on this event, so Sync prep has nothing to create.",
+        );
+      }
+      const reasons: string[] = [];
+      let created = 0;
+      await runBulkItems(rows, async (row) => {
+        const result = await syncPrepForDish({
+          id: row._id,
+          eventId,
+          dishId: row.dishId,
+          quantityServings: Number(row.quantityServings),
         });
-        if (created === 0 && reasons.length > 0) {
-          throw new Error(reasons[0] ?? "Sync prep did nothing.");
-        }
-      },
-      "Prep synced from the event menu",
-    );
+        created += result.taskCount;
+        if (result.noOpReason) reasons.push(result.noOpReason);
+      });
+      showToast(
+        reasons.length
+          ? `${created ? `Updated ${created} prep steps. ` : ""}${reasons.join(" ")}`
+          : created
+            ? `Updated ${created} prep steps from the event menu.`
+            : "Prep already matches the event menu.",
+      );
+    });
   };
   // ── Ledger ────────────────────────────────────────────────────────────
   // Prep across the whole horizon, not one event at a time. Every existing
@@ -1121,7 +1134,7 @@ export function KitchenDashboardPage() {
             id="kcd-m-service"
             className="input h-11 min-w-0 flex-1"
             value={selectedEventId}
-            onChange={(e) => setSelectedEventId(e.target.value)}
+            onChange={(e) => pickEvent(e.target.value)}
           >
             <option value="">Every service</option>
             {horizonEvents.map((e) => (
@@ -1271,6 +1284,17 @@ export function KitchenDashboardPage() {
             ))}
           </div>
         )}
+
+        {horizonEvents
+          .filter((event) => !selectedEventId || event._id === selectedEventId)
+          .map((event) => (
+            <div key={event._id} className="mt-4">
+              <EventPrepWorkNotice
+                eventId={event._id}
+                eventTitle={event.title}
+              />
+            </div>
+          ))}
 
         {loading ? (
           <div className="mt-6">
@@ -1583,7 +1607,7 @@ export function KitchenDashboardPage() {
               <span>Event</span>
               <select
                 value={selectedEventId}
-                onChange={(e) => setSelectedEventId(e.target.value)}
+                onChange={(e) => pickEvent(e.target.value)}
                 aria-label="Filter by event"
               >
                 <option value="">Every service</option>
@@ -1759,6 +1783,17 @@ export function KitchenDashboardPage() {
             <CulinaryFailureBanner error={failure} />
           </div>
         ) : null}
+
+        {horizonEvents
+          .filter((event) => !selectedEventId || event._id === selectedEventId)
+          .map((event) => (
+            <div key={event._id} className="mt-4">
+              <EventPrepWorkNotice
+                eventId={event._id}
+                eventTitle={event.title}
+              />
+            </div>
+          ))}
 
         {loading ? (
           <div className="mt-6">

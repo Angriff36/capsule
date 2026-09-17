@@ -11,9 +11,10 @@ import { CapsuleAgentAuthManager } from "../../src/agent/CapsuleAgentAuthManager
 import { McpToolCallResultParser } from "../../src/agent/mcp/McpToolCallResultParser";
 
 describe("CapsuleEventPrepCoordinator", () => {
-  it("adds a dish over MCP and builds prep only from that dish's live templates", async () => {
+  it("adds a dish over MCP and reads its generated prep without duplicate host writes", async () => {
     // Credential/network boundaries are doubled; tool dispatch, loader, filtering,
-    // quantity calculation and reconciliation all execute their production code.
+    // and result filtering execute their production code; generated writes are
+    // exercised separately by the backend runtime proofs.
     vi.spyOn(CapsuleAgentAuthManager.prototype, "resolveJwt").mockResolvedValue(
       "fixture-token",
     );
@@ -23,7 +24,7 @@ describe("CapsuleEventPrepCoordinator", () => {
     ).mockReturnValue("https://fixture.convex.cloud");
     vi.spyOn(ConvexHttpClient.prototype, "query").mockImplementation(
       async (reference, ..._args) => {
-        if (getFunctionName(reference) === "queries:listDishTask")
+        if (getFunctionName(reference) === "queries:listDishTaskByDishId")
           return [
             {
               _id: "selected-template",
@@ -41,6 +42,39 @@ describe("CapsuleEventPrepCoordinator", () => {
               status: "active",
               defaultQuantity: 99,
               defaultUnit: "each",
+            },
+          ];
+        if (getFunctionName(reference) === "queries:listPrepTaskByEventId")
+          return [
+            {
+              _id: "prep-a",
+              eventId: "event-a",
+              eventDishId: "event-dish-a",
+              name: "Portion carrots",
+              quantity: 15,
+              unit: "pound",
+              isGenerated: true,
+              status: "pending",
+            },
+            {
+              _id: "prep-other",
+              eventId: "event-a",
+              eventDishId: "event-dish-b",
+              name: "Other dish",
+              quantity: 1,
+              unit: "each",
+              isGenerated: true,
+              status: "pending",
+            },
+            {
+              _id: "prep-cancelled",
+              eventId: "event-a",
+              eventDishId: "event-dish-a",
+              name: "Cancelled",
+              quantity: 1,
+              unit: "each",
+              isGenerated: true,
+              status: "cancelled",
             },
           ];
         return [];
@@ -76,9 +110,9 @@ describe("CapsuleEventPrepCoordinator", () => {
         ),
       ).toEqual({
         ok: true,
-        result: { eventDishId: "event-dish-a", taskCount: 1, demandCount: 0 },
+        result: { eventDishId: "event-dish-a", taskCount: 1 },
       });
-      expect(execute).toHaveBeenCalledTimes(2);
+      expect(execute).toHaveBeenCalledTimes(1);
       expect(execute).not.toHaveBeenCalledWith(
         expect.objectContaining({ capabilityId: "IngredientDemand.calculate" }),
       );
@@ -93,18 +127,6 @@ describe("CapsuleEventPrepCoordinator", () => {
           specialInstructions: undefined,
         },
         idempotencyKey: "booking-a:event-dish",
-      });
-      expect(execute.mock.calls[1][0]).toMatchObject({
-        capabilityId: "PrepTask.open",
-        args: {
-          eventId: "event-a",
-          eventDishId: "event-dish-a",
-          dishTaskId: "selected-template",
-          name: "Portion carrots",
-          quantity: 15,
-          unit: "pound",
-          specialInstructions: "Weigh after cooking",
-        },
       });
     } finally {
       await client.close();

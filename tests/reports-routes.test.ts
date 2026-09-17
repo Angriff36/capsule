@@ -58,6 +58,7 @@ describe("Reports routes and lifecycle bindings", () => {
 
 describe("live report money, range, capability, viewer, and CSV contracts", () => {
   it("counts actual amountPaid, not a credit-adjusted balance, as collected", () => {
+    const issuedAt = Date.now();
     const model = buildLiveReportModel(
       "finance",
       [
@@ -68,7 +69,7 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
           amountPaid: 0,
           amountCredited: 50,
           status: "partial",
-          issuedAt: Date.now(),
+          issuedAt,
         },
         {
           _id: "paid",
@@ -76,7 +77,7 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
           amountDue: 0,
           amountPaid: 100,
           status: "paid",
-          issuedAt: Date.now(),
+          issuedAt,
         },
       ],
       "all_time",

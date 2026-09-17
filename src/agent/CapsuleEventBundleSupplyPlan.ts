@@ -3,12 +3,8 @@ import type {
   EventBundle,
 } from "../lib/tppReports/eventBundle";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
-import { toCapsuleUnit } from "./CapsuleMeasureUnit";
-import {
-  normalizeName,
-  wholeQuantity,
-  type PlannedStep,
-} from "./CapsuleEventBundleShared";
+import { toCapsuleMeasure, toCapsuleUnit } from "./CapsuleMeasureUnit";
+import { normalizeName, type PlannedStep } from "./CapsuleEventBundleShared";
 
 /**
  * The purchasing half of a TPP bundle: the order list becomes catalog
@@ -92,8 +88,12 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
       continue;
     }
     const unitWord = line.orderUnit ?? line.purchaseUnit;
-    const unit = toCapsuleUnit(unitWord);
-    if (unit === undefined && unitWord) unmappedUnits.add(unitWord);
+    const unit = toCapsuleUnit(unitWord) ?? toCapsuleUnit(line.purchaseUnit);
+    if (unit === undefined) {
+      unmappedUnits.add(unitWord ?? "(none)");
+      ingredientRefs.delete(key);
+      continue;
+    }
     counts.ingredients += 1;
     steps.push({
       capabilityId: "Ingredient.introduce",
@@ -102,7 +102,7 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
       idempotencySuffix: `ingredient:${key}`,
       args: {
         name,
-        unit: unit ?? "each",
+        unit,
         costPerUnit: 0,
         category: "TPP order list",
       },
@@ -110,7 +110,7 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
   }
   if (unmappedUnits.size > 0) {
     warnings.push(
-      `Purchasing unit(s) with no Capsule equivalent were entered as "each": ${[...unmappedUnits].join(", ")}.`,
+      `Ingredients with unmapped purchasing units were not created: ${[...unmappedUnits].join(", ")}.`,
     );
   }
 
@@ -135,6 +135,19 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
       counts.unassignedLines += 1;
       continue;
     }
+    const measure = toCapsuleMeasure(
+      line.purchaseQuantity ?? line.orderQuantity,
+      line.purchaseQuantity != null
+        ? (line.purchaseUnit ?? line.orderUnit)
+        : (line.orderUnit ?? line.purchaseUnit),
+    );
+    if (!measure) {
+      warnings.push(
+        `Purchasing item "${line.inventoryItem}" was not ordered: quantity or unit could not be mapped.`,
+      );
+      continue;
+    }
+    if (measure.quantity === 0) continue;
     const key = normalizeName(line.vendor);
     const group = byVendor.get(key) ?? { name: line.vendor.trim(), lines: [] };
     group.lines.push(line);
@@ -151,7 +164,6 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
     );
   }
 
-  let roundedLines = 0;
   for (const [key, group] of byVendor) {
     const vendorRef = `vendor:${key}`;
     const existingVendor = knownVendors.get(key);
@@ -169,33 +181,62 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
     }
 
     const orderNumber = `TPP-${invoice}-${key}`;
-    if (directory.vendorOrderNumbers.includes(orderNumber)) {
-      warnings.push(
-        `Vendor order ${orderNumber} already exists; its lines were left as they are.`,
-      );
-      continue;
-    }
     const orderRef = `order:${key}`;
-    steps.push({
-      capabilityId: "VendorOrder.open",
-      ref: orderRef,
-      label: `Open a vendor order with ${group.name}`,
-      idempotencySuffix: `order:${invoice}:${key}`,
-      resolveRefs: ["vendorId", "eventId"],
-      args: {
-        vendorId: vendorRef,
-        eventId: "event",
-        orderNumber,
-        notes: `TPP order list for invoice ${invoice}.`,
-      },
-    });
+    // An order a prior run opened resumes: only lines it never got to are
+    // added. Without line detail from the loader there is nothing to compare.
+    let orderedIngredientIds: ReadonlySet<string> | undefined;
+    if (directory.vendorOrderNumbers.includes(orderNumber)) {
+      const known = directory.vendorOrders?.find(
+        (row) => row.orderNumber === orderNumber,
+      );
+      if (!known) {
+        warnings.push(
+          `Vendor order ${orderNumber} already exists; its lines were left as they are.`,
+        );
+        continue;
+      }
+      if (known.status !== "draft") {
+        warnings.push(
+          `Vendor order ${orderNumber} is ${known.status}; its ${group.lines.length} line(s) from the reports were not entered because lines can only be added while the order is a draft.`,
+        );
+        continue;
+      }
+      seedIds[orderRef] = known.id;
+      orderedIngredientIds = new Set(known.lineIngredientIds);
+    } else {
+      steps.push({
+        capabilityId: "VendorOrder.open",
+        ref: orderRef,
+        label: `Open a vendor order with ${group.name}`,
+        idempotencySuffix: `order:${invoice}:${key}`,
+        resolveRefs: ["vendorId", "eventId"],
+        args: {
+          vendorId: vendorRef,
+          eventId: "event",
+          orderNumber,
+          notes: `TPP order list for invoice ${invoice}.`,
+        },
+      });
+    }
     group.lines.forEach((line, index) => {
       const ingredientKey = normalizeName(cleanItemName(line.inventoryItem));
       const ingredientRef = ingredientRefs.get(ingredientKey);
       if (ingredientRef === undefined) return;
-      const rawQuantity = line.purchaseQuantity ?? line.orderQuantity;
-      const { quantity, rounded } = wholeQuantity(rawQuantity);
-      if (rounded) roundedLines += 1;
+      const ingredientId = seedIds[ingredientRef];
+      if (
+        orderedIngredientIds !== undefined &&
+        ingredientId !== undefined &&
+        orderedIngredientIds.has(ingredientId)
+      ) {
+        return;
+      }
+      const measure = toCapsuleMeasure(
+        line.purchaseQuantity ?? line.orderQuantity,
+        line.purchaseQuantity != null
+          ? (line.purchaseUnit ?? line.orderUnit)
+          : (line.orderUnit ?? line.purchaseUnit),
+      );
+      if (!measure || measure.quantity === 0) return;
       counts.orderLines += 1;
       steps.push({
         capabilityId: "VendorOrderLine.addLine",
@@ -206,20 +247,12 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
         args: {
           vendorOrderId: orderRef,
           ingredientId: ingredientRef,
-          orderedQuantity: quantity,
-          unit:
-            toCapsuleUnit(line.purchaseUnit ?? line.orderUnit) ??
-            toCapsuleUnit(line.orderUnit) ??
-            "each",
+          orderedQuantity: measure.quantity,
+          unit: measure.unit,
           unitCost: 0,
         },
       });
     });
-  }
-  if (roundedLines > 0) {
-    warnings.push(
-      `${roundedLines} order line(s) under one unit were rounded up to 1, the smallest quantity a vendor order accepts.`,
-    );
   }
 
   return { steps, warnings, seedIds, counts };

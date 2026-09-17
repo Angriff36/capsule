@@ -1,0 +1,174 @@
+// Capsule execution & quality — ReviewFlag: a question raised on one piece of
+// event data while the ops binder is being built (#368 items 13 and 15). The
+// Ops Final Lock process says "walk quantities against guest count; if there
+// is an anomaly, raise the flag" — before this the only place to raise it was
+// prose in Team Chat. A flag points at the exact row (a menu line, a timeline
+// block, an equipment reservation, a shift) or at the event as a whole, holds
+// the question, and is answered or dismissed by whoever settles it. Reopening
+// is allowed: live ops stay correctable.
+
+use "../operations/event.manifest"
+
+enum ReviewFlagTarget {
+  whole_event
+  menu_line
+  timeline_activity
+  equipment_reservation
+  staff_need
+  assignment
+  pack_list_item
+}
+
+enum ReviewFlagStatus {
+  open
+  resolved
+  dismissed
+}
+
+entity ReviewFlag mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required targetKind: ReviewFlagTarget = "whole_event"
+  // Id of the flagged row in its own table; null for an event-level flag.
+  // Plain string: the target is polymorphic, so no belongsTo.
+  property targetId: string?
+  // What the row was called when flagged ("Mini Assorted Desserts") so the
+  // list reads on its own even after the row is removed.
+  property required targetLabel: string = ""
+  property required question: string = ""
+  property resolution: string?
+  // Auth subjects (user.id), not Person ids — see Incident.reportedById.
+  property raisedById: string?
+  property settledById: string?
+  property required status: ReviewFlagStatus = "open"
+  property raisedAt: datetime?
+  property settledAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint reviewFlagQuestionPresent: self.raisedAt == null or length(trim(self.question)) > 0 "A review flag needs the question it is raising"
+
+  transition status from "open" to ["resolved", "dismissed"]
+  transition status from "resolved" to ["open"]
+  transition status from "dismissed" to ["open"]
+
+  default policy reviewFlagRead read: roleAllows(user.role, "staffAccess") "Any staff member may read review flags"
+  default policy reviewFlagWrite write: roleAllows(user.role, "staffAccess") "Any staff member may raise or settle a review flag through commands"
+  default policy reviewFlagExecute execute: roleAllows(user.role, "staffAccess") "Any staff member may raise or settle a review flag"
+
+  command raise(
+    eventId: uuid,
+    targetKind: ReviewFlagTarget,
+    question: string,
+    optional targetId: string,
+    optional targetLabel: string
+  ) {
+    guard self.raisedAt == null
+    guard self.deletedAt == null
+    guard self.event != null
+    guard user.id != null
+    constraint raiseEventMatch: eventId == self.eventId "Raise eventId must match the seeded event reference"
+    constraint raiseQuestionPresent: length(trim(question)) > 0 "Say what needs a decision"
+    mutate eventId = eventId
+    mutate targetKind = targetKind
+    mutate targetId = targetId
+    mutate targetLabel = targetLabel != null ? targetLabel : ""
+    mutate question = question
+    mutate raisedById = user.id
+    mutate status = "open"
+    mutate raisedAt = now()
+    emit ReviewFlagRaised {
+      reviewFlagId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      targetKind: targetKind
+      targetId: targetId
+      raisedById: user.id
+    }
+  }
+
+  // `resolve` is a reserved word — markResolved records the decision.
+  command markResolved(resolution: string) {
+    guard self.status == "open"
+    guard self.raisedAt != null
+    guard self.deletedAt == null
+    constraint resolveTextPresent: length(trim(resolution)) > 0 "Record the decision that settles the flag"
+    mutate resolution = resolution
+    mutate settledById = user.id
+    mutate status = "resolved"
+    mutate settledAt = now()
+    emit ReviewFlagSettled {
+      reviewFlagId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      targetKind: self.targetKind
+      status: "resolved"
+    }
+  }
+
+  command dismiss(optional reason: string) {
+    guard self.status == "open"
+    guard self.raisedAt != null
+    guard self.deletedAt == null
+    mutate resolution = reason
+    mutate settledById = user.id
+    mutate status = "dismissed"
+    mutate settledAt = now()
+    emit ReviewFlagSettled {
+      reviewFlagId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      targetKind: self.targetKind
+      status: "dismissed"
+    }
+  }
+
+  command reopen() {
+    guard self.status == "resolved" or self.status == "dismissed"
+    guard self.deletedAt == null
+    mutate status = "open"
+    mutate settledAt = null
+    mutate settledById = null
+    emit ReviewFlagReopened {
+      reviewFlagId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      targetKind: self.targetKind
+    }
+  }
+
+  command reviseQuestion(question: string) {
+    guard self.deletedAt == null
+    constraint reviseQuestionPresent: length(trim(question)) > 0 "Say what needs a decision"
+    mutate question = question
+  }
+
+  store ReviewFlag in durable
+}
+
+event ReviewFlagRaised: "review_flag.raised" {
+  reviewFlagId: string
+  tenantId: string
+  eventId: string
+  targetKind: ReviewFlagTarget
+  targetId: string?
+  raisedById: string
+}
+
+event ReviewFlagSettled: "review_flag.settled" {
+  reviewFlagId: string
+  tenantId: string
+  eventId: string
+  targetKind: ReviewFlagTarget
+  status: ReviewFlagStatus
+}
+
+event ReviewFlagReopened: "review_flag.reopened" {
+  reviewFlagId: string
+  tenantId: string
+  eventId: string
+  targetKind: ReviewFlagTarget
+}

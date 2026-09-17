@@ -10,13 +10,20 @@ import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { breadcrumbsForPath, type Breadcrumb } from "./breadcrumbs";
 import { RecentsMenu } from "./RecentsMenu";
 import { ThemeToggle } from "./Sidebar";
+import { WorkingEventChip } from "./WorkingEventChip";
 
 function useBreadcrumbs(): Breadcrumb[] {
   const { pathname } = useLocation();
   return breadcrumbsForPath(pathname);
 }
 
-export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
+export function Topbar({
+  onOpenPalette,
+  onOpenAssistant,
+}: {
+  onOpenPalette: () => void;
+  onOpenAssistant: () => void;
+}) {
   const crumbs = useBreadcrumbs();
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const mobileAreas = navigationCatalog.availableAreas(
@@ -93,6 +100,8 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
         ))}
       </nav>
 
+      <WorkingEventChip />
+
       <div className="ml-auto flex items-center gap-2">
         <button
           type="button"
@@ -109,6 +118,29 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
         </button>
 
         <RecentsMenu />
+
+        <button
+          type="button"
+          onClick={onOpenAssistant}
+          title="AI assistant (Ctrl J)"
+          aria-label="Open AI assistant"
+          className="grid h-8 w-8 cursor-pointer place-items-center rounded-xs border border-transparent text-ink-3 transition-colors hover:border-line-2 hover:bg-inset hover:text-ink"
+        >
+          <svg
+            width="15"
+            height="15"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" />
+            <path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z" />
+          </svg>
+        </button>
 
         <NotificationTray />
 

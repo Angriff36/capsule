@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useState } from "react";
-import { useMutation } from "convex/react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useListClient,
@@ -21,7 +20,7 @@ import {
   useShareLinkCreate,
   useShareLinkRevoke,
 } from "../../lib/manifest-convex-react";
-import { api, type Id } from "../../lib/api";
+import { type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatMoneyExact } from "../../lib/format";
@@ -41,6 +40,7 @@ import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
 import { generateAcceptanceUrl } from "./proposalSignatureRequest";
+import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
@@ -84,9 +84,7 @@ export function ProposalsPage() {
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.
-  const send = useMutation(
-    api.lib.proposalRevision.sendProposalWithRevisionCapture,
-  );
+  const send = useSendProposalWithRevisionCapture();
   const markViewed = useProposalMarkViewed();
   const accept = useProposalAccept();
   const decline = useProposalDecline();

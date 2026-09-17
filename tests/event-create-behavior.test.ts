@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { createElement } from "react";
+import { act, createElement } from "react";
 import { expect, it } from "vitest";
 import {
   backend,
@@ -41,6 +41,18 @@ function bookingOptions() {
     },
   ]);
 }
+async function chooseAccountOrVenue(name: string, label: string) {
+  const control =
+    field(name).parentElement!.querySelector<HTMLInputElement>(
+      '[role="combobox"]',
+    )!;
+  change(control, label);
+  await act(async () => {
+    control.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+    );
+  });
+}
 it("explains a missing client, then enforces the required contact before sending the event", async () => {
   bookingOptions();
   const create = command("useCreateEvent");
@@ -48,8 +60,8 @@ it("explains a missing client, then enforces the required contact before sending
   const save = button("Create event");
   expect(save.disabled).toBe(true);
   expect(container.textContent).toContain("Client is required");
-  change(selectWith("Select a client"), "client-a");
-  change(selectWith("Select a venue"), "venue-a");
+  await chooseAccountOrVenue("clientId", "Client A");
+  await chooseAccountOrVenue("venueId", "Garden");
   input("title", "Summer dinner");
   input("eventType", "dinner");
   input("expectedHeadcount", "40");
@@ -78,9 +90,9 @@ it("explains a missing client, then enforces the required contact before sending
 it("renders empty catalog recovery links and updates the selectors when live catalog rows change", async () => {
   await mount(createElement(EventCreatePage));
   expect(container.textContent).toContain("No occasions yet");
-  expect(container.textContent).toContain("built-in service styles");
+  expect(button("Add the standard list").disabled).toBe(false);
   expect(container.querySelectorAll('a[href="/admin/catalogs"]')).toHaveLength(
-    2,
+    1,
   );
   expect(selectWith("Full Service").required).toBe(false);
   expect(selectWith("Select an occasion").required).toBe(false);
@@ -97,7 +109,7 @@ it("renders empty catalog recovery links and updates the selectors when live cat
   ).toEqual(["Select a service style", "Chef's table"]);
   expect(selectWith("Anniversary")).toBeDefined();
   expect(container.textContent).not.toContain("No occasions yet");
-  expect(container.textContent).not.toContain("built-in service styles");
+  expect(container.textContent).not.toContain("Add the standard list");
 });
 
 it("prefills distinct proposal start and end dates, headcount, client, and venue on the real create form", async () => {
@@ -122,6 +134,6 @@ it("prefills distinct proposal start and end dates, headcount, client, and venue
   expect(field("endsAt").value).toBe("2099-07-04T22:00");
   expect(field("expectedHeadcount").value).toBe("40");
   expect(field("title").value).toBe("Anniversary dinner");
-  expect(selectWith("Select a client").value).toBe("client-a");
-  expect(selectWith("Select a venue").value).toBe("venue-a");
+  expect(field("clientId").value).toBe("client-a");
+  expect(field("venueId").value).toBe("venue-a");
 });

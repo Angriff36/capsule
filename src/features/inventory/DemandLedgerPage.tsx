@@ -23,6 +23,7 @@ import {
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const UNITS = [
   "each",
@@ -44,6 +45,7 @@ const UNITS = [
 const policy = new SupplyLifecyclePolicy();
 
 export function DemandLedgerPage() {
+  const workingId = useWorkingEventId();
   const demands = useListIngredientDemand();
   const events = useListEvent();
   const ingredients = useListIngredient();
@@ -206,7 +208,13 @@ export function DemandLedgerPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Event
-              <select name="eventId" className="input" required>
+              <select
+                key={events?.length ? "events-ready" : "events-loading"}
+                name="eventId"
+                className="input"
+                defaultValue={workingId ?? ""}
+                required
+              >
                 <option value="">Select event</option>
                 {(events ?? [])
                   .filter((item) => item.deletedAt == null)

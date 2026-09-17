@@ -9,6 +9,7 @@ import {
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { prepQuantityLabel } from "../../kitchen/prepQuantityLabel";
+import { CulinaryEntityLink } from "../../kitchen/CulinaryEntityLink";
 import { prepTaskDependencySummary } from "../../production/PrepTaskDependencies";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { eventDetailPath } from "../eventRoutes";
@@ -137,6 +138,16 @@ export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
                   {task.name}
                 </span>
                 <span className="mobile-row-sub truncate">{sub}</span>
+                {task.componentId ? (
+                  <CulinaryEntityLink
+                    kind="component"
+                    id={task.componentId}
+                    prepTaskId={task._id}
+                    className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
+                  >
+                    Recipe: {task.name}
+                  </CulinaryEntityLink>
+                ) : null}
               </span>
               {waiting?.isBlocked ? (
                 <span className="mobile-row-sub max-w-40 min-w-0 text-right">

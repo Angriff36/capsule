@@ -1,0 +1,3681 @@
+{
+  "mode": "reviewed snapshot plan; not applied",
+  "source": "work/training docs/binder-docs/REF-pack-list.pdf",
+  "snapshotSha256": "b5c395b73d31a94cf3401b3ee11ad4b0a7aa6f58dc5e9903c7f8da1c8df6b921",
+  "args": {
+    "operationKey": "tpp-packing-associations:ashley:9218f2b9e5b801378f001464fd6e6cc7d42765a4ae4292c4f4fbd6a266cbf0a2",
+    "packListId": "qn74zdd566841ftstrnhy6f69s8dpsde",
+    "expectedVersion": 2,
+    "expectedEventVersion": 5,
+    "links": [
+      {
+        "itemId": "qh7e1ksb14j42gw0yzgrrxddgs8dpk10",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Chafer Set (in Chafer Kit) - Chicken Roulade (roll top)",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7a1692hcj166b9cvjz59y3918dqgsn",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Chafer Set (in Chafer Kit) - Asparagus",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh77szx09jsr7retpqwxqm9e0s8dp6rz",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Chafer Set (in Chafer Kit) - Cougar Gold Gourmet Mac n Cheese",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh7ajrca3j69rnqf9mjz4q7whn8dq6ws",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Chafer Set (in Chafer Kit) - Whipped Yukon Mashed Potatoes",
+        "eventDishId": "n170h1czw4j63167e78q33d3k58dpyq2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Whipped Yukon Mashed Potatoes; pages 4"
+      },
+      {
+        "itemId": "qh76gbjeayhh2b9wpwzczfz9ks8dq5vw",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Chafer Set (in Chafer Kit) - New York Strip",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh7cph5frfdc7969qg2axarwv18dqkbq",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Sterno Fuel (in Chafer Kit) - Chicken Roulade",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7ddc6cx36fvkn0ng4etfps218dpvmc",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Sterno Fuel (in Chafer Kit) - Asparagus",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh7b6yxcy6p3ajxhgfwc16xz758dqavq",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Sterno Fuel (in Chafer Kit) - Cougar Gold Gourmet Mac n Cheese",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh77vh3vpzk76d6z5hcz3a3dw98dq0f1",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Sterno Fuel (in Chafer Kit) - Whipped Yukon Mashed Potatoes",
+        "eventDishId": "n170h1czw4j63167e78q33d3k58dpyq2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Whipped Yukon Mashed Potatoes; pages 4"
+      },
+      {
+        "itemId": "qh76sqyjh3dnnjs2t1mkmb71e58dqve6",
+        "expectedVersion": 1,
+        "expectedDescription": "[K] Sterno Fuel (in Chafer Kit) - New York Strip",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh7bpwg2y32b9hn9wcm5ntdsa58dq4ym",
+        "expectedVersion": 1,
+        "expectedDescription": "[A04] Cocktail Plates (black) - Chicken Katsu Bao Bun",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh723wc4q61bm197x5j0qk83b98dpvnn",
+        "expectedVersion": 1,
+        "expectedDescription": "[A04] Cocktail Plates (black) - Smore Bar",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh748g5chjv9b0mmakby03n5kh8dqb0b",
+        "expectedVersion": 1,
+        "expectedDescription": "[A16] Cocktail Napkins - Mini Lobster Roll (black)",
+        "eventDishId": "n17dhm4cc715ahk5r3qrt1zvzn8dqcx3",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mini Lobster Roll; pages 3"
+      },
+      {
+        "itemId": "qh76cmy1ez05yp1jchtye1gg998dqvzq",
+        "expectedVersion": 1,
+        "expectedDescription": "[A16] Cocktail Napkins - Fried Gourmet Mac n Cheese Bites",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 2"
+      },
+      {
+        "itemId": "qh75xyzqqnnn90pq8d71r9vzfs8dpazf",
+        "expectedVersion": 1,
+        "expectedDescription": "[A16] Cocktail Napkins - Chicken Katsu Bao Bun",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh7achfy076fvwe8k23vspbysn8dq84k",
+        "expectedVersion": 1,
+        "expectedDescription": "[A16] Cocktail Napkins - Smore Bar",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh737xenyfs2wfjmw2qsk6q27x8dqep1",
+        "expectedVersion": 1,
+        "expectedDescription": "[B02] Butter Knife - Fresh Baked Dinner Rolls with Honey Butter (hammered)",
+        "eventDishId": "n17ajf93g3za6g6ak0j06za3gh8dpp30",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fresh Baked Dinner Rolls with Honey Butter; pages 2"
+      },
+      {
+        "itemId": "qh71y3qp8dqb432kkrkgb1nzdd8dq559",
+        "expectedVersion": 1,
+        "expectedDescription": "[B02] Butter Knife - Smore Bar",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7b2xwcwp2as0gwp32gdj7hhd8dppsb",
+        "expectedVersion": 1,
+        "expectedDescription": "[B04] Serving Tongs - Scissor - Mid Summer Wedding Salad",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh79q1d53sbdhc5fhnnwydap958dpg5a",
+        "expectedVersion": 1,
+        "expectedDescription": "[B04] Serving Tongs - Small - Ahi Tuna Wonton (hammered)",
+        "eventDishId": "n170net5wkmkjdaaqvpydxy3n98dq98z",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Ahi Tuna Wonton; pages 1"
+      },
+      {
+        "itemId": "qh7797jjd1ntfm434e6g6sh1r18dpr6t",
+        "expectedVersion": 1,
+        "expectedDescription": "[B04] Serving Tongs - Small - Bruschetta Crostini",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh7dhn7aet7y113yz0432d6pzh8dqtff",
+        "expectedVersion": 1,
+        "expectedDescription": "[B04] Serving Tongs - Small - Chicken Katsu Bao Bun",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh77yfzzfx3waxr7xm28qd0yd18dqcch",
+        "expectedVersion": 1,
+        "expectedDescription": "[B04] Serving Tongs - Small - Fresh Baked Dinner Rolls with Honey Butter",
+        "eventDishId": "n17ajf93g3za6g6ak0j06za3gh8dpp30",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fresh Baked Dinner Rolls with Honey Butter; pages 2"
+      },
+      {
+        "itemId": "qh77kmdr58043ypq1ak1bd9pe18dq4r9",
+        "expectedVersion": 1,
+        "expectedDescription": "[B04] Serving Tongs - Small - Smore Bar",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7bezh1cccekgxfsyxyxnjpcs8dptth",
+        "expectedVersion": 1,
+        "expectedDescription": "[B05] Serving Tongs - Standard - Chicken Roulade (hammered)",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh77aj40f6wqeanp94wwrg7wph8dpeac",
+        "expectedVersion": 1,
+        "expectedDescription": "[B05] Serving Tongs - Standard - Asparagus",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh75axe2cbw41mffa6rhhhntws8dq6zt",
+        "expectedVersion": 1,
+        "expectedDescription": "[B05] Serving Tongs - Standard - New York Strip",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh749qn9ra6e6r1j49yz257knd8dp1b0",
+        "expectedVersion": 1,
+        "expectedDescription": "[B10] Glass Jar - Large - Smore Bar",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7bn93cy0yrf2cfax11r66bgx8dqtn6",
+        "expectedVersion": 1,
+        "expectedDescription": "[B11] Tablespoons - Fried Gourmet Mac n Cheese Bites (stainless)",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 2"
+      },
+      {
+        "itemId": "qh7cyvyx7f97jy12a91yspznhs8dpkr6",
+        "expectedVersion": 1,
+        "expectedDescription": "[B11] Tablespoons - Chicken Katsu Bao Bun",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh78166pmhr21949w4b8y9hpb58dqft7",
+        "expectedVersion": 1,
+        "expectedDescription": "[B11] Tablespoons - Chicken Roulade",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7ewtj8ete66m12htkqesvs898dq2j0",
+        "expectedVersion": 1,
+        "expectedDescription": "[B11] Tablespoons - Smore Bar",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7cqw0pvgscfw6srec6ks5r618dpd41",
+        "expectedVersion": 1,
+        "expectedDescription": "[B11] Tablespoons - New York Strip",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh71v30m6kp6wsz6mzsghjwqs18dq69z",
+        "expectedVersion": 1,
+        "expectedDescription": "[B12] 1oz Squeeze Handle Scoop - Fresh Baked Dinner Rolls with Honey Butter",
+        "eventDishId": "n17ajf93g3za6g6ak0j06za3gh8dpp30",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fresh Baked Dinner Rolls with Honey Butter; pages 2"
+      },
+      {
+        "itemId": "qh77m05tdd3vv62x0vcg9d58rd8dqkv8",
+        "expectedVersion": 1,
+        "expectedDescription": "[B14] 3oz Squeeze Handle Scoop - Whipped Yukon Mashed Potatoes",
+        "eventDishId": "n170h1czw4j63167e78q33d3k58dpyq2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Whipped Yukon Mashed Potatoes; pages 4"
+      },
+      {
+        "itemId": "qh753eenv94ah7mk2jqq71e9nn8dpg2e",
+        "expectedVersion": 1,
+        "expectedDescription": "[B14] Serving Spoons - Cougar Gold Gourmet Mac n Cheese (hammered)",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh72gajym644ymscw7jmnzfa8n8dp616",
+        "expectedVersion": 1,
+        "expectedDescription": "[BAR] Bus Tub For Bar - Tableside Water Service - Bringing Water",
+        "eventDishId": "n1745zmkf13b4xqvejx16csyyd8dpyqj",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Tableside Water Service - Bringing Water; pages 4"
+      },
+      {
+        "itemId": "qh7fajztfg552h6rh9gjhkp1tn8dqp9h",
+        "expectedVersion": 1,
+        "expectedDescription": "[BAR] Ice Scoop - Tableside Water Service - Bringing Water",
+        "eventDishId": "n1745zmkf13b4xqvejx16csyyd8dpyqj",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Tableside Water Service - Bringing Water; pages 4"
+      },
+      {
+        "itemId": "qh77saywr1ksaqnb385nvtp25s8dppe7",
+        "expectedVersion": 1,
+        "expectedDescription": "[C03] Basket - Large - Fresh Baked Dinner Rolls with Honey Butter (wire)",
+        "eventDishId": "n17ajf93g3za6g6ak0j06za3gh8dpp30",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fresh Baked Dinner Rolls with Honey Butter; pages 2"
+      },
+      {
+        "itemId": "qh765t9956mt7rfmxwnrxae71s8dp6ej",
+        "expectedVersion": 1,
+        "expectedDescription": "[C07] Bowl - Large - Smore Bar (hammered)",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7dnz165heqjrkm54cmpm6n218dqjys",
+        "expectedVersion": 1,
+        "expectedDescription": "[C09] Bowl - Salad - Mid Summer Wedding Salad (grey melamine)",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh7bmf0e1jhfqxw6q0amzsq6g18dqhz5",
+        "expectedVersion": 1,
+        "expectedDescription": "[C11] Bowl - Small - Fresh Baked Dinner Rolls with Honey Butter (hammered)",
+        "eventDishId": "n17ajf93g3za6g6ak0j06za3gh8dpp30",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fresh Baked Dinner Rolls with Honey Butter; pages 2"
+      },
+      {
+        "itemId": "qh759e1hycn9hj6sg4rq6t43vn8dqdcv",
+        "expectedVersion": 1,
+        "expectedDescription": "[C11] Bowl - Small - Smore Bar",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh79f63d3x0py6pvzxhnq7k2v58dpat2",
+        "expectedVersion": 1,
+        "expectedDescription": "[C11] Bowl - Small - New York Strip",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh75gcj4z8fy6ys3e6kqz6nyws8dpwnp",
+        "expectedVersion": 1,
+        "expectedDescription": "[C12] Plastic Water Pitcher - Tableside Water Service - Bringing Water",
+        "eventDishId": "n1745zmkf13b4xqvejx16csyyd8dpyqj",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Tableside Water Service - Bringing Water; pages 4"
+      },
+      {
+        "itemId": "qh7ekg2b0wpb2z20mndj481t2x8dpq17",
+        "expectedVersion": 1,
+        "expectedDescription": "[D] Platter - Stationary - Ahi Tuna Wonton (square hammered)",
+        "eventDishId": "n170net5wkmkjdaaqvpydxy3n98dq98z",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Ahi Tuna Wonton; pages 1"
+      },
+      {
+        "itemId": "qh73znywvtgcfwf54kb7h2wb5x8dqybp",
+        "expectedVersion": 1,
+        "expectedDescription": "[D] Platter - Stationary (Medium for Display) - Show Association (hammered)",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh71xv0s6chjgmcpwacmg1fwqh8dpfc2",
+        "expectedVersion": 1,
+        "expectedDescription": "[DS] Marshmallow Station - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7bnpw2wdxrj64dbbd6fm06298dpprk",
+        "expectedVersion": 1,
+        "expectedDescription": "[E01] Beverage Dispenser - Show Association",
+        "eventDishId": "n17awc2tqnk8pygtnk6ec1d2jn8dpden",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Infused Water; pages 3"
+      },
+      {
+        "itemId": "qh72rj0xz3k31vsbr3mh08q76s8dqsjz",
+        "expectedVersion": 1,
+        "expectedDescription": "[E05] Clear Plastic Cups - 9oz - Show Association",
+        "eventDishId": "n17awc2tqnk8pygtnk6ec1d2jn8dpden",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Infused Water; pages 3"
+      },
+      {
+        "itemId": "qh7emjmpz214mke6x865vas8c98dpqpg",
+        "expectedVersion": 1,
+        "expectedDescription": "[G01] Bamboo Steamer - Cooking - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh76q0pvqqgsp4n2s689eqexmn8dqeak",
+        "expectedVersion": 1,
+        "expectedDescription": "[G01] Bamboo Steamer - Serving - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh7eq9prrr0nymc2c7v35h73gd8dpjpx",
+        "expectedVersion": 1,
+        "expectedDescription": "[GAR] Table - 6' FOH - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh71cmna0pq685k0tqssn5ked58dq8rp",
+        "expectedVersion": 1,
+        "expectedDescription": "[I] Tray Jack - Show Association",
+        "eventDishId": "n1745zmkf13b4xqvejx16csyyd8dpyqj",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Tableside Water Service - Bringing Water; pages 4"
+      },
+      {
+        "itemId": "qh72ae3r27qwvf2915pggwnqnx8dpck8",
+        "expectedVersion": 1,
+        "expectedDescription": "[I05] Large Bussing Tray - Show Association",
+        "eventDishId": "n1745zmkf13b4xqvejx16csyyd8dpyqj",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Tableside Water Service - Bringing Water; pages 4"
+      },
+      {
+        "itemId": "qh76ergt188mp0q1nww2pa5v598dq01k",
+        "expectedVersion": 1,
+        "expectedDescription": "[RS5] Sterno - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh72amy7z63pkd2hatbyvswrdx8dpapw",
+        "expectedVersion": 1,
+        "expectedDescription": "[RS6] Paper Towels - Show Association",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 3"
+      },
+      {
+        "itemId": "qh77rmhn3vf55snt8g95cs46s98dq1jv",
+        "expectedVersion": 1,
+        "expectedDescription": "2\" Hotel Pan - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7f39p889c5efv4sqay6rvrx98dpwq6",
+        "expectedVersion": 1,
+        "expectedDescription": "2\" Hotel Pan - Show Association",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh70952pa0hncggbz1gz96y6a98dpe8j",
+        "expectedVersion": 1,
+        "expectedDescription": "4\" Hotel Pan - Show Association",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 3"
+      },
+      {
+        "itemId": "qh750mbxr49z1b1aes3jtwgd018dpnp6",
+        "expectedVersion": 1,
+        "expectedDescription": "4\" Hotel Pan - Show Association",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh7cg29kpvzsdpg8t2gzshekr18dpatp",
+        "expectedVersion": 1,
+        "expectedDescription": "6\" Hotel Pan - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh71b7at91ystamk3sntfjee858dpt0h",
+        "expectedVersion": 1,
+        "expectedDescription": "Asparagus - Show Association",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh7ed1xkkpvwn7ahb89fv0k40s8dqdmj",
+        "expectedVersion": 1,
+        "expectedDescription": "Bacon Bits - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh7dgxv0mq8vbz9bwnp1v3b07d8dqkdf",
+        "expectedVersion": 1,
+        "expectedDescription": "Bacon Jam - Show Association",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 3"
+      },
+      {
+        "itemId": "qh73gtgh3xqfgax9sbx362fvsh8dp22w",
+        "expectedVersion": 1,
+        "expectedDescription": "Bain Marie - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh7aperbexmcawqg0k6z4gv6nh8dph1r",
+        "expectedVersion": 1,
+        "expectedDescription": "Balsamic Glaze - Show Association",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh7djgz4y4vnqbzr80sj0zce298dp3s2",
+        "expectedVersion": 1,
+        "expectedDescription": "Bao Bun - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh7cmj2rynk4hs3sfr9zzes7ss8dqqrz",
+        "expectedVersion": 1,
+        "expectedDescription": "Basil - Fresh - Show Association",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh7d8j79c1733nv3kxcykdtsg18dqh7f",
+        "expectedVersion": 1,
+        "expectedDescription": "Bruschetta Mix - Show Association",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh791hqes64ha22rcbgqj765cd8dpg25",
+        "expectedVersion": 1,
+        "expectedDescription": "Butter (unsalted) - Show Association",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh73210fj4tjhyqfnng9bfw8d98dq8tt",
+        "expectedVersion": 1,
+        "expectedDescription": "Candied Walnuts - Show Association",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh75mzm9gnxznhxetegn9axdhs8dqcsm",
+        "expectedVersion": 1,
+        "expectedDescription": "Caramel Sauce - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7ejkt4w6v4f30brb3haqe4zs8dqrw1",
+        "expectedVersion": 1,
+        "expectedDescription": "Cheese - Parmesan / Romano Blend - Show Association",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 3"
+      },
+      {
+        "itemId": "qh7a2f9zyevmhvxpawng8tftrn8dq5zp",
+        "expectedVersion": 1,
+        "expectedDescription": "Cheese - Shaved Parmesan - Show Association",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh72e9pfrpn2et8b4j7s1xpf198dpvch",
+        "expectedVersion": 1,
+        "expectedDescription": "Chicken Filet - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh7c3nmqpst3pejekaytqz8jjh8dqxf8",
+        "expectedVersion": 1,
+        "expectedDescription": "Chocolate Sauce - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7fnt866smwjp9hfq2hsv0j458dq39p",
+        "expectedVersion": 1,
+        "expectedDescription": "Cilantro - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh72sb44y28heend1nswhx2awn8dpyrq",
+        "expectedVersion": 1,
+        "expectedDescription": "Cold Drinking Water - Show Association",
+        "eventDishId": "n1745zmkf13b4xqvejx16csyyd8dpyqj",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Tableside Water Service - Bringing Water; pages 4"
+      },
+      {
+        "itemId": "qh74yb5rt3q8zb391pmfcjbpfn8dqc9v",
+        "expectedVersion": 1,
+        "expectedDescription": "Cold Drinking Water in Container - MINIMUM 5 GALLONS - Show Association",
+        "eventDishId": "n17awc2tqnk8pygtnk6ec1d2jn8dpden",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Infused Water; pages 3"
+      },
+      {
+        "itemId": "qh7aqjn9fvn5gzwxytkwtp2m2d8dpp4p",
+        "expectedVersion": 1,
+        "expectedDescription": "Cooking Water - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh7ajrgw0q1qejm2r94ghm1gb98dqn6c",
+        "expectedVersion": 1,
+        "expectedDescription": "Cream sauce for chicken - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7285pqyk5phsb5w380vst5118dqa5s",
+        "expectedVersion": 1,
+        "expectedDescription": "Creamy Horseradish - Show Association",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh76a9ymh7ajatjd2rvjmmtjjn8dq026",
+        "expectedVersion": 1,
+        "expectedDescription": "Crostinis - Show Association",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh748aj67w1bqcw7yys9bvtpe98dp579",
+        "expectedVersion": 1,
+        "expectedDescription": "Cucumber Kimchi - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh77n0bzqkc11yk5fr8y6xbhad8dpqbe",
+        "expectedVersion": 1,
+        "expectedDescription": "Deluxe Graham Crackers - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh73mf007ss3ad9xh8915dbyt18dqcsc",
+        "expectedVersion": 1,
+        "expectedDescription": "Dinner Rolls - Show Association",
+        "eventDishId": "n17ajf93g3za6g6ak0j06za3gh8dpp30",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fresh Baked Dinner Rolls with Honey Butter; pages 2"
+      },
+      {
+        "itemId": "qh7bskyd2j4c3nzz824xejabw58dqn89",
+        "expectedVersion": 1,
+        "expectedDescription": "Drip Cup with Lid - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7az7h17ehvd5enchf15bbtbn8dqy93",
+        "expectedVersion": 1,
+        "expectedDescription": "Fennel - Fresh - Show Association",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh7e9s33grhgaknsd6vrgk5k718dqx46",
+        "expectedVersion": 1,
+        "expectedDescription": "Food Picks - Show Association",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 3"
+      },
+      {
+        "itemId": "qh718cpd833x3hkemza294cpf18dq4pz",
+        "expectedVersion": 1,
+        "expectedDescription": "Gorgonzola Cheese Crumbs - Show Association",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh750cy6e26hg90rw8ajn2rrw58dpx4z",
+        "expectedVersion": 1,
+        "expectedDescription": "Hershey Bar - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7esbvnkx9kpjz8bb1jn5b8cx8dpm5x",
+        "expectedVersion": 1,
+        "expectedDescription": "Honey Cinnamon Whipped Butter - Show Association",
+        "eventDishId": "n17ajf93g3za6g6ak0j06za3gh8dpp30",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fresh Baked Dinner Rolls with Honey Butter; pages 2"
+      },
+      {
+        "itemId": "qh71bspcd22z5jykgzjejd2ven8dqmef",
+        "expectedVersion": 1,
+        "expectedDescription": "Ice - Show Association (Bring ice caddy for pre filled water)",
+        "eventDishId": "n17awc2tqnk8pygtnk6ec1d2jn8dpden",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Infused Water; pages 3"
+      },
+      {
+        "itemId": "qh7dxf9j1nbmbms62r7pdmr9198dp5dp",
+        "expectedVersion": 1,
+        "expectedDescription": "Ice - Show Association",
+        "eventDishId": "n1745zmkf13b4xqvejx16csyyd8dpyqj",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Tableside Water Service - Bringing Water; pages 4"
+      },
+      {
+        "itemId": "qh7c5g4jzqectc5y0frvs3cs098dqd85",
+        "expectedVersion": 1,
+        "expectedDescription": "Infused Water Kit - Show Association",
+        "eventDishId": "n17awc2tqnk8pygtnk6ec1d2jn8dpden",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Infused Water; pages 3"
+      },
+      {
+        "itemId": "qh72srqvjrsycy5a5pv9anmf258dpz94",
+        "expectedVersion": 1,
+        "expectedDescription": "Kitchen Mixing Bowls - Show Association",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh78k60av4zvas7mhywp789q418dpa2v",
+        "expectedVersion": 1,
+        "expectedDescription": "Lemons - Show Association",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh74ztw5f2fv4z4342dtbjwqzs8dpz79",
+        "expectedVersion": 1,
+        "expectedDescription": "Lobster Meat - Show Association",
+        "eventDishId": "n17dhm4cc715ahk5r3qrt1zvzn8dqcx3",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mini Lobster Roll; pages 3"
+      },
+      {
+        "itemId": "qh7awcngezq4y1nh9wysfv449s8dp4cz",
+        "expectedVersion": 1,
+        "expectedDescription": "Lobster Rolls - Show Association",
+        "eventDishId": "n17dhm4cc715ahk5r3qrt1zvzn8dqcx3",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mini Lobster Roll; pages 3"
+      },
+      {
+        "itemId": "qh7e92rc4g08p7cr0ha8crw89d8dpa5n",
+        "expectedVersion": 1,
+        "expectedDescription": "Lobster Salad - Show Association",
+        "eventDishId": "n17dhm4cc715ahk5r3qrt1zvzn8dqcx3",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mini Lobster Roll; pages 3"
+      },
+      {
+        "itemId": "qh701anxas9xw90jpnxdtf90398dqq1e",
+        "expectedVersion": 1,
+        "expectedDescription": "Long Skewers - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh7c3w0y7zva89fsnabcnqd42s8dq778",
+        "expectedVersion": 1,
+        "expectedDescription": "Mac and Cheese Balls - Show Association",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 3"
+      },
+      {
+        "itemId": "qh7d2h3gh4a16k9x5wmazmdrzh8dpzvx",
+        "expectedVersion": 1,
+        "expectedDescription": "Mac and Cheese Sauce - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh704at70by6f4d7axzsq1nmmn8dq5kr",
+        "expectedVersion": 1,
+        "expectedDescription": "Mac Noodles - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh75jj389d9rz9j1j96wejkzq18dpyf1",
+        "expectedVersion": 1,
+        "expectedDescription": "Mac Topping - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh7ew0y8c1my3vzk8a8hv3sg0h8dpbc2",
+        "expectedVersion": 1,
+        "expectedDescription": "Marshmallows - Large - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh73ewcykq711sg9t8vbyqa2j58dqq22",
+        "expectedVersion": 1,
+        "expectedDescription": "Micro Greens - Show Association",
+        "eventDishId": "n170net5wkmkjdaaqvpydxy3n98dq98z",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Ahi Tuna Wonton; pages 1"
+      },
+      {
+        "itemId": "qh76dr7a8hmdy5ef6ejtf5q8dx8dpg0f",
+        "expectedVersion": 1,
+        "expectedDescription": "Micro Greens - Show Association",
+        "eventDishId": "n17a8e95c8fwqwvatxnzjgxw4h8dpamv",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Fried Gourmet Mac n Cheese Bites; pages 3"
+      },
+      {
+        "itemId": "qh73gskd69qy6d447gt6as2wh18dq692",
+        "expectedVersion": 1,
+        "expectedDescription": "Micro Greens - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh79aq73rzrqdm09wk4rymp4s18dpaq4",
+        "expectedVersion": 1,
+        "expectedDescription": "Parchment Paper - Show Association",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh78r4vq7sbbvnppsmmtbmhmbn8dphpn",
+        "expectedVersion": 1,
+        "expectedDescription": "Perforated Hotel Pan - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh7e11v7af2wd7wtjzt5bwhwkh8dqh71",
+        "expectedVersion": 1,
+        "expectedDescription": "Potato garnish - Show Association",
+        "eventDishId": "n170h1czw4j63167e78q33d3k58dpyq2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Whipped Yukon Mashed Potatoes; pages 4"
+      },
+      {
+        "itemId": "qh7dv96qg6tq64477krkkzzjdx8dq4t5",
+        "expectedVersion": 1,
+        "expectedDescription": "Potato item in Hotel Pan - Show Association",
+        "eventDishId": "n170h1czw4j63167e78q33d3k58dpyq2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Whipped Yukon Mashed Potatoes; pages 4"
+      },
+      {
+        "itemId": "qh7d6zd0jm31nafhexm7m9r5gx8dq006",
+        "expectedVersion": 1,
+        "expectedDescription": "Raspberry Balsamic Dressing - Show Association",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh7cfj16vd8zmzs3v9y1rvs72d8dqkek",
+        "expectedVersion": 1,
+        "expectedDescription": "Red Chimichurri - Show Association",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh7drfdbfn09krwf3g4yf5vxjh8dpxcb",
+        "expectedVersion": 1,
+        "expectedDescription": "Reese's Spread - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh79j8swq79zhnzhgdyygbp8tx8dpbgm",
+        "expectedVersion": 1,
+        "expectedDescription": "Roasting Pans - Show Association",
+        "eventDishId": "n17asqew52vwdfshznfj5tzkrh8dpevx",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Asparagus; pages 1"
+      },
+      {
+        "itemId": "qh7e9b3erb0swd5t7ad0a6sghx8dqxck",
+        "expectedVersion": 1,
+        "expectedDescription": "Salt - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh78grwb97m9pv93yd9gyvmntd8dpcnd",
+        "expectedVersion": 1,
+        "expectedDescription": "Sambal Aioli - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh7fhkdar2ex5qatdppf16k8vn8dqwmk",
+        "expectedVersion": 1,
+        "expectedDescription": "Sauce Pan - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh77favyvz9d3ka9df2atv36ex8dq4pe",
+        "expectedVersion": 1,
+        "expectedDescription": "Scrap Bucket - Show Association",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh7f6c0azvt9mkkvsqj2nmb07x8dp0nj",
+        "expectedVersion": 1,
+        "expectedDescription": "Seared Tuna - Show Association",
+        "eventDishId": "n170net5wkmkjdaaqvpydxy3n98dq98z",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Ahi Tuna Wonton; pages 1"
+      },
+      {
+        "itemId": "qh7exmacy4fmwfcn9thh5ph7h18dqz4s",
+        "expectedVersion": 1,
+        "expectedDescription": "Sheet Tray - Show Association",
+        "eventDishId": "n17bgwdmbs3zdx9kzzk6n6tk9s8dpk3m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Bruschetta Crostini; pages 1"
+      },
+      {
+        "itemId": "qh7agg61wjy46snwe40bpf331d8dqeaf",
+        "expectedVersion": 1,
+        "expectedDescription": "Sheet Tray - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7amnszjdg80m7cb8ae8yj3pn8dqt1g",
+        "expectedVersion": 1,
+        "expectedDescription": "Sheet Tray - Show Association",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh7asbpjkx4edf25qs9rj1n7en8dqtzd",
+        "expectedVersion": 1,
+        "expectedDescription": "Skewers - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh7d6zss8hr7vgwmxsnd8bb0hx8dq471",
+        "expectedVersion": 1,
+        "expectedDescription": "Sliced Strawberries - Show Association",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh7bhr7v4vsnmz7zx849j0t18s8dqjsx",
+        "expectedVersion": 1,
+        "expectedDescription": "Spatula - Rubber - Show Association",
+        "eventDishId": "n170h1czw4j63167e78q33d3k58dpyq2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Whipped Yukon Mashed Potatoes; pages 4"
+      },
+      {
+        "itemId": "qh7evg0zf1k7tk1naf8ebab8498dp65g",
+        "expectedVersion": 1,
+        "expectedDescription": "Spring Mix - Show Association",
+        "eventDishId": "n175nqgbrkhndnmgf76s3j9scn8dp19m",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mid Summer Wedding Salad; pages 3"
+      },
+      {
+        "itemId": "qh795znsmr1cabt0w9x0gphf2x8dpqkd",
+        "expectedVersion": 1,
+        "expectedDescription": "Stockpot - Show Association",
+        "eventDishId": "n17a42jw4zzg2vx3rrycaa2z818dqw5r",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Cougar Gold Gourmet Mac n Cheese; pages 2"
+      },
+      {
+        "itemId": "qh71352ywrgwrfqq8f3ehkfqx18dqqb1",
+        "expectedVersion": 1,
+        "expectedDescription": "Stuffed Chicken Roulade - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh7c3tv1zfhmy542v3pxhbe4698dphbr",
+        "expectedVersion": 1,
+        "expectedDescription": "Tarragon - Show Association",
+        "eventDishId": "n17dhm4cc715ahk5r3qrt1zvzn8dqcx3",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Mini Lobster Roll; pages 3"
+      },
+      {
+        "itemId": "qh7fd3qyy4aasy745ecey66s158dqw6d",
+        "expectedVersion": 1,
+        "expectedDescription": "Togarashi * - Show Association",
+        "eventDishId": "n170net5wkmkjdaaqvpydxy3n98dq98z",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Ahi Tuna Wonton; pages 1"
+      },
+      {
+        "itemId": "qh72zq58xtc5479c7dkyd37xr58dqptf",
+        "expectedVersion": 1,
+        "expectedDescription": "Tri Tip - Show Association",
+        "eventDishId": "n17cy3j08gja6fhd2rt0x7y9ns8dp8mt",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: New York Strip; pages 3"
+      },
+      {
+        "itemId": "qh72c08bh36yt82jrax6cbxw7s8dp9py",
+        "expectedVersion": 1,
+        "expectedDescription": "Wasabi Aioli - Show Association",
+        "eventDishId": "n170net5wkmkjdaaqvpydxy3n98dq98z",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Ahi Tuna Wonton; pages 1"
+      },
+      {
+        "itemId": "qh796brh48ncgpb1gew32j4egs8dq7k5",
+        "expectedVersion": 1,
+        "expectedDescription": "Wisk - Show Association",
+        "eventDishId": "n17b746gj51h90nfm3yhw9gg158dphy9",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Roulade; pages 2"
+      },
+      {
+        "itemId": "qh77f4wcpwqw075tjbaj0vgah18dqkg0",
+        "expectedVersion": 1,
+        "expectedDescription": "Wok - Show Association",
+        "eventDishId": "n17eh5s81296h34bx1gng9s40h8dqmbb",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Chicken Katsu Bao Bun; pages 1"
+      },
+      {
+        "itemId": "qh7a9e3pagkjaxf5k5d0geb1018dq5nt",
+        "expectedVersion": 1,
+        "expectedDescription": "Wonton *** - Show Association",
+        "eventDishId": "n170net5wkmkjdaaqvpydxy3n98dq98z",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Ahi Tuna Wonton; pages 1"
+      },
+      {
+        "itemId": "qh759m0vzgakfd6vkta5jca9ws8dpdm8",
+        "expectedVersion": 1,
+        "expectedDescription": "XX Lighter - Show Association",
+        "eventDishId": "n171hck5gz6jtyvdge95jecdrn8dqcp2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Smore Bar; pages 4"
+      },
+      {
+        "itemId": "qh73dp2250ch5dqs20wq30hs2n8dp4dy",
+        "expectedVersion": 1,
+        "expectedDescription": "Yukon Potatoes - Show Association",
+        "eventDishId": "n170h1czw4j63167e78q33d3k58dpyq2",
+        "expectedEventDishVersion": 3,
+        "sourceReference": "REF-pack-list.pdf: Whipped Yukon Mashed Potatoes; pages 4"
+      }
+    ]
+  },
+  "evidence": [
+    {
+      "itemId": "qh7e1ksb14j42gw0yzgrrxddgs8dpk10",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 163.3569793701172, 228.68002319335938,
+            174.51698303222656
+          ],
+          "association": "Chicken Roulade",
+          "name": "| K| Chafer Set (in Chafer Kit)",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["roll top"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh7a1692hcj166b9cvjz59y3918dqgsn",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 310.3059997558594, 228.68002319335938,
+            321.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "| K| Chafer Set (in Chafer Kit)",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77szx09jsr7retpqwxqm9e0s8dp6rz",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 352.4781188964844, 228.68002319335938,
+            363.6380920410156
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "| K| Chafer Set (in Chafer Kit)",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ajrca3j69rnqf9mjz4q7whn8dq6ws",
+      "association": "Whipped Yukon Mashed Potatoes",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 490.3022155761719, 228.68002319335938,
+            501.4621887207031
+          ],
+          "association": "Whipped Yukon Mashed Potatoes",
+          "name": "| K| Chafer Set (in Chafer Kit)",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh76gbjeayhh2b9wpwzczfz9ks8dq5vw",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 595.3541259765625, 228.68002319335938,
+            606.5140991210938
+          ],
+          "association": "New York Strip",
+          "name": "| K| Chafer Set (in Chafer Kit)",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7cph5frfdc7969qg2axarwv18dqkbq",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 163.3569793701172, 502.9297790527344,
+            174.51698303222656
+          ],
+          "association": "Chicken Roulade",
+          "name": "| K| Sterno Fuel (in Chafer Kit)",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ddc6cx36fvkn0ng4etfps218dpvmc",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 310.3059997558594, 502.9297790527344,
+            321.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "| K| Sterno Fuel (in Chafer Kit)",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7b6yxcy6p3ajxhgfwc16xz758dqavq",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 352.4781188964844, 502.9297790527344,
+            363.6380920410156
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "| K| Sterno Fuel (in Chafer Kit)",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77vh3vpzk76d6z5hcz3a3dw98dq0f1",
+      "association": "Whipped Yukon Mashed Potatoes",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 490.3022155761719, 502.9297790527344,
+            501.4621887207031
+          ],
+          "association": "Whipped Yukon Mashed Potatoes",
+          "name": "| K| Sterno Fuel (in Chafer Kit)",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh76sqyjh3dnnjs2t1mkmb71e58dqve6",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 595.3541259765625, 502.9297790527344,
+            606.5140991210938
+          ],
+          "association": "New York Strip",
+          "name": "| K| Sterno Fuel (in Chafer Kit)",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7bpwg2y32b9hn9wcm5ntdsa58dq4ym",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 545.2050170898438, 237.6199951171875,
+            556.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "|A04| Cocktail Plates (black)",
+          "quantity": 33.6,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh723wc4q61bm197x5j0qk83b98dpvnn",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 163.3569793701172, 248.739990234375,
+            174.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|A04| Cocktail Plates (black)",
+          "quantity": 125.25,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh748g5chjv9b0mmakby03n5kh8dqb0b",
+      "association": "Mini Lobster Roll",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 487.3551025390625, 224.31997680664062,
+            498.51507568359375
+          ],
+          "association": "Mini Lobster Roll",
+          "name": "|A16| Cocktail Napkins",
+          "quantity": 125.25,
+          "unit": "Each",
+          "notes": ["black"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh76cmy1ez05yp1jchtye1gg998dqvzq",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 694.720458984375, 213.19998168945312,
+            705.8804321289062
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "|A16| Cocktail Napkins",
+          "quantity": 31.5,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh75xyzqqnnn90pq8d71r9vzfs8dpazf",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 545.2050170898438, 483.55987548828125,
+            556.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "|A16| Cocktail Napkins",
+          "quantity": 29.4,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7achfy076fvwe8k23vspbysn8dq84k",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 163.3569793701172, 494.67987060546875,
+            174.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|A16| Cocktail Napkins",
+          "quantity": 125.25,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh737xenyfs2wfjmw2qsk6q27x8dqep1",
+      "association": "Fresh Baked Dinner Rolls with Honey Butter",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 542.5001831054688, 177.05999755859375,
+            553.66015625
+          ],
+          "association": "Fresh Baked Dinner Rolls with Honey Butter",
+          "name": "|B02| Butter Knife",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh71y3qp8dqb432kkrkgb1nzdd8dq559",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 181.3569793701172, 177.05999755859375,
+            192.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|B02| Butter Knife",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7b2xwcwp2as0gwp32gdj7hhd8dppsb",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 343.35601806640625, 230.9499969482422,
+            354.5159912109375
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "|B04| Serving Tongs - Scissor",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh79q1d53sbdhc5fhnnwydap958dpg5a",
+      "association": "Ahi Tuna Wonton",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 184.30711364746094, 223.1699981689453,
+            195.4671173095703
+          ],
+          "association": "Ahi Tuna Wonton",
+          "name": "|B04| Serving Tongs - Small",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh7797jjd1ntfm434e6g6sh1r18dpr6t",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 437.2060241699219, 223.1699981689453,
+            448.3659973144531
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "|B04| Serving Tongs - Small",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7dhn7aet7y113yz0432d6pzh8dqtff",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 563.2050170898438, 223.1699981689453,
+            574.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "|B04| Serving Tongs - Small",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77yfzzfx3waxr7xm28qd0yd18dqcch",
+      "association": "Fresh Baked Dinner Rolls with Honey Butter",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 542.5001831054688, 493.52984619140625,
+            553.66015625
+          ],
+          "association": "Fresh Baked Dinner Rolls with Honey Butter",
+          "name": "|B04| Serving Tongs - Small",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77kmdr58043ypq1ak1bd9pe18dq4r9",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 181.3569793701172, 493.52984619140625,
+            192.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|B04| Serving Tongs - Small",
+          "quantity": 3.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7bezh1cccekgxfsyxyxnjpcs8dptth",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 198.4559783935547, 238.739990234375,
+            209.61598205566406
+          ],
+          "association": "Chicken Roulade",
+          "name": "|B05| Serving Tongs - Standard",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh77aj40f6wqeanp94wwrg7wph8dpeac",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 328.3059997558594, 238.739990234375,
+            339.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "|B05| Serving Tongs - Standard",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh75axe2cbw41mffa6rhhhntws8dq6zt",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 613.3541259765625, 238.739990234375,
+            624.5140991210938
+          ],
+          "association": "New York Strip",
+          "name": "|B05| Serving Tongs - Standard",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh749qn9ra6e6r1j49yz257knd8dp1b0",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 199.3569793701172, 201.51998901367188,
+            210.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|B10| Glass Jar - Large",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7bn93cy0yrf2cfax11r66bgx8dqtn6",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 694.720458984375, 452.46990966796875,
+            705.8804321289062
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "|B11| Tablespoons",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": ["stainless"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh7cyvyx7f97jy12a91yspznhs8dpkr6",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 563.2050170898438, 452.46990966796875,
+            574.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "|B11| Tablespoons",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh78166pmhr21949w4b8y9hpb58dqft7",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 198.4559783935547, 452.46990966796875,
+            209.61598205566406
+          ],
+          "association": "Chicken Roulade",
+          "name": "|B11| Tablespoons",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ewtj8ete66m12htkqesvs898dq2j0",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 199.3569793701172, 452.46990966796875,
+            210.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|B11| Tablespoons",
+          "quantity": 3.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7cqw0pvgscfw6srec6ks5r618dpd41",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 613.3541259765625, 452.46990966796875,
+            624.5140991210938
+          ],
+          "association": "New York Strip",
+          "name": "|B11| Tablespoons",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh71v30m6kp6wsz6mzsghjwqs18dq69z",
+      "association": "Fresh Baked Dinner Rolls with Honey Butter",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 577.5993041992188, 248.7799835205078,
+            588.75927734375
+          ],
+          "association": "Fresh Baked Dinner Rolls with Honey Butter",
+          "name": "|B12| 1oz Squeeze Handle Scoop",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77m05tdd3vv62x0vcg9d58rd8dqkv8",
+      "association": "Whipped Yukon Mashed Potatoes",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 508.30218505859375, 248.7799835205078,
+            519.462158203125
+          ],
+          "association": "Whipped Yukon Mashed Potatoes",
+          "name": "|B14| 3oz Squeeze Handle Scoop",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh753eenv94ah7mk2jqq71e9nn8dpg2e",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 370.4781188964844, 195.4299774169922,
+            381.6380920410156
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "|B14| Serving Spoons",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh72gajym644ymscw7jmnzfa8n8dp616",
+      "association": "Tableside Water Service - Bringing Water",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 389.3791198730469, 200.92001342773438,
+            400.5390930175781
+          ],
+          "association": "Tableside Water Service - Bringing Water",
+          "name": "|BAR| Bus Tub For Bar",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7fajztfg552h6rh9gjhkp1tn8dqp9h",
+      "association": "Tableside Water Service - Bringing Water",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 389.3791198730469, 442.4299011230469,
+            400.5390930175781
+          ],
+          "association": "Tableside Water Service - Bringing Water",
+          "name": "|BAR| Ice Scoop",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77saywr1ksaqnb385nvtp25s8dppe7",
+      "association": "Fresh Baked Dinner Rolls with Honey Butter",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 577.5993041992188, 460.77984619140625,
+            588.75927734375
+          ],
+          "association": "Fresh Baked Dinner Rolls with Honey Butter",
+          "name": "|C03| Basket - Large",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["wire"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh765t9956mt7rfmxwnrxae71s8dp6ej",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 217.3569793701172, 181.5299835205078,
+            228.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|C07| Bowl - Large",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh7dnz165heqjrkm54cmpm6n218dqjys",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 343.35601806640625, 451.8798828125,
+            354.5159912109375
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "|C09| Bowl - Salad",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": ["grey melamine"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh7bmf0e1jhfqxw6q0amzsq6g18dqhz5",
+      "association": "Fresh Baked Dinner Rolls with Honey Butter",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 612.6983032226562, 180.9499969482422,
+            623.8582763671875
+          ],
+          "association": "Fresh Baked Dinner Rolls with Honey Butter",
+          "name": "|C11| Bowl - Small",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": ["hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh759e1hycn9hj6sg4rq6t43vn8dqdcv",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 217.3569793701172, 451.30987548828125,
+            228.51698303222656
+          ],
+          "association": "Smore Bar",
+          "name": "|C11| Bowl - Small",
+          "quantity": 3.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh79f63d3x0py6pvzxhnq7k2v58dpat2",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 631.3541259765625, 180.9499969482422,
+            642.5140991210938
+          ],
+          "association": "New York Strip",
+          "name": "|C11| Bowl - Small",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh75gcj4z8fy6ys3e6kqz6nyws8dpwnp",
+      "association": "Tableside Water Service - Bringing Water",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 407.3791198730469, 237.59999084472656,
+            418.5390930175781
+          ],
+          "association": "Tableside Water Service - Bringing Water",
+          "name": "|C12| Plastic Water Pitcher",
+          "quantity": 13.36,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ekg2b0wpb2z20mndj481t2x8dpq17",
+      "association": "Ahi Tuna Wonton",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 184.30711364746094, 467.3998107910156,
+            195.4671173095703
+          ],
+          "association": "Ahi Tuna Wonton",
+          "name": "|D| Platter - Stationary",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": ["square hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh73znywvtgcfwf54kb7h2wb5x8dqybp",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 437.2060241699219, 562.3696899414062,
+            448.3659973144531
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "|D| Platter - Stationary (Medium for Display)",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": ["hammered"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh71xv0s6chjgmcpwacmg1fwqh8dpfc2",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 252.4559783935547, 213.72999572753906,
+            263.615966796875
+          ],
+          "association": "Smore Bar",
+          "name": "|DS| Marshmallow Station",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7bnpw2wdxrj64dbbd6fm06298dpprk",
+      "association": "Infused Water",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 253.3569793701172, 215.43997192382812,
+            264.5169677734375
+          ],
+          "association": "Infused Water",
+          "name": "|E01| Beverage Dispenser",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72rj0xz3k31vsbr3mh08q76s8dqsjz",
+      "association": "Infused Water",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 253.3569793701172, 521.8698120117188,
+            264.5169677734375
+          ],
+          "association": "Infused Water",
+          "name": "|E05| Clear Plastic Cups - 9oz",
+          "quantity": 183.7,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7emjmpz214mke6x865vas8c98dpqpg",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 581.2050170898438, 525.2197875976562,
+            592.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "|G01| Bamboo Steamer - Cooking",
+          "quantity": 10.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh76q0pvqqgsp4n2s689eqexmn8dqeak",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 599.2050170898438, 246.50999450683594,
+            610.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "|G01| Bamboo Steamer - Serving",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7eq9prrr0nymc2c7v35h73gd8dpjpx",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 252.4559783935547, 464.28985595703125,
+            263.615966796875
+          ],
+          "association": "Smore Bar",
+          "name": "|GAR| Table - 6' FOH",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh71cmna0pq685k0tqssn5ked58dq8rp",
+      "association": "Tableside Water Service - Bringing Water",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 407.3791198730469, 423.5398864746094,
+            418.5390930175781
+          ],
+          "association": "Tableside Water Service - Bringing Water",
+          "name": "|I| Tray Jack",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72ae3r27qwvf2915pggwnqnx8dpck8",
+      "association": "Tableside Water Service - Bringing Water",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 425.3791198730469, 207.63999938964844,
+            436.5390930175781
+          ],
+          "association": "Tableside Water Service - Bringing Water",
+          "name": "|I05| Large Bussing Tray",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh76ergt188mp0q1nww2pa5v598dq01k",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 270.45599365234375, 155.96998596191406,
+            281.615966796875
+          ],
+          "association": "Smore Bar",
+          "name": "|RS5| Sterno",
+          "quantity": 8.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72amy7z63pkd2hatbyvswrdx8dpapw",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 144.45701599121094, 457.9898986816406,
+            155.6170196533203
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "|RS6| Paper Towels",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77rmhn3vf55snt8g95cs46s98dq1jv",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 233.5549774169922, 168.77996826171875,
+            244.71498107910156
+          ],
+          "association": "Chicken Roulade",
+          "name": "2\" Hotel Pan",
+          "quantity": 6.68,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7f39p889c5efv4sqay6rvrx98dpwq6",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 328.3059997558594, 439.139892578125,
+            339.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "2\" Hotel Pan",
+          "quantity": 5.01,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh70952pa0hncggbz1gz96y6a98dpe8j",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 162.45701599121094, 168.77996826171875,
+            173.6170196533203
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "4\" Hotel Pan",
+          "quantity": 0.84,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh750mbxr49z1b1aes3jtwgd018dpnp6",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 631.3541259765625, 439.139892578125,
+            642.5140991210938
+          ],
+          "association": "New York Strip",
+          "name": "4\" Hotel Pan",
+          "quantity": 5.01,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7cg29kpvzsdpg8t2gzshekr18dpatp",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 405.5771179199219, 168.77996826171875,
+            416.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "6\" Hotel Pan",
+          "quantity": 3.34,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh71b7at91ystamk3sntfjee858dpt0h",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 346.3059997558594, 172.4999542236328,
+            357.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "Asparagus",
+          "quantity": 41.75,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ed1xkkpvwn7ahb89fv0k40s8dqdmj",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 405.5771179199219, 437.2698974609375,
+            416.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Bacon Bits",
+          "quantity": 6.68,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7dgxv0mq8vbz9bwnp1v3b07d8dqkdf",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 162.45701599121094, 446.1298522949219,
+            173.6170196533203
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "Bacon Jam",
+          "quantity": 10.5,
+          "unit": "Oz - Fld",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh73gtgh3xqfgax9sbx362fvsh8dp22w",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 423.5771179199219, 146.90997314453125,
+            434.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Bain Marie",
+          "quantity": 4.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7aperbexmcawqg0k6z4gv6nh8dph1r",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 472.3050231933594, 195.19998168945312,
+            483.4649963378906
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "Balsamic Glaze",
+          "quantity": 10.5,
+          "unit": "Oz - Fld",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7djgz4y4vnqbzr80sj0zce298dp3s2",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 599.2050170898438, 413.3899230957031,
+            610.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "Bao Bun",
+          "quantity": 84.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7cmj2rynk4hs3sfr9zzes7ss8dqqrz",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 472.3050231933594, 448.31982421875,
+            483.4649963378906
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "Basil - Fresh",
+          "quantity": 4.2,
+          "unit": "Oz - Dry",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7d8j79c1733nv3kxcykdtsg18dqh7f",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 490.3050231933594, 185.1999969482422,
+            501.4649963378906
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "Bruschetta Mix",
+          "quantity": 84.0,
+          "unit": "Oz - Dry",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh791hqes64ha22rcbgqj765cd8dpg25",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 346.3059997558594, 468.9398193359375,
+            357.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "Butter (unsalted)",
+          "quantity": 10.02,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh73210fj4tjhyqfnng9bfw8d98dq8tt",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 378.4551086425781, 465.619873046875,
+            389.6150817871094
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "Candied Walnuts",
+          "quantity": 5.01,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh75mzm9gnxznhxetegn9axdhs8dqcsm",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 270.45599365234375, 465.01983642578125,
+            281.615966796875
+          ],
+          "association": "Smore Bar",
+          "name": "Caramel Sauce",
+          "quantity": 83.5,
+          "unit": "Oz - Fld",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ejkt4w6v4f30brb3haqe4zs8dqrw1",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 180.45701599121094, 282.469970703125,
+            191.6170196533203
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "Cheese - Parmesan / Romano Blend",
+          "quantity": 0.42,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7a2f9zyevmhvxpawng8tftrn8dq5zp",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 364.3059997558594, 520.6298217773438,
+            375.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "Cheese - Shaved Parmesan",
+          "quantity": 10.02,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72e9pfrpn2et8b4j7s1xpf198dpvch",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 617.2050170898438, 162.45999145507812,
+            628.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "Chicken Filet",
+          "quantity": 84.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7c3nmqpst3pejekaytqz8jjh8dqxf8",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 288.4560241699219, 201.8899688720703,
+            299.6159973144531
+          ],
+          "association": "Smore Bar",
+          "name": "Chocolate Sauce",
+          "quantity": 83.5,
+          "unit": "Oz - Fld",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7fnt866smwjp9hfq2hsv0j458dq39p",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 617.2050170898438, 426.6798400878906,
+            628.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "Cilantro",
+          "quantity": 6.3,
+          "unit": "Oz - Dry",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72sb44y28heend1nswhx2awn8dpyrq",
+      "association": "Tableside Water Service - Bringing Water",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 425.3791198730469, 484.4798278808594,
+            436.5390930175781
+          ],
+          "association": "Tableside Water Service - Bringing Water",
+          "name": "Cold Drinking Water",
+          "quantity": 13.36,
+          "unit": "Gallon",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh74yb5rt3q8zb391pmfcjbpfn8dqc9v",
+      "association": "Infused Water",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 271.3570251464844, 271.3199768066406,
+            282.5169982910156
+          ],
+          "association": "Infused Water",
+          "name": "Cold Drinking Water in Container - MINIMUM 5 GALLONS",
+          "quantity": 33.4,
+          "unit": "Gallon",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7aqjn9fvn5gzwxytkwtp2m2d8dpp4p",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 441.5771179199219, 171.3499755859375,
+            452.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Cooking Water",
+          "quantity": 8.0,
+          "unit": "Gallon",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ajrgw0q1qejm2r94ghm1gb98dqn6c",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 251.5549774169922, 503.9097900390625,
+            262.7149658203125
+          ],
+          "association": "Chicken Roulade",
+          "name": "Cream sauce for chicken",
+          "quantity": 167.0,
+          "unit": "Oz - Fld",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7285pqyk5phsb5w380vst5118dqa5s",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 667.3541259765625, 206.90997314453125,
+            678.5140991210938
+          ],
+          "association": "New York Strip",
+          "name": "Creamy Horseradish",
+          "quantity": 5.18,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh76a9ymh7ajatjd2rvjmmtjjn8dq026",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 490.3050231933594, 416.159912109375,
+            501.4649963378906
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "Crostinis",
+          "quantity": 84.0,
+          "unit": "Piece",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh748aj67w1bqcw7yys9bvtpe98dp579",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 635.2050170898438, 198.0299835205078,
+            646.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "Cucumber Kimchi",
+          "quantity": 0.63,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77n0bzqkc11yk5fr8y6xbhad8dpqbe",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 288.4560241699219, 493.38983154296875,
+            299.6159973144531
+          ],
+          "association": "Smore Bar",
+          "name": "Deluxe Graham Crackers",
+          "quantity": 334.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh73mf007ss3ad9xh8915dbyt18dqcsc",
+      "association": "Fresh Baked Dinner Rolls with Honey Butter",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 612.6983032226562, 435.0599060058594,
+            623.8582763671875
+          ],
+          "association": "Fresh Baked Dinner Rolls with Honey Butter",
+          "name": "Dinner Rolls",
+          "quantity": 167.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7bskyd2j4c3nzz824xejabw58dqn89",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 269.55499267578125, 175.22999572753906,
+            280.7149658203125
+          ],
+          "association": "Chicken Roulade",
+          "name": "Drip Cup with Lid",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7az7h17ehvd5enchf15bbtbn8dqy93",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 396.4551086425781, 189.68997192382812,
+            407.6150817871094
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "Fennel - Fresh",
+          "quantity": 10.02,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7e9s33grhgaknsd6vrgk5k718dqx46",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 180.45701599121094, 418.929931640625,
+            191.6170196533203
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "Food Picks",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh718cpd833x3hkemza294cpf18dq4pz",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 396.4551086425781, 516.1898193359375,
+            407.6150817871094
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "Gorgonzola Cheese Crumbs",
+          "quantity": 5.18,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh750cy6e26hg90rw8ajn2rrw58dpx4z",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 306.4560241699219, 174.13998413085938,
+            317.6159973144531
+          ],
+          "association": "Smore Bar",
+          "name": "Hershey Bar",
+          "quantity": 55.11,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7esbvnkx9kpjz8bb1jn5b8cx8dpm5x",
+      "association": "Fresh Baked Dinner Rolls with Honey Butter",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 647.7974243164062, 264.1199645996094,
+            658.9573974609375
+          ],
+          "association": "Fresh Baked Dinner Rolls with Honey Butter",
+          "name": "Honey Cinnamon Whipped Butter",
+          "quantity": 3.34,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh71bspcd22z5jykgzjejd2ven8dqmef",
+      "association": "Infused Water",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 271.3570251464844, 408.39990234375,
+            282.5169982910156
+          ],
+          "association": "Infused Water",
+          "name": "Ice",
+          "quantity": 41.75,
+          "unit": "Pound",
+          "notes": ["Bring ice caddy for pre filled water"]
+        }
+      ]
+    },
+    {
+      "itemId": "qh7dxf9j1nbmbms62r7pdmr9198dp5dp",
+      "association": "Tableside Water Service - Bringing Water",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 443.3791198730469, 132.47996520996094,
+            454.5390930175781
+          ],
+          "association": "Tableside Water Service - Bringing Water",
+          "name": "Ice",
+          "quantity": 83.5,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7c5g4jzqectc5y0frvs3cs098dqd85",
+      "association": "Infused Water",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 306.4560241699219, 178.52999877929688,
+            317.6159973144531
+          ],
+          "association": "Infused Water",
+          "name": "Infused Water Kit",
+          "quantity": 1.0,
+          "unit": "Batch",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72srqvjrsycy5a5pv9anmf258dpz94",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 414.4551086425781, 207.44996643066406,
+            425.6150817871094
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "Kitchen Mixing Bowls",
+          "quantity": 3.34,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh78k60av4zvas7mhywp789q418dpa2v",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 382.3059997558594, 154.15997314453125,
+            393.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "Lemons",
+          "quantity": 41.75,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh74ztw5f2fv4z4342dtbjwqzs8dpz79",
+      "association": "Mini Lobster Roll",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 522.4541015625, 177.47998046875,
+            533.6140747070312
+          ],
+          "association": "Mini Lobster Roll",
+          "name": "Lobster Meat",
+          "quantity": 1.26,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7awcngezq4y1nh9wysfv449s8dp4cz",
+      "association": "Mini Lobster Roll",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 522.4541015625, 433.389892578125,
+            533.6140747070312
+          ],
+          "association": "Mini Lobster Roll",
+          "name": "Lobster Rolls",
+          "quantity": 84.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7e92rc4g08p7cr0ha8crw89d8dpa5n",
+      "association": "Mini Lobster Roll",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 540.4541015625, 180.81997680664062,
+            551.6140747070312
+          ],
+          "association": "Mini Lobster Roll",
+          "name": "Lobster Salad",
+          "quantity": 2.52,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh701anxas9xw90jpnxdtf90398dqq1e",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 306.4560241699219, 452.2898864746094,
+            317.6159973144531
+          ],
+          "association": "Smore Bar",
+          "name": "Long Skewers",
+          "quantity": 183.7,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7c3w0y7zva89fsnabcnqd42s8dq778",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 198.45701599121094, 204.69998168945312,
+            209.6170196533203
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "Mac and Cheese Balls",
+          "quantity": 84.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7d2h3gh4a16k9x5wmazmdrzh8dpzvx",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 441.5771179199219, 497.8398132324219,
+            452.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Mac and Cheese Sauce",
+          "quantity": 15.03,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh704at70by6f4d7axzsq1nmmn8dq5kr",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 459.5771179199219, 183.04995727539062,
+            470.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Mac Noodles",
+          "quantity": 41.75,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh75jj389d9rz9j1j96wejkzq18dpyf1",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 459.5771179199219, 447.2898864746094,
+            470.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Mac Topping",
+          "quantity": 3.34,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7ew0y8c1my3vzk8a8hv3sg0h8dpbc2",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 324.4560241699219, 208.58998107910156,
+            335.6159973144531
+          ],
+          "association": "Smore Bar",
+          "name": "Marshmallows - Large",
+          "quantity": 167.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh73ewcykq711sg9t8vbyqa2j58dqq22",
+      "association": "Ahi Tuna Wonton",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 237.40611267089844, 187.4299774169922,
+            248.5661163330078
+          ],
+          "association": "Ahi Tuna Wonton",
+          "name": "Micro Greens",
+          "quantity": 0.01,
+          "unit": "Oz - Dry",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh76dr7a8hmdy5ef6ejtf5q8dx8dpg0f",
+      "association": "Fried Gourmet Mac n Cheese Bites",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 198.45701599121094, 452.22979736328125,
+            209.6170196533203
+          ],
+          "association": "Fried Gourmet Mac n Cheese Bites",
+          "name": "Micro Greens",
+          "quantity": 4.2,
+          "unit": "Oz - Dry",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh73gskd69qy6d447gt6as2wh18dq692",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 269.55499267578125, 457.789794921875,
+            280.7149658203125
+          ],
+          "association": "Chicken Roulade",
+          "name": "Micro Greens",
+          "quantity": 1.67,
+          "unit": "Oz - Dry",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh79aq73rzrqdm09wk4rymp4s18dpaq4",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 508.30499267578125, 190.7999725341797,
+            519.4649658203125
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "Parchment Paper",
+          "quantity": 1.26,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh78r4vq7sbbvnppsmmtbmhmbn8dphpn",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 477.5771179199219, 192.4499969482422,
+            488.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Perforated Hotel Pan",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7e11v7af2wd7wtjzt5bwhwkh8dqh71",
+      "association": "Whipped Yukon Mashed Potatoes",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 526.3021850585938, 433.93988037109375,
+            537.462158203125
+          ],
+          "association": "Whipped Yukon Mashed Potatoes",
+          "name": "Potato garnish",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7dv96qg6tq64477krkkzzjdx8dq4t5",
+      "association": "Whipped Yukon Mashed Potatoes",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 544.3021850585938, 220.75999450683594,
+            555.462158203125
+          ],
+          "association": "Whipped Yukon Mashed Potatoes",
+          "name": "Potato item in Hotel Pan",
+          "quantity": 3.34,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7d6zd0jm31nafhexm7m9r5gx8dq006",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 414.4551086425781, 517.2598266601562,
+            425.6150817871094
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "Raspberry Balsamic Dressing",
+          "quantity": 3.34,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7cfj16vd8zmzs3v9y1rvs72d8dqkek",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 685.3540649414062, 186.8999786376953,
+            696.5140380859375
+          ],
+          "association": "New York Strip",
+          "name": "Red Chimichurri",
+          "quantity": 5.18,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7drfdbfn09krwf3g4yf5vxjh8dpxcb",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 342.4560241699219, 186.0399627685547,
+            353.6159973144531
+          ],
+          "association": "Smore Bar",
+          "name": "Reese's Spread",
+          "quantity": 3.34,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh79j8swq79zhnzhgdyygbp8tx8dpbgm",
+      "association": "Asparagus",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 382.3059997558594, 448.389892578125,
+            393.4659729003906
+          ],
+          "association": "Asparagus",
+          "name": "Roasting Pans",
+          "quantity": 3.34,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7e9b3erb0swd5t7ad0a6sghx8dqxck",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 477.5771179199219, 401.119873046875,
+            488.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Salt",
+          "quantity": 8.0,
+          "unit": "Oz - Dry",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh78grwb97m9pv93yd9gyvmntd8dpcnd",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 635.2050170898438, 441.1398620605469,
+            646.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "Sambal Aioli",
+          "quantity": 0.84,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7fhkdar2ex5qatdppf16k8vn8dqwmk",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 287.5550231933594, 148.0299835205078,
+            298.7149963378906
+          ],
+          "association": "Chicken Roulade",
+          "name": "Sauce Pan",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77favyvz9d3ka9df2atv36ex8dq4pe",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 685.3540649414062, 428.9299011230469,
+            696.5140380859375
+          ],
+          "association": "New York Strip",
+          "name": "Scrap Bucket",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7f6c0azvt9mkkvsqj2nmb07x8dp0nj",
+      "association": "Ahi Tuna Wonton",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 237.40611267089844, 447.2898864746094,
+            248.5661163330078
+          ],
+          "association": "Ahi Tuna Wonton",
+          "name": "Seared Tuna",
+          "quantity": 2.65,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7exmacy4fmwfcn9thh5ph7h18dqz4s",
+      "association": "Bruschetta Crostini",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 508.30499267578125, 432.2598876953125,
+            519.4649658203125
+          ],
+          "association": "Bruschetta Crostini",
+          "name": "Sheet Tray",
+          "quantity": 1.26,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7agg61wjy46snwe40bpf331d8dqeaf",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 287.5550231933594, 432.2598876953125,
+            298.7149963378906
+          ],
+          "association": "Chicken Roulade",
+          "name": "Sheet Tray",
+          "quantity": 5.01,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7amnszjdg80m7cb8ae8yj3pn8dqt1g",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 703.3540649414062, 161.8999786376953,
+            714.5140380859375
+          ],
+          "association": "New York Strip",
+          "name": "Sheet Tray",
+          "quantity": 6.68,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7asbpjkx4edf25qs9rj1n7en8dqtzd",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 653.2050170898438, 151.35997009277344,
+            664.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "Skewers",
+          "quantity": 50.4,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7d6zss8hr7vgwmxsnd8bb0hx8dq471",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            58.599998474121094, 432.4551086425781, 210.7999725341797,
+            443.6150817871094
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "Sliced Strawberries",
+          "quantity": 15.03,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7bhr7v4vsnmz7zx849j0t18s8dqjsx",
+      "association": "Whipped Yukon Mashed Potatoes",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 544.3021850585938, 445.04986572265625,
+            555.462158203125
+          ],
+          "association": "Whipped Yukon Mashed Potatoes",
+          "name": "Spatula - Rubber",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7evg0zf1k7tk1naf8ebab8498dp65g",
+      "association": "Mid Summer Wedding Salad",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 432.4551086425781, 442.2798767089844,
+            443.6150817871094
+          ],
+          "association": "Mid Summer Wedding Salad",
+          "name": "Spring Mix",
+          "quantity": 15.03,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh795znsmr1cabt0w9x0gphf2x8dpqkd",
+      "association": "Cougar Gold Gourmet Mac n Cheese",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 495.5771179199219, 138.01998901367188,
+            506.7370910644531
+          ],
+          "association": "Cougar Gold Gourmet Mac n Cheese",
+          "name": "Stockpot",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh71352ywrgwrfqq8f3ehkfqx18dqqb1",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            58.599998474121094, 305.5550231933594, 220.80996704101562,
+            316.7149963378906
+          ],
+          "association": "Chicken Roulade",
+          "name": "Stuffed Chicken Roulade",
+          "quantity": 167.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7c3tv1zfhmy542v3pxhbe4698dphbr",
+      "association": "Mini Lobster Roll",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 558.4541015625, 423.3898620605469,
+            569.6140747070312
+          ],
+          "association": "Mini Lobster Roll",
+          "name": "Tarragon",
+          "quantity": 126.0,
+          "unit": "Gram",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7fd3qyy4aasy745ecey66s158dqw6d",
+      "association": "Ahi Tuna Wonton",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 255.40611267089844, 166.3499755859375,
+            266.56610107421875
+          ],
+          "association": "Ahi Tuna Wonton",
+          "name": "Togarashi *",
+          "quantity": 0.42,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72zq58xtc5479c7dkyd37xr58dqptf",
+      "association": "New York Strip",
+      "source": [
+        {
+          "page": 3,
+          "bbox": [
+            328.9599914550781, 703.3540649414062, 423.3699035644531,
+            714.5140380859375
+          ],
+          "association": "New York Strip",
+          "name": "Tri Tip",
+          "quantity": 63.46,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh72c08bh36yt82jrax6cbxw7s8dp9py",
+      "association": "Ahi Tuna Wonton",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            328.9599914550781, 255.40611267089844, 440.5798645019531,
+            266.56610107421875
+          ],
+          "association": "Ahi Tuna Wonton",
+          "name": "Wasabi Aioli",
+          "quantity": 0.84,
+          "unit": "Quart",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh796brh48ncgpb1gew32j4egs8dq7k5",
+      "association": "Chicken Roulade",
+      "source": [
+        {
+          "page": 2,
+          "bbox": [
+            328.9599914550781, 305.5550231933594, 391.1499328613281,
+            316.7149963378906
+          ],
+          "association": "Chicken Roulade",
+          "name": "Wisk",
+          "quantity": 1.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh77f4wcpwqw075tjbaj0vgah18dqkg0",
+      "association": "Chicken Katsu Bao Bun",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 671.2050170898438, 119.12998962402344,
+            682.364990234375
+          ],
+          "association": "Chicken Katsu Bao Bun",
+          "name": "Wok",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh7a9e3pagkjaxf5k5d0geb1018dq5nt",
+      "association": "Ahi Tuna Wonton",
+      "source": [
+        {
+          "page": 1,
+          "bbox": [
+            58.599998474121094, 273.406005859375, 148.01998901367188,
+            284.56597900390625
+          ],
+          "association": "Ahi Tuna Wonton",
+          "name": "Wonton ***",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh759m0vzgakfd6vkta5jca9ws8dpdm8",
+      "association": "Smore Bar",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            328.9599914550781, 342.4560241699219, 416.14990234375,
+            353.6159973144531
+          ],
+          "association": "Smore Bar",
+          "name": "XX Lighter",
+          "quantity": 2.0,
+          "unit": "Each",
+          "notes": []
+        }
+      ]
+    },
+    {
+      "itemId": "qh73dp2250ch5dqs20wq30hs2n8dp4dy",
+      "association": "Whipped Yukon Mashed Potatoes",
+      "source": [
+        {
+          "page": 4,
+          "bbox": [
+            58.599998474121094, 562.3021850585938, 195.2599639892578,
+            573.462158203125
+          ],
+          "association": "Whipped Yukon Mashed Potatoes",
+          "name": "Yukon Potatoes",
+          "quantity": 55.11,
+          "unit": "Pound",
+          "notes": []
+        }
+      ]
+    }
+  ]
+}

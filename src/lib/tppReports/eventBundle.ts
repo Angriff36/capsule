@@ -7,7 +7,10 @@
  * agent coordinator.
  */
 
+import type { PacketEvidence } from "../eventPacket/packetContract";
+
 export type EventBundleSource =
+  | "eventPacket"
   | "beo"
   | "eventWorksheet"
   | "proposal"
@@ -56,6 +59,9 @@ export interface BundleVenue {
   phone?: string;
   contactName?: string;
   contactPhone?: string;
+  /** Decimal degrees, for sites that have coordinates but no street address. */
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface BundleTimelineEntry {
@@ -121,10 +127,14 @@ export interface BundleOrderLine {
 }
 
 export interface BundleStaffAssignment {
+  /** A real name, or "Unassigned" when TPP tracks the role without a person. */
   name: string;
   role?: string;
   team?: string;
   station?: string;
+  /** Shift window, minutes after midnight, when the report prints in/out times. */
+  startMinutes?: number;
+  endMinutes?: number;
 }
 
 export interface BundlePayment {
@@ -158,9 +168,13 @@ export interface BundleNotes {
   equipmentRentals?: string;
   decor?: string;
   additionalTasks?: string;
+  /** "Allergies: NO ONIONS" — hard restrictions the whole menu must honor. */
+  dietary?: string;
 }
 
 export interface EventBundle {
+  /** Untrusted imported packet evidence; never a native create/update command payload. */
+  packetEvidence?: PacketEvidence;
   header: BundleHeader;
   client: BundlePerson;
   otherContacts: BundlePerson[];

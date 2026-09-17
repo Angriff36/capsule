@@ -1,4 +1,5 @@
 import type { QueryCtx } from "../_generated/server";
+import type { Doc } from "../_generated/dataModel";
 import { getAuthContext } from "../lib/authContext";
 import { decrypt } from "../lib/encryption";
 
@@ -26,6 +27,55 @@ export function inDateRange(
   end: number,
 ): boolean {
   return value != null && value >= start && value <= end;
+}
+
+/** Keep event snapshots; older imports may carry only the reusable venue link. */
+export async function resolveReportEventVenue(
+  ctx: QueryCtx,
+  tenantId: string,
+  event: Doc<"events">,
+  includeAddress = true,
+): Promise<Doc<"events">> {
+  const hasName = Boolean(event.venueName?.trim());
+  const hasAddress = Boolean(event.venueAddress?.trim());
+  if ((hasName && (hasAddress || !includeAddress)) || !event.venueId)
+    return event;
+  const venueId = ctx.db.normalizeId("venues", event.venueId);
+  const venue = venueId ? await ctx.db.get(venueId) : null;
+  if (!venue || !isLiveTenantRow(venue, tenantId)) return event;
+  if (!includeAddress)
+    return { ...event, venueName: hasName ? event.venueName : venue.name };
+  const plain = hasAddress
+    ? venue
+    : await decryptReportFields(
+        ctx,
+        "Venue",
+        [
+          "addressLine1",
+          "addressLine2",
+          "city",
+          "region",
+          "postalCode",
+          "countryCode",
+        ],
+        venue,
+      );
+  return {
+    ...event,
+    venueName: hasName ? event.venueName : plain.name,
+    venueAddress: hasAddress
+      ? event.venueAddress
+      : [
+          plain.addressLine1,
+          plain.addressLine2,
+          plain.city,
+          plain.region,
+          plain.postalCode,
+          plain.countryCode,
+        ]
+          .filter(Boolean)
+          .join(", "),
+  };
 }
 
 export async function decryptReportFields<T extends Record<string, unknown>>(

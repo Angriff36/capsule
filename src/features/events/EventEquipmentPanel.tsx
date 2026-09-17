@@ -53,10 +53,7 @@ export function EventEquipmentPanel({
   const { prompt, host } = useActionPrompt(busy != null);
 
   const equipmentRows = (equipment ?? []).filter(
-    (row) =>
-      row.deletedAt == null &&
-      row.status === "active" &&
-      row.registeredAt != null,
+    (row) => row.deletedAt == null && row.status === "active",
   );
   const eventReservations = (reservations ?? [])
     .filter(
@@ -292,6 +289,7 @@ export function EventEquipmentPanel({
               </div>
             ) : (
               <EventEquipmentSheet
+                eventId={eventId}
                 rows={sheetRows}
                 busy={busy}
                 draft={checklistDraft}

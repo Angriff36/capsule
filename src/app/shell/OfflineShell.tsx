@@ -1,17 +1,19 @@
 import { type ReactNode, useEffect, useState } from "react";
+import { offlineAuthSnapshotStore } from "../../lib/offlineAuthSnapshot";
 import { WifiOffIcon } from "../../ui/icons";
 
 /**
- * Boot-time offline state for the installed (cached) shell. If the app starts
- * with no connection, Clerk cannot load and nothing can sign in, so show an
- * explicit message instead of an endless "Checking your session…". Once the
- * browser reports `online` — or the user taps "Try again" — the normal
- * providers mount and AuthGate runs as usual. Nothing here authenticates,
- * caches, or bypasses anything; a wrong `onLine=false` only costs one tap.
+ * Boot-time offline wall. If this browser has a last-confirmed workspace
+ * snapshot, skip the wall so Clerk can restore the same account and AuthGate
+ * can open My Day read-only. Otherwise Clerk cannot load and sign-in would
+ * spin forever — show the explicit offline card instead.
  */
 export function OfflineGate({ children }: { readonly children: ReactNode }) {
   const [bootOffline, setBootOffline] = useState(
-    () => typeof navigator !== "undefined" && navigator.onLine === false,
+    () =>
+      typeof navigator !== "undefined" &&
+      navigator.onLine === false &&
+      !offlineAuthSnapshotStore.hasAny(),
   );
   useEffect(() => {
     if (!bootOffline) return;

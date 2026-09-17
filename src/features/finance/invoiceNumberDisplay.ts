@@ -1,11 +1,12 @@
 /**
  * Display formatting for invoice numbers.
  *
- * Some invoices carry a raw Convex document id in `invoiceNumber` (the
- * EventApproved cascade seeds `invoiceNumber: payload.eventId` — see
+ * Invoices auto-issued before 2026-09-13 carry a raw Convex document id in
+ * `invoiceNumber` (the EventApproved cascade used to seed
+ * `invoiceNumber: payload.eventId`; it now mints `INV-<n>` — see
  * src/sales/invoice.manifest). A 32-char id is not a usable invoice number
- * and overflows page titles, so displays fall back to a short reference
- * derived from the invoice's own document id (e.g. `INV-8BD5QP`).
+ * and overflows page titles, so displays of those older rows fall back to a
+ * short reference derived from the invoice's own document id (`INV-8BD5QP`).
  */
 
 /** Lowercase alphanumeric with no separators at id-like length — not human. */

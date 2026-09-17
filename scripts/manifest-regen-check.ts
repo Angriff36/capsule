@@ -1,51 +1,54 @@
-/** Verify committed generated output with the repository-local Builder CLI. */
-import { spawnSync } from "node:child_process";
-import { builderEntrypoint } from "./manifest-regen.ts";
+/**
+ * Pre-push gate: generated Builder output must be current before code leaves
+ * this machine, using the repository-local Builder. Regenerates for real,
+ * including authored post-passes, and fails
+ * only if that leaves tracked files changed: run `bun run manifest:regen`,
+ * commit the result, push again.
+ *
+ * A pure dry-run of the Builder plan is not enough (issue #375): the Builder
+ * IR does not know about authored post-passes like
+ * applyEventServiceStyleReferenceGuard, so a dry-run always reports their
+ * patched lines in convex/mutations.ts as spuriously "pending" — permanently
+ * blocking every push once such a patch lands on main. Running the exact
+ * same pipeline as `manifest:regen` and diffing the result against git is
+ * the only way to tell real drift from that false positive.
+ */
+import { dirname, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { regenerate } from "./manifest-regen.ts";
 
-const result = spawnSync(
-  process.execPath,
-  [builderEntrypoint(), "generate", "convex", "--json"],
-  { encoding: "utf-8" },
+const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const status = regenerate();
+if (status !== 0) {
+  console.error(
+    "manifest-regen-check: Builder plan failed or has ownership conflicts (see above).",
+  );
+  process.exit(status);
+}
+
+// Scope the drift check to Builder-owned paths only (issue #375 follow-up):
+// a bare `git status --porcelain` also reports any unrelated uncommitted
+// work in the tree, which would falsely block a push that touches nothing
+// Builder owns.
+const ownershipPath = ".builder/ownership.json";
+const ownership = JSON.parse(
+  readFileSync(resolve(CAPSULE_ROOT, ownershipPath), "utf-8"),
+) as { files?: Record<string, unknown> };
+const ownedPaths = [ownershipPath, ...Object.keys(ownership.files ?? {})];
+
+const dirty = execFileSync(
+  "git",
+  ["status", "--porcelain", "--", ...ownedPaths],
+  { cwd: CAPSULE_ROOT, encoding: "utf-8" },
 );
-
-const stdout = result.stdout ?? "";
-const jsonStart = stdout.indexOf("{");
-if ((result.status !== 0 && result.status !== 2) || jsonStart < 0) {
+if (dirty.trim().length > 0) {
   console.error(
-    result.stderr || "manifest-regen-check: Builder plan failed to run.",
+    "manifest-regen-check: generated output was stale and has now been regenerated:",
   );
-  process.exit(1);
-}
-
-const plan = JSON.parse(stdout.slice(jsonStart));
-const pending =
-  (plan.additions?.length ?? 0) +
-  (plan.modifications?.length ?? 0) +
-  (plan.deletions?.length ?? 0);
-const conflicts = plan.conflicts?.length ?? 0;
-
-if (conflicts > 0) {
-  console.error(
-    `manifest-regen-check: ${conflicts} ownership conflict(s) — resolve before pushing:`,
-  );
-  for (const c of plan.conflicts) console.error(`  ${c.path}: ${c.message}`);
-  process.exit(2);
-}
-if (result.status !== 0) {
-  console.error("manifest-regen-check: Builder returned an unsuccessful plan.");
-  process.exit(1);
-}
-if (
-  pending > 0 ||
-  (plan.ledgerRepairs?.length ?? 0) > 0 ||
-  plan.dependencyRequirementsChanged
-) {
-  console.error(
-    `manifest-regen-check: generated output is stale (${pending} pending change(s)).`,
-  );
-  console.error(
-    "Run: bun run manifest:regen   then commit the result and push again.",
-  );
+  console.error(dirty);
+  console.error("Review the change, commit it, and push again.");
   process.exit(1);
 }
 console.log("manifest-regen-check: generated output is current.");

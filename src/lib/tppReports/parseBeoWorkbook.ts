@@ -3,6 +3,10 @@ import type {
   BundleTimelineEntry,
   EventBundlePart,
 } from "./eventBundle";
+import {
+  bundleNotesFromSections,
+  splitBeoNoteSections,
+} from "./beoNoteSections";
 import { valueAfterLabel } from "./csvRows";
 import {
   parseAddressBlob,
@@ -11,6 +15,7 @@ import {
   parseEmail,
   parsePersonBlob,
   parsePhone,
+  parseReportDate,
 } from "./reportValues";
 import type { XlsxSheet } from "./xlsxReader";
 
@@ -31,6 +36,16 @@ function fromExcelSerial(value: string | undefined): string | undefined {
   const days = Number(value);
   const date = new Date(Date.UTC(1899, 11, 30) + days * 86_400_000);
   return date.toISOString().slice(0, 10);
+}
+
+/**
+ * The Date cell arrives either printed (`9/12/2026`, what the typed workbook
+ * grid renders for a date-formatted cell) or as the raw Excel serial (a
+ * General-formatted cell, or a raw-grid read). Neither shape is guessed at:
+ * anything else leaves eventDate unset and the BEO warning stands.
+ */
+function parseBeoDate(value: string | undefined): string | undefined {
+  return parseReportDate(value) ?? fromExcelSerial(value);
 }
 
 function rowText(row: readonly string[]): string {
@@ -104,36 +119,6 @@ function readMenu(rows: readonly string[][]): BundleMenuItem[] {
   return items;
 }
 
-/** Setup notes arrive as one long blob; split it on its known headings. */
-function readNotes(blob: string): Record<string, string> {
-  const headings = [
-    "Event Overview",
-    "Menu / Culinary Notes",
-    "Operations Notes",
-    "Buffetware / Servingware",
-    "Decor Collection / Linen",
-    "Equipment & Rentals",
-    "Service Setup / Layout",
-    "Catering Kitchen / Staging",
-    "Additional Tasks / Responsibilities of Mangia",
-  ];
-  const found: Array<{ heading: string; index: number }> = [];
-  for (const heading of headings) {
-    const index = blob.indexOf(heading);
-    if (index >= 0) found.push({ heading, index });
-  }
-  found.sort((a, b) => a.index - b.index);
-
-  const sections: Record<string, string> = {};
-  found.forEach((entry, position) => {
-    const start = entry.index + entry.heading.length;
-    const end = found[position + 1]?.index ?? blob.length;
-    const text = blob.slice(start, end).trim();
-    if (text.length > 0) sections[entry.heading] = text;
-  });
-  return sections;
-}
-
 /** Parse a BEO workbook into its bundle contribution. */
 export function parseBeoWorkbook(
   sheets: readonly XlsxSheet[],
@@ -177,14 +162,14 @@ export function parseBeoWorkbook(
       (text) => text.includes("Event Overview") || text.includes("Theme:"),
     )
     .join(" ");
-  const sections = readNotes(noteBlob);
+  const sections = splitBeoNoteSections(noteBlob);
 
   const part: EventBundlePart = {
     source: "beo",
     header: {
       invoiceNumber: label("Invoice #"),
       title: label("Event Title"),
-      eventDate: fromExcelSerial(label("Date")),
+      eventDate: parseBeoDate(label("Date")),
       startMinutes: parseClockMinutes(eventTime?.split("-")[0]),
       endMinutes: parseClockMinutes(eventTime?.split("-")[1]),
       guestCount: parseCount(label("Guest Count")),
@@ -216,17 +201,7 @@ export function parseBeoWorkbook(
     },
     timeline: readTimeline(rows),
     menu: readMenu(rows),
-    notes: {
-      eventOverview: sections["Event Overview"],
-      menuNotes: sections["Menu / Culinary Notes"],
-      operationsNotes: sections["Operations Notes"],
-      serviceSetup: sections["Service Setup / Layout"],
-      cateringKitchen: sections["Catering Kitchen / Staging"],
-      equipmentRentals: sections["Equipment & Rentals"],
-      decor: sections["Decor Collection / Linen"],
-      additionalTasks:
-        sections["Additional Tasks / Responsibilities of Mangia"],
-    },
+    notes: bundleNotesFromSections(sections),
   };
 
   if (part.header?.eventDate === undefined) {

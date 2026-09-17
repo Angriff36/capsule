@@ -11,6 +11,7 @@ import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const DIMENSIONS = [
   { key: "reliabilityRating", label: "Reliability" },
@@ -23,6 +24,7 @@ function localDateEpoch(value: FormDataEntryValue | null) {
 }
 
 export function PerformanceReviewsPage() {
+  const workingId = useWorkingEventId();
   const reviews = useListPerformanceReview();
   const people = useListPerson();
   const events = useListEvent();
@@ -140,7 +142,12 @@ export function PerformanceReviewsPage() {
             </label>
             <label className="field-label">
               Event (optional)
-              <select name="eventId" className="input">
+              <select
+                key={events?.length ? "events-ready" : "events-loading"}
+                name="eventId"
+                className="input"
+                defaultValue={workingId ?? ""}
+              >
                 <option value="">No specific event</option>
                 {events?.map((event) => (
                   <option key={event._id} value={event._id}>

@@ -19,18 +19,18 @@ descriptions are also prefixed with `⚠️ NO UI`.
 
 ## Tools
 
-| Tool                           | Purpose                                                                                                                                                                                                                                                                                    |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `list_capsule_commands`        | Discover **all** wiring capabilities from `manifest-wiring-contract.json`                                                                                                                                                                                                                  |
-| `describe_capsule_command`     | Params + mutation name + emits for one capability                                                                                                                                                                                                                                          |
-| `execute_capsule_command`      | Run any catalog capability (`args` + optional `idempotencyKey`)                                                                                                                                                                                                                            |
-| `get_capsule_llm_tools`        | Dump Anthropic/OpenAI tool defs (wiring + agent-sdk snake names)                                                                                                                                                                                                                           |
-| `execute_capsule_llm_tool`     | Generic execute by snake name (prefer first-class tools below)                                                                                                                                                                                                                             |
-| `component_draft`, …              | First-class MCP tools for every wiring capability (snake names, Zod schemas)                                                                                                                                                                                                               |
-| `preview_component_document`      | Parse only — inspect lines/yield before writing                                                                                                                                                                                                                                            |
-| `enter_component_document`        | Write createVia path for a **Component** sheet; requires `approveUnresolvedAsNew` for new ingredients. Default does **not** create a Dish (`introduceDish` opt-in only). Dish shape = production sheet + DishTasks — see `work/list*.jpg` and `docs/event-prep-and-weekly-order-workflow.md`. |
-| `add_event_dish_and_sync_prep` | Add EventDish + PrepTask template sync (`skipDemand`; Manifest owns demand)                                                                                                                                                                                                                |
-| `capsule_query`                | Allowlisted Convex reads (demand/prep/needs/orders) for cascade verify                                                                                                                                                                                                                     |
+| Tool                           | Purpose                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `list_capsule_commands`        | Discover **all** wiring capabilities from `manifest-wiring-contract.json`                                                                                                                                                                                                                     |
+| `describe_capsule_command`     | Params + mutation name + emits for one capability                                                                                                                                                                                                                                             |
+| `execute_capsule_command`      | Run any catalog capability (`args` + optional `idempotencyKey`)                                                                                                                                                                                                                               |
+| `get_capsule_llm_tools`        | Dump Anthropic/OpenAI tool defs (wiring + agent-sdk snake names)                                                                                                                                                                                                                              |
+| `execute_capsule_llm_tool`     | Generic execute by snake name (prefer first-class tools below)                                                                                                                                                                                                                                |
+| `component_draft`, …           | First-class MCP tools for every wiring capability (snake names, Zod schemas)                                                                                                                                                                                                                  |
+| `preview_component_document`   | Parse only — inspect lines/yield before writing                                                                                                                                                                                                                                               |
+| `enter_component_document`     | Write createVia path for a **Component** sheet; requires `approveUnresolvedAsNew` for new ingredients. Default does **not** create a Dish (`introduceDish` opt-in only). Dish shape = production sheet + DishTasks — see `work/list*.jpg` and `docs/event-prep-and-weekly-order-workflow.md`. |
+| `add_event_dish_and_sync_prep` | Add EventDish + PrepTask template sync (`skipDemand`; Manifest owns demand)                                                                                                                                                                                                                   |
+| `capsule_query`                | Allowlisted Convex reads (demand/prep/needs/orders) for cascade verify                                                                                                                                                                                                                        |
 
 AC snake tools include required Convex `docId` (+ optional `version`) for
 non-`createVia` instance commands (e.g. `ingredientdemand_confirm`).
@@ -53,8 +53,13 @@ below (or call the driver from a one-off `bun` script).
 ## Setup
 
 1. Convex + Clerk working for the UI (session token claims `role` + `tenantId`).
-2. Sign into Capsule with a workspace org, then: `bun run agent:mint-jwt`
-   (writes `CAPSULE_AGENT_JWT` into `.env.local`).
+2. Sign into Capsule, then: `bun run agent:mint-jwt`
+   (writes `CAPSULE_AGENT_JWT` into `.env.local`). An account with a
+   workspace org mints from the org session (`roleSource: idp`). A
+   person-first account with no Clerk org also mints: the server takes
+   tenant/role from the linked Person, and the minter confirms that through
+   `authStatus.getAuthStatus` (`roleSource: person`) — this path needs
+   `CONVEX_URL`/`VITE_CONVEX_URL` set before minting.
 3. Ensure `CONVEX_URL` is set.
 4. Cursor MCP is wired locally (do not hand-edit unless paths change):
    - Project: `.cursor/mcp.json` (gitignored)

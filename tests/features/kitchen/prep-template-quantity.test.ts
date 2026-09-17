@@ -4,6 +4,7 @@ import {
   prepTemplateQuantityMeta,
   prepTemplateWantsQuantity,
 } from "../../../src/features/kitchen/PrepTemplateQuantityCoordinator";
+import { quantityForDishTask } from "../../../src/features/kitchen/prepTaskQuantity";
 
 describe("prep template batch-total leftover: persist derived per-guest", () => {
   it("commits 97.50 / 260 as ~0.375, not a default 1", () => {
@@ -49,6 +50,29 @@ describe("prep template batch-total leftover: persist derived per-guest", () => 
     expect(
       PrepTemplateQuantityCoordinator.persist("per_guest", "1", "", ""),
     ).toEqual({ ok: true, defaultQuantity: 1 });
+  });
+
+  it("does not multiply equipment_fixed amounts by guest count", () => {
+    expect(quantityForDishTask("equipment_fixed", 6, 98)).toBe(6);
+    expect(quantityForDishTask("manual", 0.5, 40)).toBe(20);
+    expect(quantityForDishTask("manual", null, 40)).toBe(40);
+  });
+
+  it("Fixed mode requires a positive amount and stamps equipment_fixed", () => {
+    expect(prepTemplateWantsQuantity("fixed", "", "", "")).toBe(true);
+    expect(
+      PrepTemplateQuantityCoordinator.persist("fixed", "", "", ""),
+    ).toEqual({
+      ok: false,
+      error: "Fixed amount must be greater than zero.",
+    });
+    expect(
+      PrepTemplateQuantityCoordinator.persist("fixed", "", "12", ""),
+    ).toEqual({
+      ok: true,
+      defaultQuantity: 12,
+      taskType: "equipment_fixed",
+    });
   });
 
   it("empty / zero per-guest omits quantity (0 = one each)", () => {

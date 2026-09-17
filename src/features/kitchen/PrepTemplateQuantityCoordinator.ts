@@ -7,7 +7,10 @@
  * is always the derived per-guest rate. Persist that rate — never a default 1.
  */
 
-export type PrepQuantityEntryMode = "per_guest" | "batch_total";
+export { EQUIPMENT_FIXED_TASK_TYPE } from "./prepTaskQuantity";
+import { EQUIPMENT_FIXED_TASK_TYPE } from "./prepTaskQuantity";
+
+export type PrepQuantityEntryMode = "per_guest" | "batch_total" | "fixed";
 
 export const PREP_QUANTITY_SCALE = 4;
 
@@ -15,7 +18,8 @@ export type PrepQuantityCommit =
   { ok: true; perGuest: number } | { ok: false; error: string };
 
 export type PrepTemplateQuantityPersist =
-  { ok: true; defaultQuantity?: number } | { ok: false; error: string };
+  | { ok: true; defaultQuantity?: number; taskType?: string }
+  | { ok: false; error: string };
 
 const SCALE = 10 ** PREP_QUANTITY_SCALE;
 const MAX_SCALED = 10 ** 12 - 1;
@@ -70,6 +74,9 @@ export function prepTemplateWantsQuantity(
     const text = fieldText(perGuestRaw);
     return text !== "" && Number(text) !== 0;
   }
+  if (mode === "fixed") {
+    return true;
+  }
   return fieldText(batchTotalRaw) !== "" || fieldText(batchServingsRaw) !== "";
 }
 
@@ -103,6 +110,17 @@ export class PrepTemplateQuantityCoordinator {
     batchTotalRaw: unknown,
     batchServingsRaw: unknown,
   ): PrepQuantityCommit {
+    if (mode === "fixed") {
+      const amount = decimalFromRaw(batchTotalRaw);
+      if (amount == null) {
+        return {
+          ok: false,
+          error: "Fixed amount must be greater than zero.",
+        };
+      }
+      return { ok: true, perGuest: amount };
+    }
+
     if (mode === "per_guest") {
       const perGuest = decimalFromRaw(perGuestRaw);
       if (perGuest == null) {
@@ -168,6 +186,9 @@ export class PrepTemplateQuantityCoordinator {
     return {
       ok: true,
       defaultQuantity: commit.ok ? commit.perGuest : undefined,
+      ...(mode === "fixed" && commit.ok
+        ? { taskType: EQUIPMENT_FIXED_TASK_TYPE }
+        : {}),
     };
   }
 }

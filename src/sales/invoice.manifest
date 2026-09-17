@@ -10,24 +10,26 @@ use "./payment.manifest"
 // Currency code / exchange rate default to the tenant's functional currency
 // (no exchangeRate field on EventApproved). Finance can adjust per invoice on
 // the issue form before sending.
+// invoiceSequence: 0 marks the issue as auto-numbered (issues #136 / #165 —
+// the draft never carries the raw event document id). The command writes the
+// placeholder "INV-1" and emits InvoiceIssued with autoNumbered: true; the
+// authored numbering seam (convex/lib/invoiceNumbering.ts) then replaces it,
+// inside the same transaction, with the tenant's persisted
+// InvoiceNumberSequence + 1. No count() here: a reaction-param count compiles
+// to a full by_tenantId collect of the tenant's invoices on every approval.
 on EventApproved run Invoice.issue
   match eventId = payload.eventId
   else create
   params {
     clientId: payload.clientId
     eventId: payload.eventId
-    invoiceNumber: payload.eventId
+    invoiceSequence: 0
     subtotal: payload.quotedPrice
     taxAmount: 0
     discountAmount: 0
     total: payload.quotedPrice
   }
 
-// Event cancellation voids unpaid invoices still in draft/sent/viewed/overdue.
-// ~~Paid/partial invoices are skipped by markVoided's amountPaid guard.~~
-// Correction (2026-07-20): Manifest fan-out does not skip on guard failure —
-// a paid invoice in the set aborts the whole Event.cancel transaction. Prefer
-// confirming unpaid-only selection before relying on this cascade in ops.
-on EventCancelled fanOut Invoice where eventId = payload.eventId
-  run markVoided
-  params { reason: payload.reason }
+// The transactional operational callback voids eligible unpaid invoices through
+// Invoice.markVoided. Paid/partial/voided/written-off invoices and payments stay
+// recorded; event cancellation does not imply a refund.

@@ -76,10 +76,16 @@ export function eventTabGroupFor(tab: EventDetailTab) {
 
 const EVENTS_INDEX_PATH = "/events";
 const EVENTS_NEW_PATH = "/events/new";
+const EVENTS_IMPORT_PATH = "/events/import";
 
 /** Exact events list path — never a record id. */
 export function eventsIndexPath(): string {
   return EVENTS_INDEX_PATH;
+}
+
+/** BEO / worksheet importer — paste text or drop TPP CSVs, review, create. */
+export function eventImportPath(): string {
+  return EVENTS_IMPORT_PATH;
 }
 
 const TAB_KEYS = new Set<string>(EVENT_DETAIL_TABS.map((tab) => tab.key));

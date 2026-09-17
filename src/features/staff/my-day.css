@@ -650,6 +650,10 @@
   .my-day-app .btn {
     min-height: 44px;
   }
+  .my-day-app .input:not(textarea),
+  .my-day-app .field-input:not(textarea) {
+    min-height: 44px;
+  }
   .my-day-section-stack {
     gap: 20px;
   }

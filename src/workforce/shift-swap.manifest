@@ -48,9 +48,9 @@ entity ShiftSwapRequest mixin TenantScoped, SoftDeletable {
   transition status from "withdrawn" to []
   transition status from "rejected" to []
 
-  default policy shiftSwapRequestRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read shift swap requests"
-  default policy shiftSwapRequestWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update shift swap requests through commands"
-  default policy shiftSwapRequestExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute shift swap request commands"
+  default policy shiftSwapRequestRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and (self.requesterPersonId == user.personId or self.recipientPersonId == user.personId)) "Crew may read their own shift swaps"
+  default policy shiftSwapRequestWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and (self.requesterPersonId == user.personId or self.recipientPersonId == user.personId)) "Crew may respond to their own shift swaps"
+  default policy shiftSwapRequestExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and (self.requesterPersonId == user.personId or self.recipientPersonId == user.personId)) "Crew may respond to their own shift swaps"
 
   command propose(
     shiftId: uuid,

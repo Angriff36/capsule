@@ -1,6 +1,7 @@
 import { formatDate, formatTime } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
+import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
 
 type PrepTask = {
   _id: string;
@@ -8,6 +9,7 @@ type PrepTask = {
   eventDishId: string;
   eventId: string;
   dishId?: string | null;
+  componentId?: string | null;
   name?: string;
   status: string;
   quantity: number;
@@ -97,7 +99,9 @@ export function MyDayPrepList({
                 <p className="my-day-prep-dish-meta">
                   {entry
                     ? `${entry.quantityServings} servings`
-                    : `Dish reference: ${first.eventDishId || "unavailable"}`}
+                    : eventDishes
+                      ? "Servings unavailable"
+                      : "Loading servings…"}
                   {entry?.course ? `  |  ${entry.course}` : ""}
                 </p>
               </div>
@@ -144,6 +148,16 @@ export function MyDayPrepList({
                           {task.specialInstructions}
                         </p>
                       )}
+                      {task.componentId ? (
+                        <CulinaryEntityLink
+                          kind="component"
+                          id={task.componentId}
+                          prepTaskId={task._id}
+                          className="inline-flex min-h-11 items-center text-base text-accent underline underline-offset-2"
+                        >
+                          Recipe: {task.name?.trim() || "Prep task"}
+                        </CulinaryEntityLink>
+                      ) : null}
                       {task.status === "blocked" && (
                         <p className="my-day-prep-note">
                           Blocked: {task.blockReason || "See kitchen lead"}

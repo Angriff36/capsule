@@ -14,6 +14,9 @@ tenant tenantId : string from context.tenantId
 
 role staff {
   allow staffAccess
+  // Own workforce records remain subject to the organization's workforce switch.
+  // Each self-service policy also requires the authenticated Person link.
+  allow workforceSelfAccess
 }
 
 role kitchen_staff extends staff {
@@ -162,6 +165,10 @@ entity Organization mixin TenantScoped, SoftDeletable {
   property brandAddress: string?
   property brandPrimaryColor: string?
   property brandAccentColor: string?
+  // Convex storage id of the tenant logo. Lives on the tenant record, not
+  // on a Clerk organization, so person-first admins (no Clerk org) keep
+  // their upload (#237). The Clerk org image stays a read fallback.
+  property brandLogoStorageId: string?
   // 4217 three-letter code used by financial reports as the tenant's
   // functional currency. Invoices issued in another currency store an
   // exchangeRate so reports can fold the issued total back into this code.
@@ -246,6 +253,20 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Point the tenant logo at an uploaded Convex blob; omit storageId to
+  // remove the logo. Blob upload/cleanup is the authored convex/brandLogo.ts seam.
+  command setBrandLogo(optional storageId: string) {
+    guard self.deletedAt == null
+    compute previousStorageId = self.brandLogoStorageId
+    mutate brandLogoStorageId = storageId
+    emit OrganizationBrandLogoSet {
+      organizationId: self.id
+      tenantId: self.tenantId
+      storageId: storageId
+      previousStorageId: previousStorageId
+    }
+  }
+
   // Set the tenant's default (functional) currency. ISO 4217 three-letter
   // uppercase codes only — the same code is reused by financial reports.
   command setDefaultCurrency(currencyCode: string) {
@@ -311,6 +332,13 @@ event OrganizationBrandingConfigured: "organization.branding_configured" {
   address: string
   primaryColor: string
   accentColor: string
+}
+
+event OrganizationBrandLogoSet: "organization.brand_logo_set" {
+  organizationId: string
+  tenantId: string
+  storageId: string?
+  previousStorageId: string?
 }
 
 event OrganizationRenamed: "organization.renamed" {

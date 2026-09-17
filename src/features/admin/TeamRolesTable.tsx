@@ -1,5 +1,7 @@
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { EmptyState, TableSkeleton } from "../../ui/primitives";
+import { PersonAddressField } from "./PersonAddressField";
+import { PersonEmailField } from "./PersonEmailField";
 import { PersonEmployeeNumberField } from "./PersonEmployeeNumberField";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
 import { StaffSignInCell } from "./StaffSignInCell";
@@ -63,7 +65,40 @@ export function TeamRolesTable({
                   {person.givenName} {person.familyName}
                 </strong>
                 <span className="mt-0.5 block text-xs text-ink-3">
-                  {person.email} · {formatStatusLabel(person.status)}
+                  <PersonEmailField
+                    personId={person._id}
+                    personName={`${person.givenName} ${person.familyName}`}
+                    currentEmail={person.email}
+                    canEdit={canEdit}
+                    busy={busy === person._id}
+                    onBusy={(isBusy) => onBusy(isBusy ? person._id : null)}
+                    onSaved={(message, tone) => {
+                      if (tone === "warn") {
+                        onNotice(null);
+                        onError(message);
+                      } else {
+                        onError(null);
+                        onNotice(message);
+                      }
+                    }}
+                    onError={onError}
+                  />{" "}
+                  · {formatStatusLabel(person.status)}
+                </span>
+                <span className="mt-1 block text-xs">
+                  <PersonAddressField
+                    personId={person._id}
+                    personName={`${person.givenName} ${person.familyName}`}
+                    address={person}
+                    canEdit={canEdit}
+                    busy={busy === person._id}
+                    onBusy={(isBusy) => onBusy(isBusy ? person._id : null)}
+                    onSaved={(message) => {
+                      onError(null);
+                      onNotice(message);
+                    }}
+                    onError={onError}
+                  />
                 </span>
               </td>
               <td className="border-b border-line px-3 py-3 text-xs">
