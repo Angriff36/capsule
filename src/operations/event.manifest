@@ -585,7 +585,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
-  property required clientId: uuid
+  property clientId: uuid?
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
   property serviceStyleId: uuid?
@@ -619,16 +619,20 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Snapshot the selected venue limit so historical event planning does not
   // silently change when the reusable Venue record is revised later.
   property venueCapacity: int?
-  property required expectedHeadcount: int = 0
+  property expectedHeadcount: int?
   property encrypted primaryContactName: string?
   property encrypted primaryContactEmail: string?
   property encrypted primaryContactPhone: string?
   property accessibilityNeeds: list<string> = []
   property serviceRequirements: string?
   property operationalRequirements: string?
-  property required budgetAmount: money(12, 2) = 0
-  property required quotedPrice: money(12, 2) = 0
+  property budgetAmount: money(12, 2)?
+  property quotedPrice: money(12, 2)?
   property required stage: EventStage = "planning"
+  // Source facts and reconciliation checkpoint remain on the native draft.
+  property importDraftJson: string?
+  property importSourceKey: string?
+  property draftCapturedAt: datetime?
   property plannedAt: datetime?
   property approvedAt: datetime?
   property executionStartedAt: datetime?
@@ -739,7 +743,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   // plannedAt gates full engagement invariants while planEngagement mutates fields.
   constraint eventPlanComplete: self.plannedAt == null or (length(trim(self.title)) > 0 and length(trim(self.eventType)) > 0 and self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.expectedHeadcount >= 1 and self.expectedHeadcount <= 100000 and self.primaryContactName != null and length(trim(self.primaryContactName)) > 0) "Planned events require a title, type, valid date range, headcount, and primary contact"
   constraint validEventVenueCapacity: self.venueCapacity == null or self.venueCapacity >= 0 "Venue capacity cannot be negative"
-  constraint validEventPricing: self.budgetAmount >= 0 and self.quotedPrice >= 0 "Event pricing cannot be negative"
+  constraint validEventPricing: (self.budgetAmount == null or self.budgetAmount >= 0) and (self.quotedPrice == null or self.quotedPrice >= 0) "Event pricing cannot be negative"
   constraint validRecurrenceCount: self.recurrenceGeneratedCount == null or self.recurrenceGeneratedCount >= 1 "Recurring event generated count cannot be below one"
   constraint validRecurrenceSequence: self.recurrenceSequence == null or self.recurrenceSequence >= 2 "Recurring event instances must follow the source event"
 
@@ -818,6 +822,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate quotedPrice = quotedPrice
     mutate assignedToId = assignedToId
     mutate referralSourceId = referralSourceId
+    mutate stage = "planning"
     mutate plannedAt = now()
     emit EventPlanned {
       eventId: self.id
@@ -829,6 +834,139 @@ entity Event mixin TenantScoped, SoftDeletable {
       startsAt: startsAt
       endsAt: endsAt
       expectedHeadcount: expectedHeadcount
+    }
+  }
+
+  // Save incomplete source facts without asserting engagement readiness.
+  command captureDraft(
+    title: string,
+    optional clientId: uuid,
+    optional eventType: string,
+    optional startsAt: datetime,
+    optional endsAt: datetime,
+    optional expectedHeadcount: number,
+    optional primaryContactName: string,
+    optional budgetAmount: money(12, 2),
+    optional quotedPrice: money(12, 2),
+    optional serviceStyleId: uuid,
+    optional occasionId: uuid,
+    optional venueId: uuid,
+    optional venueName: string,
+    optional venueAddress: string,
+    optional venueCapacity: number,
+    optional primaryContactEmail: string,
+    optional primaryContactPhone: string,
+    optional accessibilityNeeds: list<string>,
+    optional serviceRequirements: string,
+    optional operationalRequirements: string,
+    optional assignedToId: uuid,
+    optional referralSourceId: uuid,
+    optional importDraftJson: string,
+    optional importSourceKey: string
+  ) {
+    // Imports only reconcile a draft; planned engagements use their normal edits.
+    guard self.stage == "planning"
+    guard self.plannedAt == null
+    guard self.deletedAt == null
+    guard self.draftCapturedAt == null
+    constraint draftTitle: length(trim(title)) > 0 "Draft title is required"
+    constraint draftHeadcount: expectedHeadcount == null or (expectedHeadcount >= 0 and expectedHeadcount <= 100000) "Headcount must be between 0 and 100000 when known"
+    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "Event pricing cannot be negative"
+    mutate title = title
+    mutate clientId = clientId != null ? clientId : null
+    mutate eventType = eventType != null ? eventType : ""
+    mutate startsAt = startsAt != null ? startsAt : null
+    mutate endsAt = endsAt != null ? endsAt : null
+    mutate expectedHeadcount = expectedHeadcount != null ? expectedHeadcount : null
+    mutate primaryContactName = primaryContactName != null ? primaryContactName : null
+    mutate budgetAmount = budgetAmount != null ? budgetAmount : null
+    mutate quotedPrice = quotedPrice != null ? quotedPrice : null
+    mutate serviceStyleId = serviceStyleId != null ? serviceStyleId : null
+    mutate occasionId = occasionId != null ? occasionId : null
+    mutate venueId = venueId != null ? venueId : null
+    mutate venueName = venueName != null ? venueName : null
+    mutate venueAddress = venueAddress != null ? venueAddress : null
+    mutate venueCapacity = venueCapacity != null ? venueCapacity : null
+    mutate primaryContactEmail = primaryContactEmail != null ? primaryContactEmail : null
+    mutate primaryContactPhone = primaryContactPhone != null ? primaryContactPhone : null
+    mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
+    mutate serviceRequirements = serviceRequirements != null ? serviceRequirements : null
+    mutate operationalRequirements = operationalRequirements != null ? operationalRequirements : null
+    mutate assignedToId = assignedToId != null ? assignedToId : null
+    mutate referralSourceId = referralSourceId != null ? referralSourceId : null
+    mutate importDraftJson = importDraftJson != null ? importDraftJson : null
+    mutate importSourceKey = importSourceKey != null ? importSourceKey : null
+    mutate purchasingWeekStart = startsAt != null ? startsAt - ((startsAt - 374400000) % 604800000) : self.purchasingWeekStart
+    mutate deletedAt = null
+    mutate plannedAt = null
+    mutate draftCapturedAt = now()
+    emit EventDraftCaptured {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Save incomplete source facts without asserting engagement readiness.
+  command updateImportDraft(
+    optional title: string,
+    optional clientId: uuid,
+    optional eventType: string,
+    optional startsAt: datetime,
+    optional endsAt: datetime,
+    optional expectedHeadcount: number,
+    optional primaryContactName: string,
+    optional budgetAmount: money(12, 2),
+    optional quotedPrice: money(12, 2),
+    optional serviceStyleId: uuid,
+    optional occasionId: uuid,
+    optional venueId: uuid,
+    optional venueName: string,
+    optional venueAddress: string,
+    optional venueCapacity: number,
+    optional primaryContactEmail: string,
+    optional primaryContactPhone: string,
+    optional accessibilityNeeds: list<string>,
+    optional serviceRequirements: string,
+    optional operationalRequirements: string,
+    optional assignedToId: uuid,
+    optional referralSourceId: uuid,
+    optional importDraftJson: string,
+    optional importSourceKey: string
+  ) {
+    // Imports only reconcile a draft; planned engagements use their normal edits.
+    guard self.stage == "planning"
+    guard self.plannedAt == null
+    guard self.deletedAt == null
+    constraint draftHeadcount: expectedHeadcount == null or (expectedHeadcount >= 0 and expectedHeadcount <= 100000) "Headcount must be between 0 and 100000 when known"
+    constraint draftPricing: (budgetAmount == null or budgetAmount >= 0) and (quotedPrice == null or quotedPrice >= 0) "Event pricing cannot be negative"
+    mutate title = title != null ? title : self.title
+    mutate clientId = clientId != null ? clientId : self.clientId
+    mutate eventType = eventType != null ? eventType : self.eventType
+    mutate startsAt = startsAt != null ? startsAt : self.startsAt
+    mutate endsAt = endsAt != null ? endsAt : self.endsAt
+    mutate expectedHeadcount = expectedHeadcount != null ? expectedHeadcount : self.expectedHeadcount
+    mutate primaryContactName = primaryContactName != null ? primaryContactName : self.primaryContactName
+    mutate budgetAmount = budgetAmount != null ? budgetAmount : self.budgetAmount
+    mutate quotedPrice = quotedPrice != null ? quotedPrice : self.quotedPrice
+    mutate serviceStyleId = serviceStyleId != null ? serviceStyleId : self.serviceStyleId
+    mutate occasionId = occasionId != null ? occasionId : self.occasionId
+    mutate venueId = venueId != null ? venueId : self.venueId
+    mutate venueName = venueName != null ? venueName : self.venueName
+    mutate venueAddress = venueAddress != null ? venueAddress : self.venueAddress
+    mutate venueCapacity = venueCapacity != null ? venueCapacity : self.venueCapacity
+    mutate primaryContactEmail = primaryContactEmail != null ? primaryContactEmail : self.primaryContactEmail
+    mutate primaryContactPhone = primaryContactPhone != null ? primaryContactPhone : self.primaryContactPhone
+    mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : self.accessibilityNeeds
+    mutate serviceRequirements = serviceRequirements != null ? serviceRequirements : self.serviceRequirements
+    mutate operationalRequirements = operationalRequirements != null ? operationalRequirements : self.operationalRequirements
+    mutate assignedToId = assignedToId != null ? assignedToId : self.assignedToId
+    mutate referralSourceId = referralSourceId != null ? referralSourceId : self.referralSourceId
+    mutate importDraftJson = importDraftJson != null ? importDraftJson : self.importDraftJson
+    mutate importSourceKey = importSourceKey != null ? importSourceKey : self.importSourceKey
+    mutate purchasingWeekStart = startsAt != null ? startsAt - ((startsAt - 374400000) % 604800000) : self.purchasingWeekStart
+    emit EventDraftCaptured {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -1897,6 +2035,11 @@ event ClientMerged: "client.merged" {
 event ClientMergeStaged: "client.merge_staged" {
   duplicateClientId: string
   clientMergeId: string
+  tenantId: string
+}
+
+event EventDraftCaptured: "event.draft_captured" {
+  eventId: string
   tenantId: string
 }
 

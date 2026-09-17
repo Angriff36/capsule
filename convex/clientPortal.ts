@@ -74,7 +74,7 @@ export const getEvent = query({
         .query("organizations")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
         .collect(),
-      ctx.db.get(event.clientId),
+      event.clientId ? ctx.db.get(event.clientId) : null,
       ctx.db
         .query("contracts")
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))

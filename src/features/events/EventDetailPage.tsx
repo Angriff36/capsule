@@ -705,7 +705,7 @@ function EventDetailContent({
         <EventTabErrorBoundary tabLabel="Menu" key="menu">
           <EventMenuTab
             eventId={event._id}
-            expectedHeadcount={Number(event.expectedHeadcount) || 0}
+            expectedHeadcount={event.expectedHeadcount}
           />
         </EventTabErrorBoundary>
       ) : null}

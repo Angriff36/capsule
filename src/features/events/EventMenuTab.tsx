@@ -96,7 +96,7 @@ import type { MenuTemplate } from "./EventMenuTemplateCard";
 
 type Props = {
   eventId: string;
-  expectedHeadcount: number;
+  expectedHeadcount?: number | null;
 };
 
 /** One ledger row: identity, the four editable fields, cost, actions. */
@@ -449,15 +449,45 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     setStockPhase((current) => current + 1);
   };
 
+  const requestServings = async (title: string) => {
+    if (expectedHeadcount != null && expectedHeadcount > 0)
+      return expectedHeadcount;
+    const values = await prompt.askFields({
+      title,
+      description:
+        "The event guest count is not recorded. Enter the servings to add.",
+      fields: [
+        {
+          name: "servings",
+          label: "Servings",
+          defaultValue: "",
+          inputType: "number",
+          required: true,
+        },
+      ],
+      confirmLabel: "Add to menu",
+    });
+    if (!values) return null;
+    const servings = Number(values.servings);
+    if (
+      !values.servings.trim() ||
+      !Number.isSafeInteger(servings) ||
+      servings <= 0
+    )
+      throw new Error("Enter a positive whole-number serving count.");
+    return servings;
+  };
+
   const applyTemplate = (template: MenuTemplate) =>
     void run(`template:${template.menuId}`, async () => {
       const confirmed = await prompt.askConfirm({
         title: `Apply “${template.name}”`,
-        description: `${template.lines.length} ${template.lines.length === 1 ? "dish" : "dishes"} join this menu at the event headcount. Edit servings after applying.`,
+        description: `${template.lines.length} ${template.lines.length === 1 ? "dish" : "dishes"} join this menu. ${expectedHeadcount != null && expectedHeadcount > 0 ? "The event headcount supplies servings." : "Enter servings in the next step."}`,
         confirmLabel: "Apply template",
       });
       if (!confirmed) return;
-      const servings = Math.max(1, expectedHeadcount || 1);
+      const servings = await requestServings("Template servings");
+      if (servings == null) return;
       const missing = template.lines.filter(
         (line) => !existingDishIds.includes(line.dishId),
       );
@@ -691,7 +721,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           excludeIds={existingDishIds}
           onSelect={(dishId) =>
             void run("add", async () => {
-              const servings = Math.max(1, expectedHeadcount || 1);
+              const servings = await requestServings("Dish servings");
+              if (servings == null) return;
               await createEventDish({
                 eventId,
                 dishId,
@@ -719,12 +750,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           {selections.length > 0 ? (
             <EventMenuStatsCard
               foodCost={costRollup.foodCost}
-              costPerServing={costRollup.costPerServing}
+              costPerServing={
+                expectedHeadcount == null ? null : costRollup.costPerServing
+              }
               foodSellTotal={sellRollup.foodSellTotal}
               dishCount={selections.length}
               unpricedCount={unpricedCount}
               unpricedNote={headerUnpricedNote}
-              servings={costRollup.servings}
+              servings={expectedHeadcount ?? null}
             />
           ) : null}
 

@@ -111,11 +111,12 @@ export function ProposalCreateForm({
   const [searchParams, setSearchParams] = useSearchParams();
   const fromEventId = searchParams.get("event");
 
-  const hasClientSource = Boolean(fromEvent) || activeClients.length > 0;
+  const hasClientSource =
+    Boolean(fromEvent?.clientId) || activeClients.length > 0;
   const prefill = fromEvent
     ? {
         title: fromEvent.title ?? "",
-        guestCount: Number(fromEvent.expectedHeadcount ?? 0),
+        guestCount: fromEvent.expectedHeadcount ?? undefined,
         eventType: fromEvent.eventType ?? "",
         eventDate: dateInputFromEpoch(fromEvent.startsAt),
         eventEndDate:
@@ -139,7 +140,10 @@ export function ProposalCreateForm({
     overrideReason: "",
   });
   const [draftLines, setDraftLines] = useState<DraftLine[]>([]);
-  const [draftGuestCount, setDraftGuestCount] = useState<number>(0);
+  const [draftGuestCount, setDraftGuestCount] = useState<number | undefined>();
+  const pricingNeedsGuests =
+    draftGuestCount == null &&
+    draftLines.some((line) => line.pricingBasis === "per_person");
   const [draftTax, setDraftTax] = useState<number>(0);
   const [draftDiscount, setDraftDiscount] = useState<number>(0);
   const [draftTerms, setDraftTerms] = useState("");
@@ -162,7 +166,7 @@ export function ProposalCreateForm({
           unitPrice: Number(l.unitPrice) || 0,
           quantity: Number(l.quantity) || 0,
         })),
-        guestCount: draftGuestCount,
+        guestCount: draftGuestCount ?? 0,
         discountAmount: draftDiscount,
         taxAmount: draftTax,
       }),
@@ -208,7 +212,7 @@ export function ProposalCreateForm({
         unitPrice: Number(line.unitPrice) || 0,
         quantity: Number(line.quantity) || 0,
       })),
-      guestCount: draftGuestCount,
+      guestCount: draftGuestCount ?? 0,
       taxAmount: 0,
       discountAmount: draftDiscount,
     });
@@ -239,7 +243,7 @@ export function ProposalCreateForm({
         unitPrice: Number(line.unitPrice) || 0,
         quantity: Number(line.quantity) || 0,
       })),
-      guestCount: draftGuestCount,
+      guestCount: draftGuestCount ?? 0,
       taxAmount: 0,
       discountAmount: draftDiscount,
     });
@@ -260,7 +264,11 @@ export function ProposalCreateForm({
   const restoreProposalDraft = () => {
     const saved = draftForm.restore();
     if (!saved) return;
-    setDraftGuestCount(Number(saved.values.guestCount) || 0);
+    setDraftGuestCount(
+      saved.values.guestCount == null || saved.values.guestCount === ""
+        ? undefined
+        : Number(saved.values.guestCount),
+    );
     setDraftTax(Number(saved.values.taxAmount) || 0);
     setDraftDiscount(Number(saved.values.discountAmount) || 0);
     setDraftNotes(saved.values.notes ?? "");
@@ -321,7 +329,7 @@ export function ProposalCreateForm({
     // "Create proposal" on an event navigates here with ?event=<id>; the form
     // opens prefilled from that event (spec §5.3 create-proposal-from-event).
     if (fromEvent) {
-      setDraftGuestCount(Number(fromEvent.expectedHeadcount ?? 0));
+      setDraftGuestCount(fromEvent.expectedHeadcount ?? undefined);
     }
   }, [fromEvent?._id]);
 
@@ -352,6 +360,19 @@ export function ProposalCreateForm({
       onFailure(new Error("Every pricing line needs a description."));
       return;
     }
+    if (
+      draftGuestCount == null &&
+      populatedLines.some((line) => line.pricingBasis === "per_person")
+    ) {
+      onFailure(
+        new Error(
+          "Enter the guest count to calculate and save per-person pricing. Your proposal details remain in this form.",
+        ),
+      );
+      const guestCountInput = form.elements.namedItem("guestCount");
+      if (guestCountInput instanceof HTMLElement) guestCountInput.focus();
+      return;
+    }
     const validLines = populatedLines;
     const pricing = computeProposalPricing({
       lines: validLines.map((line) => ({
@@ -359,7 +380,7 @@ export function ProposalCreateForm({
         unitPrice: Number(line.unitPrice) || 0,
         quantity: Number(line.quantity) || 0,
       })),
-      guestCount: draftGuestCount,
+      guestCount: draftGuestCount ?? 0,
       discountAmount: draftDiscount,
       taxAmount: draftTax,
     });
@@ -498,6 +519,9 @@ export function ProposalCreateForm({
               </span>
             </label>
             {fromEvent ? (
+              <input type="hidden" name="eventId" value={fromEvent._id} />
+            ) : null}
+            {fromEvent?.clientId ? (
               <label className="field-label supply-span-2">
                 Client
                 <input
@@ -505,7 +529,6 @@ export function ProposalCreateForm({
                   name="clientId"
                   value={fromEvent.clientId}
                 />
-                <input type="hidden" name="eventId" value={fromEvent._id} />
                 <input
                   className="input"
                   value={`${clientDisplayName(
@@ -552,9 +575,11 @@ export function ProposalCreateForm({
                 name="guestCount"
                 type="number"
                 min={0}
-                value={draftGuestCount}
+                value={draftGuestCount ?? ""}
                 onChange={(e) =>
-                  setDraftGuestCount(Number(e.target.value) || 0)
+                  setDraftGuestCount(
+                    e.target.value === "" ? undefined : Number(e.target.value),
+                  )
                 }
               />
             </label>
@@ -726,9 +751,12 @@ export function ProposalCreateForm({
                             />
                           </td>
                           <td className="tabular-nums">
-                            {(draftPricing.lines[index]?.amount ?? 0).toFixed(
-                              2,
-                            )}
+                            {draftGuestCount == null &&
+                            line.pricingBasis === "per_person"
+                              ? "—"
+                              : (
+                                  draftPricing.lines[index]?.amount ?? 0
+                                ).toFixed(2)}
                           </td>
                           <td>
                             <button
@@ -779,7 +807,7 @@ export function ProposalCreateForm({
             <p className="mt-2 text-base text-ink-2">
               Subtotal (from lines):{" "}
               <span className="tabular-nums">
-                {draftPricing.subtotal.toFixed(2)}
+                {pricingNeedsGuests ? "—" : draftPricing.subtotal.toFixed(2)}
               </span>
             </p>
           </div>
@@ -819,7 +847,7 @@ export function ProposalCreateForm({
           <p className="mt-3 text-base font-semibold text-ink">
             Total:{" "}
             <span className="tabular-nums">
-              {draftPricing.total.toFixed(2)}
+              {pricingNeedsGuests ? "—" : draftPricing.total.toFixed(2)}
             </span>
           </p>
           <div className="supply-form-grid">

@@ -40,22 +40,37 @@ function fileIcon(kind: AssistantFile["kind"]): string {
 
 function ToolCallChip({ name, content }: { name: string; content: string }) {
   let failed = false;
+  let eventUrl: string | null = null;
   try {
-    failed = JSON.parse(content)?.error != null;
+    const result = JSON.parse(content);
+    failed = result?.error != null || result?.skipped === true;
+    if (
+      name === "save_event_from_beo" &&
+      typeof result.eventUrl === "string" &&
+      result.eventUrl.startsWith("/events/")
+    )
+      eventUrl = result.eventUrl;
   } catch {
     failed = true;
   }
   return (
-    <details className="my-1 rounded-sm border border-line bg-inset text-xs">
-      <summary
-        className={`cursor-pointer px-2 py-1 ${failed ? "text-warn" : "text-ink-2"}`}
-      >
-        <span aria-hidden="true">{failed ? "✕" : "✓"}</span> {name}
-      </summary>
-      <pre className="overflow-x-auto px-2 pb-1.5 text-2xs whitespace-pre-wrap text-ink-3">
-        {content}
-      </pre>
-    </details>
+    <>
+      <details className="my-1 rounded-sm border border-line bg-inset text-xs">
+        <summary
+          className={`cursor-pointer px-2 py-1 ${failed ? "text-warn" : "text-ink-2"}`}
+        >
+          <span aria-hidden="true">{failed ? "✕" : "✓"}</span> {name}
+        </summary>
+        <pre className="overflow-x-auto px-2 pb-1.5 text-2xs whitespace-pre-wrap text-ink-3">
+          {content}
+        </pre>
+      </details>
+      {eventUrl && (
+        <a href={eventUrl} className="block px-2 pb-2 text-brand underline">
+          Open saved event
+        </a>
+      )}
+    </>
   );
 }
 
