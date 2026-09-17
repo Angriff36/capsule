@@ -1,13 +1,25 @@
 /**
  * Pre-push gate: generated Builder output must be current before code leaves
  * this machine (owner policy 2026-07-19 — regen is a LOCAL gate; CI has no
- * Builder). Runs the Builder plan in dry-run and fails if anything is
- * pending: run `bun run manifest:regen`, commit the result, push again.
+ * Builder). Regenerates for real, including authored post-passes, and fails
+ * only if that leaves tracked files changed: run `bun run manifest:regen`,
+ * commit the result, push again.
+ *
+ * A pure dry-run of the Builder plan is not enough (issue #375): the Builder
+ * IR does not know about authored post-passes like
+ * applyEventServiceStyleReferenceGuard, so a dry-run always reports their
+ * patched lines in convex/mutations.ts as spuriously "pending" — permanently
+ * blocking every push once such a patch lands on main. Running the exact
+ * same pipeline as `manifest:regen` and diffing the result against git is
+ * the only way to tell real drift from that false positive.
  */
-import { spawnSync } from "node:child_process";
 import { dirname, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { builderEntrypoint } from "./manifest-regen.ts";
+import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
+import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
+import { runBuilder } from "./manifest-regen.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -18,42 +30,37 @@ if (rewritten > 0) {
   );
 }
 
-const result = spawnSync(
-  "bun",
-  [builderEntrypoint(), "generate", "convex", "--json"],
-  { encoding: "utf-8" },
+const status = runBuilder(["generate", "convex", "--apply"]);
+if (status !== 0) {
+  console.error(
+    "manifest-regen-check: Builder plan failed or has ownership conflicts (see above).",
+  );
+  process.exit(status);
+}
+applyOrgCapabilityCheckRole(CAPSULE_ROOT);
+applyEventServiceStyleReferenceGuard(CAPSULE_ROOT);
+
+// Scope the drift check to Builder-owned paths only (issue #375 follow-up):
+// a bare `git status --porcelain` also reports any unrelated uncommitted
+// work in the tree, which would falsely block a push that touches nothing
+// Builder owns.
+const ownershipPath = ".builder/ownership.json";
+const ownership = JSON.parse(
+  readFileSync(resolve(CAPSULE_ROOT, ownershipPath), "utf-8"),
+) as { files?: Record<string, unknown> };
+const ownedPaths = [ownershipPath, ...Object.keys(ownership.files ?? {})];
+
+const dirty = execFileSync(
+  "git",
+  ["status", "--porcelain", "--", ...ownedPaths],
+  { cwd: CAPSULE_ROOT, encoding: "utf-8" },
 );
-
-const stdout = result.stdout ?? "";
-const jsonStart = stdout.indexOf("{");
-if (result.status === null || jsonStart < 0) {
+if (dirty.trim().length > 0) {
   console.error(
-    result.stderr || "manifest-regen-check: Builder plan failed to run.",
+    "manifest-regen-check: generated output was stale and has now been regenerated:",
   );
-  process.exit(1);
-}
-
-const plan = JSON.parse(stdout.slice(jsonStart));
-const pending =
-  (plan.additions?.length ?? 0) +
-  (plan.modifications?.length ?? 0) +
-  (plan.deletions?.length ?? 0);
-const conflicts = plan.conflicts?.length ?? 0;
-
-if (conflicts > 0) {
-  console.error(
-    `manifest-regen-check: ${conflicts} ownership conflict(s) — resolve before pushing:`,
-  );
-  for (const c of plan.conflicts) console.error(`  ${c.path}: ${c.message}`);
-  process.exit(2);
-}
-if (pending > 0) {
-  console.error(
-    `manifest-regen-check: generated output is stale (${pending} pending change(s)).`,
-  );
-  console.error(
-    "Run: bun run manifest:regen   then commit the result and push again.",
-  );
+  console.error(dirty);
+  console.error("Review the change, commit it, and push again.");
   process.exit(1);
 }
 console.log("manifest-regen-check: generated output is current.");
