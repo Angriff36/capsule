@@ -288,6 +288,18 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
     );
     expect(await readLiveHeader(draft._id)).toBe(80);
 
+    // The totals command accepts a valid draft; later refusals must be
+    // lifecycle guards rather than a broken command or missing permission.
+    await proof.executeCommand(
+      procurement,
+      api.mutations.VendorOrder_syncLineTotals,
+      {
+        docId: draft._id,
+        lineSubtotal: 80,
+      },
+    );
+    expect(await readLiveHeader(draft._id)).toBe(80);
+
     // Submit → confirm.
     await proof.executeCommand(procurement, api.mutations.VendorOrder_submit, {
       docId: draft._id,
@@ -304,7 +316,7 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
         api.mutations.VendorOrder_syncLineTotals,
         { docId: draft._id, lineSubtotal: 0 },
       ),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/Guard/);
     expect(await readLiveHeader(draft._id)).toBe(80);
 
     // Record receipt at the real $6.25: the header must move from $80 to
@@ -349,7 +361,7 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
           lineSubtotal: 0,
         },
       ),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/Guard/);
     expect(await readLiveHeader(draft._id)).toBe(100);
   });
 });

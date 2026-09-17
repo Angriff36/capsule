@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { clientDisplayName } from "../src/features/events/clientName";
 
@@ -40,17 +39,4 @@ describe("sales report client labels", () => {
       expect(label).not.toContain("undefined");
     },
   );
-
-  it("wires Top Clients to the production helper and rejects the old interpolation", () => {
-    const page = readFileSync(
-      "src/features/reports/SalesDashboardPage.tsx",
-      "utf8",
-    );
-    expect(page).toContain("clientDisplayName(event.clientId, clients)");
-    expect(page).not.toContain("contactGivenName");
-    expect(page).not.toContain("contactFamilyName");
-    expect(clientDisplayName("client-1", [client() as never])).not.toBe(
-      "undefined undefined",
-    );
-  });
 });

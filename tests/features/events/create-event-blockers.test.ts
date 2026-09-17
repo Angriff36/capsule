@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { eventCreateDisabledReason } from "../../../src/features/events/eventCreateGuards";
 import {
@@ -7,8 +6,6 @@ import {
   serviceStyleSelectOptions,
   usingBuiltInServiceStyles,
 } from "../../../src/features/events/serviceStyleCatalog";
-
-const TEST_EVENT_ID = "nn7ez3fz56ya246m6p17az2ad58crnwg";
 
 describe("service style catalog fallback", () => {
   it("uses the production catalog name Full Service, not an invented Buffet enum", () => {
@@ -69,28 +66,5 @@ describe("empty catalogs show an explicit state and do not block create", () => 
         { _id: "ss1", name: "Full Service", status: "active" },
       ]),
     ).toBe(false);
-  });
-
-  it("empty catalogs do not block create — both selectors stay optional", () => {
-    const page = readFileSync(
-      "src/features/events/EventCreatePage.tsx",
-      "utf8",
-    );
-    const occasionSelect =
-      page.match(/Occasion\s*<select[\s\S]*?<\/select>/)?.[0] ?? "";
-    expect(occasionSelect).toContain(
-      '<option value="">Select an occasion</option>',
-    );
-    expect(occasionSelect).not.toContain("required");
-    const styleSelect =
-      page.match(/Service style\s*<select[\s\S]*?<\/select>/)?.[0] ?? "";
-    expect(styleSelect).toContain(
-      '<option value="">Select a service style</option>',
-    );
-    expect(styleSelect).not.toContain("required");
-    // Create stays gated on client and venue only, and a built-in catalog
-    // code never reaches the command as a serviceStyleId.
-    expect(page).toContain("disabled={busy !== null || !clientId || !venueId}");
-    expect(persistableServiceStyleId("full-service")).toBe("");
   });
 });

@@ -96,5 +96,14 @@ The notes below are summaries, not transcript reproductions.
 - Poor: the quote start-time test finds `startTimeStr` in source yet passes when
   the form reads the end-time field as its start time.
 
-See [the September 8 reassessment](test-audit-2026-09-08.md) and its complete
-case inventory for the current evidence and limitations.
+An important feature does not automatically justify its current test or require
+a replacement before deleting a weak test. Retain a case for the concrete
+failure detection it contributes; accept losing low-value checks and consolidate
+small useful distinctions into existing behavioral tests.
+
+See [the completed cleanup](test-cleanup-2026-09-09.md) for the current suite and
+validation, and [the deletion-first review](test-deletion-review-2026-09-08.md)
+for the reasoning behind the 103 case decisions. The
+[remaining-test audit](test-final-audit-2026-09-08.md) contains the full suite
+inventory and earlier findings. The
+[earlier reassessment](test-audit-2026-09-08.md) records the pre-replacement suite.

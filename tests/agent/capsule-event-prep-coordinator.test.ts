@@ -1,8 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-import {
-  CapsuleEventPrepCoordinator,
-  type CapsuleEventPrepStateLoader,
-} from "../../src/agent/CapsuleEventPrepCoordinator";
 import { CapsuleCommandCatalog } from "../../src/agent/CapsuleCommandCatalog";
 import { CapsuleLiveEventPrepStateLoader } from "../../src/agent/CapsuleLiveEventPrepStateLoader";
 import { CapsuleMcpToolRegistrar } from "../../src/agent/mcp/CapsuleMcpToolRegistrar";
@@ -83,6 +79,9 @@ describe("CapsuleEventPrepCoordinator", () => {
         result: { eventDishId: "event-dish-a", taskCount: 1, demandCount: 0 },
       });
       expect(execute).toHaveBeenCalledTimes(2);
+      expect(execute).not.toHaveBeenCalledWith(
+        expect.objectContaining({ capabilityId: "IngredientDemand.calculate" }),
+      );
       expect(execute.mock.calls[0][0]).toEqual({
         capabilityId: "EventDish.addToEvent",
         args: {
@@ -158,6 +157,15 @@ describe("CapsuleEventPrepCoordinator", () => {
           status: "calculated",
           version: 1,
         },
+        {
+          _id: "demand-2",
+          eventId: "event-2",
+          ingredientId: "ingredient-2",
+          requiredQuantity: 99,
+          unit: "portion",
+          status: "calculated",
+          version: 1,
+        },
       ]);
 
     const result = await new CapsuleLiveEventPrepStateLoader({ query }).load({
@@ -165,9 +173,9 @@ describe("CapsuleEventPrepCoordinator", () => {
       dishId: "dish-1",
     });
 
-    expect(result.templates).toHaveLength(1);
-    expect(result.tasks).toHaveLength(1);
-    expect(result.demands).toHaveLength(1);
+    expect(result.templates.map((row) => row.id)).toEqual(["template-1"]);
+    expect(result.tasks.map((row) => row.id)).toEqual(["task-1"]);
+    expect(result.demands.map((row) => row.id)).toEqual(["demand-1"]);
   });
 
   it("exposes generated-prep capabilities (component demand is Manifest-owned)", () => {
@@ -178,73 +186,6 @@ describe("CapsuleEventPrepCoordinator", () => {
     );
     expect(catalog.get("PrepTask.refreshGenerated").mutationName).toBe(
       "PrepTask_refreshGenerated",
-    );
-  });
-
-  it("creates an event dish then syncs prep tasks without host demand create", async () => {
-    const execute = vi
-      .fn()
-      .mockResolvedValueOnce({ docId: "event-dish-1" })
-      .mockResolvedValue({ docId: "created" });
-    const loader: CapsuleEventPrepStateLoader = {
-      load: vi.fn().mockResolvedValue({
-        templates: [
-          {
-            id: "template-1",
-            dishId: "dish-1",
-            name: "Portion vegetables",
-            defaultQuantity: 1,
-            defaultUnit: "portion",
-            ingredientId: "ingredient-1",
-            status: "active",
-          },
-        ],
-        tasks: [],
-        demands: [
-          {
-            id: "demand-1",
-            eventId: "event-1",
-            ingredientId: "ingredient-1",
-            requiredQuantity: 40,
-            unit: "portion",
-            status: "calculated",
-            version: 1,
-          },
-        ],
-      }),
-    };
-    const coordinator = new CapsuleEventPrepCoordinator({ execute }, loader);
-
-    await expect(
-      coordinator.addDishAndSync({
-        eventId: "event-1",
-        dishId: "dish-1",
-        quantityServings: 40,
-        course: "side",
-        idempotencyKey: "test-event-dish",
-      }),
-    ).resolves.toEqual({
-      eventDishId: "event-dish-1",
-      taskCount: 1,
-      demandCount: 0,
-    });
-
-    expect(execute).toHaveBeenNthCalledWith(
-      1,
-      expect.objectContaining({
-        capabilityId: "EventDish.addToEvent",
-        idempotencyKey: "test-event-dish:event-dish",
-      }),
-    );
-    expect(execute).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        capabilityId: "IngredientDemand.calculate",
-      }),
-    );
-    expect(execute).toHaveBeenCalledWith(
-      expect.objectContaining({
-        capabilityId: "PrepTask.open",
-      }),
     );
   });
 });

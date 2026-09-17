@@ -9,9 +9,12 @@ beforeAll(() => {
 });
 
 let queryResult: any;
+const completeSignature = vi.hoisted(() =>
+  vi.fn(async (_args: unknown) => undefined),
+);
 vi.mock("convex/react", () => ({
   useQuery: () => queryResult,
-  useMutation: () => vi.fn(async () => undefined),
+  useMutation: () => completeSignature,
 }));
 
 import { SharedProposalPage } from "../src/features/clients/SharedProposalPage";
@@ -24,14 +27,20 @@ afterEach(() => {
   container = null;
 });
 
-async function mountedText(element: ReactNode) {
+async function mountedText(
+  element: ReactNode,
+  interact?: (element: HTMLDivElement) => Promise<void>,
+) {
   container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
-  await act(async () => root.render(element));
-  const result = container.textContent ?? "";
-  await act(async () => root.unmount());
-  return result;
+  try {
+    await act(async () => root.render(element));
+    await interact?.(container);
+    return container.textContent ?? "";
+  } finally {
+    await act(async () => root.unmount());
+  }
 }
 
 describe("proposal public renderers", () => {
@@ -90,6 +99,7 @@ describe("proposal public renderers", () => {
   });
 
   it("keeps the signing control available when presentation hides the acceptance CTA and terms", async () => {
+    completeSignature.mockClear();
     queryResult = {
       recipientName: "Client",
       recipientEmail: "client@example.com",
@@ -113,9 +123,21 @@ describe("proposal public renderers", () => {
       createElement(ProposalAcceptancePage, {
         callbackToken: "signature-token",
       }),
+      async (element) => {
+        expect(element.textContent).not.toContain("Hidden terms");
+        const accept = Array.from(element.querySelectorAll("button")).find(
+          (button) => button.textContent === "Accept Proposal",
+        );
+        expect(accept).toBeDefined();
+        expect(accept!.disabled).toBe(false);
+        await act(async () => accept!.click());
+        expect(completeSignature).toHaveBeenCalledExactlyOnceWith({
+          token: "signature-token",
+          signerUserAgent: navigator.userAgent,
+        });
+      },
     );
-    expect(text).toContain("Accept Proposal");
-    expect(text).not.toContain("Hidden terms");
+    expect(text).toContain("Proposal Accepted");
   });
 
   it("renders timeline start and end times with date context", async () => {

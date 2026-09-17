@@ -222,7 +222,9 @@ describe("runtime proof: EventCloseout capture → finalize", () => {
           actualHeadcount: 10,
         },
       ),
-    ).rejects.toThrow();
+    ).rejects.toThrow(
+      /Finance staff and event coordinators may .*event closeouts/,
+    );
 
     const finance = proof.asRole({
       subject: "finance-reader-a",

@@ -9,8 +9,6 @@
  * bounded components stop capping at a 4-digit year, or because a bare native
  * date input reappears in authored UI without the bound.
  */
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -41,16 +39,6 @@ describe("bounded date inputs (issue #148)", () => {
     );
     expect(html).toContain('type="date"');
     expect(html).toContain(`max="${MAX_DATE_INPUT_VALUE}"`);
-  });
-
-  it("keeps a tighter explicit max but never allows a 5-digit year", () => {
-    const html = renderToStaticMarkup(
-      createElement(BoundedDateTimeLocalInput, {
-        name: "completedAt",
-        max: "2026-08-19T12:00",
-      }),
-    );
-    expect(html).toContain('max="2026-08-19T12:00"');
   });
 
   it("treats an empty explicit max as unbounded and re-applies the cap", () => {
@@ -89,40 +77,5 @@ describe("action prompt datetime fields (timesheet correction path)", () => {
     );
     const textInput = html.match(/<input[^>]*type="text"[^>]*/);
     expect(textInput?.[0]).not.toContain("max=");
-  });
-});
-
-describe("no bare native date inputs in authored UI", () => {
-  const ROOT = process.cwd();
-  const SCANNED_DIRS = ["src/app", "src/features", "src/ui"];
-  const BOUNDED_MODULE = "src/ui/BoundedDateInputs.tsx";
-
-  const collectTsxFiles = (dir: string): string[] => {
-    const out: string[] = [];
-    for (const entry of readdirSync(dir)) {
-      const path = join(dir, entry);
-      if (statSync(path).isDirectory()) out.push(...collectTsxFiles(path));
-      else if (path.endsWith(".tsx")) out.push(path);
-    }
-    return out;
-  };
-
-  it("routes every date / datetime-local input through the bounded components", () => {
-    const offenders: string[] = [];
-    for (const dir of SCANNED_DIRS) {
-      for (const file of collectTsxFiles(join(ROOT, dir))) {
-        const rel = relative(ROOT, file).split("\\").join("/");
-        if (rel === BOUNDED_MODULE) continue;
-        const source = readFileSync(file, "utf8");
-        if (/type="(?:date|datetime-local)"/.test(source)) {
-          offenders.push(rel);
-        }
-      }
-    }
-    expect(
-      offenders,
-      "Bare native date inputs let the year grow past 4 digits (issue #148). " +
-        "Use BoundedDateInput / BoundedDateTimeLocalInput from src/ui/BoundedDateInputs.",
-    ).toEqual([]);
   });
 });

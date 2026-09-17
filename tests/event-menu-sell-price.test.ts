@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
 import {
   eventMenuSellTotals,
   formatEventMenuSellInput,
@@ -63,8 +62,8 @@ describe("event menu sell prices", () => {
   });
 });
 
-describe("first-class event menu line persist", () => {
-  it("saves sell price without requiring SELL: in notes", () => {
+describe("event menu line save planning", () => {
+  it("plans a structured sell price without requiring legacy SELL notes", () => {
     const plan = planEventMenuLineSave({
       currentInstructions: "keep extra spicy",
       currentServings: 98,
@@ -90,11 +89,6 @@ describe("first-class event menu line persist", () => {
         },
       ]).lines[0]?.unitSellPrice,
     ).toBe(34);
-    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
-    expect(tab).toContain("planEventMenuLineSave");
-    expect(tab).toContain('name="unitSellPrice"');
-    expect(tab).toContain('data-testid="event-menu-unit-sell-price"');
-    expect(tab).not.toContain("formatSellPriceInstruction");
   });
 
   it("persists $0 lemonade as a first-class sell price", () => {
@@ -124,7 +118,7 @@ describe("first-class event menu line persist", () => {
     ).toBe(0);
   });
 
-  it("persists per-row servings 59 instead of event guest count 98", () => {
+  it("plans per-row servings 59 instead of event guest count 98", () => {
     const plan = planEventMenuLineSave({
       currentInstructions: "",
       currentServings: 98,
@@ -140,14 +134,9 @@ describe("first-class event menu line persist", () => {
     expect(
       eventMenuLineServings({ quantityServings: 59, expectedHeadcount: 98 }),
     ).not.toBe(98);
-    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
-    expect(tab).toContain("useEventDishAdjustServings");
-    expect(tab).toContain('name="quantityServings"');
-    expect(tab).toContain('data-testid="event-menu-servings"');
-    expect(tab).toContain("plan.quantityServings");
   });
 
-  it("persists half-pan / container count on the event menu line", () => {
+  it("round-trips an explicit container count and falls back to calculated pans", () => {
     const plan = planEventMenuLineSave({
       currentInstructions: "",
       currentServings: 59,
@@ -180,12 +169,9 @@ describe("first-class event menu line persist", () => {
         },
       ]),
     ).toBe(5);
-    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
-    expect(tab).toContain('name="containerCount"');
-    expect(tab).toContain('data-testid="event-menu-line-pans"');
   });
 
-  it("reloads Pans=1 after save when leftover notes already say 1 Half pan", () => {
+  it("preserves a legacy pan count when converting notes to structured metadata", () => {
     expect(parseEventMenuLineFields("1 Half pan").containerCount).toBe(1);
     expect(parseEventMenuLineFields("3 Foil wrap").containerCount).toBe(3);
     expect(
@@ -220,11 +206,6 @@ describe("first-class event menu line persist", () => {
     expect(reloaded.notes).toMatch(/Half pan/);
     expect(eventMenuPansInputValue(reloaded.containerCount, 3)).toBe(1);
     expect(eventMenuPansInputValue(null, 3)).toBe(3);
-
-    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
-    expect(tab).toContain("eventMenuPansInputValue");
-    expect(tab).toContain("lineFields.containerCount");
-    expect(tab).toContain("linePanCount");
   });
 
   it("keeps leftover SELL: as a read fallback only", () => {

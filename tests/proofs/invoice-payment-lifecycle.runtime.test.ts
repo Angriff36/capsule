@@ -176,7 +176,7 @@ describe("runtime proof: Invoice → Payment lifecycle", () => {
         discountAmount: 0,
         total: 100,
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/Finance staff and managers may .*invoices/);
 
     const finance = proof.asRole({
       subject: "finance-reader-a",

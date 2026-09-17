@@ -6,7 +6,6 @@ import {
   invoiceMatchesQuery,
   invoiceSearchLabel,
   invoiceStatusFilter,
-  keepInvoiceForSearch,
   parseSearchQuery,
   shouldQueryInvoices,
 } from "../convex/lib/parseSearchQuery";
@@ -95,29 +94,7 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     ).toBe("#INV-8BD5QP — $900");
   });
 
-  it("queryInvoices uses invoiceStatusFilter so paid INV-* lookup is not unpaid-only", () => {
-    // QA Gallery INV-2026-QA1 is billed. A helper-only assertion still
-    // passes if queryInvoices drops invoiceStatusFilter and always skips paid.
-    const hash = parseSearchQuery("#INV-2026-QA1", NOW);
-    const statuses = invoiceStatusFilter(hash);
-    expect(shouldQueryInvoices(hash)).toBe(true);
-    expect(statuses).toBeNull();
-    expect(keepInvoiceForSearch(qa1, hash, statuses)).toBe(true);
-
-    const unpaid = parseSearchQuery("unpaid invoices", NOW);
-    expect(keepInvoiceForSearch(qa1, unpaid, invoiceStatusFilter(unpaid))).toBe(
-      false,
-    );
-
-    const search = readFileSync("convex/search.ts", "utf8");
-    expect(search).toContain("invoiceStatusFilter(parsed)");
-    expect(search).toContain("shouldQueryInvoices(parsed)");
-    expect(search).toContain("keepInvoiceForSearch(inv, parsed, statuses)");
-    expect(search).not.toContain("unpaidStatuses");
-    expect(search).not.toContain("if (statuses && !statuses.has");
-  });
-
-  it("production build deploys Convex instead of a UI-only vite build", () => {
+  it("production configuration routes through the combined backend/frontend build script", () => {
     // QA 191 leftover: frontend 3dd95bb1 on mule, search still hyphen-split.
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
       scripts: { build: string; "deploy:production": string };

@@ -1,6 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
-import path from "node:path";
 import { ReportLifecyclePolicy } from "../src/features/reports/ReportLifecyclePolicy";
 import { ReportCreatePayloadBuilder } from "../src/features/reports/ReportCreateForm";
 import {
@@ -89,21 +87,6 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
     expect(model.rows.map((row) => row.values.functionalPaid)).toEqual([
       0, 100,
     ]);
-
-    const builder = readFileSync(
-      "src/features/reports/liveReportBuilders.ts",
-      "utf8",
-    );
-    expect(builder).toContain("number(row.amountPaid)");
-    expect(builder).not.toContain("invoiceTotal(row) - invoiceDue(row)");
-    expect(builder).toContain("function collectedInvoiceTotal");
-    const data = readFileSync(
-      "src/features/reports/LiveReportData.tsx",
-      "utf8",
-    );
-    expect(data).toContain("useListPayment");
-    expect(data).toContain("rowsWithActualPayments");
-    expect(data).toContain('payment.status !== "completed"');
   });
 
   it("emits exactly twelve current-month buckets and drops older records", () => {
@@ -127,18 +110,6 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
         timeZone: "UTC",
       }).format(new Date(currentMonth)),
     );
-
-    const builder = readFileSync(
-      "src/features/reports/liveReportBuilders.ts",
-      "utf8",
-    );
-    expect(builder).toContain("MONTHS_IN_YEAR - 1");
-    expect(builder).toContain("return Date.UTC(");
-    const workspace = readFileSync(
-      "src/features/reports/LiveReportWorkspace.tsx",
-      "utf8",
-    );
-    expect(workspace).toContain("data={model.trend}");
   });
 
   it("drops a future-dated record instead of fabricating a 13th trend bucket", () => {
@@ -186,24 +157,6 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
       false,
     );
     expect(canReadReportSubject("production", "kitchen_staff", [])).toBe(true);
-
-    const source = readFileSync(
-      "src/features/reports/LiveReportData.tsx",
-      "utf8",
-    );
-    expect(source).toContain("canReadReportSubject");
-    expect(source).not.toContain("disabledCapabilities?.includes(subject)");
-    const policy = readFileSync(
-      "src/features/reports/liveReportSubjectAccess.ts",
-      "utf8",
-    );
-    expect(policy).toContain('production: "kitchen"');
-    const workspace = readFileSync(
-      "src/features/reports/LiveReportWorkspace.tsx",
-      "utf8",
-    );
-    expect(workspace).toContain("!sourceAvailable");
-    expect(workspace).toContain("Source data isn’t available");
   });
 
   it("keeps Apply read-only for a shared-report viewer", () => {
@@ -226,13 +179,6 @@ describe("live report money, range, capability, viewer, and CSV contracts", () =
       ),
     ).toBe(true);
     expect(SAVED_REPORT_READ_ONLY_NOTICE).toContain("only its owner");
-
-    const workspace = readFileSync(
-      "src/features/reports/LiveReportWorkspace.tsx",
-      "utf8",
-    );
-    expect(workspace).toContain("disabled={controlsLocked}");
-    expect(workspace).toContain("if (!canEditSettings) return");
   });
 
   it("exports stable columns, ISO dates, and formula-safe cells", () => {

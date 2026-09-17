@@ -147,7 +147,7 @@ it("retains a first-land item bookmark until rows arrive and does not repeatedly
   await mount(createElement(StockBookPage));
   expect(scroll).toHaveBeenCalledTimes(calls);
 });
-it("focuses and scrolls the transfer editor when opened and dismisses it on Escape", async () => {
+it("focuses and scrolls the transfer editor, keeps it open on Enter, and dismisses it on Escape", async () => {
   fixture();
   await mount(createElement(StockBookPage));
   await click(button("Transfer", container.querySelector("#stock-row-low")!));
@@ -157,6 +157,10 @@ it("focuses and scrolls the transfer editor when opened and dismisses it on Esca
   expect(
     vi.mocked(HTMLElement.prototype.scrollIntoView).mock.contexts,
   ).toContain(editor);
+  await act(async () =>
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" })),
+  );
+  expect(container.querySelector("#supply-stock-editor")).toBe(editor);
   await act(async () =>
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" })),
   );

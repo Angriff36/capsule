@@ -157,31 +157,7 @@ type LinkRow = {
   createdAt: number;
 };
 
-function applyEmailLink(
-  rows: LinkRow[],
-  opts: { subject: string; tenantId?: string },
-) {
-  const linkedLive = rows.filter((row) => row.authSubjectId === opts.subject);
-  const neverLinkedLiveMatches = rows.filter(
-    (row) => row.authSubjectId == null,
-  );
-  const decision = decidePersonEmailLink({
-    subject: opts.subject,
-    tenantId: opts.tenantId,
-    linkedLive,
-    neverLinkedLiveMatches,
-  });
-  if (decision.kind === "persist") {
-    for (const row of rows) {
-      if (row.authSubjectId === opts.subject) row.authSubjectId = null;
-    }
-    const target = rows.find((row) => row._id === decision.person._id);
-    if (target) target.authSubjectId = opts.subject;
-  }
-  return decision;
-}
-
-describe("decidePersonEmailLink persist rematch", () => {
+describe("decidePersonEmailLink account selection", () => {
   const subject = "user_ostwind";
 
   function fixture(): LinkRow[] {
@@ -207,48 +183,40 @@ describe("decidePersonEmailLink persist rematch", () => {
     ];
   }
 
-  it("does not write authSubjectId on an unhinted cross-tenant pick", () => {
-    const rows = fixture();
-    const decision = applyEmailLink(rows, { subject });
+  it("returns ambiguity instead of choosing an unhinted cross-tenant membership", () => {
+    const decision = decidePersonEmailLink({
+      subject,
+      linkedLive: [],
+      neverLinkedLiveMatches: fixture(),
+    });
     expect(decision.kind).toBe("ambiguous");
-    expect(rows[0]?.authSubjectId).toBeUndefined();
-    expect(rows[1]?.authSubjectId).toBeUndefined();
   });
 
-  it("persists the hinted Mangia Admin and clears the other subject", () => {
-    const rows = fixture();
-    applyEmailLink(rows, { subject });
-    const hinted = applyEmailLink(rows, {
+  it("selects the membership in the hinted organization for linking", () => {
+    const decision = decidePersonEmailLink({
       subject,
       tenantId: "org_mangia",
+      linkedLive: [],
+      neverLinkedLiveMatches: fixture(),
     });
-    expect(hinted.kind).toBe("persist");
-    expect(rows.find((row) => row._id === "p_mangia")?.authSubjectId).toBe(
-      subject,
-    );
-    expect(
-      rows.find((row) => row._id === "p_other")?.authSubjectId,
-    ).toBeUndefined();
-    expect(pickLivePerson(rows, { subject, tenantId: "org_mangia" })?._id).toBe(
-      "p_mangia",
-    );
+    expect(decision).toMatchObject({
+      kind: "persist",
+      person: { _id: "p_mangia", tenantId: "org_mangia" },
+    });
   });
 
-  it("rematches a leftover other-tenant link onto the hinted never-linked row", () => {
+  it("selects the hinted unlinked membership over a stale other-organization link", () => {
     const rows = fixture();
-    rows[0]!.authSubjectId = subject;
-    const rematch = applyEmailLink(rows, {
+    const decision = decidePersonEmailLink({
       subject,
       tenantId: "org_mangia",
+      linkedLive: [{ ...rows[0]!, authSubjectId: subject }],
+      neverLinkedLiveMatches: [rows[1]!],
     });
-    expect(rematch.kind).toBe("persist");
-    expect(rows.find((row) => row._id === "p_mangia")?.authSubjectId).toBe(
-      subject,
-    );
-    expect(rows.find((row) => row._id === "p_other")?.authSubjectId).toBeNull();
-    expect(pickLivePerson(rows, { subject, tenantId: "org_mangia" })?._id).toBe(
-      "p_mangia",
-    );
+    expect(decision).toMatchObject({
+      kind: "persist",
+      person: { _id: "p_mangia", tenantId: "org_mangia" },
+    });
   });
 });
 

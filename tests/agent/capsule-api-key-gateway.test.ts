@@ -88,7 +88,7 @@ describe("API-key gateway for the command API", () => {
     expect(sent.headers.get("authorization")).toBe(`Bearer jwt-for-${OWNER}-1`);
   });
 
-  it("executes a command as the key owner; body tenant/role/user values change nothing", async () => {
+  it("forwards a command unchanged using the verified API-key owner identity", async () => {
     const h = harness();
     const body = {
       clientType: "company",
@@ -115,9 +115,7 @@ describe("API-key gateway for the command API", () => {
     // Identity is minted from the verified key subject only.
     expect(h.minted).toEqual([OWNER]);
     expect(sent.headers.get("authorization")).toBe(`Bearer jwt-for-${OWNER}-1`);
-    // The body is passed through untouched; the generated dispatcher drops
-    // tenantId/role/userId/__auth (DISPATCHER_FORBIDDEN_BODY_KEYS) and every
-    // guard runs on the owner's Person row.
+    // This gateway test establishes forwarding and JWT selection only.
     expect(JSON.parse(await sent.text())).toEqual(body);
   });
 

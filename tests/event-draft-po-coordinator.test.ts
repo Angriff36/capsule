@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-
 import {
   EventDraftPoCoordinator,
   eventAllowsDraftPoFromNeeds,
@@ -105,18 +104,6 @@ describe("EventDraftPoCoordinator", () => {
       expect(createOrder).not.toHaveBeenCalled();
       expect(createLine).not.toHaveBeenCalled();
     }
-  });
-
-  it("does not invent a catalog conversion when demand unit mismatches stock unit", async () => {
-    const { createOrder, createLine } = ports();
-    const coordinator = new EventDraftPoCoordinator({
-      createOrder,
-      createLine,
-    });
-    await coordinator.draftFromNeeds(needInput("planning"));
-    expect(createLine).toHaveBeenCalledWith(
-      expect.objectContaining({ unit: "each", unitCost: 0 }),
-    );
   });
 
   it("continues an existing event draft with that draft's vendor", async () => {

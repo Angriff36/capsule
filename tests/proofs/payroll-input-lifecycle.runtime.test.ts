@@ -131,7 +131,7 @@ describe("runtime proof: PayrollInput prepare → finalize", () => {
           totalMinutes: 60,
         },
       ),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/Finance managers may .*payroll inputs/);
 
     const finance = proof.asRole({
       subject: "finance-reader-a",

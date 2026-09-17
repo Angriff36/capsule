@@ -232,7 +232,7 @@ describe("runtime proof: safe template materialization", () => {
     ).rejects.toThrow(/logistics/i);
   });
 
-  it("atomically copies layout sections and makes confirmed retries idempotent", async () => {
+  it("copies layout section content once across confirmed retries", async () => {
     const proof = harness();
     const tenantId = "tenant-layout-atomic";
     const eventId = await seedEvent(proof, tenantId);
@@ -263,8 +263,25 @@ describe("runtime proof: safe template materialization", () => {
     const rows = (await manager.query(
       api.queries.listEventLayoutSection,
       {},
-    )) as unknown[];
-    expect(rows).toHaveLength(2);
+    )) as Array<{
+      eventId: string;
+      type: string;
+      instructions?: string;
+      sortOrder: number;
+    }>;
+    expect(
+      rows
+        .map(({ eventId, type, instructions, sortOrder }) => ({
+          eventId,
+          type,
+          instructions,
+          sortOrder,
+        }))
+        .sort((a, b) => a.sortOrder - b.sortOrder),
+    ).toEqual([
+      { eventId, type: "Buffet", instructions: "North wall", sortOrder: 0 },
+      { eventId, type: "Bar", instructions: "Patio", sortOrder: 1 },
+    ]);
   });
 
   it("rejects a same-tenant id from the wrong parent table at validation", async () => {

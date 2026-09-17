@@ -1,9 +1,5 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import {
-  supplyEditorCanApply,
-  supplyEditorClosesOnKey,
-} from "../src/features/inventory/StockBookPage";
+import { supplyEditorCanApply } from "../src/features/inventory/StockBookPage";
 
 describe("Stock book Transfer editor is not a no-op above the row", () => {
   it("Apply stays off until destination and quantity are set", () => {
@@ -67,17 +63,5 @@ describe("Stock book Transfer editor is not a no-op above the row", () => {
         destinationCount: 2,
       }),
     ).toBe(false);
-  });
-
-  it("Escape closes the editor the same way Cancel does", () => {
-    expect(supplyEditorClosesOnKey("Escape")).toBe(true);
-    expect(supplyEditorClosesOnKey("Enter")).toBe(false);
-    const page = readFileSync(
-      "src/features/inventory/StockBookPage.tsx",
-      "utf8",
-    );
-    expect(page).toContain("supplyEditorClosesOnKey");
-    expect(page).toContain('addEventListener("keydown"');
-    expect(page).toContain("onClose()");
   });
 });

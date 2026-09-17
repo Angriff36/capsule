@@ -208,7 +208,7 @@ describe("runtime proof: PaymentMethod → Payment linkage", () => {
           methodType: "cash",
         },
       ),
-    ).rejects.toThrow();
+    ).rejects.toThrow(/Finance staff may .*payment methods/);
 
     const finance = proof.asRole({
       subject: "finance-pmethod-reader",

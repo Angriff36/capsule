@@ -159,7 +159,7 @@ describe("runtime proof: private materialization receipts", () => {
     ).toHaveLength(2);
   });
 
-  it("denies generated receipt reads to staff and managers and isolates raw rows by tenant", async () => {
+  it("keeps private receipts out of the public query for authenticated, foreign-tenant and anonymous callers", async () => {
     const proof = harness();
     const tenantA = proof.asRole({
       subject: "receipt-manager-a",
@@ -218,11 +218,7 @@ describe("runtime proof: private materialization receipts", () => {
       ),
     ).toEqual([]);
     expect(
-      await tenantB.run(async (ctx) =>
-        (await ctx.db.query("materializationReceipts").collect()).filter(
-          (row) => row.tenantId === "tenant-receipt-b",
-        ),
-      ),
+      await tenantB.query((api.queries as any).listMaterializationReceipt, {}),
     ).toEqual([]);
   });
 });

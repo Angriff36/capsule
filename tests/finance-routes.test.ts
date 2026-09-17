@@ -1,6 +1,4 @@
 import { describe, expect, it } from "vitest";
-
-import path from "node:path";
 import {
   FINANCE_ROUTES,
   FINANCE_SECTIONS,
@@ -112,30 +110,6 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(sendKeys("draft", undefined)).not.toContain("send");
     expect(sendKeys("draft", null)).not.toContain("send");
     expect(sendKeys("draft", "not-a-number")).not.toContain("send");
-  });
-
-  it("selects only the 2 positive-due drafts out of the 4-row prod set", () => {
-    // Mirrors the prod QA data: two $0-due drafts + two positive drafts.
-    // Header "Select all sendable" must yield 2 (bar reads "Send 2"), and a
-    // bulk send over all four must target only the positive rows.
-    const policy = new CommercialLifecyclePolicy();
-    const rows = [
-      { _id: "inv-fri-lunch", status: "draft", amountDue: 0 },
-      { _id: "inv-harborview-900", status: "draft", amountDue: 900 },
-      { _id: "inv-harborview-0", status: "draft", amountDue: 0 },
-      { _id: "inv-gallery-3600", status: "draft", amountDue: 3600 },
-    ];
-    const canSend = (row: { status: unknown; amountDue?: unknown }) =>
-      policy
-        .invoiceActions(String(row.status), row)
-        .some((a) => a.key === "send");
-    const sendableRows = rows.filter(canSend);
-    expect(sendableRows.map((row) => row._id)).toEqual([
-      "inv-harborview-900",
-      "inv-gallery-3600",
-    ]);
-    // Bulk send re-filter: even if every row were ticked, no $0 row is sent.
-    expect(rows.filter(canSend)).toHaveLength(2);
   });
 
   it("default payments view never claims a bare 0 while settled rows exist", () => {

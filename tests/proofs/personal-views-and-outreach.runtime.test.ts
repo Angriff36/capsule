@@ -185,6 +185,9 @@ describe("personal saved views and outreach", () => {
       clientId,
       reason: "Owner call",
     })) as { taskId: string };
+    const before = await owner.run((ctx) =>
+      ctx.db.get(existing.taskId as never),
+    );
     let thrown: unknown;
     try {
       await denied.mutation(api.lib.clientOutreach.ensureOpen, {
@@ -195,11 +198,12 @@ describe("personal saved views and outreach", () => {
       thrown = error;
     }
     expect(thrown).toBeInstanceOf(Error);
+    expect(String(thrown)).toMatch(/Sales staff may .*client follow-up/);
     expect(String(thrown)).not.toContain(existing.taskId);
     const tasks = await owner.run(async (ctx) =>
       ctx.db.query("clientOutreachTasks").collect(),
     );
-    expect(tasks).toHaveLength(1);
+    expect(tasks).toEqual([before]);
   });
 
   it("rejects foreign, deleted, and missing clients before outreach reuse or creation", async () => {

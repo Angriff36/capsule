@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   createdIngredientId,
@@ -7,14 +6,6 @@ import {
   parseEventMenuCreateIngredientCost,
   resolveEventMenuRecipeIngredientId,
 } from "../src/features/events/eventMenuRecipeIngredient";
-import { formatEventMenuSellInput } from "../src/features/events/eventMenuSellPrice";
-import { EVENT_MENU_CONTAINER_NAMES } from "../src/features/events/eventMenuContainers";
-
-const editor = readFileSync(
-  "src/features/events/EventMenuRecipeEditor.tsx",
-  "utf8",
-);
-const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
 
 const PROD_CATALOG = [
   "Whole milk",
@@ -53,15 +44,7 @@ const MISSING = [
 ];
 
 describe("event menu recipe ingredient picker", () => {
-  it("can create an ingredient from the event menu editor at $0 / empty cost", () => {
-    expect(editor).toContain("useCreateIngredient");
-    expect(editor).toContain('data-testid="event-menu-create-ingredient"');
-    expect(editor).toContain('data-testid="event-menu-create-ingredient-form"');
-    expect(editor).toContain('data-testid="event-menu-create-ingredient-cost"');
-    expect(editor).toContain("parseEventMenuCreateIngredient");
-    expect(editor).not.toMatch(
-      /name="newIngredientCost"[\s\S]{0,200}defaultValue=\{[^0]/,
-    );
+  it("accepts blank and zero cost in an ingredient creation payload", () => {
     expect(parseEventMenuCreateIngredientCost("")).toBe(0);
     expect(parseEventMenuCreateIngredientCost("0")).toBe(0);
     expect(parseEventMenuCreateIngredientCost("0.00")).toBe(0);
@@ -101,23 +84,5 @@ describe("event menu recipe ingredient picker", () => {
     expect(
       resolveEventMenuRecipeIngredientId(PROD_CATALOG, "", "carne"),
     ).toBeNull();
-  });
-});
-
-describe("event menu leftover paint and defaults", () => {
-  it("offers the small shared container name list without inventing a vocab", () => {
-    expect(EVENT_MENU_CONTAINER_NAMES).toEqual(["Hotel pan", "Half pan"]);
-    expect(editor).toContain("EVENT_MENU_CONTAINER_NAMES");
-    expect(editor).toContain('list="event-menu-container-names"');
-  });
-
-  it("paints sell as 2.00 / 0.50 / 1.00", () => {
-    expect(formatEventMenuSellInput(2)).toBe("2.00");
-    expect(formatEventMenuSellInput(0.5)).toBe("0.50");
-    expect(formatEventMenuSellInput(1)).toBe("1.00");
-    expect(formatEventMenuSellInput(0)).toBe("0.00");
-    expect(tab).toContain("formatEventMenuSellInput");
-    expect(tab).toContain("lineFields.unitSellPrice");
-    expect(tab).not.toContain('defaultValue={lineFields.unitSellPrice ?? ""}');
   });
 });

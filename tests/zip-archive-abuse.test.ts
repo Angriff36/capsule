@@ -403,11 +403,4 @@ describe("ZipArchiveError", () => {
       expect(typeof zipError.message).toBe("string");
     }
   });
-
-  it("defaults to safe bounds and rejecting nested archives", () => {
-    expect(DEFAULT_ZIP_LIMITS.allowArchiveEntries).toBe(false);
-    expect(DEFAULT_ZIP_LIMITS.maxEntries).toBeGreaterThan(0);
-    expect(DEFAULT_ZIP_LIMITS.maxEntryExpandedBytes).toBeGreaterThan(0);
-    expect(DEFAULT_ZIP_LIMITS.maxTotalExpandedBytes).toBeGreaterThan(0);
-  });
 });

@@ -106,7 +106,7 @@ it("prefills distinct proposal start and end dates, headcount, client, and venue
     _id: "proposal-a",
     title: "Anniversary dinner",
     clientId: "client-a",
-    venueName: "Garden",
+    venueName: "  gArDeN  ",
     status: "accepted",
     version: 3,
     eventDate: new Date("2099-07-04T17:30").getTime(),
