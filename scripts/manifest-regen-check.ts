@@ -14,7 +14,8 @@
  * the only way to tell real drift from that false positive.
  */
 import { dirname, resolve } from "node:path";
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { applyEventServiceStyleReferenceGuard } from "./apply-event-service-style-reference-guard.ts";
 import { applyOrgCapabilityCheckRole } from "./apply-org-capability-check-role.ts";
@@ -39,10 +40,21 @@ if (status !== 0) {
 applyOrgCapabilityCheckRole(CAPSULE_ROOT);
 applyEventServiceStyleReferenceGuard(CAPSULE_ROOT);
 
-const dirty = execSync("git status --porcelain", {
-  cwd: CAPSULE_ROOT,
-  encoding: "utf-8",
-});
+// Scope the drift check to Builder-owned paths only (issue #375 follow-up):
+// a bare `git status --porcelain` also reports any unrelated uncommitted
+// work in the tree, which would falsely block a push that touches nothing
+// Builder owns.
+const ownershipPath = ".builder/ownership.json";
+const ownership = JSON.parse(
+  readFileSync(resolve(CAPSULE_ROOT, ownershipPath), "utf-8"),
+) as { files?: Record<string, unknown> };
+const ownedPaths = [ownershipPath, ...Object.keys(ownership.files ?? {})];
+
+const dirty = execFileSync(
+  "git",
+  ["status", "--porcelain", "--", ...ownedPaths],
+  { cwd: CAPSULE_ROOT, encoding: "utf-8" },
+);
 if (dirty.trim().length > 0) {
   console.error(
     "manifest-regen-check: generated output was stale and has now been regenerated:",
