@@ -97,8 +97,8 @@ const HEADER_LABELS: Record<string, string[]> = {
   contact: ["contact", "client", "customer", "host"],
   location: ["location", "venue", "site"],
   address: ["venue address", "site address", "address", "gps", "coordinates"],
-  phone: ["phone", "cell", "mobile"],
-  email: ["email", "e-mail"],
+  phone: ["contact phone", "phone", "cell", "mobile"],
+  email: ["contact email", "email", "e-mail"],
   dietary: [
     "allergies",
     "allergy",
@@ -148,21 +148,27 @@ function readLines(text: string): ReadLine[] {
  * TPP prints several header facts on one line: "Invoice #: 6839 Date:
  * Tuesday 9/22/2026". Split a line at every interior "Label:" run so each
  * fact becomes its own line for the header pass; menu and timeline rows
- * carry no header labels and are never split.
+ * carry no header labels and are never split. A colon is a split point only
+ * when the LONGEST label ends right before it, so "Venue Contact:" cuts as
+ * one compound label instead of leaking "Contact:" as a client fact.
  */
-const LABEL_RUN_SPLIT = new RegExp(
-  `\\s(${[...new Set([...Object.values(HEADER_LABELS).flat(), "venue contact"])]
-    .sort((a, b) => b.length - a.length)
-    .map(escapeRegExp)
-    .join("|")})\\s*[:#]`,
-  "i",
-);
+const SPLIT_LABELS = [
+  ...new Set([...Object.values(HEADER_LABELS).flat(), "venue contact"]),
+]
+  .sort((a, b) => b.length - a.length)
+  .map((label) => label.toLowerCase());
 
 function splitLabelRuns(line: string): string[] {
+  const lower = line.toLowerCase();
   const cuts: number[] = [];
-  for (const match of line.matchAll(new RegExp(LABEL_RUN_SPLIT.source, "gi"))) {
-    const labelStart = match.index! + match[0].indexOf(match[1]!);
-    if (labelStart > 0) cuts.push(labelStart);
+  for (const colon of line.matchAll(/[:#]/g)) {
+    const before = lower.slice(0, colon.index!);
+    for (const label of SPLIT_LABELS) {
+      if (!before.endsWith(label)) continue;
+      const at = before.length - label.length;
+      if (at > 0 && /\s/.test(line[at - 1]!)) cuts.push(at);
+      break;
+    }
   }
   if (cuts.length === 0) return [line];
   const parts = [line.slice(0, cuts[0]!).trim()];
@@ -314,6 +320,46 @@ function readBareClockRangeLine(
   const notes = noteParts.join(" ").trim();
   if (notes.length > 0) entry.notes = notes;
   return entry;
+}
+
+/**
+ * The venue block prints name and address without labels: "Fields Senior
+ * Living" directly above "16512 E Desmet Ct" and "Spokane Valley WA, 99216".
+ * When no labeled Location value named the venue, read that block: the bare
+ * letter line above the first address-like line is the name, and the
+ * following bare address lines fold into one address.
+ */
+function readUnlabeledVenue(lines: ReadLine[]): {
+  name?: string;
+  address?: ReturnType<typeof parseAddressBlob>;
+} {
+  for (let i = 0; i < lines.length; i++) {
+    const text = lines[i]!.text;
+    // Address blocks are bare; labeled header lines and prose are not
+    // addresses. A street line or city/ZIP line always carries a digit.
+    if (/[:#]/.test(text) || !/\d/.test(text) || looksLikeLabel(text)) continue;
+    const address = parseAddressBlob(text);
+    if (!address?.addressLine1 && !address?.city && !address?.postalCode)
+      continue;
+    let name: string | undefined;
+    for (let j = i - 1; j >= Math.max(0, i - 3); j--) {
+      const candidate = lines[j]!.text;
+      if (candidate.length < 3 || candidate.length > 60) continue;
+      if (/\d/.test(candidate)) continue;
+      if (looksLikeLabel(candidate) || isSectionHeading(candidate)) continue;
+      name = candidate.replace(/[,\-–]\s*$/, "").trim();
+      break;
+    }
+    const blob = [text];
+    for (let j = i + 1; j < Math.min(lines.length, i + 3); j++) {
+      const next = lines[j]!.text;
+      if (/[:#]/.test(next) || looksLikeLabel(next)) break;
+      if (!/\d/.test(next)) break;
+      blob.push(next);
+    }
+    return { name, address: parseAddressBlob(blob.join(", ")) };
+  }
+  return {};
 }
 
 function readStaffLine(text: string): BundleStaffAssignment | undefined {
@@ -589,6 +635,15 @@ export function parseBeoText(text: string): EventBundlePart {
   const warnings: string[] = [];
 
   const contact = readContact(labelValue(lines, "contact"));
+  const locationValue = labelValue(lines, "location");
+  // A location with no digits is a person — TPP prints the on-site contact
+  // there — not a place; the venue itself is the unlabeled name above the
+  // street address block.
+  const locationIsPlace =
+    locationValue !== undefined && /\d/.test(locationValue);
+  if (!contact.name && !locationIsPlace && locationValue) {
+    contact.name = locationValue;
+  }
   const sections = splitBeoNoteSections(body.noteLines.join("\n"));
   const notes = bundleNotesFromSections(sections);
   if (Object.keys(sections).length === 0 && body.noteLines.length > 1) {
@@ -638,10 +693,23 @@ export function parseBeoText(text: string): EventBundlePart {
       email: contact.email ?? parseEmail(labelValue(lines, "email")),
       phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
     },
-    venue: readVenueWithAddress(
-      labelValue(lines, "location"),
-      labelValue(lines, "address"),
-    ),
+    venue: (() => {
+      const venue = readVenueWithAddress(
+        locationIsPlace ? locationValue : undefined,
+        labelValue(lines, "address"),
+      );
+      if (!venue.name || !venue.addressLine1) {
+        const block = readUnlabeledVenue(lines);
+        if (!venue.name) venue.name = block.name;
+        if (!venue.addressLine1 && block.address) {
+          venue.addressLine1 = block.address.addressLine1;
+          venue.city = venue.city ?? block.address.city?.replace(/^[,\s]+/, "");
+          venue.region = venue.region ?? block.address.region;
+          venue.postalCode = venue.postalCode ?? block.address.postalCode;
+        }
+      }
+      return venue;
+    })(),
     timeline: body.timeline,
     menu: body.menu,
     staff: body.staff,

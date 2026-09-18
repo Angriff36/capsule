@@ -4,18 +4,24 @@ import { parseBeoText } from "../src/lib/tppReports/parseBeoText";
 
 /**
  * Shaped after a real TPP BEO paste (invoice 6839): several header facts on
- * one line, contact prose with phones and a ZIP, and bare service-wave clock
- * ranges inside a 2:00 PM – 5:01 PM event.
+ * one line, an unlabeled venue block above the street address, a "Venue
+ * Contact:" line that must not become the client, a person on the
+ * "Location:" line, and bare service-wave clock ranges inside a
+ * 2:00 PM – 5:01 PM event.
  */
 const BEO = `Banquet Event Order
 Invoice #: 6839 Date: Tuesday 9/22/2026
 Event Title: A Century Worth Celebrating Event Time: 2:00 PM - 5:01 PM
-Occasion: Social (Birthday Party, Anniversary, etc) Guest Count: 100
-Venue: Fields Senior Living Venue Contact: Kendra (509) 555 0134
+Occasion: **Social (Birthday Party, Anniversary, etc) Guest Count: 100
+Fields Senior Living
 16512 E Desmet Ct
 Spokane Valley WA, 99216
-Contact: Paul Brindle
-Contact Phone: (541) 701 7521 Contact Email: paul@example.com
+Venue Contact: Kendra (venue person to direct
+Contact Phone #: (541) 701 7521
+Service Style: Buffet - Cook Onsite
+Event Type: Social
+Location:
+Paul Brindle
 Event Items
 2:00 - 3:00 1st Wave: 34 Prawns
 3:00 - 4:00 2nd Wave: 33 Prawns
@@ -36,11 +42,18 @@ describe("parseBeoText pasted BEO reading", () => {
     );
   });
 
-  it("reads the venue and client contact, not the address run-on", () => {
+  it("reads the venue from the unlabeled block and the client from Location", () => {
     expect(part.venue?.name).toBe("Fields Senior Living");
+    expect(part.venue?.city).toBe("Spokane Valley");
+    expect(part.venue?.postalCode).toBe("99216");
     expect(part.client?.name).toBe("Paul Brindle");
     expect(part.client?.phone).toContain("541");
-    expect(part.client?.email).toBe("paul@example.com");
+  });
+
+  it("keeps the venue contact out of the client and venue names", () => {
+    expect(part.client?.name).not.toContain("Kendra");
+    expect(part.venue?.name).not.toContain("Kendra");
+    expect(part.venue?.name).not.toContain("Paul Brindle");
   });
 
   it("keeps address, ZIP and phone prose out of the menu", () => {
