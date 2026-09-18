@@ -73,6 +73,9 @@ export function useEventPacket(eventId: Id<"events">) {
   return {
     view,
     upload,
+    /** Live packet read for flows that must not act on a stale snapshot. */
+    readPacket: () =>
+      client.query(commands.getPacket, { eventId }) as Promise<PacketView>,
     importEvidence: (
       snapshot: EventPacketSnapshot,
       artifacts: { fingerprint: string; storageId: string }[],

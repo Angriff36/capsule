@@ -29,11 +29,16 @@ export async function resolveIssue(
 ): Promise<EventPacketSnapshot> {
   if (
     !decision.actor.trim() ||
-    !decision.reason.trim() ||
     !/^\d{4}-\d{2}-\d{2}T/.test(decision.at) ||
     Number.isNaN(Date.parse(decision.at))
   )
-    throw new Error("Decision requires actor, timestamp and reason");
+    throw new Error("Decision requires actor and timestamp");
+  // A typed reason is optional for one-click decisions: the actor and
+  // timestamp carry the audit trail. Firsthand fact entries below still
+  // require one — a value with no source needs its justification.
+  const reason =
+    decision.reason.trim() ||
+    (decision.answer ? "Verified in review" : "Confirmed in review");
   const packet = await reconcile(snapshot, currentEvent);
   const issue = packet.issues.find((i) => i.id === decision.issueId);
   if (!issue) throw new Error("Unknown issue");
@@ -60,7 +65,7 @@ export async function resolveIssue(
         answer: decision.answer,
         actor: decision.actor,
         at: decision.at,
-        reason: decision.reason,
+        reason,
         evidence: issue.evidence,
       },
     ];
@@ -140,7 +145,7 @@ export async function resolveIssue(
     choice: decision.answer ?? decision.choice,
     actor: decision.actor,
     at: decision.at,
-    reason: decision.reason,
+    reason,
     evidenceFingerprint: issue.evidenceFingerprint,
     kind: issue.key.startsWith("check.")
       ? "verification"

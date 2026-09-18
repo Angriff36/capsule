@@ -1175,24 +1175,16 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                               className="action-menu-danger"
                               disabled={busy != null}
                               onClick={() => {
-                                void (async () => {
-                                  const reason = await prompt.askReason({
-                                    ...ReasonCopy.removeLine,
-                                    title: "Remove event dish",
-                                    description:
-                                      "Record why this dish is leaving the event menu.",
-                                    confirmLabel: "Remove dish",
-                                    tone: "danger",
-                                  });
-                                  if (!reason) return;
-                                  void run(`remove:${selection._id}`, () =>
-                                    removeDish({
-                                      docId: selection._id,
-                                      version: selection.version,
-                                      reason,
-                                    }),
-                                  );
-                                })();
+                                // Choosing "Remove event dish" from this
+                                // menu is the confirmation; no typed reason
+                                // for a routine, reversible menu edit.
+                                void run(`remove:${selection._id}`, () =>
+                                  removeDish({
+                                    docId: selection._id,
+                                    version: selection.version,
+                                    reason: "Removed from event menu",
+                                  }),
+                                );
                               }}
                             >
                               Remove from menu

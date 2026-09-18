@@ -435,7 +435,7 @@ export const resolveOperationalIssue = mutation({
     issueId: v.string(),
     evidenceFingerprint: v.string(),
     choice: value,
-    reason: v.string(),
+    reason: v.optional(v.string()),
     observationId: v.optional(v.string()),
     answer: v.optional(
       v.union(v.literal("yes"), v.literal("no"), v.literal("not_applicable")),
@@ -452,7 +452,6 @@ export const resolveOperationalIssue = mutation({
   },
   handler: async (ctx, args) => {
     const auth = await authorize(ctx, args.eventId);
-    if (!args.reason.trim()) throw new Error("Record the decision reason");
     let current = await readCurrentPacket(ctx, auth.tenantId, args.eventId);
     const issue = current.snapshot.issues.find((i) => i.id === args.issueId);
     if (!issue) throw new Error("Issue not found");
@@ -596,7 +595,7 @@ export const resolveOperationalIssue = mutation({
       {
         issueId: args.issueId,
         choice: args.choice,
-        reason: args.reason,
+        reason: args.reason ?? "",
         actor: auth.id,
         at,
         observationId: args.observationId,

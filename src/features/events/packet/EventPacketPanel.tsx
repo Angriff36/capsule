@@ -81,6 +81,42 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
     );
   const snapshot = view.snapshot;
   const open = snapshot.issues.filter((i) => i.required && i.status === "open");
+  const visibleOpen = open.filter(
+    (i) => section === "all" || i.section === section,
+  );
+  const openChecks = visibleOpen.filter((i) => i.key.startsWith("check."));
+  const verifyAllChecks = () => {
+    void run(async () => {
+      let failed = 0;
+      // Re-read before each decision: every resolution re-reconciles the
+      // packet and can move the remaining issues' evidence fingerprints.
+      for (const issue of openChecks) {
+        try {
+          const fresh = await packet.readPacket();
+          const live = fresh.snapshot.issues.find(
+            (i) => i.id === issue.id && i.status === "open",
+          );
+          if (!live) continue;
+          await packet.resolve({
+            issueId: live.id,
+            evidenceFingerprint: live.evidenceFingerprint,
+            choice: "yes",
+            answer: "yes",
+            kind: "verification",
+            reason: "",
+          });
+        } catch {
+          failed += 1;
+        }
+      }
+      if (failed > 0)
+        setNotice(
+          `${failed} check${failed === 1 ? "" : "s"} could not be verified automatically — review ${
+            failed === 1 ? "it" : "them"
+          } below.`,
+        );
+    });
+  };
   const uploadAndImport = async () => {
     if (!files.length) return;
     // A declared zone prevents turning source wall-clock times into an invented instant.
@@ -283,37 +319,44 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
             </select>
           </label>
           <div className="attention-band mt-4">
-            <p className="px-4 pt-4 text-sm font-semibold text-ink">
-              Open decisions
-            </p>
+            <div className="flex flex-wrap items-center justify-between gap-2 px-4 pt-4">
+              <p className="text-sm font-semibold text-ink">Open decisions</p>
+              {openChecks.length > 0 && (
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={busy}
+                  onClick={verifyAllChecks}
+                >
+                  Verify all checks ({openChecks.length})
+                </button>
+              )}
+            </div>
             <ul className="divide-y divide-line px-4 pb-4">
-              {open
-                .filter((i) => section === "all" || i.section === section)
-                .map((issue) => (
-                  <IssueRow
-                    key={`${issue.id}:${issue.evidenceFingerprint}`}
-                    issue={issue}
-                    snapshot={snapshot}
-                    targets={view.nativeTargets?.[issue.fieldKey] ?? []}
-                    busy={busy}
-                    onSave={(decision) =>
-                      run(async () => {
-                        await packet.resolve(decision);
-                      })
-                    }
-                    onSource={(fingerprint) => {
-                      const target = openBlank();
-                      return run(async () => {
-                        try {
-                          openLink(await packet.sourceUrl(fingerprint), target);
-                        } catch (error) {
-                          target?.close();
-                          throw error;
-                        }
-                      });
-                    }}
-                  />
-                ))}
+              {visibleOpen.map((issue) => (
+                <IssueRow
+                  key={`${issue.id}:${issue.evidenceFingerprint}`}
+                  issue={issue}
+                  snapshot={snapshot}
+                  targets={view.nativeTargets?.[issue.fieldKey] ?? []}
+                  busy={busy}
+                  onSave={(decision) =>
+                    run(async () => {
+                      await packet.resolve(decision);
+                    })
+                  }
+                  onSource={(fingerprint) => {
+                    const target = openBlank();
+                    return run(async () => {
+                      try {
+                        openLink(await packet.sourceUrl(fingerprint), target);
+                      } catch (error) {
+                        target?.close();
+                        throw error;
+                      }
+                    });
+                  }}
+                />
+              ))}
             </ul>
           </div>
           <details className="mt-4">
@@ -429,7 +472,6 @@ function IssueRow({
   const [reason, setReason] = useState("");
   const [entry, setEntry] = useState("");
   const [target, setTarget] = useState("");
-  const [signed, setSigned] = useState(false);
   const requirement = requirements.find((r) => r.key === issue.key);
   const observations = snapshot.observations.filter(
     (o) => o.fieldKey === issue.fieldKey,
@@ -438,169 +480,192 @@ function IssueRow({
     (f) => f.fieldKey === issue.fieldKey && f.authority === "native_finalized",
   );
   const signature = /signature|signoff/.test(issue.key);
+  // One-click decisions for the common cases: a check you verified, or a
+  // conflict where Capsule's current value is the right one. The expandable
+  // form stays for everything else; notes are always optional.
+  const quickVerify = () =>
+    void onSave({
+      issueId: issue.id,
+      evidenceFingerprint: issue.evidenceFingerprint,
+      choice: "yes",
+      answer: "yes",
+      kind: "verification",
+      reason: "",
+    });
+  const quickKeepCurrent = () => {
+    if (!native || native.value === undefined) return;
+    void onSave({
+      issueId: issue.id,
+      evidenceFingerprint: issue.evidenceFingerprint,
+      choice: native.value,
+      unit: native.unit,
+      kind: "fact_choice",
+      reason: "",
+    });
+  };
   return (
     <li className="py-4">
-      <details>
-        <summary className="cursor-pointer text-sm font-semibold text-ink">
-          {issue.message}
-        </summary>
-        <p className="mt-2 text-sm text-ink-2">Owner: {issue.owner}</p>
-        {native && (
-          <p className="mt-2 text-sm">
-            Current Capsule value:{" "}
-            <strong>
-              {valueText(native.value)} {native.unit}
-            </strong>
-          </p>
-        )}
-        <ul className="my-2 text-sm">
-          {issue.evidence.map((e, index) => (
-            <li key={index}>
-              <button
-                className="btn-link"
-                onClick={() => void onSource(e.artifactFingerprint)}
-              >
-                {snapshot.artifacts.find(
-                  (a) => a.fingerprint === e.artifactFingerprint,
-                )?.name ?? "Source"}
-              </button>
-              {e.page ? ` · page ${e.page}` : ""}
-              {e.row ? ` · row ${e.row}` : ""}
-              {e.cell ? ` · cell ${e.cell}` : ""}
-            </li>
-          ))}
-        </ul>
-        <form
-          className="space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const observed = observations.find((o) => o.id === choice);
-            const answer = requirement
-              ? (choice as "yes" | "no" | "not_applicable")
-              : undefined;
-            const value = requirement
-              ? choice
-              : choice === "native"
-                ? native?.value
-                : (observed?.value ??
-                  (issue.fieldKey === "guestCount" ? Number(entry) : entry));
-            if (value === undefined) return;
-            void onSave({
-              issueId: issue.id,
-              evidenceFingerprint: issue.evidenceFingerprint,
-              choice: value,
-              reason,
-              ...(answer
-                ? { answer, kind: "verification" as const }
-                : observed
-                  ? {
-                      observationId: observed.id,
-                      unit: observed.unit,
-                      kind: "fact_choice" as const,
-                    }
-                  : { kind: "fact_entry" as const, unit: native?.unit }),
-              ...(target ? { nativeTargetId: target } : {}),
-            });
-          }}
-        >
-          <label className="block text-sm">
-            {requirement ? "Verification" : fieldLabel(issue.fieldKey)}
-            <select
-              className="input mt-1 block w-full"
-              required
-              value={choice}
-              onChange={(e) => setChoice(e.target.value)}
-            >
-              <option value="">Choose a decision</option>
-              {requirement ? (
-                <>
-                  <option value="yes">Yes — verified</option>
-                  <option value="no">No — still open</option>
-                  {requirement &&
-                    canMarkNotApplicable(requirement, snapshot) && (
-                      <option value="not_applicable">
-                        Not applicable — explain why
-                      </option>
-                    )}
-                </>
-              ) : (
-                <>
-                  {native && (
-                    <option value="native">Keep current Capsule value</option>
-                  )}
-                  {observations.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {valueText(o.value)} {o.unit} — source evidence
-                    </option>
-                  ))}
-                  <option value="entry">Enter confirmed value</option>
-                </>
-              )}
-            </select>
-          </label>
-          {choice === "entry" && (
-            <label className="block text-sm">
-              Confirmed value
-              <input
-                className="input mt-1 block w-full"
-                required
-                value={entry}
-                onChange={(e) => setEntry(e.target.value)}
-                type={issue.fieldKey === "guestCount" ? "number" : "text"}
-              />
-            </label>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <details className="min-w-0 flex-1">
+          <summary className="cursor-pointer text-sm font-semibold text-ink">
+            {issue.message}
+          </summary>
+          <p className="mt-2 text-sm text-ink-2">Owner: {issue.owner}</p>
+          {native && (
+            <p className="mt-2 text-sm">
+              Current Capsule value:{" "}
+              <strong>
+                {valueText(native.value)} {native.unit}
+              </strong>
+            </p>
           )}
-          {targets.length > 0 && (
+          <ul className="my-2 text-sm">
+            {issue.evidence.map((e, index) => (
+              <li key={index}>
+                <button
+                  className="btn-link"
+                  onClick={() => void onSource(e.artifactFingerprint)}
+                >
+                  {snapshot.artifacts.find(
+                    (a) => a.fingerprint === e.artifactFingerprint,
+                  )?.name ?? "Source"}
+                </button>
+                {e.page ? ` · page ${e.page}` : ""}
+                {e.row ? ` · row ${e.row}` : ""}
+                {e.cell ? ` · cell ${e.cell}` : ""}
+              </li>
+            ))}
+          </ul>
+          <form
+            className="space-y-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const observed = observations.find((o) => o.id === choice);
+              const answer = requirement
+                ? (choice as "yes" | "no" | "not_applicable")
+                : undefined;
+              const value = requirement
+                ? choice
+                : choice === "native"
+                  ? native?.value
+                  : (observed?.value ??
+                    (issue.fieldKey === "guestCount" ? Number(entry) : entry));
+              if (value === undefined) return;
+              void onSave({
+                issueId: issue.id,
+                evidenceFingerprint: issue.evidenceFingerprint,
+                choice: value,
+                reason,
+                ...(answer
+                  ? { answer, kind: "verification" as const }
+                  : observed
+                    ? {
+                        observationId: observed.id,
+                        unit: observed.unit,
+                        kind: "fact_choice" as const,
+                      }
+                    : { kind: "fact_entry" as const, unit: native?.unit }),
+                ...(target ? { nativeTargetId: target } : {}),
+              });
+            }}
+          >
             <label className="block text-sm">
-              Update native record
+              {requirement ? "Verification" : fieldLabel(issue.fieldKey)}
               <select
                 className="input mt-1 block w-full"
-                value={target}
-                onChange={(e) => setTarget(e.target.value)}
+                required
+                value={choice}
+                onChange={(e) => setChoice(e.target.value)}
               >
-                <option value="">Select if changing the current value</option>
-                {targets.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.label}
-                  </option>
-                ))}
+                <option value="">Choose a decision</option>
+                {requirement ? (
+                  <>
+                    <option value="yes">Yes — verified</option>
+                    <option value="no">No — still open</option>
+                    {canMarkNotApplicable(requirement, snapshot) && (
+                      <option value="not_applicable">Not applicable</option>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {native && (
+                      <option value="native">Keep current Capsule value</option>
+                    )}
+                    {observations.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {valueText(o.value)} {o.unit} — source evidence
+                      </option>
+                    ))}
+                    <option value="entry">Enter confirmed value</option>
+                  </>
+                )}
               </select>
             </label>
-          )}
-          <label className="block text-sm">
-            Decision and evidence
-            <textarea
-              className="input mt-1 block min-h-20 w-full"
-              required
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="What you checked and why this is correct"
-            />
-          </label>
-          {signature && choice === "yes" && (
-            <label className="flex gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={signed}
-                onChange={(e) => setSigned(e.target.checked)}
-                required
+            {choice === "entry" && (
+              <label className="block text-sm">
+                Confirmed value
+                <input
+                  className="input mt-1 block w-full"
+                  required
+                  value={entry}
+                  onChange={(e) => setEntry(e.target.value)}
+                  type={issue.fieldKey === "guestCount" ? "number" : "text"}
+                />
+              </label>
+            )}
+            {targets.length > 0 && (
+              <label className="block text-sm">
+                Update native record
+                <select
+                  className="input mt-1 block w-full"
+                  value={target}
+                  onChange={(e) => setTarget(e.target.value)}
+                >
+                  <option value="">Select if changing the current value</option>
+                  {targets.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <label className="block text-sm">
+              Note (optional)
+              <textarea
+                className="input mt-1 block min-h-20 w-full"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Anything special about this decision"
               />
-              I personally confirm this sign-off under my signed-in name.
             </label>
+            <button className="btn btn-secondary" disabled={busy || !choice}>
+              {signature ? "Sign off" : "Record decision"}
+            </button>
+          </form>
+        </details>
+        <div className="flex shrink-0 items-center gap-2">
+          {requirement ? (
+            <button
+              className="btn btn-secondary btn-sm"
+              disabled={busy}
+              onClick={quickVerify}
+            >
+              {signature ? "Sign off" : "Verified"}
+            </button>
+          ) : (
+            native && (
+              <button
+                className="btn btn-secondary btn-sm"
+                disabled={busy}
+                onClick={quickKeepCurrent}
+              >
+                Keep current value
+              </button>
+            )
           )}
-          <button
-            className="btn btn-secondary"
-            disabled={
-              busy ||
-              !choice ||
-              !reason.trim() ||
-              (signature && choice === "yes" && !signed)
-            }
-          >
-            Record decision
-          </button>
-        </form>
-      </details>
+        </div>
+      </div>
     </li>
   );
 }
