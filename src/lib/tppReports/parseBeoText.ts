@@ -76,6 +76,8 @@ const SECTION_HEADINGS: Array<{ pattern: RegExp; section: Section }> = [
   { pattern: /^time\s+(name|activity)\b/i, section: "timeline" },
   { pattern: /^(event\s+)?(menu|event items?|food)\b/i, section: "menu" },
   { pattern: /^time\s+event item\b/i, section: "menu" },
+  // The BEO item table prints its column header as one run-on line.
+  { pattern: /^time\s+service\s+area/i, section: "menu" },
   { pattern: /^(staff|staffing|labor|labour|crew|team)\b/i, section: "staff" },
   { pattern: /^(notes|setup notes|event overview)\b/i, section: "notes" },
   {
@@ -591,6 +593,19 @@ function readMenuBodyLine(
   // The BEO menu table leads each row with its serving time; drop it.
   const withoutClock = text.replace(LEADING_CLOCK, "$2").trim();
   const current = menu.at(-1);
+  // BEO item tables also mark rows with "-" or "**": "- 200 Serving Lasagna
+  // Meal", "**250 Trays of Lasagna". A marked line that reads as an item is
+  // an item; only a marked line without a count stays a note.
+  const withoutMark = withoutClock.replace(/^[-–*]+\s*/, "");
+  if (withoutMark !== withoutClock) {
+    const markedItem = readMenuLine(withoutMark, { allowBareCount: true });
+    if (markedItem) {
+      if (courseState.course !== undefined)
+        markedItem.course = courseState.course;
+      menu.push(markedItem);
+      return;
+    }
+  }
   const note = withoutClock.match(NOTE_LINE);
   if (note && current) {
     const instruction = note[1]!.trim();

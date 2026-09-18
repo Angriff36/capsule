@@ -23,6 +23,11 @@ Event Type: Social
 Location:
 Paul Brindle
 Event Items
+- 200 Serving Lasagna Meal (individually packaged)
+Individually packaged. Lasagna with meat ragu.
+**250 Trays of Lasagna
+250 - 2ea Rolls + Butterchips
+** Sauce on the side
 2:00 - 3:00 1st Wave: 34 Prawns
 3:00 - 4:00 2nd Wave: 33 Prawns
 30 Serving Century Board`;
@@ -56,10 +61,33 @@ describe("parseBeoText pasted BEO reading", () => {
     expect(part.venue?.name).not.toContain("Paul Brindle");
   });
 
-  it("keeps address, ZIP and phone prose out of the menu", () => {
+  it("reads BEO item-table rows marked with - or **", () => {
     const names = part.menu.map((item) => item.name);
-    expect(names).toEqual(["Century Board"]);
-    expect(part.menu[0]?.quantityServings).toBe(30);
+    expect(names).toEqual([
+      "Lasagna Meal (individually packaged)",
+      "Trays of Lasagna",
+      "- 2ea Rolls + Butterchips",
+      "Century Board",
+    ]);
+    expect(part.menu[0]?.quantityServings).toBe(200);
+    expect(part.menu[0]?.description).toBe(
+      "Individually packaged. Lasagna with meat ragu.",
+    );
+    expect(part.menu[2]?.specialInstructions).toBe("Sauce on the side");
+  });
+
+  it("recognizes the run-on BEO item table header", () => {
+    const table = parseBeoText(
+      [
+        "Time Service AreaEvent Item Service StyleQty",
+        "- 200 Serving Lasagna Meal (individually packaged)",
+        "**250 Trays of Lasagna",
+      ].join("\n"),
+    );
+    expect(table.menu.map((item) => item.name)).toEqual([
+      "Lasagna Meal (individually packaged)",
+      "Trays of Lasagna",
+    ]);
   });
 
   it("reads bare service-wave clock ranges as timeline rows", () => {
