@@ -70,28 +70,29 @@ it("renders the submitted details, resolves retired catalog names, falls back to
   expect(container.textContent).not.toContain("public quote form is offline");
 });
 
-it("dismisses with the entered reason and keeps the returned dismissed request reachable through the toggle", async () => {
+it("dismisses in one click and keeps the returned dismissed request reachable through the toggle", async () => {
   backend.values.set("useListQuoteSubmission", [submission]);
   const dismiss = command("useQuoteSubmissionDismiss");
   await mount(page());
+  // One click — the raw submission is kept and still blocks duplicates, so
+  // no typed reason is demanded.
   await click(button("Dismiss"));
-  expect(dismiss).not.toHaveBeenCalled();
-  input("reason", "Client withdrew");
-  await submit(
-    container.querySelector<HTMLFormElement>("[data-action-prompt]")!,
-  );
   expect(dismiss).toHaveBeenCalledExactlyOnceWith({
     docId: "submission-a",
-    reason: "Client withdrew",
+    reason: "Dismissed in review",
   });
   backend.values.set("useListQuoteSubmission", [
-    { ...submission, status: "dismissed", errorMessage: "Client withdrew" },
+    {
+      ...submission,
+      status: "dismissed",
+      errorMessage: "Dismissed in review",
+    },
   ]);
   await mount(page());
   expect(container.textContent).not.toContain("Garden Club");
   await click(button("Show dismissed (1)"));
   expect(container.textContent).toContain("Garden Club");
-  expect(container.textContent).toContain("Dismissed — Client withdrew");
+  expect(container.textContent).toContain("Dismissed — Dismissed in review");
   expect(container.textContent).toContain("No nuts");
 });
 

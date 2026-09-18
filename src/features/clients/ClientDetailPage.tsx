@@ -191,16 +191,13 @@ export function ClientDetailPage() {
   const invokeClient = (key: string) => {
     void (async () => {
       if (key === "archive") {
-        const reason = await prompt.askReason({
-          ...ReasonCopy.archiveClient,
-          tone: "danger",
-        });
-        if (!reason) return;
+        // Reactivate stays one click away; no typed reason for a routine,
+        // reversible archive.
         void run("archive", async () => {
           await archive({
             docId: client._id,
             version: client.version,
-            reason,
+            reason: "Archived in review",
           });
           setNotice("Client archived.");
         });

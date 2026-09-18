@@ -64,15 +64,12 @@ it.each([
       description: "Updated",
     });
     await click(button("Retire"));
-    expect(retire).not.toHaveBeenCalled();
-    input("reason", "Replaced by evening service");
-    await submit(
-      container.querySelector<HTMLFormElement>("[data-action-prompt]")!,
-    );
+    // Retire is one click — routine and reversible (Reactivate below), so it
+    // carries the standard reason instead of demanding a typed one.
     expect(retire).toHaveBeenCalledExactlyOnceWith({
       docId: "catalog-a",
       version: 7,
-      reason: "Replaced by evening service",
+      reason: "Retired in review",
     });
     backend.values.set(`useList${entity}`, [
       { ...row, status: "inactive", version: 8 },

@@ -174,18 +174,15 @@ export function CatalogsSection({
   };
 
   const retire = (row: CatalogRow) => {
-    void (async () => {
-      const reason = await prompt.askReason({
-        title: `Retire ${row.name}`,
-        description: `Retired ${singular}s stay on existing records but disappear from new selectors.`,
-        label: "Reason",
-        confirmLabel: "Retire",
-      });
-      if (!reason) return;
-      await run(`${row._id}:retire`, () =>
-        commands.deactivate({ docId: row._id, version: row.version, reason }),
-      );
-    })();
+    // Retired rows stay on existing records and reactivate is one click —
+    // no typed reason for a routine catalog edit.
+    void run(`${row._id}:retire`, () =>
+      commands.deactivate({
+        docId: row._id,
+        version: row.version,
+        reason: "Retired in review",
+      }),
+    );
   };
 
   const reactivate = (row: CatalogRow) => {

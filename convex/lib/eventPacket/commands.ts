@@ -22,6 +22,11 @@ import {
 import { parsePacketSnapshot } from "../../../src/lib/eventPacket/packetContract";
 import { resolveIssue } from "../../../src/lib/eventPacket/resolveIssue";
 import {
+  summarizePacketRows,
+  type SummaryClientLike,
+  type SummaryEventLike,
+} from "../../../src/lib/eventPacket/summaryProjection";
+import {
   canonicalJson,
   fingerprintBytes,
   fingerprintSnapshot,
@@ -72,6 +77,59 @@ export const canManagePacket = query({
     if (!auth.tenantId || !hasManagementAccess(auth)) return false;
     await scopedEvent(ctx, auth.tenantId, eventId);
     return true;
+  },
+});
+/** Cross-event workbook rows: counts as of the last import or decision. */
+export const listPacketSummaries = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !hasManagementAccess(auth)) return null;
+    const tenantId = auth.tenantId;
+    const rows = async (
+      table:
+        | "eventPacketArtifacts"
+        | "eventPacketIssues"
+        | "eventPacketRevisions",
+    ) =>
+      (
+        await (ctx.db as any)
+          .query(table)
+          .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+          .collect()
+      ).filter((r: any) => r.deletedAt == null);
+    const [artifacts, issues, revisions] = await Promise.all([
+      rows("eventPacketArtifacts"),
+      rows("eventPacketIssues"),
+      rows("eventPacketRevisions"),
+    ]);
+    const eventIds = new Set<string>([
+      ...artifacts.map((r: any) => r.eventId as string),
+      ...issues.map((r: any) => r.eventId as string),
+      ...revisions.map((r: any) => r.eventId as string),
+    ]);
+    const events = new Map<string, SummaryEventLike>();
+    const clients = new Map<string, SummaryClientLike>();
+    for (const id of eventIds) {
+      const event: any = await ctx.db.get(id as Id<"events">);
+      if (!event || event.tenantId !== tenantId || event.deletedAt != null)
+        continue;
+      events.set(id, event);
+      if (event.clientId && !clients.has(event.clientId)) {
+        const client: any = await ctx.db.get(event.clientId);
+        if (client && client.tenantId === tenantId && client.deletedAt == null)
+          clients.set(event.clientId, client);
+      }
+    }
+    return clean(
+      summarizePacketRows({
+        artifacts,
+        issues,
+        revisions,
+        getEvent: (eventId) => events.get(eventId) ?? null,
+        getClient: (clientId) => clients.get(clientId) ?? null,
+      }),
+    );
   },
 });
 export const getPacket = query({
@@ -377,7 +435,7 @@ export const resolveOperationalIssue = mutation({
     issueId: v.string(),
     evidenceFingerprint: v.string(),
     choice: value,
-    reason: v.string(),
+    reason: v.optional(v.string()),
     observationId: v.optional(v.string()),
     answer: v.optional(
       v.union(v.literal("yes"), v.literal("no"), v.literal("not_applicable")),
@@ -394,7 +452,6 @@ export const resolveOperationalIssue = mutation({
   },
   handler: async (ctx, args) => {
     const auth = await authorize(ctx, args.eventId);
-    if (!args.reason.trim()) throw new Error("Record the decision reason");
     let current = await readCurrentPacket(ctx, auth.tenantId, args.eventId);
     const issue = current.snapshot.issues.find((i) => i.id === args.issueId);
     if (!issue) throw new Error("Issue not found");
@@ -538,7 +595,7 @@ export const resolveOperationalIssue = mutation({
       {
         issueId: args.issueId,
         choice: args.choice,
-        reason: args.reason,
+        reason: args.reason ?? "",
         actor: auth.id,
         at,
         observationId: args.observationId,

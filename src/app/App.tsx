@@ -9,6 +9,7 @@ import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlanne
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventImportPage } from "../features/events/import/EventImportPage";
+import { EventWorkbooksPage } from "../features/events/packet/EventWorkbooksPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTrackerPage } from "../features/events/EventTrackerPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
@@ -659,6 +660,7 @@ export function App() {
             <Route index element={<HomeCalendarPage />} />
             <Route path="/today" element={<HomePage />} />
             <Route path="/events" element={<EventsListPage />} />
+            <Route path="/workbooks" element={<EventWorkbooksPage />} />
             <Route path="/events/tracker" element={<EventTrackerPage />} />
             <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/import" element={<EventImportPage />} />

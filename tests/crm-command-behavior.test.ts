@@ -43,14 +43,11 @@ it("revises, archives and reactivates the selected proposal template", async () 
     validityDays: undefined,
   });
   await click(button("Archive"));
-  expect(archive).not.toHaveBeenCalled();
-  input("reason", "Replaced by the supper template");
-  await submit(
-    container.querySelector<HTMLFormElement>("[data-action-prompt]")!,
-  );
+  // Archive is one click — reversible via Reactivate below, so it carries
+  // the standard reason instead of demanding a typed one.
   expect(archive).toHaveBeenCalledExactlyOnceWith({
     docId: "template-a",
-    reason: "Replaced by the supper template",
+    reason: "Archived in review",
   });
   backend.values.set("useListProposalTemplate", [
     { ...row, status: "archived" },

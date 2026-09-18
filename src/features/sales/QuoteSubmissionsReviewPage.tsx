@@ -145,20 +145,14 @@ export function QuoteSubmissionsReviewPage() {
 
   const dismiss = async (sub: QuoteSubmission) => {
     setFailure(null);
-    // The reason is required (manifest constraint); a blank prompt cancels.
-    const reason = (
-      await prompt.askReason({
-        title: "Dismiss quote request",
-        description:
-          "Hides this request from the queue. The raw submission is kept and still blocks duplicate submits of the same event.",
-        label: "Reason",
-        confirmLabel: "Dismiss",
-      })
-    )?.trim();
-    if (!reason) return;
+    // One click: the raw submission is kept and still blocks duplicate
+    // submits of the same event, so no typed reason is demanded.
     setBusyId(sub._id);
     try {
-      await dismissSubmission({ docId: sub._id, reason });
+      await dismissSubmission({
+        docId: sub._id,
+        reason: "Dismissed in review",
+      });
     } catch (err) {
       setFailure(classifyCommandFailure(err));
     } finally {

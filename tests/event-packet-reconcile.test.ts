@@ -205,6 +205,32 @@ describe("packet reconciliation", () => {
       }),
     ).rejects.toThrow();
   });
+  it("resolves one-click decisions without a typed reason; firsthand entries still need one", async () => {
+    let p = await reconcile(actual());
+    const check = p.issues.find((i) => i.key.startsWith("check."))!;
+    p = await resolveIssue(p, {
+      issueId: check.id,
+      choice: "yes",
+      answer: "yes",
+      actor: "Manager",
+      at,
+      reason: "",
+    });
+    expect(
+      p.checklistVerifications.find((c) => c.checkKey === check.key)?.reason,
+    ).toBe("Verified in review");
+    const fact = p.issues.find((i) => !i.key.startsWith("check."))!;
+    await expect(
+      resolveIssue(p, {
+        issueId: fact.id,
+        choice: "Made up on the spot",
+        kind: "fact_entry",
+        actor: "Manager",
+        at,
+        reason: "",
+      }),
+    ).rejects.toThrow(/fact entry/i);
+  });
   it("preserves native values with explicit disagreement and detects native change", async () => {
     const native: Fact[] = [
       {

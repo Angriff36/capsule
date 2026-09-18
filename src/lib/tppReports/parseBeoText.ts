@@ -75,7 +75,10 @@ const SECTION_HEADINGS: Array<{ pattern: RegExp; section: Section }> = [
   },
   { pattern: /^time\s+(name|activity)\b/i, section: "timeline" },
   { pattern: /^(event\s+)?(menu|event items?|food)\b/i, section: "menu" },
-  { pattern: /^time\s+event item\b/i, section: "menu" },
+  // The BEO item table prints its column header as one run-on line in
+  // varying column order: "Time Qty Event Item Service Style Service Area",
+  // "Time Service AreaEvent Item Service StyleQty".
+  { pattern: /^time\b.*event item/i, section: "menu" },
   { pattern: /^(staff|staffing|labor|labour|crew|team)\b/i, section: "staff" },
   { pattern: /^(notes|setup notes|event overview)\b/i, section: "notes" },
   {
@@ -97,8 +100,8 @@ const HEADER_LABELS: Record<string, string[]> = {
   contact: ["contact", "client", "customer", "host"],
   location: ["location", "venue", "site"],
   address: ["venue address", "site address", "address", "gps", "coordinates"],
-  phone: ["phone", "cell", "mobile"],
-  email: ["email", "e-mail"],
+  phone: ["contact phone", "phone", "cell", "mobile"],
+  email: ["contact email", "email", "e-mail"],
   dietary: [
     "allergies",
     "allergy",
@@ -108,6 +111,9 @@ const HEADER_LABELS: Record<string, string[]> = {
     "dietary",
     "restrictions",
   ],
+  // Read as a label so an empty "Company:" line stops the contact reader from
+  // taking the next line as the contact value.
+  company: ["company"],
 };
 
 interface ReadLine {
@@ -134,6 +140,7 @@ function readLines(text: string): ReadLine[] {
   return text
     .split(/\r?\n/)
     .map((line) => line.replace(/\t/g, "  ").trim())
+    .flatMap((line) => splitLabelRuns(line))
     .filter(
       (line) =>
         line.length > 0 &&
@@ -141,6 +148,40 @@ function readLines(text: string): ReadLine[] {
         !PAGE_FOOTER.test(line),
     )
     .map((line) => ({ text: line, lower: line.toLowerCase() }));
+}
+
+/**
+ * TPP prints several header facts on one line: "Invoice #: 6839 Date:
+ * Tuesday 9/22/2026". Split a line at every interior "Label:" run so each
+ * fact becomes its own line for the header pass; menu and timeline rows
+ * carry no header labels and are never split. A colon is a split point only
+ * when the LONGEST label ends right before it, so "Venue Contact:" cuts as
+ * one compound label instead of leaking "Contact:" as a client fact.
+ */
+const SPLIT_LABELS = [
+  ...new Set([...Object.values(HEADER_LABELS).flat(), "venue contact"]),
+]
+  .sort((a, b) => b.length - a.length)
+  .map((label) => label.toLowerCase());
+
+function splitLabelRuns(line: string): string[] {
+  const lower = line.toLowerCase();
+  const cuts: number[] = [];
+  for (const colon of line.matchAll(/[:#]/g)) {
+    const before = lower.slice(0, colon.index!);
+    for (const label of SPLIT_LABELS) {
+      if (!before.endsWith(label)) continue;
+      const at = before.length - label.length;
+      if (at > 0 && /\s/.test(line[at - 1]!)) cuts.push(at);
+      break;
+    }
+  }
+  if (cuts.length === 0) return [line];
+  const parts = [line.slice(0, cuts[0]!).trim()];
+  for (let i = 0; i < cuts.length; i += 1) {
+    parts.push(line.slice(cuts[i]!, cuts[i + 1] ?? line.length).trim());
+  }
+  return parts;
 }
 
 /** Longer labels win over shorter ones ("Event Date" before "Date"). */
@@ -194,17 +235,37 @@ function readTimelineLine(text: string): BundleTimelineEntry | undefined {
   return entry;
 }
 
+/**
+ * Menu-row guards: a bare "N:NN" is a clock, not a count; servings above a
+ * full-service ceiling are ZIP codes, phone numbers or street numbers; a name
+ * without letters or carrying a phone/email fragment is contact or address
+ * prose, not a dish.
+ */
+const MENU_NAME_REJECT =
+  /@|\(\d{3}\)\s*\d{3}|\b\d{3}[-.\s]\d{4}\b|\b\d{7,}\b|\b\d{5}\b/;
+
+function menuRowPlausible(name: string, quantity: number): boolean {
+  if (quantity > 5000) return false;
+  if (!/[A-Za-z]/.test(name)) return false;
+  return !MENU_NAME_REJECT.test(name);
+}
+
 function readMenuLine(
   text: string,
   options: { allowBareCount: boolean },
 ): BundleMenuItem | undefined {
+  if (/^\d{1,2}:\d{2}/.test(text)) return undefined;
   const leading = text.match(
     options.allowBareCount ? LEADING_SERVINGS_BARE : LEADING_SERVINGS_WITH_UNIT,
   );
   if (leading) {
     const quantity = Number(leading[1]);
     const name = leading[2]!.trim();
-    if (Number.isFinite(quantity) && name.length > 1) {
+    if (
+      Number.isFinite(quantity) &&
+      name.length > 1 &&
+      menuRowPlausible(name, quantity)
+    ) {
       return { name, quantityServings: quantity };
     }
   }
@@ -212,11 +273,99 @@ function readMenuLine(
   if (trailing) {
     const quantity = Number(trailing[2]);
     const name = trailing[1]!.trim();
-    if (Number.isFinite(quantity) && name.length > 1 && !CLOCK.test(name)) {
+    if (
+      Number.isFinite(quantity) &&
+      name.length > 1 &&
+      !CLOCK.test(name) &&
+      menuRowPlausible(name, quantity)
+    ) {
       return { name, quantityServings: quantity };
     }
   }
   return undefined;
+}
+
+/**
+ * Service-wave rows print bare 24-hour ranges without AM/PM: "2:00 – 3:00
+ * 1st Wave: 34 Prawns". They are timeline rows, not menu rows. A bare hour is
+ * ambiguous, so it is resolved against the BEO's own event window — "2:00"
+ * inside a 2:00 PM event is 14:00 — and skipped when it stays ambiguous.
+ */
+const BARE_CLOCK_RANGE =
+  /^(\d{1,2}):(\d{2})\s*(?:-|–|to)\s*(\d{1,2}):(\d{2})\s+(.+)$/;
+
+function resolveBareHour(
+  hour: number,
+  window: { start?: number; end?: number },
+): number | undefined {
+  if (hour > 12) return hour * 60;
+  if (window.start === undefined || window.end === undefined) return undefined;
+  const hits = [hour, hour + 12]
+    .map((candidate) => candidate * 60)
+    .filter(
+      (minutes) => minutes + 60 >= window.start! && minutes - 60 <= window.end!,
+    );
+  return hits.length === 1 ? hits[0] : undefined;
+}
+
+function readBareClockRangeLine(
+  text: string,
+  window: { start?: number; end?: number },
+): BundleTimelineEntry | undefined {
+  const match = text.match(BARE_CLOCK_RANGE);
+  if (!match) return undefined;
+  const start = resolveBareHour(Number(match[1]), window);
+  if (
+    start === undefined ||
+    resolveBareHour(Number(match[3]), window) === undefined
+  )
+    return undefined;
+  const [name, ...noteParts] = match[5]!.trim().split(/\s{2,}/);
+  if (!name || name.length === 0) return undefined;
+  const entry: BundleTimelineEntry = { name: name.trim(), minutes: start };
+  const notes = noteParts.join(" ").trim();
+  if (notes.length > 0) entry.notes = notes;
+  return entry;
+}
+
+/**
+ * The venue block prints name and address without labels: "Fields Senior
+ * Living" directly above "16512 E Desmet Ct" and "Spokane Valley WA, 99216".
+ * When no labeled Location value named the venue, read that block: the bare
+ * letter line above the first address-like line is the name, and the
+ * following bare address lines fold into one address.
+ */
+function readUnlabeledVenue(lines: ReadLine[]): {
+  name?: string;
+  address?: ReturnType<typeof parseAddressBlob>;
+} {
+  for (let i = 0; i < lines.length; i++) {
+    const text = lines[i]!.text;
+    // Address blocks are bare; labeled header lines and prose are not
+    // addresses. A street line or city/ZIP line always carries a digit.
+    if (/[:#]/.test(text) || !/\d/.test(text) || looksLikeLabel(text)) continue;
+    const address = parseAddressBlob(text);
+    if (!address?.addressLine1 && !address?.city && !address?.postalCode)
+      continue;
+    let name: string | undefined;
+    for (let j = i - 1; j >= Math.max(0, i - 3); j--) {
+      const candidate = lines[j]!.text;
+      if (candidate.length < 3 || candidate.length > 60) continue;
+      if (/\d/.test(candidate)) continue;
+      if (looksLikeLabel(candidate) || isSectionHeading(candidate)) continue;
+      name = candidate.replace(/[,\-–]\s*$/, "").trim();
+      break;
+    }
+    const blob = [text];
+    for (let j = i + 1; j < Math.min(lines.length, i + 3); j++) {
+      const next = lines[j]!.text;
+      if (/[:#]/.test(next) || looksLikeLabel(next)) break;
+      if (!/\d/.test(next)) break;
+      blob.push(next);
+    }
+    return { name, address: parseAddressBlob(blob.join(", ")) };
+  }
+  return {};
 }
 
 function readStaffLine(text: string): BundleStaffAssignment | undefined {
@@ -377,7 +526,10 @@ interface Body {
   noteLines: string[];
 }
 
-function readBody(lines: ReadLine[]): Body {
+function readBody(
+  lines: ReadLine[],
+  eventWindow: { start?: number; end?: number } = {},
+): Body {
   const body: Body = { timeline: [], menu: [], staff: [], noteLines: [] };
   let section: Section = "header";
   let course: string | undefined;
@@ -409,6 +561,11 @@ function readBody(lines: ReadLine[]): Body {
       continue;
     }
     if (section === "menu") {
+      const wave = readBareClockRangeLine(line.text, eventWindow);
+      if (wave) {
+        body.timeline.push(wave);
+        continue;
+      }
       readMenuBodyLine(line.text, body.menu, {
         course,
         setCourse: (next) => {
@@ -440,6 +597,25 @@ function readMenuBodyLine(
   // The BEO menu table leads each row with its serving time; drop it.
   const withoutClock = text.replace(LEADING_CLOCK, "$2").trim();
   const current = menu.at(-1);
+  // BEO item tables also mark rows with "-" or "**": "- 200 Serving Lasagna
+  // Meal", "**250 Trays of Lasagna". A marked line that reads as an item is
+  // an item; only a marked line without a count stays a note.
+  const withoutMark = withoutClock.replace(/^[-–*]+\s*/, "");
+  if (withoutMark !== withoutClock) {
+    // " - Wave 1" / " - Beverage" mark the course the following rows belong
+    // to — checked before the count reader, or "Wave 1" reads as 1 serving.
+    if (/^(?:wave \d+|beverages?)$/i.test(withoutMark)) {
+      courseState.setCourse(withoutMark);
+      return;
+    }
+    const markedItem = readMenuLine(withoutMark, { allowBareCount: true });
+    if (markedItem) {
+      if (courseState.course !== undefined)
+        markedItem.course = courseState.course;
+      menu.push(markedItem);
+      return;
+    }
+  }
   const note = withoutClock.match(NOTE_LINE);
   if (note && current) {
     const instruction = note[1]!.trim();
@@ -475,12 +651,24 @@ function readMenuBodyLine(
 /** Parse pasted BEO / worksheet text into its bundle contribution. */
 export function parseBeoText(text: string): EventBundlePart {
   const lines = readLines(text);
-  const body = readBody(lines);
-  const warnings: string[] = [];
-
   const eventTime = labelValue(lines, "time");
   const timeRange = eventTime?.match(CLOCK_RANGE);
+  const body = readBody(lines, {
+    start: parseClockMinutes(timeRange?.[1] ?? eventTime),
+    end: parseClockMinutes(timeRange?.[2]),
+  });
+  const warnings: string[] = [];
+
   const contact = readContact(labelValue(lines, "contact"));
+  const locationValue = labelValue(lines, "location");
+  // A location with no digits is a person — TPP prints the on-site contact
+  // there — not a place; the venue itself is the unlabeled name above the
+  // street address block.
+  const locationIsPlace =
+    locationValue !== undefined && /\d/.test(locationValue);
+  if (!contact.name && !locationIsPlace && locationValue) {
+    contact.name = locationValue;
+  }
   const sections = splitBeoNoteSections(body.noteLines.join("\n"));
   const notes = bundleNotesFromSections(sections);
   if (Object.keys(sections).length === 0 && body.noteLines.length > 1) {
@@ -530,10 +718,24 @@ export function parseBeoText(text: string): EventBundlePart {
       email: contact.email ?? parseEmail(labelValue(lines, "email")),
       phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
     },
-    venue: readVenueWithAddress(
-      labelValue(lines, "location"),
-      labelValue(lines, "address"),
-    ),
+    venue: (() => {
+      const venue =
+        readVenueWithAddress(
+          locationIsPlace ? locationValue : undefined,
+          labelValue(lines, "address"),
+        ) ?? {};
+      if (!venue.name || !venue.addressLine1) {
+        const block = readUnlabeledVenue(lines);
+        if (!venue.name) venue.name = block.name;
+        if (!venue.addressLine1 && block.address) {
+          venue.addressLine1 = block.address.addressLine1;
+          venue.city = venue.city ?? block.address.city?.replace(/^[,\s]+/, "");
+          venue.region = venue.region ?? block.address.region;
+          venue.postalCode = venue.postalCode ?? block.address.postalCode;
+        }
+      }
+      return venue;
+    })(),
     timeline: body.timeline,
     menu: body.menu,
     staff: body.staff,

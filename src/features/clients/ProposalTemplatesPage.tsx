@@ -149,28 +149,18 @@ export function ProposalTemplatesPage() {
     })();
   };
 
-  const handleArchive = (id: string) => {
-    void (async () => {
-      const reason = await prompt.askReason({
-        title: "Archive template",
-        description:
-          "The template stops being offered for new proposals. Existing proposals keep their content, and you can reactivate it anytime.",
-        label: "Archive reason",
-        placeholder: "e.g. Replaced by the 2027 wedding template",
-        confirmLabel: "Archive template",
-        tone: "danger",
-      });
-      if (!reason) return;
-      setFailure(null);
-      setBusy(true);
-      try {
-        await archive({ docId: id, reason });
-      } catch (error) {
-        setFailure(error);
-      } finally {
-        setBusy(false);
-      }
-    })();
+  const handleArchive = async (id: string) => {
+    // Existing proposals keep their content and reactivate is one click —
+    // no typed reason for a routine template archive.
+    setFailure(null);
+    setBusy(true);
+    try {
+      await archive({ docId: id, reason: "Archived in review" });
+    } catch (error) {
+      setFailure(error);
+    } finally {
+      setBusy(false);
+    }
   };
 
   const handleReactivate = async (id: string) => {
