@@ -2,6 +2,7 @@ import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import { api, type Id } from "../api";
 import { prepareNativeWorkbook } from "./prepareNativeWorkbook";
 import type { EventPacketSnapshot, FieldValue } from "./model";
+import type { PacketWorkbookSummary } from "./summaryProjection";
 
 export interface PacketView {
   snapshot: EventPacketSnapshot;
@@ -24,6 +25,12 @@ export interface PacketDecision {
 /** Server-resolved capability for the event workbook panel. */
 export function useEventPacketAccess(eventId: Id<"events">) {
   return useQuery(api.lib.eventPacket.commands.canManagePacket, { eventId });
+}
+
+/** Cross-event workbook rows; null means the viewer is not a manager. */
+export function useEventWorkbookSummaries() {
+  return useQuery(api.lib.eventPacket.commands.listPacketSummaries, {}) as
+    PacketWorkbookSummary[] | null | undefined;
 }
 
 export function useEventPacket(eventId: Id<"events">) {

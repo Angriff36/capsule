@@ -6,6 +6,7 @@ import {
   ChartIcon,
   CoinsIcon,
   ContactIcon,
+  FileTextIcon,
   FlameIcon,
   GearIcon,
   HomeIcon,
@@ -23,6 +24,12 @@ export interface NavArea {
 export const NAV_AREAS: NavArea[] = [
   { path: "/", label: "Home", group: "Operate", icon: HomeIcon },
   { path: "/events", label: "Events", group: "Operate", icon: CalendarIcon },
+  {
+    path: "/workbooks",
+    label: "Event Workbooks",
+    group: "Operate",
+    icon: FileTextIcon,
+  },
   {
     path: "/kitchen",
     label: "Kitchen",
