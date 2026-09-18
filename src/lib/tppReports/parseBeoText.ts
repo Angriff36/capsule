@@ -75,9 +75,10 @@ const SECTION_HEADINGS: Array<{ pattern: RegExp; section: Section }> = [
   },
   { pattern: /^time\s+(name|activity)\b/i, section: "timeline" },
   { pattern: /^(event\s+)?(menu|event items?|food)\b/i, section: "menu" },
-  { pattern: /^time\s+event item\b/i, section: "menu" },
-  // The BEO item table prints its column header as one run-on line.
-  { pattern: /^time\s+service\s+area/i, section: "menu" },
+  // The BEO item table prints its column header as one run-on line in
+  // varying column order: "Time Qty Event Item Service Style Service Area",
+  // "Time Service AreaEvent Item Service StyleQty".
+  { pattern: /^time\b.*event item/i, section: "menu" },
   { pattern: /^(staff|staffing|labor|labour|crew|team)\b/i, section: "staff" },
   { pattern: /^(notes|setup notes|event overview)\b/i, section: "notes" },
   {
@@ -110,6 +111,9 @@ const HEADER_LABELS: Record<string, string[]> = {
     "dietary",
     "restrictions",
   ],
+  // Read as a label so an empty "Company:" line stops the contact reader from
+  // taking the next line as the contact value.
+  company: ["company"],
 };
 
 interface ReadLine {
@@ -598,6 +602,12 @@ function readMenuBodyLine(
   // an item; only a marked line without a count stays a note.
   const withoutMark = withoutClock.replace(/^[-–*]+\s*/, "");
   if (withoutMark !== withoutClock) {
+    // " - Wave 1" / " - Beverage" mark the course the following rows belong
+    // to — checked before the count reader, or "Wave 1" reads as 1 serving.
+    if (/^(?:wave \d+|beverages?)$/i.test(withoutMark)) {
+      courseState.setCourse(withoutMark);
+      return;
+    }
     const markedItem = readMenuLine(withoutMark, { allowBareCount: true });
     if (markedItem) {
       if (courseState.course !== undefined)
@@ -709,10 +719,11 @@ export function parseBeoText(text: string): EventBundlePart {
       phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
     },
     venue: (() => {
-      const venue = readVenueWithAddress(
-        locationIsPlace ? locationValue : undefined,
-        labelValue(lines, "address"),
-      );
+      const venue =
+        readVenueWithAddress(
+          locationIsPlace ? locationValue : undefined,
+          labelValue(lines, "address"),
+        ) ?? {};
       if (!venue.name || !venue.addressLine1) {
         const block = readUnlabeledVenue(lines);
         if (!venue.name) venue.name = block.name;

@@ -22,10 +22,14 @@ Service Style: Buffet - Cook Onsite
 Event Type: Social
 Location:
 Paul Brindle
-Event Items
-- 200 Serving Lasagna Meal (individually packaged)
-Individually packaged. Lasagna with meat ragu.
+Contact:
+Company:
+Time Qty Event Item Service Style Service Area
+ - Wave 1
+ - 25 Serving Charcuterie Display
+Marinated mozzarella, provolone, parmesan wheel.
 **250 Trays of Lasagna
+ - Wave 2
 250 - 2ea Rolls + Butterchips
 ** Sauce on the side
 2:00 - 3:00 1st Wave: 34 Prawns
@@ -34,17 +38,18 @@ Individually packaged. Lasagna with meat ragu.
 
 describe("parseBeoText pasted BEO reading", () => {
   const part = parseBeoText(BEO);
+  const menu = part.menu ?? [];
+  const timeline = part.timeline ?? [];
 
   it("splits multi-label header lines into separate facts", () => {
-    expect(part.header.invoiceNumber).toBe("6839");
-    expect(part.header.eventDate).toBe("2026-09-22");
-    expect(part.header.title).toBe("A Century Worth Celebrating");
-    expect(part.header.startMinutes).toBe(14 * 60);
-    expect(part.header.endMinutes).toBe(17 * 60 + 1);
-    expect(part.header.guestCount).toBe(100);
-    expect(part.header.occasion).toBe(
-      "Social (Birthday Party, Anniversary, etc)",
-    );
+    const header = part.header ?? {};
+    expect(header.invoiceNumber).toBe("6839");
+    expect(header.eventDate).toBe("2026-09-22");
+    expect(header.title).toBe("A Century Worth Celebrating");
+    expect(header.startMinutes).toBe(14 * 60);
+    expect(header.endMinutes).toBe(17 * 60 + 1);
+    expect(header.guestCount).toBe(100);
+    expect(header.occasion).toBe("Social (Birthday Party, Anniversary, etc)");
   });
 
   it("reads the venue from the unlabeled block and the client from Location", () => {
@@ -62,18 +67,23 @@ describe("parseBeoText pasted BEO reading", () => {
   });
 
   it("reads BEO item-table rows marked with - or **", () => {
-    const names = part.menu.map((item) => item.name);
-    expect(names).toEqual([
-      "Lasagna Meal (individually packaged)",
+    expect(menu.map((item) => item.name)).toEqual([
+      "Charcuterie Display",
       "Trays of Lasagna",
       "- 2ea Rolls + Butterchips",
       "Century Board",
     ]);
-    expect(part.menu[0]?.quantityServings).toBe(200);
-    expect(part.menu[0]?.description).toBe(
-      "Individually packaged. Lasagna with meat ragu.",
+    expect(menu[0]?.quantityServings).toBe(25);
+    expect(menu[0]?.course).toBe("Wave 1");
+    expect(menu[0]?.description).toBe(
+      "Marinated mozzarella, provolone, parmesan wheel.",
     );
-    expect(part.menu[2]?.specialInstructions).toBe("Sauce on the side");
+    expect(menu[2]?.course).toBe("Wave 2");
+    expect(menu[2]?.specialInstructions).toBe("Sauce on the side");
+  });
+
+  it("treats marked Wave and Beverage rows as courses, not dishes", () => {
+    expect(menu.map((item) => item.name)).not.toContain("Wave");
   });
 
   it("recognizes the run-on BEO item table header", () => {
@@ -84,24 +94,24 @@ describe("parseBeoText pasted BEO reading", () => {
         "**250 Trays of Lasagna",
       ].join("\n"),
     );
-    expect(table.menu.map((item) => item.name)).toEqual([
+    expect((table.menu ?? []).map((item) => item.name)).toEqual([
       "Lasagna Meal (individually packaged)",
       "Trays of Lasagna",
     ]);
   });
 
   it("reads bare service-wave clock ranges as timeline rows", () => {
-    expect(part.timeline.map((entry) => entry.name)).toEqual([
+    expect(timeline.map((entry) => entry.name)).toEqual([
       "1st Wave: 34 Prawns",
       "2nd Wave: 33 Prawns",
     ]);
-    expect(part.timeline[0]?.minutes).toBe(14 * 60);
-    expect(part.timeline[1]?.minutes).toBe(15 * 60);
+    expect(timeline[0]?.minutes).toBe(14 * 60);
+    expect(timeline[1]?.minutes).toBe(15 * 60);
   });
 
   it("still warns when no date can be read", () => {
     const bare = parseBeoText("Event Items\n30 Serving Century Board");
-    expect(bare.header.eventDate).toBeUndefined();
-    expect(bare.warnings.join(" ")).toMatch(/no event date/i);
+    expect(bare.header?.eventDate).toBeUndefined();
+    expect((bare.warnings ?? []).join(" ")).toMatch(/no event date/i);
   });
 });
