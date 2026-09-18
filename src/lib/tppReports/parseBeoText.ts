@@ -134,6 +134,7 @@ function readLines(text: string): ReadLine[] {
   return text
     .split(/\r?\n/)
     .map((line) => line.replace(/\t/g, "  ").trim())
+    .flatMap((line) => splitLabelRuns(line))
     .filter(
       (line) =>
         line.length > 0 &&
@@ -141,6 +142,34 @@ function readLines(text: string): ReadLine[] {
         !PAGE_FOOTER.test(line),
     )
     .map((line) => ({ text: line, lower: line.toLowerCase() }));
+}
+
+/**
+ * TPP prints several header facts on one line: "Invoice #: 6839 Date:
+ * Tuesday 9/22/2026". Split a line at every interior "Label:" run so each
+ * fact becomes its own line for the header pass; menu and timeline rows
+ * carry no header labels and are never split.
+ */
+const LABEL_RUN_SPLIT = new RegExp(
+  `\\s(${[...new Set([...Object.values(HEADER_LABELS).flat(), "venue contact"])]
+    .sort((a, b) => b.length - a.length)
+    .map(escapeRegExp)
+    .join("|")})\\s*[:#]`,
+  "i",
+);
+
+function splitLabelRuns(line: string): string[] {
+  const cuts: number[] = [];
+  for (const match of line.matchAll(new RegExp(LABEL_RUN_SPLIT.source, "gi"))) {
+    const labelStart = match.index! + match[0].indexOf(match[1]!);
+    if (labelStart > 0) cuts.push(labelStart);
+  }
+  if (cuts.length === 0) return [line];
+  const parts = [line.slice(0, cuts[0]!).trim()];
+  for (let i = 0; i < cuts.length; i += 1) {
+    parts.push(line.slice(cuts[i]!, cuts[i + 1] ?? line.length).trim());
+  }
+  return parts;
 }
 
 /** Longer labels win over shorter ones ("Event Date" before "Date"). */
@@ -194,17 +223,37 @@ function readTimelineLine(text: string): BundleTimelineEntry | undefined {
   return entry;
 }
 
+/**
+ * Menu-row guards: a bare "N:NN" is a clock, not a count; servings above a
+ * full-service ceiling are ZIP codes, phone numbers or street numbers; a name
+ * without letters or carrying a phone/email fragment is contact or address
+ * prose, not a dish.
+ */
+const MENU_NAME_REJECT =
+  /@|\(\d{3}\)\s*\d{3}|\b\d{3}[-.\s]\d{4}\b|\b\d{7,}\b|\b\d{5}\b/;
+
+function menuRowPlausible(name: string, quantity: number): boolean {
+  if (quantity > 5000) return false;
+  if (!/[A-Za-z]/.test(name)) return false;
+  return !MENU_NAME_REJECT.test(name);
+}
+
 function readMenuLine(
   text: string,
   options: { allowBareCount: boolean },
 ): BundleMenuItem | undefined {
+  if (/^\d{1,2}:\d{2}/.test(text)) return undefined;
   const leading = text.match(
     options.allowBareCount ? LEADING_SERVINGS_BARE : LEADING_SERVINGS_WITH_UNIT,
   );
   if (leading) {
     const quantity = Number(leading[1]);
     const name = leading[2]!.trim();
-    if (Number.isFinite(quantity) && name.length > 1) {
+    if (
+      Number.isFinite(quantity) &&
+      name.length > 1 &&
+      menuRowPlausible(name, quantity)
+    ) {
       return { name, quantityServings: quantity };
     }
   }
@@ -212,11 +261,59 @@ function readMenuLine(
   if (trailing) {
     const quantity = Number(trailing[2]);
     const name = trailing[1]!.trim();
-    if (Number.isFinite(quantity) && name.length > 1 && !CLOCK.test(name)) {
+    if (
+      Number.isFinite(quantity) &&
+      name.length > 1 &&
+      !CLOCK.test(name) &&
+      menuRowPlausible(name, quantity)
+    ) {
       return { name, quantityServings: quantity };
     }
   }
   return undefined;
+}
+
+/**
+ * Service-wave rows print bare 24-hour ranges without AM/PM: "2:00 – 3:00
+ * 1st Wave: 34 Prawns". They are timeline rows, not menu rows. A bare hour is
+ * ambiguous, so it is resolved against the BEO's own event window — "2:00"
+ * inside a 2:00 PM event is 14:00 — and skipped when it stays ambiguous.
+ */
+const BARE_CLOCK_RANGE =
+  /^(\d{1,2}):(\d{2})\s*(?:-|–|to)\s*(\d{1,2}):(\d{2})\s+(.+)$/;
+
+function resolveBareHour(
+  hour: number,
+  window: { start?: number; end?: number },
+): number | undefined {
+  if (hour > 12) return hour * 60;
+  if (window.start === undefined || window.end === undefined) return undefined;
+  const hits = [hour, hour + 12]
+    .map((candidate) => candidate * 60)
+    .filter(
+      (minutes) => minutes + 60 >= window.start! && minutes - 60 <= window.end!,
+    );
+  return hits.length === 1 ? hits[0] : undefined;
+}
+
+function readBareClockRangeLine(
+  text: string,
+  window: { start?: number; end?: number },
+): BundleTimelineEntry | undefined {
+  const match = text.match(BARE_CLOCK_RANGE);
+  if (!match) return undefined;
+  const start = resolveBareHour(Number(match[1]), window);
+  if (
+    start === undefined ||
+    resolveBareHour(Number(match[3]), window) === undefined
+  )
+    return undefined;
+  const [name, ...noteParts] = match[5]!.trim().split(/\s{2,}/);
+  if (!name || name.length === 0) return undefined;
+  const entry: BundleTimelineEntry = { name: name.trim(), minutes: start };
+  const notes = noteParts.join(" ").trim();
+  if (notes.length > 0) entry.notes = notes;
+  return entry;
 }
 
 function readStaffLine(text: string): BundleStaffAssignment | undefined {
@@ -377,7 +474,10 @@ interface Body {
   noteLines: string[];
 }
 
-function readBody(lines: ReadLine[]): Body {
+function readBody(
+  lines: ReadLine[],
+  eventWindow: { start?: number; end?: number } = {},
+): Body {
   const body: Body = { timeline: [], menu: [], staff: [], noteLines: [] };
   let section: Section = "header";
   let course: string | undefined;
@@ -409,6 +509,11 @@ function readBody(lines: ReadLine[]): Body {
       continue;
     }
     if (section === "menu") {
+      const wave = readBareClockRangeLine(line.text, eventWindow);
+      if (wave) {
+        body.timeline.push(wave);
+        continue;
+      }
       readMenuBodyLine(line.text, body.menu, {
         course,
         setCourse: (next) => {
@@ -475,11 +580,14 @@ function readMenuBodyLine(
 /** Parse pasted BEO / worksheet text into its bundle contribution. */
 export function parseBeoText(text: string): EventBundlePart {
   const lines = readLines(text);
-  const body = readBody(lines);
-  const warnings: string[] = [];
-
   const eventTime = labelValue(lines, "time");
   const timeRange = eventTime?.match(CLOCK_RANGE);
+  const body = readBody(lines, {
+    start: parseClockMinutes(timeRange?.[1] ?? eventTime),
+    end: parseClockMinutes(timeRange?.[2]),
+  });
+  const warnings: string[] = [];
+
   const contact = readContact(labelValue(lines, "contact"));
   const sections = splitBeoNoteSections(body.noteLines.join("\n"));
   const notes = bundleNotesFromSections(sections);
