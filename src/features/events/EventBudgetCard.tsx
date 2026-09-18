@@ -37,9 +37,10 @@ export function EventBudgetCard({
   readonly marginHref: string;
   readonly locked: boolean;
 }) {
-  const budget = budgetAmount ?? 0;
-  const quoted = quotedPrice ?? 0;
-  const variance = quoted - budget;
+  const variance =
+    budgetAmount == null || quotedPrice == null
+      ? null
+      : quotedPrice - budgetAmount;
   return (
     <EventOverviewCard
       title="Budget & pricing"
@@ -70,9 +71,18 @@ export function EventBudgetCard({
           value={formatMoney(quotedPrice, currencyCode)}
         />
         <Tile
-          label={variance > 0 ? "Over budget" : "Under budget"}
-          value={formatMoney(Math.abs(variance), currencyCode)}
-          tone={variance > 0 ? "warn" : "ok"}
+          label={
+            variance == null
+              ? "Budget variance"
+              : variance > 0
+                ? "Over budget"
+                : "Under budget"
+          }
+          value={formatMoney(
+            variance == null ? null : Math.abs(variance),
+            currencyCode,
+          )}
+          tone={variance == null ? undefined : variance > 0 ? "warn" : "ok"}
         />
       </div>
     </EventOverviewCard>

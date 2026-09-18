@@ -36,7 +36,7 @@ export interface ContractPdfEvent {
   title: string;
   startsAt?: number | null;
   endsAt?: number | null;
-  expectedHeadcount: number;
+  expectedHeadcount?: number | null;
   venueName?: string | null;
   venueAddress?: string | null;
   quotedPrice?: number | null;
@@ -186,7 +186,12 @@ export function buildContractPdf(input: ContractPdfInput): jsPDF {
     ["Event", event.title],
     ["Starts", dateTimeText(event.startsAt)],
     ["Ends", dateTimeText(event.endsAt)],
-    ["Guests", `${event.expectedHeadcount} expected`],
+    [
+      "Guests",
+      event.expectedHeadcount == null
+        ? "Not recorded"
+        : `${event.expectedHeadcount} expected`,
+    ],
     [
       "Venue",
       [event.venueName, event.venueAddress].filter(Boolean).join(" · ") ||

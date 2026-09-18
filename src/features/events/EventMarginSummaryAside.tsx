@@ -66,19 +66,24 @@ export function EventMarginSummaryAside({
   budget,
   budgetVariance,
 }: {
-  revenue: number;
+  revenue: number | null;
   totalCost: number;
-  grossProfit: number;
+  grossProfit: number | null;
   marginPct: number | null;
-  headcount: number;
+  headcount: number | null;
   buckets: readonly MarginCostBucket[];
-  budget: number;
+  budget: number | null;
   budgetVariance: number | null;
 }) {
   const ranked = [...buckets]
     .filter((bucket) => bucket.amount > 0)
     .sort((left, right) => right.amount - left.amount);
-  const profitTone = grossProfit < 0 ? "text-danger" : "text-ok";
+  const profitTone =
+    grossProfit == null
+      ? "text-ink-3"
+      : grossProfit < 0
+        ? "text-danger"
+        : "text-ok";
 
   return (
     <div className="flex flex-col gap-3" data-testid="event-margin-aside">
@@ -97,18 +102,18 @@ export function EventMarginSummaryAside({
             </div>
             <p className={`mt-0.5 text-right font-mono text-xs ${profitTone}`}>
               {marginPct == null
-                ? "no revenue booked"
+                ? "Margin needs revenue"
                 : `${marginPct.toFixed(1)}% margin`}
             </p>
           </div>
         </div>
       </AsideCard>
 
-      {headcount > 0 ? (
+      {headcount != null && headcount > 0 ? (
         <AsideCard title="Per cover">
           <PerCover
             label="Revenue per cover"
-            value={formatMoney(revenue / headcount)}
+            value={formatMoney(revenue == null ? null : revenue / headcount)}
           />
           <PerCover
             label="Cost per cover"
@@ -116,7 +121,9 @@ export function EventMarginSummaryAside({
           />
           <PerCover
             label="Profit per cover"
-            value={formatMoney(grossProfit / headcount)}
+            value={formatMoney(
+              grossProfit == null ? null : grossProfit / headcount,
+            )}
             tone={profitTone}
           />
           <p className="mt-1.5 font-mono text-xs text-ink-3">
@@ -145,7 +152,7 @@ export function EventMarginSummaryAside({
         </AsideCard>
       ) : null}
 
-      {budget > 0 && budgetVariance != null ? (
+      {budget != null && budgetVariance != null ? (
         <section
           className={`rounded-md border px-3.5 py-3 ${
             budgetVariance < 0

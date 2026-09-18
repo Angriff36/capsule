@@ -135,7 +135,7 @@ async function eventBundle(
   );
   const [client, invoices, proposals, contracts, eventDishes] =
     await Promise.all([
-      ctx.db.get(event.clientId),
+      event.clientId ? ctx.db.get(event.clientId) : null,
       ctx.db
         .query("invoices")
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
@@ -411,7 +411,10 @@ export const run = query({
           .filter(Boolean)
           .join(" · "),
       },
-      { label: "Guests", value: String(bundle.event.expectedHeadcount) },
+      {
+        label: "Guests",
+        value: String(bundle.event.expectedHeadcount ?? "Not recorded"),
+      },
     ];
 
     if (args.reportId === "contact-event-envelope") {

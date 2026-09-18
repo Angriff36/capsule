@@ -12,6 +12,7 @@
 // capabilityId → mutation naming rule from
 // src/agent/CapsuleCapabilityMutationResolver.ts instead of importing it.
 import wiringContract from "../../src/generated/manifest-wiring-contract.json";
+import { eventImportTool } from "./eventImportTool";
 
 /** Write commands the assistant may propose. Scalar-parameter commands only. */
 export const ASSISTANT_WRITE_CAPABILITY_IDS: readonly string[] = [
@@ -370,7 +371,8 @@ export type AssistantToolExecution =
       /** Parameters needing ISO-string → epoch-ms coercion (generated args use float64 ms). */
       dateLikeParamNames: string[];
     }
-  | { kind: "query"; queryName: string };
+  | { kind: "query"; queryName: string }
+  | { kind: "event-import" };
 
 export interface AssistantToolDef {
   /** LLM-facing name ([A-Za-z0-9_-], ≤64 chars). */
@@ -458,7 +460,12 @@ function writeToolDefs(): AssistantToolDef[] {
   return ASSISTANT_WRITE_CAPABILITY_IDS.map((capabilityId) => {
     const cap = capability(capabilityId);
     const params = cap.parameters.filter((p) => p.ownership === "client");
-    const properties: Record<string, unknown> = {};
+    const properties: Record<string, unknown> = {
+      idempotencyKey: {
+        type: "string",
+        description: "Unique key for this logical write. Reuse the same key and arguments for a retry; use a new key for a different write.",
+      },
+    };
     const required: string[] = [];
     const dateLikeParamNames: string[] = [];
     for (const p of params) {
@@ -496,7 +503,7 @@ function writeToolDefs(): AssistantToolDef[] {
         kind: "mutation" as const,
         mutationName,
         requiresDocumentId,
-        paramNames: params.map((p) => p.name),
+        paramNames: [...params.map((p) => p.name), "idempotencyKey"],
         dateLikeParamNames,
       },
     };
@@ -504,18 +511,37 @@ function writeToolDefs(): AssistantToolDef[] {
 }
 
 function readToolDefs(): AssistantToolDef[] {
-  return ASSISTANT_READS.map((r) => ({
+  // Every compact list must have a full-detail route through the same generated
+  // read policy. These get<Entity> exports accompany the curated list queries.
+  const reads = [...ASSISTANT_READS];
+  for (const read of ASSISTANT_READS) {
+    const entity = /^list(.+?)By/.exec(read.queryName)?.[1];
+    if (!entity || reads.some((r) => r.queryName === `get${entity}`)) continue;
+    reads.push({
+      toolName: `get_${entity.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase()}`,
+      queryName: `get${entity}`,
+      description: `Get the complete ${entity} record, including fields omitted from list summaries. Use its exact _id from a list result.`,
+      params: [{ name: "id", type: "string", description: `${entity} _id, copied exactly from a list result.` }],
+    });
+  }
+  return reads.map((r) => ({
     name: r.toolName,
     definition: {
       type: "function" as const,
       function: {
         name: r.toolName,
-        description: r.description,
+        description: r.description + (r.queryName.startsWith("list")
+          ? " Returns compact complete-ID summaries and total/more/nextOffset. Optional search matches the authorized records; use offset to retrieve all pages and the named detailTool for full records. Never infer absence or denied access from an empty list."
+          : " Returns all fields without truncation. A null/unavailable result does not establish whether the record is missing or access was denied."),
         parameters: {
           type: "object" as const,
-          properties: Object.fromEntries(
+          properties: { ...Object.fromEntries(
             r.params.map((p) => [p.name, { type: p.type, description: p.description }]),
-          ),
+          ), ...(r.queryName.startsWith("list") ? {
+            search: { type: "string", description: "Optional case-insensitive text search across authorized records, before pagination." },
+            offset: { type: "integer", minimum: 0, description: "Zero-based offset; use nextOffset from the previous result. Defaults to 0." },
+            limit: { type: "integer", minimum: 1, maximum: 50, description: "Number of complete record summaries per page, default 20, maximum 50." },
+          } : {}) },
           required: r.params.map((p) => p.name),
         },
       },
@@ -528,7 +554,7 @@ let cached: AssistantToolDef[] | null = null;
 
 /** All curated assistant tools, in stable order (writes then reads). */
 export function assistantToolDefs(): AssistantToolDef[] {
-  if (cached == null) cached = [...writeToolDefs(), ...readToolDefs()];
+  if (cached == null) cached = [eventImportTool, ...writeToolDefs(), ...readToolDefs()];
   return cached;
 }
 

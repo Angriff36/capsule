@@ -13,6 +13,7 @@ import type {
   AssistantTurnResult,
 } from "../../../convex/assistantTurn";
 import { executeAssistantToolCall } from "./assistantClient";
+import type { EventImportSource } from "../../lib/eventImportDraft";
 
 export interface AssistantUiMessage {
   id: string;
@@ -49,6 +50,10 @@ export function useAssistantChat() {
   const [error, setError] = useState<string | null>(null);
   const convoRef = useRef<ServerMessage[]>([]);
   const runIdRef = useRef(0);
+  const importSourceRef = useRef<{
+    sources: EventImportSource[];
+    sourceText: string;
+  } | null>(null);
 
   const send = useCallback(
     async (text: string, files?: AssistantFile[]) => {
@@ -58,6 +63,9 @@ export function useAssistantChat() {
       const runId = runIdRef.current + 1;
       runIdRef.current = runId;
       const isActive = () => runIdRef.current === runId;
+      // Source selection is explicit in the import tool's resume parameters;
+      // a new pasted BEO never inherits an earlier conversation attachment.
+      const importContext = { sources: attached, sourceText: trimmed };
       setError(null);
       setBusy(true);
       convoRef.current = [
@@ -149,9 +157,32 @@ export function useAssistantChat() {
             ]);
             break;
           }
+          let importedEventSummary: string | null = null;
           for (const call of res.toolCalls) {
             if (!isActive()) return;
-            const result = await executeAssistantToolCall(convex, call);
+            const result = await executeAssistantToolCall(convex, call, {
+              ...importContext,
+              isActive,
+              previousImport: importSourceRef.current,
+              rememberImport: (source) => {
+                importSourceRef.current = source;
+              },
+            });
+            if (call.execution.kind === "event-import") {
+              const saved = JSON.parse(result);
+              if (saved.saved) {
+                importedEventSummary = `Event draft saved. Use “Open saved event” to review it.\n${saved.message ?? "Review the saved event for missing facts and unresolved items."}`;
+                if (saved.missing?.length)
+                  importedEventSummary += `\nLeft blank: ${saved.missing.map((key: string) => key.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase()).join(", ")}.`;
+                const unresolved = saved.menu?.filter(
+                  (line: { status: string }) => line.status !== "linked",
+                );
+                if (unresolved?.length)
+                  importedEventSummary += `\n${unresolved.length} menu line(s) retained for matching in the event's Imported BEO draft section.`;
+                if (saved.error)
+                  importedEventSummary += `\nPaused: ${saved.error}`;
+              }
+            }
             if (!isActive()) return;
             convoRef.current = [
               ...convoRef.current,
@@ -167,6 +198,23 @@ export function useAssistantChat() {
                 toolName: call.name,
               },
             ]);
+          }
+          // Import orchestration is one deterministic tool, not eight model
+          // rounds. Always deliver its verified receipt without another call.
+          if (importedEventSummary) {
+            convoRef.current = [
+              ...convoRef.current,
+              { role: "assistant", content: importedEventSummary },
+            ];
+            setMessages((m) => [
+              ...m,
+              {
+                id: newId(),
+                role: "assistant",
+                content: importedEventSummary!,
+              },
+            ]);
+            break;
           }
         }
       } catch (err) {
@@ -236,6 +284,7 @@ export function useAssistantChat() {
   const reset = useCallback(() => {
     if (busy) return;
     convoRef.current = [];
+    importSourceRef.current = null;
     setMessages([]);
     setError(null);
   }, [busy]);

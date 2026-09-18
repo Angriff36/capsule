@@ -13,6 +13,7 @@ import {
   MobileTimelineCard,
 } from "./MobileEventReadCards";
 import { EventSetupProgress } from "../EventSetupProgress";
+import { EventImportDraftPanel } from "../import/EventImportDraftPanel";
 import { MobilePackListCard } from "./MobilePackListCard";
 import { MobilePrepCard } from "./MobilePrepCard";
 import type { StaffingRosterEntry } from "../eventTimelineStaffRoster";
@@ -59,6 +60,7 @@ export function MobileEventOverview({
   return (
     <div className="space-y-3" data-testid="mobile-event-overview">
       <EventSetupProgress eventId={event._id} event={event} />
+      <EventImportDraftPanel eventId={event._id} />
       <MobileMenuCard
         eventId={event._id}
         eventDishes={eventDishes}

@@ -95,7 +95,7 @@ export type EventMenuDishEstimateKind = "priced" | "unit_mismatch" | "unpriced";
  * headcount). Summing 20 dishes × 98 guests paints 1960 and is wrong.
  */
 export function eventMenuHeaderServings(
-  expectedHeadcount: number,
+  expectedHeadcount: number | null | undefined,
   dishServings: readonly number[],
 ): number {
   const guest = Number(expectedHeadcount);
@@ -138,7 +138,7 @@ export function eventMenuHeaderUnpricedNote(
 
 export type BuildEventMenuCostInput = {
   eventId: string;
-  expectedHeadcount: number;
+  expectedHeadcount?: number | null;
   eventDishes: readonly EventMenuCostDish[];
   dishIngredients: readonly EventMenuCostDishIngredient[];
   dishComponents?: readonly EventMenuCostDishComponent[];
@@ -154,7 +154,7 @@ function isActive(row: SoftDelete) {
 
 function servingsFor(
   dish: EventMenuCostDish,
-  expectedHeadcount: number,
+  expectedHeadcount: number | null | undefined,
 ): number {
   const qty = Number(dish.quantityServings);
   // The event line's servings are shared by prep, demand and food cost.

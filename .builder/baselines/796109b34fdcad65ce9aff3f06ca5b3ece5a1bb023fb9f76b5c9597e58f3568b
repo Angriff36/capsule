@@ -3621,7 +3621,7 @@ export const listEvent = query({
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("events").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -3706,7 +3706,7 @@ export const getEvent = query({
     if (doc && (doc as any).deletedAt != null) return null;
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
-    const __doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __rawDoc);
+    const __doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __rawDoc);
     {
       const __fk = ((__doc as any) as any).serviceStyleId;
       ((__doc as any) as any).serviceStyle = __fk != null ? await ctx.db.get(__fk as any) : null;
@@ -3786,7 +3786,7 @@ export const listEventByTenantId = query({
     if (__tenant == null) return [];
     let rows = await ctx.db.query("events").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -3870,7 +3870,7 @@ export const listEventByClientId = query({
     let rows = await ctx.db.query("events").withIndex("by_clientId", (q) => q.eq("clientId", clientId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -3954,7 +3954,7 @@ export const listEventByClientMergeAuthorizationId = query({
     let rows = await ctx.db.query("events").withIndex("by_clientMergeAuthorizationId", (q) => q.eq("clientMergeAuthorizationId", clientMergeAuthorizationId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -4038,7 +4038,7 @@ export const listEventByMergeTargetClientId = query({
     let rows = await ctx.db.query("events").withIndex("by_mergeTargetClientId", (q) => q.eq("mergeTargetClientId", mergeTargetClientId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -4122,7 +4122,7 @@ export const listEventByServiceStyleId = query({
     let rows = await ctx.db.query("events").withIndex("by_serviceStyleId", (q) => q.eq("serviceStyleId", serviceStyleId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -4206,7 +4206,7 @@ export const listEventByOccasionId = query({
     let rows = await ctx.db.query("events").withIndex("by_occasionId", (q) => q.eq("occasionId", occasionId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -4290,7 +4290,7 @@ export const listEventByVenueId = query({
     let rows = await ctx.db.query("events").withIndex("by_venueId", (q) => q.eq("venueId", venueId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -4374,7 +4374,7 @@ export const listEventByAssignedToId = query({
     let rows = await ctx.db.query("events").withIndex("by_assignedToId", (q) => q.eq("assignedToId", assignedToId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -4458,7 +4458,7 @@ export const listEventByReferralSourceId = query({
     let rows = await ctx.db.query("events").withIndex("by_referralSourceId", (q) => q.eq("referralSourceId", referralSourceId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {
@@ -4542,7 +4542,7 @@ export const listEventByRecurrenceTemplateEventId = query({
     let rows = await ctx.db.query("events").withIndex("by_recurrenceTemplateEventId", (q) => q.eq("recurrenceTemplateEventId", recurrenceTemplateEventId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
-    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], row)));
+    const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
       {

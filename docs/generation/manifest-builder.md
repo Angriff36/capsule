@@ -259,3 +259,23 @@ regeneration, and calls assembly verification with `requireContractTests: false`
 All other assembly checks remain active. The published companion registry is
 still verified; its presence does not claim behavioral coverage. Other consumers
 retain contract-test emission unless they explicitly opt out.
+## Incomplete Event imports
+
+`Event.captureDraft` stores source-backed event facts without asserting a complete
+engagement. Unknown client, dates, headcount, contacts, and prices remain null;
+`plannedAt` stays null and stage stays `planning`. `importSourceKey` identifies
+the source and `importDraftJson` retains structured source references, unresolved
+menu lines, and reconciliation checkpoints. `Event.updateImportDraft` preserves
+known native values when an input is omitted. It only reconciles unplanned drafts.
+
+Manifest currently selects one initializer per entity. The repository Builder
+projects an additional `Event_createViaCaptureDraft` with the upstream Convex
+emitter against the same IR narrowed to that command. The preferred initializer
+remains `planEngagement`; existing create hooks, booking, and proposal flows keep
+their established contract. The supplement is included before Builder computes
+ownership, and contains upstream-generated policies, encryption, event emission,
+and atomic persistence. Do not hand-edit either creation route.
+
+Creation and checkpoint retries must use stable tenant-prefixed idempotency keys:
+the current generated idempotency table indexes a global key. `importSourceKey`
+is provenance and is not itself a uniqueness constraint.

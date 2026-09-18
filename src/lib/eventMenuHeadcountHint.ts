@@ -14,11 +14,16 @@ export type HeadcountHint = {
 export function eventMenuHeadcountHint(input: {
   dishName: string;
   quantityServings: number;
-  expectedHeadcount: number;
+  expectedHeadcount?: number | null;
   headcountOverride?: number | null;
 }): HeadcountHint | null {
   const { dishName, quantityServings, expectedHeadcount } = input;
-  if (!(expectedHeadcount > 0) || !(quantityServings > 0)) return null;
+  if (
+    expectedHeadcount == null ||
+    !(expectedHeadcount > 0) ||
+    !(quantityServings > 0)
+  )
+    return null;
   if ((input.headcountOverride ?? 0) > 0) return null;
   if (quantityServings < expectedHeadcount) {
     return {

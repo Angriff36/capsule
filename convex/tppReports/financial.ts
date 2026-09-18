@@ -757,7 +757,7 @@ export const run = query({
             date: row.startsAt ?? null,
             contact: row.primaryContactName ?? "",
             reason: row.cancellationReason ?? "Not specified",
-            revenue: row.quotedPrice,
+            revenue: row.quotedPrice ?? null,
           },
         }));
       return financial(
@@ -859,16 +859,17 @@ export const run = query({
               referral: event.referralSourceId
                 ? String(event.referralSourceId)
                 : "Unassigned",
-              guests: event.expectedHeadcount,
-              subtotal: event.quotedPrice,
+              guests: event.expectedHeadcount ?? null,
+              subtotal: event.quotedPrice ?? null,
               tax: 0,
               discount: 0,
-              revenue: event.quotedPrice,
+              revenue: event.quotedPrice ?? null,
               paid: 0,
-              balance: event.quotedPrice,
-              perGuest: event.expectedHeadcount
-                ? event.quotedPrice / event.expectedHeadcount
-                : 0,
+              balance: event.quotedPrice ?? null,
+              perGuest:
+                event.expectedHeadcount && event.quotedPrice != null
+                  ? event.quotedPrice / event.expectedHeadcount
+                  : null,
               status: "forecast",
             },
           })),

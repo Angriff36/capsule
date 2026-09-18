@@ -86,6 +86,7 @@ import {
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
 import { EventOverviewTab } from "./EventOverviewTab";
+import { CompleteDraftPlanningPanel } from "./CompleteDraftPlanningPanel";
 import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
 import { EventStaffingTab } from "./EventStaffingTab";
@@ -277,7 +278,10 @@ function EventDetailContent({
 
   // One obvious next step: the first primary lifecycle action. Other stage
   // moves and every utility live under "More"; destructive moves sit last.
-  const lifecycle = eventLifecyclePolicy.availableActions(String(event.stage));
+  const lifecycle = eventLifecyclePolicy.availableActions(
+    String(event.stage),
+    event,
+  );
   const primaryAction = lifecycle.find((action) => action.kind === "primary");
   const secondaryActions = lifecycle.filter(
     (action) => action !== primaryAction && action.kind !== "danger",
@@ -631,6 +635,10 @@ function EventDetailContent({
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
 
+      {event.stage === "planning" && event.plannedAt == null ? (
+        <CompleteDraftPlanningPanel event={event} clients={clients} />
+      ) : null}
+
       <EventDetailTabs active={activeTab} onChange={setTab} compact={mobile} />
 
       {mobileOverview ? (
@@ -705,7 +713,7 @@ function EventDetailContent({
         <EventTabErrorBoundary tabLabel="Menu" key="menu">
           <EventMenuTab
             eventId={event._id}
-            expectedHeadcount={Number(event.expectedHeadcount) || 0}
+            expectedHeadcount={event.expectedHeadcount}
           />
         </EventTabErrorBoundary>
       ) : null}

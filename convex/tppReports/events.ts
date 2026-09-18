@@ -328,7 +328,10 @@ async function productionWorksheet(
       heading: event.title,
       rows: [
         { label: "Event date", value: dateText(event.startsAt) },
-        { label: "Guests", value: String(event.expectedHeadcount) },
+        {
+          label: "Guests",
+          value: String(event.expectedHeadcount ?? "Not recorded"),
+        },
         {
           label: "Venue",
           value: [event.venueName, event.venueAddress]
@@ -395,7 +398,7 @@ async function productionWorksheet(
         venue: [event.venueName, event.venueAddress]
           .filter(Boolean)
           .join("  /  "),
-        guests: event.expectedHeadcount,
+        guests: event.expectedHeadcount ?? null,
         dish: dishName,
         servings: selection?.quantityServings ?? null,
         course: selection?.course ?? "",
@@ -495,7 +498,7 @@ async function productionWorksheet(
         id: `${event._id}-${group.key}`,
         heading: dishName,
         headingLevel: 4,
-        printContext: `${event.title} / ${dateText(event.startsAt)} / ${event.expectedHeadcount} guests`,
+        printContext: `${event.title} / ${dateText(event.startsAt)} / ${event.expectedHeadcount ?? "Unknown"} guests`,
         rows: sectionRows,
       });
     }
@@ -540,7 +543,7 @@ function eventRows(events: Doc<"events">[]): TppRow[] {
       status: event.stage,
       invoice: "",
       contact: event.primaryContactName ?? "",
-      guests: event.expectedHeadcount,
+      guests: event.expectedHeadcount ?? null,
       venue: event.venueName ?? "",
       address: event.venueAddress ?? "",
       type: event.eventType,
@@ -925,7 +928,10 @@ export const run = query({
           .filter(Boolean)
           .join(" · "),
       },
-      { label: "Guests", value: String(event.expectedHeadcount) },
+      {
+        label: "Guests",
+        value: String(event.expectedHeadcount ?? "Not recorded"),
+      },
       { label: "Status", value: event.stage },
     ];
 
@@ -1265,7 +1271,7 @@ export const run = query({
             value: event.startsAt ?? null,
             kind: "date" as const,
           },
-          { label: "Guests", value: event.expectedHeadcount },
+          { label: "Guests", value: event.expectedHeadcount ?? null },
           {
             label: "Venue",
             value:
@@ -1333,7 +1339,10 @@ export const run = query({
           heading: event.title,
           rows: [
             { label: "Event date", value: dateText(event.startsAt) },
-            { label: "Guests", value: String(event.expectedHeadcount) },
+            {
+              label: "Guests",
+              value: String(event.expectedHeadcount ?? "Not recorded"),
+            },
           ],
         },
       ];
