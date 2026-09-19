@@ -364,7 +364,7 @@
   width: 42.5rem;
 }
 .tracker-col-binder {
-  width: 9rem;
+  width: 7rem;
 }
 .tracker-col-pack {
   width: 11rem;
@@ -461,12 +461,16 @@
   font-size: var(--text-xs);
 }
 
-.tracker-sheet-input[data-binder="ready"] {
+.tracker-binder {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.75rem;
+  color: var(--color-ink-2);
+}
+.tracker-binder:has(input:checked) {
   color: var(--color-ok);
   font-weight: 600;
-}
-.tracker-sheet-input[data-binder="none"] {
-  color: var(--color-ink-3);
 }
 
 .tracker-pack-pill {

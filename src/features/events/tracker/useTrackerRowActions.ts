@@ -3,7 +3,8 @@ import {
   useCreateEventVehicleAssignment,
   useCreatePackList,
   useEventChangeServiceStyle,
-  useEventSetBinderStatus,
+  useEventClearBinderBuilt,
+  useEventMarkBinderBuilt,
   useEventSetEventNumber,
   useEventVehicleAssignmentClearPreloaded,
   useEventVehicleAssignmentMarkPreloaded,
@@ -23,7 +24,8 @@ export function useTrackerRowActions() {
   const releaseRig = useEventVehicleAssignmentRelease();
   const markPreloaded = useEventVehicleAssignmentMarkPreloaded();
   const clearPreloaded = useEventVehicleAssignmentClearPreloaded();
-  const setBinderStatus = useEventSetBinderStatus();
+  const markBinderBuilt = useEventMarkBinderBuilt();
+  const clearBinderBuilt = useEventClearBinderBuilt();
   const setEventNumber = useEventSetEventNumber();
   const changeServiceStyle = useEventChangeServiceStyle();
   const openPackList = useCreatePackList();
@@ -73,16 +75,15 @@ export function useTrackerRowActions() {
           }),
         "Service style saved. Its kit is on the pack list.",
       ),
-    onBinder: (binderStatus) =>
+    onBinderBuilt: (built) =>
       void run(
         row,
         () =>
-          setBinderStatus({
+          (built ? markBinderBuilt : clearBinderBuilt)({
             docId: row.id,
             version: row.version,
-            binderStatus,
           }),
-        "Binder status saved",
+        built ? "Binder marked built" : "Binder marked not built",
       ),
     onOpenPackList: () =>
       void run(

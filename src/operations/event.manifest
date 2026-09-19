@@ -32,15 +32,6 @@ enum EventStage {
   closed_out
 }
 
-// Event Tracker binder state (Mangia Ops Final Lock Training parts 3.9 and 6):
-// Binder Ready to Build -> built -> Fully Packed -> Ready.
-enum EventBinderStatus {
-  ready_to_build
-  built
-  fully_packed
-  ready
-}
-
 enum EventRecurrenceFrequency {
   weekly
   monthly
@@ -709,8 +700,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   property beverageTableSetup: string?
   property beverageDispensers: string?
   property buffetService: string?
-  property binderStatus: EventBinderStatus?
-  property binderStatusChangedAt: datetime?
+  // The event binder is built (Ops Final Lock, Part 4). Built or not built:
+  // "fully packed" and "ready" describe the load, which the pack list holds.
+  property binderBuiltAt: datetime?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -1243,15 +1235,23 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // The binder can move in the two directions: a repack sends it back.
-  command setBinderStatus(binderStatus: EventBinderStatus) {
+  command markBinderBuilt() {
     guard self.deletedAt == null
-    mutate binderStatus = binderStatus
-    mutate binderStatusChangedAt = now()
-    emit EventBinderStatusChanged {
+    mutate binderBuiltAt = now()
+    emit EventBinderBuilt {
       eventId: self.id
       tenantId: self.tenantId
-      binderStatus: binderStatus
+    }
+  }
+
+  // A binder that is taken apart again (the event changed after the print).
+  command clearBinderBuilt() {
+    guard self.binderBuiltAt != null
+    guard self.deletedAt == null
+    mutate binderBuiltAt = null
+    emit EventBinderBuiltCleared {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -2287,10 +2287,14 @@ event EventNumberSet: "event_number.set" {
   eventNumber: string?
 }
 
-event EventBinderStatusChanged: "event_binder_status.changed" {
+event EventBinderBuilt: "event_binder.built" {
   eventId: string
   tenantId: string
-  binderStatus: EventBinderStatus
+}
+
+event EventBinderBuiltCleared: "event_binder.built_cleared" {
+  eventId: string
+  tenantId: string
 }
 
 event EventTimelineCommentPosted: "event_timeline_comment.posted" {

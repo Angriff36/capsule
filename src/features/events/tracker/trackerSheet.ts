@@ -24,13 +24,6 @@ export const PACK_STATE_LABEL: Record<PackState, string> = {
   not_started: "Not started",
 };
 
-export const BINDER_OPTIONS = [
-  { value: "ready_to_build", label: "Ready to build" },
-  { value: "built", label: "Built" },
-  { value: "fully_packed", label: "Fully packed" },
-  { value: "ready", label: "Ready" },
-] as const;
-
 const BEFORE_SALES_LOCK = new Set([
   "quote",
   "planning",
@@ -63,7 +56,7 @@ export interface TrackerRow {
   guests: number;
   stage: string;
   serviceStyleId: string | null;
-  binderStatus: string | null;
+  binderBuilt: boolean;
   packState: PackState;
   packDetail: string | null;
   packListId: string | null;
@@ -235,7 +228,7 @@ export function buildTrackerRows(
         guests: event.expectedHeadcount ?? 0,
         stage,
         serviceStyleId: event.serviceStyleId ?? null,
-        binderStatus: event.binderStatus ? String(event.binderStatus) : null,
+        binderBuilt: event.binderBuiltAt != null,
         packState: pack.state,
         packDetail: pack.detail,
         packListId: lists[0]?._id ?? null,

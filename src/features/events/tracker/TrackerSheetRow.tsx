@@ -9,7 +9,6 @@ import {
   type RigOption,
 } from "./TrackerRigCells";
 import {
-  BINDER_OPTIONS,
   PACK_STATE_LABEL,
   type TrackerRig,
   type TrackerRow,
@@ -25,7 +24,7 @@ export interface TrackerRowPermissions {
 export interface TrackerRowActions {
   onEventNumber: (next: string) => void;
   onServiceStyle: (serviceStyleId: string) => void;
-  onBinder: (binderStatus: string) => void;
+  onBinderBuilt: (built: boolean) => void;
   onOpenPackList: () => void;
   onAddRig: (first: { vehicleId?: string; trailerId?: string }) => void;
   onChangeRig: (rig: TrackerRig, next: RigChange) => void;
@@ -151,26 +150,18 @@ export function TrackerSheetRow({
         />
       </td>
       <td className="tracker-col-binder">
-        <select
-          className="tracker-sheet-input"
-          aria-label={`Binder status for ${row.title}`}
-          data-binder={row.binderStatus ?? "none"}
-          value={row.binderStatus ?? ""}
-          disabled={!permissions.canEditEvent || busy}
-          onChange={(domEvent) => {
-            const next = domEvent.currentTarget.value;
-            if (next) actions.onBinder(next);
-          }}
-        >
-          <option value="" disabled>
-            Not started
-          </option>
-          {BINDER_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <label className="tracker-binder">
+          <input
+            type="checkbox"
+            aria-label={`Binder built for ${row.title}`}
+            checked={row.binderBuilt}
+            disabled={!permissions.canEditEvent || busy}
+            onChange={(domEvent) =>
+              actions.onBinderBuilt(domEvent.currentTarget.checked)
+            }
+          />
+          {row.binderBuilt ? "Built" : "Not built"}
+        </label>
       </td>
       <td className="tracker-col-pack">
         <span
