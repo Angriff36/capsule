@@ -11,6 +11,11 @@
 // separate trailer). A row records who drives it and whether the load is
 // already in the vehicle. Rows stay correctable up to and during the event:
 // trucks break down and drivers call out.
+//
+// A rig's truck, trailer and driver are set when the row is made and never
+// patched: an update command cannot check a NEW id against the caller's
+// workspace (relations read the saved row). To change one, the tracker attaches
+// the corrected rig and releases the old one.
 
 use "../foundation/base.manifest"
 
@@ -51,7 +56,8 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     optional vehicleId: uuid,
     optional trailerId: uuid,
     optional driverId: uuid,
-    optional notes: string
+    optional notes: string,
+    optional preloaded: boolean
   ) {
     guard self.assignedAt == null
     guard self.deletedAt == null
@@ -68,36 +74,12 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     mutate trailerId = trailerId
     mutate driverId = driverId
     mutate notes = notes
+    mutate preloadedAt = preloaded == true ? now() : null
     mutate assignedAt = now()
     emit EventVehicleAssigned {
       eventVehicleAssignmentId: self.id
       tenantId: self.tenantId
       eventId: eventId
-      vehicleId: vehicleId
-      trailerId: trailerId
-      driverId: driverId
-    }
-  }
-
-  // Omit a value to clear it. The rig rule still holds.
-  command change(
-    optional vehicleId: uuid,
-    optional trailerId: uuid,
-    optional driverId: uuid,
-    optional notes: string
-  ) {
-    guard self.assignedAt != null
-    guard self.releasedAt == null
-    guard self.deletedAt == null
-    constraint changeHasRig: vehicleId != null or trailerId != null "Select a vehicle or a trailer"
-    mutate vehicleId = vehicleId
-    mutate trailerId = trailerId
-    mutate driverId = driverId
-    mutate notes = notes
-    emit EventVehicleAssignmentChanged {
-      eventVehicleAssignmentId: self.id
-      tenantId: self.tenantId
-      eventId: self.eventId
       vehicleId: vehicleId
       trailerId: trailerId
       driverId: driverId
@@ -148,15 +130,6 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
 }
 
 event EventVehicleAssigned: "event_vehicle.assigned" {
-  eventVehicleAssignmentId: string
-  tenantId: string
-  eventId: string
-  vehicleId: string?
-  trailerId: string?
-  driverId: string?
-}
-
-event EventVehicleAssignmentChanged: "event_vehicle.changed" {
   eventVehicleAssignmentId: string
   tenantId: string
   eventId: string

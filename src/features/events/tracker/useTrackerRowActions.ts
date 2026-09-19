@@ -5,7 +5,6 @@ import {
   useEventChangeServiceStyle,
   useEventSetBinderStatus,
   useEventSetEventNumber,
-  useEventVehicleAssignmentChange,
   useEventVehicleAssignmentClearPreloaded,
   useEventVehicleAssignmentMarkPreloaded,
   useEventVehicleAssignmentRelease,
@@ -21,7 +20,6 @@ import type { TrackerRow } from "./trackerSheet";
  */
 export function useTrackerRowActions() {
   const assignRig = useCreateEventVehicleAssignment();
-  const changeRig = useEventVehicleAssignmentChange();
   const releaseRig = useEventVehicleAssignmentRelease();
   const markPreloaded = useEventVehicleAssignmentMarkPreloaded();
   const clearPreloaded = useEventVehicleAssignmentClearPreloaded();
@@ -98,20 +96,25 @@ export function useTrackerRowActions() {
         () => assignRig({ eventId: row.id, ...first }),
         "Attached to the event",
       ),
+    // A rig is never patched (the server cannot check a new id on an update).
+    // Attach the corrected rig first, then release the old one: a failure in
+    // between leaves two visible rigs, never a lost one.
     onChangeRig: (rig, next) =>
       void run(
         row,
-        () =>
-          next.vehicleId == null && next.trailerId == null
-            ? releaseRig({ docId: rig.id, version: rig.version })
-            : changeRig({
-                docId: rig.id,
-                version: rig.version,
-                vehicleId: next.vehicleId ?? undefined,
-                trailerId: next.trailerId ?? undefined,
-                driverId: next.driverId ?? undefined,
-                notes: rig.notes ?? undefined,
-              }),
+        async () => {
+          if (next.vehicleId != null || next.trailerId != null) {
+            await assignRig({
+              eventId: row.id,
+              vehicleId: next.vehicleId ?? undefined,
+              trailerId: next.trailerId ?? undefined,
+              driverId: next.driverId ?? undefined,
+              notes: rig.notes ?? undefined,
+              preloaded: rig.preloaded || undefined,
+            });
+          }
+          await releaseRig({ docId: rig.id, version: rig.version });
+        },
         "Saved",
       ),
     onTogglePreloaded: (rig, on) =>

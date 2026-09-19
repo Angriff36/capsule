@@ -105,7 +105,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
       packListId: self.id
       tenantId: self.tenantId
       eventId: eventId
-      kitServiceStyleId: wasOpen or self.event == null or self.event.serviceStyleId == null ? "" : self.event.serviceStyleId
+      kitKey: wasOpen or self.event == null or self.event.serviceStyleId == null ? "" : self.tenantId + ":" + self.event.serviceStyleId
       expectedHeadcount: self.event != null ? self.event.expectedHeadcount : 0
     }
   }
@@ -118,7 +118,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
       packListId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
-      kitServiceStyleId: serviceStyleId
+      kitKey: self.tenantId + ":" + serviceStyleId
       expectedHeadcount: self.event != null ? self.event.expectedHeadcount : 0
     }
   }
@@ -562,12 +562,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // Service style kit line (operations/service-style-kit.manifest). Idempotent:
   // first write wins, so a second kit request never overwrites what the packer
   // changed on this event.
-  command ensureKitItem(packListId: uuid, serviceStyleKitItemId: uuid, kitTenantId: string, description: string, requiredQuantity: decimal(12, 4), unit: UnitOfMeasure, optional note: string) {
+  command ensureKitItem(packListId: uuid, serviceStyleKitItemId: uuid, description: string, requiredQuantity: decimal(12, 4), unit: UnitOfMeasure, optional note: string) {
     guard self.deletedAt == null
     constraint kitReferencesMatch: self.packListId == packListId and self.serviceStyleKitItemId == serviceStyleKitItemId "Kit references must match the packing line"
-    // The fan-out finds kit lines by service style id alone. A style id from
-    // another workspace must never copy that workspace's kit onto this list.
-    constraint kitTenantMatch: kitTenantId == self.tenantId "Service style kit belongs to another workspace"
     guard self.packList != null
     compute wasListed = self.listedAt != null
     mutate description = self.listedAt == null ? description : self.description
@@ -724,7 +721,7 @@ event PackListKitRequested: "pack_list.kit_requested" {
   packListId: string
   tenantId: string
   eventId: string
-  kitServiceStyleId: string
+  kitKey: string
   expectedHeadcount: int
 }
 
@@ -783,17 +780,17 @@ on EventApproved run PackList.open
     name: "Event pack list"
   }
 
-// An empty kitServiceStyleId (re-open, or an event with no style) matches no
-// row. It is "" and never null: a retired kit line stores a null
-// activeServiceStyleId, and a null key would match every retired line.
-on PackListKitRequested fanOut ServiceStyleKitItem where activeServiceStyleId = payload.kitServiceStyleId
+// The key is "<tenantId>:<serviceStyleId>", so only this workspace's kit lines
+// match. An empty key (re-open, or an event with no style) matches no row. It
+// is "" and never null: a retired kit line stores a null activeKitKey, and a
+// null key would match every retired line.
+on PackListKitRequested fanOut ServiceStyleKitItem where activeKitKey = payload.kitKey
   run PackListItem.ensureKitItem
   match packListId = payload.packListId, serviceStyleKitItemId = self.id
   else create
   params {
     packListId: payload.packListId
     serviceStyleKitItemId: self.id
-    kitTenantId: self.tenantId
     description: self.description
     requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(payload.expectedHeadcount / self.guestsPerUnit) : 0)
     unit: self.unit

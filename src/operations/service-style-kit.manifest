@@ -24,8 +24,13 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
-  // Null while retired, so the pack-list fan-out skips a retired line.
-  property indexed activeServiceStyleId: uuid?
+  // Null while retired.
+  property activeServiceStyleId: uuid?
+  // The pack-list fan-out key: "<tenantId>:<serviceStyleId>", null while
+  // retired. The tenant is part of the key because a fan-out matches on ONE
+  // field: a row written with another workspace's style id must never be
+  // selected by that workspace's pack list.
+  property indexed activeKitKey: string?
   property required serviceStyleId: uuid
   property required searchable description: string = ""
   // Always sent, whatever the headcount (1 field kitchen, 2 tents).
@@ -70,9 +75,12 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
+    // The relation resolves inside the caller's workspace only.
+    guard self.serviceStyle != null and self.serviceStyle.deletedAt == null
     constraint addKitItemDescription: length(trim(description)) > 0 "Kit line description is required"
     mutate serviceStyleId = serviceStyleId
     mutate activeServiceStyleId = serviceStyleId
+    mutate activeKitKey = self.tenantId + ":" + serviceStyleId
     mutate description = description
     mutate baseQuantity = baseQuantity != null ? baseQuantity : (guestsPerUnit != null ? 0 : 1)
     mutate guestsPerUnit = guestsPerUnit
@@ -118,6 +126,7 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "retired"
     mutate activeServiceStyleId = null
+    mutate activeKitKey = null
     mutate retiredAt = now()
     emit ServiceStyleKitItemRetired {
       serviceStyleKitItemId: self.id
@@ -131,6 +140,7 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "active"
     mutate activeServiceStyleId = self.serviceStyleId
+    mutate activeKitKey = self.tenantId + ":" + self.serviceStyleId
     mutate retiredAt = null
     emit ServiceStyleKitItemReinstated {
       serviceStyleKitItemId: self.id
