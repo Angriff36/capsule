@@ -32,6 +32,7 @@ import { clientDisplayName } from "../events/clientName";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { ClientCommunicationPanel } from "./ClientCommunicationPanel";
 import { ClientContactsPanel } from "./ClientContactsPanel";
+import { ClientProfilePanel } from "./ClientProfilePanel";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -332,6 +333,8 @@ export function ClientDetailPage() {
         contacts={activeContacts}
         onSubmitAdd={submitContact}
         askConfirm={(request) => prompt.askConfirm(request)}
+        run={run}
+        onSaved={setNotice}
         onSetPrimary={(row) =>
           void run(`${row._id}:primary`, async () => {
             await setPrimary({ docId: row._id, version: row.version });
@@ -389,6 +392,14 @@ export function ClientDetailPage() {
           Save contact details
         </button>
       </form>
+
+      <ClientProfilePanel
+        key={`profile-${client.version}`}
+        client={{ ...client, status: String(client.status) }}
+        busy={busy}
+        run={run}
+        onSaved={setNotice}
+      />
 
       <AttachmentsSection parentType="client" parentId={client._id} />
     </div>

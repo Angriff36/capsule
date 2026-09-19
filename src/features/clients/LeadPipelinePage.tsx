@@ -20,6 +20,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
+import { LeadDetailsForm } from "./LeadDetailsForm";
 import { LeadSourceReport } from "./LeadSourceReport";
 import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import "./LeadPipelinePage.css";
@@ -49,6 +50,7 @@ interface LeadRow {
   email?: string | null;
   phone?: string | null;
   source: string;
+  referralSourceId?: string | null;
   estimatedValue: number;
   stage: LeadStage;
   probability: number;
@@ -112,6 +114,7 @@ export function LeadPipelinePage() {
   const [showCapture, setShowCapture] = useState(false);
   const [leadType, setLeadType] = useState<"company" | "person">("company");
   const [proposalLeadId, setProposalLeadId] = useState<string | null>(null);
+  const [editLeadId, setEditLeadId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -608,6 +611,18 @@ export function LeadPipelinePage() {
                     </form>
 
                     <div className="lead-card-actions">
+                      <button
+                        className="btn btn-ghost"
+                        type="button"
+                        onClick={() =>
+                          setEditLeadId((current) =>
+                            current === lead._id ? null : lead._id,
+                          )
+                        }
+                        disabled={busy != null}
+                      >
+                        {editLeadId === lead._id ? "Close" : "Edit details"}
+                      </button>
                       {lead.convertedAt == null ? (
                         <button
                           className="btn btn-secondary"
@@ -653,6 +668,18 @@ export function LeadPipelinePage() {
                         </>
                       )}
                     </div>
+
+                    {editLeadId === lead._id ? (
+                      <LeadDetailsForm
+                        key={`${lead._id}:${lead.version}`}
+                        lead={lead}
+                        referralSources={activeReferralSources}
+                        busy={busy}
+                        run={run}
+                        onSaved={setNotice}
+                        onClose={() => setEditLeadId(null)}
+                      />
+                    ) : null}
 
                     {proposalLeadId === lead._id ? (
                       <form
