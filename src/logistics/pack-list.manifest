@@ -256,6 +256,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property containerServings: int?
   property productionBatchId: uuid?
   // Internal source evidence for a reviewed correction of imported unit labels.
+  // Servingware type note for the packer (Mangia Ops Final Lock Training part
+  // 3, PACKLIST): "wood board", "white marble bowl". Empty = no note.
+  property note: string?
   property unitCorrectionSource: string?
   property associationSource: string?
   property required requiredQuantity: decimal(12, 4) = 0
@@ -500,6 +503,17 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A note is never frozen: the packer reads it up to dispatch.
+  command annotate(optional note: string) {
+    guard self.deletedAt == null
+    mutate note = note
+    emit PackListItemAnnotated {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+    }
+  }
+
   store PackListItem in durable
 }
 
@@ -602,6 +616,12 @@ event PackListItemMissing: "pack_list_item.missing" {
   requiredQuantity: decimal(12, 4)
   packedQuantity: decimal(12, 4)
   unit: UnitOfMeasure
+}
+
+event PackListItemAnnotated: "pack_list_item.annotated" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
 }
 
 event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {

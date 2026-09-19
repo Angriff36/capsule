@@ -29,6 +29,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   property headcountOverride: int? = 0
   // Denormalized from Event at add time for BOM → weekly purchasing reactions.
   property purchasingWeekStart: datetime?
+  // Print order on the event menu (Mangia Ops Final Lock Training part 3,
+  // EVENT MENU: mains, then sides, then dessert and place settings).
+  property sortOrder: int?
   property course: string?
   property serviceStyle: string?
   property specialInstructions: string?
@@ -209,6 +212,18 @@ entity EventDish mixin TenantScoped, SoftDeletable {
       dishId: self.dishId
       course: course
       serviceStyle: serviceStyle
+    }
+  }
+
+  command reorder(sortOrder: int) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    mutate sortOrder = sortOrder
+    emit EventDishReordered {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      sortOrder: sortOrder
     }
   }
 
@@ -396,6 +411,13 @@ event EventDishCourseChanged: "event_dish.course_changed" {
   dishId: string
   course: string?
   serviceStyle: string?
+}
+
+event EventDishReordered: "event_dish.reordered" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  sortOrder: int
 }
 
 event EventDishInstructionsUpdated: "event_dish.instructions_updated" {
