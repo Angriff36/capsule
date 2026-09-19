@@ -8,7 +8,7 @@ import {
   useServiceStyleKitItemRetire,
   useServiceStyleKitItemRevise,
 } from "../../lib/manifest-convex-react";
-import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -17,27 +17,10 @@ import {
   ServiceStyleKitLineFields,
   type KitLineDraft as LineDraft,
 } from "./ServiceStyleKitLineFields";
-
-interface KitLine {
-  _id: string;
-  version: number;
-  serviceStyleId: string;
-  description: string;
-  baseQuantity: number;
-  guestsPerUnit?: number | null;
-  unit: string;
-  note?: string | null;
-  sortOrder?: number | null;
-  status: unknown;
-  deletedAt?: number | null;
-}
-
-function quantityRule(line: KitLine): string {
-  const base = `${line.baseQuantity} ${line.unit}`;
-  if (line.guestsPerUnit == null) return base;
-  const scaled = `1 per ${line.guestsPerUnit} guests`;
-  return line.baseQuantity > 0 ? `${base} + ${scaled}` : scaled;
-}
+import {
+  ServiceStyleKitLineTable,
+  type KitLine,
+} from "./ServiceStyleKitLineTable";
 
 function wholeNumber(raw: string): number | undefined {
   const value = Number(raw);
@@ -115,6 +98,30 @@ export function ServiceStyleKitsPage() {
         sortOrder: linesFor(styleId).length,
       });
       setDrafts((all) => ({ ...all, [styleId]: EMPTY_DRAFT }));
+    });
+  };
+
+  // Swap two neighbours. revise() clears an omitted optional value, so every
+  // saved value goes back with it.
+  const move = (lines: KitLine[], index: number, step: -1 | 1) => {
+    const line = lines[index];
+    const other = lines[index + step];
+    if (!line || !other) return;
+    const place = (target: KitLine, sortOrder: number) =>
+      reviseLine({
+        docId: target._id,
+        version: target.version,
+        description: target.description,
+        baseQuantity: target.baseQuantity,
+        guestsPerUnit: target.guestsPerUnit ?? undefined,
+        unit: target.unit,
+        note: target.note ?? undefined,
+        sortOrder,
+      });
+    void run(`move:${line._id}`, async () => {
+      // Positions, not the saved numbers: old lines can share a sort order.
+      await place(line, index + step);
+      await place(other, index);
     });
   };
 
@@ -200,96 +207,39 @@ export function ServiceStyleKitsPage() {
                   </span>
                 </div>
                 {lines.length > 0 ? (
-                  <div className="supply-table-wrap mt-3">
-                    <table className="supply-table">
-                      <thead>
-                        <tr>
-                          <th>Item</th>
-                          <th>Quantity rule</th>
-                          <th>Packer note</th>
-                          <th>State</th>
-                          <th aria-label="Actions" />
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {lines.map((line) => (
-                          <tr key={line._id}>
-                            <td>
-                              <strong>{line.description}</strong>
-                            </td>
-                            <td>{quantityRule(line)}</td>
-                            <td>{line.note || "—"}</td>
-                            <td>
-                              <StatusChip status={String(line.status)} />
-                            </td>
-                            <td>
-                              <div className="supply-row-actions">
-                                {String(line.status) === "active" ? (
-                                  <>
-                                    <button
-                                      type="button"
-                                      className="btn btn-ghost btn-sm"
-                                      disabled={busy != null}
-                                      onClick={() =>
-                                        setEditing({
-                                          id: line._id,
-                                          draft: {
-                                            description: line.description,
-                                            baseQuantity: String(
-                                              line.baseQuantity,
-                                            ),
-                                            guestsPerUnit:
-                                              line.guestsPerUnit != null
-                                                ? String(line.guestsPerUnit)
-                                                : "",
-                                            unit: line.unit,
-                                            note: line.note ?? "",
-                                          },
-                                        })
-                                      }
-                                    >
-                                      Edit
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className="btn btn-ghost btn-sm"
-                                      disabled={busy != null}
-                                      onClick={() =>
-                                        void run(`retire:${line._id}`, () =>
-                                          retireLine({
-                                            docId: line._id,
-                                            version: line.version,
-                                          }),
-                                        )
-                                      }
-                                    >
-                                      Retire
-                                    </button>
-                                  </>
-                                ) : (
-                                  <button
-                                    type="button"
-                                    className="btn btn-ghost btn-sm"
-                                    disabled={busy != null}
-                                    onClick={() =>
-                                      void run(`reinstate:${line._id}`, () =>
-                                        reinstateLine({
-                                          docId: line._id,
-                                          version: line.version,
-                                        }),
-                                      )
-                                    }
-                                  >
-                                    Reinstate
-                                  </button>
-                                )}
-                              </div>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  <ServiceStyleKitLineTable
+                    lines={lines}
+                    busy={busy}
+                    onMove={(index, step) => move(lines, index, step)}
+                    onEdit={(line) =>
+                      setEditing({
+                        id: line._id,
+                        draft: {
+                          description: line.description,
+                          baseQuantity: String(line.baseQuantity),
+                          guestsPerUnit:
+                            line.guestsPerUnit != null
+                              ? String(line.guestsPerUnit)
+                              : "",
+                          unit: line.unit,
+                          note: line.note ?? "",
+                        },
+                      })
+                    }
+                    onRetire={(line) =>
+                      void run(`retire:${line._id}`, () =>
+                        retireLine({ docId: line._id, version: line.version }),
+                      )
+                    }
+                    onReinstate={(line) =>
+                      void run(`reinstate:${line._id}`, () =>
+                        reinstateLine({
+                          docId: line._id,
+                          version: line.version,
+                        }),
+                      )
+                    }
+                  />
                 ) : (
                   <p className="mt-3 text-base text-ink-2">
                     No kit lines. Events of this style start with an empty pack
