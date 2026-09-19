@@ -56,7 +56,8 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   transition operationalStatus from "out_of_service" to ["available", "in_use", "maintenance", "retired"]
   transition operationalStatus from "retired" to ["available", "in_use", "maintenance", "out_of_service"]
 
-  default policy vehicleRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicles"
+  // Read wide: the Event Tracker shows every role which truck goes to which event.
+  default policy vehicleRead read: roleAllows(user.role, "staffAccess") "Staff may read vehicles"
   default policy vehicleWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write vehicles through commands"
   default policy vehicleExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute vehicle commands"
 
@@ -278,7 +279,7 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   transition operationalStatus from "out_of_service" to ["available", "in_use", "maintenance", "retired"]
   transition operationalStatus from "retired" to ["available", "in_use", "maintenance", "out_of_service"]
 
-  default policy trailerRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read trailers"
+  default policy trailerRead read: roleAllows(user.role, "staffAccess") "Staff may read trailers"
   default policy trailerWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write trailers through commands"
   default policy trailerExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute trailer commands"
 

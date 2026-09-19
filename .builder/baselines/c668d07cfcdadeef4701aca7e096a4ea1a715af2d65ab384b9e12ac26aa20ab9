@@ -793,7 +793,6 @@ export default defineSchema({
     venueId: v.optional(v.union(v.id("venues"), v.null())),
     assignedToId: v.optional(v.union(v.id("people"), v.null())),
     title: v.string(),
-    eventNumber: v.optional(v.union(v.string(), v.null())),
     eventType: v.string(),
     startsAt: v.optional(v.union(v.number(), v.null())),
     endsAt: v.optional(v.union(v.number(), v.null())),
@@ -889,8 +888,7 @@ export default defineSchema({
     .index("by_assignedToId", ["assignedToId"])
     .index("by_referralSourceId", ["referralSourceId"])
     .index("by_recurrenceTemplateEventId", ["recurrenceTemplateEventId"])
-    .searchIndex("search_title", { searchField: "title", filterFields: ["tenantId"] })
-    .searchIndex("search_eventNumber", { searchField: "eventNumber", filterFields: ["tenantId"] }),
+    .searchIndex("search_title", { searchField: "title", filterFields: ["tenantId"] }),
   eventAllergenChecks: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

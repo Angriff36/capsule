@@ -1,0 +1,169 @@
+// ServiceStyleKitItem — the default kit that travels with every event of a
+// service style.
+//
+// A cook-onsite event always needs the field kitchen, tents, tarps and the
+// handwashing station; a drop-off never does. Before this, that knowledge lived
+// in the packer's head: an event's PackList opened EMPTY unless a dish
+// container (culinary/dish-container.manifest) put something on it.
+//
+// One row per kit line. The reaction in logistics/pack-list.manifest fans the
+// active lines of the event's service style onto the event's PackList the first
+// time that list opens, so the sheet builds itself. The generated PackListItem
+// rows are an independent snapshot: the packer can change or remove them for
+// one event, and a later kit edit touches future events only.
+
+use "../foundation/base.manifest"
+
+enum ServiceStyleKitItemStatus {
+  active
+  retired
+}
+
+entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Null while retired, so the pack-list fan-out skips a retired line.
+  property indexed activeServiceStyleId: uuid?
+  property required serviceStyleId: uuid
+  property required searchable description: string = ""
+  // Always sent, whatever the headcount (1 field kitchen, 2 tents).
+  property required baseQuantity: int = 1
+  // Scales with the event: one more unit for each N guests (1 chafer per 25
+  // guests). Null = the line does not scale.
+  property guestsPerUnit: int?
+  property required unit: UnitOfMeasure = "each"
+  // Packer note that goes onto the pack line ("black wall kit", "soft surface
+  // needs two tarps").
+  property note: string?
+  property sortOrder: int = 0
+  property required status: ServiceStyleKitItemStatus = "active"
+  property addedAt: datetime?
+  property retiredAt: datetime?
+
+  belongsTo serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
+
+  constraint kitItemDescription: self.addedAt == null or length(trim(self.description)) > 0 "Kit line description is required"
+  constraint kitItemBase: self.baseQuantity >= 0 "Base quantity cannot be negative"
+  constraint kitItemPerGuests: self.guestsPerUnit == null or self.guestsPerUnit >= 1 "Guests per unit must be at least 1"
+  constraint kitItemQuantity: self.addedAt == null or self.baseQuantity > 0 or self.guestsPerUnit != null "A kit line needs a base quantity or a guests-per-unit rule"
+  constraint kitItemSort: self.sortOrder >= 0 "Sort order cannot be negative"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  // The whole crew reads the kit (it explains the pack list). The people who
+  // run events and logistics keep it up to date.
+  default policy serviceStyleKitItemRead read: roleAllows(user.role, "staffAccess") "Staff may read service style kits"
+  default policy serviceStyleKitItemWrite write: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may write service style kits through commands"
+  default policy serviceStyleKitItemExecute execute: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may execute service style kit commands"
+
+  command add(
+    serviceStyleId: uuid,
+    description: string,
+    optional baseQuantity: int,
+    optional guestsPerUnit: int,
+    optional unit: UnitOfMeasure,
+    optional note: string,
+    optional sortOrder: int
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addKitItemDescription: length(trim(description)) > 0 "Kit line description is required"
+    mutate serviceStyleId = serviceStyleId
+    mutate activeServiceStyleId = serviceStyleId
+    mutate description = description
+    mutate baseQuantity = baseQuantity != null ? baseQuantity : (guestsPerUnit != null ? 0 : 1)
+    mutate guestsPerUnit = guestsPerUnit
+    mutate unit = unit != null ? unit : "each"
+    mutate note = note
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate addedAt = now()
+    emit ServiceStyleKitItemAdded {
+      serviceStyleKitItemId: self.id
+      tenantId: self.tenantId
+      serviceStyleId: serviceStyleId
+      description: description
+    }
+  }
+
+  command revise(
+    description: string,
+    baseQuantity: int,
+    optional guestsPerUnit: int,
+    optional unit: UnitOfMeasure,
+    optional note: string,
+    optional sortOrder: int
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint reviseKitItemDescription: length(trim(description)) > 0 "Kit line description is required"
+    mutate description = description
+    mutate baseQuantity = baseQuantity
+    mutate guestsPerUnit = guestsPerUnit
+    mutate unit = unit != null ? unit : self.unit
+    mutate note = note
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    emit ServiceStyleKitItemRevised {
+      serviceStyleKitItemId: self.id
+      tenantId: self.tenantId
+      serviceStyleId: self.serviceStyleId
+      description: description
+    }
+  }
+
+  command retire() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "retired"
+    mutate activeServiceStyleId = null
+    mutate retiredAt = now()
+    emit ServiceStyleKitItemRetired {
+      serviceStyleKitItemId: self.id
+      tenantId: self.tenantId
+      serviceStyleId: self.serviceStyleId
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    mutate status = "active"
+    mutate activeServiceStyleId = self.serviceStyleId
+    mutate retiredAt = null
+    emit ServiceStyleKitItemReinstated {
+      serviceStyleKitItemId: self.id
+      tenantId: self.tenantId
+      serviceStyleId: self.serviceStyleId
+    }
+  }
+
+  store ServiceStyleKitItem in durable
+}
+
+event ServiceStyleKitItemAdded: "service_style_kit_item.added" {
+  serviceStyleKitItemId: string
+  tenantId: string
+  serviceStyleId: string
+  description: string
+}
+
+event ServiceStyleKitItemRevised: "service_style_kit_item.revised" {
+  serviceStyleKitItemId: string
+  tenantId: string
+  serviceStyleId: string
+  description: string
+}
+
+event ServiceStyleKitItemRetired: "service_style_kit_item.retired" {
+  serviceStyleKitItemId: string
+  tenantId: string
+  serviceStyleId: string
+}
+
+event ServiceStyleKitItemReinstated: "service_style_kit_item.reinstated" {
+  serviceStyleKitItemId: string
+  tenantId: string
+  serviceStyleId: string
+}

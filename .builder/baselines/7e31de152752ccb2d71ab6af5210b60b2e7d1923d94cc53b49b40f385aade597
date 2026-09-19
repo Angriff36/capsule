@@ -866,7 +866,6 @@ export const EventSchema = z.object({
   venueId: z.string().uuid().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
   title: z.string().default(""),
-  eventNumber: z.string().nullable().optional(),
   eventType: z.string().default(""),
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
@@ -5447,13 +5446,6 @@ export const EventSetBinderStatusParamsSchema = z.object({
 });
 
 export type EventSetBinderStatusParams = z.infer<typeof EventSetBinderStatusParamsSchema>;
-
-// Command: setEventNumber on Event
-export const EventSetEventNumberParamsSchema = z.object({
-  eventNumber: z.string().optional(),
-});
-
-export type EventSetEventNumberParams = z.infer<typeof EventSetEventNumberParamsSchema>;
 
 // Command: stageClientMerge on Event
 export const EventStageClientMergeParamsSchema = z.object({

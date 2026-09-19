@@ -217,7 +217,6 @@ import {
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
   EventSetBinderStatusParamsSchema,
-  EventSetEventNumberParamsSchema,
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
   EventStaffNeedCancelParamsSchema,
   EventStaffNeedChangeCoverageParamsSchema,
@@ -3189,16 +3188,6 @@ export function useEventSetBinderStatus() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventSetBinderStatusParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
-/** Mutation hook for Event.setEventNumber. */
-export function useEventSetEventNumber() {
-  const mutate = useMutation(api.mutations.Event_setEventNumber);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = EventSetEventNumberParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11108,4 +11097,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1180 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1179 as const;

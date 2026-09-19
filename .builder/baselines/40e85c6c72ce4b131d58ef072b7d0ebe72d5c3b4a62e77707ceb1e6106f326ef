@@ -13428,7 +13428,7 @@ export const listTrailer = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("trailerRead", "Trailer", () => checkRole(user, "staffAccess"))) return [];
+    if (!__allowsRead("trailerRead", "Trailer", () => (checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("trailers").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -13442,7 +13442,7 @@ export const getTrailer = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("trailerRead", "Trailer", () => checkRole(user, "staffAccess"))) return null;
+    if (!__allowsRead("trailerRead", "Trailer", () => (checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -13463,7 +13463,7 @@ export const listTrailerByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("trailerRead", "Trailer", () => checkRole(user, "staffAccess"))) return [];
+    if (!__allowsRead("trailerRead", "Trailer", () => (checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("trailers").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -13617,7 +13617,7 @@ export const listVehicle = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vehicleRead", "Vehicle", () => checkRole(user, "staffAccess"))) return [];
+    if (!__allowsRead("vehicleRead", "Vehicle", () => (checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("vehicles").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -13631,7 +13631,7 @@ export const getVehicle = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vehicleRead", "Vehicle", () => checkRole(user, "staffAccess"))) return null;
+    if (!__allowsRead("vehicleRead", "Vehicle", () => (checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -13652,7 +13652,7 @@ export const listVehicleByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("vehicleRead", "Vehicle", () => checkRole(user, "staffAccess"))) return [];
+    if (!__allowsRead("vehicleRead", "Vehicle", () => (checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("vehicles").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();

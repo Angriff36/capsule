@@ -603,6 +603,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   property venueId: uuid?
   property assignedToId: uuid?
   property required searchable title: string = ""
+  // The number the shop calls the event by: on the Event Tracker, the binder
+  // spine and the Slack channel. A TPP-era event keeps its TPP invoice number.
+  // Empty = the tracker falls back to the Capsule invoice number.
+  property searchable eventNumber: string?
   property required eventType: string = ""
   property startsAt: datetime?
   property endsAt: datetime?
@@ -1224,6 +1228,16 @@ entity Event mixin TenantScoped, SoftDeletable {
     emit EventTaskBreakdownUpdated {
       eventId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  command setEventNumber(optional eventNumber: string) {
+    guard self.deletedAt == null
+    mutate eventNumber = eventNumber
+    emit EventNumberSet {
+      eventId: self.id
+      tenantId: self.tenantId
+      eventNumber: eventNumber
     }
   }
 
@@ -2263,6 +2277,12 @@ event EventSetupNotesUpdated: "event_setup_notes.updated" {
 event EventTaskBreakdownUpdated: "event_task_breakdown.updated" {
   eventId: string
   tenantId: string
+}
+
+event EventNumberSet: "event_number.set" {
+  eventId: string
+  tenantId: string
+  eventNumber: string?
 }
 
 event EventBinderStatusChanged: "event_binder_status.changed" {

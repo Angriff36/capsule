@@ -1,0 +1,184 @@
+// EventVehicleAssignment — a truck, a trailer, or a truck with its trailer,
+// attached to ONE event from the Event Tracker.
+//
+// Owner correction 2026-09-19: in catering a "delivery" is the Drop-Off service
+// style, not the truck trip of a full-service event. The Ops Final Lock process
+// assigns the truck and trailer on the Event Tracker BEFORE the warehouse
+// packs, so the assignment belongs to the event, not to a Delivery that only
+// exists after a pack list is packed.
+//
+// One row per rig. An event can hold several rows (two trucks, a truck and a
+// separate trailer). A row records who drives it and whether the load is
+// already in the vehicle. Rows stay correctable up to and during the event:
+// trucks break down and drivers call out.
+
+use "../foundation/base.manifest"
+
+entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Null once released, so "what is on this event now" is one index read.
+  property indexed activeEventId: uuid?
+  property required eventId: uuid
+  property indexed vehicleId: uuid?
+  property indexed trailerId: uuid?
+  property driverId: uuid?
+  property notes: string?
+  property assignedAt: datetime?
+  property preloadedAt: datetime?
+  property releasedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
+  belongsTo trailer: Trailer fields [tenantId, trailerId] references [tenantId, id]
+  belongsTo driver: Person fields [tenantId, driverId] references [tenantId, id]
+
+  computed isPreloaded: boolean = self.preloadedAt != null
+  computed isReleased: boolean = self.releasedAt != null
+
+  constraint assignmentHasRig: self.assignedAt == null or self.vehicleId != null or self.trailerId != null "An assignment needs a vehicle or a trailer"
+
+  // The crew needs to know which truck they are on; the people who run events
+  // and logistics set it from the tracker.
+  default policy eventVehicleAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may read event vehicle assignments"
+  default policy eventVehicleAssignmentWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may write event vehicle assignments through commands"
+  default policy eventVehicleAssignmentExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales and logistics staff and managers may execute event vehicle assignment commands"
+
+  command assign(
+    eventId: uuid,
+    optional vehicleId: uuid,
+    optional trailerId: uuid,
+    optional driverId: uuid,
+    optional notes: string
+  ) {
+    guard self.assignedAt == null
+    guard self.deletedAt == null
+    constraint assignHasRig: vehicleId != null or trailerId != null "Select a vehicle or a trailer"
+    mutate eventId = eventId
+    mutate activeEventId = eventId
+    mutate vehicleId = vehicleId
+    mutate trailerId = trailerId
+    mutate driverId = driverId
+    mutate notes = notes
+    mutate assignedAt = now()
+    emit EventVehicleAssigned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      vehicleId: vehicleId
+      trailerId: trailerId
+      driverId: driverId
+    }
+  }
+
+  // Omit a value to clear it. The rig rule still holds.
+  command change(
+    optional vehicleId: uuid,
+    optional trailerId: uuid,
+    optional driverId: uuid,
+    optional notes: string
+  ) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    constraint changeHasRig: vehicleId != null or trailerId != null "Select a vehicle or a trailer"
+    mutate vehicleId = vehicleId
+    mutate trailerId = trailerId
+    mutate driverId = driverId
+    mutate notes = notes
+    emit EventVehicleAssignmentChanged {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      vehicleId: vehicleId
+      trailerId: trailerId
+      driverId: driverId
+    }
+  }
+
+  // The load is in the actual vehicle. Reversible: a repack unloads it.
+  command markPreloaded() {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    mutate preloadedAt = now()
+    emit EventVehiclePreloaded {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command clearPreloaded() {
+    guard self.preloadedAt != null
+    guard self.deletedAt == null
+    mutate preloadedAt = null
+    emit EventVehiclePreloadCleared {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Take the rig off the event. The row stays as history.
+  command release() {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    mutate activeEventId = null
+    mutate releasedAt = now()
+    emit EventVehicleReleased {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      vehicleId: self.vehicleId
+      trailerId: self.trailerId
+    }
+  }
+
+  store EventVehicleAssignment in durable
+}
+
+event EventVehicleAssigned: "event_vehicle.assigned" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+  vehicleId: string?
+  trailerId: string?
+  driverId: string?
+}
+
+event EventVehicleAssignmentChanged: "event_vehicle.changed" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+  vehicleId: string?
+  trailerId: string?
+  driverId: string?
+}
+
+event EventVehiclePreloaded: "event_vehicle.preloaded" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehiclePreloadCleared: "event_vehicle.preload_cleared" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventVehicleReleased: "event_vehicle.released" {
+  eventVehicleAssignmentId: string
+  tenantId: string
+  eventId: string
+  vehicleId: string?
+  trailerId: string?
+}
+
+// A cancelled event gives its rigs back.
+on EventCancelled fanOut EventVehicleAssignment where activeEventId = payload.eventId
+  run release
