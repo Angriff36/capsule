@@ -41,6 +41,7 @@ import {
   shiftsInScheduleWeek,
   startOfScheduleWeek,
 } from "./weeklySchedule";
+import { ShiftRescheduleAction } from "./ShiftRescheduleAction";
 import { SmsAlertOptInSection } from "./SmsAlertOptInSection";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
@@ -944,6 +945,12 @@ export function RosterPage() {
                     </td>
                     <td>
                       <div className="supply-row-actions">
+                        <ShiftRescheduleAction
+                          shift={row}
+                          prompt={prompt}
+                          busy={busy}
+                          run={run}
+                        />
                         {policy
                           .shiftActions(String(row.status))
                           .map((action) => (

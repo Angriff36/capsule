@@ -5,6 +5,7 @@ export type TeamPerson = {
   email: string;
   role: string;
   status: string;
+  phone?: string | null;
   authSubjectId?: string | null;
   employeeNumber?: string | null;
   addressLine1?: string | null;

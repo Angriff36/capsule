@@ -10,6 +10,11 @@ import {
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
+import { useActionPrompt } from "../../ui/action-prompt";
+import {
+  ShiftTypeLifecycleAction,
+  TrainingModuleLifecycleAction,
+} from "./TrainingLifecycleActions";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import "./TrainingPage.css";
@@ -60,6 +65,7 @@ export function TrainingPage() {
   const [editor, setEditor] = useState<Editor>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
   const [moduleDraft, setModuleDraft] = useState({
     name: "",
     category: "food_safety",
@@ -76,6 +82,17 @@ export function TrainingPage() {
   const activeShiftTypes = (shiftTypes ?? []).filter(
     (row) => row.deletedAt == null && row.status === "active",
   );
+  // The library lists retired rows too, so a retired module or type has a row
+  // to be reactivated from. The selects above stay on the active rows.
+  const byStatusThenName = (a: { status: unknown }, b: { status: unknown }) =>
+    Number(String(a.status) === "retired") -
+    Number(String(b.status) === "retired");
+  const listedModules = (modules ?? [])
+    .filter((row) => row.deletedAt == null)
+    .sort(byStatusThenName);
+  const listedShiftTypes = (shiftTypes ?? [])
+    .filter((row) => row.deletedAt == null)
+    .sort(byStatusThenName);
   const activePeople = (people ?? []).filter(
     (row) => row.deletedAt == null && row.status === "active",
   );
@@ -199,6 +216,7 @@ export function TrainingPage() {
 
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
+      {host}
 
       <section className="training-scoreboard" aria-label="Training overview">
         <div>
@@ -438,7 +456,7 @@ export function TrainingPage() {
         </div>
         {loading ? (
           <TableSkeleton rows={3} />
-        ) : activeModules.length === 0 ? (
+        ) : listedModules.length === 0 ? (
           <div className="document-empty">
             <p>No training modules yet.</p>
             <span>
@@ -447,7 +465,7 @@ export function TrainingPage() {
           </div>
         ) : (
           <div className="training-module-grid">
-            {activeModules.map((module, index) => {
+            {listedModules.map((module, index) => {
               const completionCount = activeCompletions.filter(
                 (row) => row.trainingModuleId === module._id,
               ).length;
@@ -459,6 +477,7 @@ export function TrainingPage() {
                   <div>
                     <span>
                       {categoryLabels[String(module.category)] ?? "Other"}
+                      {String(module.status) === "retired" ? " · retired" : ""}
                     </span>
                     <b>{module.passingScore}% pass</b>
                   </div>
@@ -469,6 +488,12 @@ export function TrainingPage() {
                     <span>
                       {completionCount === 1 ? "completion" : "completions"}
                     </span>
+                    <TrainingModuleLifecycleAction
+                      row={module}
+                      prompt={prompt}
+                      busy={busy}
+                      run={run}
+                    />
                   </footer>
                 </article>
               );
@@ -539,21 +564,23 @@ export function TrainingPage() {
           </div>
           {loading ? (
             <TableSkeleton rows={4} />
-          ) : activeShiftTypes.length === 0 ? (
+          ) : listedShiftTypes.length === 0 ? (
             <div className="document-empty">
               <p>No shift types are defined.</p>
               <span>Types without a prerequisite remain easy to schedule.</span>
             </div>
           ) : (
             <div className="training-shift-types">
-              {activeShiftTypes.map((shiftType) => (
+              {listedShiftTypes.map((shiftType) => (
                 <article key={shiftType._id}>
                   <div>
                     <strong>{shiftType.name}</strong>
                     <span>
-                      {shiftType.requiredTrainingModuleId
-                        ? "Training required"
-                        : "Open assignment"}
+                      {String(shiftType.status) === "retired"
+                        ? "Retired"
+                        : shiftType.requiredTrainingModuleId
+                          ? "Training required"
+                          : "Open assignment"}
                     </span>
                   </div>
                   <p>{shiftType.description || "No description provided."}</p>
@@ -564,6 +591,12 @@ export function TrainingPage() {
                   ) : (
                     <small>No module gate</small>
                   )}
+                  <ShiftTypeLifecycleAction
+                    row={shiftType}
+                    prompt={prompt}
+                    busy={busy}
+                    run={run}
+                  />
                 </article>
               ))}
             </div>
