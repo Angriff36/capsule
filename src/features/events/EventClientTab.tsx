@@ -17,7 +17,7 @@ import { EventClientHistoryPanel } from "./EventClientHistoryPanel";
 type Props = {
   eventId: Id<"events">;
   eventTitle: string;
-  clientId: string;
+  clientId?: string | null;
   primaryContactName?: string | null;
   primaryContactEmail?: string | null;
   primaryContactPhone?: string | null;
@@ -82,7 +82,12 @@ export function EventClientTab({
   const clientEvents = useMemo(
     () =>
       (events ?? [])
-        .filter((row) => row.clientId === clientId && row.deletedAt == null)
+        .filter(
+          (row) =>
+            Boolean(clientId) &&
+            row.clientId === clientId &&
+            row.deletedAt == null,
+        )
         .sort((left, right) => Number(left.startsAt) - Number(right.startsAt)),
     [clientId, events],
   );
@@ -110,7 +115,9 @@ export function EventClientTab({
                   ? "Company account"
                   : client
                     ? "Individual account"
-                    : "Client record not found"}
+                    : clientId
+                      ? "Client record not found"
+                      : "Client not assigned"}
               </p>
               <p className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-1 text-base text-ink-2">
                 {locality ? <span>{locality}</span> : null}

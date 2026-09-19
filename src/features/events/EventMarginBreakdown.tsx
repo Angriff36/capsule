@@ -27,12 +27,19 @@ export function EventMarginTiles({
   grossProfit,
   marginPct,
 }: {
-  revenue: number;
+  revenue: number | null;
   totalCost: number;
-  grossProfit: number;
+  grossProfit: number | null;
   marginPct: number | null;
 }) {
-  const costShare = revenue > 0 ? (totalCost / revenue) * 100 : null;
+  const costShare =
+    revenue != null && revenue > 0 ? (totalCost / revenue) * 100 : null;
+  const profitTone =
+    grossProfit == null
+      ? "text-ink-3"
+      : grossProfit < 0
+        ? "text-danger"
+        : "text-ok";
   return (
     <div className="grid gap-3 sm:grid-cols-3">
       <section className="card px-4 py-3.5">
@@ -51,32 +58,24 @@ export function EventMarginTiles({
         </p>
         <p className="mt-1.5 text-base text-ink-3">
           {costShare == null
-            ? "No revenue booked yet"
+            ? "Revenue needed for cost share"
             : `${costShare.toFixed(1)}% of revenue`}
         </p>
       </section>
       <section
         className={`rounded-md border px-4 py-3.5 ${
-          grossProfit < 0
-            ? "border-danger/40 bg-danger-soft"
-            : "border-ok/40 bg-ok-soft"
+          grossProfit == null
+            ? "border-line bg-inset"
+            : grossProfit < 0
+              ? "border-danger/40 bg-danger-soft"
+              : "border-ok/40 bg-ok-soft"
         }`}
       >
-        <p className={`eyebrow ${grossProfit < 0 ? "text-danger" : "text-ok"}`}>
-          Net margin
-        </p>
-        <p
-          className={`mt-1.5 font-mono text-3xl leading-none ${
-            grossProfit < 0 ? "text-danger" : "text-ok"
-          }`}
-        >
+        <p className={`eyebrow ${profitTone}`}>Net margin</p>
+        <p className={`mt-1.5 font-mono text-3xl leading-none ${profitTone}`}>
           {formatMoney(grossProfit)}
         </p>
-        <p
-          className={`mt-1.5 text-base ${
-            grossProfit < 0 ? "text-danger" : "text-ok"
-          }`}
-        >
+        <p className={`mt-1.5 text-base ${profitTone}`}>
           {marginPct == null
             ? "Margin needs revenue"
             : `${marginPct.toFixed(1)}% margin`}
@@ -92,7 +91,7 @@ export function EventMarginRevenueBreakdown({
   total,
 }: {
   lines: readonly MarginRevenueLine[];
-  total: number;
+  total: number | null;
 }) {
   return (
     <section className="card px-4 py-3.5" data-testid="event-margin-revenue">

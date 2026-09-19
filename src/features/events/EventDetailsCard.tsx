@@ -55,7 +55,7 @@ function Fact({
 }
 
 export type EventDetailsCardProps = {
-  readonly clientId: string;
+  readonly clientId?: string | null;
   readonly clients: Parameters<typeof clientDisplayName>[1];
   readonly eventType: string;
   readonly startsAt?: number | null;
@@ -128,9 +128,13 @@ export function EventDetailsCard({
     >
       <dl className="event-fact-grid">
         <Fact icon={<UserIcon width={14} height={14} />} label="Client">
-          <Link to={`/clients/${clientId}`} className="hover:underline">
-            {clientDisplayName(clientId, clients)}
-          </Link>
+          {clientId ? (
+            <Link to={`/clients/${clientId}`} className="hover:underline">
+              {clientDisplayName(clientId, clients)}
+            </Link>
+          ) : (
+            "—"
+          )}
         </Fact>
         <Fact icon={<TagIcon width={14} height={14} />} label="Event type">
           {formatStatusLabel(eventType)}
@@ -142,7 +146,9 @@ export function EventDetailsCard({
             : ""}
         </Fact>
         <Fact icon={<UsersIcon width={14} height={14} />} label="Headcount">
-          {formatCount(expectedHeadcount)} guests
+          {expectedHeadcount == null
+            ? "—"
+            : `${formatCount(expectedHeadcount)} guests`}
         </Fact>
         <Fact icon={<MapPinIcon width={14} height={14} />} label="Venue">
           {venueLine}

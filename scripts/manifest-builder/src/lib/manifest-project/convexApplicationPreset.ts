@@ -216,6 +216,60 @@ export function assembleConvexApplicationPreset(
           : {}),
       },
     );
+    // Manifest currently emits only the preferred initializer. Preserve the
+    // normal Event.planEngagement route and project the incomplete-draft entry
+    // from the same authored IR, validators, policies and atomic create emitter.
+    if (
+      ir.commands.some(
+        (command) =>
+          command.entity === "Event" && command.name === "captureDraft",
+      )
+    ) {
+      const draftIr = {
+        ...ir,
+        commands: ir.commands.filter(
+          (command) =>
+            command.entity !== "Event" || command.name === "captureDraft",
+        ),
+      };
+      const extra = generateProjection(draftIr, "convex", "convex.mutations", {
+        invokeWithoutDescriptor: true,
+        options: {
+          ...manifestConvexOptions(options),
+          authContextImport: CONVEX_AUTH_CONTEXT_IMPORT,
+          encryptionImport: CONVEX_ENCRYPTION_IMPORT,
+        },
+      });
+      const code = extra.artifacts.map((artifact) => artifact.code).join("\n");
+      const entry = code.match(
+        /^export const Event_createViaCaptureDraft = mutation\(\{[\s\S]*?^\}\);/m,
+      )?.[0];
+      const mutations = files.find(
+        (file) => file.path === "convex/mutations.ts",
+      );
+      if (
+        extra.blocked ||
+        extra.error ||
+        !entry ||
+        !mutations ||
+        extra.diagnostics.some((d) => d.severity === "error")
+      ) {
+        errors.push(
+          extra.error ??
+            "Unable to project Event.captureDraft atomic creation entry",
+        );
+      } else if (
+        !mutations.content.includes(
+          "export const Event_createViaCaptureDraft =",
+        )
+      ) {
+        mutations.content += "\n\n" + entry + "\n";
+        const artifact = assemblyArtifacts.find(
+          (item) => item.id === "convex.mutations",
+        );
+        if (artifact) artifact.code = mutations.content;
+      }
+    }
     files.push({
       path: CONVEX_AUTH_CONTEXT_PATH,
       content: convexAuthContextSeamSource(),

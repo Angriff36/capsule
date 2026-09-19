@@ -27,7 +27,7 @@ export interface CapsuleCalendarEvent {
   endsAt: number;
   venueName?: string | null;
   venueAddress?: string | null;
-  expectedHeadcount: number;
+  expectedHeadcount?: number | null;
 }
 
 export interface GoogleCalendarEventResource {
@@ -173,7 +173,7 @@ export function buildGoogleCalendarEvent(
     .join(" — ");
   return {
     summary: event.title.trim() || "CapsuleX event",
-    description: `Expected headcount: ${event.expectedHeadcount}\nSynced from CapsuleX.`,
+    description: `Expected headcount: ${event.expectedHeadcount ?? "Not recorded"}\nSynced from CapsuleX.`,
     ...(location ? { location } : {}),
     start: { dateTime: new Date(event.startsAt).toISOString() },
     end: { dateTime: new Date(event.endsAt).toISOString() },

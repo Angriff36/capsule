@@ -25,7 +25,7 @@ export type CateringPackageInput = {
 
 type Props = {
   eventId: string;
-  headcount: number;
+  headcount?: number | null;
   startsAt?: number;
   busy: boolean;
   onApply: (input: CateringPackageInput) => Promise<CateringPackageResult>;
@@ -49,7 +49,7 @@ export function CateringPackagePicker({
   const [open, setOpen] = useState(false);
   const [book, setBook] = useState("wedding");
   const [packageId, setPackageId] = useState("");
-  const [guests, setGuests] = useState(Math.max(1, headcount || 1));
+  const [guests, setGuests] = useState(headcount ?? Number.NaN);
   const [selections, setSelections] = useState<CateringSelection[]>([]);
   const [serviceTime, setServiceTime] = useState(localDateTime(startsAt));
   const [submitting, setSubmitting] = useState(false);
@@ -63,13 +63,17 @@ export function CateringPackagePicker({
   function choosePackage(id: string) {
     setPackageId(id);
     const next = cateringPackages.find((entry) => entry.id === id);
-    setSelections(next ? defaultCateringSelections(next, guests) : []);
+    setSelections(
+      next && Number.isSafeInteger(guests) && guests > 0
+        ? defaultCateringSelections(next, guests)
+        : [],
+    );
     setFailure(null);
     setResult(null);
   }
 
   function toggle(recipeId: string, groupIndex: number) {
-    if (!pack) return;
+    if (!pack || !Number.isSafeInteger(guests) || guests <= 0) return;
     const group = pack.groups[groupIndex];
     setSelections((current) => {
       const next = current.some((line) => line.recipeId === recipeId)
@@ -190,11 +194,21 @@ export function CateringPackagePicker({
                 min="1"
                 step="1"
                 className="input min-h-10 w-full"
-                value={guests}
+                value={Number.isFinite(guests) ? guests : ""}
                 disabled={disabled}
                 onChange={(event) => {
-                  const value = Number(event.target.value);
+                  const value =
+                    event.target.value === ""
+                      ? Number.NaN
+                      : Number(event.target.value);
                   setGuests(value);
+                  if (
+                    Number.isSafeInteger(value) &&
+                    value > 0 &&
+                    !(guests > 0) &&
+                    pack
+                  )
+                    setSelections(defaultCateringSelections(pack, value));
                   if (Number.isSafeInteger(value) && value > 0 && guests > 0)
                     setSelections((current) =>
                       current.map((line) => ({
@@ -211,6 +225,12 @@ export function CateringPackagePicker({
           </div>
           {pack && (
             <>
+              {!(guests > 0) ? (
+                <p className="text-ink-2">
+                  Enter a guest count to choose package dishes and calculate
+                  servings.
+                </p>
+              ) : null}
               <div className="border-l-2 border-line-2 pl-3 text-base text-ink-2">
                 <p>{cateringSource(pack)}</p>
                 <p className="mt-1">{pack.notes}</p>

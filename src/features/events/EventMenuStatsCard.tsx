@@ -2,12 +2,12 @@ import { formatMoneyExact } from "../../lib/format";
 
 type Props = {
   foodCost: number;
-  costPerServing: number;
+  costPerServing: number | null;
   foodSellTotal: number;
   dishCount: number;
   unpricedCount: number;
   unpricedNote: string | null;
-  servings: number;
+  servings: number | null;
 };
 
 function Figure({
@@ -75,7 +75,7 @@ export function EventMenuStatsCard({
       />
       <Figure
         label="Service headcount"
-        value={String(servings)}
+        value={servings == null ? "—" : String(servings)}
         note="guests"
         alignRight
       />

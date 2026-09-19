@@ -16,7 +16,7 @@ export interface BeoEventRecord {
   primaryContactName?: string | null;
   startsAt?: number | null;
   endsAt?: number | null;
-  expectedHeadcount: number;
+  expectedHeadcount?: number | null;
   eventType: string;
   venueName?: string | null;
   venueAddress?: string | null;
@@ -348,7 +348,10 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
       secondary: `Ends ${dateTime(event.endsAt)}`,
     },
     {
-      primary: formatCountNoun(event.expectedHeadcount ?? 0, "guest"),
+      primary:
+        event.expectedHeadcount == null
+          ? "Guest count not recorded"
+          : formatCountNoun(event.expectedHeadcount, "guest"),
       secondary: plain(event.eventType, "Event type not recorded"),
     },
     {

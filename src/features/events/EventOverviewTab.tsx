@@ -20,6 +20,7 @@ import { EventTimelineCommentsPanel } from "./EventTimelineCommentsPanel";
 import { EventWeatherPanel } from "./EventWeatherPanel";
 import { EventReviewFlagsSection } from "./review-flags/EventReviewFlagsSection";
 import { EventPacketPanel } from "./packet/EventPacketPanel";
+import { EventImportDraftPanel } from "./import/EventImportDraftPanel";
 import { eventDetailPath } from "./eventRoutes";
 import "./EventOverview.css";
 
@@ -53,7 +54,7 @@ type OwnerPerson = {
 type Props = EventDetailRevisePanelsProps & {
   event: OverviewEvent;
   venue: Doc<"venues"> | null | undefined;
-  clientId: string;
+  clientId?: string | null;
   clients: Doc<"clients">[] | undefined;
   stage: string;
   currencyCode: string;
@@ -106,6 +107,7 @@ export function EventOverviewTab({
             onAction={onAction}
           />
           <EventReviewFlagsSection eventId={eventId} />
+          <EventImportDraftPanel eventId={eventId} />
           <EventPacketPanel eventId={eventId} />
           <EventDetailsCard
             clientId={clientId}

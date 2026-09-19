@@ -61,14 +61,14 @@ export function EventMarginTab({ eventId }: Props) {
     (event as { estimatedFoodCost?: number } | null | undefined)
       ?.estimatedFoodCost ?? 0,
   );
-  const quoted = Number(event?.quotedPrice ?? 0);
-  const budget = Number(event?.budgetAmount ?? 0);
+  const quoted = event?.quotedPrice ?? null;
+  const budget = event?.budgetAmount ?? null;
 
   const recipeRollup = useMemo(
     () =>
       buildEventMenuCost({
         eventId,
-        expectedHeadcount: Number(event?.expectedHeadcount ?? 0),
+        expectedHeadcount: event?.expectedHeadcount,
         eventDishes: (eventDishes ?? [])
           .filter((row) => row.deletedAt == null && row.eventId === eventId)
           .map((row) => ({
@@ -173,13 +173,19 @@ export function EventMarginTab({ eventId }: Props) {
 
   const laborCost = live.laborCost;
   const equipmentCost = live.equipmentCost;
-  const revenue = live.confirmedRevenue || quoted;
+  const revenue = live.invoiceCount > 0 ? live.confirmedRevenue : quoted;
   const totalCost = foodCost + laborCost + equipmentCost;
-  const grossProfit = revenue - totalCost;
-  const marginPct = revenue > 0 ? (grossProfit / revenue) * 100 : null;
-  const budgetVariance = budget > 0 ? budget - totalCost : null;
-  const headcount = Number(event?.expectedHeadcount ?? 0);
-  const perPerson = headcount > 0 && quoted > 0 ? quoted / headcount : null;
+  const grossProfit = revenue == null ? null : revenue - totalCost;
+  const marginPct =
+    revenue != null && revenue > 0 && grossProfit != null
+      ? (grossProfit / revenue) * 100
+      : null;
+  const budgetVariance = budget == null ? null : budget - totalCost;
+  const headcount = event?.expectedHeadcount ?? null;
+  const perPerson =
+    headcount != null && headcount > 0 && quoted != null
+      ? quoted / headcount
+      : null;
   const costBuckets: MarginCostBucket[] = [
     { key: "food", label: "Food & ingredients", amount: foodCost },
     { key: "labor", label: "Labor & staffing", amount: laborCost },
@@ -193,7 +199,7 @@ export function EventMarginTab({ eventId }: Props) {
         perPerson == null
           ? undefined
           : `${headcount} covers × ${formatMoney(perPerson)} per person`,
-      amount: quoted > 0 ? quoted : null,
+      amount: quoted,
     },
     {
       key: "invoiced",
@@ -202,7 +208,7 @@ export function EventMarginTab({ eventId }: Props) {
       amount: live.confirmedRevenue,
       tone: "ok",
     },
-    ...(budget > 0
+    ...(budget != null
       ? [
           {
             key: "budget",
