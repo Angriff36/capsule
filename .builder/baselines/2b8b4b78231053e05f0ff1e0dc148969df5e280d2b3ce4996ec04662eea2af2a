@@ -12328,17 +12328,6 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const __targetServiceStyle = await ctx.db
-      .query("serviceStyles")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", __auth.tenantId))
-      .filter((q: any) => q.eq(q.field("_id"), serviceStyleId))
-      .first();
-    if (!__targetServiceStyle ||
-        __targetServiceStyle.tenantId !== __auth.tenantId ||
-        __targetServiceStyle.status !== "active" ||
-        __targetServiceStyle.deletedAt != null) {
-      throw new Error("Events must reference an active service style");
-    }
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
@@ -19653,6 +19642,12 @@ async function __runEventVehicleAssignmentChange(ctx: MutationCtx, { docId, vehi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventVehicleAssignment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventVehicleAssignment not found");
+    const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, doc.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_trailer = await __resolveRelation(ctx, "trailers", [__auth.tenantId, doc.trailerId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_driver = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.driverId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    ((doc as any) as any).vehicle = __rel_vehicle;
+    ((doc as any) as any).trailer = __rel_trailer;
+    ((doc as any) as any).driver = __rel_driver;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may write event vehicle assignments through commands");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may execute event vehicle assignment commands");
@@ -19660,6 +19655,9 @@ async function __runEventVehicleAssignmentChange(ctx: MutationCtx, { docId, vehi
     if (!((doc.releasedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((vehicleId != null) || (trailerId != null)))) throw new Error("Select a vehicle or a trailer");
+    if (!(((vehicleId == null) || (__rel_vehicle != null)))) throw new Error("Vehicle is not available in this workspace");
+    if (!(((trailerId == null) || (__rel_trailer != null)))) throw new Error("Trailer is not available in this workspace");
+    if (!(((driverId == null) || (__rel_driver != null)))) throw new Error("Driver is not available in this workspace");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

@@ -562,10 +562,14 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // Service style kit line (operations/service-style-kit.manifest). Idempotent:
   // first write wins, so a second kit request never overwrites what the packer
   // changed on this event.
-  command ensureKitItem(packListId: uuid, serviceStyleKitItemId: uuid, description: string, requiredQuantity: decimal(12, 4), unit: UnitOfMeasure, optional note: string) {
+  command ensureKitItem(packListId: uuid, serviceStyleKitItemId: uuid, kitTenantId: string, description: string, requiredQuantity: decimal(12, 4), unit: UnitOfMeasure, optional note: string) {
     guard self.deletedAt == null
     constraint kitReferencesMatch: self.packListId == packListId and self.serviceStyleKitItemId == serviceStyleKitItemId "Kit references must match the packing line"
+    // The fan-out finds kit lines by service style id alone. A style id from
+    // another workspace must never copy that workspace's kit onto this list.
+    constraint kitTenantMatch: kitTenantId == self.tenantId "Service style kit belongs to another workspace"
     guard self.packList != null
+    compute wasListed = self.listedAt != null
     mutate description = self.listedAt == null ? description : self.description
     mutate unit = self.listedAt == null ? unit : self.unit
     mutate requiredQuantity = self.listedAt == null ? requiredQuantity : self.requiredQuantity
@@ -577,6 +581,13 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       packListId: packListId
       serviceStyleKitItemId: serviceStyleKitItemId
+    }
+    // A new kit line on a packed or loaded list reopens packing, the same as a
+    // new dish container: the list must not dispatch with the line unpacked.
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: not wasListed
     }
   }
 
@@ -782,6 +793,7 @@ on PackListKitRequested fanOut ServiceStyleKitItem where activeServiceStyleId = 
   params {
     packListId: payload.packListId
     serviceStyleKitItemId: self.id
+    kitTenantId: self.tenantId
     description: self.description
     requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(payload.expectedHeadcount / self.guestsPerUnit) : 0)
     unit: self.unit

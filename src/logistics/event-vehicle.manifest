@@ -55,6 +55,12 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
   ) {
     guard self.assignedAt == null
     guard self.deletedAt == null
+    // Relations resolve inside the caller's workspace only: an id from another
+    // workspace resolves to nothing and the assignment is refused.
+    guard self.event != null and self.event.deletedAt == null
+    guard vehicleId == null or self.vehicle != null
+    guard trailerId == null or self.trailer != null
+    guard driverId == null or self.driver != null
     constraint assignHasRig: vehicleId != null or trailerId != null "Select a vehicle or a trailer"
     mutate eventId = eventId
     mutate activeEventId = eventId

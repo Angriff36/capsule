@@ -168,181 +168,205 @@ export function ServiceStyleKitsPage() {
           </span>
         </div>
       ) : (
-        styles.map((style) => {
-          const lines = linesFor(style._id);
-          const draft = draftFor(style._id);
-          return (
-            <section key={style._id} className="mt-8">
-              <div className="flex flex-wrap items-baseline justify-between gap-3">
-                <h2 className="font-display text-2xl text-ink">{style.name}</h2>
-                <span className="text-base text-ink-2">
-                  {lines.filter((l) => String(l.status) === "active").length}{" "}
-                  active lines
-                </span>
-              </div>
-              {lines.length > 0 ? (
-                <div className="supply-table-wrap mt-3">
-                  <table className="supply-table">
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th>Quantity rule</th>
-                        <th>Packer note</th>
-                        <th>State</th>
-                        <th aria-label="Actions" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {lines.map((line) => (
-                        <tr key={line._id}>
-                          <td>
-                            <strong>{line.description}</strong>
-                          </td>
-                          <td>{quantityRule(line)}</td>
-                          <td>{line.note || "—"}</td>
-                          <td>
-                            <StatusChip status={String(line.status)} />
-                          </td>
-                          <td>
-                            <div className="supply-row-actions">
-                              {String(line.status) === "active" ? (
-                                <>
+        <>
+          <nav className="fact-row mt-4" aria-label="Jump to a service style">
+            {styles.map((style) => (
+              <a key={style._id} className="fact" href={`#kit-${style._id}`}>
+                <b>{style.name}:</b>
+                {
+                  linesFor(style._id).filter(
+                    (line) => String(line.status) === "active",
+                  ).length
+                }
+              </a>
+            ))}
+          </nav>
+          {styles.map((style) => {
+            const lines = linesFor(style._id);
+            const draft = draftFor(style._id);
+            return (
+              <section
+                key={style._id}
+                id={`kit-${style._id}`}
+                className="mt-8 scroll-mt-16"
+              >
+                <div className="flex flex-wrap items-baseline justify-between gap-3">
+                  <h2 className="font-display text-2xl text-ink">
+                    {style.name}
+                  </h2>
+                  <span className="text-base text-ink-2">
+                    {lines.filter((l) => String(l.status) === "active").length}{" "}
+                    active lines
+                  </span>
+                </div>
+                {lines.length > 0 ? (
+                  <div className="supply-table-wrap mt-3">
+                    <table className="supply-table">
+                      <thead>
+                        <tr>
+                          <th>Item</th>
+                          <th>Quantity rule</th>
+                          <th>Packer note</th>
+                          <th>State</th>
+                          <th aria-label="Actions" />
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lines.map((line) => (
+                          <tr key={line._id}>
+                            <td>
+                              <strong>{line.description}</strong>
+                            </td>
+                            <td>{quantityRule(line)}</td>
+                            <td>{line.note || "—"}</td>
+                            <td>
+                              <StatusChip status={String(line.status)} />
+                            </td>
+                            <td>
+                              <div className="supply-row-actions">
+                                {String(line.status) === "active" ? (
+                                  <>
+                                    <button
+                                      type="button"
+                                      className="btn btn-ghost btn-sm"
+                                      disabled={busy != null}
+                                      onClick={() =>
+                                        setEditing({
+                                          id: line._id,
+                                          draft: {
+                                            description: line.description,
+                                            baseQuantity: String(
+                                              line.baseQuantity,
+                                            ),
+                                            guestsPerUnit:
+                                              line.guestsPerUnit != null
+                                                ? String(line.guestsPerUnit)
+                                                : "",
+                                            unit: line.unit,
+                                            note: line.note ?? "",
+                                          },
+                                        })
+                                      }
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="btn btn-ghost btn-sm"
+                                      disabled={busy != null}
+                                      onClick={() =>
+                                        void run(`retire:${line._id}`, () =>
+                                          retireLine({
+                                            docId: line._id,
+                                            version: line.version,
+                                          }),
+                                        )
+                                      }
+                                    >
+                                      Retire
+                                    </button>
+                                  </>
+                                ) : (
                                   <button
                                     type="button"
                                     className="btn btn-ghost btn-sm"
                                     disabled={busy != null}
                                     onClick={() =>
-                                      setEditing({
-                                        id: line._id,
-                                        draft: {
-                                          description: line.description,
-                                          baseQuantity: String(
-                                            line.baseQuantity,
-                                          ),
-                                          guestsPerUnit:
-                                            line.guestsPerUnit != null
-                                              ? String(line.guestsPerUnit)
-                                              : "",
-                                          unit: line.unit,
-                                          note: line.note ?? "",
-                                        },
-                                      })
-                                    }
-                                  >
-                                    Edit
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="btn btn-ghost btn-sm"
-                                    disabled={busy != null}
-                                    onClick={() =>
-                                      void run(`retire:${line._id}`, () =>
-                                        retireLine({
+                                      void run(`reinstate:${line._id}`, () =>
+                                        reinstateLine({
                                           docId: line._id,
                                           version: line.version,
                                         }),
                                       )
                                     }
                                   >
-                                    Retire
+                                    Reinstate
                                   </button>
-                                </>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="btn btn-ghost btn-sm"
-                                  disabled={busy != null}
-                                  onClick={() =>
-                                    void run(`reinstate:${line._id}`, () =>
-                                      reinstateLine({
-                                        docId: line._id,
-                                        version: line.version,
-                                      }),
-                                    )
-                                  }
-                                >
-                                  Reinstate
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="mt-3 text-base text-ink-2">
-                  No kit lines. Events of this style start with an empty pack
-                  list.
-                </p>
-              )}
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="mt-3 text-base text-ink-2">
+                    No kit lines. Events of this style start with an empty pack
+                    list.
+                  </p>
+                )}
 
-              {editing && lines.some((line) => line._id === editing.id) ? (
+                {editing && lines.some((line) => line._id === editing.id) ? (
+                  <form
+                    className="mt-3 rounded-sm border border-line-2 bg-panel p-4"
+                    onSubmit={(e) =>
+                      submitEdit(
+                        lines.find(
+                          (line) => line._id === editing.id,
+                        ) as KitLine,
+                        e,
+                      )
+                    }
+                  >
+                    <p className="eyebrow">Edit kit line</p>
+                    <div className="mt-2 grid gap-3 md:grid-cols-4">
+                      <ServiceStyleKitLineFields
+                        draft={editing.draft}
+                        disabled={busy != null}
+                        onChange={(patch) =>
+                          setEditing({
+                            id: editing.id,
+                            draft: { ...editing.draft, ...patch },
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        type="submit"
+                        className="btn btn-primary btn-sm"
+                        disabled={busy != null}
+                      >
+                        {busy === `edit:${editing.id}`
+                          ? "Saving…"
+                          : "Save line"}
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm"
+                        onClick={() => setEditing(null)}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : null}
+
                 <form
                   className="mt-3 rounded-sm border border-line-2 bg-panel p-4"
-                  onSubmit={(e) =>
-                    submitEdit(
-                      lines.find((line) => line._id === editing.id) as KitLine,
-                      e,
-                    )
-                  }
+                  onSubmit={(e) => submitAdd(style._id, e)}
                 >
-                  <p className="eyebrow">Edit kit line</p>
+                  <p className="eyebrow">Add to the {style.name} kit</p>
                   <div className="mt-2 grid gap-3 md:grid-cols-4">
                     <ServiceStyleKitLineFields
-                      draft={editing.draft}
+                      draft={draft}
                       disabled={busy != null}
-                      onChange={(patch) =>
-                        setEditing({
-                          id: editing.id,
-                          draft: { ...editing.draft, ...patch },
-                        })
-                      }
+                      onChange={(patch) => setDraft(style._id, patch)}
                     />
                   </div>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary btn-sm"
-                      disabled={busy != null}
-                    >
-                      {busy === `edit:${editing.id}` ? "Saving…" : "Save line"}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setEditing(null)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-sm mt-3"
+                    disabled={busy != null || !draft.description.trim()}
+                  >
+                    {busy === `add:${style._id}` ? "Adding…" : "Add kit line"}
+                  </button>
                 </form>
-              ) : null}
-
-              <form
-                className="mt-3 rounded-sm border border-line-2 bg-panel p-4"
-                onSubmit={(e) => submitAdd(style._id, e)}
-              >
-                <p className="eyebrow">Add to the {style.name} kit</p>
-                <div className="mt-2 grid gap-3 md:grid-cols-4">
-                  <ServiceStyleKitLineFields
-                    draft={draft}
-                    disabled={busy != null}
-                    onChange={(patch) => setDraft(style._id, patch)}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-sm mt-3"
-                  disabled={busy != null || !draft.description.trim()}
-                >
-                  {busy === `add:${style._id}` ? "Adding…" : "Add kit line"}
-                </button>
-              </form>
-            </section>
-          );
-        })
+              </section>
+            );
+          })}
+        </>
       )}
     </div>
   );

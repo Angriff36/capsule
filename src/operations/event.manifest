@@ -1183,6 +1183,8 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // An omitted value keeps what is saved; send "" to clear one. A caller that
+  // knows one answer (the BEO reader, the assistant) must not wipe the rest.
   command updateSetupNotes(
     optional linenColorTables: string,
     optional linenColorBaskets: string,
@@ -1192,12 +1194,12 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional setupDiagram: string
   ) {
     guard self.deletedAt == null
-    mutate linenColorTables = linenColorTables
-    mutate linenColorBaskets = linenColorBaskets
-    mutate servingwareKit = servingwareKit
-    mutate decorKit = decorKit
-    mutate rainPlan = rainPlan
-    mutate setupDiagram = setupDiagram
+    mutate linenColorTables = linenColorTables != null ? linenColorTables : self.linenColorTables
+    mutate linenColorBaskets = linenColorBaskets != null ? linenColorBaskets : self.linenColorBaskets
+    mutate servingwareKit = servingwareKit != null ? servingwareKit : self.servingwareKit
+    mutate decorKit = decorKit != null ? decorKit : self.decorKit
+    mutate rainPlan = rainPlan != null ? rainPlan : self.rainPlan
+    mutate setupDiagram = setupDiagram != null ? setupDiagram : self.setupDiagram
     emit EventSetupNotesUpdated {
       eventId: self.id
       tenantId: self.tenantId
@@ -1216,15 +1218,15 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional buffetService: string
   ) {
     guard self.deletedAt == null
-    mutate servingwareSource = servingwareSource
-    mutate takeRentalsWithUs = takeRentalsWithUs
-    mutate leaveRentalsOnsite = leaveRentalsOnsite
-    mutate guestTableSetup = guestTableSetup
-    mutate buffetTableSetup = buffetTableSetup
-    mutate appetizerTableSetup = appetizerTableSetup
-    mutate beverageTableSetup = beverageTableSetup
-    mutate beverageDispensers = beverageDispensers
-    mutate buffetService = buffetService
+    mutate servingwareSource = servingwareSource != null ? servingwareSource : self.servingwareSource
+    mutate takeRentalsWithUs = takeRentalsWithUs != null ? takeRentalsWithUs : self.takeRentalsWithUs
+    mutate leaveRentalsOnsite = leaveRentalsOnsite != null ? leaveRentalsOnsite : self.leaveRentalsOnsite
+    mutate guestTableSetup = guestTableSetup != null ? guestTableSetup : self.guestTableSetup
+    mutate buffetTableSetup = buffetTableSetup != null ? buffetTableSetup : self.buffetTableSetup
+    mutate appetizerTableSetup = appetizerTableSetup != null ? appetizerTableSetup : self.appetizerTableSetup
+    mutate beverageTableSetup = beverageTableSetup != null ? beverageTableSetup : self.beverageTableSetup
+    mutate beverageDispensers = beverageDispensers != null ? beverageDispensers : self.beverageDispensers
+    mutate buffetService = buffetService != null ? buffetService : self.buffetService
     emit EventTaskBreakdownUpdated {
       eventId: self.id
       tenantId: self.tenantId

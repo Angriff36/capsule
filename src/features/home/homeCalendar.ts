@@ -98,6 +98,9 @@ export interface CalendarSources {
   serviceStyles: Doc<"serviceStyles">[];
   people: Doc<"people">[];
   invoices: Doc<"invoices">[];
+  /** Trucks and trailers attached to the event on the tracker sheet. */
+  assignments?: Doc<"eventVehicleAssignments">[];
+  trailers?: Doc<"trailers">[];
 }
 
 export function shortRef(id: string): string {
@@ -110,7 +113,7 @@ function personName(person: Doc<"people"> | undefined): string {
   return name || "—";
 }
 
-function vehicleLabel(vehicle: Doc<"vehicles">): string {
+function vehicleLabel(vehicle: Doc<"vehicles"> | Doc<"trailers">): string {
   const name = `${vehicle.make} ${vehicle.model}`.trim();
   return vehicle.registration ? `${name} · ${vehicle.registration}` : name;
 }
@@ -157,6 +160,21 @@ export function buildCalendarFacts(
     }
   }
 
+  const trailerById = new Map(
+    (sources.trailers ?? []).map((t) => [String(t._id), t]),
+  );
+  for (const rig of sources.assignments ?? []) {
+    if (rig.deletedAt != null || rig.releasedAt != null) continue;
+    const truck = rig.vehicleId ? vehicleById.get(rig.vehicleId) : undefined;
+    const trailer = rig.trailerId
+      ? trailerById.get(String(rig.trailerId))
+      : undefined;
+    const set = vehiclesByEvent.get(rig.eventId) ?? new Set<string>();
+    if (truck) set.add(vehicleLabel(truck));
+    if (trailer) set.add(vehicleLabel(trailer));
+    if (set.size > 0) vehiclesByEvent.set(rig.eventId, set);
+  }
+
   return sources.events
     .filter((event) => event.deletedAt == null)
     .map((event): CalendarEventFacts => {
@@ -181,7 +199,10 @@ export function buildCalendarFacts(
         title: event.title || "Untitled event",
         startsAt: event.startsAt ?? null,
         endsAt: event.endsAt ?? null,
-        eventNumber: invoiceByEvent.get(event._id) ?? shortRef(event._id),
+        eventNumber:
+          event.eventNumber?.trim() ||
+          invoiceByEvent.get(event._id) ||
+          shortRef(event._id),
         guests: event.expectedHeadcount ?? 0,
         vehicle: vehicles ? [...vehicles].join(", ") : "—",
         deliveryAssignments: deliveriesByEvent.get(event._id) ?? [],
