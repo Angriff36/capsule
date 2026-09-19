@@ -2,11 +2,13 @@ import { useMemo, useState } from "react";
 import {
   useCreateEventAssignment,
   useCreateEventStaffNeed,
+  useEventAssignmentPlanTiming,
   useEventAssignmentUnassign,
   useEventStaffNeedCancel,
   useEventStaffNeedChangeCoverage,
   useEventStaffNeedClaim,
   useEventStaffNeedFill,
+  useEventStaffNeedPlanTiming,
   useEventStaffNeedReleaseClaim,
   useGetEvent,
   useListAvailabilityWindow,
@@ -31,6 +33,7 @@ import {
 } from "./EventStaffingSummaryAside";
 import { FailureBanner } from "./FailureBanner";
 import { EventStaffingAddForm } from "./EventStaffingAddForm";
+import { EventStaffTimingControl } from "./EventStaffTimingForm";
 import { collectStaffRoles } from "./EventStaffingRoleSelect";
 import {
   EventTimelineStaffRoster,
@@ -67,6 +70,8 @@ export function EventStaffingTab({ eventId }: Props) {
   const releaseClaim = useEventStaffNeedReleaseClaim();
   const cancelNeed = useEventStaffNeedCancel();
   const changeCoverage = useEventStaffNeedChangeCoverage();
+  const planAssignmentTiming = useEventAssignmentPlanTiming();
+  const planNeedTiming = useEventStaffNeedPlanTiming();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [needPersonIds, setNeedPersonIds] = useState<Record<string, string>>(
@@ -227,6 +232,64 @@ export function EventStaffingTab({ eventId }: Props) {
     } finally {
       setBusy(null);
     }
+  };
+
+  // Planned in / out times for one assigned person or one open position.
+  // planTiming needs workforce manage access, which is what this page already
+  // calls canManage; crew without it never sees the control.
+  const timingControl = (kind: "assignment" | "need", docId: string) => {
+    if (!canManage) return null;
+    if (kind === "assignment") {
+      const row = eventAssignments.find((item) => item._id === docId);
+      if (!row) return null;
+      const person = people?.find((item) => item._id === row.personId);
+      return (
+        <EventStaffTimingControl
+          key={`timing:${docId}:${row.version}`}
+          label={`${person ? personLabel(person) : "this crew member"}${row.role ? ` · ${row.role}` : ""}`}
+          startsAt={row.startsAt}
+          endsAt={row.endsAt}
+          followsEventTiming={row.followsEventTiming}
+          busy={busy != null}
+          onSave={(plan) =>
+            void run(`timing:${docId}`, () =>
+              planAssignmentTiming({
+                docId,
+                version: row.version,
+                startsAt: plan.startsAt,
+                endsAt: plan.endsAt,
+                followsEventTiming: plan.followsEventTiming,
+                synchronizeShifts: true,
+              }),
+            )
+          }
+        />
+      );
+    }
+    const need = eventNeeds.find((item) => item._id === docId);
+    if (!need) return null;
+    return (
+      <EventStaffTimingControl
+        key={`timing:${docId}:${need.version}`}
+        label={String(need.role ?? "this open shift")}
+        startsAt={need.startsAt}
+        endsAt={need.endsAt}
+        followsEventTiming={need.followsEventTiming}
+        busy={busy != null}
+        onSave={(plan) =>
+          void run(`timing:${docId}`, () =>
+            planNeedTiming({
+              docId,
+              version: need.version,
+              startsAt: plan.startsAt,
+              endsAt: plan.endsAt,
+              followsEventTiming: plan.followsEventTiming,
+              synchronizeShifts: true,
+            }),
+          )
+        }
+      />
+    );
   };
 
   if (
@@ -465,6 +528,7 @@ export function EventStaffingTab({ eventId }: Props) {
                 });
               })();
             }}
+            timingControl={timingControl}
             conflictsFor={conflictsFor}
           />
         </div>

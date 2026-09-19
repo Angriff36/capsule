@@ -5,6 +5,7 @@ import {
   useEventDishAdjustServings,
   useEventDishChangeCourse,
   useEventDishRemove,
+  useEventDishReorder,
   useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
@@ -54,6 +55,8 @@ import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventMenuLineNote } from "./EventMenuLineNote";
+import { EventMenuLineOverrides } from "./EventMenuLineOverrides";
+import { orderEventMenuLines, planEventMenuLineSwap } from "./eventMenuOrder";
 import {
   EventMenuDietaryConflictsCard,
   type DietaryConflictInputs,
@@ -124,6 +127,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const adjustServings = useEventDishAdjustServings();
   const changeCourse = useEventDishChangeCourse();
   const removeDish = useEventDishRemove();
+  const reorderDish = useEventDishReorder();
   const setHeadcountOverride = useEventDishSetHeadcountOverride();
   const updateInstructions = useEventDishUpdateInstructions();
   const {
@@ -155,11 +159,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
 
   const selections = useMemo(
     () =>
-      (eventDishes ?? [])
-        .filter((item) => item.deletedAt == null && item.eventId === eventId)
-        .sort((a, b) =>
-          String(a.course ?? "").localeCompare(String(b.course ?? "")),
-        ),
+      orderEventMenuLines(
+        (eventDishes ?? [])
+          .filter((item) => item.deletedAt == null && item.eventId === eventId)
+          .sort((a, b) =>
+            String(a.course ?? "").localeCompare(String(b.course ?? "")),
+          ),
+      ),
     [eventDishes, eventId],
   );
   const existingDishIds = selections.map((row) => row.dishId);
@@ -532,6 +538,27 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   };
   const editLineNote = (row: EventMenuNoteRow) => editNoteForLine(row.lineId);
 
+  // Print order. Two neighbours trade places: each one is saved with the
+  // position the other had on screen.
+  const moveLine = (index: number, direction: -1 | 1) => {
+    const swap = planEventMenuLineSwap(selections.length, index, direction);
+    if (!swap) return;
+    const moved = selections[swap.from];
+    const displaced = selections[swap.to];
+    void run(`reorder:${moved._id}`, async () => {
+      await reorderDish({
+        docId: moved._id,
+        version: moved.version,
+        sortOrder: swap.to,
+      });
+      await reorderDish({
+        docId: displaced._id,
+        version: displaced.version,
+        sortOrder: swap.from,
+      });
+    });
+  };
+
   return (
     <section className="space-y-4" data-testid="event-menu-tab">
       <div className="flex flex-wrap items-baseline justify-between gap-3">
@@ -778,7 +805,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                 <span className="sr-only">Actions</span>
               </div>
               <ul className="divide-y divide-line">
-                {selections.map((selection) => {
+                {selections.map((selection, lineIndex) => {
                   const dish = dishes?.find(
                     (row) => row._id === selection.dishId,
                   );
@@ -970,6 +997,17 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                               busy={busy != null}
                               onEdit={() => editNoteForLine(selection._id)}
                             />
+                            <EventMenuLineOverrides
+                              eventId={eventId}
+                              eventDishId={selection._id}
+                              dishId={selection.dishId}
+                              dishName={dish?.name ?? "Unknown dish"}
+                              busy={busy != null}
+                              prompt={prompt}
+                              onFailure={(error) =>
+                                setFailure(classifyCommandFailure(error))
+                              }
+                            />
                             <p className="mt-1 text-sm text-ink-2 xl:hidden">
                               {selection.quantityServings} servings
                               {" · est. "}
@@ -1085,6 +1123,29 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2 xl:pt-4">
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null || lineIndex === 0}
+                            aria-label={`Move ${dish?.name ?? "this dish"} earlier on the printed menu`}
+                            title="Move earlier on the printed menu"
+                            onClick={() => moveLine(lineIndex, -1)}
+                          >
+                            ↑
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            disabled={
+                              busy != null ||
+                              lineIndex === selections.length - 1
+                            }
+                            aria-label={`Move ${dish?.name ?? "this dish"} later on the printed menu`}
+                            title="Move later on the printed menu"
+                            onClick={() => moveLine(lineIndex, 1)}
+                          >
+                            ↓
+                          </button>
                           <button
                             type="submit"
                             className="btn btn-secondary btn-sm"
