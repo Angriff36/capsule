@@ -171,6 +171,7 @@ export function EventOverviewTab({
           budgetAmount={budgetAmount}
           quotedPrice={quotedPrice}
           primaryContactName={primaryContactName}
+          serviceStyleId={event.serviceStyleId}
         />
       </div>
 
