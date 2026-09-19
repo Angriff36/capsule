@@ -75,7 +75,7 @@ export async function ensureEventNumber(
   }
 }
 
-/** Whether another LIVE event of the tenant holds this number, typed or given. */
+/** Whether another LIVE event of the tenant shows this number: typed, given, or from its invoice. */
 async function isHeld(
   ctx: MutationCtx,
   tenantId: string,
@@ -111,6 +111,27 @@ async function isHeld(
       (holder.eventNumber?.trim() ?? "") === ""
     )
       return true;
+  }
+  // An event that came from TPP has no typed and no given number: the screens
+  // show its all-digit invoice number as its event number. That number is
+  // taken too.
+  const invoices = await ctx.db
+    .query("invoices")
+    .withIndex("by_tenantId_and_invoiceNumber", (q) =>
+      q.eq("tenantId", tenantId).eq("invoiceNumber", eventNumber),
+    )
+    .collect();
+  for (const invoice of invoices) {
+    if (invoice.deletedAt != null || !invoice.eventId) continue;
+    if (invoice.eventId === exceptEventId) continue;
+    const holder = await ctx.db.get(invoice.eventId as Id<"events">);
+    if (!holder || holder.deletedAt != null) continue;
+    if ((holder.eventNumber?.trim() ?? "") !== "") continue;
+    const holderGiven = await ctx.db
+      .query("eventNumberAssignments")
+      .withIndex("by_eventId", (q) => q.eq("eventId", holder._id))
+      .first();
+    if (!holderGiven) return true;
   }
   return false;
 }
