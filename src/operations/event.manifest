@@ -594,10 +594,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   property venueId: uuid?
   property assignedToId: uuid?
   property required searchable title: string = ""
-  // The number the shop calls the event by: on the Event Tracker, the binder
-  // spine and the Slack channel. A TPP-era event keeps its TPP invoice number.
-  // Empty = the tracker falls back to the Capsule invoice number.
-  property searchable eventNumber: string?
+  // The 4-digit number the shop calls the event by: on the Event Tracker, the
+  // binder spine and the chat channel. The numbering seam
+  // (convex/lib/eventNumbering.ts) gives every planned event the next number.
+  // A person can type a different one (a TPP-era event keeps its TPP number).
+  property indexed eventNumber: string?
   property required eventType: string = ""
   property startsAt: datetime?
   property endsAt: datetime?
@@ -1225,6 +1226,8 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Omit the number and the seam gives the event the next free one. The seam
+  // also refuses a number that is not 4 to 6 digits or that another event holds.
   command setEventNumber(optional eventNumber: string) {
     guard self.deletedAt == null
     mutate eventNumber = eventNumber

@@ -14,6 +14,7 @@ import {
   useListClient,
   useListDelivery,
   useListEvent,
+  useListEventNumberAssignment,
   useListInvoice,
   useListPerson,
   useListServiceStyle,
@@ -330,6 +331,7 @@ export function HomeCalendarPage() {
   const serviceStyles = useListServiceStyle();
   const people = useListPerson();
   const invoices = useListInvoice();
+  const numberAssignments = useListEventNumberAssignment();
   const assignVehicle = useAssignVehicle();
   const unassignVehicle = useUnassignVehicle();
 
@@ -399,6 +401,7 @@ export function HomeCalendarPage() {
             serviceStyles: serviceStyles ?? [],
             people: people ?? [],
             invoices: invoices ?? [],
+            numberAssignments: numberAssignments ?? [],
           }),
     [
       loading,
@@ -410,6 +413,7 @@ export function HomeCalendarPage() {
       serviceStyles,
       people,
       invoices,
+      numberAssignments,
     ],
   );
   const shown = useMemo(

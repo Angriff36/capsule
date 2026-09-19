@@ -1,6 +1,6 @@
 import type { Doc } from "../../../lib/api";
 import { clientDisplayName } from "../clientName";
-import { shortRef } from "../../home/homeCalendar";
+import { eventNumberLabel, givenEventNumbers } from "../../home/homeCalendar";
 
 /** What the pack column of the tracker sheet says, most urgent first. */
 export type PackState =
@@ -48,7 +48,7 @@ export interface TrackerRow {
   id: string;
   version: number | undefined;
   eventNumber: string;
-  /** The stored number; empty when the row shows a fallback. */
+  /** The typed or given number; empty when the row has neither. */
   storedEventNumber: string;
   startsAt: number | null;
   title: string;
@@ -70,6 +70,7 @@ export interface TrackerSources {
   packLists: Doc<"packLists">[];
   reviewFlags: Doc<"reviewFlags">[];
   assignments: Doc<"eventVehicleAssignments">[];
+  numberAssignments: Doc<"eventNumberAssignments">[];
 }
 
 const PACK_LIST_RANK: Record<string, number> = {
@@ -128,6 +129,8 @@ export function buildTrackerRows(
     if (!invoice.invoiceNumber || invoiceByEvent.has(invoice.eventId)) continue;
     invoiceByEvent.set(invoice.eventId, invoice.invoiceNumber);
   }
+
+  const givenNumbers = givenEventNumbers(sources.numberAssignments);
 
   const listsByEvent = new Map<string, Doc<"packLists">[]>();
   for (const list of sources.packLists) {
@@ -215,12 +218,12 @@ export function buildTrackerRows(
       const stage = String(event.stage);
       const lists = listsByEvent.get(event._id) ?? [];
       const pack = packStateOf(stage, lists, flagsByEvent.get(event._id) ?? 0);
-      const stored = event.eventNumber?.trim() ?? "";
+      const stored =
+        event.eventNumber?.trim() || givenNumbers.get(event._id) || "";
       return {
         id: event._id,
         version: typeof event.version === "number" ? event.version : undefined,
-        eventNumber:
-          stored || invoiceByEvent.get(event._id) || shortRef(event._id),
+        eventNumber: eventNumberLabel(stored, invoiceByEvent.get(event._id)),
         storedEventNumber: stored,
         startsAt: event.startsAt ?? null,
         title: event.title || "Untitled event",

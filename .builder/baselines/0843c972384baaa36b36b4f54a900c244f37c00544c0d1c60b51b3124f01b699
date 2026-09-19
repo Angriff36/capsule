@@ -3913,16 +3913,6 @@ export function useCreateEventLayoutSection() {
   };
 }
 
-/** Reactive list for EventNumberAssignment. */
-export function useListEventNumberAssignment() {
-  return useQuery(api.queries.listEventNumberAssignment);
-}
-
-/** Reactive get-by-id for EventNumberAssignment. Pass "skip" to suspend. */
-export function useGetEventNumberAssignment(id: string | "skip") {
-  return useQuery(api.queries.getEventNumberAssignment, id === "skip" ? "skip" : { id: id as any });
-}
-
 /** Reactive list for EventNumberSequence. */
 export function useListEventNumberSequence() {
   return useQuery(api.queries.listEventNumberSequence);
@@ -11128,4 +11118,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1184 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1182 as const;

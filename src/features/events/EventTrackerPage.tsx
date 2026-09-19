@@ -21,6 +21,7 @@ import {
   useListClient,
   useListDelivery,
   useListEvent,
+  useListEventNumberAssignment,
   useListEventVehicleAssignment,
   useListInvoice,
   useListPerson,
@@ -152,6 +153,7 @@ export function EventTrackerPage() {
   const invoices = useListInvoice();
   const assignments = useListEventVehicleAssignment();
   const trailers = useListTrailer();
+  const numberAssignments = useListEventNumberAssignment();
 
   const reschedule = useEventReschedule();
   const changeHeadcount = useEventChangeHeadcount();
@@ -200,6 +202,7 @@ export function EventTrackerPage() {
             invoices: invoices ?? [],
             assignments: assignments ?? [],
             trailers: trailers ?? [],
+            numberAssignments: numberAssignments ?? [],
           }),
     [
       loading,
@@ -213,6 +216,7 @@ export function EventTrackerPage() {
       invoices,
       assignments,
       trailers,
+      numberAssignments,
     ],
   );
 

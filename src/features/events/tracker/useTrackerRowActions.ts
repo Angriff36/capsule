@@ -136,8 +136,38 @@ export function useTrackerRowActions() {
       ),
   });
 
+  // Give every row that has no stored number one: a TPP-era row keeps the
+  // number its invoice shows, the rest get the next free number. One at a
+  // time: each write moves the workspace's number sequence.
+  const numberRows = async (rows: TrackerRow[]) => {
+    setFailure(null);
+    setBusyId("numbering");
+    try {
+      // Rows that keep a TPP number go first: they move the sequence up, so
+      // the rows that get a new number continue above them.
+      const ordered = [...rows].sort(
+        (x, y) => Number(y.eventNumber !== "") - Number(x.eventNumber !== ""),
+      );
+      for (const row of ordered) {
+        await setEventNumber({
+          docId: row.id,
+          version: row.version,
+          eventNumber: row.eventNumber || undefined,
+        });
+      }
+      notifySuccess(
+        `${rows.length} ${rows.length === 1 ? "event" : "events"} numbered`,
+      );
+    } catch (error) {
+      setFailure(classifyCommandFailure(error));
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return {
     actionsFor,
+    numberRows,
     busyId,
     failure,
     clearFailure: () => setFailure(null),

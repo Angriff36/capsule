@@ -1222,18 +1222,6 @@ export const EventLayoutSectionSchema = z.object({
 
 export type EventLayoutSection = z.infer<typeof EventLayoutSectionSchema>;
 
-// Entity: EventNumberAssignment
-export const EventNumberAssignmentSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  eventId: z.string().uuid(),
-  eventNumber: z.string(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type EventNumberAssignment = z.infer<typeof EventNumberAssignmentSchema>;
-
 // Entity: EventNumberSequence
 export const EventNumberSequenceSchema = z.object({
   id: z.string().uuid(),

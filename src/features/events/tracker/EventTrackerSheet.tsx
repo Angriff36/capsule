@@ -5,6 +5,7 @@ import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import {
   useListClient,
   useListEvent,
+  useListEventNumberAssignment,
   useListEventVehicleAssignment,
   useListInvoice,
   useListPackList,
@@ -55,13 +56,21 @@ export function EventTrackerSheet() {
   const packLists = useListPackList();
   const reviewFlags = useListReviewFlag();
   const assignments = useListEventVehicleAssignment();
+  const numberAssignments = useListEventNumberAssignment();
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
   const serviceStyles = useListServiceStyle();
 
-  const { actionsFor, busyId, failure, clearFailure, resetKey, savedToast } =
-    useTrackerRowActions();
+  const {
+    actionsFor,
+    numberRows,
+    busyId,
+    failure,
+    clearFailure,
+    resetKey,
+    savedToast,
+  } = useTrackerRowActions();
   const [params, setParams] = useSearchParams();
   const { year, month } = parseMonth(params.get("month"));
   const [search, setSearch] = useState("");
@@ -75,6 +84,7 @@ export function EventTrackerSheet() {
     packLists,
     reviewFlags,
     assignments,
+    numberAssignments,
     vehicles,
     trailers,
     people,
@@ -95,6 +105,7 @@ export function EventTrackerSheet() {
               packLists: packLists ?? [],
               reviewFlags: reviewFlags ?? [],
               assignments: assignments ?? [],
+              numberAssignments: numberAssignments ?? [],
             },
             bounds.start,
             bounds.end,
@@ -107,6 +118,7 @@ export function EventTrackerSheet() {
       packLists,
       reviewFlags,
       assignments,
+      numberAssignments,
       bounds.start,
       bounds.end,
     ],
@@ -198,6 +210,7 @@ export function EventTrackerSheet() {
     month: "long",
     year: "numeric",
   });
+  const unnumbered = visible.filter((row) => row.storedEventNumber === "");
   const noRig = visible.filter((row) => row.rigs.length === 0).length;
   const stuck = visible.filter(
     (row) => row.packState === "needs_assistance",
@@ -248,6 +261,18 @@ export function EventTrackerSheet() {
             <b>Needs assistance:</b>
             {stuck}
           </span>
+          {canEditEvent && unnumbered.length > 0 ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={busyId != null}
+              onClick={() => void numberRows(unnumbered)}
+            >
+              {busyId === "numbering"
+                ? "Numbering…"
+                : `Number ${unnumbered.length} ${unnumbered.length === 1 ? "event" : "events"}`}
+            </button>
+          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <label className="tracker-sheet-toggle">

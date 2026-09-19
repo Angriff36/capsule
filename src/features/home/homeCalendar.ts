@@ -101,10 +101,36 @@ export interface CalendarSources {
   /** Trucks and trailers attached to the event on the tracker sheet. */
   assignments?: Doc<"eventVehicleAssignments">[];
   trailers?: Doc<"trailers">[];
+  /** Numbers the numbering seam gave (convex/lib/eventNumbering.ts). */
+  numberAssignments?: Doc<"eventNumberAssignments">[];
 }
 
 export function shortRef(id: string): string {
   return `#${id.slice(-6).toUpperCase()}`;
+}
+
+/**
+ * The number the shop calls the event by: the number a person typed, else the
+ * number the numbering seam gave, else an all-digit invoice number (a TPP-era
+ * event), else nothing. Never a
+ * reference made from the record id: nobody can say "#8D7JX6" out loud.
+ */
+export function eventNumberLabel(
+  stored: string | null | undefined,
+  invoiceNumber: string | undefined,
+  given?: string,
+): string {
+  const own = stored?.trim();
+  if (own) return own;
+  if (given) return given;
+  return invoiceNumber && /^\d{4,6}$/.test(invoiceNumber) ? invoiceNumber : "";
+}
+
+/** eventId → the number the numbering seam gave that event. */
+export function givenEventNumbers(
+  rows: Doc<"eventNumberAssignments">[] | undefined,
+): Map<string, string> {
+  return new Map((rows ?? []).map((row) => [row.eventId, row.eventNumber]));
 }
 
 function personName(person: Doc<"people"> | undefined): string {
@@ -175,6 +201,8 @@ export function buildCalendarFacts(
     if (set.size > 0) vehiclesByEvent.set(rig.eventId, set);
   }
 
+  const givenNumbers = givenEventNumbers(sources.numberAssignments);
+
   return sources.events
     .filter((event) => event.deletedAt == null)
     .map((event): CalendarEventFacts => {
@@ -200,9 +228,11 @@ export function buildCalendarFacts(
         startsAt: event.startsAt ?? null,
         endsAt: event.endsAt ?? null,
         eventNumber:
-          event.eventNumber?.trim() ||
-          invoiceByEvent.get(event._id) ||
-          shortRef(event._id),
+          eventNumberLabel(
+            event.eventNumber,
+            invoiceByEvent.get(event._id),
+            givenNumbers.get(event._id),
+          ) || "No #",
         guests: event.expectedHeadcount ?? 0,
         vehicle: vehicles ? [...vehicles].join(", ") : "—",
         deliveryAssignments: deliveriesByEvent.get(event._id) ?? [],

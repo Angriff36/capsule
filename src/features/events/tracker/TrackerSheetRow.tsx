@@ -81,7 +81,8 @@ export function TrackerSheetRow({
           className="tracker-sheet-input"
           aria-label={`Event number for ${row.title}`}
           defaultValue={row.storedEventNumber}
-          placeholder={row.eventNumber}
+          placeholder={row.eventNumber || "No #"}
+          inputMode="numeric"
           disabled={!permissions.canEditEvent || busy}
           onBlur={(domEvent: FocusEvent<HTMLInputElement>) => {
             const next = domEvent.currentTarget.value.trim();
