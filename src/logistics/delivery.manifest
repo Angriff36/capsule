@@ -20,9 +20,6 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   property required eventId: uuid
   property driverId: uuid?
   property vehicleId: uuid?
-  // Event Tracker trailer assignment (Mangia Ops Final Lock Training part 3,
-  // PACKLIST). Optional: many events tow nothing.
-  property trailerId: uuid?
   property required destination: string = ""
   property windowStartsAt: datetime?
   property windowEndsAt: datetime?
@@ -40,7 +37,6 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo driver: Person fields [tenantId, driverId] references [tenantId, id]
   belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
-  belongsTo trailer: Trailer fields [tenantId, trailerId] references [tenantId, id]
 
   constraint deliveryScheduledComplete: self.scheduledAt == null or (length(trim(self.destination)) > 0 and self.windowStartsAt != null and self.windowEndsAt != null and self.windowEndsAt > self.windowStartsAt) "Scheduled deliveries require a destination and a valid delivery window"
 
@@ -93,20 +89,6 @@ entity Delivery mixin TenantScoped, SoftDeletable {
       windowStartsAt: self.windowStartsAt != null ? self.windowStartsAt : windowStartsAt
       windowEndsAt: self.windowEndsAt != null ? self.windowEndsAt : windowEndsAt
       status: "scheduled"
-    }
-  }
-
-  // Omit trailerId to clear the assignment. Open deliveries only: settled
-  // history is not rewritten.
-  command assignTrailer(optional trailerId: uuid) {
-    guard self.deletedAt == null
-    guard self.status == "scheduled" or self.status == "in_transit"
-    mutate trailerId = trailerId
-    emit DeliveryTrailerAssigned {
-      deliveryId: self.id
-      tenantId: self.tenantId
-      eventId: self.eventId
-      trailerId: trailerId
     }
   }
 
@@ -290,13 +272,6 @@ event DeliveryVehicleAssigned: "delivery.vehicle_assigned" {
   eventId: string
   windowStartsAt: datetime?
   windowEndsAt: datetime?
-}
-
-event DeliveryTrailerAssigned: "delivery.trailer_assigned" {
-  deliveryId: string
-  tenantId: string
-  eventId: string
-  trailerId: string?
 }
 
 event DeliveryVehicleUnassigned: "delivery.vehicle_unassigned" {

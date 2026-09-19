@@ -12323,17 +12323,6 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const __targetServiceStyle = await ctx.db
-      .query("serviceStyles")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", __auth.tenantId))
-      .filter((q: any) => q.eq(q.field("_id"), serviceStyleId))
-      .first();
-    if (!__targetServiceStyle ||
-        __targetServiceStyle.tenantId !== __auth.tenantId ||
-        __targetServiceStyle.status !== "active" ||
-        __targetServiceStyle.deletedAt != null) {
-      throw new Error("Events must reference an active service style");
-    }
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
