@@ -154,6 +154,10 @@ export function EventMenuLineOverrides({
     const portions = Number(data.get("portionsAffected") ?? 0);
     const reason = String(data.get("reason") ?? "").trim();
     if (!Number.isFinite(portions) || portions < 0 || reason === "") return;
+    // Add, replace and adjust put demand back for the portions they take off
+    // the catalog line; with no amount that demand is lost (the command
+    // refuses it too).
+    if (kind !== "remove" && (!(Number(quantity) > 0) || unit === "")) return;
     const form = formEvent.currentTarget;
     void (async () => {
       setWorking(true);
@@ -343,24 +347,28 @@ export function EventMenuLineOverrides({
           </label>
 
           <label className="field-label">
-            <span>Quantity (optional)</span>
+            <span>
+              {kind === "remove" ? "Quantity (not used)" : "Quantity"}
+            </span>
             <input
               className="field-input"
               name="quantity"
               type="number"
-              min={0}
+              min={0.0001}
               step="0.0001"
-              disabled={disabled}
+              required={kind !== "remove"}
+              disabled={disabled || kind === "remove"}
             />
           </label>
 
           <label className="field-label">
-            <span>Unit (optional)</span>
+            <span>{kind === "remove" ? "Unit (not used)" : "Unit"}</span>
             <select
               className="field-input"
               name="unit"
               defaultValue=""
-              disabled={disabled}
+              required={kind !== "remove"}
+              disabled={disabled || kind === "remove"}
             >
               <option value="">—</option>
               {SELECTABLE_UNITS.map((unit) => (

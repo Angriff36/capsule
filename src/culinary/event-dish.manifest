@@ -499,6 +499,10 @@ entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
     constraint applyOverridePortions: portionsAffected >= 0 "Portions affected cannot be negative"
     constraint applyOverrideTarget: kind == "add" or targetDishIngredientId != null or targetDishComponentId != null or targetDishContainerId != null or targetDishTaskId != null "Remove, replace and adjust need a target line"
     constraint applyOverrideSource: (kind != "add" and kind != "replace") or ingredientId != null or componentId != null "Add and replace need an ingredient or a recipe"
+    // The demand engine takes the affected portions off the catalog line first.
+    // With no amount the replacement demand is never added, and purchasing and
+    // production come up short with no warning.
+    constraint applyOverrideAmount: kind == "remove" or (quantity != null and quantity > 0 and unit != null) "Add, replace and adjust need a quantity and a unit"
     mutate eventDishId = eventDishId
     mutate eventId = eventId
     mutate kind = kind

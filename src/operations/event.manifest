@@ -238,7 +238,9 @@ entity Client mixin TenantScoped, SoftDeletable {
     constraint billingTerms: paymentTermsDays >= 0 and paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
     mutate paymentTermsDays = paymentTermsDays
     mutate taxExempt = taxExempt
-    mutate taxId = taxId
+    // taxId is private: no screen can read it back to send it again. An omitted
+    // value keeps the saved ID; "" clears it.
+    mutate taxId = taxId != null ? taxId : self.taxId
     emit ClientBillingProfileChanged {
       clientId: self.id
       tenantId: self.tenantId
@@ -1368,7 +1370,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   // also refuses a number that is not 4 to 6 digits or that another event holds.
   command setEventNumber(optional eventNumber: string) {
     guard self.deletedAt == null
-    mutate eventNumber = eventNumber
+    // Stored trimmed: the numbering seam looks a number up by this exact value.
+    mutate eventNumber = eventNumber != null ? trim(eventNumber) : null
     emit EventNumberSet {
       eventId: self.id
       tenantId: self.tenantId

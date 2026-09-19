@@ -84,7 +84,11 @@ export function ClientProfilePanel({
         version: client.version,
         paymentTermsDays,
         taxExempt: data.get("taxExempt") === "on",
-        taxId: optional(data.get("taxId")),
+        // The saved tax ID is private and never reaches this screen. An empty
+        // box sends nothing, and the command then keeps the saved ID; only the
+        // "Clear" box sends "" to remove it.
+        taxId:
+          data.get("clearTaxId") === "on" ? "" : optional(data.get("taxId")),
       });
       onSaved("Billing profile saved.");
     });
@@ -164,8 +168,11 @@ export function ClientProfilePanel({
           <input name="taxId" defaultValue={client.taxId ?? ""} />
           <span className="field-hint">
             The saved tax ID stays hidden for privacy, so this box starts empty.
-            What you type here replaces it, and an empty box clears it.
+            Leave it empty to keep the saved ID. Type a new ID to replace it.
           </span>
+        </label>
+        <label>
+          <input name="clearTaxId" type="checkbox" /> Clear the saved tax ID
         </label>
         <button
           className="btn btn-ghost"

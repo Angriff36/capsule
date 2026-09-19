@@ -38,7 +38,13 @@ export async function ensureEventNumber(
       .query("eventNumberAssignments")
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
       .first();
-    if (given) return;
+    if (given) {
+      // While this event had a typed number, its given number was free and
+      // another event may have taken it. Keep it only when it is still free.
+      if (!(await isHeld(ctx, event.tenantId, given.eventNumber, eventId)))
+        return;
+      await ctx.db.delete(given._id);
+    }
     const row = await sequenceRow(ctx, event.tenantId);
     let next = Math.max(row.lastNumber, FLOOR) + 1;
     while (await isHeld(ctx, event.tenantId, String(next), eventId)) next += 1;
@@ -115,7 +121,7 @@ async function sequenceRow(ctx: MutationCtx, tenantId: string) {
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .first();
   if (existing) return existing;
-  // First use in this workspace: start above the highest number already typed
+  // First use in this workspace: start above the highest number already in use
   // (a shop that came from TPP has events numbered 68xx), so the next event
   // continues the shop's own run. One scan, once; later mints read the row.
   const events = await ctx.db
@@ -127,6 +133,18 @@ async function sequenceRow(ctx: MutationCtx, tenantId: string) {
     const typed = event.eventNumber?.trim() ?? "";
     if (event.deletedAt == null && NUMBER_SHAPE.test(typed))
       lastNumber = Math.max(lastNumber, Number(typed));
+  }
+  // Event.eventNumber is a new field: an event that came from TPP carries its
+  // number only on its invoice, and the screens show that invoice number as
+  // the event number. Count those too.
+  const invoices = await ctx.db
+    .query("invoices")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  for (const invoice of invoices) {
+    const number = invoice.invoiceNumber?.trim() ?? "";
+    if (invoice.deletedAt == null && NUMBER_SHAPE.test(number))
+      lastNumber = Math.max(lastNumber, Number(number));
   }
   const now = Date.now();
   const id = await ctx.db.insert("eventNumberSequences", {
