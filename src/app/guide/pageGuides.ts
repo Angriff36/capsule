@@ -242,6 +242,26 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Search by ingredient to trace where stock went."],
   },
   {
+    prefix: "/inventory/locations",
+    title: "Storage locations",
+    purpose:
+      "The walk-ins, freezers, and dry storage that stock is kept in. Edit a location or take it out of use.",
+    steps: [
+      "Edit a location's name, type, and temperature range.",
+      "Deactivate a location you no longer use; activate it again when you do.",
+    ],
+  },
+  {
+    prefix: "/kitchen/stations",
+    title: "Kitchen stations",
+    purpose:
+      "The stations that prep work and the day sheet are sorted by. Add, rename, or retire a station.",
+    steps: [
+      "Add a station with its sheet order and any other names the crew uses for it.",
+      "Retire a station you no longer run; reinstate it when it comes back.",
+    ],
+  },
+  {
     prefix: "/inventory/waste",
     title: "Waste",
     purpose:
