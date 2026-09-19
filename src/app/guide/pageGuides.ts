@@ -74,11 +74,11 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/events/tracker",
     title: "Event tracker",
     purpose:
-      "The next two weeks as day lanes, so the things that change at the last minute can be changed right here.",
+      "One month as a sheet, one row for each event: event number, vehicles, trailers, driver, load, binder, and pack status.",
     steps: [
-      "Drag a card to another day to move the event.",
-      "Change the time, guest count, venue, or owner on the card.",
-      "Use the lock button to move the event to the next stage.",
+      "Pick a vehicle or trailer in the row to attach it to the event. Add as many as the event needs.",
+      "Set the driver, tick Loaded when the load is in the vehicle, and set the binder status.",
+      "Use the Two-week board view to drag an event to another day.",
     ],
   },
   {
@@ -312,6 +312,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose:
       "Reusable load lists for event types you run often, so packing is never from memory.",
     steps: ["Build a template once; new pack lists start from it."],
+  },
+  {
+    prefix: "/logistics/style-kits",
+    title: "Service style kits",
+    purpose:
+      "The default kit that goes with every event of a service style, so a new event's pack list builds itself.",
+    steps: [
+      "Add the lines a style always needs. Use guests-per-unit for lines that scale with the headcount.",
+      "Change one event on its own pack list; the kit stays as it is.",
+    ],
   },
   {
     prefix: "/logistics/deliveries",

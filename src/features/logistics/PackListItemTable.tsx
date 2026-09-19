@@ -9,6 +9,7 @@ import {
 interface PackListItemRow {
   _id: string;
   description: string;
+  note?: string | null;
   dishId?: string | null;
   requiredQuantity: number;
   packedQuantity: number;
@@ -21,6 +22,8 @@ interface PackListItemTableProps {
   loading: boolean;
   items: PackListItemRow[];
   canAddItems: boolean;
+  /** Note and remove stay available until the list is dispatched or cancelled. */
+  canEditLines: boolean;
   busy: string | null;
   dishName: (dishId?: string | null) => string | null;
   itemActions: (status: string) => LogisticsAction[];
@@ -39,6 +42,7 @@ export function PackListItemTable({
   loading,
   items,
   canAddItems,
+  canEditLines,
   busy,
   dishName,
   itemActions,
@@ -128,6 +132,9 @@ export function PackListItemTable({
                 ) : packingAssociationMissing(item.description) ? (
                   <small className="block">Association not recorded</small>
                 ) : null}
+                {item.note ? (
+                  <small className="block">Note: {item.note}</small>
+                ) : null}
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">
                     {failedItem.message}
@@ -166,6 +173,24 @@ export function PackListItemTable({
                         : action.label}
                     </button>
                   ))}
+                  {canEditLines ? (
+                    <>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() => onInvokeItem(item, "note")}
+                      >
+                        {item.note ? "Edit note" : "Note"}
+                      </button>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() => onInvokeItem(item, "remove")}
+                      >
+                        {busy === `${item._id}:remove` ? "Working…" : "Remove"}
+                      </button>
+                    </>
+                  ) : null}
                 </div>
               </td>
             </tr>

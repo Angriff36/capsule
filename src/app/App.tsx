@@ -11,7 +11,7 @@ import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventImportPage } from "../features/events/import/EventImportPage";
 import { EventWorkbooksPage } from "../features/events/packet/EventWorkbooksPage";
 import { EventsListPage } from "../features/events/EventsListPage";
-import { EventTrackerPage } from "../features/events/EventTrackerPage";
+import { EventTrackerHome } from "../features/events/tracker/EventTrackerHome";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { WorkingEventRouteSync } from "../features/events/workingEvent";
@@ -195,6 +195,11 @@ const PackListsPage = lazy(() =>
 const PackListDetailPage = lazy(() =>
   import("../features/logistics/PackListDetailPage").then((module) => ({
     default: module.PackListDetailPage,
+  })),
+);
+const ServiceStyleKitsPage = lazy(() =>
+  import("../features/logistics/ServiceStyleKitsPage").then((module) => ({
+    default: module.ServiceStyleKitsPage,
   })),
 );
 const PackListTemplatesPage = lazy(() =>
@@ -661,7 +666,7 @@ export function App() {
             <Route path="/today" element={<HomePage />} />
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/workbooks" element={<EventWorkbooksPage />} />
-            <Route path="/events/tracker" element={<EventTrackerPage />} />
+            <Route path="/events/tracker" element={<EventTrackerHome />} />
             <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/import" element={<EventImportPage />} />
             <Route path="/events/templates" element={<EventTemplatesPage />} />
@@ -980,6 +985,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PackListTemplatesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/style-kits"
+              element={
+                <SupplyRoute>
+                  <ServiceStyleKitsPage />
                 </SupplyRoute>
               }
             />

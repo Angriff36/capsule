@@ -5,6 +5,7 @@ export const LOGISTICS_SECTIONS = [
     label: "Pack templates",
     path: "/logistics/pack-templates",
   },
+  { key: "style-kits", label: "Style kits", path: "/logistics/style-kits" },
   { key: "deliveries", label: "Deliveries", path: "/logistics/deliveries" },
   { key: "schedule", label: "Vehicle schedule", path: "/logistics/schedule" },
   { key: "route", label: "Route planner", path: "/logistics/route" },
