@@ -5,9 +5,15 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import {
   useCreateDishContainer,
+  useDishContainerReinstate,
   useDishContainerRetire,
   useListDishContainer,
 } from "../../lib/manifest-convex-react";
+import {
+  DishContainerEditForm,
+  SERVICE_LABEL,
+  SERVICE_METHODS,
+} from "./DishContainerEditForm";
 
 // DishContainer management — what a dish ships in, and how it is served.
 // These rows are what the PackList cascade fans out: when an approved event
@@ -19,35 +25,23 @@ type Props = {
   dishId: string;
 };
 
-const SERVICE_METHODS = [
-  { value: "cooked_on_site", label: "Cooked on site" },
-  { value: "cooked_at_kitchen", label: "Cooked at kitchen" },
-  { value: "brought_hot", label: "Brought hot" },
-  { value: "cold_service", label: "Cold service" },
-] as const;
-
-const SERVICE_LABEL: Record<string, string> = Object.fromEntries(
-  SERVICE_METHODS.map((m) => [m.value, m.label]),
-);
-
 export function DishContainersPanel({ dishId }: Props) {
   const containers = useListDishContainer();
   const defineContainer = useCreateDishContainer();
   const retireContainer = useDishContainerRetire();
+  const reinstateContainer = useDishContainerReinstate();
 
   const [busy, setBusy] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
   const { prompt, host: promptHost } = useActionPrompt();
 
-  const rows = (containers ?? [])
-    .filter(
-      (row) =>
-        row.deletedAt == null &&
-        row.dishId === dishId &&
-        row.status === "active",
-    )
+  const forThisDish = (containers ?? [])
+    .filter((row) => row.deletedAt == null && row.dishId === dishId)
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const rows = forThisDish.filter((row) => row.status === "active");
+  const retiredRows = forThisDish.filter((row) => row.status === "retired");
 
   async function onDefine(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -116,6 +110,26 @@ export function DishContainersPanel({ dishId }: Props) {
     }
   }
 
+  async function onReinstate(id: string, version: number | undefined) {
+    setBusy(id);
+    setError(null);
+    setNotice(null);
+    try {
+      await reinstateContainer({ docId: id, version });
+      setNotice(
+        "Container reinstated. It is listed again on the pack list of events using this dish.",
+      );
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not reinstate the container.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <section className="culinary-section">
       <div className="culinary-section-heading">
@@ -143,35 +157,110 @@ export function DishContainersPanel({ dishId }: Props) {
       ) : (
         <ul className="divide-y divide-line">
           {rows.map((row) => (
-            <li
-              key={row._id}
-              className="flex flex-wrap items-center justify-between gap-2 py-3"
-              data-testid="dish-container-row"
-            >
-              <div>
-                <p className="text-lg font-medium text-ink">{row.name}</p>
-                <p className="text-sm text-ink-3">
-                  {SERVICE_LABEL[String(row.serviceMethod)] ??
-                    String(row.serviceMethod)}{" "}
-                  · holds {row.servingsPerContainer}
-                  {row.baseQuantity ? ` · +${row.baseQuantity} always` : ""}
-                </p>
-                {row.equipmentNotes ? (
-                  <p className="text-base text-ink-2">{row.equipmentNotes}</p>
-                ) : null}
+            <li key={row._id} className="py-3" data-testid="dish-container-row">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <p className="text-lg font-medium text-ink">{row.name}</p>
+                  <p className="text-sm text-ink-3">
+                    {SERVICE_LABEL[String(row.serviceMethod)] ??
+                      String(row.serviceMethod)}{" "}
+                    · holds {row.servingsPerContainer}
+                    {row.baseQuantity ? ` · +${row.baseQuantity} always` : ""}
+                  </p>
+                  {row.equipmentNotes ? (
+                    <p className="text-base text-ink-2">{row.equipmentNotes}</p>
+                  ) : null}
+                  {row.handlingNotes ? (
+                    <p className="text-base text-ink-2">{row.handlingNotes}</p>
+                  ) : null}
+                </div>
+                <div className="supply-row-actions">
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    disabled={busy != null}
+                    onClick={() =>
+                      setEditingId((current) =>
+                        current === row._id ? null : row._id,
+                      )
+                    }
+                  >
+                    {editingId === row._id ? "Close" : "Edit"}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    disabled={busy != null}
+                    onClick={() =>
+                      void onRetire(row._id, row.version, row.name)
+                    }
+                  >
+                    {busy === row._id ? "Working…" : "Retire"}
+                  </button>
+                </div>
               </div>
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                disabled={busy != null}
-                onClick={() => void onRetire(row._id, row.version, row.name)}
-              >
-                {busy === row._id ? "Working…" : "Retire"}
-              </button>
+              {editingId === row._id ? (
+                <DishContainerEditForm
+                  key={`${row._id}:${row.version}`}
+                  container={{
+                    _id: row._id,
+                    version: Number(row.version),
+                    name: String(row.name),
+                    serviceMethod: String(row.serviceMethod),
+                    servingsPerContainer: Number(row.servingsPerContainer),
+                    baseQuantity: Number(row.baseQuantity ?? 0),
+                    unit: String(row.unit),
+                    equipmentNotes: row.equipmentNotes,
+                    handlingNotes: row.handlingNotes,
+                    sortOrder: Number(row.sortOrder ?? 0),
+                  }}
+                  onSaved={() => {
+                    setEditingId(null);
+                    setNotice("Container updated.");
+                  }}
+                  onCancel={() => setEditingId(null)}
+                  onError={setError}
+                />
+              ) : null}
             </li>
           ))}
         </ul>
       )}
+
+      {retiredRows.length > 0 ? (
+        <div className="mt-4">
+          <div className="culinary-section-heading">
+            <h3 className="text-lg font-semibold text-ink-3">Retired</h3>
+            <span>{formatCountNoun(retiredRows.length, "container")}</span>
+          </div>
+          <ul className="divide-y divide-line">
+            {retiredRows.map((row) => (
+              <li
+                key={row._id}
+                className="flex flex-wrap items-center justify-between gap-2 py-3 text-ink-3"
+                data-testid="dish-container-retired-row"
+              >
+                <div>
+                  <p className="text-base font-medium">{row.name}</p>
+                  <p className="text-sm">
+                    {SERVICE_LABEL[String(row.serviceMethod)] ??
+                      String(row.serviceMethod)}{" "}
+                    · holds {row.servingsPerContainer} · not on pack lists
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={busy != null}
+                  onClick={() => void onReinstate(row._id, row.version)}
+                >
+                  {busy === row._id ? "Working…" : "Reinstate"}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <details className="recipe-add-editor">
         <summary>Add container</summary>

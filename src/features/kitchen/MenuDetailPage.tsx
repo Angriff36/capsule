@@ -24,6 +24,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
@@ -487,6 +488,24 @@ export function MenuDetailPage() {
       {menu.description ? (
         <p className="culinary-lead">{menu.description}</p>
       ) : null}
+
+      <MenuDetailsEditor
+        key={`${menu._id}:${menu.version}`}
+        menu={{
+          _id: menu._id,
+          version: menu.version,
+          name: menu.name,
+          description: menu.description,
+          category: menu.category,
+          isTemplate: Boolean(menu.isTemplate),
+          basePrice: Number(menu.basePrice),
+          pricePerPerson: Number(menu.pricePerPerson),
+          minGuests: Number(menu.minGuests),
+          maxGuests: Number(menu.maxGuests),
+          status: String(menu.status),
+        }}
+        onFailure={setFailure}
+      />
 
       <MenuDishManager
         menuId={menu._id}

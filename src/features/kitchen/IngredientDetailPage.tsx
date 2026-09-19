@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useIngredientLookupApplyToIngredient } from "../../lib/ingredientLookupClient";
 import {
   useGetIngredient,
+  useIngredientDiscontinue,
   useIngredientPurge,
   useIngredientReinstate,
   useIngredientSetPreferredVendors,
@@ -15,6 +16,7 @@ import {
 import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -29,8 +31,10 @@ import { IngredientPriceTrendPanel } from "./IngredientPriceTrendPanel";
 import { VendorPriceComparisonPanel } from "./VendorPriceComparisonPanel";
 import { IngredientCostingEditor } from "./IngredientCostingEditor";
 import { IngredientDetailsEditor } from "./IngredientDetailsEditor";
+import { IngredientMergeControl } from "./IngredientMergeControl";
 import { IngredientNutritionEditor } from "./IngredientNutritionEditor";
 import { IngredientSubstitutionEditor } from "./IngredientSubstitutionEditor";
+import { ItemUnitMappingsPanel } from "./ItemUnitMappingsPanel";
 import { kitchenCatalogPath } from "./kitchenRoutes";
 import { IngredientDatabaseLookup } from "./lookup/IngredientDatabaseLookup";
 import type { IngredientAutofillProfile } from "./lookup/ExternalIngredientProfile";
@@ -306,7 +310,9 @@ export function IngredientDetailPage() {
   const priceObservations = useListIngredientPriceObservation();
   const purge = useIngredientPurge();
   const reinstate = useIngredientReinstate();
+  const discontinue = useIngredientDiscontinue();
   const applyLookup = useIngredientLookupApplyToIngredient();
+  const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [lookupSuggestedCost, setLookupSuggestedCost] = useState<
@@ -387,6 +393,7 @@ export function IngredientDetailPage() {
         ← Ingredient index
       </Link>
       <KitchenBookNav />
+      {host}
       {failure ? (
         <div className="mt-4">
           <CulinaryFailureBanner error={failure} />
@@ -465,6 +472,43 @@ export function IngredientDetailPage() {
                 {busy === action.key ? "Working…" : action.label}
               </button>
             ))}
+            {ingredient.status === "active" && ingredient.deletedAt == null ? (
+              <button
+                type="button"
+                className="btn btn-ghost"
+                disabled={busy != null}
+                onClick={() => {
+                  void (async () => {
+                    // The command takes an optional reason — the prompt asks
+                    // for one but never demands it.
+                    const values = await prompt.askFields({
+                      title: "Discontinue ingredient",
+                      description: `Take ${ingredient.name} out of the kitchen book. Recipe lines that name it keep working.`,
+                      fields: [
+                        {
+                          name: "reason",
+                          label: "Reason (optional)",
+                          multiline: true,
+                          required: false,
+                        },
+                      ],
+                      confirmLabel: "Discontinue ingredient",
+                      tone: "danger",
+                    });
+                    if (!values) return;
+                    await run("discontinue", async () => {
+                      await discontinue({
+                        docId: ingredient._id,
+                        version: ingredient.version,
+                        reason: (values.reason ?? "").trim() || undefined,
+                      });
+                    });
+                  })();
+                }}
+              >
+                {busy === "discontinue" ? "Working…" : "Discontinue"}
+              </button>
+            ) : null}
           </div>
         </div>
         <dl className="culinary-facts culinary-facts-compact">
@@ -560,6 +604,12 @@ export function IngredientDetailPage() {
         onFailure={setFailure}
       />
 
+      <ItemUnitMappingsPanel
+        ingredientId={ingredient._id}
+        ingredientUnit={String(ingredient.unit)}
+        onFailure={setFailure}
+      />
+
       <VendorPriceComparisonPanel
         observations={ingredientPrices}
         vendors={vendors}
@@ -570,6 +620,17 @@ export function IngredientDetailPage() {
         vendors={vendors}
         loading={priceObservations === undefined || vendors === undefined}
       />
+
+      {ingredient.status === "active" && ingredient.deletedAt == null ? (
+        <IngredientMergeControl
+          key={`merge:${ingredient._id}:${ingredient.version}`}
+          ingredientId={ingredient._id}
+          ingredientName={ingredient.name}
+          version={ingredient.version}
+          ingredients={ingredients}
+          onFailure={setFailure}
+        />
+      ) : null}
 
       <section className="culinary-section">
         <div className="culinary-section-heading">
