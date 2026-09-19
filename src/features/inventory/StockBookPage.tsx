@@ -6,6 +6,7 @@ import {
   useCreateStorageLocation,
   useInventoryItemReceiveStock,
   useInventoryItemRecount,
+  useInventoryItemRemove,
   useInventoryItemSetExpiry,
   useInventoryItemUpdateLevels,
   useInventoryReservationConsume,
@@ -99,6 +100,7 @@ export function StockBookPage() {
   const createTransfer = useCreateStockTransfer();
   const receiveStock = useInventoryItemReceiveStock();
   const recount = useInventoryItemRecount();
+  const removeItem = useInventoryItemRemove();
   const setExpiry = useInventoryItemSetExpiry();
   const updateLevels = useInventoryItemUpdateLevels();
   const consumeReservation = useInventoryReservationConsume();
@@ -149,6 +151,13 @@ export function StockBookPage() {
           reservation.status === "active",
       )
       .reduce((sum, reservation) => sum + reservation.quantity, 0);
+  // The generated remove guard rejects while any hold is still active.
+  const activeHoldCount = (itemId: string) =>
+    activeReservations.filter(
+      (reservation) =>
+        reservation.inventoryItemId === itemId &&
+        reservation.status === "active",
+    ).length;
 
   // decimal(12, 4) projection — trim float noise from derived quantities.
   const qty4 = (value: number) => Math.round(value * 10000) / 10000;
@@ -402,6 +411,31 @@ export function StockBookPage() {
           version: item.version,
           parLevel,
           reorderThreshold,
+        });
+      });
+    })();
+  };
+
+  const removeAction = (item: any) => {
+    void (async () => {
+      const reason = (
+        await prompt.askReason({
+          title: "Remove stock line",
+          description: `${ingredientName(item.ingredientId)} at ${locationName(
+            item.locationId,
+          )} leaves the stock book. Its history stays in the audit log.`,
+          label: "Removal reason",
+          confirmLabel: "Remove stock line",
+          cancelLabel: "Keep stock line",
+          tone: "danger",
+        })
+      )?.trim();
+      if (!reason) return;
+      void run(`${item._id}:remove`, async () => {
+        await removeItem({
+          docId: item._id,
+          version: item.version,
+          reason,
         });
       });
     })();
@@ -764,6 +798,22 @@ export function StockBookPage() {
                             }}
                           >
                             Transfer
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={
+                              busy != null || activeHoldCount(item._id) > 0
+                            }
+                            title={
+                              activeHoldCount(item._id) > 0
+                                ? "Release or consume the active event reservations on this line first."
+                                : undefined
+                            }
+                            onClick={() => removeAction(item)}
+                          >
+                            {busy === `${item._id}:remove`
+                              ? "Working…"
+                              : "Remove"}
                           </button>
                         </div>
                       </td>

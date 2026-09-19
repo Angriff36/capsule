@@ -19,6 +19,7 @@ import {
   useVendorOrderApprove,
   useVendorOrderCancel,
   useVendorOrderConfirm,
+  useVendorOrderLineCancelLine,
   useVendorOrderLineRecordReceipt,
   useVendorOrderLineReconcileDraftRequirement,
   useVendorOrderLineReviseQuantity,
@@ -43,6 +44,10 @@ import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { vendorOrderTitle } from "./vendorOrderNumber";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
+import {
+  canCancelVendorOrderLine,
+  cancelVendorOrderLine,
+} from "./VendorOrderLineCancel";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -70,6 +75,7 @@ export function VendorOrderPage() {
   const cancelOrder = useVendorOrderCancel();
   const updateTotals = useVendorOrderUpdateTotals();
   const recordReceipt = useVendorOrderLineRecordReceipt();
+  const cancelLine = useVendorOrderLineCancelLine();
   const reconcileLine = useVendorOrderLineReconcileDraftRequirement();
   const reviseLine = useVendorOrderLineReviseQuantity();
   const [showLineForm, setShowLineForm] = useState(false);
@@ -692,6 +698,28 @@ export function VendorOrderPage() {
                           Record receipt
                         </button>
                       )}
+                      {canCancelVendorOrderLine(
+                        String(order.status),
+                        String(line.status),
+                      ) ? (
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() =>
+                            cancelVendorOrderLine({
+                              line,
+                              itemName: ingredientName(line.ingredientId),
+                              prompt,
+                              run,
+                              cancelLine,
+                            })
+                          }
+                        >
+                          {busy === `${line._id}:cancel`
+                            ? "Working…"
+                            : "Cancel line"}
+                        </button>
+                      ) : null}
                     </div>
                   </div>
                   {lineLots.length > 0 ? (

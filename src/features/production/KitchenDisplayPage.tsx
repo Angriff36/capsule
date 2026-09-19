@@ -9,11 +9,14 @@ import {
   usePrepTaskClaim,
   usePrepTaskComplete,
   usePrepTaskStart,
+  useProductionBatchCancel,
   useProductionBatchComplete,
   useProductionBatchStart,
 } from "../../lib/manifest-convex-react";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { TableSkeleton } from "../../ui/primitives";
+import { BatchAllocationsPanel } from "./BatchAllocationsPanel";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
@@ -83,11 +86,13 @@ export function KitchenDisplayPage() {
   const complete = usePrepTaskComplete();
   const batchStart = useProductionBatchStart();
   const batchComplete = useProductionBatchComplete();
+  const batchCancel = useProductionBatchCancel();
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [actualYields, setActualYields] = useState<Record<string, string>>({});
   const optimistic = useOptimisticStatus();
+  const { prompt, host } = useActionPrompt(busy != null);
   const now = Date.now();
 
   const isLoading =
@@ -218,6 +223,31 @@ export function KitchenDisplayPage() {
     }
   };
 
+  const cancelBatch = (item: BoardItem) => {
+    void (async () => {
+      const reason = (
+        await prompt.askReason({
+          title: "Cancel batch",
+          description: `${item.title} · ${item.detail}. The kitchen stops making it.`,
+          label: "Cancellation reason",
+          confirmLabel: "Cancel batch",
+          cancelLabel: "Keep batch",
+          tone: "danger",
+        })
+      )?.trim();
+      if (!reason) return;
+      setFailure(null);
+      setBusy(item.id);
+      try {
+        await batchCancel({ docId: item.id, version: item.version, reason });
+      } catch (error) {
+        setFailure(error);
+      } finally {
+        setBusy(null);
+      }
+    })();
+  };
+
   return (
     <main className="kds" aria-label="Kitchen display board">
       <header className="kds-header">
@@ -246,6 +276,7 @@ export function KitchenDisplayPage() {
         </div>
       </header>
       {failure != null ? <ProductionFailureBanner error={failure} /> : null}
+      {host}
       {isLoading ? (
         <TableSkeleton rows={6} />
       ) : items.length === 0 ? (
@@ -344,11 +375,22 @@ export function KitchenDisplayPage() {
                     Blocked — resolve on the prep board
                   </span>
                 )}
+                {item.kind === "batch" ? (
+                  <button
+                    type="button"
+                    className="kds-secondary"
+                    disabled={busy != null}
+                    onClick={() => cancelBatch(item)}
+                  >
+                    Cancel batch
+                  </button>
+                ) : null}
               </li>
             );
           })}
         </ul>
       )}
+      <BatchAllocationsPanel />
     </main>
   );
 }

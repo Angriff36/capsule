@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 const sections = [
   { label: "Demand", path: "/inventory/demand" },
   { label: "Stock book", path: "/inventory/stock" },
+  { label: "Locations", path: "/inventory/locations" },
   { label: "Counts", path: "/inventory/counts" },
   { label: "Audit log", path: "/inventory/audit" },
   { label: "Waste", path: "/inventory/waste" },
