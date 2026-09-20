@@ -104,8 +104,8 @@ CONVEX_SELF_HOSTED_URL and CONVEX_SELF_HOSTED_ADMIN_KEY are set`, the name is
 
 ## Hermes skill
 
-The skill is in the repository: `.hermes/skills/devops/capsule-backend-deploy/SKILL.md`.
-To load it from the checkout, add the checkout's `.hermes/skills` directory to
+The skill is in the repository: `docs/operations/hermes/skills/devops/capsule-backend-deploy/SKILL.md`.
+To load it from the checkout, add the checkout's `docs/operations/hermes/skills` directory to
 `skills.external_dirs` in `~/.hermes/config.yaml` on the production box. The
 skill holds no machine-local path.
 
