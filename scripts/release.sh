@@ -6,7 +6,9 @@
 # 1. Merges the current branch into main (--no-ff), runs `bun run check` on
 #    the merge result, and only then pushes main once. That push is the only
 #    Vercel production build and Convex prod deploy for the branch.
-# 2. Renames the branch to archive/<branch> locally and on origin.
+# 2. Renames the branch to archive/<branch> locally and on origin. The shared
+#    `dev` branch is the exception (owner rule, 2026-09-20): it is permanent,
+#    so it is moved to the release commit and never archived.
 #
 # --reviewer names the independent cross-model reviewer that APPROVED the
 # diff (AGENTS.md merge gate). The merge commit records it. The merge
@@ -55,6 +57,18 @@ base="$(git rev-parse origin/main)"
 proof=.artifacts/release-check-passed
 
 archive_branch() {
+  # The shared `dev` branch (owner rule, 2026-09-20) is permanent: every agent
+  # works on it and it is never archived. Move it to the release commit, so
+  # the next work starts from main. Commits pushed to dev during the gate stay.
+  if [ "$branch" = "dev" ]; then
+    git checkout -q dev
+    if ! { git merge -q --ff-only main && { git push -q origin dev || { git pull -q --no-rebase --no-edit origin dev && git push -q origin dev; }; }; }; then
+      echo "release: main is released, but dev could not be moved to it. You are on dev. Run: git pull --no-rebase origin dev && git merge main && git push origin dev"
+      exit 1
+    fi
+    echo "release: done. dev is at the release commit and stays the shared work branch."
+    return 0
+  fi
   # Remote first (one atomic push), then local. --force-with-lease pins the
   # delete to the released sha: work pushed during the gate is never deleted.
   if [ "$remote_archive" = "$branch_sha" ] && [ -z "$remote_branch" ]; then
