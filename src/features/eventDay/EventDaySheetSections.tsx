@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
+import type { Id } from "../../lib/api";
 import type {
   EventDayBriefing,
   EventDayEvent,
   EventDayPerson,
 } from "../../lib/eventDayBriefing";
+import { useEventPacketAccess } from "../../lib/eventPacket/useEventPacket";
 import { formatDate, formatTime } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
+import { eventWorkbookReviewPath } from "../events/eventRoutes";
 import { compareActivities } from "../events/EventTimelinePanel";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
@@ -20,9 +24,13 @@ import type { EventDayInputs, EventDaySection } from "./eventDayModel";
 
 export function PacketSectionCaution({
   section,
+  eventId,
 }: {
   section: EventDaySection;
+  eventId: string;
 }) {
+  // Only a manager can record workbook decisions; crew get no dead link.
+  const canManage = useEventPacketAccess(eventId as Id<"events">);
   if (!section.urgentAction && !section.openIssueCount) return null;
   return (
     <>
@@ -46,6 +54,14 @@ export function PacketSectionCaution({
           flag={issue.count > 1 ? `×${issue.count}` : undefined}
         />
       ))}
+      {canManage === true && section.openIssueCount ? (
+        <Link
+          className="evd-open-link"
+          to={eventWorkbookReviewPath(eventId, section.key)}
+        >
+          Resolve these in the event workbook ›
+        </Link>
+      ) : null}
     </>
   );
 }
