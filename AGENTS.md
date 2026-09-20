@@ -334,6 +334,8 @@ Set `CAPSULE_RELEASE_URL` (canonical production URL) and optionally
 `VERCEL_TOKEN` / `CAPSULE_API_KEY` so its legs can verify; a leg without
 its input keeps the receipt PARTIAL by design.
 
+**The production Convex backend is a SELF-HOSTED instance on the owner's Linux box** (`pop-os`, public address `https://pop-os.tail78dd9e.ts.net`, cutover 2026-09-14). It is deployed ON THAT BOX, by the owner. **An agent on Windows never runs the production backend deploy and never tries to.** A Vercel production build is UI-ONLY in this mode, so a release that changes `.manifest`, `convex/`, or generated Convex files is not complete until the Linux box has redeployed from the release commit: say so BEFORE running `scripts/release.sh`. **ONE script does that deploy: `bash scripts/deploy-backend.sh --expect <main sha> [--verify <new query>,<new query>]`** (runbook: `docs/operations/production-backend-deploy.md`; Hermes skill: `docs/operations/hermes/skills/devops/capsule-backend-deploy/SKILL.md`). `scripts/release.sh` prints that handoff line at the end of a release; give the owner that line (add `--verify` for queries the release added) and nothing else — never write your own deploy command block. The script refuses any system that is not Linux; `--dry-run` does the local checks only. Read-only check from any machine: `POST <backend>/api/query` with `{"path":"queries:<name>","args":{},"format":"json"}` — `"status":"success"` means the function is deployed, `Server Error` means it is not. Convex Cloud `impartial-mule-193` is only the fallback.
+
 **Manual deploy commands and settings changes are HUMAN-AUTHORIZED only.** No
 loop or agent runs `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk
 settings without the human explicitly asking in the current conversation.
@@ -358,7 +360,9 @@ When the human asks for a MANUAL deploy (no `main` push involved):
 1. Backend first, if `convex/` or manifests changed:
    `bun run manifest:regen` (manifest changes only) → `npx convex deploy -y`
    → the production Convex backend (since the 2026-09-14 cutover that is the
-   self-hosted instance, not Convex Cloud `impartial-mule-193`).
+   self-hosted instance, not Convex Cloud `impartial-mule-193`). For that
+   instance the ONLY path is `bash scripts/deploy-backend.sh --expect <main sha>`
+   on the Linux box; it runs this same command after it verifies the commit.
 2. Frontend: `vercel deploy --prod --yes --archive=tgz`.
 
 Invariants agents must not break (each broke a real deploy once):

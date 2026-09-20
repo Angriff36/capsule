@@ -13,8 +13,9 @@ both the product flow and its test.
 ## 0. Start here (handoff, updated 2026-07-27)
 
 Working environment: production, <https://capsule-tau-eight.vercel.app>,
-signed in as `Angriff36`. Vercel builds run `convex deploy`, so a push to
-`main` deploys both; allow ~2 minutes before re-testing in the browser.
+signed in as `Angriff36`. Since the 2026-09-14 cutover the production Convex is
+self-hosted on the owner's Linux box: a release of `main` builds the UI ONLY, and
+backend changes are live only after the owner redeploys on that box.
 Test data lives on **Test Event** (Jul 30 2026, 55 guests).
 
 **Done and proven live** — §7 has the evidence:

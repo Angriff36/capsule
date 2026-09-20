@@ -226,6 +226,7 @@ bash scripts/release.sh --reviewer <model>         # ONE merge + ONE main push, 
 
 ```bash
 bun run deploy                 # convex deploy — HUMAN-ONLY manual path; the normal path is `bash scripts/release.sh`
+bash scripts/deploy-backend.sh --expect <main sha>   # production backend, ON THE LINUX BOX only — docs/operations/production-backend-deploy.md
 ```
 
 ### Reset local state
