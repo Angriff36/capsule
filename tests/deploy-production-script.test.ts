@@ -236,6 +236,26 @@ describe("scripts/deploy-production.sh", () => {
       expect(silentRun.lastLine).toContain("the review gave no verdict");
       expect(silent.mainSha()).toBe(silentBefore);
 
+      // A branch that already landed on main (a GitHub-side merge) has no diff
+      // to review: no automatic approval, the reviewer must be named.
+      const landed = makeCheckout();
+      git(landed.work, "checkout", "-q", "main");
+      git(
+        landed.work,
+        "merge",
+        "--no-ff",
+        BRANCH,
+        "-m",
+        "Merge pull request #1",
+      );
+      git(landed.work, "push", "-q", "origin", "main");
+      git(landed.work, "checkout", "-q", BRANCH);
+      const landedBefore = landed.mainSha();
+      const landedRun = landed.run([]);
+      expect(landedRun.lastLine).toContain("is already on origin/main");
+      expect(landed.mainSha()).toBe(landedBefore);
+      expect(landed.calls()).toEqual([]);
+
       const approved = makeCheckout();
       const approvedRun = approved.run([]);
       expect(approvedRun.lastLine).toContain(

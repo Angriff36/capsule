@@ -22,12 +22,15 @@ handoff between machines.
    when the reviewer's last message has `VERDICT: APPROVE`. A REJECT, no
    verdict, no `codex` CLI, or Codex-authored commits stop the run.
 2. Release commit. It takes the `[release]` commit on `origin/main` (the full
-   sha) and runs `scripts/verify-vercel-release.ts`: Vercel's PRODUCTION
-   deployment for that commit must be READY, and the production address must
-   serve it (signed-in Vercel CLI, read-only).
+   sha) and runs `scripts/verify-vercel-release.ts`: the production address
+   must serve the build OF that commit. Every build writes `<site>/version.json`
+   with its commit (`vite.config.ts`, from `VERCEL_GIT_COMMIT_SHA`); the script
+   reads it until it equals the release sha. Read-only, no Vercel credential. A
+   failed or stale deployment never matches.
 3. Backend or not. `scripts/release-backend-scope.ts` decides
-   (`src/lib/releaseBackendScope.ts`): the backend deploy is necessary when the
-   release changed a `.manifest` file, `convex/`, `convex.json`, the dependency
+   (`src/lib/releaseBackendScope.ts`). It compares the release with the PREVIOUS
+   `[release]` commit on `main`, so a branch that landed through a GitHub-side
+   merge is included. The backend deploy is necessary when that range changed a `.manifest` file, `convex/`, `convex.json`, the dependency
    pins (`package.json`, `bun.lock`), or a `src/` module that `convex/` code
    imports. Frontend-only: `RESULT: PASS - frontend deployed at <sha>; backend unchanged`.
 4. Backend deploy. It opens SSH to the production box (`oc@pop-os`, the user's
@@ -47,9 +50,8 @@ Every failure stops the run at once. After a FAIL that came after the release
 `[release]` commit, it skips step 1 and continues. The backend deploy is
 idempotent.
 
-One-time conditions on the WORK PC: `ssh oc@pop-os` works with a key
-(`BatchMode`, no password prompt), and `vercel whoami` answers. Both were true
-on 2026-09-20.
+One-time condition on the WORK PC: `ssh oc@pop-os` works with a key
+(`BatchMode`, no password prompt). It was true on 2026-09-20.
 
 ## Facts
 

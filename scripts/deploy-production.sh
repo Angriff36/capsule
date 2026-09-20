@@ -12,10 +12,10 @@
 #    review ALREADY approved this branch (AGENTS.md merge gate) and the name is
 #    passed on. With no --reviewer this script runs the documented primary
 #    review (Codex gpt-5.6-sol) and continues only on `VERDICT: APPROVE`.
-# 2. Takes the [release] commit on origin/main and waits until Vercel's
-#    production deployment for that commit is READY and live.
-# 3. scripts/release-backend-scope.ts decides if the release changed the
-#    backend. Frontend-only: PASS, stop.
+# 2. Takes the [release] commit on origin/main and waits until the production
+#    address serves the Vercel build OF that commit (<site>/version.json).
+# 3. scripts/release-backend-scope.ts decides if anything since the previous
+#    [release] commit changed the backend. Frontend-only: PASS, stop.
 # 4. Backend changed: SSH to the production box, find the production Capsule
 #    checkout by its git origin (no path is assumed), fast-forward main, require
 #    HEAD == the release sha, and run scripts/deploy-backend.sh --expect <sha>
@@ -25,8 +25,8 @@
 # Run again after a failure: on `main`, at the [release] commit, it skips step
 # 1 and continues from step 2 (the backend deploy is idempotent).
 # It holds no credentials: SSH uses the user's own key and host configuration,
-# Vercel uses the signed-in CLI. It never rolls back Vercel and never edits
-# settings.
+# the Vercel check reads a public file. It never rolls back Vercel and never
+# edits settings.
 set -uo pipefail
 
 PROD_SSH="oc@pop-os"
@@ -56,6 +56,11 @@ branch="$(git symbolic-ref --short -q HEAD || true)"
 # that did not write the diff, so Codex never reviews Codex commits.
 run_review() {
   local log=.artifacts/deploy-production-review.log prompt=.artifacts/deploy-production-review-prompt.md
+  # A branch that already landed on main (a GitHub-side merge) has an empty
+  # diff against origin/main: a review here would approve nothing.
+  if git merge-base --is-ancestor HEAD origin/main; then
+    fail "$branch is already on origin/main, so there is no diff for an automatic review. Run this again with --reviewer <model>, the model whose review approved that merge"
+  fi
   if git log origin/main..HEAD --format='%an %ae %(trailers:key=Co-Authored-By,valueonly)' | grep -qiE 'codex|gpt-'; then
     fail "commits on $branch name Codex/GPT as an author. A model never approves its own diff: get a review from another model, then run this again with --reviewer <model>"
   fi

@@ -7,8 +7,15 @@
 //   reason=<changed path>          (up to 10)
 //   verify=<listA,listB>           (new zero-argument list queries; may be empty)
 //
+// The change set is everything since the PREVIOUS [release] commit on main, not
+// only the release commit itself: a release of a branch that already landed on
+// main (a GitHub-side merge) is an empty [release] commit, and merges that
+// landed between two releases were never deployed either. No previous release
+// means "required".
+//
 // Reads git and the working tree only. The working tree must be AT the release
-// commit, because the import closure of convex/ is read from disk.
+// commit with no tracked edits under convex/ or src/, because the import
+// closure of convex/ is read from disk.
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
@@ -97,14 +104,54 @@ if ((git(["rev-parse", "HEAD"]) ?? "").trim() !== sha) {
   process.exit(2);
 }
 
-const changedPaths = (git(["diff", "--name-only", `${sha}^1`, sha]) ?? "")
+const dirty = (
+  git([
+    "status",
+    "--porcelain",
+    "--untracked-files=no",
+    "--",
+    "convex",
+    "src",
+  ]) ?? ""
+).trim();
+if (dirty !== "") {
+  console.error(
+    `release-backend-scope: tracked files under convex/ or src/ have local changes; the import closure would be wrong:
+${dirty}`,
+  );
+  process.exit(2);
+}
+
+// The last commit that was released before this one (first-parent history).
+const previousRelease = (
+  git(
+    [
+      "log",
+      "--first-parent",
+      "-n",
+      "1",
+      "--format=%H",
+      String.raw`--grep=^\[release\] `,
+      `${sha}^1`,
+    ],
+    true,
+  ) ?? ""
+).trim();
+if (!/^[0-9a-f]{40}$/.test(previousRelease)) {
+  console.log("backend=required");
+  console.log("reason=no previous [release] commit on main to compare with");
+  console.log("verify=");
+  process.exit(0);
+}
+
+const changedPaths = (git(["diff", "--name-only", previousRelease, sha]) ?? "")
   .split("\n")
   .map((line) => line.trim())
   .filter(Boolean);
 const scope = releaseBackendScope({
   changedPaths,
   convexImportedPaths: convexImportedPaths(),
-  queriesBefore: git(["show", `${sha}^1:convex/queries.ts`], true),
+  queriesBefore: git(["show", `${previousRelease}:convex/queries.ts`], true),
   queriesAfter: git(["show", `${sha}:convex/queries.ts`], true),
 });
 
