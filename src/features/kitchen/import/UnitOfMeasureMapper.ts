@@ -20,6 +20,15 @@ export const UNIT_OF_MEASURE = [
   "batch",
   "melon",
   "bottle",
+  // Revision-2 culinary model units (TPP catalog and printed sheets).
+  "fluid_ounce",
+  "piece",
+  "slice",
+  "pizza",
+  "package",
+  "case",
+  "can",
+  "tub",
 ] as const;
 
 export type UnitOfMeasure = (typeof UNIT_OF_MEASURE)[number];

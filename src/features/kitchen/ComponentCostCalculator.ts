@@ -3,7 +3,20 @@ import type { UnitOfMeasure } from "./import/UnitOfMeasureMapper";
 // The prep-sheet units are opaque labels — nothing converts a melon into an
 // each — so each gets its own dimension and only ever matches itself.
 type UnitDimension =
-  "mass" | "volume" | "count" | "serving" | "batch" | "melon" | "bottle";
+  | "mass"
+  | "volume"
+  | "count"
+  | "serving"
+  | "batch"
+  | "melon"
+  | "bottle"
+  | "piece"
+  | "slice"
+  | "pizza"
+  | "package"
+  | "case"
+  | "can"
+  | "tub";
 
 const UNIT_FACTORS: Record<
   UnitOfMeasure,
@@ -27,6 +40,14 @@ const UNIT_FACTORS: Record<
   batch: { dimension: "batch", factor: 1 },
   melon: { dimension: "melon", factor: 1 },
   bottle: { dimension: "bottle", factor: 1 },
+  fluid_ounce: { dimension: "volume", factor: 29.5735295625 },
+  piece: { dimension: "piece", factor: 1 },
+  slice: { dimension: "slice", factor: 1 },
+  pizza: { dimension: "pizza", factor: 1 },
+  package: { dimension: "package", factor: 1 },
+  case: { dimension: "case", factor: 1 },
+  can: { dimension: "can", factor: 1 },
+  tub: { dimension: "tub", factor: 1 },
 };
 
 export type ComponentCostLineStatus =
