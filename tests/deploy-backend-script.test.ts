@@ -17,13 +17,15 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { WindowsGitBashPath } from "../scripts/windowsGitBashPath";
 
 const SCRIPT = join(__dirname, "..", "scripts", "deploy-backend.sh");
-const BASH =
-  process.platform === "win32"
-    ? (new WindowsGitBashPath().resolveExe() ?? "bash")
-    : "bash";
+// Git Bash on Windows, never the WSL stub (same lookup as scripts/windowsGitBashPath.ts).
+const GIT_BASH = [
+  process.env.GIT_BASH?.trim() ?? "",
+  "C:/Program Files/Git/bin/bash.exe",
+  "C:/Program Files (x86)/Git/bin/bash.exe",
+].find((path) => path !== "" && existsSync(path));
+const BASH = process.platform === "win32" ? (GIT_BASH ?? "bash") : "bash";
 const ADMIN_KEY_VALUE = "stub-admin-key-value";
 const TIMEOUT = 120_000;
 
