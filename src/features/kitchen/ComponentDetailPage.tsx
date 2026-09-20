@@ -13,10 +13,10 @@ import {
   useListIngredientPriceObservation,
   useListPerson,
   useListComponentIngredient,
-  useListComponentStep,
   useListComponentSnapshot,
   useComponentIngredientAdjustQuantity,
   useComponentIngredientRemove,
+  useComponentIngredientSetWasteFactor,
   useComponentPublishVersion,
   useComponentPurge,
   useComponentRetract,
@@ -61,6 +61,9 @@ import { ComponentImportSourcePanel } from "./import/ComponentImportSourcePanel"
 import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
 import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
 import { ComponentPortionSpecsPanel } from "./ComponentPortionSpecsPanel";
+import { ComponentMethodStepsPanel } from "./ComponentMethodStepsPanel";
+import { ComponentYieldStoragePanel } from "./ComponentYieldStoragePanel";
+import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
 import {
   beginPendingOperation,
   confirmPendingOperation,
@@ -91,7 +94,6 @@ export function ComponentDetailPage() {
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
   const lines = useListComponentIngredient();
-  const steps = useListComponentStep();
   const dishes = useListDish();
   const dishComponents = useListDishComponent();
   const revise = useComponentReviseDraft();
@@ -101,6 +103,7 @@ export function ComponentDetailPage() {
   const createLine = useCreateComponentIngredient();
   const adjustLine = useComponentIngredientAdjustQuantity();
   const removeLine = useComponentIngredientRemove();
+  const setLineWasteFactor = useComponentIngredientSetWasteFactor();
   const reconcileEvents = useReconcileLiveEventsForComponent();
   // Creation path: the governed create hook (ComponentSnapshot_createViaCapture),
   // not the entity-command hook which targets an existing doc via docId.
@@ -169,24 +172,6 @@ export function ComponentDetailPage() {
       (line) => line.deletedAt == null && line.componentId === component._id,
     )
     .sort((a, b) => a.sortOrder - b.sortOrder);
-  const componentSteps = (steps ?? [])
-    .filter(
-      (step) => step.deletedAt == null && step.componentId === component._id,
-    )
-    .sort(
-      (a, b) =>
-        a.sortOrder - b.sortOrder ||
-        a._creationTime - b._creationTime ||
-        String(a._id).localeCompare(String(b._id)),
-    );
-  const methodInstructions = component.instructions?.trim();
-  const methodMatchesSteps =
-    componentSteps.length > 0 &&
-    methodInstructions?.replace(/\s+/g, " ") ===
-      componentSteps
-        .map((step) => step.instruction.trim())
-        .join(" ")
-        .replace(/\s+/g, " ");
   const componentDishIds = new Set(
     (dishComponents ?? [])
       .filter(
@@ -481,6 +466,11 @@ export function ComponentDetailPage() {
 
       <ComponentRecipeStatusPanel componentId={component._id} />
 
+      <ComponentYieldStoragePanel
+        component={component}
+        onFailure={setFailure}
+      />
+
       <div className="culinary-work-grid">
         <section className="culinary-section">
           <div className="culinary-section-heading">
@@ -615,6 +605,23 @@ export function ComponentDetailPage() {
                     >
                       Adjust
                     </button>
+                    <ComponentIngredientWasteButton
+                      ingredientName={ingredientName(line.ingredientId)}
+                      wasteFactor={line.wasteFactor}
+                      disabled={busy != null}
+                      prompt={prompt}
+                      onSave={(wasteFactor) =>
+                        run(`waste:${line._id}`, async () => {
+                          await captureBefore("Set waste factor");
+                          await setLineWasteFactor({
+                            docId: line._id,
+                            version: line.version,
+                            wasteFactor,
+                          });
+                          await reconcileEvents(component._id);
+                        })
+                      }
+                    />
                     <button
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
@@ -708,46 +715,10 @@ export function ComponentDetailPage() {
           ) : null}
         </section>
 
-        <section className="culinary-section">
-          <div className="culinary-section-heading">
-            <h2>Method</h2>
-          </div>
-          {methodInstructions && !methodMatchesSteps ? (
-            <div className="method-prose">{methodInstructions}</div>
-          ) : null}
-          {steps === undefined ? (
-            <p className="py-4 text-base text-ink-2" role="status">
-              Loading method steps…
-            </p>
-          ) : componentSteps.length ? (
-            <ol className="divide-y divide-line" aria-label="Method steps">
-              {componentSteps.map((step, index) => (
-                <li key={step._id} className="flex min-w-0 gap-3 py-4">
-                  <span className="font-mono text-base text-ink-2" aria-hidden>
-                    {index + 1}.
-                  </span>
-                  <div className="min-w-0 space-y-1">
-                    <p className="whitespace-pre-wrap break-words text-base text-ink">
-                      {step.instruction}
-                    </p>
-                    {step.durationMinutes != null ? (
-                      <span className="text-sm text-ink-2">
-                        {step.durationMinutes} min
-                      </span>
-                    ) : null}
-                  </div>
-                </li>
-              ))}
-            </ol>
-          ) : !methodInstructions ? (
-            <div className="document-empty">
-              <p>No method recorded.</p>
-              <span>
-                Edit this draft to capture the source-backed instructions.
-              </span>
-            </div>
-          ) : null}
-        </section>
+        <ComponentMethodStepsPanel
+          componentId={component._id}
+          instructions={component.instructions}
+        />
       </div>
 
       <ComponentSubRecipesPanel componentId={component._id} />

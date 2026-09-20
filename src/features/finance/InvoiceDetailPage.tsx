@@ -15,6 +15,7 @@ import {
   useInvoiceMarkViewed,
   useInvoiceMarkVoided,
   useInvoiceSend,
+  useInvoiceSendBalanceReminder,
   useInvoiceSetDeposit,
   useInvoiceWriteOff,
   useListClient,
@@ -52,6 +53,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
+import { InvoiceNumberEditor } from "./InvoiceNumberEditor";
 import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import { useActionNotice } from "../../ui/action-result";
@@ -91,6 +93,7 @@ export function InvoiceDetailPage() {
   const writeOff = useInvoiceWriteOff();
   const setDeposit = useInvoiceSetDeposit();
   const markDepositPaid = useInvoiceMarkDepositPaid();
+  const sendBalanceReminder = useInvoiceSendBalanceReminder();
   const createCreditMemo = useCreateCreditMemo();
   const {
     getSchedule: getReminderSchedule,
@@ -375,6 +378,27 @@ export function InvoiceDetailPage() {
     })();
   };
 
+  // Invoice.sendBalanceReminder: guards are "not yet reminded" plus an
+  // outstanding balance. It stamps the reminder on the invoice; it does not
+  // email — the reminder schedule below does that.
+  const balanceReminderSent = invoice.balanceReminderSentAt != null;
+  const balanceDue = Number(invoice.amountDue ?? 0) > 0;
+  const balanceReminderBlock = balanceReminderSent
+    ? "A balance reminder is already recorded on this invoice."
+    : balanceDue
+      ? undefined
+      : "Nothing remains due on this invoice.";
+
+  const onSendBalanceReminder = () => {
+    void run("sendBalanceReminder", async () => {
+      await sendBalanceReminder({
+        docId: invoice._id,
+        version: invoice.version,
+      });
+      setNotice("Balance reminder recorded on this invoice.");
+    });
+  };
+
   const onSetDeposit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -557,6 +581,16 @@ export function InvoiceDetailPage() {
             {formatInvoiceNumber(invoice.invoiceNumber, invoice._id) ||
               "Untitled invoice"}
           </h1>
+          <InvoiceNumberEditor
+            invoice={invoice}
+            busy={busy != null}
+            onBusy={(isBusy) => setBusy(isBusy ? "assignNumber" : null)}
+            onSaved={(invoiceNumber) => {
+              setFailure(null);
+              setNotice(`Invoice number set to ${invoiceNumber}.`);
+            }}
+            onFailure={setFailure}
+          />
           <p className="mt-3 max-w-160 text-ink-2">
             Billed to{" "}
             <Link
@@ -692,6 +726,17 @@ export function InvoiceDetailPage() {
                     : action.label}
               </button>
             ))}
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={busy != null || balanceReminderBlock != null}
+            title={balanceReminderBlock}
+            onClick={onSendBalanceReminder}
+          >
+            {busy === "sendBalanceReminder"
+              ? "Working…"
+              : "Send balance reminder"}
+          </button>
         </div>
       </section>
 

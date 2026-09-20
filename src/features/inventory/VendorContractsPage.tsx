@@ -19,6 +19,7 @@ import {
 } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
+import { useVendorContractEdits } from "./VendorContractEdits";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -77,6 +78,8 @@ export function VendorContractsPage() {
       setBusy(null);
     }
   };
+
+  const { editTerms, editTier } = useVendorContractEdits(prompt, run);
 
   const submitDraft = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -319,15 +322,24 @@ export function VendorContractsPage() {
                     </div>
                     <div className="supply-row-actions">
                       {isDraft ? (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          onClick={() =>
-                            invokeContractAction(contract, "activate")
-                          }
-                        >
-                          Activate
-                        </button>
+                        <>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => editTerms(contract)}
+                          >
+                            Edit terms
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() =>
+                              invokeContractAction(contract, "activate")
+                            }
+                          >
+                            Activate
+                          </button>
+                        </>
                       ) : null}
                       {isActive && days != null && days <= 0 ? (
                         <button
@@ -384,20 +396,29 @@ export function VendorContractsPage() {
                                 : ""}
                             </span>
                             {isDraft ? (
-                              <button
-                                className="btn btn-ghost btn-sm"
-                                disabled={busy != null}
-                                onClick={() =>
-                                  void run(`${tier._id}:remove`, async () => {
-                                    await removeTier({
-                                      docId: tier._id,
-                                      version: tier.version,
-                                    });
-                                  })
-                                }
-                              >
-                                Remove
-                              </button>
+                              <>
+                                <button
+                                  className="btn btn-ghost btn-sm"
+                                  disabled={busy != null}
+                                  onClick={() => editTier(tier)}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="btn btn-ghost btn-sm"
+                                  disabled={busy != null}
+                                  onClick={() =>
+                                    void run(`${tier._id}:remove`, async () => {
+                                      await removeTier({
+                                        docId: tier._id,
+                                        version: tier.version,
+                                      });
+                                    })
+                                  }
+                                >
+                                  Remove
+                                </button>
+                              </>
                             ) : null}
                           </li>
                         ))}

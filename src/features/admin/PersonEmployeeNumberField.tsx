@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api } from "../../lib/api";
+import { usePersonSetEmployeeNumber } from "../../lib/manifest-convex-react";
 
 /**
  * Saves a payroll employee number on an already-hired person.
  * Used on Admin → Permissions and Finance → Payroll.
+ *
+ * `governed` picks the generated Person.setEmployeeNumber command (workforce
+ * managers). Finance → Payroll leaves it off and keeps the authored
+ * convex/personEmployeeNumber.ts seam, which also admits finance managers —
+ * the role that needs the number for the payroll export.
  */
 export function PersonEmployeeNumberField({
   personId,
@@ -13,6 +19,7 @@ export function PersonEmployeeNumberField({
   version,
   canEdit,
   busy,
+  governed = false,
   onBusy,
   onSaved,
   onError,
@@ -23,13 +30,18 @@ export function PersonEmployeeNumberField({
   version?: number;
   canEdit: boolean;
   busy: boolean;
+  governed?: boolean;
   onBusy?: (busy: boolean) => void;
   onSaved?: (employeeNumber: string) => void;
   onError?: (message: string) => void;
 }) {
-  const setEmployeeNumber = useMutation(
+  const setEmployeeNumberViaSeam = useMutation(
     api.personEmployeeNumber.setEmployeeNumber,
   );
+  const setEmployeeNumberViaCommand = usePersonSetEmployeeNumber();
+  const setEmployeeNumber = governed
+    ? setEmployeeNumberViaCommand
+    : setEmployeeNumberViaSeam;
   const saved = (currentNumber ?? "").trim();
   const [draft, setDraft] = useState(saved);
 

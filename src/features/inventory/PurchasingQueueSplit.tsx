@@ -3,7 +3,11 @@ import { formatCountNoun } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import type { PurchasingStockContext } from "./purchasingStockContext";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
-import { vendorContactRoleLabel } from "./vendorContactRoles";
+import {
+  VendorDirectoryControls,
+  type VendorDirectoryContact,
+  type VendorDirectoryVendor,
+} from "./VendorDirectoryControls";
 import {
   receivedByWeekEndLabel,
   type VendorPerformance,
@@ -37,22 +41,9 @@ type VendorOrderLine = {
   deletedAt?: number | null;
 };
 
-type Vendor = {
-  _id: string;
-  name: string;
-  email?: string | null;
-  phone?: string | null;
-  status: string;
-};
+type Vendor = VendorDirectoryVendor;
 
-type VendorContact = {
-  _id: string;
-  vendorId: string;
-  name: string;
-  role: string;
-  email?: string | null;
-  phone?: string | null;
-};
+type VendorContact = VendorDirectoryContact;
 
 export type PurchasingQueueSplitProps = {
   needsLoading: boolean;
@@ -301,20 +292,12 @@ export function PurchasingQueueSplit({
                         {` · ${performance.sampleSize} order${performance.sampleSize === 1 ? "" : "s"}`}
                       </small>
                     ) : null}
-                    {contacts.map((contact) => (
-                      <small key={contact._id} className="block">
-                        {vendorContactRoleLabel(contact.role)} · {contact.name}
-                        {contact.phone ? ` · ${contact.phone}` : ""}
-                        {contact.email ? ` · ${contact.email}` : ""}
-                      </small>
-                    ))}
-                    <button
-                      type="button"
-                      className="text-link mt-1 self-start"
-                      onClick={() => onAddContact(vendor._id)}
-                    >
-                      + Add contact
-                    </button>
+                    <VendorDirectoryControls
+                      vendor={vendor}
+                      contacts={contacts}
+                      pageBusy={busy != null}
+                      onAddContact={onAddContact}
+                    />
                   </div>
                   <StatusChip status={String(vendor.status)} />
                 </li>

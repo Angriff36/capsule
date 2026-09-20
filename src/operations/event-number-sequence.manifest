@@ -1,0 +1,44 @@
+// Per-tenant high-water mark for event numbers ("6839").
+//
+// The shop calls an event by a 4-digit number: on the Event Tracker, the binder
+// spine and the chat channel. One row per tenant. Generated commands must not
+// read or write these rows: the authored numbering seam
+// (convex/lib/eventNumbering.ts) is the only owner, running inside the
+// transaction of Event.planEngagement and Event.setEventNumber. The seam gives
+// a new event lastNumber + 1, skips a number another event holds, and moves
+// this row up when a person types a higher number (a TPP-era event keeps its
+// TPP number, and new events continue above it). Same design as
+// sales/invoice-number-sequence.manifest.
+
+entity EventNumberSequence mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+
+  property required lastNumber: int
+
+  default policy eventNumberSequenceRead read: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number sequences are private implementation records"
+  default policy eventNumberSequenceWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number sequences are managed only by the numbering seam"
+  default policy eventNumberSequenceExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number sequences expose no generated commands"
+
+  store EventNumberSequence in durable
+}
+
+// The number the seam gave an event. It lives in its own row, not on the Event:
+// an authored module must not write Event rows (check:event-manifest), and a
+// second governed command inside planEngagement would bump the event version
+// that the caller holds for its next command. A number a person types is stored
+// on Event.eventNumber through Event.setEventNumber and wins over this row.
+entity EventNumberAssignment mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+
+  property indexed required eventId: uuid
+  property indexed required eventNumber: string
+
+  // The whole crew reads event numbers; only the numbering seam writes them.
+  default policy eventNumberAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may read event numbers"
+  default policy eventNumberAssignmentWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event numbers are given only by the numbering seam"
+  default policy eventNumberAssignmentExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number assignments expose no generated commands"
+
+  store EventNumberAssignment in durable
+}

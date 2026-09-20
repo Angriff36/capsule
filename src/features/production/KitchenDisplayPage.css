@@ -167,3 +167,66 @@
   color: #a33c2e;
   font-weight: 600;
 }
+
+/* Secondary board action: destructive or follow-up, never the primary bump. */
+.kds-secondary {
+  background: transparent;
+  color: #31574f;
+  border: 1px solid #a9b6ae;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.kds-secondary:disabled {
+  color: #69756f;
+  border-color: #cfd6d0;
+  cursor: default;
+}
+
+.kds-shares {
+  margin-top: 28px;
+}
+
+.kds-shares h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.kds-shares > p {
+  font-size: 13px;
+  color: #b6c2ba;
+  margin-bottom: 14px;
+}
+
+.kds-shares-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.kds-shares-list > li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid #d9ded8;
+  padding-top: 10px;
+}
+
+.kds-shares-list strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.kds-shares-list small {
+  display: block;
+  font-size: 12px;
+  color: #5c6a63;
+}

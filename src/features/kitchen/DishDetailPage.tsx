@@ -22,8 +22,10 @@ import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { DishContainersPanel } from "./DishContainersPanel";
+import { DishDetailsEditor } from "./DishDetailsEditor";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
 import { DishComponentsPanel } from "./DishComponentsPanel";
+import { DishComponentPortionSpecPanel } from "./DishComponentPortionSpecPanel";
 import { DishIngredientsPanel } from "./DishIngredientsPanel";
 import { DishPlateCostFact } from "./DishPlateCostFact";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
@@ -222,6 +224,31 @@ export function DishDetailPage() {
         />
       </details>
 
+      <details className="recipe-add-editor">
+        <summary>Edit dish</summary>
+        <DishDetailsEditor
+          key={`${dish._id}:${dish.version}`}
+          dish={{
+            _id: dish._id,
+            version: dish.version,
+            name: dish.name,
+            description: dish.description,
+            category: dish.category,
+            course: dish.course,
+            serviceStyle: dish.serviceStyle,
+            dietaryTags: dish.dietaryTags,
+            portionSize: Number(dish.portionSize),
+            portionUnit: String(dish.portionUnit),
+            serviceInstructions: dish.serviceInstructions,
+            serviceInstructionsSource: dish.serviceInstructionsSource,
+            allergenSummary: dish.allergenSummary,
+            kind: dish.kind,
+            status: String(dish.status),
+          }}
+          onFailure={setFailure}
+        />
+      </details>
+
       {dish.recipeInstructions ? (
         <section className="culinary-section">
           <div className="flex flex-wrap items-center gap-3.5">
@@ -242,6 +269,8 @@ export function DishDetailPage() {
       <DishPrepTasksPanel dishId={dish._id} />
 
       <DishComponentsPanel dishId={dish._id} />
+
+      <DishComponentPortionSpecPanel dishId={dish._id} />
 
       <DishContainersPanel dishId={dish._id} />
 

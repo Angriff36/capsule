@@ -2,11 +2,13 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   useCreateVenueVendorRelationship,
+  useVenueVendorRelationshipReviseDetails,
   useVenueVendorRelationshipReviseStatus,
   useVenueVendorRelationshipRetire,
   useListVenueVendorRelationship,
-  useListVenue,
   useListVendor,
+  useListVendorContact,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
 import {
   venueDetailPath,
@@ -15,7 +17,7 @@ import {
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
-import { formatDate } from "../../lib/format";
+import { formatDate, toDatetimeLocalValue } from "../../lib/format";
 import {
   classifyCommandFailure,
   type CommandFailure,
@@ -69,15 +71,31 @@ const toDateEpoch = (raw: FormDataEntryValue | null): number | undefined => {
   return Number.isNaN(ms) ? undefined : ms;
 };
 
+/** Epoch-ms back into the "YYYY-MM-DDTHH:mm" an edit field shows. */
+const toLocalInput = (ms: number | null | undefined): string =>
+  ms == null ? "" : toDatetimeLocalValue(Number(ms));
+
+const trimmed = (value: string | undefined): string | undefined =>
+  value?.trim() ? value.trim() : undefined;
+
+const toOptionalNumber = (value: string | undefined): number | undefined => {
+  const raw = value?.trim();
+  if (!raw) return undefined;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) ? parsed : undefined;
+};
+
 /** Venue vendor relationships page — manage venue-specific vendor policies. */
 export function VenueVendorRelationshipsPage() {
   const { venueId } = useParams<{ venueId: string }>();
   const relationships = useListVenueVendorRelationship();
   const venues = useListVenue();
   const vendors = useListVendor();
+  const vendorContacts = useListVendorContact();
 
   const createRelationship = useCreateVenueVendorRelationship();
   const reviseStatus = useVenueVendorRelationshipReviseStatus();
+  const reviseDetails = useVenueVendorRelationshipReviseDetails();
   const retireRelationship = useVenueVendorRelationshipRetire();
 
   const [showForm, setShowForm] = useState(false);
@@ -169,6 +187,121 @@ export function VenueVendorRelationshipsPage() {
         status: newStatus,
       });
     });
+  };
+
+  // Every optional param must travel on each call: a box left blank sends
+  // nothing and the command keeps the value it already holds.
+  const handleRevise = (row: (typeof rows)[number]) => {
+    void (async () => {
+      const contactOptions = (vendorContacts ?? [])
+        .filter((c) => c.deletedAt == null && c.vendorId === row.vendorId)
+        .map((c) => ({ value: String(c._id), label: String(c.name) }));
+      const values = await prompt.askFields({
+        title: `Edit ${getVendorName(row.vendorId)}`,
+        description:
+          "Terms this venue holds with the vendor. A box left blank keeps its saved value; change the policy with the status control.",
+        fields: [
+          {
+            name: "category",
+            label: "Category",
+            defaultValue: row.category,
+            options: CATEGORIES.map((c) => ({ ...c })),
+          },
+          {
+            name: "effectiveFrom",
+            label: "Effective from",
+            inputType: "datetime-local",
+            defaultValue: toLocalInput(row.effectiveFrom),
+            required: false,
+          },
+          {
+            name: "effectiveUntil",
+            label: "Effective until",
+            inputType: "datetime-local",
+            defaultValue: toLocalInput(row.effectiveUntil),
+            required: false,
+          },
+          {
+            name: "primaryContactId",
+            label: "Primary contact at the vendor",
+            defaultValue: row.primaryContactId
+              ? String(row.primaryContactId)
+              : "",
+            options: contactOptions,
+            placeholder: "No contact chosen",
+            required: false,
+          },
+          {
+            name: "insuranceCertificate",
+            label: "Insurance certificate",
+            defaultValue: row.insuranceCertificate ?? "",
+            required: false,
+          },
+          {
+            name: "insuranceExpiry",
+            label: "Insurance expiry",
+            inputType: "datetime-local",
+            defaultValue: toLocalInput(row.insuranceExpiry),
+            required: false,
+          },
+          {
+            name: "complianceNotes",
+            label: "Compliance notes",
+            multiline: true,
+            defaultValue: row.complianceNotes ?? "",
+            required: false,
+          },
+          {
+            name: "discountPercent",
+            label: "Discount percent",
+            inputType: "number",
+            defaultValue:
+              row.discountPercent != null ? String(row.discountPercent) : "",
+            required: false,
+          },
+          {
+            name: "paymentTerms",
+            label: "Payment terms",
+            defaultValue: row.paymentTerms ?? "",
+            required: false,
+          },
+          {
+            name: "minimumOrder",
+            label: "Minimum order",
+            inputType: "number",
+            defaultValue:
+              row.minimumOrder != null ? String(row.minimumOrder) : "",
+            required: false,
+          },
+          {
+            name: "notes",
+            label: "Notes",
+            multiline: true,
+            defaultValue: row.notes ?? "",
+            required: false,
+          },
+        ],
+        confirmLabel: "Save relationship",
+      });
+      if (!values) return;
+      void run(`revise-${row._id}`, async () => {
+        await reviseDetails({
+          docId: row._id,
+          version: row.version,
+          category: (values.category || undefined) as CategoryValue | undefined,
+          effectiveFrom: toDateEpoch(values.effectiveFrom ?? null),
+          effectiveUntil: toDateEpoch(values.effectiveUntil ?? null),
+          primaryContactId: trimmed(values.primaryContactId),
+          insuranceCertificate: trimmed(values.insuranceCertificate),
+          insuranceExpiry: toDateEpoch(values.insuranceExpiry ?? null),
+          complianceNotes: trimmed(values.complianceNotes),
+          discountPercent: toOptionalNumber(values.discountPercent),
+          paymentTerms: trimmed(values.paymentTerms),
+          minimumOrder: toOptionalNumber(values.minimumOrder),
+          notes: trimmed(values.notes),
+        });
+      });
+    })();
   };
 
   const handleRetire = async (id: string, vendorName: string) => {
@@ -569,6 +702,14 @@ export function VenueVendorRelationshipsPage() {
                             </option>
                           ))}
                         </select>
+                        <button
+                          type="button"
+                          onClick={() => handleRevise(row)}
+                          disabled={busy === `revise-${row._id}`}
+                          className="ml-2 text-brand hover:underline disabled:opacity-50"
+                        >
+                          Edit
+                        </button>
                         <button
                           type="button"
                           onClick={() =>

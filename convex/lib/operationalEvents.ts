@@ -23,6 +23,7 @@ import {
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
+import { ensureEventNumber } from "./eventNumbering";
 import { deleteBlobIfOrphan } from "./blobs";
 
 /** Runs after declared reactions, inside the originating command transaction. */
@@ -102,6 +103,12 @@ export async function handleManifestEvent(
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {
     if (event.payload.previousPurchasingWeekStart !== event.payload.purchasingWeekStart)
       await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Event" &&
+    (event.type === "EventPlanned" || event.type === "EventNumberSet")) {
+    // Every planned event gets the next 4-digit number; a typed one is checked.
+    await ensureEventNumber(ctx, event.entityId as Id<"events">);
     return;
   }
   if (event.entity === "Invoice" &&

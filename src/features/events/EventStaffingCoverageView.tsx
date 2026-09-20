@@ -21,6 +21,12 @@ export type EventStaffNeedRow = StaffNeedRow & {
   readonly coverageContinuedAt?: number | null;
 };
 
+/** Renders the "Edit times" control for one assignment or staffing request. */
+export type StaffTimingControlRenderer = (
+  kind: "assignment" | "need",
+  docId: string,
+) => ReactNode;
+
 export type StaffingConflictSummary = {
   overlappingShifts: readonly unknown[];
   approvedOff: readonly unknown[];
@@ -108,6 +114,7 @@ export function EventStaffingCoverageView({
   onReleaseClaim,
   onCancel,
   onChangeCoverage,
+  timingControl,
   conflictsFor,
 }: {
   roster: readonly StaffingRosterEntry[];
@@ -126,6 +133,7 @@ export function EventStaffingCoverageView({
   onReleaseClaim?: (need: EventStaffNeedRow) => void;
   onCancel: (need: EventStaffNeedRow) => void;
   onChangeCoverage?: (need: EventStaffNeedRow) => void;
+  timingControl?: StaffTimingControlRenderer;
   conflictsFor: (
     personId: string,
     windows?: readonly { startsAt?: number | null; endsAt?: number | null }[],
@@ -220,14 +228,17 @@ export function EventStaffingCoverageView({
                       className={`${canManage && (entry.unassign || coveredNeeds.length) ? "block" : "hidden"} px-3 py-2 md:table-cell text-right align-top`}
                     >
                       {canManage && entry.unassign ? (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-sm"
-                          disabled={busy != null}
-                          onClick={() => onUnassign(entry)}
-                        >
-                          Unassign
-                        </button>
+                        <>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            disabled={busy != null}
+                            onClick={() => onUnassign(entry)}
+                          >
+                            Unassign
+                          </button>
+                          {timingControl?.("assignment", entry.unassign.docId)}
+                        </>
                       ) : !canManage || coveredNeeds.length === 0 ? (
                         <span className="text-base text-ink-3">—</span>
                       ) : null}
@@ -257,6 +268,7 @@ export function EventStaffingCoverageView({
                               >
                                 Remove {need.role} coverage
                               </button>
+                              {timingControl?.("need", need._id)}
                             </div>
                           ))
                         : null}
@@ -437,14 +449,17 @@ export function EventStaffingCoverageView({
                           />
                         ) : null}
                         {canManage && claimable ? (
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-sm"
-                            disabled={busy != null}
-                            onClick={() => onCancel(need)}
-                          >
-                            Cancel
-                          </button>
+                          <>
+                            {timingControl?.("need", need._id)}
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              disabled={busy != null}
+                              onClick={() => onCancel(need)}
+                            >
+                              Cancel
+                            </button>
+                          </>
                         ) : null}
                       </div>
                     </td>

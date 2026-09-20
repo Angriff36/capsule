@@ -43,6 +43,10 @@ entity PackList mixin TenantScoped, SoftDeletable {
   property dispatchedAt: datetime?
   property cancelledAt: datetime?
   property cancellationReason: string?
+  // Event Tracker call-out: the packer is stuck and needs a hand. Shown as
+  // "Needs assistance" on the tracker until someone resolves it.
+  property assistanceRequestedAt: datetime?
+  property assistanceNote: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   hasMany items: PackListItem
@@ -58,9 +62,11 @@ entity PackList mixin TenantScoped, SoftDeletable {
 
   // manageAccess: Event.approve (event_manager) reaction-opens PackList;
   // logisticsAccess: packing staff. Same cascade pattern as PurchaseNeed.
-  default policy packListRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may read pack lists"
-  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may write pack lists through commands"
-  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may execute pack list commands"
+  // Read wide: the Event Tracker shows pack status to the whole crew. Event
+  // and sales staff write because they open a pack list from the tracker row.
+  default policy packListRead read: roleAllows(user.role, "staffAccess") "Staff may read pack lists"
+  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may write pack lists through commands"
+  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may execute pack list commands"
 
   // Idempotent open: Event.approve reaction may re-fire; do not fail or duplicate.
   command open(
@@ -71,11 +77,14 @@ entity PackList mixin TenantScoped, SoftDeletable {
   ) {
     // Preserve the existing header-creation authority; kitchen access supports
     // packing existing lists and automatic recipe-driven requirement updates.
-    guard roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess")
+    guard roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess")
     guard self.deletedAt == null
     guard self.status != "cancelled" and self.status != "dispatched"
     guard self.event != null
     guard self.openedAt == null or self.eventId == eventId
+    // The service style kit lands once, on the first open. A re-open (the
+    // EventApproved cascade) must not put back a line the packer removed.
+    compute wasOpen = self.openedAt != null
     constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
     constraint openNamePresent: length(trim(name)) > 0 or length(trim(self.name)) > 0 "Pack list name is required"
     mutate eventId = eventId
@@ -91,6 +100,50 @@ entity PackList mixin TenantScoped, SoftDeletable {
       name: length(trim(self.name)) > 0 ? self.name : name
       purpose: purpose != null ? purpose : self.purpose
       status: self.status
+    }
+    emit PackListKitRequested {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      kitKey: wasOpen or self.event == null or self.event.serviceStyleId == null ? "" : self.tenantId + ":" + self.event.serviceStyleId
+      expectedHeadcount: self.event != null ? self.event.expectedHeadcount : 0
+    }
+  }
+
+  // Put a service style's kit on this list: the event changed style, or the
+  // packer asks for the kit again. Lines already on the list are left alone.
+  command applyServiceStyleKit(serviceStyleId: uuid) {
+    guard self.deletedAt == null and self.status != "dispatched" and self.status != "cancelled"
+    emit PackListKitRequested {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      kitKey: self.tenantId + ":" + serviceStyleId
+      expectedHeadcount: self.event != null ? self.event.expectedHeadcount : 0
+    }
+  }
+
+  command requestAssistance(optional note: string) {
+    guard self.deletedAt == null and self.status != "dispatched" and self.status != "cancelled"
+    mutate assistanceRequestedAt = now()
+    mutate assistanceNote = note
+    emit PackListAssistanceRequested {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      note: note
+    }
+  }
+
+  command resolveAssistance() {
+    guard self.assistanceRequestedAt != null
+    guard self.deletedAt == null
+    mutate assistanceRequestedAt = null
+    mutate assistanceNote = null
+    emit PackListAssistanceResolved {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
     }
   }
 
@@ -256,6 +309,12 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property containerServings: int?
   property productionBatchId: uuid?
   // Internal source evidence for a reviewed correction of imported unit labels.
+  // Servingware type note for the packer (Mangia Ops Final Lock Training part
+  // 3, PACKLIST): "wood board", "white marble bowl". Empty = no note.
+  property note: string?
+  // Set on a line that came from the service style kit; the idempotency key of
+  // the kit cascade.
+  property indexed serviceStyleKitItemId: uuid?
   property unitCorrectionSource: string?
   property associationSource: string?
   property required requiredQuantity: decimal(12, 4) = 0
@@ -284,9 +343,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   // Kitchen and logistics share physical packing; recipe corrections also
   // reconcile container requirements through these same commands.
-  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may read pack list items"
-  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may write pack list items through commands"
-  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics staff and managers may execute pack list item commands"
+  default policy packListItemRead read: roleAllows(user.role, "staffAccess") "Staff may read pack list items"
+  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may write pack list items through commands"
+  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may execute pack list item commands"
 
   command addItem(
     packListId: uuid,
@@ -500,6 +559,60 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Service style kit line (operations/service-style-kit.manifest). Idempotent:
+  // first write wins, so a second kit request never overwrites what the packer
+  // changed on this event.
+  command ensureKitItem(packListId: uuid, serviceStyleKitItemId: uuid, description: string, requiredQuantity: decimal(12, 4), unit: UnitOfMeasure, optional note: string) {
+    guard self.deletedAt == null
+    constraint kitReferencesMatch: self.packListId == packListId and self.serviceStyleKitItemId == serviceStyleKitItemId "Kit references must match the packing line"
+    guard self.packList != null
+    compute wasListed = self.listedAt != null
+    mutate description = self.listedAt == null ? description : self.description
+    mutate unit = self.listedAt == null ? unit : self.unit
+    mutate requiredQuantity = self.listedAt == null ? requiredQuantity : self.requiredQuantity
+    mutate note = self.listedAt == null ? note : self.note
+    mutate status = self.listedAt == null ? "listed" : self.status
+    mutate listedAt = self.listedAt != null ? self.listedAt : now()
+    emit PackListItemKitEnsured {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: packListId
+      serviceStyleKitItemId: serviceStyleKitItemId
+    }
+    // A new kit line on a packed or loaded list reopens packing, the same as a
+    // new dish container: the list must not dispatch with the line unpacked.
+    emit PackListItemRequirementSynced {
+      packListId: self.packListId
+      tenantId: self.tenantId
+      additionalRequired: not wasListed
+    }
+  }
+
+  // Take a line off this event's list (the kit sends a tent, this event is
+  // indoors). The kit itself does not change.
+  command remove() {
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled"
+    mutate deletedAt = now()
+    emit PackListItemRemoved {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      description: self.description
+    }
+  }
+
+  // A note is never frozen: the packer reads it up to dispatch.
+  command annotate(optional note: string) {
+    guard self.deletedAt == null
+    mutate note = note
+    emit PackListItemAnnotated {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+    }
+  }
+
   store PackListItem in durable
 }
 
@@ -604,6 +717,47 @@ event PackListItemMissing: "pack_list_item.missing" {
   unit: UnitOfMeasure
 }
 
+event PackListKitRequested: "pack_list.kit_requested" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  kitKey: string
+  expectedHeadcount: int
+}
+
+event PackListAssistanceRequested: "pack_list.assistance_requested" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  note: string?
+}
+
+event PackListAssistanceResolved: "pack_list.assistance_resolved" {
+  packListId: string
+  tenantId: string
+  eventId: string
+}
+
+event PackListItemKitEnsured: "pack_list_item.kit_ensured" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  serviceStyleKitItemId: string
+}
+
+event PackListItemRemoved: "pack_list_item.removed" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  description: string
+}
+
+event PackListItemAnnotated: "pack_list_item.annotated" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+}
+
 event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {
   packListItemId: string
   tenantId: string
@@ -625,6 +779,27 @@ on EventApproved run PackList.open
     eventId: payload.eventId
     name: "Event pack list"
   }
+
+// The key is "<tenantId>:<serviceStyleId>", so only this workspace's kit lines
+// match. An empty key (re-open, or an event with no style) matches no row. It
+// is "" and never null: a retired kit line stores a null activeKitKey, and a
+// null key would match every retired line.
+on PackListKitRequested fanOut ServiceStyleKitItem where activeKitKey = payload.kitKey
+  run PackListItem.ensureKitItem
+  match packListId = payload.packListId, serviceStyleKitItemId = self.id
+  else create
+  params {
+    packListId: payload.packListId
+    serviceStyleKitItemId: self.id
+    description: self.description
+    requiredQuantity: self.baseQuantity + (self.guestsPerUnit != null ? ceil(payload.expectedHeadcount / self.guestsPerUnit) : 0)
+    unit: self.unit
+    note: self.note
+  }
+
+on EventServiceStyleChanged fanOut PackList where activeEventId = payload.eventId
+  run applyServiceStyleKit
+  params { serviceStyleId: payload.serviceStyleId }
 
 
 on EventDishServingsAdjusted fanOut PackListItem where eventDishId = payload.eventDishId

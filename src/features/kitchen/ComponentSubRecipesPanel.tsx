@@ -5,6 +5,7 @@ import {
   useReconcileLiveEventsForComponent,
 } from "../../lib/culinaryDemandClient";
 import {
+  useComponentComponentAdjustQuantity,
   useComponentComponentRemove,
   useListComponent,
   useListComponentComponent,
@@ -13,7 +14,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { readableRecipeAmount } from "./RecipeNotes";
-import { SELECTABLE_UNITS } from "./import/UnitOfMeasureMapper";
+import { SELECTABLE_UNITS, unitOptionsFor } from "./import/UnitOfMeasureMapper";
 
 /** Recipes this recipe is built from. The seam refuses a line that would make
  *  a recipe contain itself; that refusal is shown on the form. */
@@ -25,6 +26,7 @@ export function ComponentSubRecipesPanel({
   const lines = useListComponentComponent();
   const recipes = useListComponent();
   const addLine = useAddNestedRecipeLine();
+  const adjustLine = useComponentComponentAdjustQuantity();
   const removeLine = useComponentComponentRemove();
   const reconcileEvents = useReconcileLiveEventsForComponent();
   const { prompt, host } = useActionPrompt();
@@ -72,6 +74,55 @@ export function ComponentSubRecipesPanel({
         cause instanceof Error
           ? cause.message
           : "Could not add the sub-recipe line.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function onAdjust(line: (typeof rows)[number], name: string) {
+    const values = await prompt.askFields({
+      title: "Adjust sub-recipe quantity",
+      description: `How much ${name} this recipe uses.`,
+      fields: [
+        {
+          name: "quantity",
+          label: "Quantity",
+          inputType: "number",
+          defaultValue: String(line.quantity),
+          required: true,
+        },
+        {
+          name: "unit",
+          label: "Unit",
+          defaultValue: String(line.unit),
+          options: unitOptionsFor(String(line.unit)).map((unit) => ({
+            value: unit,
+            label: unit,
+          })),
+          required: true,
+        },
+      ],
+      confirmLabel: "Save quantity",
+    });
+    if (!values) return;
+    const quantity = Number(values.quantity);
+    if (!Number.isFinite(quantity) || quantity <= 0) return;
+    setBusy(line._id);
+    setError(null);
+    try {
+      await adjustLine({
+        docId: line._id,
+        version: line.version,
+        quantity,
+        unit: values.unit,
+      });
+      await reconcileEvents(componentId);
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not change the sub-recipe quantity.",
       );
     } finally {
       setBusy(null);
@@ -145,6 +196,16 @@ export function ComponentSubRecipesPanel({
               </span>
               <span>{line.prepNotes || "No preparation note"}</span>
               <div className="culinary-line-actions">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={busy != null}
+                  onClick={() =>
+                    void onAdjust(line, nameOf(line.childComponentId))
+                  }
+                >
+                  Adjust
+                </button>
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm"

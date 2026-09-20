@@ -300,6 +300,15 @@
   }
 }
 
+/* Retire / Reactivate on a module card and on a shift type row. */
+.training-module-grid footer .btn {
+  margin-left: auto;
+}
+
+.training-shift-types article .btn {
+  margin-top: 0.45rem;
+}
+
 @media (max-width: 620px) {
   .training-actions {
     display: grid;

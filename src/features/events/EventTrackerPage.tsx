@@ -21,9 +21,12 @@ import {
   useListClient,
   useListDelivery,
   useListEvent,
+  useListEventNumberAssignment,
+  useListEventVehicleAssignment,
   useListInvoice,
   useListPerson,
   useListServiceStyle,
+  useListTrailer,
   useListVehicle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
@@ -148,6 +151,9 @@ export function EventTrackerPage() {
   const serviceStyles = useListServiceStyle();
   const people = useListPerson();
   const invoices = useListInvoice();
+  const assignments = useListEventVehicleAssignment();
+  const trailers = useListTrailer();
+  const numberAssignments = useListEventNumberAssignment();
 
   const reschedule = useEventReschedule();
   const changeHeadcount = useEventChangeHeadcount();
@@ -194,6 +200,9 @@ export function EventTrackerPage() {
             serviceStyles: serviceStyles ?? [],
             people: people ?? [],
             invoices: invoices ?? [],
+            assignments: assignments ?? [],
+            trailers: trailers ?? [],
+            numberAssignments: numberAssignments ?? [],
           }),
     [
       loading,
@@ -205,6 +214,9 @@ export function EventTrackerPage() {
       serviceStyles,
       people,
       invoices,
+      assignments,
+      trailers,
+      numberAssignments,
     ],
   );
 

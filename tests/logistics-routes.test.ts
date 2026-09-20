@@ -16,6 +16,7 @@ describe("Logistics routes and lifecycle bindings", () => {
     expect(LOGISTICS_SECTIONS.map((section) => section.path)).toEqual([
       "/logistics/packs",
       "/logistics/pack-templates",
+      "/logistics/style-kits",
       "/logistics/deliveries",
       "/logistics/schedule",
       "/logistics/route",

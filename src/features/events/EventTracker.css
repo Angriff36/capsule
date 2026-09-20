@@ -232,3 +232,279 @@
     grid-auto-columns: 85vw;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Month sheet: the tracker as a spreadsheet. Dense rows, ruled cells, inputs
+   that look like cells until they are focused.
+   ------------------------------------------------------------------------ */
+.tracker-view-switch {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-inset);
+  padding: 0.125rem;
+}
+.tracker-view-switch > button {
+  padding: 0.25rem 0.875rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.tracker-view-switch > button[data-active] {
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+}
+
+.tracker-sheet-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1.25rem;
+}
+.tracker-sheet-month {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.tracker-sheet-month > strong {
+  min-width: 11rem;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  text-align: center;
+  color: var(--color-ink);
+}
+.tracker-sheet-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+
+.tracker-sheet-scroll {
+  margin-top: 0.75rem;
+  overflow-x: auto;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ledger);
+  background: var(--color-panel);
+}
+.tracker-sheet {
+  width: 100%;
+  min-width: 90rem;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.tracker-sheet th,
+.tracker-sheet td {
+  border-right: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.25rem 0.5rem;
+  vertical-align: top;
+  text-align: left;
+}
+.tracker-sheet th:last-child,
+.tracker-sheet td:last-child {
+  border-right: 0;
+}
+.tracker-sheet thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--color-inset);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-2);
+  white-space: nowrap;
+}
+.tracker-sheet tbody tr:hover > td {
+  background: var(--color-inset);
+}
+.tracker-sheet tr[data-weekend] > td {
+  background: var(--color-mute-soft);
+}
+.tracker-sheet tr[data-today] > td {
+  box-shadow:
+    inset 0 1px 0 var(--color-brand),
+    inset 0 -1px 0 var(--color-brand);
+}
+.tracker-sheet tr[data-busy] {
+  opacity: 0.6;
+}
+.tracker-sheet-blank > td {
+  padding-block: 0.125rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.tracker-sheet-empty {
+  padding: 2rem !important;
+  text-align: center !important;
+  color: var(--color-ink-2);
+}
+
+.tracker-col-num {
+  width: 6.5rem;
+  font-family: var(--font-mono);
+}
+.tracker-col-date {
+  width: 7.5rem;
+  white-space: nowrap;
+}
+.tracker-col-event {
+  min-width: 15rem;
+}
+.tracker-col-style {
+  width: 13.5rem;
+}
+.tracker-col-rigs {
+  width: 42.5rem;
+}
+.tracker-col-binder {
+  width: 7rem;
+}
+.tracker-col-pack {
+  width: 11rem;
+}
+.tracker-col-date > small,
+.tracker-col-event > small,
+.tracker-col-pack > small {
+  display: block;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.tracker-col-event > a {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.tracker-col-event > a:hover {
+  color: var(--color-brand);
+}
+
+/* An input that reads as a cell: no chrome until hover or focus. */
+.tracker-sheet-input {
+  width: 100%;
+  min-height: 1.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  padding: 0.125rem 0.25rem;
+  color: var(--color-ink);
+  font: inherit;
+}
+.tracker-sheet-input:hover:not(:disabled) {
+  border-color: var(--color-line-2);
+}
+.tracker-sheet-input:focus-visible {
+  border-color: var(--color-brand);
+  background: var(--color-canvas);
+  outline: none;
+}
+.tracker-sheet-input:disabled {
+  color: var(--color-ink-2);
+  opacity: 1;
+}
+.tracker-sheet-input option {
+  background: var(--color-panel);
+  color: var(--color-ink);
+}
+
+.tracker-rigs {
+  display: grid;
+  gap: 0.125rem;
+}
+.tracker-rig {
+  display: grid;
+  grid-template-columns: 15rem 11rem 10.5rem 4rem;
+  align-items: center;
+  gap: 0.25rem;
+}
+.tracker-rig-head > span {
+  padding-inline: 0.25rem;
+}
+.tracker-rig[data-new] .tracker-sheet-input {
+  color: var(--color-ink-3);
+}
+.tracker-rig[data-conflict] .tracker-sheet-input:first-child {
+  border-color: var(--color-warn);
+}
+.tracker-rig-end {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+  padding-inline: 0.25rem;
+}
+.tracker-rig-release {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: var(--radius-xs);
+  color: var(--color-ink-3);
+  line-height: 1;
+}
+.tracker-rig-release:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+.tracker-rig-hint {
+  padding-inline: 0.25rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.tracker-rig-conflict {
+  grid-column: 1 / -1;
+  padding-inline: 0.25rem;
+  color: var(--color-warn);
+  font-size: var(--text-xs);
+}
+
+.tracker-binder {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.75rem;
+  color: var(--color-ink-2);
+}
+.tracker-binder:has(input:checked) {
+  color: var(--color-ok);
+  font-weight: 600;
+}
+
+.tracker-pack-pill {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  padding: 0.0625rem 0.5rem;
+  background: var(--color-mute-soft);
+  color: var(--color-ink-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.tracker-pack-pill[data-pack="needs_assistance"] {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+.tracker-pack-pill[data-pack="question"] {
+  background: var(--color-warn-soft);
+  color: var(--color-warn);
+}
+.tracker-pack-pill[data-pack="packing"] {
+  background: var(--color-info-soft);
+  color: var(--color-info);
+}
+.tracker-pack-pill[data-pack="packed"],
+.tracker-pack-pill[data-pack="loaded"],
+.tracker-pack-pill[data-pack="dispatched"] {
+  background: var(--color-ok-soft);
+  color: var(--color-ok);
+}
+.tracker-pack-link {
+  margin-left: 0.5rem;
+  color: var(--color-brand);
+  font-size: var(--text-xs);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}

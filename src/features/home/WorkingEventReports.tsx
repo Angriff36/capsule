@@ -1,5 +1,9 @@
 import { useMemo } from "react";
-import { useGetClient, useGetEvent } from "../../lib/manifest-convex-react";
+import {
+  useGetClient,
+  useGetEvent,
+  useListEventNumberAssignment,
+} from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { clientDisplayName } from "../events/clientName";
 import {
@@ -11,13 +15,14 @@ import {
   useEventReportList,
   type ReportRailEvent,
 } from "./EventReportRail";
-import { shortRef } from "./homeCalendar";
+import { eventNumberLabel, givenEventNumbers } from "./homeCalendar";
 
 /** The shell's report rail: the working event's reports on every screen. */
 export function WorkingEventReports() {
   const id = useWorkingEventId();
   const event = useGetEvent(id ?? "skip");
   const client = useGetClient(event?.clientId ?? "skip");
+  const numberAssignments = useListEventNumberAssignment();
   const authStatus = useAuthStatus();
   const { ids, chosen, toggle } = useEventReportList(
     authStatus?.personId ?? "anonymous",
@@ -30,7 +35,12 @@ export function WorkingEventReports() {
         ? {
             id: event._id,
             title: event.title,
-            eventNumber: shortRef(event._id),
+            eventNumber:
+              eventNumberLabel(
+                event.eventNumber,
+                undefined,
+                givenEventNumbers(numberAssignments).get(event._id),
+              ) || "No #",
             client: clientDisplayName(
               event.clientId,
               client ? [client] : undefined,
@@ -39,7 +49,7 @@ export function WorkingEventReports() {
             endsAt: event.endsAt ?? null,
           }
         : null,
-    [client, event, id],
+    [client, event, id, numberAssignments],
   );
 
   if (!railEvent) return null;

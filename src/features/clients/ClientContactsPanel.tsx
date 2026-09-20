@@ -1,11 +1,17 @@
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { ReasonCopy } from "../../ui/action-prompt";
+import { ClientContactEditForm } from "./ClientContactEditForm";
 
 export interface ClientContactRow {
   _id: string;
   version: number;
   givenName?: string | null;
   familyName?: string | null;
+  title?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  mobile?: string | null;
+  notes?: string | null;
   isPrimary?: boolean;
   isBillingContact?: boolean;
 }
@@ -17,6 +23,8 @@ interface ClientContactsPanelProps {
   onSubmitAdd: (event: FormEvent<HTMLFormElement>) => void;
   onSetPrimary: (row: ClientContactRow) => void;
   onRemove: (row: ClientContactRow) => void;
+  run: (key: string, work: () => Promise<void>) => void;
+  onSaved: (message: string) => void;
   askConfirm: (request: {
     title: string;
     description: string;
@@ -34,7 +42,12 @@ export function ClientContactsPanel({
   onSetPrimary,
   onRemove,
   askConfirm,
+  run,
+  onSaved,
 }: ClientContactsPanelProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const editing = contacts.find((row) => row._id === editingId) ?? null;
+
   return (
     <>
       {showAddForm ? (
@@ -113,6 +126,18 @@ export function ClientContactsPanel({
                     {row.isBillingContact ? "Billing" : ""}
                   </td>
                   <td className="supply-row-actions">
+                    <button
+                      className="btn btn-ghost"
+                      type="button"
+                      disabled={busy != null}
+                      onClick={() =>
+                        setEditingId((current) =>
+                          current === row._id ? null : row._id,
+                        )
+                      }
+                    >
+                      {editingId === row._id ? "Close" : "Edit"}
+                    </button>
                     {!row.isPrimary ? (
                       <button
                         className="btn btn-ghost"
@@ -149,6 +174,17 @@ export function ClientContactsPanel({
           </table>
         )}
       </section>
+
+      {editing ? (
+        <ClientContactEditForm
+          key={`${editing._id}:${editing.version}`}
+          contact={editing}
+          busy={busy}
+          run={run}
+          onSaved={onSaved}
+          onClose={() => setEditingId(null)}
+        />
+      ) : null}
     </>
   );
 }

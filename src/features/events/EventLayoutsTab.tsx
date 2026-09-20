@@ -1,6 +1,10 @@
 import type { Id } from "../../lib/api";
 import { EventBattleBoardLayoutsPanel } from "./EventBattleBoardLayoutsPanel";
 import { EventDaySheetPanel } from "./EventDaySheetPanel";
+import {
+  EventSetupNotesPanel,
+  EventTaskBreakdownPanel,
+} from "./EventSetupNotesPanel";
 import { EventTabIntro } from "./EventTabIntro";
 
 type Props = {
@@ -17,6 +21,8 @@ export function EventLayoutsTab({ eventId }: Props) {
       />
       <EventBattleBoardLayoutsPanel eventId={eventId} />
       <EventDaySheetPanel eventId={eventId} />
+      <EventSetupNotesPanel eventId={eventId} />
+      <EventTaskBreakdownPanel eventId={eventId} />
     </section>
   );
 }

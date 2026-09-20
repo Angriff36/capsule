@@ -238,7 +238,9 @@ entity Client mixin TenantScoped, SoftDeletable {
     constraint billingTerms: paymentTermsDays >= 0 and paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
     mutate paymentTermsDays = paymentTermsDays
     mutate taxExempt = taxExempt
-    mutate taxId = taxId
+    // taxId is private: no screen can read it back to send it again. An omitted
+    // value keeps the saved ID; "" clears it.
+    mutate taxId = taxId != null ? taxId : self.taxId
     emit ClientBillingProfileChanged {
       clientId: self.id
       tenantId: self.tenantId
@@ -594,6 +596,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   property venueId: uuid?
   property assignedToId: uuid?
   property required searchable title: string = ""
+  // The 4-digit number the shop calls the event by: on the Event Tracker, the
+  // binder spine and the chat channel. The numbering seam
+  // (convex/lib/eventNumbering.ts) gives every planned event the next number.
+  // A person can type a different one (a TPP-era event keeps its TPP number).
+  property indexed eventNumber: string?
   property required eventType: string = ""
   property startsAt: datetime?
   property endsAt: datetime?
@@ -677,6 +684,32 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Buffet line order, comma-separated plate names.
   property buffetColdPlates: string?
   property buffetHotPlates: string?
+  // Ops Final Lock setup notes (Mangia Ops Final Lock Training part 3, NOTES
+  // and EQUIP) — what the packer and the field team read before load-out.
+  // Free text like the day sheet ("Ivory", "White napkin in bread basket",
+  // "Rustic kit: wood platters, white marble bowls", "Guests inside under
+  // tent", "Dropbox > green number 1"). Empty = not answered.
+  property linenColorTables: string?
+  property linenColorBaskets: string?
+  property servingwareKit: string?
+  property decorKit: string?
+  property rainPlan: string?
+  property setupDiagram: string?
+  // Event Task Breakdown lines (Event Forms One Print, tab 1) that the day
+  // sheet above does not hold. One free-text value each ("Plasticware",
+  // "Rented", "Client provided", "Yes", "No", "Serve", "Self-serve").
+  property servingwareSource: string?
+  property takeRentalsWithUs: string?
+  property leaveRentalsOnsite: string?
+  property guestTableSetup: string?
+  property buffetTableSetup: string?
+  property appetizerTableSetup: string?
+  property beverageTableSetup: string?
+  property beverageDispensers: string?
+  property buffetService: string?
+  // The event binder is built (Ops Final Lock, Part 4). Built or not built:
+  // "fully packed" and "ready" describe the load, which the pack list holds.
+  property binderBuiltAt: datetime?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -717,6 +750,14 @@ entity Event mixin TenantScoped, SoftDeletable {
   computed timingDepartVenueAt: datetime? = self.endsAt != null and self.timingCleanupMinutes != null ? self.endsAt + self.timingCleanupMinutes * 60000 : null
   computed timingReturnShopAt: datetime? = self.timingDepartVenueAt != null and self.timingReturnTravelMinutes != null ? self.timingDepartVenueAt + self.timingReturnTravelMinutes * 60000 : null
   computed timingStaffOffAt: datetime? = self.timingReturnShopAt != null and self.timingUnloadMinutes != null ? self.timingReturnShopAt + self.timingUnloadMinutes * 60000 : null
+  // Mangia Ops Final Lock Training p4: back out 1 hour to load (more for a
+  // large event) and allow 1 hour after event end for cleanup and reload.
+  // Suggestions only, like timingSuggestedSetupMinutes — never silently saved.
+  computed timingSuggestedLoadMinutes: float = 60
+  computed timingSuggestedCleanupMinutes: float = 60
+  // Binder color code (training part 4): red = cooked on site (full service),
+  // green = limited service, blue = drop-off clipboard.
+  computed binderColor: string? = self.serviceStyle != null and self.serviceStyle.name == "Full Service" ? "red" : (self.serviceStyle != null and self.serviceStyle.name == "Limited Service" ? "green" : (self.serviceStyle != null and self.serviceStyle.name == "Drop Off" ? "blue" : null))
   computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
   // Setup readiness for approval / automation (UI EventSetupProgress). Distinct
   // from isReadyForExecution (in-flight prep/pack/delivery). Uses raw child
@@ -726,6 +767,12 @@ entity Event mixin TenantScoped, SoftDeletable {
   computed hasMenuDishes: boolean = count_of(self.eventDishes, (d) => d.deletedAt == null and d.removedAt == null) > 0
   computed hasStaffAssigned: boolean = count_of(self.assignments, (a) => a.deletedAt == null and a.status != "unassigned") > 0
   computed isSetupReady: boolean = self.hasAssignedClient and self.hasExpectedHeadcount and self.hasMenuDishes and self.hasStaffAssigned
+  // Ops Final Lock readiness (training part 3: INFO, EVENT MENU, TIMELINE).
+  // A readiness signal for the tracker and the workbook, not a guard on
+  // finalizeEvent: live ops stay correctable (domain-gating-restraint.md).
+  computed hasServiceStyle: boolean = self.serviceStyleId != null
+  computed hasFinalLockTiming: boolean = self.timingStaffOnAt != null and self.timingDepartShopAt != null and self.timingOnsiteAt != null and self.timingStaffOffAt != null
+  computed isFinalLockReady: boolean = self.hasServiceStyle and self.hasExpectedHeadcount and self.hasMenuDishes and self.hasFinalLockTiming
   // Readiness: no incomplete prep, undelivered logistics work, or open pack lists.
   // Staffing coverage math remains deferred (NO EVIDENCE) — assignments hasMany
   // is navigation only until coverage is product-defined.
@@ -1264,6 +1311,89 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate buffetColdPlates = buffetColdPlates
     mutate buffetHotPlates = buffetHotPlates
     emit EventDaySheetUpdated {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // An omitted value keeps what is saved; send "" to clear one. A caller that
+  // knows one answer (the BEO reader, the assistant) must not wipe the rest.
+  command updateSetupNotes(
+    optional linenColorTables: string,
+    optional linenColorBaskets: string,
+    optional servingwareKit: string,
+    optional decorKit: string,
+    optional rainPlan: string,
+    optional setupDiagram: string
+  ) {
+    guard self.deletedAt == null
+    mutate linenColorTables = linenColorTables != null ? linenColorTables : self.linenColorTables
+    mutate linenColorBaskets = linenColorBaskets != null ? linenColorBaskets : self.linenColorBaskets
+    mutate servingwareKit = servingwareKit != null ? servingwareKit : self.servingwareKit
+    mutate decorKit = decorKit != null ? decorKit : self.decorKit
+    mutate rainPlan = rainPlan != null ? rainPlan : self.rainPlan
+    mutate setupDiagram = setupDiagram != null ? setupDiagram : self.setupDiagram
+    emit EventSetupNotesUpdated {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command updateTaskBreakdown(
+    optional servingwareSource: string,
+    optional takeRentalsWithUs: string,
+    optional leaveRentalsOnsite: string,
+    optional guestTableSetup: string,
+    optional buffetTableSetup: string,
+    optional appetizerTableSetup: string,
+    optional beverageTableSetup: string,
+    optional beverageDispensers: string,
+    optional buffetService: string
+  ) {
+    guard self.deletedAt == null
+    mutate servingwareSource = servingwareSource != null ? servingwareSource : self.servingwareSource
+    mutate takeRentalsWithUs = takeRentalsWithUs != null ? takeRentalsWithUs : self.takeRentalsWithUs
+    mutate leaveRentalsOnsite = leaveRentalsOnsite != null ? leaveRentalsOnsite : self.leaveRentalsOnsite
+    mutate guestTableSetup = guestTableSetup != null ? guestTableSetup : self.guestTableSetup
+    mutate buffetTableSetup = buffetTableSetup != null ? buffetTableSetup : self.buffetTableSetup
+    mutate appetizerTableSetup = appetizerTableSetup != null ? appetizerTableSetup : self.appetizerTableSetup
+    mutate beverageTableSetup = beverageTableSetup != null ? beverageTableSetup : self.beverageTableSetup
+    mutate beverageDispensers = beverageDispensers != null ? beverageDispensers : self.beverageDispensers
+    mutate buffetService = buffetService != null ? buffetService : self.buffetService
+    emit EventTaskBreakdownUpdated {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Omit the number and the seam gives the event the next free one. The seam
+  // also refuses a number that is not 4 to 6 digits or that another event holds.
+  command setEventNumber(optional eventNumber: string) {
+    guard self.deletedAt == null
+    // Stored trimmed: the numbering seam looks a number up by this exact value.
+    mutate eventNumber = eventNumber != null ? trim(eventNumber) : null
+    emit EventNumberSet {
+      eventId: self.id
+      tenantId: self.tenantId
+      eventNumber: eventNumber
+    }
+  }
+
+  command markBinderBuilt() {
+    guard self.deletedAt == null
+    mutate binderBuiltAt = now()
+    emit EventBinderBuilt {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // A binder that is taken apart again (the event changed after the print).
+  command clearBinderBuilt() {
+    guard self.binderBuiltAt != null
+    guard self.deletedAt == null
+    mutate binderBuiltAt = null
+    emit EventBinderBuiltCleared {
       eventId: self.id
       tenantId: self.tenantId
     }
@@ -2286,6 +2416,32 @@ event EventTimelineActivityReopened: "event_timeline_activity.reopened" {
 }
 
 event EventDaySheetUpdated: "event_day_sheet.updated" {
+  eventId: string
+  tenantId: string
+}
+
+event EventSetupNotesUpdated: "event_setup_notes.updated" {
+  eventId: string
+  tenantId: string
+}
+
+event EventTaskBreakdownUpdated: "event_task_breakdown.updated" {
+  eventId: string
+  tenantId: string
+}
+
+event EventNumberSet: "event_number.set" {
+  eventId: string
+  tenantId: string
+  eventNumber: string?
+}
+
+event EventBinderBuilt: "event_binder.built" {
+  eventId: string
+  tenantId: string
+}
+
+event EventBinderBuiltCleared: "event_binder.built_cleared" {
   eventId: string
   tenantId: string
 }

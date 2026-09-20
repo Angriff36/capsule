@@ -7,6 +7,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { WasteRecentEntries } from "./WasteRecentEntries";
 import { WASTE_REASON_LABELS, WasteRecordForm } from "./WasteRecordForm";
 import "./WasteCostReportPage.css";
 
@@ -316,6 +317,14 @@ export function WasteCostReportPage() {
           </div>
         )}
       </section>
+
+      <WasteRecentEntries
+        records={wasteRecords}
+        ingredients={ingredients}
+        events={events}
+        periodDays={period.days}
+        periodLabel={period.label}
+      />
     </div>
   );
 }

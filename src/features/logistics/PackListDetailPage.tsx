@@ -11,6 +11,13 @@ import {
   usePackListCancel,
   usePackListDispatch,
   usePackListItemAdjustQuantity,
+  usePackListItemAnnotate,
+  usePackListItemRemove,
+  usePackListApplyServiceStyleKit,
+  usePackListRequestAssistance,
+  usePackListResolveAssistance,
+  useListServiceStyle,
+  useListServiceStyleKitItem,
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
   usePackListMarkLoaded,
@@ -33,6 +40,7 @@ import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PackListItemForm } from "./PackListItemForm";
 import { PackListItemTable } from "./PackListItemTable";
+import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { useActionNotice } from "../../ui/action-result";
 import { useApplyPackTemplate } from "../../lib/safeMaterialization";
@@ -66,6 +74,13 @@ export function PackListDetailPage() {
   const applyPackTemplate = useApplyPackTemplate();
   const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
+  const annotateItem = usePackListItemAnnotate();
+  const removeItem = usePackListItemRemove();
+  const applyKit = usePackListApplyServiceStyleKit();
+  const requestAssistance = usePackListRequestAssistance();
+  const resolveAssistance = usePackListResolveAssistance();
+  const serviceStyles = useListServiceStyle();
+  const kitItems = useListServiceStyleKitItem();
   const markItemPacked = usePackListItemMarkPacked();
   const markItemMissing = usePackListItemMarkMissing();
   const startPacking = usePackListStartPacking();
@@ -181,6 +196,21 @@ export function PackListDetailPage() {
   };
 
   const event = events?.find((e) => e._id === packList.eventId);
+  const serviceStyle = event?.serviceStyleId
+    ? serviceStyles?.find(
+        (style) =>
+          style._id === event.serviceStyleId && style.deletedAt == null,
+      )
+    : undefined;
+  const kitLineCount = (kitItems ?? []).filter(
+    (line) =>
+      line.deletedAt == null &&
+      String(line.status) === "active" &&
+      line.serviceStyleId === serviceStyle?._id,
+  ).length;
+  const listIsLive =
+    String(packList.status) !== "dispatched" &&
+    String(packList.status) !== "cancelled";
 
   const parseTemplateItems = (
     raw: string | null | undefined,
@@ -321,9 +351,44 @@ export function PackListDetailPage() {
       version: number;
       requiredQuantity: number;
       status: unknown;
+      note?: string | null;
     },
     key: string,
   ) => {
+    if (key === "note") {
+      const values = await prompt.askFields({
+        title: "Packer note",
+        description:
+          "What the packer needs to know for this line, such as the servingware type. Leave it empty to clear the note.",
+        confirmLabel: "Save note",
+        fields: [
+          {
+            name: "note",
+            label: "Note",
+            inputType: "text",
+            required: false,
+            defaultValue: item.note ?? "",
+          },
+        ],
+      });
+      if (!values) return;
+      void run(`${item._id}:note`, async () => {
+        await annotateItem({
+          docId: item._id,
+          version: item.version,
+          note: values.note?.trim() || undefined,
+        });
+        setNotice("Note saved.");
+      });
+      return;
+    }
+    if (key === "remove") {
+      void run(`${item._id}:remove`, async () => {
+        await removeItem({ docId: item._id, version: item.version });
+        setNotice("Line removed from this event's list.");
+      });
+      return;
+    }
     if (key === "markPacked") {
       const values = await prompt.askFields({
         title: "Mark item packed",
@@ -491,6 +556,62 @@ export function PackListDetailPage() {
         </p>
       ) : null}
       {host}
+      {listIsLive ? (
+        <PackListKitAssistBar
+          serviceStyleName={serviceStyle?.name ?? null}
+          kitLineCount={kitLineCount}
+          assistanceRequestedAt={packList.assistanceRequestedAt}
+          assistanceNote={packList.assistanceNote}
+          busy={busy}
+          onApplyKit={() =>
+            void run("list:applyKit", async () => {
+              if (!serviceStyle) return;
+              await applyKit({
+                docId: packList._id,
+                version: packList.version,
+                serviceStyleId: serviceStyle._id,
+              });
+              setNotice("Style kit lines added.");
+            })
+          }
+          onRequestAssistance={() =>
+            void (async () => {
+              const values = await prompt.askFields({
+                title: "Needs assistance",
+                description:
+                  "The Event Tracker shows this list as Needs assistance until someone resolves it.",
+                confirmLabel: "Ask for help",
+                fields: [
+                  {
+                    name: "note",
+                    label: "What is the problem",
+                    inputType: "text",
+                    required: false,
+                  },
+                ],
+              });
+              if (!values) return;
+              void run("list:requestAssistance", async () => {
+                await requestAssistance({
+                  docId: packList._id,
+                  version: packList.version,
+                  note: values.note?.trim() || undefined,
+                });
+                setNotice("The tracker now shows Needs assistance.");
+              });
+            })()
+          }
+          onResolveAssistance={() =>
+            void run("list:resolveAssistance", async () => {
+              await resolveAssistance({
+                docId: packList._id,
+                version: packList.version,
+              });
+              setNotice("Assistance resolved.");
+            })
+          }
+        />
+      ) : null}
 
       {showAdd && canAddItems ? (
         <PackListItemForm
@@ -574,6 +695,7 @@ export function PackListDetailPage() {
           }
           items={listItems}
           canAddItems={canAddItems}
+          canEditLines={listIsLive}
           busy={busy}
           dishName={dishName}
           itemActions={(status) => policy.packItemActions(status)}

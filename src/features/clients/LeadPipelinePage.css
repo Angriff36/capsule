@@ -528,6 +528,67 @@
   gap: 0.55rem;
 }
 
+.lead-edit-form {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0 -0.85rem -0.85rem;
+  border-top: 2px solid var(--color-line-2);
+  padding: 0.85rem;
+  background: var(--color-inset);
+}
+
+.lead-edit-form > p {
+  color: var(--color-ink-2);
+  font-size: 10.5px;
+  line-height: 1.4;
+}
+
+.lead-edit-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.lead-edit-form label {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  color: var(--color-ink-2);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.lead-edit-form-span-2 {
+  grid-column: span 2;
+}
+
+.lead-edit-form input,
+.lead-edit-form select,
+.lead-edit-form textarea {
+  width: 100%;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-xs);
+  padding: 0.58rem 0.65rem;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 12px;
+}
+
+.lead-edit-form input:focus,
+.lead-edit-form select:focus,
+.lead-edit-form textarea:focus {
+  border-color: var(--color-accent);
+  outline: 2px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+  outline-offset: 1px;
+}
+
+.lead-edit-form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 @keyframes lead-card-enter {
   from {
     opacity: 0;

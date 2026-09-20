@@ -3,6 +3,7 @@ import { formatMoney } from "../../lib/format";
 import { EventDetailReviseContactPanels } from "./EventDetailReviseContactPanels";
 import { localDateTime } from "./eventDetailFormHelpers";
 import { EventFormCluster } from "./EventFormCluster";
+import { EventServiceStyleForm } from "./EventServiceStyleForm";
 import { EventTabPanel } from "./EventTabPanel";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
@@ -30,6 +31,7 @@ export type EventDetailRevisePanelsProps = {
   readonly endsAt?: number | null;
   readonly expectedHeadcount?: number | null;
   readonly venueId?: Id<"venues"> | null;
+  readonly serviceStyleId?: Id<"serviceStyles"> | null;
   readonly budgetAmount?: number | null;
   readonly quotedPrice?: number | null;
   readonly primaryContactName?: string | null;
@@ -100,6 +102,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
     endsAt,
     expectedHeadcount,
     venueId,
+    serviceStyleId,
     budgetAmount,
     quotedPrice,
     primaryContactName,
@@ -181,8 +184,15 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
 
         <EventFormCluster
           title="Service"
-          hint="Headcount and venue for the day"
+          hint="Service style, headcount and venue for the day"
         >
+          <EventServiceStyleForm
+            eventId={eventId}
+            version={version}
+            serviceStyleId={serviceStyleId}
+            busy={busy}
+            run={run}
+          />
           <form
             key={`headcount-${version}`}
             className="flex min-w-0 flex-wrap items-end gap-2"

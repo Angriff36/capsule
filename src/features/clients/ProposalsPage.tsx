@@ -36,6 +36,7 @@ import {
   transformVenueLogistics,
   type ProposalPdfRecord,
 } from "./proposalPdf";
+import { ProposalSignatureRevokeAction } from "../sales/ProposalSignatureRevokeAction";
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
@@ -741,6 +742,12 @@ export function ProposalsPage() {
                             Request signature
                           </button>
                         )}
+                        <ProposalSignatureRevokeAction
+                          proposalId={row._id}
+                          prompt={prompt}
+                          busy={busy}
+                          run={run}
+                        />
                         {(String(row.status) === "sent" ||
                           String(row.status) === "viewed" ||
                           String(row.status) === "accepted") && (
