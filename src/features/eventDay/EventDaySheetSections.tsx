@@ -39,7 +39,12 @@ export function PacketSectionCaution({
         </p>
       </div>
       {section.openIssues?.map((issue) => (
-        <Row key={issue.key} title={issue.label} sub={issue.owner} />
+        <Row
+          key={issue.label}
+          title={issue.label}
+          sub={issue.owner}
+          flag={issue.count > 1 ? `×${issue.count}` : undefined}
+        />
       ))}
     </>
   );

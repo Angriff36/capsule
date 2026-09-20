@@ -12,9 +12,9 @@ import { api } from "./api";
 import type { Section } from "./eventPacket/model";
 
 export type EventDayOpenIssue = {
-  key: string;
   label: string;
   owner: string;
+  count: number;
 };
 
 /** Server-built public cautions only; source evidence and decisions never cross this boundary. */

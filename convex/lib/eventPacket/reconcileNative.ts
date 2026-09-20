@@ -15,6 +15,7 @@ import {
   type Section,
 } from "../../../src/lib/eventPacket/model";
 import {
+  requiredFacts,
   requirements,
   sectionFor,
 } from "../../../src/lib/eventPacket/requirements";
@@ -390,15 +391,22 @@ export function projectPacketReadiness(snapshot: EventPacketSnapshot) {
         section,
         status: ready ? ("ready" as const) : ("blocked" as const),
         openIssueCount,
-        // What is blocking, in static words only. `issue.message` can quote
-        // source-document values, so it never crosses to crew.
-        openIssues: open.map((i) => ({
-          key: i.key,
-          label:
+        // What is blocking, in allowlisted static words only. `issue.message`
+        // and menu/production/timeline field keys are built from source-document
+        // text, so neither crosses to crew; those issues share one fixed label.
+        openIssues: open.reduce<
+          { label: string; owner: string; count: number }[]
+        >((rows, i) => {
+          const label =
             requirements.find((r) => r.key === i.key)?.message ??
-            fieldLabel(i.fieldKey),
-          owner: i.owner,
-        })),
+            (requiredFacts.some((f) => f.fieldKey === i.fieldKey)
+              ? fieldLabel(i.fieldKey)
+              : "Source line to confirm in the event workbook");
+          const row = rows.find((r) => r.label === label);
+          if (row) row.count += 1;
+          else rows.push({ label, owner: i.owner, count: 1 });
+          return rows;
+        }, []),
         urgentAction: ready
           ? null
           : "Operations review or required verification is pending",
