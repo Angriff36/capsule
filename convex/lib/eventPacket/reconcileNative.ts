@@ -1,7 +1,11 @@
 import type { QueryCtx, MutationCtx } from "../../_generated/server";
 import type { Id } from "../../_generated/dataModel";
 import { decrypt } from "../encryption";
-import { reconcile, readiness } from "../../../src/lib/eventPacket/reconcile";
+import {
+  fieldLabel,
+  reconcile,
+  readiness,
+} from "../../../src/lib/eventPacket/reconcile";
 import {
   canonicalJson,
   fingerprintBytes,
@@ -10,7 +14,11 @@ import {
   type EventPacketSnapshot,
   type Section,
 } from "../../../src/lib/eventPacket/model";
-import { sectionFor } from "../../../src/lib/eventPacket/requirements";
+import {
+  requiredFacts,
+  requirements,
+  sectionFor,
+} from "../../../src/lib/eventPacket/requirements";
 type Ctx = QueryCtx | MutationCtx;
 export const sections: Section[] = [
   "venue",
@@ -374,14 +382,31 @@ export function projectPacketReadiness(snapshot: EventPacketSnapshot) {
       snapshot.issues.some((i) => i.key === key && i.status === "resolved"),
     ),
     sections: sections.map((section) => {
-      const openIssueCount = snapshot.issues.filter(
+      const open = snapshot.issues.filter(
         (i) => i.section === section && i.required && i.status === "open",
-      ).length;
+      );
+      const openIssueCount = open.length;
       const ready = readiness(snapshot, section);
       return {
         section,
         status: ready ? ("ready" as const) : ("blocked" as const),
         openIssueCount,
+        // What is blocking, in allowlisted static words only. `issue.message`
+        // and menu/production/timeline field keys are built from source-document
+        // text, so neither crosses to crew; those issues share one fixed label.
+        openIssues: open.reduce<
+          { label: string; owner: string; count: number }[]
+        >((rows, i) => {
+          const label =
+            requirements.find((r) => r.key === i.key)?.message ??
+            (requiredFacts.some((f) => f.fieldKey === i.fieldKey)
+              ? fieldLabel(i.fieldKey)
+              : "Source line to confirm in the event workbook");
+          const row = rows.find((r) => r.label === label);
+          if (row) row.count += 1;
+          else rows.push({ label, owner: i.owner, count: 1 });
+          return rows;
+        }, []),
         urgentAction: ready
           ? null
           : "Operations review or required verification is pending",
