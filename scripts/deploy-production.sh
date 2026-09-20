@@ -130,7 +130,8 @@ case "$scope" in
   *) fail "scripts/release-backend-scope.ts gave no answer" ;;
 esac
 verify="$(printf '%s\n' "$scope" | sed -n 's/^verify=//p' | tr -d '\r')"
-printf '%s' "$verify" | grep -Eq '^[A-Za-z0-9_,]*$' || fail "unexpected --verify list: $verify"
+# '\n' matters: an empty list is a valid answer, and grep matches nothing on zero lines.
+printf '%s\n' "$verify" | grep -Eq '^[A-Za-z0-9_,]*$' || fail "unexpected --verify list: $verify"
 
 # 4. The backend deploy, ON the production box. The remote script is fixed text;
 #    only the sha and the query list (both checked above) are passed to it.
