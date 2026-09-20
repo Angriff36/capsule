@@ -44,7 +44,7 @@
   the loop writes only STATE.md, loop-run-log.md, loop-budget.md,
   loop-ledger.json there. Read-only git commands are fine.
 - Code edits happen ONLY inside a fresh worktree:
-  `git worktree add .loop-worktrees/<run-id> -b loop/<run-id> main`.
+  `git worktree add .loop-worktrees/<run-id> -b loop/<run-id> dev`.
   add/commit inside that worktree is allowed.
 
 ## Push & Merge

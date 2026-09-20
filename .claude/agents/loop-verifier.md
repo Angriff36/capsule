@@ -14,7 +14,7 @@ from the model that authored the diff. Primary reviewer: **Codex
 1. Identify the worktree path and diff you were given.
 2. Run the Codex review via Bash (long timeout — Codex runs can be slow):
    ```bash
-   cd <worktree> && git diff main | codex exec -s read-only -c model="gpt-5.6-sol" \
+   cd <worktree> && git diff dev | codex exec -s read-only -c model="gpt-5.6-sol" \
      "Review this diff against the stated fix target: <target>. \
       Find reasons to REJECT: wrong scope, unrelated edits, denylist paths \
       (see loop-constraints.md), disabled tests, symptom-fixes. \
