@@ -64,8 +64,8 @@ Machine split:
 - A Vercel release deploys the frontend only. It never deploys this backend.
 - The script aborts if `HEAD` is not the expected sha after the fast-forward.
   Do not deploy from a different commit. Ask for a new handoff line.
-- The script aborts on tracked local changes, and on untracked files under
-  `convex/` (the Convex CLI would deploy them). Do not stash, reset, or delete
+- The script aborts on tracked local changes, and on untracked or git-ignored files under
+  `convex/` or an untracked root `convex.json` (the Convex CLI would deploy them). Do not stash, reset, or delete
   them without the owner's instruction.
 - The runtime probe goes to the address in `CONVEX_SELF_HOSTED_URL`: the same
   backend that the deploy used. There is no second backend address.

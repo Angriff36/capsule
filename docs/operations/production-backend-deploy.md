@@ -70,7 +70,8 @@ If the checkout is older than this script (first use), bring it to `main` first:
 ## What the script does
 
 1. Checkout: `origin` is the Capsule repository; no tracked local changes; no
-   untracked file under `convex/` (the Convex CLI bundles every file on disk
+   untracked or git-ignored file under `convex/`, and no untracked root
+   `convex.json` (the Convex CLI bundles every file on disk
    there, so such a file would deploy code that the release commit lacks);
    `git fetch origin main`, `git checkout main`, `git pull --ff-only origin main`;
    `HEAD` equals `--expect`. If the pull brought a newer copy of the script, it

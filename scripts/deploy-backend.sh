@@ -105,11 +105,13 @@ if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   fail "tracked files have local changes. Deploy only from a clean checkout"
 fi
 # The Convex CLI bundles every source file on disk under convex/, tracked or
-# not: an untracked file there would deploy code the release commit lacks.
-untracked_convex="$(git status --porcelain --untracked-files=all -- convex | grep '^??' || true)"
-if [ -n "$untracked_convex" ]; then
-  echo "$untracked_convex"
-  fail "untracked files under convex/ (above) would be deployed. Remove them first"
+# not, and obeys a root convex.json (its `functions` setting can point the
+# deploy at other code). An untracked (??) or git-ignored (!!) file in either
+# place would deploy code the release commit lacks.
+stray_convex="$(git status --porcelain --untracked-files=all --ignored -- convex convex.json | grep -E '^(\?\?|!!)' || true)"
+if [ -n "$stray_convex" ]; then
+  echo "$stray_convex"
+  fail "untracked or ignored files under convex/ or a root convex.json (above) would be deployed. Remove them first"
 fi
 start_sha="$(git rev-parse HEAD)"
 if [ "$dry_run" = 0 ]; then
@@ -143,7 +145,8 @@ fi
 # A Convex Cloud deploy key outranks the self-hosted names in the Convex CLI:
 # the deploy would go to Cloud while the probes pass on the unchanged box.
 for name in CONVEX_DEPLOY_KEY CONVEX_DEPLOYMENT_TOKEN; do
-  if [ -n "${!name:-}" ] || grep -Eqs "^(export )?$name=.+" .env.local .env; then
+  # dotenv syntax: optional indent and `export`, spaces around `=`, or `NAME: value`.
+  if [ -n "${!name:-}" ] || grep -Eqs "^[[:space:]]*(export[[:space:]]+)?$name[[:space:]]*[=:][[:space:]]*[^[:space:]#]" .env.local .env; then
     fail "$name is set (shell, .env.local or .env). It would send the deploy away from the self-hosted backend. Remove it on this box"
   fi
 done

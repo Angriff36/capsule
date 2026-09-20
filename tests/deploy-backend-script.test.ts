@@ -88,7 +88,7 @@ function makeCheckout(originName = "Angriff36/capsule.git"): Checkout {
   git(work, "config", "user.name", "Deploy Script Test");
   git(work, "config", "core.autocrlf", "false");
   writeFileSync(join(work, ".bun-version"), "9.9.9\n");
-  writeFileSync(join(work, ".gitignore"), ".env.local\n");
+  writeFileSync(join(work, ".gitignore"), ".env.local\nconvex/scratch/\n");
   copyFileSync(SCRIPT, join(work, "scripts", "deploy-backend.sh"));
   git(work, "add", "-A");
   git(work, "commit", "-m", "[release] fixture");
@@ -269,6 +269,30 @@ describe("scripts/deploy-backend.sh", () => {
         "CONVEX_DEPLOY_KEY=stub-key\n",
       );
       expect(checkout.run(real).output).toContain("CONVEX_DEPLOY_KEY is set");
+
+      // Valid dotenv spellings the Convex CLI also reads.
+      for (const line of [
+        "CONVEX_DEPLOY_KEY = stub-key",
+        "  export CONVEX_DEPLOYMENT_TOKEN=stub-token",
+        "CONVEX_DEPLOY_KEY: stub-key",
+      ]) {
+        writeFileSync(join(checkout.work, ".env.local"), `${line}\n`);
+        const result = checkout.run(real);
+        expect(result.output).toContain(
+          `${/CONVEX_\w+/.exec(line)?.[0]} is set`,
+        );
+        expect(result.output).not.toContain("stub-key");
+        expect(result.output).not.toContain("stub-token");
+        expect(result.status).toBe(1);
+      }
+      // A comment or an empty assignment is not a key.
+      writeFileSync(
+        join(checkout.work, ".env.local"),
+        "# CONVEX_DEPLOY_KEY=stub-key\nCONVEX_DEPLOYMENT_TOKEN=\n",
+      );
+      expect(checkout.run([...real, "--dry-run"]).output).toContain(
+        "RESULT: DRY-RUN PASS",
+      );
       expect(existsSync(checkout.log)).toBe(false);
     },
     TIMEOUT,
@@ -288,10 +312,29 @@ describe("scripts/deploy-backend.sh", () => {
       for (const args of [dry, ["--expect", checkout.sha]]) {
         const result = checkout.run(args);
         expect(result.output).toContain("convex/lib/stray.ts");
-        expect(result.output).toContain("untracked files under convex/");
+        expect(result.output).toContain("would be deployed");
         expect(result.status).toBe(1);
       }
       expect(existsSync(checkout.log)).toBe(false);
+
+      // A git-ignored file under convex/ is on disk too: the CLI bundles it.
+      const ignored = makeCheckout();
+      mkdirSync(join(ignored.work, "convex", "scratch"), { recursive: true });
+      writeFileSync(join(ignored.work, "convex", "scratch", "old.ts"), "x\n");
+      const ignoredRun = ignored.run(["--expect", ignored.sha]);
+      expect(ignoredRun.output).toContain("convex/scratch");
+      expect(ignoredRun.output).toContain("would be deployed");
+      expect(ignoredRun.status).toBe(1);
+
+      // An untracked root convex.json can point the deploy at other code.
+      const config = makeCheckout();
+      writeFileSync(join(config.work, "convex.json"), '{"functions":"x/"}\n');
+      const configRun = config.run(["--expect", config.sha]);
+      expect(configRun.output).toContain("convex.json");
+      expect(configRun.output).toContain("would be deployed");
+      expect(configRun.status).toBe(1);
+      expect(existsSync(ignored.log)).toBe(false);
+      expect(existsSync(config.log)).toBe(false);
     },
     TIMEOUT,
   );
