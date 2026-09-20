@@ -106,6 +106,7 @@ export function EventImportPage() {
     bundle,
     catalog: match,
     directory,
+    pastedText,
   });
   const busy = runner.progress !== null;
 

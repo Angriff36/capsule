@@ -1,5 +1,6 @@
 import { useAction, useConvex, useMutation, useQuery } from "convex/react";
 import { api, type Id } from "../api";
+import { importSources } from "./importSources";
 import { prepareNativeWorkbook } from "./prepareNativeWorkbook";
 import type { EventPacketSnapshot, FieldValue } from "./model";
 import type { PacketWorkbookSummary } from "./summaryProjection";
@@ -111,5 +112,82 @@ export function useEventPacket(eventId: Id<"events">) {
             snapshotStorageId: input.snapshotStorageId as Id<"_storage">,
           }),
       }),
+  };
+}
+
+/**
+ * Give source files to an event's workbook with no workbook panel on screen.
+ * The event import calls this right after it makes the event, so the BEO that
+ * made the event is also the workbook's source (owner rule, 2026-09-20: the
+ * BEO import and the workbook import are one thing). Same steps as the
+ * panel's own upload. Returns false when the files do not name one event.
+ */
+export function useAttachPacketSources() {
+  const commands = api.lib.eventPacket.commands;
+  const client = useConvex();
+  return async (
+    eventId: Id<"events">,
+    files: { name: string; mimeType: string; bytes: Uint8Array }[],
+    timeZone: string,
+  ): Promise<boolean> => {
+    const view = (await client.query(commands.getPacket, {
+      eventId,
+    })) as PacketView;
+    const result = await importSources(files, {
+      tenantId: view.snapshot.identity.tenantId,
+      importedAt: new Date().toISOString(),
+      existingArtifacts: view.snapshot.artifacts,
+    });
+    if (result.candidates.length !== 1) return false;
+    const candidate = result.candidates[0];
+    const included = [...candidate.sources, ...result.sharedReferences];
+    const keys = new Set(included.map((source) => source.artifact.fingerprint));
+    const snapshot: EventPacketSnapshot = {
+      schemaVersion: 1,
+      identity: { ...candidate.identity, eventId },
+      artifacts: included.map((source) => source.artifact),
+      observations: candidate.observations,
+      facts: [],
+      issues: [],
+      resolutions: [],
+      checklistVerifications: [],
+      revisions: [],
+      stage: "review",
+    };
+    const attached: { fingerprint: string; storageId: Id<"_storage"> }[] = [];
+    for (const blob of result.artifactBytes) {
+      if (!keys.has(blob.artifact.fingerprint)) continue;
+      const uploadUrl = await client.mutation(
+        commands.generatePacketUploadUrl,
+        { eventId },
+      );
+      const response = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": blob.artifact.mimeType },
+        body: new Uint8Array(blob.bytes).buffer,
+      });
+      if (!response.ok)
+        throw new Error(`Packet upload failed (${response.status})`);
+      const { storageId } = (await response.json()) as { storageId?: string };
+      if (!storageId) throw new Error("Packet upload returned no storage id");
+      const stored = await client.action(commands.registerPacketUpload, {
+        eventId,
+        storageId: storageId as Id<"_storage">,
+        name: blob.artifact.name,
+        mimeType: blob.artifact.mimeType,
+        purpose: "source",
+      });
+      attached.push({
+        fingerprint: blob.artifact.fingerprint,
+        storageId: stored.storageId as Id<"_storage">,
+      });
+    }
+    await client.mutation(commands.importEvidence, {
+      eventId,
+      snapshotJson: JSON.stringify(snapshot),
+      artifacts: attached,
+      timeZone,
+    });
+    return true;
   };
 }

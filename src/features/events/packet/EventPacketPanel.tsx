@@ -285,7 +285,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
           <input
             className="mt-1 block max-w-full"
             type="file"
-            accept=".pdf,.csv,.json"
+            accept=".pdf,.rtf,.csv,.json"
             multiple
             disabled={busy}
             onChange={(e) => setFiles(Array.from(e.target.files ?? []))}

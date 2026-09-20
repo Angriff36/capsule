@@ -92,6 +92,12 @@ export interface CapsuleEventBundleContext {
   existing?: CapsuleEventBundleExistingEvent;
   catalog?: CapsuleEventBundleCatalogMatch;
   /**
+   * The tenant's active service styles. The BEO prints the style as text
+   * ("Buffet - Cook Onsite"); the event stores the matching style's id, which
+   * is what the Event workbook and the Final Lock checks read.
+   */
+  serviceStyles?: Array<{ id: string; name: string }>;
+  /**
    * Staff rows that match no person become open shifts (EventStaffNeed) with
    * the printed role and times, instead of a "match no person" warning. TPP
    * prints unfilled roles as "*Unassigned*", so this is how those come in.

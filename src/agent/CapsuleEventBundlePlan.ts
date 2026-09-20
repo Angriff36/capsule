@@ -6,6 +6,7 @@ import {
   centsToDollars,
   dishKey,
   isMenuDishLine,
+  matchServiceStyleId,
   normalizeName,
   operationalRequirementsText,
   personNameParts,
@@ -226,6 +227,10 @@ export function buildEventBundlePlan(
         quotedPrice: centsToDollars(bundle.totals.eventTotalCents),
         venueName: bundle.venue.name,
         venueAddress: venueAddressText(bundle),
+        serviceStyleId: matchServiceStyleId(
+          bundle.header.serviceStyle,
+          context.serviceStyles,
+        ),
         serviceRequirements: serviceRequirementsText(bundle),
         operationalRequirements: operationalRequirementsText(bundle),
       },

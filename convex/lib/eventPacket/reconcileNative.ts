@@ -148,6 +148,10 @@ export async function readCurrentPacket(
         evidence: [],
       });
   };
+  // The TPP invoice number is the packet identity: the first source sets it
+  // and every later source must match it (importEvidence). It is a fact of
+  // this event, not a question for a person.
+  add("invoiceNumber", context.invoiceNumber);
   add("eventTitle", event.title);
   add("guestCount", event.expectedHeadcount);
   if (event.startsAt != null) {

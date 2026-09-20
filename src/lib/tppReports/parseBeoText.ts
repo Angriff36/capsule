@@ -743,7 +743,17 @@ export function parseBeoText(text: string): EventBundlePart {
     },
     client: {
       name: contact.name,
-      email: contact.email ?? parseEmail(labelValue(lines, "email")),
+      // TPP prints the contact's email alone on its own line, with no label.
+      email:
+        contact.email ??
+        parseEmail(labelValue(lines, "email")) ??
+        lines
+          .map((line) => line.text)
+          .find(
+            (text) =>
+              /^[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(text) &&
+              text !== salespersonEmail,
+          ),
       phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
     },
     venue: (() => {
