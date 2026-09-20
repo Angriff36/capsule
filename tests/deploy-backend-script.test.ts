@@ -105,12 +105,8 @@ function makeCheckout(originName = "Angriff36/capsule.git"): Checkout {
       // second guard: a stub that lost the PATH race still reaches nothing.
       const launch =
         'export PATH="$(cygpath -u "$STUB_BIN" 2>/dev/null || echo "$STUB_BIN"):$PATH"; exec bash scripts/deploy-backend.sh "$@"';
-      const offline = [
-        "--backend-url",
-        "http://backend.invalid",
-        "--frontend-url",
-        "http://frontend.invalid/",
-      ];
+      // The backend address is CONVEX_SELF_HOSTED_URL below: also .invalid.
+      const offline = ["--frontend-url", "http://frontend.invalid/"];
       const result = spawnSync(
         BASH,
         ["-c", launch, "bash", ...args, ...offline],
@@ -218,11 +214,94 @@ describe("scripts/deploy-backend.sh", () => {
       const calls = readFileSync(checkout.log, "utf8").trim().split("\n");
       expect(calls[0]).toBe("bun install --frozen-lockfile");
       expect(calls[1]).toBe("npx convex deploy -y");
-      expect(calls[2]).toContain("/api/query");
+      // The probes go to the backend the deploy used, not to a second address.
+      expect(calls[2]).toContain("http://backend.invalid/api/query");
       expect(calls[2]).toContain("queries:listEvent");
       expect(calls[3]).toContain("queries:listFoo");
       expect(calls[4]).toContain("custom:listBar");
       expect(calls.at(-1)).toContain("http://frontend.invalid/");
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "probes the backend that .env.local selects when the shell has no address",
+    () => {
+      const checkout = makeCheckout();
+      writeFileSync(
+        join(checkout.work, ".env.local"),
+        'CONVEX_SELF_HOSTED_URL="http://envfile.invalid/"\n',
+      );
+      const result = checkout.run(["--expect", checkout.sha], {
+        CONVEX_SELF_HOSTED_URL: "",
+      });
+      expect(result.output).toContain("RESULT: PASS");
+      const calls = readFileSync(checkout.log, "utf8").trim().split("\n");
+      expect(calls[2]).toContain("http://envfile.invalid/api/query");
+      expect(result.output).not.toContain("envfile.invalid");
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "refuses untracked files under convex/ and ignores untracked files elsewhere",
+    () => {
+      const checkout = makeCheckout();
+      const dry = ["--expect", checkout.sha, "--dry-run"];
+      mkdirSync(join(checkout.work, "notes"));
+      writeFileSync(join(checkout.work, "notes", "todo.md"), "x\n");
+      expect(checkout.run(dry).output).toContain("RESULT: DRY-RUN PASS");
+
+      mkdirSync(join(checkout.work, "convex", "lib"), { recursive: true });
+      writeFileSync(join(checkout.work, "convex", "lib", "stray.ts"), "x\n");
+      for (const args of [dry, ["--expect", checkout.sha]]) {
+        const result = checkout.run(args);
+        expect(result.output).toContain("convex/lib/stray.ts");
+        expect(result.output).toContain("untracked files under convex/");
+        expect(result.status).toBe(1);
+      }
+      expect(existsSync(checkout.log)).toBe(false);
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "sends the argument payload of a --verify query and never passes an argument error",
+    () => {
+      const checkout = makeCheckout();
+      const real = ["--expect", checkout.sha];
+      const withArgs = checkout.run([
+        ...real,
+        "--verify",
+        'custom:getOne={"id":"abc","deep":{"n":1}}',
+        "--verify",
+        "listFoo",
+      ]);
+      expect(withArgs.output).toContain("3 queries respond");
+      const calls = readFileSync(checkout.log, "utf8").trim().split("\n");
+      expect(calls[3]).toContain(
+        '{"path":"custom:getOne","args":{"id":"abc","deep":{"n":1}},"format":"json"}',
+      );
+      expect(calls[4]).toContain('"path":"queries:listFoo","args":{}');
+
+      const argumentError = checkout.run([...real, "--verify", "getOne"], {
+        STUB_QUERY_BODY:
+          '{"status":"error","errorMessage":"ArgumentValidationError: missing id"}',
+      });
+      expect(argumentError.output).toContain("needs arguments");
+      expect(argumentError.output).toContain("RESULT: FAIL");
+      expect(argumentError.status).toBe(1);
+
+      const fresh = makeCheckout();
+      const notJson = fresh.run([
+        "--expect",
+        fresh.sha,
+        "--verify",
+        "getOne=abc",
+      ]);
+      expect(notJson.output).toContain("must be one JSON object");
+      expect(notJson.status).toBe(1);
+      expect(existsSync(fresh.log)).toBe(false);
     },
     TIMEOUT,
   );

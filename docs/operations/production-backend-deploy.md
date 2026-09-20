@@ -40,6 +40,11 @@ bash scripts/deploy-backend.sh --expect <full 40-character main sha> --verify <n
 - `--verify` is optional. It names the queries that the release added, so the
   runtime check proves that they exist. The WORK PC adds it to the handoff when
   the release added queries. The script always checks `queries:listEvent`.
+  - Queries with no arguments: one comma list, `--verify listA,listB`. A name
+    with no module is in the `queries` module.
+  - A query with required arguments: its own flag with the JSON payload,
+    `--verify 'events:getOne={"eventId":"<id>"}'`. The flag can be repeated.
+  - Every error answer is a FAIL. An argument error is never counted as a pass.
 
 ## Authorization
 
@@ -64,7 +69,9 @@ If the checkout is older than this script (first use), bring it to `main` first:
 
 ## What the script does
 
-1. Checkout: `origin` is the Capsule repository; no tracked local changes;
+1. Checkout: `origin` is the Capsule repository; no tracked local changes; no
+   untracked file under `convex/` (the Convex CLI bundles every file on disk
+   there, so such a file would deploy code that the release commit lacks);
    `git fetch origin main`, `git checkout main`, `git pull --ff-only origin main`;
    `HEAD` equals `--expect`. If the pull brought a newer copy of the script, it
    runs that copy.
@@ -73,8 +80,11 @@ If the checkout is older than this script (first use), bring it to `main` first:
    shell or in `.env.local` on the box. It never prints their values.
 3. Deploy (the documented commands, `AGENTS.md`): `bun install --frozen-lockfile`,
    then `npx convex deploy -y`.
-4. Runtime verification: `POST <backend>/api/query` with
-   `{"path":"queries:<name>","args":{},"format":"json"}` for each query.
+4. Runtime verification: `POST <CONVEX_SELF_HOSTED_URL>/api/query` with
+   `{"path":"<query>","args":<payload>,"format":"json"}` for each query. The
+   address is the effective `CONVEX_SELF_HOSTED_URL` (the shell value, else
+   `.env.local`): the SAME backend that the deploy used. The script holds no
+   second backend address.
    `"status":"success"` means that the function ran. `Server Error` means that
    the backend does not have it. `npx convex function-spec` is a secondary check
    and gives only a warning.

@@ -32,6 +32,9 @@ to deploy, run `--dry-run` at most.
 # The handoff line (the WORK PC release gives it):
 bash scripts/deploy-backend.sh --expect <full 40-character main sha> --verify <query>,<query>
 
+# A query with required arguments has its own --verify flag with a JSON payload:
+bash scripts/deploy-backend.sh --expect <sha> --verify 'events:getOne={"eventId":"<id>"}'
+
 # Checks only. No fetch, no install, no deploy, no network:
 bash scripts/deploy-backend.sh --expect <sha> --dry-run
 ```
@@ -61,8 +64,13 @@ Machine split:
 - A Vercel release deploys the frontend only. It never deploys this backend.
 - The script aborts if `HEAD` is not the expected sha after the fast-forward.
   Do not deploy from a different commit. Ask for a new handoff line.
-- The script aborts on tracked local changes. Do not stash or reset them
-  without the owner's instruction.
+- The script aborts on tracked local changes, and on untracked files under
+  `convex/` (the Convex CLI would deploy them). Do not stash, reset, or delete
+  them without the owner's instruction.
+- The runtime probe goes to the address in `CONVEX_SELF_HOSTED_URL`: the same
+  backend that the deploy used. There is no second backend address.
+- An argument error from a `--verify` query is a FAIL, not a pass. The handoff
+  line must give the JSON payload for a query that has required arguments.
 - The active Bun must equal `.bun-version`. If the script says so, put the
   pinned Bun first in `PATH` and run the same line again.
 - `CONVEX_SELF_HOSTED_URL` and `CONVEX_SELF_HOSTED_ADMIN_KEY` must already be
@@ -78,6 +86,6 @@ Machine split:
 ## Verification
 
 The script does the verification itself: each query answers
-`"status":"success"` through `POST <backend>/api/query`, and the production
+`"status":"success"` through `POST <CONVEX_SELF_HOSTED_URL>/api/query`, and the production
 frontend returns HTTP 200. The deploy is good only when the last line is
 `RESULT: PASS` with the expected sha.

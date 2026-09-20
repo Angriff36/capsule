@@ -1,37 +1,45 @@
 #!/usr/bin/env bash
 # The ONE production backend deploy (owner rule, 2026-09-19).
 #
-#   bash scripts/deploy-backend.sh --expect <release sha> [--verify <query>[,<query>]] [--dry-run]
+#   bash scripts/deploy-backend.sh --expect <release sha> [--verify <query>[,<query>]]
+#        [--verify '<query>=<json args>'] [--dry-run]
 #
 # Production Convex is SELF-HOSTED on the owner's Linux box. A Vercel release
 # builds the UI only, so the backend is deployed ON THAT BOX, from the exact
 # release commit, by this script. Runbook: docs/operations/production-backend-deploy.md.
 #
 # 1. Verifies the checkout: origin is the Capsule repo, no tracked local
-#    changes, main fast-forwards, HEAD is exactly --expect.
+#    changes, no untracked file under convex/ (the Convex CLI bundles every
+#    file on disk there), main fast-forwards, HEAD is exactly --expect.
 # 2. Verifies the machine: Linux, the Bun pinned in .bun-version, the
 #    self-hosted credential NAMES present (values are never printed).
 # 3. Runs the documented deploy (AGENTS.md): bun install --frozen-lockfile,
 #    then npx convex deploy -y.
-# 4. Verifies runtime: POST <backend>/api/query for a baseline query and every
-#    --verify query, then the production frontend returns HTTP 200.
+# 4. Verifies runtime: POST <CONVEX_SELF_HOSTED_URL>/api/query (the SAME
+#    backend the deploy used; this script holds no second backend address) for
+#    a baseline query and every --verify query, then the production frontend
+#    returns HTTP 200.
 # 5. Prints RESULT: PASS or RESULT: FAIL with the sha.
 #
-# --backend-url / --frontend-url replace the two production addresses below
-# (the offline test uses them; also for an address change).
+# --verify takes zero-argument queries as a comma list (listA,listB). A query
+# with required arguments takes its own flag with the payload:
+#   --verify 'events:getOne={"eventId":"<id>"}'
+# An error answer, argument errors included, is always a FAIL.
+# --frontend-url replaces the production frontend address below (the offline
+# test uses it; also for an address change).
 # --dry-run runs only the local checks of 1 and 2 (no fetch, no checkout, no
 # install, no deploy, no network) and prints what a real run would do.
 # This script never rolls back Vercel, never edits settings, never edits code.
 set -uo pipefail
 
-BACKEND_URL="https://pop-os.tail78dd9e.ts.net"
 FRONTEND_URL="https://capsule-tau-eight.vercel.app/"
 ORIGIN_MATCH="Angriff36/capsule"
 BASELINE_QUERY="queries:listEvent"
 CREDENTIAL_NAMES="CONVEX_SELF_HOSTED_URL CONVEX_SELF_HOSTED_ADMIN_KEY"
 
 expected=""
-verify=""
+verify_queries=()
+verify_args=()
 dry_run=0
 original_args=("$@")
 
@@ -41,12 +49,35 @@ fail() {
   exit 1
 }
 
+# "<query>=<json object>" is one query with its arguments; anything else is a
+# comma list of zero-argument queries. A name with no module is in `queries`.
+add_query() {
+  case "$1" in
+    *:*) verify_queries+=("$1") ;;
+    *) verify_queries+=("queries:$1") ;;
+  esac
+  verify_args+=("$2")
+}
+add_verify() {
+  local name
+  case "$1" in
+    "") fail "--verify needs a query name" ;;
+    *=*)
+      case "${1#*=}" in
+        "{"*"}") add_query "${1%%=*}" "${1#*=}" ;;
+        *) fail "--verify ${1%%=*}: the arguments must be one JSON object, for example '${1%%=*}={\"id\":\"...\"}'" ;;
+      esac
+      ;;
+    *) for name in $(printf '%s' "$1" | tr ',' ' '); do add_query "$name" "{}"; done ;;
+  esac
+}
+add_query "$BASELINE_QUERY" "{}"
+
 while [ $# -gt 0 ]; do
   case "$1" in
     --expect) expected="${2:-}"; shift 2 ;;
-    --verify) verify="$verify,${2:-}"; shift 2 ;;
+    --verify) add_verify "${2:-}"; shift 2 ;;
     --dry-run) dry_run=1; shift ;;
-    --backend-url) BACKEND_URL="${2:-}"; shift 2 ;;
     --frontend-url) FRONTEND_URL="${2:-}"; shift 2 ;;
     *) fail "unknown argument $1" ;;
   esac
@@ -72,6 +103,13 @@ case "$origin" in
 esac
 if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   fail "tracked files have local changes. Deploy only from a clean checkout"
+fi
+# The Convex CLI bundles every source file on disk under convex/, tracked or
+# not: an untracked file there would deploy code the release commit lacks.
+untracked_convex="$(git status --porcelain --untracked-files=all -- convex | grep '^??' || true)"
+if [ -n "$untracked_convex" ]; then
+  echo "$untracked_convex"
+  fail "untracked files under convex/ (above) would be deployed. Remove them first"
 fi
 start_sha="$(git rev-parse HEAD)"
 if [ "$dry_run" = 0 ]; then
@@ -103,20 +141,25 @@ if [ -n "${CONVEX_DEPLOYMENT:-}" ]; then
   fail "CONVEX_DEPLOYMENT is set in this shell. The Convex CLI refuses it together with the self-hosted names. Unset it and run again"
 fi
 
-queries="$BASELINE_QUERY"
-for name in $(printf '%s' "$verify" | tr ',' ' '); do
-  case "$name" in
-    *:*) queries="$queries $name" ;;
-    *) queries="$queries queries:$name" ;;
-  esac
-done
+# The backend to verify is the backend the deploy uses: the effective
+# CONVEX_SELF_HOSTED_URL (the shell value wins over .env.local, as in the
+# Convex CLI). Its value is not printed.
+backend_url="${CONVEX_SELF_HOSTED_URL:-}"
+if [ -z "$backend_url" ]; then
+  backend_url="$(grep -E '^CONVEX_SELF_HOSTED_URL=' .env.local | tail -n 1 | cut -d= -f2- | tr -d '\r' | tr -d "\"'")"
+fi
+backend_url="${backend_url%/}"
+case "$backend_url" in
+  http://*|https://*) ;;
+  *) fail "CONVEX_SELF_HOSTED_URL is not an http(s) address" ;;
+esac
 
 if [ "$dry_run" = 1 ]; then
   echo "dry run: checkout, sha, bun $pinned and credential names are good."
   echo "dry run: a real run would now do:"
   echo "  bun install --frozen-lockfile"
   echo "  npx convex deploy -y"
-  for query in $queries; do echo "  POST $BACKEND_URL/api/query  $query"; done
+  for i in "${!verify_queries[@]}"; do echo "  POST <CONVEX_SELF_HOSTED_URL>/api/query  ${verify_queries[$i]}  args ${verify_args[$i]}"; done
   echo "  GET  $FRONTEND_URL"
   echo ""
   echo "RESULT: DRY-RUN PASS - nothing was deployed (sha: $head_sha)"
@@ -127,16 +170,17 @@ fi
 bun install --frozen-lockfile || fail "bun install failed"
 npx convex deploy -y || fail "convex deploy failed"
 
-# 4. Runtime verification. "success" means the function ran on the backend;
-#    "Server Error" means the backend does not have it.
+# 4. Runtime verification, on the backend that was just deployed. "success"
+#    means the function ran; "Server Error" means the backend does not have it.
+#    Every error answer fails: an argument error is never counted as a pass.
 bad=0
-count=0
-for query in $queries; do
-  count=$((count + 1))
-  body="$(curl -s -m 30 -X POST "$BACKEND_URL/api/query" -H 'Content-Type: application/json' \
-    -d "{\"path\":\"$query\",\"args\":{},\"format\":\"json\"}" || true)"
+count=${#verify_queries[@]}
+for i in "${!verify_queries[@]}"; do
+  query="${verify_queries[$i]}"
+  body="$(curl -s -m 30 -X POST "$backend_url/api/query" -H 'Content-Type: application/json' -d "{\"path\":\"$query\",\"args\":${verify_args[$i]},\"format\":\"json\"}" || true)"
   case "$body" in
     *'"status":"success"'*) echo "  ok    $query" ;;
+    *ArgumentValidationError*) echo "  FAIL  $query needs arguments: use --verify '$query={...}' -> $body"; bad=1 ;;
     *) echo "  FAIL  $query -> $body"; bad=1 ;;
   esac
 done
@@ -144,9 +188,9 @@ done
 
 # Secondary only: the deployed function spec. A miss here is a warning; the
 # runtime probe above is the proof.
-if [ -n "$verify" ]; then
+if [ "$count" -gt 1 ]; then
   spec="$(npx convex function-spec 2>/dev/null || true)"
-  for query in $queries; do
+  for query in "${verify_queries[@]}"; do
     case "$spec" in
       *":${query##*:}\""*) echo "  spec  $query" ;;
       *) echo "  warn  $query is not in function-spec output (runtime probe passed)" ;;
