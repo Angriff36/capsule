@@ -188,4 +188,11 @@ bun scripts/release-receipt.ts \
   --wait "${CAPSULE_RELEASE_WAIT:-600}" \
   || echo "release: receipt gathering failed (see above); the release itself already shipped."
 
+# Production Convex is self-hosted on the Linux box: this release built the UI
+# only. The backend handoff (docs/operations/production-backend-deploy.md).
+echo "release: BACKEND HANDOFF. Vercel built the UI only. If this release changed manifests or convex/,"
+echo "  the owner runs this ON THE LINUX PRODUCTION BOX (never on this machine):"
+echo "    bash scripts/deploy-backend.sh --expect $(git rev-parse main)"
+echo "  Add --verify <query>,<query> for queries that this release added."
+
 archive_branch

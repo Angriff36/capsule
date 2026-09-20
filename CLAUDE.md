@@ -63,6 +63,14 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
   (`CONVEX_SELF_HOSTED_URL` set → UI-only, no Convex Cloud deploy): Vercel
   builds `main` only for a `[release]` commit, so a merge
   made on GitHub never deploys. The script then renames the branch to `archive/<branch>`.
+- **Production Convex is self-hosted on the owner's Linux box (`pop-os`).** The Vercel
+  `main` build is UI-only. The backend deploy runs ON THAT BOX, by the owner. On Windows you
+  never run it and never try to. A release that changes manifests or `convex/` is not complete
+  until that box redeploys from the release commit: say so before `scripts/release.sh`. ONE
+  script does that deploy: `bash scripts/deploy-backend.sh --expect <main sha>` (runbook
+  `docs/operations/production-backend-deploy.md`). `scripts/release.sh` prints the handoff line;
+  give the owner that line (add `--verify <query>,<query>` for queries the release added).
+  Never write your own deploy command block, and never rediscover the procedure.
 - Put diagnostics under `.artifacts/` (gitignored).
 
 ## Format gate
