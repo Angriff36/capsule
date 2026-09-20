@@ -1,8 +1,55 @@
-# Production backend deploy (runbook)
+# Production deploy (runbook)
 
-One script does the work: `scripts/deploy-backend.sh`. Agents and people do not
-write deploy commands by hand. They decide WHEN to run the script, and they hand
-off between the two machines.
+ONE command does the whole production release, from the WORK PC, on the branch
+to release:
+
+```bash
+bash scripts/deploy-production.sh --reviewer <model>
+```
+
+It is only the orchestrator. The authoritative pieces do the work:
+`scripts/release.sh` (merge, gate, the one `main` push, archive) and
+`scripts/deploy-backend.sh` (the self-hosted Convex deploy, ON the Linux box).
+Agents and people do not write deploy commands by hand, and nobody copies a
+handoff between machines.
+
+## What the one command does
+
+1. Review and release. `--reviewer <model>` names the independent reviewer that
+   ALREADY approved the branch (`AGENTS.md`, merge gate); the name goes to
+   `scripts/release.sh`. With no `--reviewer`, the script runs the primary
+   review itself (`codex -c model="gpt-5.6-sol" review -`) and continues only
+   when the reviewer's last message has `VERDICT: APPROVE`. A REJECT, no
+   verdict, no `codex` CLI, or Codex-authored commits stop the run.
+2. Release commit. It takes the `[release]` commit on `origin/main` (the full
+   sha) and runs `scripts/verify-vercel-release.ts`: Vercel's PRODUCTION
+   deployment for that commit must be READY, and the production address must
+   serve it (signed-in Vercel CLI, read-only).
+3. Backend or not. `scripts/release-backend-scope.ts` decides
+   (`src/lib/releaseBackendScope.ts`): the backend deploy is necessary when the
+   release changed a `.manifest` file, `convex/`, `convex.json`, the dependency
+   pins (`package.json`, `bun.lock`), or a `src/` module that `convex/` code
+   imports. Frontend-only: `RESULT: PASS - frontend deployed at <sha>; backend unchanged`.
+4. Backend deploy. It opens SSH to the production box (`oc@pop-os`, the user's
+   own SSH key and host configuration; no credential is in the repository). On
+   the box it finds the production checkout by its git origin plus the
+   self-hosted credential names in `.env.local` (no path is assumed, exactly
+   one must match), fast-forwards `main`, requires `HEAD` = the release sha, and
+   runs `scripts/deploy-backend.sh --expect <sha>`, with `--verify` for the
+   zero-argument `list*` queries that the release added to `convex/queries.ts`.
+5. Result. The last line is one of:
+   - `RESULT: PASS - frontend and backend deployed at <sha>`
+   - `RESULT: PASS - frontend deployed at <sha>; backend unchanged`
+   - `RESULT: FAIL - <reason>`
+
+Every failure stops the run at once. After a FAIL that came after the release
+(Vercel, SSH, backend), run the same command again: on `main`, at the
+`[release]` commit, it skips step 1 and continues. The backend deploy is
+idempotent.
+
+One-time conditions on the WORK PC: `ssh oc@pop-os` works with a key
+(`BatchMode`, no password prompt), and `vercel whoami` answers. Both were true
+on 2026-09-20.
 
 ## Facts
 
@@ -18,18 +65,19 @@ off between the two machines.
 
 ## Machine split
 
-| Machine                      | Does                                                                                                                                        |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| WORK PC (Claude, Windows)    | release review → `bash scripts/release.sh --reviewer <model>` (merge, push `main`, Vercel frontend deploy) → gives the backend handoff line |
-| PRODUCTION PC (Hermes, Linux) | runs the handoff line → runtime verification → frontend HTTP verification → STOP                                                            |
+| Machine                       | Does                                                                                                  |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------- |
+| WORK PC (Windows)             | `scripts/deploy-production.sh`: review, `scripts/release.sh`, Vercel verification, backend decision    |
+| PRODUCTION PC (Linux, pop-os) | `scripts/deploy-backend.sh`, started over SSH by the command above: deploy, runtime check, HTTP check |
 
-The WORK PC never runs the backend deploy. The script refuses any system that
-is not Linux.
+`convex deploy` never runs against production from the WORK PC.
+`scripts/deploy-backend.sh` refuses any system that is not Linux.
 
-## The handoff
+## The manual path (only when SSH from the WORK PC is not possible)
 
-`scripts/release.sh` prints the handoff line at the end of a release. It always
-has this shape:
+`scripts/release.sh` prints the backend line at the end of a release. Someone
+on the production box (the owner, or Hermes with the skill below) runs it. It
+always has this shape:
 
 ```bash
 bash scripts/deploy-backend.sh --expect <full 40-character main sha> --verify <new query>,<new query>
@@ -48,8 +96,10 @@ bash scripts/deploy-backend.sh --expect <full 40-character main sha> --verify <n
 
 ## Authorization
 
-The deploy is HUMAN-AUTHORIZED. The owner gives the handoff line to the
-production-box agent, or runs it. To read this runbook, or to load the Hermes
+A production deploy needs the same authorization as a release: the owner's
+instruction, or an independent APPROVE under the merge gate (`AGENTS.md`). On
+the manual path, the owner gives the backend line to the production-box agent,
+or runs it. To read this runbook, or to load the Hermes
 skill, is not an authorization. An agent that has only the expected sha, and no
 instruction from the owner to deploy, runs `--dry-run` at most.
 
@@ -131,6 +181,9 @@ audits, a deploy from a commit that the handoff did not name.
 
 ## Test
 
-`tests/deploy-backend-script.test.ts` runs the script offline: a throwaway git
+`tests/deploy-production-script.test.ts` runs the orchestrator offline: the real
+`scripts/release.sh` against a local bare `origin`, with stub `bun`, `ssh` and
+`codex`. `tests/release-backend-scope.test.ts` covers the backend decision.
+`tests/deploy-backend-script.test.ts` runs the backend script offline: a throwaway git
 checkout with a local bare `origin`, stub `bun`/`npx`/`curl`, and `.invalid`
 addresses. It never contacts production.

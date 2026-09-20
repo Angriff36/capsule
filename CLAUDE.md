@@ -64,13 +64,15 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
   builds `main` only for a `[release]` commit, so a merge
   made on GitHub never deploys. The script then renames the branch to `archive/<branch>`.
 - **Production Convex is self-hosted on the owner's Linux box (`pop-os`).** The Vercel
-  `main` build is UI-only. The backend deploy runs ON THAT BOX, by the owner. On Windows you
-  never run it and never try to. A release that changes manifests or `convex/` is not complete
-  until that box redeploys from the release commit: say so before `scripts/release.sh`. ONE
-  script does that deploy: `bash scripts/deploy-backend.sh --expect <main sha>` (runbook
-  `docs/operations/production-backend-deploy.md`). `scripts/release.sh` prints the handoff line;
-  give the owner that line (add `--verify <query>,<query>` for queries the release added).
-  Never write your own deploy command block, and never rediscover the procedure.
+  `main` build is UI-only, so a release that changes manifests or `convex/` is not complete
+  until that box deploys the backend from the release commit. **ONE command does the whole
+  production release from the work PC: `bash scripts/deploy-production.sh --reviewer <model>`**
+  (owner rule, 2026-09-20; runbook `docs/operations/production-backend-deploy.md`). It runs
+  `scripts/release.sh`, waits for the Vercel deployment of the release commit, decides by itself
+  if the backend changed, and if so runs `scripts/deploy-backend.sh --expect <sha>` ON THE BOX
+  over SSH. Use it in place of a bare `scripts/release.sh`. Never run `convex deploy` against
+  production from Windows, never write your own deploy command block, never hand the owner a
+  copy/paste handoff, and never rediscover the procedure.
 - Put diagnostics under `.artifacts/` (gitignored).
 
 ## Format gate

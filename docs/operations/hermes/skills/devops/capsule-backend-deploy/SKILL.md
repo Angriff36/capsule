@@ -16,6 +16,10 @@ One repo script does the deploy: `scripts/deploy-backend.sh`. This skill tells
 you when to run it and how to report. It adds no deploy commands of its own.
 Full runbook in the repo: `docs/operations/production-backend-deploy.md`.
 
+Routine releases do not need this skill: the WORK PC runs
+`scripts/deploy-production.sh`, which starts the same script on this machine
+over SSH. This skill is the manual path, for when the owner asks you directly.
+
 ## When to Use
 
 - The owner gives you a backend handoff line from a Capsule release, or tells
