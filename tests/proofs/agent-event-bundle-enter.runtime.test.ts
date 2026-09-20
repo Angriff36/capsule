@@ -149,6 +149,7 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
         "Venue.register",
         "Client.register",
         "Event.planEngagement",
+        "Event.setEventNumber",
         "EventTimelineActivity.schedule",
         "Dish.introduce",
         "EventDish.addToEvent",

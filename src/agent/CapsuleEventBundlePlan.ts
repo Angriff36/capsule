@@ -15,6 +15,7 @@ import {
   venueAddressText,
   type PlannedStep,
 } from "./CapsuleEventBundleShared";
+import { planHeaderSteps } from "./CapsuleEventBundleHeaderPlan";
 import { planReviewFlagSteps } from "./CapsuleEventBundleReviewFlagPlan";
 import { planSupplySteps } from "./CapsuleEventBundleSupplyPlan";
 import { toCapsuleMeasure } from "./CapsuleMeasureUnit";
@@ -236,6 +237,17 @@ export function buildEventBundlePlan(
       },
     });
   }
+
+  steps.push(
+    ...planHeaderSteps(bundle, invoice, existing, {
+      startsAt,
+      endsAt,
+      serviceStyleId: matchServiceStyleId(
+        bundle.header.serviceStyle,
+        context.serviceStyles,
+      ),
+    }),
+  );
 
   const knownTimeline = existing?.timelineNames ?? [];
   const timeline = [...bundle.timeline].sort(

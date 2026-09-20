@@ -60,6 +60,19 @@ export interface CapsuleEventBundleExistingEvent {
   clientId: string;
   venueId?: string;
   event: {
+    /**
+     * Header values a newer BEO overwrites (optional: a loader that does not
+     * read them leaves the header alone).
+     */
+    stage?: string;
+    eventNumber?: string | null;
+    startsAt?: number | null;
+    endsAt?: number | null;
+    expectedHeadcount?: number | null;
+    serviceStyleId?: string | null;
+    venueName?: string | null;
+    venueAddress?: string | null;
+    venueCapacity?: number | null;
     quotedPrice: number;
     primaryContactName?: string;
     primaryContactEmail?: string | null;

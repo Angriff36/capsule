@@ -91,7 +91,10 @@ async function isHeld(
       (row) =>
         row.tenantId === tenantId &&
         row._id !== exceptEventId &&
-        row.deletedAt == null,
+        row.deletedAt == null &&
+        // "Delete" in the app cancels the event: a cancelled event frees its
+        // number, or a new import of the same TPP event could never take it.
+        row.stage !== "cancelled",
     )
   )
     return true;
@@ -108,6 +111,7 @@ async function isHeld(
     if (
       holder &&
       holder.deletedAt == null &&
+      holder.stage !== "cancelled" &&
       (holder.eventNumber?.trim() ?? "") === ""
     )
       return true;
