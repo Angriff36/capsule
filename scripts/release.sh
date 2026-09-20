@@ -79,8 +79,20 @@ if [ -n "$remote_archive" ] && [ "$remote_archive" != "$branch_sha" ]; then
   echo "release: archive/$branch already exists on origin at a different sha. Delete or rename it first."
   exit 1
 fi
-if git merge-base --is-ancestor "$branch" origin/main && [ -n "$(git log origin/main -1 --format=%H --grep="^\[release\] $branch ")" ]; then
+# Production Convex is self-hosted on the Linux box: a release builds the UI
+# only. The backend handoff (docs/operations/production-backend-deploy.md);
+# $1 is the [release] commit on main. Every path that ends a release prints it.
+backend_handoff() {
+  echo "release: BACKEND HANDOFF. Vercel built the UI only. If this release changed manifests or convex/,"
+  echo "  the owner runs this ON THE LINUX PRODUCTION BOX (never on this machine):"
+  echo "    bash scripts/deploy-backend.sh --expect $1"
+  echo "  Add --verify <query>,<query> for queries that this release added."
+}
+
+released_sha="$(git log origin/main -1 --format=%H --grep="^\[release\] $branch " || true)"
+if git merge-base --is-ancestor "$branch" origin/main && [ -n "$released_sha" ]; then
   echo "release: $branch was already released (a [release] commit for it is on main). Resuming the archive only."
+  backend_handoff "$released_sha"
   archive_branch
   exit 0
 fi
@@ -188,11 +200,5 @@ bun scripts/release-receipt.ts \
   --wait "${CAPSULE_RELEASE_WAIT:-600}" \
   || echo "release: receipt gathering failed (see above); the release itself already shipped."
 
-# Production Convex is self-hosted on the Linux box: this release built the UI
-# only. The backend handoff (docs/operations/production-backend-deploy.md).
-echo "release: BACKEND HANDOFF. Vercel built the UI only. If this release changed manifests or convex/,"
-echo "  the owner runs this ON THE LINUX PRODUCTION BOX (never on this machine):"
-echo "    bash scripts/deploy-backend.sh --expect $(git rev-parse main)"
-echo "  Add --verify <query>,<query> for queries that this release added."
-
+backend_handoff "$(git rev-parse main)"
 archive_branch
