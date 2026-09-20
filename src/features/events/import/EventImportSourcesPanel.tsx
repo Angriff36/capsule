@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { TextReportSource } from "../../../lib/tppReports/loadEventBundleFromText";
+import { isRtf, rtfToText } from "../../../lib/tppReports/rtfToText";
 
 type Props = {
   pastedText: string;
@@ -48,10 +49,24 @@ export function EventImportSourcesPanel({
     if (!list || list.length === 0) return;
     setReadError(null);
     const next: TextReportSource[] = [...csvFiles];
+    let pasted = pastedText;
     for (const file of Array.from(list)) {
+      // TPP saves the BEO and the worksheet as .rtf: read it into the text box.
+      if (/\.rtf$/i.test(file.name)) {
+        try {
+          const text = await file.text();
+          if (!isRtf(text)) throw new Error("not rtf");
+          pasted = [pasted.trim(), rtfToText(text)]
+            .filter(Boolean)
+            .join("\n\n");
+        } catch {
+          setReadError(`${file.name} could not be read.`);
+        }
+        continue;
+      }
       if (!/\.csv$/i.test(file.name)) {
         setReadError(
-          `${file.name}: only .csv exports are read here. Save the workbook as CSV, or copy its text into the box above.`,
+          `${file.name}: only .rtf and .csv exports are read here. Save the workbook as CSV, or copy its text into the box above.`,
         );
         continue;
       }
@@ -62,6 +77,7 @@ export function EventImportSourcesPanel({
       }
     }
     onCsvFilesChange(next);
+    if (pasted !== pastedText) onPastedTextChange(pasted);
   };
 
   return (
@@ -88,10 +104,10 @@ export function EventImportSourcesPanel({
 
       <div className="space-y-1">
         <label className="field-label">
-          Add TPP CSV exports (optional)
+          Add the TPP BEO (.rtf) or CSV exports (optional)
           <input
             type="file"
-            accept=".csv,text/csv"
+            accept=".rtf,.csv,text/csv,application/rtf,text/rtf"
             multiple
             className="input py-1.5"
             disabled={disabled}
@@ -102,8 +118,9 @@ export function EventImportSourcesPanel({
             data-testid="event-import-files"
           />
           <span className="field-hint">
-            Event Worksheet, Proposal, Pack List and Order List exports are
-            recognized by their content. Where the worksheet and the BEO
+            A BEO or worksheet saved from TPP as .rtf is read into the box
+            above. Event Worksheet, Proposal, Pack List and Order List exports
+            are recognized by their content. Where the worksheet and the BEO
             disagree, the worksheet count is used and the disagreement is
             flagged for review on the event.
           </span>

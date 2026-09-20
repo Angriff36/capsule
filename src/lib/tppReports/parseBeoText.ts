@@ -137,17 +137,22 @@ function labelPattern(label: string): RegExp {
 }
 
 function readLines(text: string): ReadLine[] {
-  return text
-    .split(/\r?\n/)
-    .map((line) => line.replace(/\t/g, "  ").trim())
-    .flatMap((line) => splitLabelRuns(line))
-    .filter(
-      (line) =>
-        line.length > 0 &&
-        !PRINTED_FOOTER.test(line) &&
-        !PAGE_FOOTER.test(line),
-    )
-    .map((line) => ({ text: line, lower: line.toLowerCase() }));
+  return (
+    text
+      .split(/\r?\n/)
+      .map((line) => line.replace(/\t/g, "  ").trim())
+      // Before the label split: "Printed Date: … Invoice # 5935" would leave a
+      // bare "Printed" line that reads as a course heading.
+      .filter((line) => !PRINTED_FOOTER.test(line))
+      .flatMap((line) => splitLabelRuns(line))
+      .filter(
+        (line) =>
+          line.length > 0 &&
+          !PRINTED_FOOTER.test(line) &&
+          !PAGE_FOOTER.test(line),
+      )
+      .map((line) => ({ text: line, lower: line.toLowerCase() }))
+  );
 }
 
 /**
@@ -214,7 +219,9 @@ function looksLikeLabel(text: string): boolean {
 }
 
 function isSectionHeading(text: string): Section | undefined {
-  if (text.length > 48 || /[:#]\s*\S/.test(text)) return undefined;
+  // Column gaps are layout, not length: an .rtf table heading keeps wide gaps.
+  if (text.replace(/\s+/g, " ").length > 48 || /[:#]\s*\S/.test(text))
+    return undefined;
   for (const { pattern, section } of SECTION_HEADINGS) {
     if (pattern.test(text)) return section;
   }
@@ -261,9 +268,14 @@ function readMenuLine(
   if (leading) {
     const quantity = Number(leading[1]);
     const name = leading[2]!.trim();
+    // A wrapped description line ("2 bites per guest.") starts with a count
+    // too; a dish name with no unit word before it starts with a capital.
+    const proseTail =
+      /^[a-z]/.test(name) && !LEADING_SERVINGS_WITH_UNIT.test(text);
     if (
       Number.isFinite(quantity) &&
       name.length > 1 &&
+      !proseTail &&
       menuRowPlausible(name, quantity)
     ) {
       return { name, quantityServings: quantity };
@@ -615,6 +627,11 @@ function readMenuBodyLine(
       menu.push(markedItem);
       return;
     }
+    // TPP's item table marks its course rows with a dash: "-   Reception".
+    if (/^[-–]/.test(withoutClock) && looksLikeCourseHeading(withoutMark)) {
+      courseState.setCourse(withoutMark.replace(/:$/, ""));
+      return;
+    }
   }
   const note = withoutClock.match(NOTE_LINE);
   if (note && current) {
@@ -634,7 +651,8 @@ function readMenuBodyLine(
   // header pass reads, not a course or a description of the row above.
   if (looksLikeLabel(withoutClock)) return;
   // A short title-case line starts a new course; prose describes the row above.
-  if (looksLikeCourseHeading(withoutClock)) {
+  // "NO ONIONS" under a dish is an instruction for it, never a course.
+  if (looksLikeCourseHeading(withoutClock) && !/^not?\s/i.test(withoutClock)) {
     courseState.setCourse(withoutClock.replace(/:$/, ""));
     return;
   }
@@ -664,8 +682,18 @@ export function parseBeoText(text: string): EventBundlePart {
   // A location with no digits is a person — TPP prints the on-site contact
   // there — not a place; the venue itself is the unlabeled name above the
   // street address block.
+  // A remote site has no street: "Location: Singh Campsite" with its GPS pair
+  // on the next line is a place too, and that line is its address.
+  const locationAt = lines.findIndex((line) =>
+    HEADER_LABELS.location!.some((label) => line.lower.startsWith(label + ":")),
+  );
+  const afterLocation =
+    locationAt >= 0 ? lines[locationAt + 1]?.text : undefined;
+  const gpsLine =
+    afterLocation && readCoordinates(afterLocation) ? afterLocation : undefined;
   const locationIsPlace =
-    locationValue !== undefined && /\d/.test(locationValue);
+    locationValue !== undefined &&
+    (/\d/.test(locationValue) || gpsLine !== undefined);
   if (!contact.name && !locationIsPlace && locationValue) {
     contact.name = locationValue;
   }
@@ -722,9 +750,10 @@ export function parseBeoText(text: string): EventBundlePart {
       const venue =
         readVenueWithAddress(
           locationIsPlace ? locationValue : undefined,
-          labelValue(lines, "address"),
+          labelValue(lines, "address") ?? gpsLine,
         ) ?? {};
-      if (!venue.name || !venue.addressLine1) {
+      // A GPS-only site has no street block to look for.
+      if (!venue.name || (!venue.addressLine1 && gpsLine === undefined)) {
         const block = readUnlabeledVenue(lines);
         if (!venue.name) venue.name = block.name;
         if (!venue.addressLine1 && block.address) {
