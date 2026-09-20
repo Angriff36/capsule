@@ -231,6 +231,20 @@ export default defineConfig(({ mode }) => ({
     tailwindcss(),
     apiKeyGatewayDev(loadEnv(mode, process.cwd(), "")),
     markItDownDev(),
+    // The build says which commit it is: <site>/version.json. A Vercel build
+    // has VERCEL_GIT_COMMIT_SHA; scripts/verify-vercel-release.ts reads this
+    // file from the production address to prove a release is live.
+    {
+      name: "capsule-version-json",
+      apply: "build",
+      generateBundle() {
+        this.emitFile({
+          type: "asset",
+          fileName: "version.json",
+          source: `${JSON.stringify({ commit: process.env.VERCEL_GIT_COMMIT_SHA ?? null })}\n`,
+        });
+      },
+    },
   ],
   resolve: {
     alias: {

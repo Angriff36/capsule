@@ -87,6 +87,7 @@ backend_handoff() {
   echo "  the owner runs this ON THE LINUX PRODUCTION BOX (never on this machine):"
   echo "    bash scripts/deploy-backend.sh --expect $1"
   echo "  Add --verify <query>,<query> for queries that this release added."
+  echo "  scripts/deploy-production.sh does this step by itself; when it started this release, do nothing."
 }
 
 released_sha="$(git log origin/main -1 --format=%H --grep="^\[release\] $branch " || true)"
