@@ -140,6 +140,13 @@ done
 if [ -n "${CONVEX_DEPLOYMENT:-}" ]; then
   fail "CONVEX_DEPLOYMENT is set in this shell. The Convex CLI refuses it together with the self-hosted names. Unset it and run again"
 fi
+# A Convex Cloud deploy key outranks the self-hosted names in the Convex CLI:
+# the deploy would go to Cloud while the probes pass on the unchanged box.
+for name in CONVEX_DEPLOY_KEY CONVEX_DEPLOYMENT_TOKEN; do
+  if [ -n "${!name:-}" ] || grep -Eqs "^(export )?$name=.+" .env.local .env; then
+    fail "$name is set (shell, .env.local or .env). It would send the deploy away from the self-hosted backend. Remove it on this box"
+  fi
+done
 
 # The backend to verify is the backend the deploy uses: the effective
 # CONVEX_SELF_HOSTED_URL (the shell value wins over .env.local, as in the

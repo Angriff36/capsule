@@ -120,6 +120,8 @@ function makeCheckout(originName = "Angriff36/capsule.git"): Checkout {
             CONVEX_SELF_HOSTED_URL: "http://backend.invalid",
             CONVEX_SELF_HOSTED_ADMIN_KEY: ADMIN_KEY_VALUE,
             CONVEX_DEPLOYMENT: "",
+            CONVEX_DEPLOY_KEY: "",
+            CONVEX_DEPLOYMENT_TOKEN: "",
             CAPSULE_DEPLOY_REEXEC: "",
             ...env,
           },
@@ -239,6 +241,35 @@ describe("scripts/deploy-backend.sh", () => {
       const calls = readFileSync(checkout.log, "utf8").trim().split("\n");
       expect(calls[2]).toContain("http://envfile.invalid/api/query");
       expect(result.output).not.toContain("envfile.invalid");
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "refuses a Convex Cloud deploy key in the shell, .env.local or .env",
+    () => {
+      const checkout = makeCheckout();
+      const real = ["--expect", checkout.sha];
+      const shell = checkout.run(real, { CONVEX_DEPLOY_KEY: "prod:stub-key" });
+      expect(shell.output).toContain("CONVEX_DEPLOY_KEY is set");
+      expect(shell.output).not.toContain("prod:stub-key");
+      expect(shell.status).toBe(1);
+
+      writeFileSync(
+        join(checkout.work, ".env"),
+        "CONVEX_DEPLOYMENT_TOKEN=stub-token\n",
+      );
+      const envFile = checkout.run(real);
+      expect(envFile.output).toContain("CONVEX_DEPLOYMENT_TOKEN is set");
+      expect(envFile.status).toBe(1);
+
+      writeFileSync(join(checkout.work, ".env"), "");
+      writeFileSync(
+        join(checkout.work, ".env.local"),
+        "CONVEX_DEPLOY_KEY=stub-key\n",
+      );
+      expect(checkout.run(real).output).toContain("CONVEX_DEPLOY_KEY is set");
+      expect(existsSync(checkout.log)).toBe(false);
     },
     TIMEOUT,
   );

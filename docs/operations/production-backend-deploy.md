@@ -109,6 +109,10 @@ network. It prints the commands that a real run does.
   Convex CLI itself says `CONVEX_DEPLOYMENT must not be set when
 CONVEX_SELF_HOSTED_URL and CONVEX_SELF_HOSTED_ADMIN_KEY are set`, the name is
   in `.env.local` on the box: remove that line there.
+- `CONVEX_DEPLOY_KEY is set` or `CONVEX_DEPLOYMENT_TOKEN is set` → a Convex
+  Cloud deploy key is in the shell, `.env.local`, or `.env` on the box. The
+  Convex CLI gives it priority over the self-hosted names, so the deploy would
+  not go to the self-hosted backend. Remove it on the box.
 - `HEAD is <sha>` → `main` moved after the handoff. Ask the WORK PC for a new
   handoff line. Do not deploy.
 
