@@ -9,22 +9,11 @@ import { TableSkeleton } from "../../ui/primitives";
 import { SELECTABLE_UNITS } from "./import/UnitOfMeasureMapper";
 
 /**
- * Count units the catalog cannot convert on its own. The manifest says they
- * convert "only through an ItemUnitMapping on the specific item", so the
- * mapping form offers them next to the catalog units.
+ * The closed vocabulary already holds the count units (case, package, can…)
+ * that the manifest says convert "only through an ItemUnitMapping on the
+ * specific item", so the mapping form offers that one list.
  */
-const PACK_UNITS = [
-  "case",
-  "package",
-  "can",
-  "tub",
-  "piece",
-  "slice",
-  "pizza",
-  "fluid_ounce",
-] as const;
-
-const MAPPING_UNITS: readonly string[] = [...SELECTABLE_UNITS, ...PACK_UNITS];
+const MAPPING_UNITS: readonly string[] = SELECTABLE_UNITS;
 
 const KINDS: readonly { value: string; label: string; helper: string }[] = [
   {
