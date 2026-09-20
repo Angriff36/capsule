@@ -25,18 +25,23 @@ export function PacketSectionCaution({
 }) {
   if (!section.urgentAction && !section.openIssueCount) return null;
   return (
-    <div role="status" className="evd-note">
-      <p className="evd-kicker">
-        Needs attention
-        {section.openIssueCount
-          ? ` · ${section.openIssueCount} open ${section.openIssueCount === 1 ? "issue" : "issues"}`
-          : ""}
-      </p>
-      <p>
-        {section.urgentAction ??
-          "Check this section with the manager before service."}
-      </p>
-    </div>
+    <>
+      <div role="status" className="evd-note">
+        <p className="evd-kicker">
+          Needs attention
+          {section.openIssueCount
+            ? ` · ${section.openIssueCount} open ${section.openIssueCount === 1 ? "issue" : "issues"}`
+            : ""}
+        </p>
+        <p>
+          {section.urgentAction ??
+            "Check this section with the manager before service."}
+        </p>
+      </div>
+      {section.openIssues?.map((issue) => (
+        <Row key={issue.key} title={issue.label} sub={issue.owner} />
+      ))}
+    </>
   );
 }
 

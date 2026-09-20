@@ -70,6 +70,7 @@ describe("crew packet briefing boundary", () => {
     for (const section of packet.sections)
       expect(Object.keys(section).sort()).toEqual([
         "openIssueCount",
+        "openIssues",
         "section",
         "status",
         "urgentAction",

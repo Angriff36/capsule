@@ -11,6 +11,12 @@ import { useQuery } from "convex/react";
 import { api } from "./api";
 import type { Section } from "./eventPacket/model";
 
+export type EventDayOpenIssue = {
+  key: string;
+  label: string;
+  owner: string;
+};
+
 /** Server-built public cautions only; source evidence and decisions never cross this boundary. */
 export type EventDayPacketReadiness = {
   ready: boolean;
@@ -20,6 +26,7 @@ export type EventDayPacketReadiness = {
     section: Section;
     status: "ready" | "review" | "blocked";
     openIssueCount: number;
+    openIssues: EventDayOpenIssue[];
     urgentAction: string | null;
   }[];
 };

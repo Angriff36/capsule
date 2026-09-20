@@ -6,6 +6,7 @@ import type {
   EventDayEvent,
   EventDayEventDish,
   EventDayLayoutSection,
+  EventDayOpenIssue,
   EventDayPackList,
   EventDayPackListItem,
   EventDayStaffNeed,
@@ -45,6 +46,7 @@ export type EventDaySection = {
   /** Short state line rendered under the label, e.g. "3 of 5 confirmed". */
   caption: string;
   openIssueCount?: number;
+  openIssues?: EventDayOpenIssue[];
   urgentAction?: string | null;
 };
 
@@ -378,6 +380,7 @@ export function deriveSections(inputs: EventDayInputs): EventDaySection[] {
             ? "blocked"
             : "review",
         openIssueCount: caution.openIssueCount,
+        openIssues: caution.openIssues,
         urgentAction: caution.urgentAction,
         caption: `${caution.openIssueCount > 0 ? `${caution.openIssueCount} open ${caution.openIssueCount === 1 ? "issue" : "issues"}` : "Verification pending"}${caution.urgentAction ? ` · ${caution.urgentAction}` : ""}`,
       };
