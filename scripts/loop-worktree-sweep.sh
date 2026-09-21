@@ -12,7 +12,7 @@ git worktree list --porcelain | awk '/^worktree /{print $2}' | grep "/.loop-work
     echo "REMOVE (detached/broken): $wt"
     git worktree remove --force "$wt" 2>/dev/null; continue
   fi
-  ahead=$(git rev-list --count origin/main.."$branch" 2>/dev/null || echo "?")
+  ahead=$(git rev-list --count origin/dev.."$branch" 2>/dev/null || echo "?")
   remote=$(git ls-remote --heads origin "$branch" 2>/dev/null | awk '{print $1}')
   local_tip=$(git rev-parse "$branch" 2>/dev/null)
   if [ "$ahead" = "0" ] || [ "$ahead" = "?" ]; then
