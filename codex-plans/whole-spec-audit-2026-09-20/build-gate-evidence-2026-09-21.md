@@ -77,10 +77,39 @@ or full command lines were copied. This proves checkout-local serving only — n
 authenticated business workflows and not production. The browser connector was
 unavailable, so no browser interaction is claimed.
 
+## Linux CI leg (2026-09-21)
+
+GitHub Actions run [35599405184](https://github.com/Angriff36/capsule/actions/runs/35599405184)
+concluded `success` (result source of truth: `.artifacts/iteration-pl-build/ci-result.json`
+and `ci-run.log`).
+
+- Environment: `ubuntu-latest`. Tested commit (head SHA):
+  `fcf2238af52a457f920fc1513cc2dc3e4e6f3349` on `dev` (tag v0.0.71, draft PR
+  [#388](https://github.com/Angriff36/capsule/pull/388)).
+- Run window: created 2026-09-21T12:25:00Z, completed 2026-09-21T12:28:46Z.
+- Job `check` (106331671842): `success`, 12:25:03Z → 12:28:46Z. Required steps both
+  `success`: step 6 "Verify generated output" (12:25:20Z → 12:25:27Z) and step 7
+  "Run repository check gate" (12:25:27Z → 12:28:43Z).
+- Suite footer read from `ci-run.log` (not assumed): `Test Files 194 passed (194)`,
+  `Tests 896 passed (896)` — same counts as the Windows logs. Both new/owned suites ran:
+  `tests/baseline-decay.test.ts` (4 tests) and `tests/builder-regen-guard.test.ts`
+  (2 tests), plus `baseline-decay: ok`.
+- The gate's frontend build prints existing bundle-size warnings; warnings are not gate
+  failures — the step and the run concluded `success`.
+
+The final follow-up for this increment edited evidence documents only
+(`IMPLEMENTATION_PLAN.md`, `ACCEPTANCE_TESTS.md`, `source-coverage.json`, this receipt).
+The tested script and test hashes remain exactly those recorded under "Source identity"
+above; no application, script, or test file changed after CI ran. The branch is pushed
+and draft PR #388 is open; nothing merged to `main`, no deployment happened.
+
 ## Criterion outcome
 
-- AC-356, AC-362, AC-395, AC-396, AC-439 → PASS on this Windows evidence.
-- AC-162 stays PENDING: the Linux CI leg has not run for this increment. The Windows leg
-  (`manifest:regen:check` + full `bun run check` green) is retained. PL-BUILD stays
-  unchecked until that CI leg passes. No criterion was renumbered, deleted, retired, or
-  weakened.
+- AC-162 → PASS: the Windows leg (`manifest:regen:check` + full `bun run check` green)
+  is retained, and the Linux CI leg above passed at the same source commit.
+- AC-356, AC-362, AC-395, AC-396, AC-439 → PASS on the Windows evidence, corroborated by
+  the same suites passing in Linux CI.
+- All six PL-BUILD criteria (AC-162, AC-356, AC-362, AC-395, AC-396, AC-439) are now
+  PASS. This closes the PL-BUILD task only; the whole application delivery is NOT
+  complete, and every other PENDING criterion stays PENDING. No criterion was
+  renumbered, deleted, retired, or weakened.

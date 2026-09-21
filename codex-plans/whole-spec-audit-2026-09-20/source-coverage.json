@@ -3766,15 +3766,16 @@
       "key": "PR13-07",
       "source": "specs/ralph/production-13-release-recovery.md",
       "locator": "PR13-07",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-BUILD"],
-      "gap": "Linux CI leg has not run for this increment; the Windows leg is green.",
+      "gap": "None known for this criterion; build-gate scope only. The wider delivery keeps its other PENDING criteria.",
       "evidence": [
         "Windows leg green 2026-09-21 on the working tree based on 89c103bc plus the tested increment: bun run manifest:regen:check plus full bun run check incl. index-based baseline-decay ok (.artifacts/iteration-pl-build/check-after.log, regen-check.log)",
+        "Linux CI leg green 2026-09-21: GitHub Actions run 35599405184 on ubuntu-latest at commit fcf2238af52a457f920fc1513cc2dc3e4e6f3349 (dev, tag v0.0.71, draft PR #388); steps Verify generated output and Run repository check gate both success; suite footer 194 test files / 896 tests passed incl. tests/baseline-decay.test.ts (4) and tests/builder-regen-guard.test.ts (2); baseline-decay ok (https://github.com/Angriff36/capsule/actions/runs/35599405184)",
         "#380 repaired in its owner: scripts/check-baseline-decay.ts now counts distinct Git-index root entries (cap unchanged at 71; missing index refuses); regression tests in tests/baseline-decay.test.ts (4 tests green)",
         "loop-ledger.json line endings normalized (CRLF to LF only) with exact backup .artifacts/iteration-pl-build/loop-ledger-before.json; it stays unstaged",
-        "receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md; PL-BUILD stays unchecked until the Linux CI leg passes"
+        "receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md; all six PL-BUILD criteria (AC-162, AC-356, AC-362, AC-395, AC-396, AC-439) PASS; no main merge or deployment happened"
       ]
     },
     {
