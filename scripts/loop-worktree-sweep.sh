@@ -8,9 +8,14 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 kept=0; removed=0
 git worktree list --porcelain | awk '/^worktree /{print $2}' | grep "/.loop-worktrees/" | awk '{ print length, $0 }' | sort -rn | cut -d' ' -f2- | while read -r wt; do
   branch=$(git -C "$wt" branch --show-current 2>/dev/null)
-  if [ -z "$branch" ]; then
-    echo "REMOVE (detached/broken): $wt"
-    git worktree remove --force "$wt" 2>/dev/null; continue
+  # Other agent sessions also park worktrees here (detached, fix/*, archive/*).
+  # The sweep owns ONLY loop/* branches, and never deletes uncommitted files.
+  case "$branch" in
+    loop/*) ;;
+    *) echo "SKIP (not a loop worktree): $wt [${branch:-detached}]"; continue ;;
+  esac
+  if [ -n "$(git -C "$wt" status --porcelain 2>/dev/null)" ]; then
+    echo "KEEP (uncommitted files): $wt [$branch]"; continue
   fi
   ahead=$(git rev-list --count origin/dev.."$branch" 2>/dev/null || echo "?")
   remote=$(git ls-remote --heads origin "$branch" 2>/dev/null | awk '{print $1}')
