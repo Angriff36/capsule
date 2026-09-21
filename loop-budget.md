@@ -14,7 +14,7 @@ What limits the loop instead:
 
 - 3 review FAILs on one item -> escalated, not retried
 - 4 rounds per tick (`.claude/loop-tick.cmd`), one fix per round
-- ticks only 09:15-17:15, and a new tick never starts while one is running
+- a new tick never starts while one is running (ticks fire every hour, 24/7)
 - each provider's own plan limit (z.ai / MiniMax for the maker, OpenAI for the reviewer)
 
 `tokens_estimate` in loop-run-log.md is still welcome as information. Nothing gates on it.

@@ -131,6 +131,6 @@
 - NO token cap and no report-only mode (owner rule 2026-09-21). The old cap was an
   AI-invented backstop on flat-rate worker tokens, counted from the maker's own
   guesses; it stopped a working loop at 1 PM on its first unattended day. The
-  real limits: 3 FAILs per item, 4 rounds per tick, work-hours ticks only.
+  real limits: 3 FAILs per item, 4 rounds per tick, one tick at a time.
 - `loop-pause-all` in STATE.md: exit immediately.
 

@@ -2,7 +2,7 @@
 
 ## Loops in this repo (2026-07-21)
 
-1. **Hygiene tick** (`capsule-loop-tick`, every 2h 9:15-17:15): triage scan ->
+1. **Hygiene tick** (`capsule-loop-tick`, every hour, all day and night): triage scan ->
    STATE.md queue -> queue-drain fix flow. Prompt: `.claude/loop-tick-prompt.txt`.
 2. **Product loop** (`capsule-product-loop`) — **OFF, do not enable as is
    (2026-09-20).** It has no real work: an AI session wrote
@@ -25,7 +25,7 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 
 | Role                        | Model                                                 | Mechanism                                                                                                                                                                                                                                                |
 | --------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Scheduler                   | Windows Task Scheduler (`capsule-loop-tick`)          | 9:15–17:15 every 2h, daily (switched from weekdays 2026-07-17 for away coverage) → `.claude/loop-tick.cmd` → headless `claude -p` on a worker profile                                                                                                    |
+| Scheduler                   | Windows Task Scheduler (`capsule-loop-tick`)          | every hour, around the clock (owner 2026-09-21; was work hours only - an AI-copied habit from the draft-PR days, when a person had to be around to approve). A new tick never starts while one runs (IgnoreNew), so the loop works back to back → `.claude/loop-tick.cmd` → headless `claude -p` on a worker profile                                                                                                    |
 | Tick runner (triage, state) | **GLM 5.2** (z.ai plan), auto-fallback **MiniMax-M3** | `~/.claude/claude-glm.ps1` / `claude-minimax.ps1` profiles — zero Anthropic quota; reads `.claude/loop-tick-prompt.txt`, runs `loop-triage`, owns STATE.md; scoped Edit perms (state files only). Manual alternate: Codex `gpt-5.6-luna` (`codex exec`). |
 | Overseer                    | Fable 5 — on-demand only                              | reviews STATE.md when the human asks; judges graduation; NEVER runs ticks. No Anthropic-quota model runs ticks (incl. Sonnet).                                                                                                                           |
 | Maker | GLM/MiniMax, in-tick | One fix per round, inside `.loop-worktrees/<run-id>` only. Commits there, writes a hand-off file, stops. NEVER checks or lands its own work. Runs with permission checks ON + deny list `.claude/loop-maker-settings.json` |
@@ -37,7 +37,7 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 
 | Pattern                   | Cadence                     | Status         |
 | ------------------------- | --------------------------- | -------------- |
-| Daily Triage (2h variant) | work hours, daily, every 2h | AUTO-LAND on `dev` (2026-09-20): maker -> independent check -> land, up to 4 fixes per tick |
+| Daily Triage (hourly variant) | every hour, 24/7 | AUTO-LAND on `dev` (2026-09-20): maker -> independent check -> land, up to 4 fixes per tick |
 
 ## L1 → L2 graduation criteria (all required — evidence bar, not calendar)
 
@@ -62,7 +62,7 @@ MCP not required for this pattern — triage uses `gh` CLI (read-only) and git.
 
 ## Budget
 
-- NO token cap (owner rule 2026-09-21; see `loop-budget.md`). The limits are 3 FAILs per item, 4 rounds per tick, and work-hours ticks only.
+- NO token cap (owner rule 2026-09-21; see `loop-budget.md`). The limits are 3 FAILs per item and 4 rounds per tick.
 - Kill switch: set `loop-pause-all` in STATE.md → every tick exits immediately.
 
 ## Hard limits (always)
