@@ -62,7 +62,7 @@ MCP not required for this pattern — triage uses `gh` CLI (read-only) and git.
 
 ## Budget
 
-- Caps in `loop-budget.md`; `loop-budget` skill runs at start/end of each tick.
+- NO token cap (owner rule 2026-09-21; see `loop-budget.md`). The limits are 3 FAILs per item, 4 rounds per tick, and work-hours ticks only.
 - Kill switch: set `loop-pause-all` in STATE.md → every tick exits immediately.
 
 ## Hard limits (always)

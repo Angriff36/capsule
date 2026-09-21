@@ -15,7 +15,7 @@
   Why the change: the owner does not code and cannot approve PRs. Under the
   draft-PR design 26 of 37 loop PRs sat unapproved, went stale against a
   moving tree, and were thrown away — most of them never looked at.
-- **One fix at a time, as many per tick as the budget allows.** Each fix
+- **One fix at a time, up to 4 per tick (the runner's round count).** Each fix
   starts from the newest `origin/dev`, lands, and only then does the next one
   start. NEVER hold two fixes open together — nearly every fix regenerates
   the same Builder-owned files, so parallel fixes collide.
@@ -128,6 +128,9 @@
 
 ## Budget
 
-- At 80% of daily cap: report-only for the rest of the day.
+- NO token cap and no report-only mode (owner rule 2026-09-21). The old cap was an
+  AI-invented backstop on flat-rate worker tokens, counted from the maker's own
+  guesses; it stopped a working loop at 1 PM on its first unattended day. The
+  real limits: 3 FAILs per item, 4 rounds per tick, work-hours ticks only.
 - `loop-pause-all` in STATE.md: exit immediately.
 
