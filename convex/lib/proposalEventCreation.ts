@@ -89,7 +89,20 @@ export const createEventFromAcceptedProposal = mutation({
     if (proposal.status !== "accepted") {
       throw new Error("Only an accepted proposal can be booked into an event.");
     }
+    // A lost response must not wedge the retry (issue #389, spec §7.1
+    // "Replaying acceptance or booking returns the existing Event"): an
+    // accepted proposal with an intact event link IS booked — return that
+    // event without creating, staging, linking, or cascading again. A
+    // dangling or cross-tenant link is still an operator error.
     if (proposal.eventId != null) {
+      const linked = await ctx.db.get(proposal.eventId);
+      if (
+        linked != null &&
+        linked.deletedAt == null &&
+        linked.tenantId === proposal.tenantId
+      ) {
+        return { docId: proposal.eventId };
+      }
       throw new Error(
         "This proposal is already linked to an event — open that event instead of creating another.",
       );

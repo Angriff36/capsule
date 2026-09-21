@@ -8,7 +8,9 @@
  *   - accepted proposal → create event → menu selections copy (removed ones don't)
  *   - sales_staff can complete the whole flow (policy regression) but stays
  *     DENIED on direct EventDish composition (addToEvent/adjustServings/remove)
- *   - already-linked proposals reject, at the seam AND the domain command
+ *   - an already-linked proposal replays to the saved event at the seam
+ *     (lost-response retry, issue #389); the domain command still refuses a
+ *     second link
  *   - a rejected double-booking creates no duplicate event
  *   - linkEvent refuses a missing/fake eventId (even with no menu selections,
  *     where the cascade would never run) and a wrong-client event
@@ -648,7 +650,7 @@ describe("accepted proposal → create event (issue #141)", () => {
     expect((copied[0] as { dishId?: string }).dishId).toBe(seed.dishA.docId);
   });
 
-  it("rejects an already-linked proposal at the booking seam without changing the existing event or menu", async () => {
+  it("replays an already-linked proposal to the saved event without booking again (issue #389)", async () => {
     const tenantId = "tenant-booking-dup";
     const proof = harness();
     const owner = proof.asRole({
@@ -669,25 +671,106 @@ describe("accepted proposal → create event (issue #141)", () => {
     )) as { docId: string };
     const eventsAfterBooking = await liveEventCount(owner);
 
-    // Seam rejects and rolls back — no second event appears.
-    await expect(
-      proof.executeCommand(
-        owner,
-        api.lib.proposalEventCreation.createEventFromAcceptedProposal,
-        {
-          proposalId,
-          event: { clientId: seed.clientId, ...EVENT_ARGS },
-        },
-      ),
-    ).rejects.toThrow(/already linked/);
-    expect(await liveEventCount(owner)).toBe(eventsAfterBooking);
+    // Lost-response retry with identical args returns the SAME event —
+    // spec §7.1: replaying booking returns the existing Event.
+    const retry = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId,
+        event: { clientId: seed.clientId, ...EVENT_ARGS },
+      },
+    )) as { docId: string };
+    expect(retry.docId).toBe(booked.docId);
 
-    // The original link and menu survive untouched.
+    // A stale optimistic version must not fail the replay either: the
+    // replay returns before the concurrency check runs (booking bumped the
+    // proposal's version when it linked).
+    const staleRetry = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId,
+        proposalVersion: 999999,
+        event: { clientId: seed.clientId, ...EVENT_ARGS },
+      },
+    )) as { docId: string };
+    expect(staleRetry.docId).toBe(booked.docId);
+
+    // No second event, no second menu copy, link untouched.
+    expect(await liveEventCount(owner)).toBe(eventsAfterBooking);
     const linked = await owner.run(async (ctx) =>
       ctx.db.get(proposalId as never),
     );
     expect((linked as { eventId?: string }).eventId).toBe(booked.docId);
     expect(await liveEventDishes(owner, booked.docId)).toHaveLength(1);
+  });
+
+  it("replays for a proposal linked to its event before acceptance (event-first path)", async () => {
+    const tenantId = "tenant-booking-event-first";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-event-first",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedCatalog(proof, owner, tenantId);
+
+    // Conversion-first shape (spec §7.2.2): the event exists first, the
+    // proposal links to it at draft (createViaDraft eventId), and a later
+    // acceptance keeps that link and copies the menu (the accept-with-event
+    // cascade). The booking seam must replay to this event, not throw.
+    const event = (await proof.executeCommand(
+      owner,
+      api.mutations.Event_createViaPlanEngagement,
+      { clientId: seed.clientId, ...EVENT_ARGS },
+    )) as { docId: string };
+    const proposal = (await proof.executeCommand(
+      owner,
+      api.mutations.Proposal_createViaDraft,
+      {
+        clientId: seed.clientId,
+        title: "Converted quote proposal",
+        subtotal: 1200,
+        taxAmount: 100,
+        discountAmount: 0,
+        total: 1300,
+        eventId: event.docId,
+      },
+    )) as { docId: string };
+    await proof.executeCommand(
+      owner,
+      api.mutations.ProposalDishSelection_createViaSelect,
+      {
+        proposalId: proposal.docId,
+        menuId: seed.menuId,
+        dishId: seed.dishA.docId,
+        quantityServings: 80,
+        course: "main",
+      },
+    );
+    await proof.executeCommand(owner, api.mutations.Proposal_send, {
+      docId: proposal.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_markViewed, {
+      docId: proposal.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_accept, {
+      docId: proposal.docId,
+    });
+
+    const eventsBeforeReplay = await liveEventCount(owner);
+    const replay = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId: proposal.docId,
+        event: { clientId: seed.clientId, ...EVENT_ARGS },
+      },
+    )) as { docId: string };
+    expect(replay.docId).toBe(event.docId);
+    expect(await liveEventCount(owner)).toBe(eventsBeforeReplay);
+    expect(await liveEventDishes(owner, event.docId)).toHaveLength(1);
   });
 
   it("denies sales_staff direct EventDish composition (addToEvent/adjustServings/remove)", async () => {
