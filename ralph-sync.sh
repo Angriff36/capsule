@@ -58,25 +58,3 @@ Its default port is 7812. Configure the check with the same command without
 frontend; verify the local backend separately using the project's instructions.
 EOF
 }
-
-ralph_ready_to_finish() {
-    ralph_refresh_base || return 1
-    if ! git merge-base --is-ancestor "$RALPH_BASE_SHA" HEAD; then
-        echo "Ralph: upstream advanced; another integration iteration is required."
-        return 1
-    fi
-    if git rev-parse -q --verify MERGE_HEAD >/dev/null || [ -n "$(git ls-files -u)" ]; then
-        echo "Ralph: merge is unfinished."
-        return 1
-    fi
-    # Reload the check configured by the agent during this iteration.
-    if [ -f .ralph.env ]; then . ./.ralph.env; fi
-    if [ -z "${RALPH_PREVIEW_CHECK_CMD:-}" ]; then
-        echo "Ralph: preview verification has not been configured; continuing."
-        return 1
-    fi
-    bash -c "$RALPH_PREVIEW_CHECK_CMD" || {
-        echo "Ralph: preview verification failed; continuing to repair it."
-        return 1
-    }
-}

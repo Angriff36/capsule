@@ -1,12 +1,10 @@
 #!/bin/bash
-# Usage: ./loop.sh [plan | plan-work "work description"] [max_iterations] [--branch <name>]
+# Usage: ./loop.sh [plan] [max_iterations] [--branch <name>]
 # Examples:
 #   ./loop.sh                                   # Build mode, unlimited iterations
 #   ./loop.sh 20                                # Build mode, max 20 iterations
-#   ./loop.sh plan                              # Full plan mode, default 3 iterations (#271)
-#   ./loop.sh plan 5                            # Full plan mode, max 5 iterations
-#   ./loop.sh plan-work "user auth" --branch ralph/user-auth
-#                                               # Scoped plan on a work branch
+#   ./loop.sh plan                              # Plan mode, unlimited iterations
+#   ./loop.sh plan 5                            # Plan mode, max 5 iterations
 #   ./loop.sh --branch ralph/user-auth          # Build on a work branch
 #   ./loop.sh 20 --resume                        # Resume, skipping iterations in .ralph-checkpoint
 #   ./loop.sh plan --dry-run                     # Print rendered prompt + command, then exit
@@ -41,26 +39,11 @@ RALPH_INITIAL_DIRTY=$(git status --porcelain 2>/dev/null)
 
 # Parse mode
 if [ "${1:-}" = "plan" ]; then
-    # Full planning mode
+    # Plan mode: plans the WHOLE gap between specs/ and src/. Runs until stopped
+    # (owner rule 2026-09-20: the loop never stops itself and never narrows the work).
     MODE="plan"
     PROMPT_FILE="PROMPT_plan.md"
-    # Plan mode must converge. Unlimited plan ticks rewrite the same
-    # checklist forever (#271). Override with `./loop.sh plan 20`.
-    MAX_ITERATIONS=${2:-3}
-    rm -f .ralph-plan-converged
-elif [ "${1:-}" = "plan-work" ]; then
-    # Scoped planning mode — scope the plan to one body of work at creation time
-    if [ -z "${2:-}" ]; then
-        echo "Error: plan-work requires a work description"
-        echo "Usage: ./loop.sh plan-work \"description of the work\" [max_iterations] [--branch <name>]"
-        exit 1
-    fi
-    MODE="plan-work"
-    PROMPT_FILE="PROMPT_plan_work.md"
-    WORK_DESCRIPTION="$2"
-    export WORK_SCOPE="$WORK_DESCRIPTION"
-    MAX_ITERATIONS=${3:-5}  # Default 5 for scoped planning
-    rm -f .ralph-plan-converged
+    MAX_ITERATIONS=${2:-0}
 elif [[ "${1:-}" =~ ^[0-9]+$ ]]; then
     # Build mode with max iterations
     MODE="build"
@@ -120,7 +103,7 @@ export MODEL_PLAN MODEL_BUILD MODEL_REVIEW
 : "${RALPH_MAX_BUILD_AGENTS:=1}"
 export RALPH_MAX_READ_AGENTS RALPH_MAX_BUILD_AGENTS
 
-# Top-level agent model per mode. Both planning modes use the plan model.
+# Top-level agent model per mode. Plan mode uses the plan model.
 if [ "$MODE" = "build" ]; then
     MODEL=$MODEL_BUILD
 else
@@ -198,13 +181,6 @@ if [ "$RESUME" -eq 1 ]; then
     fi
 fi
 
-# Scoping must happen on a work branch, not on the trunk.
-if [ "$MODE" = "plan-work" ] && { [ "$CURRENT_BRANCH" = "main" ] || [ "$CURRENT_BRANCH" = "master" ]; }; then
-    echo "Error: plan-work should run on a work branch, not $CURRENT_BRANCH"
-    echo "Pass --branch <name> or create/checkout a work branch first."
-    exit 1
-fi
-
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Mode:   $MODE"
 echo "Prompt: $PROMPT_FILE"
@@ -212,7 +188,6 @@ echo "CLI:    $RALPH_CLI"
 echo "Model:  $MODEL"
 [ -n "${RALPH_PROFILE:-}" ] && echo "Provider: $RALPH_PROFILE (${ANTHROPIC_BASE_URL:-})"
 echo "Branch: $CURRENT_BRANCH"
-[ "$MODE" = "plan-work" ] && echo "Work:   $WORK_DESCRIPTION"
 [ $MAX_ITERATIONS -gt 0 ] && echo "Max:    $MAX_ITERATIONS iterations"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
@@ -228,7 +203,7 @@ fi
 # loop so what dry-run prints is exactly what gets piped to Claude.
 render_prompt() {
     if command -v envsubst >/dev/null 2>&1; then
-        envsubst '$PROJECT_NAME $TEST_CMD $LINT_CMD $BUILD_CMD $MODEL_PLAN $MODEL_BUILD $MODEL_REVIEW $RALPH_MAX_READ_AGENTS $RALPH_MAX_BUILD_AGENTS $WORK_SCOPE' < "$PROMPT_FILE"
+        envsubst '$PROJECT_NAME $TEST_CMD $LINT_CMD $BUILD_CMD $MODEL_PLAN $MODEL_BUILD $MODEL_REVIEW $RALPH_MAX_READ_AGENTS $RALPH_MAX_BUILD_AGENTS' < "$PROMPT_FILE"
     else
         cat "$PROMPT_FILE"
     fi
@@ -325,26 +300,9 @@ $(ralph_integration_prompt)"
         "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$((ITERATION + 1))" "$MODE" "$ELAPSED" "$EXIT_CODE" "$COMMIT_SUBJECT" \
         >> .ralph-telemetry.jsonl
 
-    # Halt cleanly once the plan is exhausted (build mode only — plan mode
-    # writes the plan, so an empty checklist there just means "not written yet")
-    if [ "$MODE" = "build" ] && [ "$EXIT_CODE" -eq 0 ] && [ "$PUSH_OK" -eq 1 ] &&
-        ./check_done.sh && ralph_ready_to_finish; then
-        echo "Plan complete. Branch includes $RALPH_REMOTE/$RALPH_BASE_BRANCH; local preview check passed."
-        echo "Worktree: $(git rev-parse --show-toplevel) | Branch: $CURRENT_BRANCH | Commit: $(git rev-parse --short HEAD)"
-        echo "Branch pushed. This is not a production deployment."
-        break
-    fi
-
-    # Plan mode: the agent writes .ralph-plan-converged when a tick changes
-    # no remaining `- [ ]` tasks (#271). Stop instead of looping forever.
-    if { [ "$MODE" = "plan" ] || [ "$MODE" = "plan-work" ]; } &&
-        [ -f .ralph-plan-converged ] &&
-        [ "$EXIT_CODE" -eq 0 ] &&
-        [ "$PUSH_OK" -eq 1 ]; then
-        echo "Plan converged (.ralph-plan-converged). Start build mode next."
-        break
-    fi
-
+    # No self-stop (owner rule 2026-09-20). An empty plan is not "done": the
+    # prompts keep finding gaps between specs/ and src/. Stop the loop with a
+    # max iteration count or Ctrl+C.
     ITERATION=$((ITERATION + 1))
     echo -e "\n\n======================== LOOP $ITERATION ========================\n"
 done
