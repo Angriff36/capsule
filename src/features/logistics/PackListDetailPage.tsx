@@ -322,6 +322,30 @@ export function PackListDetailPage() {
         });
         return;
       }
+      if (key === "markPacked") {
+        // #377 part 3: same zero-packed warn as the lists page. While the
+        // line rows are still loading the counts are unknown, so ask anyway
+        // — skipping then would let an unresolved query bypass the check.
+        const packedCount = listItems.filter(
+          (item) => String(item.status) === "packed",
+        ).length;
+        if (
+          items === undefined ||
+          (listItems.length > 0 && packedCount === 0)
+        ) {
+          const proceed = await prompt.askConfirm({
+            title: "No lines packed yet",
+            description:
+              items === undefined
+                ? "Line details are still loading, so packed counts are not known yet. If this list has lines and none are packed, marking it packed now would close it blind. Mark the list packed anyway?"
+                : `This list has ${formatCountNoun(listItems.length, "line")} and none are marked packed. Mark the list packed anyway?`,
+            confirmLabel: "Mark packed anyway",
+            cancelLabel: "Go back",
+            tone: "danger",
+          });
+          if (!proceed) return;
+        }
+      }
       void run(`list:${key}`, async () => {
         const args = { docId: packList._id, version: packList.version };
         if (key === "startPacking") await startPacking(args);
