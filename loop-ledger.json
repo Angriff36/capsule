@@ -431,6 +431,13 @@
       "verdict": "NOOP",
       "timestamp": "2026-07-31T02:00:46.5062307Z",
       "reason": "STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"
+    },
+    {
+      "item": "LANDER SELF-TEST (not a real item)",
+      "runId": "selftest-20260920-reject",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-21T00:45:27.7025457Z",
+      "reason": "review by gpt-5.6-sol: REJECT the candidate does not implement or test the requested new-menu validation and contains only unrelated edits"
     }
   ]
 }

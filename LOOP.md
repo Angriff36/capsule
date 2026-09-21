@@ -4,15 +4,19 @@
 
 1. **Hygiene tick** (`capsule-loop-tick`, every 2h 9:15-17:15): triage scan ->
    STATE.md queue -> queue-drain fix flow. Prompt: `.claude/loop-tick-prompt.txt`.
-2. **Product loop** (`capsule-product-loop`, 4-iteration shifts at 9:00/13:00/
-   17:00): works `PRODUCT-BACKLOG.md` top-down, one item -> one draft PR per
-   iteration. Prompt: `PROMPT-product.md`. Runner: `.claude/product-loop.cmd`.
-   Backlog = OD-defect fixes + evolution-plan slices; human merges + reorders.
-   Kill: delete the task, or `loop-pause-all` in STATE.md (stops both loops).
+2. **Product loop** (`capsule-product-loop`) — **OFF, do not enable as is
+   (2026-09-20).** It has no real work: an AI session wrote
+   `PRODUCT-BACKLOG.md` without asking the owner, and all six PRs it produced
+   were closed unmerged. `PROMPT-product.md` + `.claude/product-loop.cmd`
+   still use the retired draft-PR design (maker reviews its own work, runs
+   with permission checks off). Before any restart: the owner supplies a real
+   backlog, and the prompt + runner are converted to the maker/lander design
+   used by the hygiene tick.
+   Kill switch for both loops: `loop-pause-all` in STATE.md.
 
 Architecture per [loop-engineering](https://github.com/cobusgreyling/loop-engineering).
 Ported from the retired capsule-pro loop 2026-07-16 (13 clean L1 ticks there).
-**Current phase: L2 standing (draft PRs; human decision 2026-07-19 — see loop-constraints.md).**
+**Current phase: AUTO-LAND (owner decision 2026-09-20 — see loop-constraints.md). Approved fixes land on `dev` with no human step; the draft-PR design is retired (26 of 37 loop PRs went stale unapproved).**
 
 Stack note: this repo is Bun + Vite + Convex + Vitest (NOT the capsule-pro
 pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
@@ -24,16 +28,16 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 | Scheduler                   | Windows Task Scheduler (`capsule-loop-tick`)          | 9:15–17:15 every 2h, daily (switched from weekdays 2026-07-17 for away coverage) → `.claude/loop-tick.cmd` → headless `claude -p` on a worker profile                                                                                                    |
 | Tick runner (triage, state) | **GLM 5.2** (z.ai plan), auto-fallback **MiniMax-M3** | `~/.claude/claude-glm.ps1` / `claude-minimax.ps1` profiles — zero Anthropic quota; reads `.claude/loop-tick-prompt.txt`, runs `loop-triage`, owns STATE.md; scoped Edit perms (state files only). Manual alternate: Codex `gpt-5.6-luna` (`codex exec`). |
 | Overseer                    | Fable 5 — on-demand only                              | reviews STATE.md when the human asks; judges graduation; NEVER runs ticks. No Anthropic-quota model runs ticks (incl. Sonnet).                                                                                                                           |
-| Implementers (L2 — **ON, away mode**) | GLM/MiniMax, in-tick                        | One fix attempt per tick, inside `.loop-worktrees/<run-id>` only; draft PRs; per loop-constraints.md away-mode rules                                                                                                                                     |
-| Review gate (L2 — **ON, away mode**)  | Codex (gpt-5.6-sol); cross-model fallback: Fable 5 or grok (Cursor CLI) | Tick pipes worktree diff to `codex exec -s read-only`; REJECT blocks the PR. Reviewer must be a different model than the diff's author; if Codex is unavailable (quota/outage) or authored the diff, fall back per loop-constraints.md § Push & Merge — either fallback may review GLM/MiniMax loop diffs |
+| Maker | GLM/MiniMax, in-tick | One fix per round, inside `.loop-worktrees/<run-id>` only. Commits there, writes a hand-off file, stops. NEVER checks or lands its own work. Runs with permission checks ON + deny list `.claude/loop-maker-settings.json` |
+| Checker + lander | `.claude/loop-land.ps1` (plain code) + a reviewer from a DIFFERENT PROVIDER: Codex gpt-5.6-sol (OpenAI); fallback grok via Cursor CLI (xAI) | Reruns typecheck itself, gets the review, and on APPROVE pushes the fix onto `dev`. Anything else: records why, deletes the attempt. The pre-push hook refuses loop-worktree pushes that do not come from the lander |
 | Circuit breaker             | loop-context                                          | `loop-ledger.json`; 3× same error / 5 fails → escalate                                                                                                                                                                                                   |
-| Final gate                  | Human (Ryan)                                          | STATE.md High Priority + escalations                                                                                                                                                                                                                     |
+| Release gate | Human (Ryan) says "release" | Nothing reaches production until then. Escalations (3 failures on an item) are listed in STATE.md |
 
 ## Active loops
 
 | Pattern                   | Cadence                     | Status         |
 | ------------------------- | --------------------------- | -------------- |
-| Daily Triage (2h variant) | work hours, daily, every 2h | L2 away mode (draft PRs) |
+| Daily Triage (2h variant) | work hours, daily, every 2h | AUTO-LAND on `dev` (2026-09-20): maker -> independent check -> land, up to 4 fixes per tick |
 
 ## L1 → L2 graduation criteria (all required — evidence bar, not calendar)
 
@@ -45,10 +49,10 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 
 - The human works in this checkout daily and the tree is often dirty with
   in-flight work. The loop **never edits or commits in this checkout at any
-  level** — L1 writes only the four loop state files; L2 fix attempts each
-  get their own worktree under `.loop-worktrees/` (loop-worktree tool) and
-  the loop's commits exist only on `loop/<run-id>` branches there. The human
-  merges approved attempts.
+  level** — it writes only the four loop state files there; each fix attempt
+  gets its own worktree under `.loop-worktrees/`, started from `origin/dev`.
+  The maker commits there and stops; `.claude/loop-land.ps1` checks the
+  attempt and lands approved ones on `dev`.
 - Single loop for now. Adding a second requires the multi-loop rules
   (separate state files, `acting_on:` claims, shared denylist).
 
@@ -61,18 +65,25 @@ MCP not required for this pattern — triage uses `gh` CLI (read-only) and git.
 - Caps in `loop-budget.md`; `loop-budget` skill runs at start/end of each tick.
 - Kill switch: set `loop-pause-all` in STATE.md → every tick exits immediately.
 
-## Human gates (always, regardless of level)
+## Hard limits (always)
+
+`loop-constraints.md` is binding and wins over this file. Auth, payments,
+billing, schema, and Manifest source are ATTEMPTABLE there (HIGH-SCRUTINY
+commit subject, listed for the release review) — they are not human-only.
 
 - Anything matching the denylist in `loop-constraints.md`
-- Convex schema changes (`convex/schema.ts`) and anything under `convex/_generated`
-- **Builder-owned trees** (see `.builder/ownership.json`): never hand-edit.
+- **Builder-owned trees** (see `.builder/ownership.json`) and anything under
+  `convex/_generated`: never hand-edit.
   Regen happens ONLY via the app-local Builder CLI —
   `bun run manifest:regen`). Conflicts block apply.
   Details: `docs/generation/manifest-builder.md`, Builder `mintlify/guides/safe-regeneration.mdx`.
-- Editable Manifest source (`src/**/*.manifest`, `manifest.config.yaml`) and
-  `.builder/**` — human-only; the loop reports, never edits
+- Editable Manifest source (`src/**/*.manifest`): edit in the worktree only,
+  always with `bun run manifest:regen` in the same commit. `.builder/**` and
+  `manifest.config.yaml`: the loop never edits these
 - Deploys: `convex deploy` / `bun run deploy` are forbidden to the loop
   (Builder never deploys Convex either — `bun run codegen` / `bun run dev:convex`
   are human steps after apply)
-- Pushes, merges, PR closes (production ships only via the one
-  `bash scripts/release.sh` per branch — owner rule 2026-08-25)
+- The maker never pushes; only the lander pushes, and only onto `dev`.
+  Production ships only when the owner says "release"
+  (`bash scripts/deploy-production.sh`). The loop never opens, merges, or
+  closes PRs.

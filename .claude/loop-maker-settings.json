@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": ["Bash(git fetch *)", "Bash(bash scripts/loop-worktree-sweep.sh)"],
+    "deny": [
+      "Bash(git push *)",
+      "Bash(git -C * push *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr ready *)",
+      "Bash(gh pr close *)",
+      "Bash(codex *)",
+      "Bash(bash scripts/release.sh*)",
+      "Bash(bash scripts/deploy*)",
+      "Bash(bunx convex deploy*)",
+      "Bash(bun run deploy*)",
+      "Edit(.claude/**)",
+      "Edit(.githooks/**)",
+      "Edit(.loop-worktrees/**/.githooks/**)",
+      "Edit(.loop-worktrees/**/.claude/**)",
+      "Edit(loop-constraints.md)"
+    ]
+  }
+}

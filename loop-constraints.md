@@ -5,20 +5,24 @@
 
 ## Phase
 
-- **L2 STANDING (human decision 2026-07-19; throughput redesign 2026-07-21)**
-  — draft-PR fix powers are permanent. **The PR gate is the safety boundary**:
-  every change is worktree-isolated, test-verified, cross-model reviewed
-  (see Push & Merge → Reviewer selection), and ships
-  only as a draft PR the human must approve — so the loop does NOT pre-filter
-  work into "safe" and "unsafe". Anything reviewable is attemptable.
-- **Drain the queue every tick.** Work items in priority order — one fresh
-  worktree and one draft PR per logical fix — and keep going until there are
-  no actionable items left or the budget gate trips. There is NO per-tick fix
-  cap. (One-fix-per-iteration is for back-to-back loops; a scheduled tick
-  that stops after one fix is throughput theater — human decision 2026-07-21.)
+- **AUTO-LAND (owner decision 2026-09-20; replaces the draft-PR design).**
+  **The independent review is the safety boundary**: every change is
+  worktree-isolated, test-verified, and reviewed by a different provider than
+  the maker (see Check & Land). APPROVE → the lander puts the fix on the
+  shared `dev` branch at once: no PR, no human step. `dev` is the work copy; production changes only
+  when the owner says "release". The loop does NOT pre-filter work into "safe"
+  and "unsafe". Anything reviewable is attemptable.
+  Why the change: the owner does not code and cannot approve PRs. Under the
+  draft-PR design 26 of 37 loop PRs sat unapproved, went stale against a
+  moving tree, and were thrown away — most of them never looked at.
+- **One fix at a time, as many per tick as the budget allows.** Each fix
+  starts from the newest `origin/dev`, lands, and only then does the next one
+  start. NEVER hold two fixes open together — nearly every fix regenerates
+  the same Builder-owned files, so parallel fixes collide.
 - High-scrutiny areas (auth, payments, billing, schema, manifest sources) are
-  ATTEMPTABLE, not skipped — but the PR title/body must flag them loudly
-  (e.g. "HIGH-SCRUTINY: touches payments") so the human reviews accordingly.
+  ATTEMPTABLE, not skipped — they land on `dev` like the rest, but the commit
+  subject starts "[loop] HIGH-SCRUTINY:" and STATE.md lists them under
+  "Landed - check before release" so the release review sees them.
 - Check `loop-ledger.json` before any attempt: 3 failures on an item →
   escalate in STATE.md, do not retry.
 - The `file:../builder` dependency was REMOVED 2026-07-19 (it broke CI's
@@ -44,35 +48,37 @@
   the loop writes only STATE.md, loop-run-log.md, loop-budget.md,
   loop-ledger.json there. Read-only git commands are fine.
 - Code edits happen ONLY inside a fresh worktree:
-  `git worktree add .loop-worktrees/<run-id> -b loop/<run-id> dev`.
+  `git fetch origin dev` then
+  `git worktree add .loop-worktrees/<run-id> -b loop/<run-id> origin/dev`.
   add/commit inside that worktree is allowed.
 
-## Push & Merge
+## Check & Land (the maker does neither — owner rule 2026-09-20)
 
-- Push ONLY `loop/*` branches (`git push origin loop/<run-id>`). Branch
-  pushes are chores (Vercel ignores non-`main` refs). `main` is only ever
-  deployed by `bash scripts/release.sh` — the pre-push hook blocks hand
-  pushes, and Vercel builds only `[release]` commits, so an auto-merged PR
-  lands on `main` without deploying.
-- PRs must be created with `gh pr create --draft`, verification evidence in
-  the body. NEVER push main, merge, mark PRs ready, or close PRs.
-- **AUTO-MERGE IS ON (human enabled 2026-07-21): once a PR is marked ready, a
-  green CI merges it with no further human step.** The review verdict is
-  therefore a HARD gate: never push a PR branch without a recorded APPROVE
-  from an independent cross-model reviewer. There is NO `REVIEW_GATE`
-  override mechanism — the 2026-07-22 `REVIEW_GATE=0` push (PR #31) was a
-  violation, not a precedent. REJECT → fix or escalate in STATE.md; never
-  push around the gate.
-- Reviewer selection (cross-model rule, owner 2026-07-22): **any frontier
-  model that did NOT author the diff is an eligible reviewer** — the only
-  hard rule is reviewer ≠ author; a model never approves its own diff.
-  Preferred routing: primary is Codex gpt-5.6-sol; when Codex is unavailable
-  (quota/outage) or authored the diff, fall back to **Fable 5** (fresh
-  review pass) or **grok via Cursor CLI**
-  (`agent -p --trust --model cursor-grok-4.5-high-fast`, PowerShell) —
-  either may review GLM/MiniMax-authored loop diffs. Only when NO eligible
-  reviewer can produce a verdict: escalate in STATE.md; never push
-  unreviewed. The PR body must name the reviewing model and its verdict.
+- **The maker never checks and never lands its own work.** It commits in its
+  worktree, writes `.loop-worktrees/_handoff/<run-id>.json`, and stops. It
+  never pushes, never runs or reads a review, never opens a PR. Its session
+  runs with permission checks ON and a deny list
+  (`.claude/loop-maker-settings.json`), and `.githooks/pre-push` refuses any
+  push from a loop worktree that does not come from the lander.
+- **The lander is `.claude/loop-land.ps1` — plain code, no AI.** It brings
+  the worktree up to date with `origin/dev`, reruns typecheck itself, then
+  asks a reviewer from a DIFFERENT PROVIDER than the maker. APPROVE → it
+  pushes the commit onto `dev`. Anything else → it records why in
+  loop-ledger.json + loop-run-log.md and deletes the attempt. No verdict from
+  any reviewer counts as REJECT. There is NO override — the 2026-07-22
+  `REVIEW_GATE=0` push (PR #31) was a violation, not a precedent.
+- A collision with newer `dev` work is NOT a strike on the item: the lander
+  records COLLISION and the maker retries from a fresh worktree.
+- `dev` pushes are chores (Vercel ignores non-`main` refs). `main` is only
+  ever changed by `bash scripts/release.sh` when the owner says "release";
+  the pre-push hook blocks every other push to `main`.
+- Reviewer selection (owner 2026-09-20): **the reviewer must come from a
+  different PROVIDER than the maker**, and the lander picks and runs it — the
+  maker never does. The maker is GLM (z.ai) or MiniMax; the reviewer is
+  Codex gpt-5.6-sol (OpenAI), and when Codex gives no verdict (quota/outage),
+  grok via Cursor CLI (`cursor-grok-4.5-high-fast`, xAI). No verdict from
+  either → the attempt is recorded as FAIL and nothing lands. The lander
+  stamps the landed commit with `Reviewed-by: <model> APPROVE`.
 
 ## Paths (hard rules — the short list that is NOT about caution)
 
@@ -83,13 +89,13 @@
   to generated files are wrong by construction (the next regen erases them).
   When a fix requires manifest source changes, edit `src/**/*.manifest` in
   the worktree AND run `bun run manifest:regen` inside that worktree so
-  source + generated output land together in one reviewable PR. (Regen in
+  source + generated output land together in one reviewable commit. (Regen in
   the MAIN checkout stays forbidden — it would stomp human WIP.)
 - Never leave `*.manifest` under `.artifacts/` (or other non-`src/` scratch
   dirs) in a worktree. Builder/manifest globs pick them up; relative `use`
   paths then resolve to e.g. `/.artifacts/workforce/...` and regen dies.
 - Manifest-source (C:\Projects\Manifest-source) is canonical for the domain
-  model: a PR that edits capsule `.manifest` files must say in its body
+  model: a commit that edits capsule `.manifest` files must say in its body
   whether the change needs porting to canonical (or came from it).
 - Formatting policy (human-approved 2026-07-19): Prettier is a normal CI gate
   but is for CODE only — it must never touch generated trees OR doc files
@@ -97,9 +103,8 @@
   exclusions; extend the ignore file rather than reformatting). `.manifest`
   sources are formatted ONLY by the Manifest CLI's own formatter
   (`npx manifest fmt`), run whenever `.manifest` files change.
-- Auth, payments, billing, `convex/schema.ts`: attemptable via draft PR with
-  a HIGH-SCRUTINY flag (see Phase) — the PR is the request for human
-  approval; do not silently skip these items.
+- Auth, payments, billing, `convex/schema.ts`: attemptable with a
+  HIGH-SCRUTINY commit subject (see Phase); do not silently skip these items.
 
 ## Code (applies at L2)
 
@@ -108,11 +113,11 @@
   worktrees live in `.loop-worktrees/`, gitignored). The loop NEVER edits
   files in this main checkout — that stays true after graduation, not just
   at L1. Commits/branches happen only inside the attempt's worktree; the
-  human merges.
+  lander lands them.
 - Mark the worktree `rejected`/`escalated` when the verifier or breaker says
   so; `loop-worktree cleanup` sweeps them. `active` is never swept.
-- One logical fix per worktree/PR (reviewability), smallest diff that truly
-  fixes it — but as many worktrees/PRs per tick as the queue and budget allow.
+- One logical fix per worktree (reviewability), smallest diff that truly
+  fixes it, one at a time.
 - Focused verification first: `bun run typecheck`, then any **existing**
   focused tests via `bun run test` (vitest). Never invent new test files
   unless the backlog item or owner explicitly asks. Never run the full

@@ -6,6 +6,19 @@
 # and writes the passing commit's sha to .artifacts/release-check-passed.
 # A main push is accepted only when CAPSULE_RELEASE=1 AND that file names the
 # exact commit being pushed. CI does not run on main, so this is the gate.
+# Loop rule (owner, 2026-09-20): the loop's maker never lands its own work.
+# A push from a loop worktree is accepted only from .claude/loop-land.ps1,
+# which sets LOOP_LANDER=1 after an independent review said APPROVE.
+case "$(git rev-parse --show-toplevel)" in
+  */.loop-worktrees/*)
+    if [ "${LOOP_LANDER:-0}" != "1" ]; then
+      echo ""
+      echo "pre-push blocked: loop worktrees do not push. Commit, write the hand-off file, and stop."
+      exit 1
+    fi
+    ;;
+esac
+
 while read -r _local_ref local_sha remote_ref _remote_sha; do
   case "$remote_ref" in
     refs/heads/main)
