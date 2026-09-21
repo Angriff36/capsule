@@ -63,3 +63,10 @@ Phase 5
 | Combined focused verification was killed by an intentionally short shell timeout | 1 | Split formatting, typecheck, payroll tests, full tests, and build into independently timed commands |
 | `bun run test` exposed 12 unrelated failures in concurrent Event/navigation/generated work | 1 | Preserve unrelated changes; record that payroll's focused 12 tests pass |
 | Finance managers cannot read TimeRecords used by the payroll exporter | 1 | Filed GitHub issue #39; do not race the active generated-tree rewrite with regeneration |
+
+## Whole-spec planning audit — 2026-09-20
+- [x] Preserve startup changes; confirm required upstream; verify local preview/backend.
+- [x] Audit every specs/ file and src/lib/ through read-only workers.
+- [x] Synthesize complete prioritized IMPLEMENTATION_PLAN.md and stable ACCEPTANCE_TESTS.md.
+- [x] Validate coverage, existing project checks and local checkout identity; prepare a checkpoint containing only owned planning paths. Final commit/push outcome is recorded by Git history and the closing response.
+Plan only; no application or test implementation. Required upstream 89262916f59e32dbed5d63749999309a62586742 is already an ancestor of dev at be4288fb.

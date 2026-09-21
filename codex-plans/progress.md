@@ -48,3 +48,15 @@
 | What's the goal? | Payroll data export for approved time and adjustments |
 | What have I learned? | Payroll and time read models exist; employeeNumber exists; completed time has no separate approval state |
 | What have I done? | Implemented the export and passed typecheck, smoke, and Playwright verification |
+
+## Whole-spec audit — 2026-09-20
+Started eight read-only GLM workers via ralph-worker.ps1. Captured startup diff/hashes and AC file in ignored .artifacts/whole-spec-audit-2026-09-20. Preview started and verified; no dependencies changed during upstream check. Full gate exit 5: existing loop-ledger.json formatting. No app or test source changed.
+
+
+Worker 007 and 015 returned provider 429 errors with exit code 0. Rejected both outputs. Paused not-yet-started second-wave queue processes after verifying their exact task command and absence of children; existing workers continue. Recover those scopes and retry remaining read-only work at lower concurrency. No application process stopped.
+
+## Whole-spec planning checkpoint — 2026-09-21
+- Finished read-only worker audits and orchestrator synthesis; source and library coverage verified mechanically. Full plan and acceptance contract written, with stable IDs and explicit P/J evidence requirements.
+- Existing suite/coverage, build, secrets, regeneration and all 19 Ralph spec-format checks passed. Full check and baseline remain blocked by the preserved startup conditions documented in verification.md.
+- Rechecked frontend source-map identity at http://127.0.0.1:7813 and local Convex process/data ownership at 3210; anonymous authStatus probe succeeded. Existing preview check configuration was already correct.
+- Prepared only planning paths for the dev checkpoint; application/generated/user-owned changes are excluded. Final commit/push outcome is recorded in Git history and the closing response.

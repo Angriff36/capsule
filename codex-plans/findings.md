@@ -54,3 +54,24 @@
 
 ## Visual/Browser Findings
 - None yet.
+
+## Whole-spec audit baseline — 2026-09-20
+- Required origin/main 89262916 is already ancestor of dev be4288fb; git pull --no-rebase origin dev reports up to date.
+- Existing acceptance IDs AC-001 through AC-046 must remain stable; startup IMPLEMENTATION_PLAN.md is empty.
+- Preview 127.0.0.1:7813 source map identifies C:/Projects/capsule/src/main.tsx; served Vite source points to local backend 3210. Convex dev parent and local storage paths identify this checkout; authStatus:getAuthStatus returns the expected anonymous response.
+- bun run check passes ownership/proof/domain/design/typecheck gates then stops at format:check on preserved startup-owned loop-ledger.json. Do not edit or stage that unrelated file. Run remaining checks separately and report the full gate honestly.
+- All 19 Ralph specs assigned to 8 read-only worker processes; complete Markdown/JSON product and backend contract audits follow.
+
+
+- Existing full suite passed: 193 test files, 892 tests; coverage thresholds passed. Frontend build and secrets passed. manifest:regen:check passed with no owned-file drift.
+- baseline:decay separately fails at 75 roots versus cap 71. HEAD has exactly 71 roots; ignored .ralph-tasks, .ralph-workers.log, IMPLEMENTATION_PLAN.md.bak and owner-owned untracked capsule-backend-end-state-spec.md inflate the runtime count. Escalated https://github.com/Angriff36/capsule/issues/380.
+- No skipped/todo/only test declarations found by source sweep; TODO commit/revert branches exist in convex/importCoordinator.ts and must be assessed against live importCommit consumers, not called universal missing imports.
+- Read-only issue refresh: 142/143/145/146 remain open; 144/147/148/149/150/151 are closed. Issue state is not workflow proof.
+- src/lib/llm-review.ts exists but review-criteria.md and llm-review.test.ts contain sample design-professional/financial-services criteria; normal Vitest include is tests/**/*.test.ts, so the passing suite does not run those perceptual reviews.
+
+## Whole-spec synthesis — 2026-09-21
+- Reviewed all 22 spec files and all 115 src/lib files; normative complete-product Markdown/JSON share criteria, while stale status tables are not evidence.
+- Published 115 prioritized task groups and 727 stable criteria (40 retained PASS, 687 PENDING); all 164 Ralph checkboxes and every backend explicit suite leg map to tasks.
+- Corrected false negatives about cancellation, reminders, attribution pages, recipe methods/stations/images, and source-estimate honesty. Full decisions and evidence: codex-plans/whole-spec-audit-2026-09-20/.
+- Reopened AC-012/024/029/030 for the missing full outcomes, retaining their passing narrower evidence. No source criterion retired; no application/test implementation.
+- Escalated source-confirmed tooling/release/provider/lifecycle/privacy/cutover/stock blockers as issues #380 through #387. User-owned files remain untouched apart from the requested plan target.
