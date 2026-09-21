@@ -36,6 +36,8 @@ Handle Git maintenance yourself. Resolve merge conflicts preserving both shipped
 features and this branch's work. Regenerate generated files through their owning
 tool. Preserve unrelated uncommitted work; do not bulk-stage or discard it.
 Stage only your own changes; this overrides any earlier git add -A instruction.
+Commit through the project's git hooks exactly as they are: never --no-verify,
+never core.hooksPath, never a copied or edited hook (seen 2026-09-21).
 Do not reset, force-push, push trunk, or deploy production. If a conflict requires
 an actual product choice, explain that choice rather than asking the user to run Git.
 After integration, install dependencies if changed and run project validation.

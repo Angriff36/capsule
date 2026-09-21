@@ -251,8 +251,38 @@ $(ralph_integration_prompt)"
     # while still showing it live. ponytail: the process-substitution tee may drop
     # the very last buffered line in a rare race — fine for a diagnostic tail.
     STDERR_LOG=$(mktemp)
-    printf '%s' "$PROMPT" | "${CLI_CMD[@]}" 2> >(tee "$STDERR_LOG" >&2)
-    EXIT_CODE=$?
+    if [ "$RALPH_CLI" = "codex" ]; then
+        # codex exec can finish its turn ("turn.completed" in the JSON stream) and then
+        # never exit: a long-lived grandchild it started (the Vite preview server) keeps
+        # its pipes open (seen 2026-09-21: idle 18 min, loop blocked). Watch the stream;
+        # once the turn is complete, give it 30s to exit, then stop it and carry on.
+        OUT_LOG=$(mktemp)
+        printf '%s' "$PROMPT" | "${CLI_CMD[@]}" > >(tee "$OUT_LOG") 2> >(tee "$STDERR_LOG" >&2) &
+        CLI_PID=$!
+        while kill -0 "$CLI_PID" 2>/dev/null; do
+            if grep -q '"type":"turn.completed"' "$OUT_LOG"; then
+                sleep 30
+                if kill -0 "$CLI_PID" 2>/dev/null; then
+                    echo "Ralph: codex finished its turn but did not exit; stopping it."
+                    # `codex` is an npm shim (sh -> node -> codex.exe): stop that one
+                    # process tree by its Windows pid. Never kill node.exe by name.
+                    WINPID=$(cat "/proc/$CLI_PID/winpid" 2>/dev/null)
+                    [ -n "$WINPID" ] && taskkill //PID "$WINPID" //T //F >/dev/null 2>&1
+                    kill "$CLI_PID" 2>/dev/null
+                fi
+                break
+            fi
+            sleep 10
+        done
+        wait "$CLI_PID" 2>/dev/null
+        EXIT_CODE=$?
+        # A completed turn is a completed iteration, however the process ended.
+        grep -q '"type":"turn.completed"' "$OUT_LOG" && EXIT_CODE=0
+        rm -f "$OUT_LOG"
+    else
+        printf '%s' "$PROMPT" | "${CLI_CMD[@]}" 2> >(tee "$STDERR_LOG" >&2)
+        EXIT_CODE=$?
+    fi
     if [ "$(git branch --show-current)" != "$CURRENT_BRANCH" ]; then
         echo "Ralph: agent changed branches unexpectedly; stopping before any push."
         exit 1
