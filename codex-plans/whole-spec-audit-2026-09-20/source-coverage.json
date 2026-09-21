@@ -3769,9 +3769,12 @@
       "status": "PENDING",
       "codeState": "partial",
       "tasks": ["PL-BUILD"],
-      "gap": "Qualify pinned Windows/Linux reproducibility and repair source-owned validation drift without hand-editing generated files or hiding local artifact counts by raising the cap.",
+      "gap": "Linux CI leg has not run for this increment; the Windows leg is green.",
       "evidence": [
-        "bun run manifest:regen:check passed on this Windows checkout; repository-local scripts/manifest-builder owns generation. Full check stopped on startup-owned loop-ledger.json formatting; baseline root count includes four local/untracked artifacts, GitHub #380."
+        "Windows leg green 2026-09-21 on the working tree based on 89c103bc plus the tested increment: bun run manifest:regen:check plus full bun run check incl. index-based baseline-decay ok (.artifacts/iteration-pl-build/check-after.log, regen-check.log)",
+        "#380 repaired in its owner: scripts/check-baseline-decay.ts now counts distinct Git-index root entries (cap unchanged at 71; missing index refuses); regression tests in tests/baseline-decay.test.ts (4 tests green)",
+        "loop-ledger.json line endings normalized (CRLF to LF only) with exact backup .artifacts/iteration-pl-build/loop-ledger-before.json; it stays unstaged",
+        "receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md; PL-BUILD stays unchecked until the Linux CI leg passes"
       ]
     },
     {
@@ -6561,13 +6564,14 @@
       "key": "CF-13-1-manifest-proof",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§13 item 1 (Manifest proof: compiles, generated artifacts current, no new diagnostics, policies/guards/constraints/events exercised)",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-BUILD"],
-      "gap": "None — gate exists and CI runs the same script (AGENTS.md:111).",
+      "gap": "None — full gate re-run green on this increment (Windows 2026-09-21).",
       "evidence": [
         "AGENTS.md:74 `bun run check` = toolchain + ownership + proof:emit + check:proof + manifest-registry + nine per-domain manifest gates + design-vocab + typecheck + format:check + secrets + coverage; `bun run manifest:regen` is the only regen entry (AGENTS.md:76)",
-        "Per-domain integration guard tests, e.g. tests/workforce-manifest-integration-guard.test.ts (approved-api-path + no direct writes to eventAssignments/shifts tables)"
+        "Per-domain integration guard tests, e.g. tests/workforce-manifest-integration-guard.test.ts (approved-api-path + no direct writes to eventAssignments/shifts tables)",
+        "Full `bun run check` green 2026-09-21 on the working tree based on 89c103bc plus the tested increment incl. all nine guards, 194 files / 896 tests, baseline-decay ok — .artifacts/iteration-pl-build/check-after.log; receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md"
       ]
     },
     {
@@ -6643,12 +6647,13 @@
       "key": "CF-13-7-gate",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§13 item 7 (run the project's normal touched-file/type/build gate, not an unrelated broad suite)",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-BUILD"],
-      "gap": "None.",
+      "gap": "None — the increment's own gate ran green 2026-09-21.",
       "evidence": [
-        "AGENTS.md:23 `bun run typecheck && bun run format:check`, :74 `bun run check`, :111 'must pass before claiming work complete; CI runs the same script'; focused proofs preferred per docs/quality/testing-principles.md"
+        "AGENTS.md:23 `bun run typecheck && bun run format:check`, :74 `bun run check`, :111 'must pass before claiming work complete; CI runs the same script'; focused proofs preferred per docs/quality/testing-principles.md",
+        "Full `bun run check` green 2026-09-21 on the working tree based on 89c103bc plus the tested increment — .artifacts/iteration-pl-build/check-after.log; manifest:regen:check green (regen-check.log); receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md"
       ]
     },
     {
@@ -7108,13 +7113,14 @@
       "key": "BE-3.1-ownership",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "§3.1 lines 157-171 source ownership",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-BUILD"],
-      "gap": "None in audited paths",
+      "gap": "None — ownership gates green on the current tree 2026-09-21.",
       "evidence": [
         "ownership enforced by regen ownership gate (ACCEPTANCE_TESTS.md AC-043 'bun run manifest:regen ownership gate')",
-        "seam placement rule honored: proposalEventCreation.ts:36-39 derives event id type so the integration guard proves no raw event writes"
+        "seam placement rule honored: proposalEventCreation.ts:36-39 derives event id type so the integration guard proves no raw event writes",
+        "manifest:regen:check green 2026-09-21 ('generated output is current', no tracked owned-output drift) plus green full check incl. ownership guard — .artifacts/iteration-pl-build/regen-check.log, check-after.log; receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md"
       ]
     },
     {
@@ -7122,14 +7128,14 @@
       "key": "BE-3.2-regen",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "§3.2 lines 175-181 regeneration",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-BUILD"],
-      "gap": "Must be re-run per change; historical pass is not current-tree proof",
+      "gap": "None — re-run on the current tree 2026-09-21; per-change re-runs remain the standing rule.",
       "evidence": [
         "AGENTS.md 'Regeneration (one command)' section",
-        "ACCEPTANCE_TESTS.md AC-046 records manifest-regen-check green 2026-09-07",
-        "known regen blockers documented (stale scratch dirs, orphan files — memory)"
+        "bun run manifest:regen:check green 2026-09-21 on the working tree based on 89c103bc plus the tested increment — 'generated output is current', no tracked owned-output drift — .artifacts/iteration-pl-build/regen-check.log; receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md",
+        "no generated file hand-edited in this increment; known regen blockers (stale scratch dirs, orphan files) avoided"
       ]
     },
     {
@@ -7780,14 +7786,14 @@
       "key": "BE-23-09",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "§23 criterion 9 (line 1294)",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-BUILD"],
-      "gap": "Re-run required on the current tree before any completion claim",
+      "gap": "None — re-run green on the current tree 2026-09-21.",
       "evidence": [
-        "ACCEPTANCE_TESTS.md AC-046 records full run green 2026-09-07 (164 files/1408 tests, typecheck, format:check, vite build, lint_specs, manifest-regen-check)",
-        "booking proofs: tests/proofs/proposal-event-booking.runtime.test.ts (11 cases, lines 186-871)",
-        "no re-run performed in this read-only audit; current dev tree has uncommitted modifications (git status) so the historical pass is not current-tree proof"
+        "booking proofs: tests/proofs/proposal-event-booking.runtime.test.ts 11/11 green in both suite runs 2026-09-21 (.artifacts/iteration-pl-build/test-before.log, test-after.log)",
+        "bun run manifest:regen:check green (regen-check.log); full bun run check green incl. nine integration guards and 194 files / 896 tests on the working tree based on 89c103bc plus the tested increment (check-after.log)",
+        "receipt codex-plans/whole-spec-audit-2026-09-20/build-gate-evidence-2026-09-21.md"
       ]
     },
     {
