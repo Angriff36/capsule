@@ -1,0 +1,48 @@
+{
+  "attribution": { "commit": "", "pr": "" },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit",
+      "Write",
+      "Bash(bun *)",
+      "Bash(bunx *)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(git grep*)",
+      "Bash(ls *)",
+      "Bash(cat *)"
+    ],
+    "deny": [
+      "Bash(git push*)",
+      "Bash(git commit*)",
+      "Bash(git add*)",
+      "Bash(git checkout*)",
+      "Bash(git switch*)",
+      "Bash(git reset*)",
+      "Bash(git stash*)",
+      "Bash(git clean*)",
+      "Bash(git merge*)",
+      "Bash(git rebase*)",
+      "Bash(git -C *)",
+      "Bash(gh *)",
+      "Bash(codex *)",
+      "Bash(bash scripts/release.sh*)",
+      "Bash(bash scripts/deploy*)",
+      "Bash(bunx convex deploy*)",
+      "Bash(bun run deploy*)",
+      "Edit(.env*)",
+      "Edit(.claude/**)",
+      "Edit(.githooks/**)",
+      "Edit(loop.sh)",
+      "Edit(ralph-*.sh)",
+      "Edit(ralph-*.ps1)",
+      "Edit(.ralph.env)",
+      "Edit(PROMPT_*.md)"
+    ]
+  }
+}
