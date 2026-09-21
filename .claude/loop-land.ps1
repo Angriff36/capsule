@@ -32,6 +32,7 @@ function Review($wt, $target) {
   $prompt = @"
 You are the independent reviewer for an automated fix. In this directory run ``git diff origin/dev HEAD --stat`` and then ``git diff origin/dev HEAD`` (skip the bodies of .builder/, convex/_generated/, src/generated/ and schemas/ - only confirm those were regenerated, not hand-edited). Fix target: $target
 Find reasons to REJECT: wrong scope, unrelated edits, secrets, hand-edited generated files, disabled tests, symptom-fixes, partial implementation. Also REJECT tedium: any new guard, policy, approval, or validation that blocks a reasonable user action without a proportionate real-world reason - this is a catering app, not a bank.
+On REJECT give numbered reasons with file and line, and say concretely what a passing fix must do - the maker's next attempt is built from your text.
 End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT - <main reason>
 "@
   $out = Join-Path $wt '.loop-verdict.txt'
@@ -46,9 +47,9 @@ End your answer with exactly one line: VERDICT: APPROVE   or   VERDICT: REJECT -
   }
   Remove-Item $out -Force -ErrorAction SilentlyContinue
   $m = [regex]::Matches($text, '(?m)^VERDICT: (APPROVE|REJECT)(.*)$')
-  if ($m.Count -eq 0) { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict' } }
+  if ($m.Count -eq 0) { return @{ reviewer = 'none'; verdict = 'NONE'; reason = 'no reviewer produced a verdict'; full = $text } }
   $last = $m[$m.Count - 1]
-  return @{ reviewer = $reviewer; verdict = $last.Groups[1].Value; reason = $last.Groups[2].Value.Trim(' -') }
+  return @{ reviewer = $reviewer; verdict = $last.Groups[1].Value; reason = $last.Groups[2].Value.Trim(' -'); full = $text }
 }
 
 if (-not (Test-Path $handoffDir)) { exit 0 }
@@ -76,7 +77,16 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   Remove-Item (Join-Path $wt '.loop-typecheck.log') -Force
 
   $r = Review $wt "$($h.item) - $($h.target)"
-  if ($r.verdict -ne 'APPROVE') { Record $h 'FAIL' "review by $($r.reviewer): $($r.verdict) $($r.reason)"; Discard $h $file.FullName; continue }
+  if ($r.verdict -ne 'APPROVE') {
+    # Keep the WHOLE review and the rejected patch: the attempt is deleted, and the next maker run starts from this file.
+    $fbDir = Join-Path $root '.loop-worktrees\_feedback'
+    New-Item -ItemType Directory -Force $fbDir | Out-Null
+    $fb = Join-Path $fbDir "$($h.runId).md"
+    $patch = (git -C $wt diff origin/dev HEAD -- . ':(exclude).builder' ':(exclude)convex/_generated' ':(exclude)src/generated' ':(exclude)schemas') -join "`n"
+    "# Rejected attempt $($h.runId)`n`nItem: $($h.item)`n`nTarget: $($h.target)`n`nReviewer: $($r.reviewer) - $($r.verdict)`n`n## Full review`n`n$($r.full)`n`n## The rejected patch (generated trees left out)`n`n``````diff`n$patch`n``````" | Set-Content $fb -Encoding utf8NoBOM
+    Record $h 'FAIL' "review by $($r.reviewer): $($r.verdict) $($r.reason) | full review + rejected patch: .loop-worktrees/_feedback/$($h.runId).md"
+    Discard $h $file.FullName; continue
+  }
 
   git -C $wt commit --amend --no-edit --quiet --trailer "Reviewed-by: $($r.reviewer) APPROVE" --trailer 'Landed-by: loop-land.ps1'
   $env:LOOP_LANDER = '1'
