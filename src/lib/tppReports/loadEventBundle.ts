@@ -6,8 +6,7 @@ import type {
 } from "./eventBundle";
 import { mergeEventBundle } from "./mergeEventBundle";
 import { parseBattleBoard } from "./parseBattleBoard";
-import { parseBeoWorkbook } from "./parseBeoWorkbook";
-import { parseProductionWorksheet } from "./parseProductionWorksheet";
+import { bundlePartFromSheets } from "./bundlePartFromSheets";
 import { readPdfTextLines } from "./pdfTextReader";
 import { readXlsxWorkbook } from "./xlsxReader";
 import { XlsxReportGrid } from "./xlsxReportGrid";
@@ -35,21 +34,7 @@ export interface EventBundleLoadResult {
   unrecognized: string[];
 }
 
-export function detectWorkbookSource(
-  rows: readonly (readonly string[])[],
-): EventBundleSource | undefined {
-  const head = rows
-    .slice(0, 12)
-    .map((row) => row.join(" ").toLowerCase())
-    .join(" | ");
-
-  if (head.includes("banquet event order")) return "beo";
-  if (head.includes("category") && head.includes("quantity/unit")) {
-    return "productionWorksheet";
-  }
-  if (head.includes("site:")) return "productionWorksheet";
-  return undefined;
-}
+export { detectWorkbookSource } from "./bundlePartFromSheets";
 
 function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   const lower = file.name.toLowerCase();
@@ -67,16 +52,9 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
     // Typed read: date cells print as M/D/YYYY and format-literal units ride
     // along with their numbers, so a report exported as a workbook reads the
     // same as the CSV TPP prints (issue #274).
-    const sheets = XlsxReportGrid.fromWorkbook(readXlsxWorkbook(file.contents));
-    const rows = sheets.flatMap((sheet) => sheet.rows);
-    const source = detectWorkbookSource(rows);
-    if (source === "beo") return parseBeoWorkbook(sheets);
-    if (source === "productionWorksheet") {
-      return parseProductionWorksheet(sheets);
-    }
-    // The row-shaped reports (worksheet, pack list, order list, proposal)
-    // are the same grid whether TPP exported CSV or a workbook.
-    return parseRowReport(rows);
+    return bundlePartFromSheets(
+      XlsxReportGrid.fromWorkbook(readXlsxWorkbook(file.contents)),
+    );
   }
   if (!lower.endsWith(".csv")) return undefined;
   return parseCsvReportText(file.contents.toString("utf8"));

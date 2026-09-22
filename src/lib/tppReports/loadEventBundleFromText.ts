@@ -1,4 +1,6 @@
+import { bundlePartFromSheets } from "./bundlePartFromSheets";
 import { parseCsvReportText } from "./csvReports";
+import type { XlsxSheet } from "./xlsxWorkbookParser";
 import type {
   EventBundle,
   EventBundlePart,
@@ -18,6 +20,8 @@ export interface TextReportSource {
   /** Name shown in messages, usually the file name. */
   name: string;
   text: string;
+  /** An .xlsx export, already unzipped and read in the page; text is "". */
+  sheets?: readonly XlsxSheet[];
 }
 
 export interface TextBundleLoadResult {
@@ -48,6 +52,15 @@ export function loadEventBundleFromText(input: {
   ]) {
     let part: EventBundlePart | undefined;
     try {
+      if (file.sheets) {
+        part = bundlePartFromSheets(file.sheets);
+        if (part === undefined) unrecognized.push(file.name);
+        else {
+          parts.push(part);
+          recognized.push({ name: file.name, source: part.source });
+        }
+        continue;
+      }
       const packetEvidence = packetEvidenceFromText(file.text);
       part = packetEvidence
         ? { source: "eventPacket", packetEvidence }
@@ -68,7 +81,7 @@ export function loadEventBundleFromText(input: {
   const bundle = mergeEventBundle(parts);
   if (unrecognized.length > 0) {
     bundle.warnings.push(
-      `These files were not recognized as TPP reports: ${unrecognized.join(", ")}. Only CSV exports (Event Worksheet, Proposal, Pack List, Order List) are read here; .xlsx and .pdf go through the agent bundle import.`,
+      `These files were not recognized as TPP reports: ${unrecognized.join(", ")}. Excel (.xlsx) and CSV exports (BEO, Event Worksheet, Production Worksheet, Pack List, Proposal, Order List) are read here; .pdf goes through the agent bundle import.`,
     );
   }
   return { bundle, recognized, unrecognized };
