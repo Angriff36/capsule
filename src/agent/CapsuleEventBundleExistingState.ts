@@ -59,6 +59,8 @@ export interface CapsuleEventBundleExistingEvent {
   eventId: string;
   clientId: string;
   venueId?: string;
+  /** The venue's stored fields (decrypted by the list query), for fill-in. */
+  venue?: Record<string, unknown>;
   event: {
     /**
      * Header values a newer BEO overwrites (optional: a loader that does not

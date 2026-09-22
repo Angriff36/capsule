@@ -22,6 +22,7 @@ export interface BundleExistingEventRows {
   packLists: unknown;
   packListItems: unknown;
   assignments: unknown;
+  venues?: unknown;
 }
 
 export function mapBundleExistingEvent(
@@ -55,6 +56,12 @@ export function mapBundleExistingEvent(
   // to draft/packing. A packed, loaded, dispatched or cancelled list is left
   // alone and the plan opens a new one.
   const eventPackLists = rows(input.packLists).filter(forEvent);
+  const venueRow =
+    event.venueId == null
+      ? undefined
+      : rows(input.venues ?? []).find(
+          (row) => String(row._id) === String(event.venueId),
+        );
   const packList = eventPackLists.find(
     (row) => row.status === "draft" || row.status === "packing",
   );
@@ -64,6 +71,7 @@ export function mapBundleExistingEvent(
     eventId,
     clientId,
     venueId: event.venueId == null ? undefined : String(event.venueId),
+    venue: venueRow,
     event: {
       stage: text(event.stage) || undefined,
       eventNumber: event.eventNumber as string | null | undefined,
