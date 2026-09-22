@@ -12,6 +12,7 @@ import type {
   EventLifecycleAction,
   EventLifecycleActionKey,
 } from "./EventLifecyclePolicy";
+import { EventReadinessCard } from "./EventReadinessCard";
 import { EventOverviewRail } from "./EventOverviewRail";
 import { EventPipelineStageCard } from "./EventPipelineStageCard";
 import { EventSetupProgress } from "./EventSetupProgress";
@@ -151,6 +152,7 @@ export function EventOverviewTab({
         </div>
 
         <div className="event-overview-rail">
+          <EventReadinessCard eventId={eventId} />
           <EventSetupProgress eventId={eventId} event={event} />
           <EventOverviewRail
             assignedToId={event.assignedToId}

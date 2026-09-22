@@ -294,6 +294,122 @@ it("prints the booked commercial seed on the budget card, not a later proposal t
   expect(card.textContent).not.toContain("$9,999");
 });
 
+it("prints the live nine-domain readiness summary, not a frozen Event readiness name", async () => {
+  backend.values.set("useGetEvent", {
+    _id: eventId,
+    title: "Garden dinner",
+    eventType: "dinner",
+    stage: "planning",
+    clientId: "client-a",
+    startsAt: Date.UTC(2099, 6, 4, 17),
+    endsAt: Date.UTC(2099, 6, 4, 22),
+    expectedHeadcount: 40,
+    quotedPrice: 2000,
+    version: 3,
+    // deliberately no readiness / readinessName field
+  });
+  backend.values.set("eventReadiness:getEventReadiness", {
+    eventId,
+    domains: [
+      {
+        domain: "commercial",
+        issues: [
+          {
+            code: "commercial.quoted_price_missing",
+            affectedIds: [eventId],
+            severity: "warning",
+            reason: "This event has no quoted price to seed billing.",
+            resolvingAction: "Event.changePricing",
+          },
+        ],
+      },
+      { domain: "planning", issues: [] },
+      { domain: "kitchen", issues: [] },
+      { domain: "purchasing", issues: [] },
+      { domain: "staffing", issues: [] },
+      { domain: "packing", issues: [] },
+      { domain: "packet", issues: [] },
+      { domain: "execution", issues: [] },
+      { domain: "closeout", issues: [] },
+    ],
+  });
+  await mount(page(), `/events/${eventId}`);
+  expect(backend.reads).toHaveBeenCalledWith(
+    "eventReadiness:getEventReadiness",
+    { eventId },
+  );
+  const card = container.querySelector(
+    '[data-testid="event-readiness-summary"]',
+  )!;
+  for (const label of [
+    "Commercial",
+    "Planning",
+    "Kitchen",
+    "Purchasing",
+    "Staffing",
+    "Packing",
+    "Packet",
+    "Execution",
+    "Closeout",
+  ]) {
+    expect(card.textContent).toContain(label);
+  }
+  expect(card.textContent).toContain(
+    "This event has no quoted price to seed billing.",
+  );
+  expect(card.textContent).toContain("warning");
+  expect(card.textContent).toContain("Event.changePricing");
+  expect(card.textContent).toContain("1 open");
+  expect(card.textContent).not.toContain("FROZEN READY");
+  expect(card.textContent).not.toContain("readinessName");
+  expect(
+    container.querySelector(
+      '[data-testid="event-readiness-domain-commercial"]',
+    ),
+  ).not.toBeNull();
+  expect(
+    container.querySelector('[data-testid="event-readiness-domain-closeout"]'),
+  ).not.toBeNull();
+
+  // LIVE, not a stored Event name: only the query value changes, and the card
+  // prints the new facts on the next mount.
+  backend.values.set("eventReadiness:getEventReadiness", {
+    eventId,
+    domains: [
+      { domain: "commercial", issues: [] },
+      { domain: "planning", issues: [] },
+      { domain: "kitchen", issues: [] },
+      { domain: "purchasing", issues: [] },
+      { domain: "staffing", issues: [] },
+      { domain: "packing", issues: [] },
+      { domain: "packet", issues: [] },
+      { domain: "execution", issues: [] },
+      { domain: "closeout", issues: [] },
+    ],
+  });
+  await mount(page());
+  const live = container.querySelector(
+    '[data-testid="event-readiness-summary"]',
+  )!;
+  expect(live.textContent).not.toContain(
+    "This event has no quoted price to seed billing.",
+  );
+  for (const label of [
+    "Commercial",
+    "Planning",
+    "Kitchen",
+    "Purchasing",
+    "Staffing",
+    "Packing",
+    "Packet",
+    "Execution",
+    "Closeout",
+  ]) {
+    expect(live.textContent).toContain(label);
+  }
+  expect(live.textContent).toContain("0 open");
+});
+
 it("renders malformed imported layout fields safely while preserving real instructions and accessibility notes", async () => {
   backend.values.set("useGetEvent", {
     _id: eventId,
