@@ -50,15 +50,25 @@ export function EventImportSourcesPanel({
     setReadError(null);
     const next: TextReportSource[] = [...csvFiles];
     let pasted = pastedText;
+    // One BEO at a time: two .rtf reports joined into one text would read as
+    // one event and put one report's menu on the other's header.
+    const rtfFiles = Array.from(list).filter((file) =>
+      /\.rtf$/i.test(file.name),
+    );
+    if (rtfFiles.length > 1) {
+      setReadError(
+        `${rtfFiles.length} .rtf reports were chosen; only ${rtfFiles[0]!.name} was read. Import one BEO at a time.`,
+      );
+    }
     for (const file of Array.from(list)) {
       // TPP saves the BEO and the worksheet as .rtf: read it into the text box.
       if (/\.rtf$/i.test(file.name)) {
+        if (file !== rtfFiles[0]) continue;
         try {
           const text = await file.text();
           if (!isRtf(text)) throw new Error("not rtf");
-          pasted = [pasted.trim(), rtfToText(text)]
-            .filter(Boolean)
-            .join("\n\n");
+          // The report replaces whatever was in the box; it never joins it.
+          pasted = rtfToText(text);
         } catch {
           setReadError(`${file.name} could not be read.`);
         }

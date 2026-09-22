@@ -51,7 +51,13 @@ export function mapBundleExistingEvent(
       dishNames.get(String(row.dishId)) ?? "",
     ]),
   );
-  const packList = rows(input.packLists).find(forEvent);
+  // Only a list that can still take items: PackListItem.addItem is guarded
+  // to draft/packing. A packed, loaded, dispatched or cancelled list is left
+  // alone and the plan opens a new one.
+  const packList = rows(input.packLists).find(
+    (row) =>
+      forEvent(row) && (row.status === "draft" || row.status === "packing"),
+  );
 
   return {
     eventId,

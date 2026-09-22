@@ -661,7 +661,13 @@ async function applyOne(
     const known = new Map<string, Doc<"dishTasks">>();
     for (const id of meta.existing.dishTaskIds) {
       const task = await ctx.db.get(id as Id<"dishTasks">);
-      if (task && task.tenantId === tenantId && task.deletedAt == null)
+      // A task retired between planning and apply no longer counts.
+      if (
+        task &&
+        task.tenantId === tenantId &&
+        task.deletedAt == null &&
+        String(task.status) === "active"
+      )
         known.set(String(task._id), task);
     }
     const key = nameKey(dish.name);

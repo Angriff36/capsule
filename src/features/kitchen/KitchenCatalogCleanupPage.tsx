@@ -13,7 +13,6 @@ import {
   useCatalogReclassificationPlan,
   useDecideCatalogReclassification,
 } from "../../lib/catalogReclassificationClient";
-import { TableSkeleton } from "../../ui/primitives";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -50,6 +49,10 @@ const stateLabel = (row: PlanRow) =>
           ? "Ready"
           : "Needs a look";
 
+/**
+ * One kind of row as a working ledger: a ruled list, no table header, no
+ * nested cards, body copy at 15px and supporting copy at 13px (DESIGN.md).
+ */
 function GroupSection({
   group,
   busy,
@@ -75,118 +78,111 @@ function GroupSection({
   const rows = showAll ? group.rows : group.rows.slice(0, PREVIEW_ROWS);
 
   return (
-    <section className="culinary-section">
-      <div className="culinary-section-heading">
-        <h2>{RECLASSIFY_KIND_LABEL[group.kind]}</h2>
-        <span>{group.total}</span>
+    <section className="working-ledger mt-8">
+      <div className="ledger-heading">
+        <div>
+          <h2>{RECLASSIFY_KIND_LABEL[group.kind]}</h2>
+          <p className="mt-1 text-sm text-ink-2">
+            {group.total} rows · {group.ready} ready · {group.needsLook} need a
+            look · {group.approved} approved · {group.rejected} rejected ·{" "}
+            {group.applied} applied
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            disabled={busy || readyIds.length === 0}
+            onClick={() => void onDecide(readyIds, "approved")}
+          >
+            Approve all ready ({readyIds.length})
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            disabled={busy || approvedCount === 0}
+            onClick={() => void onApply(group)}
+          >
+            Apply approved ({approvedCount})
+          </button>
+        </div>
       </div>
-      <p className="text-sm text-ink-2">
-        {group.ready} ready · {group.needsLook} need a look · {group.approved}{" "}
-        approved · {group.rejected} rejected · {group.applied} applied
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        <button
-          type="button"
-          className="btn btn-secondary"
-          disabled={busy || readyIds.length === 0}
-          onClick={() => void onDecide(readyIds, "approved")}
-        >
-          Approve all ready ({readyIds.length})
-        </button>
-        <button
-          type="button"
-          className="btn btn-primary"
-          disabled={busy || approvedCount === 0}
-          onClick={() => void onApply(group)}
-        >
-          Apply approved ({approvedCount})
-        </button>
-      </div>
-      <table className="data-table mt-3">
-        <thead>
-          <tr>
-            <th>Row</th>
-            <th>Decided by</th>
-            <th>State</th>
-            <th>Parents</th>
-            <th>Existing</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.linkId}>
-              <td>
-                <CulinaryEntityLink kind="dish" id={row.dishId}>
-                  {row.name}
-                </CulinaryEntityLink>
-                {row.category ? (
-                  <span className="ml-2 text-xs text-ink-2">
-                    → {row.category}
-                  </span>
+      <ul className="divide-y divide-line">
+        {rows.map((row) => (
+          <li
+            key={row.linkId}
+            className="flex flex-wrap items-center gap-x-6 gap-y-2 py-3"
+          >
+            <div className="min-w-64 flex-1 text-base">
+              <CulinaryEntityLink kind="dish" id={row.dishId}>
+                {row.name}
+              </CulinaryEntityLink>
+              {row.category ? (
+                <span className="ml-2 text-sm text-ink-2">
+                  → {row.category}
+                </span>
+              ) : null}
+            </div>
+            <span className="text-sm text-ink-2">{sourceLabel(row)}</span>
+            <span className="text-sm">
+              {stateLabel(row)}
+              {row.outcome ? (
+                <span className="ml-2 text-ink-2">{row.outcome}</span>
+              ) : null}
+              {row.note ? (
+                <span className="ml-2 text-danger">{row.note}</span>
+              ) : null}
+            </span>
+            <span className="text-sm text-ink-2">
+              {row.parentCount} parent{row.parentCount === 1 ? "" : "s"} ·{" "}
+              {row.existingCount} existing
+            </span>
+            {row.applied ? null : (
+              <div className="flex flex-wrap items-center gap-1">
+                <select
+                  className="input w-auto"
+                  aria-label="Kind"
+                  value={row.kind}
+                  disabled={busy}
+                  onChange={(event) =>
+                    void onDecide(
+                      [row.linkId],
+                      "approved",
+                      event.target.value as ReclassifyKind,
+                    )
+                  }
+                >
+                  {RECLASSIFY_KINDS.map((kind) => (
+                    <option key={kind} value={kind}>
+                      {RECLASSIFY_KIND_LABEL[kind]}
+                    </option>
+                  ))}
+                </select>
+                {row.decision !== "approved" ? (
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    disabled={busy}
+                    onClick={() => void onDecide([row.linkId], "approved")}
+                  >
+                    Approve
+                  </button>
                 ) : null}
-              </td>
-              <td>{sourceLabel(row)}</td>
-              <td>
-                {stateLabel(row)}
-                {row.outcome ? (
-                  <span className="ml-2 text-xs text-ink-2">{row.outcome}</span>
+                {row.decision !== "rejected" ? (
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    disabled={busy}
+                    onClick={() => void onDecide([row.linkId], "rejected")}
+                  >
+                    Keep as is
+                  </button>
                 ) : null}
-                {row.note ? (
-                  <span className="ml-2 text-xs text-danger">{row.note}</span>
-                ) : null}
-              </td>
-              <td>{row.parentCount}</td>
-              <td>{row.existingCount}</td>
-              <td>
-                {row.applied ? null : (
-                  <div className="flex flex-wrap items-center gap-1">
-                    <select
-                      className="input w-auto"
-                      aria-label="Kind"
-                      value={row.kind}
-                      disabled={busy}
-                      onChange={(event) =>
-                        void onDecide(
-                          [row.linkId],
-                          "approved",
-                          event.target.value as ReclassifyKind,
-                        )
-                      }
-                    >
-                      {RECLASSIFY_KINDS.map((kind) => (
-                        <option key={kind} value={kind}>
-                          {RECLASSIFY_KIND_LABEL[kind]}
-                        </option>
-                      ))}
-                    </select>
-                    {row.decision !== "approved" ? (
-                      <button
-                        type="button"
-                        className="btn btn-ghost"
-                        disabled={busy}
-                        onClick={() => void onDecide([row.linkId], "approved")}
-                      >
-                        Approve
-                      </button>
-                    ) : null}
-                    {row.decision !== "rejected" ? (
-                      <button
-                        type="button"
-                        className="btn btn-ghost"
-                        disabled={busy}
-                        onClick={() => void onDecide([row.linkId], "rejected")}
-                      >
-                        Keep as is
-                      </button>
-                    ) : null}
-                  </div>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
       {group.rows.length > PREVIEW_ROWS ? (
         <button
           type="button"
@@ -268,10 +264,10 @@ export function KitchenCatalogCleanupPage() {
           <p className="eyebrow">Culinary book · Cleanup</p>
           <h1 className="display-title mt-2">Catalog cleanup</h1>
           <p className="mt-3 max-w-150 text-ink-2">
-            Imported TPP menu rows sorted into what they really are. Rules
-            decided most; Jev suggested the rest. Approve a group, then apply. A
-            row that stops being a dish is retired, never deleted, and its link
-            names the new record.
+            Imported TPP menu rows sorted into what they really are. The TPP
+            import map and the rules decided most; Jev suggested the rest.
+            Approve a group, then apply. A row that stops being a dish is
+            retired, never deleted, and its link names the new record.
           </p>
         </div>
       </header>
@@ -280,14 +276,14 @@ export function KitchenCatalogCleanupPage() {
       {host}
 
       {failure ? (
-        <div className="card mt-4 border-danger text-danger">{failure}</div>
+        <div className="attention-band mt-4 px-4 py-3" role="status">
+          {failure}
+        </div>
       ) : null}
       {progress ? <p className="mt-2 text-sm text-ink-2">{progress}</p> : null}
 
       {plan === undefined ? (
-        <div className="card mt-4">
-          <TableSkeleton rows={6} />
-        </div>
+        <p className="mt-4 text-sm text-ink-2">Loading the suggestions…</p>
       ) : total === 0 ? (
         <div className="document-empty mt-4">
           <p>
