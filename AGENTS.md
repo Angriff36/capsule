@@ -190,6 +190,8 @@ Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:bu
 
 `bun run check` verifies owned files still match the ownership ledger. Pre-commit rejects commits that touch owned paths without updating ownership.
 
+`bun run manifest:regen:check` regenerates owned output and requires it to be committed: uncommitted owned changes make it exit 1 even when the regeneration is deterministic. Run `bun run manifest:regen`, commit the owned output together with the ownership ledger, then run that pre-push gate.
+
 **Repository-local Builder (owner-authorized build streamlining, 2026-09-08):**
 `scripts/manifest-builder/` contains the CLI source and upstream provenance.
 Regeneration and pre-push use it with Capsule's pinned dependencies. There is

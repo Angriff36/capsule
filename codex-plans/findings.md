@@ -54,3 +54,32 @@
 
 ## Visual/Browser Findings
 - None yet.
+
+## Whole-spec audit baseline — 2026-09-20
+- Required origin/main 89262916 is already ancestor of dev be4288fb; git pull --no-rebase origin dev reports up to date.
+- Existing acceptance IDs AC-001 through AC-046 must remain stable; startup IMPLEMENTATION_PLAN.md is empty.
+- Preview 127.0.0.1:7813 source map identifies C:/Projects/capsule/src/main.tsx; served Vite source points to local backend 3210. Convex dev parent and local storage paths identify this checkout; authStatus:getAuthStatus returns the expected anonymous response.
+- bun run check passes ownership/proof/domain/design/typecheck gates then stops at format:check on preserved startup-owned loop-ledger.json. Do not edit or stage that unrelated file. Run remaining checks separately and report the full gate honestly.
+- All 19 Ralph specs assigned to 8 read-only worker processes; complete Markdown/JSON product and backend contract audits follow.
+
+
+- Existing full suite passed: 193 test files, 892 tests; coverage thresholds passed. Frontend build and secrets passed. manifest:regen:check passed with no owned-file drift.
+- baseline:decay separately fails at 75 roots versus cap 71. HEAD has exactly 71 roots; ignored .ralph-tasks, .ralph-workers.log, IMPLEMENTATION_PLAN.md.bak and owner-owned untracked capsule-backend-end-state-spec.md inflate the runtime count. Escalated https://github.com/Angriff36/capsule/issues/380.
+- No skipped/todo/only test declarations found by source sweep; TODO commit/revert branches exist in convex/importCoordinator.ts and must be assessed against live importCommit consumers, not called universal missing imports.
+- Read-only issue refresh: 142/143/145/146 remain open; 144/147/148/149/150/151 are closed. Issue state is not workflow proof.
+- src/lib/llm-review.ts exists but review-criteria.md and llm-review.test.ts contain sample design-professional/financial-services criteria; normal Vitest include is tests/**/*.test.ts, so the passing suite does not run those perceptual reviews.
+
+## Whole-spec synthesis — 2026-09-21
+- Reviewed all 22 spec files and all 115 src/lib files; normative complete-product Markdown/JSON share criteria, while stale status tables are not evidence.
+- Published 115 prioritized task groups and 727 stable criteria (40 retained PASS, 687 PENDING); all 164 Ralph checkboxes and every backend explicit suite leg map to tasks.
+- Corrected false negatives about cancellation, reminders, attribution pages, recipe methods/stations/images, and source-estimate honesty. Full decisions and evidence: codex-plans/whole-spec-audit-2026-09-20/.
+- Reopened AC-012/024/029/030 for the missing full outcomes, retaining their passing narrower evidence. No source criterion retired; no application/test implementation.
+- Escalated source-confirmed tooling/release/provider/lifecycle/privacy/cutover/stock blockers as issues #380 through #387. User-owned files remain untouched apart from the requested plan target.
+
+## PL-BOOKING retry-link increment findings — 2026-09-21
+- Required upstream 89262916f59e32dbed5d63749999309a62586742 is already an ancestor of dev; `git pull --no-rebase origin dev` reported up to date. Pre-existing edits preserved; another session committed unrelated paths during investigation — those paths are avoided.
+- Four read-only workers studied all 22 specs; outputs in `.artifacts/iteration-booking-next/201-study-product.log` through `204-study-ralph-rest.log`.
+- Source-confirmed defect, filed as issue https://github.com/Angriff36/capsule/issues/391 and REPAIRED this increment: `convex/quoteBuilder.ts` `processQuoteSubmission` creates the draft proposal even when event creation failed (checkpointed), but on retry it reuses `submission.proposalId` without linking it to the newly created Event before `QuoteSubmission_complete`. Result: a completed submission whose proposal has no eventId, so accepted-proposal booking (`convex/lib/proposalEventCreation.ts` early-return requires `eventId != null`) books a second Event. Violates spec 7.1 / 7.2-2 / 23.3 / 23.6.
+- Separate pending PL-BOOKING/AC-411 finding, filed as issue https://github.com/Angriff36/capsule/issues/392, still open with no UI edits this increment: `EventCreatePage.tsx` submit's generic `useCreateEvent` fallback permits proposal-derived unlinked events when the proposal is missing/loading/nonaccepted/already linked.
+- Preview http://127.0.0.1:7813 has source-map identity C:/Projects/capsule; served main.tsx points at local Convex 3210 (frontend PID 45384, backend PID 55244, storage C:/projects/capsule/.convex/local/default, parent dev CLI belongs to this checkout). `authStatus:getAuthStatus` answered (anonymous only). No authenticated UI or production claim. `.ralph.env` already correct.
+- Increment outcome (final state): the manifest guard now lets draft or accepted proposals stage/link, a draft link emits a null menu-cascade key (no unaccepted menu copy), and the new internal `linkConvertedQuoteProposal` reconciles the canonical link before completion — checkpoint recovery before create, same-event no-op, conflicting ids and deleted-Event refusals with ids preserved. Evidence chain: `red.log` RED (6 green/1 red), `207-validate-recovered-event.log` deleted-Event RED→corrected, `focused-final.log` 5 files/39, `test.log` 197/918, `check-final.log` full check exit 0, `review.log` VERDICT: APPROVE (gpt-5.6-sol). AC-412/AC-433 PASS; AC-006 (J), AC-411 (UI), AC-436 (concurrency) and all other old PENDING stay PENDING; lifecycle meaning unresolved. Receipt: codex-plans/whole-spec-audit-2026-09-20/quote-retry-evidence-2026-09-21.md.

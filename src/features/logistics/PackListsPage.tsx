@@ -5,6 +5,7 @@ import {
   useCreatePackList,
   useListEvent,
   useListPackList,
+  useListPackListItem,
   usePackListCancel,
   usePackListDispatch,
   usePackListMarkLoaded,
@@ -29,6 +30,7 @@ export function PackListsPage() {
   const eventScope = useWorkingEventScope();
   const workingId = useWorkingEventId();
   const packLists = useListPackList();
+  const packListItems = useListPackListItem();
   const events = useListEvent();
   const createPackList = useCreatePackList();
   const startPacking = usePackListStartPacking();
@@ -101,6 +103,34 @@ export function PackListsPage() {
           setNotice("Pack list cancelled.");
         });
         return;
+      }
+      if (key === "markPacked") {
+        // #377 part 3: closing a list with every line still open is usually
+        // a slip. Warn, never block. While the line rows are still loading
+        // the counts are unknown, so ask anyway — skipping then would let an
+        // unresolved query bypass the zero-packed check.
+        const lines =
+          packListItems === undefined
+            ? undefined
+            : packListItems.filter(
+                (item) => item.deletedAt == null && item.packListId === row._id,
+              );
+        const packedCount = lines?.filter(
+          (item) => String(item.status) === "packed",
+        ).length;
+        if (lines === undefined || (lines.length > 0 && packedCount === 0)) {
+          const proceed = await prompt.askConfirm({
+            title: "No lines packed yet",
+            description:
+              lines === undefined
+                ? "Line details are still loading, so packed counts are not known yet. If this list has lines and none are packed, marking it packed now would close it blind. Mark the list packed anyway?"
+                : `This list has ${formatCountNoun(lines.length, "line")} and none are marked packed. Mark the list packed anyway?`,
+            confirmLabel: "Mark packed anyway",
+            cancelLabel: "Go back",
+            tone: "danger",
+          });
+          if (!proceed) return;
+        }
       }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };

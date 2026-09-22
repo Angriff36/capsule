@@ -616,3 +616,687 @@ describe("runtime proof: retry after partial failure (AC-019)", () => {
     ).rejects.toThrow(/Guard \d+ failed/);
   });
 });
+
+/**
+ * Read the live EventDish rows on one event (spec §7.1: a removed proposal
+ * selection never becomes an EventDish; acceptance books the menu once).
+ */
+async function liveEventDishes(actor: Actor, eventId: string) {
+  const rows = await actor.run(async (ctx) =>
+    ctx.db.query("eventDishes").collect(),
+  );
+  return rows.filter(
+    (row) =>
+      (row as { eventId?: string }).eventId === eventId &&
+      (row as { deletedAt?: number | null }).deletedAt == null,
+  );
+}
+
+describe("runtime proof: retry links the reused proposal to one canonical event (AC-412, AC-433)", () => {
+  it("resumed conversion keeps one Proposal-to-Event relationship", async () => {
+    const tenantId = "tenant-quote-retry-link-a12";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-retry-link-a12",
+      role: "owner",
+      tenantId,
+    });
+
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      { name: "Retry link proof kitchen" },
+    );
+
+    // Persisted partial conversion state (issue #391): the earlier attempt's
+    // event step failed; the conversion caught that, still saved the draft
+    // proposal unlinked (the proposal step runs after the event step), then
+    // checkpointed the known ids and marked the row failed — exactly the row
+    // state checkpointQuoteSubmissionIds + QuoteSubmission_fail produce. The
+    // draft carries no eventId: the saved unlinked state a retry must repair.
+    // This seeds persisted checkpoint state; it is not an injected transport
+    // fault, and processQuoteSubmission and its persistence are never mocked.
+    const client = (await proof.executeCommand(
+      owner,
+      api.mutations.Client_createViaRegister,
+      {
+        clientType: "company",
+        companyName: "Dana Prospect",
+        email: "dana-retry-link@example.com",
+        phone: "555-0100",
+      },
+    )) as { docId: string };
+    const clientId = client.docId;
+    expect(clientId).toBeTruthy();
+
+    const lead = (await proof.executeCommand(
+      owner,
+      api.mutations.Lead_createViaCapture,
+      {
+        leadType: "company",
+        source: "quote-builder",
+        estimatedValue: 0,
+        companyName: "Dana Prospect",
+        email: "dana-retry-link@example.com",
+        phone: "555-0100",
+      },
+    )) as { docId: string };
+    const leadId = lead.docId;
+    expect(leadId).toBeTruthy();
+
+    // A real published menu and dish, with a live proposal dish selection at
+    // distinct known servings, so the acceptance cascade is checkable.
+    const menu = (await proof.executeCommand(
+      owner,
+      api.mutations.Menu_createViaDraft,
+      { name: "Retry link tasting menu" },
+    )) as { docId: string };
+    await proof.executeCommand(owner, api.mutations.Menu_markPublished, {
+      docId: menu.docId,
+    });
+    const dish = (await proof.executeCommand(
+      owner,
+      api.mutations.Dish_createViaIntroduce,
+      { name: "Cedar salmon", portionSize: 1, portionUnit: "serving" },
+    )) as { docId: string };
+
+    const proposal = (await proof.executeCommand(
+      owner,
+      api.mutations.Proposal_createViaDraft,
+      {
+        clientId,
+        title: "Proposal for Dana Prospect",
+        subtotal: 0,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 0,
+        eventDate: Date.UTC(2026, 9, 15, 17, 0),
+        guestCount: 60,
+        venueName: "Orchard Barn",
+      },
+    )) as { docId: string };
+    const proposalId = proposal.docId;
+    expect(proposalId).toBeTruthy();
+
+    await proof.executeCommand(
+      owner,
+      api.mutations.ProposalDishSelection_createViaSelect,
+      {
+        proposalId,
+        menuId: menu.docId,
+        dishId: dish.docId,
+        quantityServings: 42,
+        course: "main",
+      },
+    );
+
+    const eventDate = Date.UTC(2026, 9, 15, 17, 0);
+    const submitted = (await asActions(owner).action(
+      api.quoteBuilder.submitQuote,
+      {
+        clientName: "Dana Prospect",
+        email: "dana-retry-link@example.com",
+        phone: "555-0100",
+        eventDate,
+        eventEndTime: eventDate + 5 * 60 * 60 * 1000,
+        guestCount: 60,
+        consent: true,
+        venueName: "Orchard Barn",
+        venueAddress: "12 Quarry Lane",
+        menuPreferences: "BBQ buffet",
+        dietaryRestrictions: "",
+        notes: "",
+      },
+    )) as { submissionId: string; isDuplicate: boolean };
+    expect(submitted.isDuplicate).toBe(false);
+
+    await owner.run(async (ctx) => {
+      await ctx.db.patch(submitted.submissionId, {
+        status: "failed",
+        clientId,
+        leadId,
+        proposalId,
+        errorMessage: "Conversion could not complete all steps",
+        processingErrors: "event: simulated failure for the retry-link proof",
+      });
+    });
+
+    await proof.executeCommand(owner, api.mutations.QuoteSubmission_retry, {
+      docId: submitted.submissionId,
+    });
+
+    // The retry converts: the event step now succeeds and the saved records
+    // are REUSED (checkpointed ids win), so nothing is duplicated.
+    const converted = (await asActions(owner).action(
+      api.quoteBuilder.processQuoteSubmission,
+      { submissionId: submitted.submissionId },
+    )) as {
+      clientId: string | null;
+      leadId: string | null;
+      eventId: string | null;
+      proposalId: string | null;
+      errors: string[];
+    };
+    expect(converted.errors).toEqual([]);
+    expect(converted.clientId).toBe(clientId);
+    expect(converted.leadId).toBe(leadId);
+    expect(converted.proposalId).toBe(proposalId);
+    const eventId = converted.eventId as string;
+    expect(eventId).toBeTruthy();
+
+    // Exactly one client, lead, event and proposal.
+    const clients = await liveRows(owner, "clients");
+    expect(clients).toHaveLength(1);
+    expect((clients[0] as { _id?: string })._id).toBe(clientId);
+    expect(await liveRows(owner, "leads")).toHaveLength(1);
+    const events = await liveRows(owner, "events");
+    expect(events).toHaveLength(1);
+    expect((events[0] as { _id?: string })._id).toBe(eventId);
+    const proposals = await liveRows(owner, "proposals");
+    expect(proposals).toHaveLength(1);
+    expect((proposals[0] as { _id?: string })._id).toBe(proposalId);
+
+    // THE CANONICAL LINK: the reused draft proposal must point at the event
+    // this retry created. Spec §7.2-2/§23.6: a completed conversion leaves
+    // one Proposal-to-Event relationship, or accepting the proposal later
+    // books a second Event.
+    expect((proposals[0] as { eventId?: string | null }).eventId).toBe(eventId);
+
+    // The submission completed with the same ids checkpointed.
+    const row = (await owner.run(async (ctx) =>
+      ctx.db.get(submitted.submissionId),
+    )) as {
+      status: string;
+      eventId: string | null;
+      proposalId: string | null;
+    };
+    expect(row.status).toBe("completed");
+    expect(row.eventId).toBe(eventId);
+    expect(row.proposalId).toBe(proposalId);
+
+    // Draft linking must not book the menu: no EventDish before acceptance.
+    expect(await liveEventDishes(owner, eventId)).toHaveLength(0);
+
+    // Accept through the real lifecycle (raw agent-bundle send path).
+    await proof.executeCommand(owner, api.mutations.Proposal_send, {
+      docId: proposalId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_markViewed, {
+      docId: proposalId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_accept, {
+      docId: proposalId,
+    });
+
+    // Acceptance books the linked event's menu exactly once, at the saved
+    // selections.
+    const dishes = await liveEventDishes(owner, eventId);
+    expect(dishes).toHaveLength(1);
+    expect((dishes[0] as { dishId?: string }).dishId).toBe(dish.docId);
+    expect((dishes[0] as { quantityServings?: number }).quantityServings).toBe(
+      42,
+    );
+
+    // The booking seam replays to the ALREADY-converted event — never a
+    // second one (spec §7.1: replaying booking returns the existing Event;
+    // §23.3: quote conversion and accepted-proposal booking converge on one
+    // Event).
+    const booked = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId,
+        event: {
+          clientId,
+          title: "Quote Request: Dana Prospect",
+          eventType: "Catering Inquiry",
+          startsAt: eventDate,
+          endsAt: eventDate + 5 * 60 * 60 * 1000,
+          expectedHeadcount: 60,
+          primaryContactName: "Dana Prospect",
+          budgetAmount: 0,
+          quotedPrice: 0,
+          venueName: "Orchard Barn",
+        },
+      },
+    )) as { docId: string };
+    expect(booked.docId).toBe(eventId);
+
+    // No duplicates: still one event and one proposal, the accepted link and
+    // menu copy are unchanged, and the raw-send path captured no revision for
+    // booking to invent.
+    expect(await liveRows(owner, "events")).toHaveLength(1);
+    expect(await liveRows(owner, "proposals")).toHaveLength(1);
+    const relinked = (await owner.run(async (ctx) =>
+      ctx.db.get(proposalId as never),
+    )) as { eventId?: string | null };
+    expect(relinked.eventId).toBe(eventId);
+    expect(await liveEventDishes(owner, eventId)).toHaveLength(1);
+    expect(await liveRows(owner, "proposalRevisions")).toHaveLength(0);
+  });
+});
+
+describe("runtime proof: persisted-checkpoint convergence repair (AC-433)", () => {
+  const eventDate = Date.UTC(2026, 9, 15, 17, 0);
+
+  type Seed = {
+    clientId: string;
+    leadId: string;
+    proposalId: string;
+    dishId: string;
+  };
+
+  /**
+   * Seed the records a failed conversion leaves behind: organization,
+   * client, lead, published menu + dish, a live dish selection, and a DRAFT
+   * proposal — linked to linkedEventId when given (event-first conversion),
+   * unlinked otherwise.
+   */
+  async function seedSavedRecords(
+    proof: ReturnType<typeof harness>,
+    owner: Actor,
+    tenantId: string,
+    opts?: { linkedEventId?: string },
+  ): Promise<Seed> {
+    await proof.executeCommand(
+      owner,
+      api.mutations.Organization_createViaRegister,
+      { name: `Convergence kitchen ${tenantId}` },
+    );
+    const client = (await proof.executeCommand(
+      owner,
+      api.mutations.Client_createViaRegister,
+      {
+        clientType: "company",
+        companyName: "Dana Prospect",
+        email: `dana-${tenantId}@example.com`,
+        phone: "555-0100",
+      },
+    )) as { docId: string };
+    const lead = (await proof.executeCommand(
+      owner,
+      api.mutations.Lead_createViaCapture,
+      {
+        leadType: "company",
+        source: "quote-builder",
+        estimatedValue: 0,
+        companyName: "Dana Prospect",
+        email: `dana-${tenantId}@example.com`,
+        phone: "555-0100",
+      },
+    )) as { docId: string };
+    const menu = (await proof.executeCommand(
+      owner,
+      api.mutations.Menu_createViaDraft,
+      { name: "Convergence tasting menu" },
+    )) as { docId: string };
+    await proof.executeCommand(owner, api.mutations.Menu_markPublished, {
+      docId: menu.docId,
+    });
+    const dish = (await proof.executeCommand(
+      owner,
+      api.mutations.Dish_createViaIntroduce,
+      { name: "Cedar salmon", portionSize: 1, portionUnit: "serving" },
+    )) as { docId: string };
+    const proposal = (await proof.executeCommand(
+      owner,
+      api.mutations.Proposal_createViaDraft,
+      {
+        clientId: client.docId,
+        title: "Proposal for Dana Prospect",
+        subtotal: 0,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 0,
+        eventDate,
+        guestCount: 60,
+        venueName: "Orchard Barn",
+        eventId: opts?.linkedEventId,
+      },
+    )) as { docId: string };
+    await proof.executeCommand(
+      owner,
+      api.mutations.ProposalDishSelection_createViaSelect,
+      {
+        proposalId: proposal.docId,
+        menuId: menu.docId,
+        dishId: dish.docId,
+        quantityServings: 42,
+        course: "main",
+      },
+    );
+    return {
+      clientId: client.docId,
+      leadId: lead.docId,
+      proposalId: proposal.docId,
+      dishId: dish.docId,
+    };
+  }
+
+  /** A live conversion-shaped event for the saved client. */
+  async function createConversionEvent(
+    proof: ReturnType<typeof harness>,
+    owner: Actor,
+    clientId: string,
+    title: string,
+  ) {
+    return (await proof.executeCommand(
+      owner,
+      api.mutations.Event_createViaPlanEngagement,
+      {
+        clientId,
+        title,
+        eventType: "Catering Inquiry",
+        startsAt: eventDate,
+        endsAt: eventDate + 5 * 60 * 60 * 1000,
+        expectedHeadcount: 60,
+        primaryContactName: "Dana Prospect",
+        budgetAmount: 0,
+        quotedPrice: 0,
+        venueName: "Orchard Barn",
+      },
+    )) as { docId: string };
+  }
+
+  /**
+   * Submit a quote for the saved contact, checkpoint the failed row with
+   * exactly the given ids (the state the failed attempt persisted), and
+   * reopen it via the real retry transition.
+   */
+  async function retriedSubmission(
+    proof: ReturnType<typeof harness>,
+    owner: Actor,
+    tenantId: string,
+    checkpoint: Pick<Seed, "clientId" | "leadId" | "proposalId"> & {
+      eventId?: string;
+    },
+  ) {
+    const submitted = (await asActions(owner).action(
+      api.quoteBuilder.submitQuote,
+      {
+        clientName: "Dana Prospect",
+        email: `dana-${tenantId}@example.com`,
+        phone: "555-0100",
+        eventDate,
+        eventEndTime: eventDate + 5 * 60 * 60 * 1000,
+        guestCount: 60,
+        consent: true,
+        venueName: "Orchard Barn",
+        menuPreferences: "BBQ buffet",
+        dietaryRestrictions: "",
+        notes: "",
+      },
+    )) as { submissionId: string; isDuplicate: boolean };
+    expect(submitted.isDuplicate).toBe(false);
+    await owner.run(async (ctx) => {
+      await ctx.db.patch(submitted.submissionId, {
+        status: "failed",
+        clientId: checkpoint.clientId,
+        leadId: checkpoint.leadId,
+        proposalId: checkpoint.proposalId,
+        eventId: checkpoint.eventId ?? null,
+        errorMessage: "Conversion could not complete all steps",
+        processingErrors: "event: simulated failure for the convergence proof",
+      });
+    });
+    await proof.executeCommand(owner, api.mutations.QuoteSubmission_retry, {
+      docId: submitted.submissionId,
+    });
+    return submitted.submissionId;
+  }
+
+  it("recovers a conversion whose checkpoint lost the event id by reusing the saved proposal's event", async () => {
+    const tenantId = "tenant-quote-conv-recover";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-conv-recover",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedSavedRecords(proof, owner, tenantId);
+    const event = await createConversionEvent(
+      proof,
+      owner,
+      seed.clientId,
+      "Quote Request: Dana Prospect",
+    );
+    // Event-first conversion (spec §7.2-2): the saved draft already
+    // references its event through the domain's staged handshake, but the
+    // failed row's event checkpoint is absent.
+    await proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+      docId: seed.proposalId,
+      eventId: event.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
+      docId: seed.proposalId,
+    });
+    const linked = (await owner.run(async (ctx) =>
+      ctx.db.get(seed.proposalId as never),
+    )) as { eventId?: string | null };
+    expect(linked.eventId).toBe(event.docId);
+
+    const submissionId = await retriedSubmission(proof, owner, tenantId, {
+      clientId: seed.clientId,
+      leadId: seed.leadId,
+      proposalId: seed.proposalId,
+    });
+
+    const converted = (await asActions(owner).action(
+      api.quoteBuilder.processQuoteSubmission,
+      { submissionId },
+    )) as {
+      eventId: string | null;
+      proposalId: string | null;
+      errors: string[];
+    };
+    expect(converted.errors).toEqual([]);
+    // The conversion REUSED the saved proposal's event — no second Event.
+    expect(converted.eventId).toBe(event.docId);
+    expect(converted.proposalId).toBe(seed.proposalId);
+    expect(await liveRows(owner, "events")).toHaveLength(1);
+
+    const row = (await owner.run(async (ctx) =>
+      ctx.db.get(submissionId as never),
+    )) as { status: string; eventId: string | null };
+    expect(row.status).toBe("completed");
+    expect(row.eventId).toBe(event.docId);
+
+    // Draft state books no menu — and the draft was already linked, so the
+    // retry changed nothing about the proposal.
+    expect(await liveEventDishes(owner, event.docId)).toHaveLength(0);
+
+    // Acceptance books the menu once, and booking replays to the SAME event.
+    await proof.executeCommand(owner, api.mutations.Proposal_send, {
+      docId: seed.proposalId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_markViewed, {
+      docId: seed.proposalId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_accept, {
+      docId: seed.proposalId,
+    });
+    const dishes = await liveEventDishes(owner, event.docId);
+    expect(dishes).toHaveLength(1);
+    expect((dishes[0] as { dishId?: string }).dishId).toBe(seed.dishId);
+    expect((dishes[0] as { quantityServings?: number }).quantityServings).toBe(
+      42,
+    );
+    const booked = (await proof.executeCommand(
+      owner,
+      api.lib.proposalEventCreation.createEventFromAcceptedProposal,
+      {
+        proposalId: seed.proposalId,
+        event: {
+          clientId: seed.clientId,
+          title: "Quote Request: Dana Prospect",
+          eventType: "Catering Inquiry",
+          startsAt: eventDate,
+          endsAt: eventDate + 5 * 60 * 60 * 1000,
+          expectedHeadcount: 60,
+          primaryContactName: "Dana Prospect",
+          budgetAmount: 0,
+          quotedPrice: 0,
+          venueName: "Orchard Barn",
+        },
+      },
+    )) as { docId: string };
+    expect(booked.docId).toBe(event.docId);
+    expect(await liveRows(owner, "events")).toHaveLength(1);
+  });
+
+  it("fails a conversion whose saved proposal and checkpoint name different events, preserving both ids", async () => {
+    const tenantId = "tenant-quote-conv-conflict";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-conv-conflict",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedSavedRecords(proof, owner, tenantId);
+
+    // The saved draft is already linked to ITS event through the domain's
+    // staged handshake (draft linking, issue #391) — the canonical way this
+    // state arises.
+    const proposalEvent = await createConversionEvent(
+      proof,
+      owner,
+      seed.clientId,
+      "Proposal's event",
+    );
+    await proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+      docId: seed.proposalId,
+      eventId: proposalEvent.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
+      docId: seed.proposalId,
+    });
+
+    // The failed row's checkpoint names a DIFFERENT live event.
+    const checkpointEvent = await createConversionEvent(
+      proof,
+      owner,
+      seed.clientId,
+      "Checkpoint's event",
+    );
+    const submissionId = await retriedSubmission(proof, owner, tenantId, {
+      clientId: seed.clientId,
+      leadId: seed.leadId,
+      proposalId: seed.proposalId,
+      eventId: checkpointEvent.docId,
+    });
+
+    const converted = (await asActions(owner).action(
+      api.quoteBuilder.processQuoteSubmission,
+      { submissionId },
+    )) as {
+      eventId: string | null;
+      proposalId: string | null;
+      errors: string[];
+    };
+    expect(converted.errors).toHaveLength(1);
+    expect(converted.errors[0]).toMatch(/proposal event link/);
+    expect(converted.eventId).toBe(checkpointEvent.docId);
+    expect(converted.proposalId).toBe(seed.proposalId);
+
+    // The conversion FAILED — never "completed" over a mismatched link — and
+    // both recorded ids are preserved on the row for the next decision.
+    const row = (await owner.run(async (ctx) =>
+      ctx.db.get(submissionId as never),
+    )) as {
+      status: string;
+      eventId: string | null;
+      proposalId: string | null;
+    };
+    expect(row.status).toBe("failed");
+    expect(row.eventId).toBe(checkpointEvent.docId);
+    expect(row.proposalId).toBe(seed.proposalId);
+
+    // The proposal's relationship is untouched: still its own event, no
+    // staged pointer left behind, no third event, and no menu copied to
+    // either event by the refused conversion.
+    const linked = (await owner.run(async (ctx) =>
+      ctx.db.get(seed.proposalId as never),
+    )) as { eventId?: string | null; pendingEventId?: string | null };
+    expect(linked.eventId).toBe(proposalEvent.docId);
+    expect(linked.pendingEventId ?? null).toBeNull();
+    expect(await liveRows(owner, "events")).toHaveLength(2);
+    expect(await liveEventDishes(owner, proposalEvent.docId)).toHaveLength(0);
+    expect(await liveEventDishes(owner, checkpointEvent.docId)).toHaveLength(0);
+  });
+
+  it("fails a conversion whose recovered event was soft-deleted, preserving checkpoint and pointer", async () => {
+    const tenantId = "tenant-quote-conv-deleted";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-quote-conv-deleted",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedSavedRecords(proof, owner, tenantId);
+
+    // The saved draft is linked to its event through the domain's staged
+    // handshake — then the event is soft-deleted after the fact. The failed
+    // row's checkpoint names NO event, so a retry recovers the pointer from
+    // the saved proposal — into a now-deleted event.
+    const event = await createConversionEvent(
+      proof,
+      owner,
+      seed.clientId,
+      "Quote Request: Dana Prospect",
+    );
+    await proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+      docId: seed.proposalId,
+      eventId: event.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
+      docId: seed.proposalId,
+    });
+    await owner.run(async (ctx) => {
+      await ctx.db.patch(event.docId as never, { deletedAt: Date.now() });
+    });
+
+    const submissionId = await retriedSubmission(proof, owner, tenantId, {
+      clientId: seed.clientId,
+      leadId: seed.leadId,
+      proposalId: seed.proposalId,
+    });
+
+    const converted = (await asActions(owner).action(
+      api.quoteBuilder.processQuoteSubmission,
+      { submissionId },
+    )) as {
+      eventId: string | null;
+      proposalId: string | null;
+      errors: string[];
+    };
+    expect(converted.errors).toHaveLength(1);
+    expect(converted.errors[0]).toMatch(/proposal event link/);
+    // The recovered pointer is reported back — never a replacement Event.
+    expect(converted.eventId).toBe(event.docId);
+    expect(converted.proposalId).toBe(seed.proposalId);
+
+    // Not a completion: the row stays failed with both ids preserved.
+    const row = (await owner.run(async (ctx) =>
+      ctx.db.get(submissionId as never),
+    )) as {
+      status: string;
+      eventId: string | null;
+      proposalId: string | null;
+    };
+    expect(row.status).toBe("failed");
+    expect(row.eventId).toBe(event.docId);
+    expect(row.proposalId).toBe(seed.proposalId);
+
+    // No replacement Event was created (the only row is the soft-deleted
+    // one, which liveRows filters out), the proposal still points at its own
+    // (deleted) event with no staged pointer left behind, and the refused
+    // conversion copied no menu anywhere.
+    expect(await liveRows(owner, "events")).toHaveLength(0);
+    const linked = (await owner.run(async (ctx) =>
+      ctx.db.get(seed.proposalId as never),
+    )) as { eventId?: string | null; pendingEventId?: string | null };
+    expect(linked.eventId).toBe(event.docId);
+    expect(linked.pendingEventId ?? null).toBeNull();
+    expect(await liveEventDishes(owner, event.docId)).toHaveLength(0);
+  });
+});

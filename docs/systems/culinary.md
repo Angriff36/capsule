@@ -79,6 +79,10 @@ recipe (even with no content), "Portion X" over one inventory row is a portionin
 pattern over that ingredient, never a recipe. Acceptance tests:
 `tests/culinary-model-acceptance.test.ts`.
 
+Moving mis-imported TPP menu rows (prep steps, batches, supplies) out of the
+Dish list and into these entities is designed in
+[culinary-catalog-reclassification.md](culinary-catalog-reclassification.md).
+
 ## Primary workspace
 
 Use a **culinary book** rather than a dashboard:

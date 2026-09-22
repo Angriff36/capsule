@@ -83,3 +83,13 @@ workaround without editing owned `package.json` (`#338` remainder). The
 gitignored `bash.exe` copy planted in the worktree on Windows is
 local-only and must not count. Cap in `scripts/check-baseline-decay.ts`
 matches.
+
+**How the count works (2026-09-21, #380):** The cap stays 71, but the check
+now counts distinct root entries in the Git index
+(`git ls-files --cached --full-name -z`), not a `readdirSync` of one
+machine's directory. The index is the right source because a clean checkout
+materializes exactly the index: staged additions already count and staged
+removals already do not. Untracked and gitignored local artifacts (tool
+caches, Ralph loop state, editor backups) never count, so the result is the
+same on every machine. A missing or failing Git index fails the check with an
+actionable error instead of passing silently.

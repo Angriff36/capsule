@@ -26,7 +26,7 @@
 // The pre-checks below only exist to fail fast with operator-readable errors
 // before any write; the domain commands are the authority and re-enforce all
 // of them (plus the event-side guards the seam cannot see).
-import { mutation } from "../_generated/server";
+import { mutation, internalMutation } from "../_generated/server";
 import { api } from "../_generated/api";
 import type { Doc } from "../_generated/dataModel";
 import { v } from "convex/values";
@@ -89,7 +89,27 @@ export const createEventFromAcceptedProposal = mutation({
     if (proposal.status !== "accepted") {
       throw new Error("Only an accepted proposal can be booked into an event.");
     }
+    // A lost response must not wedge the retry (issue #389, spec §7.1
+    // "Replaying acceptance or booking returns the existing Event"): an
+    // accepted proposal with an intact event link IS booked — return that
+    // event without creating, staging, linking, or cascading again. A
+    // dangling or cross-tenant link is still an operator error.
     if (proposal.eventId != null) {
+      const linked = await ctx.db.get(proposal.eventId);
+      if (
+        linked != null &&
+        linked.deletedAt == null &&
+        linked.tenantId === proposal.tenantId &&
+        String(linked.clientId) === String(proposal.clientId) &&
+        linked.stage !== "cancelled"
+      ) {
+        return { docId: proposal.eventId };
+      }
+      if (linked != null && linked.stage === "cancelled") {
+        throw new Error(
+          "The event this proposal was booked into has been cancelled. Unlink the proposal from it before booking again.",
+        );
+      }
       throw new Error(
         "This proposal is already linked to an event — open that event instead of creating another.",
       );
@@ -127,5 +147,84 @@ export const createEventFromAcceptedProposal = mutation({
     });
 
     return { docId: created.docId };
+  },
+});
+
+// Quote-conversion convergence repair (issue #391, spec §7.2-2 / §23.3-23.6):
+// a retry that reuses a checkpointed draft proposal must leave exactly one
+// Proposal-to-Event relationship, or accepting the proposal later books a
+// second Event. Internal — only processQuoteSubmission calls it — so this is
+// not another public booking API: it never creates an Event, only reconciles
+// the link through the domain's own staged handshake.
+//
+// Both documents load through the generated authorized reads (the same
+// canonical read authority quoteBuilder.getEventBookingDetails uses), which
+// apply the read policy and filter soft-deleted and cross-tenant rows to
+// null. The Event is validated BEFORE any success return — including the
+// same-event no-op a replay takes — so a deleted or foreign Event can never
+// be reported as successfully recovered.
+//
+// Already correctly linked to a VALID event (every normal fresh conversion
+// lands here) → success with no mutation, so a replay never bumps the
+// proposal's version. Linked to a DIFFERENT event → refused, never
+// overwritten. Unlinked → stage+link in this transaction; any failure rolls
+// the staged pointer back.
+export const linkConvertedQuoteProposal = internalMutation({
+  args: {
+    proposalId: v.id("proposals"),
+    eventId: v.id("events"),
+  },
+  handler: async (ctx, args): Promise<CreateEventFromProposalResult> => {
+    // The caller's (operator) auth applies through the generated reads — no
+    // elevated system runner; a foreign proposal id looks exactly like a
+    // missing one.
+    const proposal: Doc<"proposals"> | null = await ctx.runQuery(
+      api.queries.getProposal,
+      { id: args.proposalId },
+    );
+    if (!proposal) throw new Error("Proposal not found");
+    const event: Doc<"events"> | null = await ctx.runQuery(api.queries.getEvent, {
+      id: args.eventId,
+    });
+    if (!event) throw new Error("Conversion event not found in this tenant.");
+    if (String(event.clientId) !== String(proposal.clientId)) {
+      throw new Error("The event's client must match the proposal's client.");
+    }
+    // The generated read filters only soft deletion: a cancelled event is
+    // still returned, and the same-event no-op below must not call that a
+    // completed conversion.
+    if (event.stage === "cancelled") {
+      throw new Error(
+        "The conversion event has been cancelled. Unlink the proposal from it before booking again.",
+      );
+    }
+
+    // The event is now proven live, in-tenant, and the proposal's client —
+    // for both paths, including the same-event no-op. Stage/live/cancelled
+    // business rules stay with the domain commands below.
+    if (proposal.eventId != null) {
+      if (proposal.eventId === args.eventId) {
+        return { docId: proposal.eventId };
+      }
+      throw new Error(
+        "This proposal is already linked to a different event — open that event instead of forcing a second link.",
+      );
+    }
+
+    // New link only: stage + promote through the generated governed commands
+    // — the sole write/policy/guard authority here (their link guards
+    // re-enforce liveness, cancelled stage, tenant and client through the
+    // pendingEvent relation; draft or accepted both link, a draft's null
+    // cascade key copies no menu). An uncaught throw rolls the staged pointer
+    // back with the whole subtransaction.
+    await ctx.runMutation(api.mutations.Proposal_stageEventLink, {
+      docId: args.proposalId,
+      eventId: args.eventId,
+    });
+    await ctx.runMutation(api.mutations.Proposal_linkEvent, {
+      docId: args.proposalId,
+    });
+
+    return { docId: args.eventId };
   },
 });

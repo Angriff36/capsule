@@ -288,12 +288,23 @@ event SignatureRevoked: "signature_request.revoked" {
   revokedAt: datetime
 }
 
-// Acceptance cascade (spec §5.5). Declared intent: SignatureCompleted drives
-// the bound Proposal through accept. CAUTION: as of 2026-07-29 the generator
-// does not project `run` reactions into Convex at all (convex/sagas.ts is
-// empty; emits only insert into the manifestEvents ledger) — this reaction is
-// inert at runtime. The working path is the authored public seam
-// convex/signatureAcceptance.ts, which completes the request AND performs the
-// proposal accept in the same mutation. If reaction projection ever lands,
-// the seam's direct accept must be reconciled with this declaration.
+// Acceptance cascade (spec §5.5). SignatureCompleted drives the bound
+// Proposal through accept: the generator projects this single-target `run`
+// reaction inline into the generated SignatureRequest_complete mutation, so
+// the accept (its guards, cascade, and ProposalAccepted ledger row) runs in
+// the SAME transaction as the completion, right after the completion's own
+// ledger insert. The request's proposalRevisionId travels into Proposal.accept
+// so the acceptance records the exact revision the signer saw
+// (convex/lib/proposalAcceptanceRevision.ts validates and stores it). The
+// reaction only fires when the request carries a proposalId; the authored
+// public seam convex/signatureAcceptance.ts serves anonymous token clicks,
+// which cannot pass the generated command guards. It validates the token and
+// the signed revision itself, then runs the SAME generated Proposal_accept
+// under the established tenant system runner
+// (convex/lib/tenantSystemCommandRunner.ts), so an anonymous acceptance
+// commits the identical guards, ProposalAccepted ledger row and menu cascade
+// in one transaction (issue #390).
 on SignatureCompleted run Proposal.accept resolve payload.proposalId
+  params {
+    acceptedRevisionId: payload.proposalRevisionId
+  }

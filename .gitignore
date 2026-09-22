@@ -67,7 +67,8 @@ storybook-static/
 .ralph-checkpoint
 .ralph-telemetry.jsonl
 .ralph-failures.md
-.ralph-plan-converged
+.ralph-tasks/
+.ralph-workers.log
 
 # Machine-local MCP tool config (points at a localhost server; never part of
 # a clean CI checkout)

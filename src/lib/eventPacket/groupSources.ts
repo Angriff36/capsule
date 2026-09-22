@@ -62,13 +62,23 @@ export function sourceEventDate(s: ExtractedSource): string | undefined {
         "gi",
       ),
     );
-  if (s.artifact.kind === "beo")
+  if (s.artifact.kind === "beo") {
     collect(
       new RegExp(
         "(" + datePattern + ")\\s*\\d+\\s*Invoice\\s*#:\\s*Date:",
         "gi",
       ),
     );
+    // The .rtf BEO keeps reading order: "Invoice #: 5935 Date: Saturday 9/26/2026".
+    collect(
+      new RegExp(
+        "Invoice\\s*#:\\s*\\d+\\s+Date:\\s*(?:(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),?\\s*)?(" +
+          datePattern +
+          ")",
+        "gi",
+      ),
+    );
+  }
   if (s.artifact.kind === "menu_production")
     collect(
       new RegExp(

@@ -37287,7 +37287,7 @@ export const ProductionBatchAllocation_release = mutation({
   },
 });
 
-async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, version }: any, __creation = false) {
+async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, acceptedRevisionId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -37317,13 +37317,14 @@ async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, version }
     const updates = {
       status: "accepted",
       eventId: ((eventId != null) ? eventId : doc.eventId),
+      acceptedRevisionId: ((acceptedRevisionId != null) ? acceptedRevisionId : null),
       acceptedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: ((eventId != null) ? eventId : __after.eventId), title: __after.title, eventDate: __after.eventDate, eventType: __after.eventType, guestCount: __after.guestCount, venueName: __after.venueName, venueAddress: __after.venueAddress, subtotal: __after.subtotal, taxAmount: __after.taxAmount, discountAmount: __after.discountAmount, total: __after.total, dishSelectionProposalId: ((__after.eventId != null) ? docId : null), _subject: { entity: "Proposal", command: "accept", id: docId } };
-    const __manifestEvent0 = { type: "ProposalAccepted", entity: "Proposal", entityId: docId, payload: { proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: ((eventId != null) ? eventId : __after.eventId), title: __after.title, eventDate: __after.eventDate, eventType: __after.eventType, guestCount: __after.guestCount, venueName: __after.venueName, venueAddress: __after.venueAddress, subtotal: __after.subtotal, taxAmount: __after.taxAmount, discountAmount: __after.discountAmount, total: __after.total, dishSelectionProposalId: ((__after.eventId != null) ? docId : null) }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: ((eventId != null) ? eventId : __after.eventId), acceptedRevisionId: ((acceptedRevisionId != null) ? acceptedRevisionId : null), title: __after.title, eventDate: __after.eventDate, eventType: __after.eventType, guestCount: __after.guestCount, venueName: __after.venueName, venueAddress: __after.venueAddress, subtotal: __after.subtotal, taxAmount: __after.taxAmount, discountAmount: __after.discountAmount, total: __after.total, dishSelectionProposalId: ((__after.eventId != null) ? docId : null), _subject: { entity: "Proposal", command: "accept", id: docId } };
+    const __manifestEvent0 = { type: "ProposalAccepted", entity: "Proposal", entityId: docId, payload: { proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: ((eventId != null) ? eventId : __after.eventId), acceptedRevisionId: ((acceptedRevisionId != null) ? acceptedRevisionId : null), title: __after.title, eventDate: __after.eventDate, eventType: __after.eventType, guestCount: __after.guestCount, venueName: __after.venueName, venueAddress: __after.venueAddress, subtotal: __after.subtotal, taxAmount: __after.taxAmount, discountAmount: __after.discountAmount, total: __after.total, dishSelectionProposalId: ((__after.eventId != null) ? docId : null) }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const fanRows0 = (await ctx.db.query("proposalDishSelections").withIndex("by_proposalId", (q) => q.eq("proposalId", payload.dishSelectionProposalId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -37359,6 +37360,7 @@ export const Proposal_accept = mutation({
   args: {
     docId: v.id("proposals"),
     eventId: v.optional(v.string()),
+    acceptedRevisionId: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -37698,7 +37700,7 @@ async function __runProposalLinkEvent(ctx: MutationCtx, { docId, version }: any,
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write proposals through commands");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute proposal commands");
-    if (!((doc.status === "accepted"))) throw new Error("Guard 0 failed");
+    if (!(((doc.status === "draft") || (doc.status === "accepted")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.eventId == null))) throw new Error("Guard 2 failed");
     if (!((doc.pendingEventId != null))) throw new Error("Guard 3 failed");
@@ -37717,8 +37719,8 @@ async function __runProposalLinkEvent(ctx: MutationCtx, { docId, version }: any,
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: linkedEventId, dishSelectionProposalId: docId, _subject: { entity: "Proposal", command: "linkEvent", id: docId } };
-    const __manifestEvent0 = { type: "ProposalEventLinked", entity: "Proposal", entityId: docId, payload: { proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: linkedEventId, dishSelectionProposalId: docId }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: linkedEventId, dishSelectionProposalId: ((__after.status === "accepted") ? docId : null), _subject: { entity: "Proposal", command: "linkEvent", id: docId } };
+    const __manifestEvent0 = { type: "ProposalEventLinked", entity: "Proposal", entityId: docId, payload: { proposalId: docId, tenantId: __after.tenantId, clientId: __after.clientId, eventId: linkedEventId, dishSelectionProposalId: ((__after.status === "accepted") ? docId : null) }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const fanRows0 = (await ctx.db.query("proposalDishSelections").withIndex("by_proposalId", (q) => q.eq("proposalId", payload.dishSelectionProposalId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -38013,7 +38015,7 @@ async function __runProposalStageEventLink(ctx: MutationCtx, { docId, eventId, v
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write proposals through commands");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute proposal commands");
-    if (!((doc.status === "accepted"))) throw new Error("Guard 0 failed");
+    if (!(((doc.status === "draft") || (doc.status === "accepted")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.eventId == null))) throw new Error("Guard 2 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -45352,7 +45354,7 @@ async function __runSignatureRequestComplete(ctx: MutationCtx, { docId, callback
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const reactionTarget0 = payload.proposalId;
-    if (reactionTarget0) await __runProposalAccept(ctx, { docId: reactionTarget0 } as any);
+    if (reactionTarget0) await __runProposalAccept(ctx, { docId: reactionTarget0, acceptedRevisionId: payload.proposalRevisionId } as any);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "complete", emitIndex: 0 });
     return { ...doc, ...updates };
 }

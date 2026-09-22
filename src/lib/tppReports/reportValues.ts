@@ -294,3 +294,28 @@ export function titleCase(value: string): string {
     .replace(/\bIn\b/g, "in")
     .replace(/\bOf\b/g, "of");
 }
+
+/**
+ * One address line for a venue. A remote site (a campsite) has no street;
+ * its GPS pair is its address. The event import and the Event workbook both
+ * use this text, so the two never disagree about the same venue.
+ */
+export function venueAddressLine(venue: {
+  addressLine1?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+}): string | undefined {
+  const parts = [
+    venue.addressLine1,
+    venue.city,
+    venue.region,
+    venue.postalCode,
+  ].filter((part): part is string => part !== undefined && part.length > 0);
+  if (parts.length > 0) return parts.join(", ");
+  if (venue.latitude === undefined || venue.longitude === undefined)
+    return undefined;
+  return `${Math.abs(venue.latitude)}° ${venue.latitude < 0 ? "S" : "N"}, ${Math.abs(venue.longitude)}° ${venue.longitude < 0 ? "W" : "E"}`;
+}

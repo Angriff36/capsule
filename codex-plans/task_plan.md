@@ -63,3 +63,16 @@ Phase 5
 | Combined focused verification was killed by an intentionally short shell timeout | 1 | Split formatting, typecheck, payroll tests, full tests, and build into independently timed commands |
 | `bun run test` exposed 12 unrelated failures in concurrent Event/navigation/generated work | 1 | Preserve unrelated changes; record that payroll's focused 12 tests pass |
 | Finance managers cannot read TimeRecords used by the payroll exporter | 1 | Filed GitHub issue #39; do not race the active generated-tree rewrite with regeneration |
+
+## Whole-spec planning audit — 2026-09-20
+- [x] Preserve startup changes; confirm required upstream; verify local preview/backend.
+- [x] Audit every specs/ file and src/lib/ through read-only workers.
+- [x] Synthesize complete prioritized IMPLEMENTATION_PLAN.md and stable ACCEPTANCE_TESTS.md.
+- [x] Validate coverage, existing project checks and local checkout identity; prepare a checkpoint containing only owned planning paths. Final commit/push outcome is recorded by Git history and the closing response.
+Plan only; no application or test implementation. Required upstream 89262916f59e32dbed5d63749999309a62586742 is already an ancestor of dev at be4288fb.
+
+## PL-BOOKING retry-link increment — 2026-09-21 (complete)
+- Selected increment: qualify AC-412 and AC-433 by repairing partial quote conversion's saved unlinked draft proposal; full PL-BOOKING stays unchecked.
+- Scope: one concern — a resumed quote conversion must retain one canonical Proposal-to-Event relationship. Application edits stayed inside the manifest guard change (regenerated), `convex/quoteBuilder.ts`, the new internal `convex/lib/proposalEventCreation.ts` helper, and `tests/proofs/quote-conversion.runtime.test.ts`; no UI/generated-by-hand/spec/env edits, no commit/push.
+- RED phase (past tense): the regression run showed 6 original cases green and the new canonical-link case failing (`red.log`); a soft-deleted-Event case then exposed one more gap and the repair was corrected (`207-validate-recovered-event.log`).
+- Final state: 4 new runtime cases green, focused 5 files/39 (`focused-final.log`), full suite 197 files/918 (`test.log`), full `bun run check` exit 0 with coverage 197/918 (`check-final.log`); review gpt-5.6-sol ends VERDICT: APPROVE (`review.log`). AC-412 and AC-433 → PASS; AC-006, AC-411, AC-436 and all other PENDING stay PENDING. Receipt: codex-plans/whole-spec-audit-2026-09-20/quote-retry-evidence-2026-09-21.md.

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import type { Id } from "../../../lib/api";
 import {
   useEventPacket,
@@ -21,6 +22,7 @@ import {
 import { readiness, fieldLabel } from "../../../lib/eventPacket/reconcile";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
+import { WORKBOOK_REVIEW_PARAM } from "../eventRoutes";
 
 function valueText(value: unknown) {
   return Array.isArray(value)
@@ -59,8 +61,17 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
   const [timeZone, setTimeZone] = useState(
     Intl.DateTimeFormat().resolvedOptions().timeZone,
   );
-  const [section, setSection] = useState("all");
-  const [expanded, setExpanded] = useState(false);
+  // Event Day links here with ?workbook=<section>: open the review on it.
+  const [searchParams] = useSearchParams();
+  const reviewSection = searchParams.get(WORKBOOK_REVIEW_PARAM);
+  const [section, setSection] = useState(reviewSection ?? "all");
+  const [expanded, setExpanded] = useState(reviewSection != null);
+  const panelRef = useRef<HTMLElement>(null);
+  const loaded = packet.view != null;
+  useEffect(() => {
+    if (reviewSection && loaded)
+      panelRef.current?.scrollIntoView({ block: "start" });
+  }, [reviewSection, loaded]);
   const run = async (work: () => Promise<void>) => {
     setBusy(true);
     setFailure(null);
@@ -81,8 +92,12 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
     );
   const snapshot = view.snapshot;
   const open = snapshot.issues.filter((i) => i.required && i.status === "open");
+  // A section with nothing open (all resolved, or a stale link) shows all.
+  const activeSection = open.some((i) => i.section === section)
+    ? section
+    : "all";
   const visibleOpen = open.filter(
-    (i) => section === "all" || i.section === section,
+    (i) => activeSection === "all" || i.section === activeSection,
   );
   const openChecks = visibleOpen.filter((i) => i.key.startsWith("check."));
   const verifyAllChecks = () => {
@@ -230,6 +245,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
   };
   return (
     <section
+      ref={panelRef}
       className="border-t border-line pt-5"
       aria-label="Event workbook"
       data-testid="event-packet-panel"
@@ -269,7 +285,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
           <input
             className="mt-1 block max-w-full"
             type="file"
-            accept=".pdf,.csv,.json"
+            accept=".pdf,.rtf,.csv,.json"
             multiple
             disabled={busy}
             onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
@@ -305,7 +321,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
             Review section
             <select
               className="input ml-2"
-              value={section}
+              value={activeSection}
               onChange={(e) => setSection(e.target.value)}
             >
               <option value="all">All sections</option>

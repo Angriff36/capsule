@@ -1,4 +1,5 @@
 import type { EventBundle } from "../lib/tppReports/eventBundle";
+import { venueAddressLine } from "../lib/tppReports/reportValues";
 
 /**
  * Pieces the event-bundle planners share: the step shape, name keys, money
@@ -106,14 +107,24 @@ export function personNameParts(name: string | undefined): {
 }
 
 export function venueAddressText(bundle: EventBundle): string | undefined {
-  const venue = bundle.venue;
-  const parts = [
-    venue.addressLine1,
-    venue.city,
-    venue.region,
-    venue.postalCode,
-  ].filter((part): part is string => part !== undefined && part.length > 0);
-  return parts.length > 0 ? parts.join(", ") : undefined;
+  return venueAddressLine(bundle.venue);
+}
+
+/**
+ * The BEO prints the service style as text; the event stores a style id.
+ * Names match without regard to case, dash style ("-" / "–") or spacing.
+ */
+export function matchServiceStyleId(
+  printed: string | undefined,
+  styles: ReadonlyArray<{ id: string; name: string }> | undefined,
+): string | undefined {
+  const key = (text: string) =>
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  if (!printed || !styles) return undefined;
+  return styles.find((style) => key(style.name) === key(printed))?.id;
 }
 
 /**

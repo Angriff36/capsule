@@ -1,7 +1,8 @@
 /**
  * Monthly/on-demand baseline decay checks (objective yes/no).
  */
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 /**
@@ -33,56 +34,32 @@ class BaselineDecayCheck {
   }
 
   private checkRootCap(): void {
-    // Count only entries that would appear in a clean CI checkout + committed
-    // roots. Local tool caches (.git, .convex, .codex, …) must not inflate the
-    // cap — otherwise baseline:decay is machine-dependent.
-    const localOnly = new Set([
-      "node_modules",
-      "dist",
-      "graphify-out",
-      "coverage",
-      ".git",
-      ".convex",
-      ".artifacts",
-      ".codex",
-      ".agents",
-      ".fallow",
-      ".tmp",
-      ".env.local",
-      // Editor / IDE local state — never part of a clean CI checkout
-      ".cursor",
-      ".sonarlint",
-      ".vscode",
-      // Gitignored local tool/loop state — never part of a clean CI checkout
-      ".aboardai",
-      // Ralph loop per-machine state (gitignored "Ralph loop state" block)
-      ".ralph-checkpoint",
-      ".ralph-telemetry.jsonl",
-      ".ralph-failures.md",
-      ".local",
-      ".loop-worktrees",
-      ".worktrees",
-      ".playwright-mcp",
-      ".scannerwork",
-      ".vercel",
-      "test-results",
-      "work",
-      "output",
-      // Machine-local MCP tool config (points at a localhost server) — never
-      // part of a clean CI checkout; gitignored alongside .env.local.
-      ".mcp.json",
-      // Machine-local tool state: the production-env snapshot pulled for
-      // release config checks and the Playwright CLI session file.
-      ".env.production",
-      ".playwright-cli",
-      // Git Bash copy so Windows CreateProcess finds cwd before WSL System32
-      // bash. Gitignored; planted by scripts/windowsGitBashPath.ts.
-      "bash.exe",
-    ]);
-    const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
-    if (entries.length > ROOT_CAP) {
+    // Count distinct root entries in the GIT INDEX — what a clean CI checkout
+    // materializes — not whatever readdirSync sees on one machine. Staged
+    // additions are already in `ls-files --cached`; staged removals are
+    // already out. Untracked and gitignored local artifacts never count.
+    let out: Buffer;
+    try {
+      out = execFileSync("git", ["ls-files", "--cached", "--full-name", "-z"], {
+        cwd: ROOT,
+        stdio: ["ignore", "pipe", "pipe"],
+      });
+    } catch (err) {
       this.failures.push(
-        `root entry count ${entries.length} exceeds cap ${ROOT_CAP}`,
+        `root cap needs the Git index: git ls-files failed in ${ROOT} (${
+          err instanceof Error ? err.message : String(err)
+        })`,
+      );
+      return;
+    }
+    const roots = new Set<string>();
+    for (const entry of out.toString().split("\0")) {
+      if (entry === "") continue;
+      roots.add(entry.split("/")[0]);
+    }
+    if (roots.size > ROOT_CAP) {
+      this.failures.push(
+        `root entry count ${roots.size} exceeds cap ${ROOT_CAP}`,
       );
     }
   }

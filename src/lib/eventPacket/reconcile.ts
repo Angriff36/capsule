@@ -16,8 +16,15 @@ import {
 } from "./requirements";
 const hash = (v: unknown) =>
   fingerprintBytes(new TextEncoder().encode(canonicalJson(v)));
+// "Buffet - Cook Onsite" and "Buffet – Cook Onsite" are one value: the dash
+// style (hyphen, en dash, em dash) is a print difference, not a disagreement.
+const sameText = (value: unknown) =>
+  typeof value === "string" ? value.replace(/[‐‑‒–—―]/g, "-") : value;
 const signature = (v: { value?: unknown; unit?: string }) =>
-  canonicalJson({ value: v.value, unit: v.unit?.trim().toLowerCase() });
+  canonicalJson({
+    value: sameText(v.value),
+    unit: v.unit?.trim().toLowerCase(),
+  });
 const sorted = (values: unknown[]) => values.map(canonicalJson).sort();
 const operational = (key: string) =>
   !key.startsWith("sourceContent.") &&

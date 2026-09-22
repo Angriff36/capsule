@@ -10,6 +10,8 @@ import {
   sourceContactName,
   referenceKinds,
 } from "./groupSources";
+import { parseBeoText } from "../tppReports/parseBeoText";
+import { venueAddressLine } from "../tppReports/reportValues";
 export const fieldSlug = (s: string) =>
   s
     .toLowerCase()
@@ -140,6 +142,42 @@ export function extractObservations(
         new RegExp("(?:Printed Date|Date Printed):\\s*" + stamp, "i"),
       )?.[1];
     if (recorded) add("source.recordedTime", recorded, loc);
+    // ONE BEO reader (owner rule, 2026-09-20): a BEO that arrives as text or
+    // .rtf is read by the same parser as the event import, so the workbook
+    // and the import never give two answers for one file. The patterns below
+    // stay for the PDF text order only.
+    if (artifact.kind === "beo" && /rtf|text\/plain/.test(artifact.mimeType)) {
+      const beo = parseBeoText(t);
+      const put = (key: string, value: FieldValue | undefined, unit?: string) =>
+        value !== undefined && value !== "" && add(key, value, loc, unit);
+      put("eventTitle", beo.header?.title);
+      put("guestCount", beo.header?.guestCount);
+      put("serviceStyle", beo.header?.serviceStyle);
+      put("contact.name", beo.client?.name);
+      put("contact.phone", beo.client?.phone);
+      put("contact.email", beo.client?.email);
+      put("venue.name", beo.venue?.name);
+      put("venue.address", beo.venue ? venueAddressLine(beo.venue) : undefined);
+      for (const row of beo.timeline ?? []) {
+        const label = fieldSlug(row.name).replaceAll("-", "_");
+        const n = (timelineCounts[label] = (timelineCounts[label] ?? 0) + 1);
+        const hh = String(Math.floor(row.minutes / 60) % 24).padStart(2, "0");
+        const mm = String(row.minutes % 60).padStart(2, "0");
+        put(`timeline.${label}.${n}.time`, `${hh}:${mm}`);
+        put(`timeline.${label}.${n}.notes`, row.notes);
+      }
+      for (const item of beo.menu ?? []) {
+        // As in the event import: "Mini Assorted Desserts (JAD)" is the
+        // catalog dish "Mini Assorted Desserts"; the note in brackets is print.
+        const name = item.name.replace(/\s*\([^)]*\)/g, "").trim();
+        const key = `menu.${fieldSlug(name)}`;
+        put(key + ".name", name);
+        put(key + ".quantity", item.quantityServings, "Serving");
+        put(key + ".notes", item.specialInstructions);
+      }
+      add(`sourceContent.beo.page${p.page}`, t, loc);
+      continue;
+    }
     if (artifact.kind === "event_tracker") {
       if (!identity) continue;
       for (const row of p.sourceRows ?? []) {

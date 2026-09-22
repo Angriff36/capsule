@@ -6,6 +6,7 @@ import {
   centsToDollars,
   dishKey,
   isMenuDishLine,
+  matchServiceStyleId,
   normalizeName,
   operationalRequirementsText,
   personNameParts,
@@ -14,6 +15,7 @@ import {
   venueAddressText,
   type PlannedStep,
 } from "./CapsuleEventBundleShared";
+import { planHeaderSteps } from "./CapsuleEventBundleHeaderPlan";
 import { planReviewFlagSteps } from "./CapsuleEventBundleReviewFlagPlan";
 import { planSupplySteps } from "./CapsuleEventBundleSupplyPlan";
 import { toCapsuleMeasure } from "./CapsuleMeasureUnit";
@@ -226,11 +228,27 @@ export function buildEventBundlePlan(
         quotedPrice: centsToDollars(bundle.totals.eventTotalCents),
         venueName: bundle.venue.name,
         venueAddress: venueAddressText(bundle),
+        serviceStyleId: matchServiceStyleId(
+          bundle.header.serviceStyle,
+          context.serviceStyles,
+        ),
         serviceRequirements: serviceRequirementsText(bundle),
         operationalRequirements: operationalRequirementsText(bundle),
       },
     });
   }
+
+  steps.push(
+    ...planHeaderSteps(bundle, invoice, existing, {
+      startsAt,
+      endsAt,
+      venueId: catalog.venueId,
+      serviceStyleId: matchServiceStyleId(
+        bundle.header.serviceStyle,
+        context.serviceStyles,
+      ),
+    }),
+  );
 
   const knownTimeline = existing?.timelineNames ?? [];
   const timeline = [...bundle.timeline].sort(
@@ -384,11 +402,17 @@ export function buildEventBundlePlan(
       warnings.push(
         "A pack list is created here with the packed items. Approving the event later opens a second, empty pack list, because Event.approve does that by reaction.",
       );
+      // A closed list from an earlier run must not answer this open through
+      // the idempotency cache: the key changes with every closed list.
+      const closed = existing?.closedPackLists ?? 0;
       steps.push({
         capabilityId: "PackList.open",
         ref: "packList",
         label: `Open the pack list`,
-        idempotencySuffix: `pack-list:${invoice}`,
+        idempotencySuffix:
+          closed > 0
+            ? `pack-list:${invoice}:again${closed}`
+            : `pack-list:${invoice}`,
         resolveRefs: ["eventId"],
         args: {
           eventId: "event",

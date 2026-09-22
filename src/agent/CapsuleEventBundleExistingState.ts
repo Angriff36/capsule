@@ -60,6 +60,19 @@ export interface CapsuleEventBundleExistingEvent {
   clientId: string;
   venueId?: string;
   event: {
+    /**
+     * Header values a newer BEO overwrites (optional: a loader that does not
+     * read them leaves the header alone).
+     */
+    stage?: string;
+    eventNumber?: string | null;
+    startsAt?: number | null;
+    endsAt?: number | null;
+    expectedHeadcount?: number | null;
+    serviceStyleId?: string | null;
+    venueName?: string | null;
+    venueAddress?: string | null;
+    venueCapacity?: number | null;
     quotedPrice: number;
     primaryContactName?: string;
     primaryContactEmail?: string | null;
@@ -73,6 +86,12 @@ export interface CapsuleEventBundleExistingEvent {
   timelineNames: string[];
   prepTasks: Array<{ dishName: string; name: string }>;
   packList?: { id: string; itemDescriptions: string[] };
+  /**
+   * Live pack lists of the event that can no longer take items (packed,
+   * loaded, dispatched, cancelled). A later BEO then opens a new list under
+   * a new idempotency key instead of replaying the closed one.
+   */
+  closedPackLists?: number;
   assignedPersonIds: string[];
 }
 
@@ -91,6 +110,12 @@ export interface CapsuleEventBundleContext {
   directory?: CapsuleEventBundleDirectory;
   existing?: CapsuleEventBundleExistingEvent;
   catalog?: CapsuleEventBundleCatalogMatch;
+  /**
+   * The tenant's active service styles. The BEO prints the style as text
+   * ("Buffet - Cook Onsite"); the event stores the matching style's id, which
+   * is what the Event workbook and the Final Lock checks read.
+   */
+  serviceStyles?: Array<{ id: string; name: string }>;
   /**
    * Staff rows that match no person become open shifts (EventStaffNeed) with
    * the printed role and times, instead of a "match no person" warning. TPP

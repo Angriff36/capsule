@@ -6,6 +6,7 @@ import {
   type SourcePage,
 } from "./groupSources";
 import { extractObservations } from "./extractObservations";
+import { isRtf, rtfToText } from "../tppReports/rtfToText";
 export interface ImportInput {
   name: string;
   mimeType: string;
@@ -62,7 +63,8 @@ export async function importSources(
     );
     const isPdf = new TextDecoder().decode(input.bytes.slice(0, 5)) === "%PDF-";
     let pages: SourcePage[] = [],
-      rows: string[][] | undefined;
+      rows: string[][] | undefined,
+      mimeType = input.mimeType;
     if (isPdf) {
       const extract =
         options.extractPdfPages ??
@@ -73,7 +75,13 @@ export async function importSources(
         });
       pages = await extract(input.bytes);
     } else {
-      const text = new TextDecoder().decode(input.bytes).replace(/^\uFEFF/, "");
+      const decoded = new TextDecoder()
+        .decode(input.bytes)
+        .replace(/^\uFEFF/, "");
+      // TPP saves the BEO and the worksheet as .rtf; read it as its plain text.
+      const text = isRtf(decoded) ? rtfToText(decoded) : decoded;
+      // The browser names an .rtf many ways (or not at all); the content decides.
+      if (isRtf(decoded)) mimeType = "application/rtf";
       if (
         input.mimeType.includes("csv") ||
         /Pack List[\s\S]*Grouped by:/i.test(text)
@@ -88,7 +96,7 @@ export async function importSources(
     const artifact: SourceArtifact = {
       fingerprint,
       name: input.name,
-      mimeType: input.mimeType,
+      mimeType,
       ...recognition,
       importedAt: existing?.importedAt ?? options.importedAt,
     };

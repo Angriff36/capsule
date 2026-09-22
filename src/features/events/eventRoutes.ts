@@ -108,6 +108,12 @@ export function eventDetailPath(id: string, tab?: EventDetailTab): string {
   return `/events/${id}?tab=${tab}`;
 }
 
+/** Overview tab with the Event workbook review open on one packet section. */
+export const WORKBOOK_REVIEW_PARAM = "workbook";
+export function eventWorkbookReviewPath(id: string, section: string): string {
+  return `${eventDetailPath(id, "overview")}&${WORKBOOK_REVIEW_PARAM}=${encodeURIComponent(section)}`;
+}
+
 export function parseEventDetailTab(
   value: string | null | undefined,
 ): EventDetailTab {

@@ -36,6 +36,8 @@ Handle Git maintenance yourself. Resolve merge conflicts preserving both shipped
 features and this branch's work. Regenerate generated files through their owning
 tool. Preserve unrelated uncommitted work; do not bulk-stage or discard it.
 Stage only your own changes; this overrides any earlier git add -A instruction.
+Commit through the project's git hooks exactly as they are: never --no-verify,
+never core.hooksPath, never a copied or edited hook (seen 2026-09-21).
 Do not reset, force-push, push trunk, or deploy production. If a conflict requires
 an actual product choice, explain that choice rather than asking the user to run Git.
 After integration, install dependencies if changed and run project validation.
@@ -57,26 +59,4 @@ Its default port is 7812. Configure the check with the same command without
 -Ensure. Adjust the port in both commands if occupied. This only manages the
 frontend; verify the local backend separately using the project's instructions.
 EOF
-}
-
-ralph_ready_to_finish() {
-    ralph_refresh_base || return 1
-    if ! git merge-base --is-ancestor "$RALPH_BASE_SHA" HEAD; then
-        echo "Ralph: upstream advanced; another integration iteration is required."
-        return 1
-    fi
-    if git rev-parse -q --verify MERGE_HEAD >/dev/null || [ -n "$(git ls-files -u)" ]; then
-        echo "Ralph: merge is unfinished."
-        return 1
-    fi
-    # Reload the check configured by the agent during this iteration.
-    if [ -f .ralph.env ]; then . ./.ralph.env; fi
-    if [ -z "${RALPH_PREVIEW_CHECK_CMD:-}" ]; then
-        echo "Ralph: preview verification has not been configured; continuing."
-        return 1
-    fi
-    bash -c "$RALPH_PREVIEW_CHECK_CMD" || {
-        echo "Ralph: preview verification failed; continuing to repair it."
-        return 1
-    }
 }

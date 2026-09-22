@@ -18,7 +18,8 @@ enum ProposalStatus {
 
 // Sales offer for a Client. Line items omitted in this trio (send requires a
 // non-empty title instead). eventId may link at draft time ("create proposal
-// from event", spec §5.3), at accept time, or after acceptance via linkEvent
+// from event", spec §5.3; quote-conversion retry via stageEventLink →
+// linkEvent, issue #391), at accept time, or after acceptance via linkEvent
 // (issue #141 — booking an accepted proposal into a newly created event).
 entity Proposal mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
@@ -36,6 +37,14 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // the event exists, is live, and belongs to this proposal's client — the
   // expression language cannot resolve a relation from a raw command param.
   property pendingEventId: uuid?
+  // The exact ProposalRevision the client accepted, stored durably at
+  // acceptance (AC-413/AC-434, spec §7.2.3). convex/lib/proposalAcceptanceRevision.ts
+  // resolves and validates it inside the accept transaction: an explicit id
+  // must be live, captured, and bound to this proposal and tenant; without one
+  // the highest captured revision AT ACCEPTANCE TIME is recorded, else
+  // explicit null. ABSENT (not null) marks a pre-change record. `accepted` is
+  // a terminal status, so a later revision can never re-label an acceptance.
+  property acceptedRevisionId: uuid?
   property unique proposalNumber: string?
   property required searchable title: string = ""
   property eventDate: datetime?
@@ -73,6 +82,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref pendingEvent: Event fields [tenantId, pendingEventId] references [tenantId, id]
+  ref acceptedRevision: ProposalRevision fields [tenantId, acceptedRevisionId] references [tenantId, id]
   ref supersededBy: Proposal fields [tenantId, supersededById] references [tenantId, id]
   ref replacesProposal: Proposal fields [tenantId, replacesProposalId] references [tenantId, id]
 
@@ -177,18 +187,24 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command accept(optional eventId: uuid) {
+  command accept(optional eventId: uuid, optional acceptedRevisionId: uuid) {
     guard self.status == "sent" or self.status == "viewed"
     guard self.deletedAt == null
     guard self.expiresAt == null or self.expiresAt > now()
     mutate status = "accepted"
     mutate eventId = eventId != null ? eventId : self.eventId
+    // Stored as-is here; the acceptance callback
+    // (convex/lib/proposalAcceptanceRevision.ts, same transaction) validates
+    // an explicit id or resolves the highest captured revision at this
+    // moment, and rolls the whole acceptance back on a bad reference.
+    mutate acceptedRevisionId = acceptedRevisionId != null ? acceptedRevisionId : null
     mutate acceptedAt = now()
     emit ProposalAccepted {
       proposalId: self.id
       tenantId: self.tenantId
       clientId: self.clientId
       eventId: eventId != null ? eventId : self.eventId
+      acceptedRevisionId: acceptedRevisionId != null ? acceptedRevisionId : null
       title: self.title
       eventDate: self.eventDate
       eventType: self.eventType
@@ -203,9 +219,11 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Book an already-accepted proposal into its Event (issue #141). Signature
-  // acceptance and "accept now, create the event after" both leave accepted
-  // proposals unlinked, and accept is the only other eventId writer.
+  // Book a proposal into its Event (issue #141; draft linking issue #391).
+  // Signature acceptance and "accept now, create the event after" both leave
+  // accepted proposals unlinked, and a quote-conversion retry saves a draft
+  // whose event was created after it — both repair through the same
+  // handshake. accept is the only other eventId writer.
   //
   // Two-step handshake (same shape as stageClientMerge → reassignClient):
   // stageEventLink records the candidate event id; linkEvent promotes it only
@@ -214,7 +232,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // a raw command param cannot be relation-validated, and eventId must never
   // persist a dangling or cross-client id (review High on #157).
   command stageEventLink(eventId: uuid) {
-    guard self.status == "accepted"
+    guard self.status == "draft" or self.status == "accepted"
     guard self.deletedAt == null
     guard self.eventId == null
     mutate pendingEventId = eventId
@@ -225,11 +243,14 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Promote the staged link. Emits the dish-selection cascade key so the
-  // client's accepted menu copies onto the linked event
-  // (sales/proposal-dish-selection.manifest).
+  // Promote the staged link. For an accepted proposal the emit carries the
+  // dish-selection cascade key so the client's accepted menu copies onto the
+  // linked event (sales/proposal-dish-selection.manifest). A draft (quote
+  // conversion retry, issue #391) links with a null key: unaccepted menu
+  // selections never cascade — ProposalAccepted copies the menu once, at
+  // acceptance.
   command linkEvent() {
-    guard self.status == "accepted"
+    guard self.status == "draft" or self.status == "accepted"
     guard self.deletedAt == null
     guard self.eventId == null
     guard self.pendingEventId != null
@@ -246,7 +267,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       clientId: self.clientId
       eventId: linkedEventId
-      dishSelectionProposalId: self.id
+      dishSelectionProposalId: self.status == "accepted" ? self.id : null
     }
   }
 
@@ -368,6 +389,10 @@ event ProposalAccepted: "proposal.accepted" {
   tenantId: string
   clientId: string
   eventId: string?
+  // Raw acceptedRevisionId command param; the acceptance callback resolves it
+  // (highest captured revision when absent) and patches the ledger row to the
+  // same reference it stores on the proposal.
+  acceptedRevisionId: string?
   title: string
   eventDate: datetime?
   eventType: string?
@@ -395,9 +420,11 @@ event ProposalEventLinked: "proposal.event_linked" {
   clientId: string
   eventId: string
   // Keys the menu selection → EventDish cascade, exactly like
-  // ProposalAccepted.dishSelectionProposalId (always non-null here — linkEvent
-  // requires an event).
-  dishSelectionProposalId: string
+  // ProposalAccepted.dishSelectionProposalId. Non-null only when the proposal
+  // is already accepted; a draft link (quote conversion retry, issue #391)
+  // emits null, which skips the cascade cleanly — acceptance copies the menu
+  // once, later.
+  dishSelectionProposalId: string?
 }
 
 event ProposalDeclined: "proposal.declined" {
