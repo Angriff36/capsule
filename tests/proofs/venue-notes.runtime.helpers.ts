@@ -113,7 +113,7 @@ export async function postNote(
   extra?: {
     eventId?: string;
     category?: "logistics" | "access";
-    visibility?: "public" | "internal";
+    visibility?: "public" | "internal" | "management_only";
   },
 ) {
   const created = (await proof.executeCommand(

@@ -9,8 +9,13 @@ import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
 import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
+import { createClientPortalToken } from "../../convex/lib/clientPortalToken";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
 import { modules } from "./convex-test-modules";
+import {
+  S as FX,
+  setupAc317Fixture,
+} from "./venue-note-visibility.runtime.helpers";
 
 const S = {
   tenantA: "tenant-venue-a",
@@ -208,5 +213,98 @@ describe("runtime proof: venue note visibility read policy (#385)", () => {
     await expect(
       outsider.query(api.queries.getVenueNote, { id: mgmtId }),
     ).resolves.toBeNull();
+  });
+
+  it("a management_only note is refused to a non-management role and absent from every client-facing projection", async () => {
+    const proof = harness();
+    const fx = await setupAc317Fixture(proof);
+
+    // The shared proposal is not a blind empty: the client-safe note and the
+    // booked venue name come through, and no venue-note marker rides along.
+    const shared = (await fx.sales.query(api.shareLinks.getSharedProposal, {
+      token: fx.linkId,
+    })) as any;
+    expect(shared?.ok).toBe(true);
+    expect(shared.proposal.notes).toBe(FX.proposalNote);
+    expect(shared.proposal.venueName).toBe(fx.venueName);
+    const sharedText = JSON.stringify(shared);
+    expect(sharedText).not.toContain(FX.internalMarker);
+    expect(sharedText).not.toContain(FX.mgmtMarker);
+
+    // The pinned revision snapshot behind that share is equally clean.
+    const revisions = (await fx.sales.query(
+      api.queries.listProposalRevisionByProposalId,
+      { proposalId: fx.proposalId },
+    )) as Array<{ _id: string; snapshot: string }>;
+    const revision = revisions.find((row) => row._id === fx.revisionId);
+    expect(revision).toBeDefined();
+    const snapshotText = JSON.stringify(JSON.parse(revision!.snapshot));
+    expect(snapshotText).not.toContain(FX.internalMarker);
+    expect(snapshotText).not.toContain(FX.mgmtMarker);
+
+    // The authenticated sales read of the live proposal carries none either.
+    const proposal = (await fx.sales.query(api.queries.getProposal, {
+      id: fx.proposalId,
+    })) as unknown;
+    expect(proposal).not.toBeNull();
+    const proposalText = JSON.stringify(proposal);
+    expect(proposalText).not.toContain(FX.internalMarker);
+    expect(proposalText).not.toContain(FX.mgmtMarker);
+
+    // The anonymous client portal projection of the event is clean too, and
+    // really resolves the event (control against a null projection).
+    const portalToken = await createClientPortalToken({
+      eventId: fx.eventId,
+      tenantId: FX.tenantId,
+    });
+    const portal = (await fx.sales.query(api.clientPortal.getEvent, {
+      token: portalToken,
+    })) as any;
+    expect(portal?.event?.title).toBe(fx.eventTitle);
+    const portalText = JSON.stringify(portal);
+    expect(portalText).not.toContain(FX.internalMarker);
+    expect(portalText).not.toContain(FX.mgmtMarker);
+
+    // A sales-only actor (salesAccess, no eventAccess) reads no venue notes:
+    // not in the list, not by direct ID for either visibility.
+    const salesOnly = proof.asRole({
+      subject: `salesonly-${FX.tenantId}`,
+      role: "sales_staff",
+      tenantId: FX.tenantId,
+    });
+    expect(
+      (await salesOnly.query(api.queries.listVenueNote, {})) as unknown[],
+    ).toEqual([]);
+    await expect(
+      salesOnly.query(api.queries.getVenueNote, { id: fx.internalId }),
+    ).resolves.toBeNull();
+    await expect(
+      salesOnly.query(api.queries.getVenueNote, { id: fx.mgmtId }),
+    ).resolves.toBeNull();
+
+    // Non-management event staff keep the internal note but never mgmt-only.
+    const staffRows = (await fx.staff.query(
+      api.queries.listVenueNote,
+      {},
+    )) as Array<{
+      _id: string;
+    }>;
+    expect(staffRows.map((row) => row._id)).toContain(fx.internalId);
+    expect(staffRows.map((row) => row._id)).not.toContain(fx.mgmtId);
+    await expect(
+      fx.staff.query(api.queries.getVenueNote, { id: fx.mgmtId }),
+    ).resolves.toBeNull();
+
+    // Control: the manager reads both notes with the mgmt content intact.
+    const mgrRows = (await fx.manager.query(
+      api.queries.listVenueNote,
+      {},
+    )) as Array<{ _id: string }>;
+    expect(mgrRows.map((row) => row._id)).toEqual(
+      expect.arrayContaining([fx.internalId, fx.mgmtId]),
+    );
+    await expect(
+      fx.manager.query(api.queries.getVenueNote, { id: fx.mgmtId }),
+    ).resolves.toMatchObject({ content: FX.mgmtMarker });
   });
 });
