@@ -24,6 +24,7 @@ import { ComponentImportPage } from "../features/kitchen/import/ComponentImportP
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
 import { KitchenDashboardPage } from "../features/kitchen/KitchenDashboardPage";
 import { KitchenUnresolvedWorkPage } from "../features/kitchen/KitchenUnresolvedWorkPage";
+import { KitchenCatalogCleanupPage } from "../features/kitchen/KitchenCatalogCleanupPage";
 import { KitchenStationsPage } from "../features/kitchen/KitchenStationsPage";
 import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { ComponentDetailPage } from "../features/kitchen/ComponentDetailPage";
@@ -745,6 +746,10 @@ export function App() {
             <Route
               path="/kitchen/unresolved"
               element={<KitchenUnresolvedWorkPage />}
+            />
+            <Route
+              path="/kitchen/cleanup"
+              element={<KitchenCatalogCleanupPage />}
             />
             <Route path="/kitchen/stations" element={<KitchenStationsPage />} />
             <Route
