@@ -81,7 +81,10 @@ run_review() {
     echo "A rejection must identify a concrete problem in the changed code and a plausible user or production failure. End with exactly one line: \`VERDICT: APPROVE\` or \`VERDICT: REJECT\`."
   } > "$prompt"
   echo "deploy-production: independent review by Codex gpt-5.6-sol (log: $log)"
-  codex -c model="gpt-5.6-sol" review - < "$prompt" > "$log" 2>&1 || fail "the review command failed. Read $log"
+  # "high", not the config default "xhigh": the owner (2026-09-22) does not
+  # want the release review at the highest reasoning level. It took 20-40
+  # minutes a pass; the verdicts do not need it.
+  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 || fail "the review command failed. Read $log"
   # The log echoes the prompt; the verdict is in the reviewer's last message.
   local answer
   answer="$(awk '/^codex$/ { buffer = "" ; next } { buffer = buffer "\n" $0 } END { print buffer }' "$log")"
