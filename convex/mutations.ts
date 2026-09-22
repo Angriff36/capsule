@@ -12209,7 +12209,7 @@ async function __runEventChangeHeadcount(ctx: MutationCtx, { docId, newHeadcount
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
-    if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "executing")))) throw new Error("Guard 0 failed");
+    if (!((((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")) || (doc.stage === "executing")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((newHeadcount >= 1) && (newHeadcount <= 100000)))) throw new Error("Headcount must be between 1 and 100000");
     const previousHeadcount = doc.expectedHeadcount;
@@ -13575,7 +13575,7 @@ async function __runEventReturnToPlanning(ctx: MutationCtx, { docId, reason, ver
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
-    if (!(((doc.stage === "pending_approval") || (doc.stage === "approved")))) throw new Error("Guard 0 failed");
+    if (!(((doc.stage === "quote") || (doc.stage === "pending_approval")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Return reason is required");
@@ -15162,7 +15162,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     if (!((eventId === doc.eventId))) throw new Error("addToEvent eventId must match the seeded event reference");
     if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
     if (!(((headcountOverride == null) || (headcountOverride >= 0)))) throw new Error("Headcount override cannot be negative");
@@ -15350,7 +15350,7 @@ export const EventDish_createViaAddToEvent = mutation({
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((__draft.addedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     if (!((eventId === __draft.eventId))) throw new Error("addToEvent eventId must match the seeded event reference");
     if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
     if (!(((headcountOverride == null) || (headcountOverride >= 0)))) throw new Error("Headcount override cannot be negative");
@@ -15489,7 +15489,7 @@ async function __runEventDishAdjustServings(ctx: MutationCtx, { docId, quantityS
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing")) || (__rel_event.stage === "completed")) || (__rel_event.stage === "closed_out"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing")) || (__rel_event.stage === "completed")) || (__rel_event.stage === "closed_out"))))) throw new Error("Guard 3 failed");
     if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
@@ -15555,7 +15555,7 @@ async function __runEventDishChangeCourse(ctx: MutationCtx, { docId, course, ser
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -15769,7 +15769,7 @@ async function __runEventDishRemove(ctx: MutationCtx, { docId, reason, version }
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
@@ -16015,7 +16015,7 @@ async function __runEventDishSetHeadcountOverride(ctx: MutationCtx, { docId, hea
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing")) || (__rel_event.stage === "completed")) || (__rel_event.stage === "closed_out"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing")) || (__rel_event.stage === "completed")) || (__rel_event.stage === "closed_out"))))) throw new Error("Guard 3 failed");
     if (!((headcountOverride >= 0))) throw new Error("Headcount override cannot be negative");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
@@ -16084,7 +16084,7 @@ async function __runEventDishSyncHeadcount(ctx: MutationCtx, { docId, previousHe
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     const follows = ((doc.followsEventHeadcount != null) ? doc.followsEventHeadcount : ((doc.quantityServings === previousHeadcount) && ((doc.headcountOverride == null) || (doc.headcountOverride === 0))));
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
@@ -16150,7 +16150,7 @@ async function __runEventDishUpdateInstructions(ctx: MutationCtx, { docId, speci
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 0 failed");
     if (!((doc.addedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
