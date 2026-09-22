@@ -235,10 +235,13 @@ export function useEventImportRunner(input: {
       if (eventId === undefined) throw new Error("The event was not created");
       // The BEO that made the event is also the Event workbook source, so the
       // workbook starts with these values and asks for none of them again.
-      // The event is made at this point: a workbook failure must not hide it.
+      // The event is made at this point; if the BEO cannot be attached the
+      // import still reports that, so the event is never silently left
+      // without its workbook evidence.
       if (input.pastedText.trim().length > 0) {
+        let attached = false;
         try {
-          await attachPacketSources(
+          attached = await attachPacketSources(
             eventId as Id<"events">,
             [
               {
@@ -256,6 +259,11 @@ export function useEventImportRunner(input: {
           console.warn(
             "Event import: the BEO was not added to the workbook",
             error,
+          );
+        }
+        if (!attached) {
+          throw new Error(
+            `The event was created, but the pasted BEO could not be attached to its workbook (the text was not recognized as a BEO). Open the event and add the BEO under Workbook sources.`,
           );
         }
       }

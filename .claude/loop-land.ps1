@@ -69,6 +69,16 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   $h = Get-Content $file.FullName -Raw | ConvertFrom-Json
   $wt = $h.worktree
   if (-not (Test-Path $wt)) { Record $h 'FAIL' 'hand-off names a worktree that does not exist'; Remove-Item $file.FullName -Force; continue }
+  # The hand-off is model-written: before ANY git operation in it, the path
+  # must be this run's own worktree, checked out on this run's own branch.
+  $expectedWt = Join-Path $root ".loop-worktrees\$($h.runId)"
+  $expectedBranch = "loop/$($h.runId)"
+  $actualWt = try { (Resolve-Path $wt -ErrorAction Stop).Path } catch { '' }
+  $checkedOut = if ($actualWt) { (git -C $actualWt rev-parse --abbrev-ref HEAD 2>$null) } else { '' }
+  if (-not ($actualWt -and $actualWt -ieq $expectedWt -and $h.branch -eq $expectedBranch -and $checkedOut -eq $expectedBranch)) {
+    Record $h 'FAIL' "hand-off names '$wt' on '$($h.branch)' (checked out: '$checkedOut'); this run owns $expectedWt on $expectedBranch - nothing touched"
+    Remove-Item $file.FullName -Force; continue
+  }
   if (git -C $wt status --porcelain) { Record $h 'FAIL' 'maker left uncommitted changes in the worktree'; Discard $h $file.FullName; continue }
 
   git -C $wt fetch origin dev --quiet

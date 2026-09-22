@@ -262,7 +262,10 @@ describe("scripts/deploy-production.sh", () => {
         "RESULT: PASS - frontend deployed",
       );
       expect(approved.calls()[0]).toBe(
-        'codex -c model="gpt-5.6-sol" review -'.replace(/"/g, ""),
+        'codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review -'.replace(
+          /"/g,
+          "",
+        ),
       );
       expect(
         git(approved.work, "log", "-1", "--format=%s", approved.mainSha()),

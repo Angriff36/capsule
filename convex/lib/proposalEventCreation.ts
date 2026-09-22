@@ -190,6 +190,14 @@ export const linkConvertedQuoteProposal = internalMutation({
     if (String(event.clientId) !== String(proposal.clientId)) {
       throw new Error("The event's client must match the proposal's client.");
     }
+    // The generated read filters only soft deletion: a cancelled event is
+    // still returned, and the same-event no-op below must not call that a
+    // completed conversion.
+    if (event.stage === "cancelled") {
+      throw new Error(
+        "The conversion event has been cancelled. Unlink the proposal from it before booking again.",
+      );
+    }
 
     // The event is now proven live, in-tenant, and the proposal's client —
     // for both paths, including the same-event no-op. Stage/live/cancelled
