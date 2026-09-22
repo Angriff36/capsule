@@ -311,11 +311,6 @@ for (const c of catalog.components) {
   const key = nameKey(c.name);
   if (!componentsByName.has(key)) componentsByName.set(key, c.componentId);
 }
-const tasksByName = new Map<string, string[]>();
-for (const t of catalog.dishTasks) {
-  const key = nameKey(t.name);
-  tasksByName.set(key, [...(tasksByName.get(key) ?? []), t.dishTaskId]);
-}
 const dishesByName = new Map<string, string[]>();
 for (const d of catalog.dishes) {
   const key = nameKey(d.name);
@@ -421,6 +416,13 @@ for (const row of catalog.rows) {
     };
   });
 
+  const parentDishIds = new Set(
+    parents.map((p) => p.dishId).filter((id): id is string => id != null),
+  );
+  const parentTaskIds = catalog.dishTasks
+    .filter((t) => nameKey(t.name) === key && parentDishIds.has(t.dishId))
+    .map((t) => t.dishTaskId);
+
   const yieldLabel = item
     ? (tpp.unitMeasures[String(item.mi_YieldSak)] ?? "")
     : "";
@@ -459,11 +461,12 @@ for (const row of catalog.rows) {
         decision.kind === "kitchen_batch"
           ? (importedComponentId ?? componentsByName.get(key) ?? null)
           : null,
+      // A same-name task counts only under one of this row's parent dishes.
       dishTaskIds:
         decision.kind === "prep_step"
           ? importedTaskIds.length
             ? importedTaskIds
-            : (tasksByName.get(key) ?? [])
+            : parentTaskIds
           : [],
     },
     sourceText: entry

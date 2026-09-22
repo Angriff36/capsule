@@ -18,7 +18,13 @@ export function planHeaderSteps(
   bundle: EventBundle,
   invoice: string,
   existing: CapsuleEventBundleExistingEvent | undefined,
-  computed: { startsAt: number; endsAt: number; serviceStyleId?: string },
+  computed: {
+    startsAt: number;
+    endsAt: number;
+    serviceStyleId?: string;
+    /** The tenant venue the BEO's venue name matched, when it did. */
+    venueId?: string;
+  },
 ): PlannedStep[] {
   const steps: PlannedStep[] = [];
   const current = existing?.event;
@@ -42,22 +48,29 @@ export function planHeaderSteps(
   if (!existing || !current || current.stage === undefined) return steps;
   const stage = current.stage;
 
+  // A BEO with a start but no end must not shorten an event whose end is
+  // already known: computed.endsAt is a one-hour guess in that case.
+  const endsAt =
+    bundle.header.endMinutes === undefined &&
+    current.endsAt != null &&
+    current.endsAt > computed.startsAt
+      ? current.endsAt
+      : computed.endsAt;
   if (
     SCHEDULE_STAGES.includes(stage) &&
     bundle.header.startMinutes !== undefined &&
-    (current.startsAt !== computed.startsAt ||
-      current.endsAt !== computed.endsAt)
+    (current.startsAt !== computed.startsAt || current.endsAt !== endsAt)
   )
     steps.push({
       capabilityId: "Event.reschedule",
       ref: "event-schedule",
       label: "Bring the event date and time up to date",
-      idempotencySuffix: `schedule:${invoice}:${computed.startsAt}:${computed.endsAt}`,
+      idempotencySuffix: `schedule:${invoice}:${computed.startsAt}:${endsAt}`,
       resolveRefs: ["docId"],
       args: {
         docId: "event",
         startsAt: computed.startsAt,
-        endsAt: computed.endsAt,
+        endsAt,
       },
     });
 
@@ -91,6 +104,10 @@ export function planHeaderSteps(
     });
 
   const venueName = bundle.venue.name ?? current.venueName ?? undefined;
+  const venueRenamed =
+    bundle.venue.name !== undefined &&
+    (current.venueName ?? "").trim().toLowerCase() !==
+      bundle.venue.name.trim().toLowerCase();
   const venueAddress =
     venueAddressText(bundle) ?? current.venueAddress ?? undefined;
   if (
@@ -105,12 +122,18 @@ export function planHeaderSteps(
       idempotencySuffix: `venue:${invoice}:${venueName ?? ""}:${venueAddress ?? ""}`,
       resolveRefs: ["docId"],
       // Every optional param is sent: this command clears what it is not given.
+      // A different venue name means a different venue: point at the matched
+      // tenant venue, or at none, never at the old one under a new name.
       args: {
         docId: "event",
-        venueId: existing.venueId,
+        venueId: venueRenamed
+          ? (computed.venueId ?? undefined)
+          : (computed.venueId ?? existing.venueId),
         venueName,
         venueAddress,
-        venueCapacity: current.venueCapacity ?? undefined,
+        venueCapacity: venueRenamed
+          ? undefined
+          : (current.venueCapacity ?? undefined),
       },
     });
 

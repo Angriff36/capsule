@@ -242,6 +242,7 @@ export function buildEventBundlePlan(
     ...planHeaderSteps(bundle, invoice, existing, {
       startsAt,
       endsAt,
+      venueId: catalog.venueId,
       serviceStyleId: matchServiceStyleId(
         bundle.header.serviceStyle,
         context.serviceStyles,

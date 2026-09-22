@@ -573,6 +573,7 @@ async function applyOne(
   }
 
   if (kind === "kitchen_batch") {
+    // 1. The recipe: the one the TPP import made, a live same-name one, or a new draft.
     let componentId = meta.existing.componentId;
     if (componentId) {
       const component = await ctx.db.get(componentId as Id<"components">);
@@ -618,24 +619,34 @@ async function applyOne(
       )) as { docId: string };
       componentId = created.docId;
       done.push("recipe drafted");
-      let attached = 0;
-      for (const parentDish of await liveParentDishes(
-        ctx,
-        tenantId,
-        meta,
-        dish._id,
-      )) {
-        await ctx.runMutation(api.mutations.DishComponent_createViaAttach, {
-          dishId: parentDish._id,
-          componentId,
-          yieldQuantity: 1,
-          sortOrder: 0,
-          role: "tpp_recipe_row",
-        });
-        attached += 1;
-      }
-      if (attached) done.push(`attached to ${attached} dish(es)`);
     }
+    // 2. Every live parent dish carries the recipe, whether the recipe is new
+    //    or already existed (a retry after a partial failure lands here too).
+    let attached = 0;
+    for (const parentDish of await liveParentDishes(
+      ctx,
+      tenantId,
+      meta,
+      dish._id,
+    )) {
+      const already = (
+        await ctx.db
+          .query("dishComponents")
+          .withIndex("by_dishId", (q) => q.eq("dishId", parentDish._id))
+          .collect()
+      ).some((dc) => dc.deletedAt == null && dc.componentId === componentId);
+      if (already) continue;
+      await ctx.runMutation(api.mutations.DishComponent_createViaAttach, {
+        dishId: parentDish._id,
+        componentId,
+        yieldQuantity: 1,
+        sortOrder: 0,
+        role: "tpp_recipe_row",
+      });
+      attached += 1;
+    }
+    if (attached) done.push(`attached to ${attached} dish(es)`);
+    // 3. Only now the duplicate dish row goes.
     if (await retireDish(ctx, dish, `Reclassified as recipe: ${dish.name}`))
       done.push("dish row retired");
     return {
@@ -646,23 +657,23 @@ async function applyOne(
   }
 
   if (kind === "prep_step") {
-    const taskIds: string[] = [];
+    // Tasks the TPP import (or an earlier apply) already wrote, by id.
+    const known = new Map<string, Doc<"dishTasks">>();
     for (const id of meta.existing.dishTaskIds) {
       const task = await ctx.db.get(id as Id<"dishTasks">);
       if (task && task.tenantId === tenantId && task.deletedAt == null)
-        taskIds.push(String(task._id));
+        known.set(String(task._id), task);
     }
-    if (taskIds.length) {
-      done.push(`already tracked as ${taskIds.length} dish task(s)`);
-    } else {
-      const key = nameKey(dish.name);
-      for (const parentDish of await liveParentDishes(
-        ctx,
-        tenantId,
-        meta,
-        dish._id,
-      )) {
-        const already = (
+    const key = nameKey(dish.name);
+    const taskIds: string[] = [];
+    const parents = await liveParentDishes(ctx, tenantId, meta, dish._id);
+    // Every live parent dish gets exactly one task for this step: a known one
+    // under it, a same-name one already under it, or a new one.
+    let added = 0;
+    for (const parentDish of parents) {
+      const mine =
+        [...known.values()].find((t) => t.dishId === parentDish._id) ??
+        (
           await ctx.db
             .query("dishTasks")
             .withIndex("by_dishId", (q) => q.eq("dishId", parentDish._id))
@@ -673,25 +684,29 @@ async function applyOne(
             String(t.status) === "active" &&
             nameKey(t.name) === key,
         );
-        if (already) {
-          taskIds.push(String(already._id));
-          continue;
-        }
-        const created = (await ctx.runMutation(
-          api.mutations.DishTask_createViaAdd,
-          {
-            synchronizePrep: false,
-            dishId: parentDish._id,
-            name: dish.name,
-            category: parentDish.category ?? "Finish at Kitchen",
-            taskType: "manual",
-            sortOrder: 0,
-          },
-        )) as { docId: string };
-        taskIds.push(created.docId);
+      if (mine) {
+        taskIds.push(String(mine._id));
+        continue;
       }
-      if (taskIds.length) done.push(`added under ${taskIds.length} dish(es)`);
+      const created = (await ctx.runMutation(
+        api.mutations.DishTask_createViaAdd,
+        {
+          synchronizePrep: false,
+          dishId: parentDish._id,
+          name: dish.name,
+          category: parentDish.category ?? "Finish at Kitchen",
+          taskType: "manual",
+          sortOrder: 0,
+        },
+      )) as { docId: string };
+      taskIds.push(created.docId);
+      added += 1;
     }
+    // Known tasks under dishes this plan could not name as parents still count.
+    for (const [id] of known) if (!taskIds.includes(id)) taskIds.push(id);
+    if (added) done.push(`added under ${added} dish(es)`);
+    if (taskIds.length > added)
+      done.push(`already tracked as ${taskIds.length - added} dish task(s)`);
     if (taskIds.length === 0) {
       if (
         await retireDish(
