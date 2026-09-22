@@ -177,9 +177,11 @@ const VENUE_DETAIL_FIELDS = [
 ] as const;
 
 /**
- * A venue is shared by every event held there, so a BEO only FILLS IN what
- * the venue record lacks (its contact, its coordinates, the kitchen and
- * load-in notes) and never overwrites a value the venue already has.
+ * A venue is shared by every event held there, so a BEO only FILLS IN the
+ * site facts the venue record lacks (its address, its contact, its
+ * coordinates) and never overwrites a value the venue already has. The BEO's
+ * kitchen and service-setup sections are about THIS event, so they stay on
+ * the event record, never on the shared venue (#395).
  */
 function planVenueFillStep(
   bundle: EventBundle,
@@ -204,11 +206,6 @@ function planVenueFillStep(
     contactPhone: fill(
       venue.contactPhone,
       bundle.venue.contactPhone ?? bundle.venue.phone,
-    ),
-    cateringNotes: fill(venue.cateringNotes, bundle.notes.cateringKitchen),
-    loadInInstructions: fill(
-      venue.loadInInstructions,
-      bundle.notes.serviceSetup,
     ),
   };
   const changed = Object.entries(fills).filter(

@@ -173,8 +173,9 @@ export function buildEventBundlePlan(
           contactPhone: bundle.venue.contactPhone ?? bundle.venue.phone,
           latitude: bundle.venue.latitude,
           longitude: bundle.venue.longitude,
-          cateringNotes: bundle.notes.cateringKitchen,
-          loadInInstructions: bundle.notes.serviceSetup,
+          // The kitchen/service-setup prose is about THIS event; the venue
+          // row is shared by every event at the site, and the event record
+          // carries the notes via planEngagement (#395).
         },
       });
     }
