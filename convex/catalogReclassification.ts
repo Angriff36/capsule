@@ -708,6 +708,12 @@ async function applyOne(
     if (taskIds.length > added)
       done.push(`already tracked as ${taskIds.length - added} dish task(s)`);
     if (taskIds.length === 0) {
+      // TPP names parents but none is a live dish in this catalog: there is
+      // nothing to attach the step to, so the row stays and the note says why.
+      if (meta.parents.length > 0)
+        throw new Error(
+          `TPP names ${meta.parents.length} parent dish(es) for this step, but none is a live dish here; the row stays until a parent exists`,
+        );
       if (
         await retireDish(
           ctx,

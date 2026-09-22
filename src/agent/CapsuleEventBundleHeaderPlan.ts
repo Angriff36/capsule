@@ -108,8 +108,11 @@ export function planHeaderSteps(
     bundle.venue.name !== undefined &&
     (current.venueName ?? "").trim().toLowerCase() !==
       bundle.venue.name.trim().toLowerCase();
+  // A renamed venue never keeps the old venue's address: the BEO's address
+  // or none, so nobody is routed to the previous site.
   const venueAddress =
-    venueAddressText(bundle) ?? current.venueAddress ?? undefined;
+    venueAddressText(bundle) ??
+    (venueRenamed ? undefined : (current.venueAddress ?? undefined));
   if (
     SCHEDULE_STAGES.includes(stage) &&
     (venueName !== (current.venueName ?? undefined) ||
