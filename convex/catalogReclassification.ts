@@ -131,7 +131,12 @@ async function tenantLinks(ctx: Ctx, tenantId: string): Promise<Link[]> {
     .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
     .filter((q) =>
       q.and(
-        q.eq(q.field("deletedAt"), null),
+        // Links written before the soft-delete field existed have no
+        // deletedAt at all (the 2026-09-03 menus import on production).
+        q.or(
+          q.eq(q.field("deletedAt"), null),
+          q.eq(q.field("deletedAt"), undefined),
+        ),
         q.eq(q.field("recordType"), MENU_RECORD_TYPE),
         // Only rows the TPP menus import made; other import sources are not
         // this cleanup's business.
@@ -247,7 +252,12 @@ export const recordSuggestions = mutation({
         .filter((q) =>
           q.and(
             q.eq(q.field("tenantId"), tenantId),
-            q.eq(q.field("deletedAt"), null),
+            // Links written before the soft-delete field existed have no
+            // deletedAt at all (the 2026-09-03 menus import on production).
+            q.or(
+              q.eq(q.field("deletedAt"), null),
+              q.eq(q.field("deletedAt"), undefined),
+            ),
           ),
         )
         .first();
