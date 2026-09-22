@@ -15,6 +15,8 @@ export type EventPlanEngagementFormInput = {
   /** Selected style row (or built-in catalog name) — stamped as the snapshot. */
   serviceStyle?: { name: string } | undefined;
   salespersonId: string;
+  /** Selected salesperson row — stamped as the snapshot. */
+  salesperson?: { name: string } | undefined;
   referralSourceId: string;
   startsAtRaw: string;
   endsAtRaw: string;
@@ -75,7 +77,11 @@ export class EventPlanEngagementFormMapper {
       input.serviceStyleId,
       input.serviceStyle,
     );
-    this.assignOptionalSalespersonField(args, input.salespersonId);
+    this.assignOptionalSalespersonField(
+      args,
+      input.salespersonId,
+      input.salesperson,
+    );
     this.assignOptionalReferralSourceField(args, input.referralSourceId);
     this.assignOptionalVenueFields(args, input.venue);
     this.assignOptionalContactFields(args, input);
@@ -158,10 +164,15 @@ export class EventPlanEngagementFormMapper {
   private assignOptionalSalespersonField(
     args: Record<string, unknown>,
     salespersonId: string,
+    salesperson: { name: string } | undefined,
   ): void {
     const trimmed = salespersonId.trim();
     if (trimmed) {
       args.assignedToId = trimmed;
+      // Snapshot the owner printed name at booking so a later catalog rename
+      // cannot rewrite the event's printed owner (same as occasionName).
+      const ownerName = salesperson?.name?.trim();
+      if (ownerName) args.ownerName = ownerName;
     }
   }
 

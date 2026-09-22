@@ -201,6 +201,36 @@ it("prints the booked client snapshot in the details card, not a later catalog r
   expect(card.textContent).not.toContain("Acme RENAMED");
 });
 
+it("prints the booked owner snapshot in the assigned-owner card, not a later catalog rename", async () => {
+  backend.values.set("useGetEvent", {
+    _id: eventId,
+    title: "Garden dinner",
+    eventType: "dinner",
+    stage: "planning",
+    startsAt: Date.UTC(2099, 6, 4, 17),
+    endsAt: Date.UTC(2099, 6, 4, 22),
+    expectedHeadcount: 40,
+    version: 3,
+    assignedToId: "person-a",
+    ownerName: "Pat Owner",
+  });
+  backend.values.set("useListPerson", [
+    {
+      _id: "person-a",
+      givenName: "Pat",
+      familyName: "Owner RENAMED",
+      role: "sales_manager",
+    },
+  ]);
+  await mount(page(), `/events/${eventId}`);
+  const name = container.querySelector(
+    '[data-testid="event-assigned-owner-name"]',
+  );
+  expect(name?.textContent).toBe("Pat Owner");
+  const card = container.querySelector('[data-testid="event-assigned-owner"]')!;
+  expect(card.textContent).not.toContain("RENAMED");
+});
+
 it("prints the booked commercial seed on the budget card, not a later proposal total", async () => {
   backend.values.set("useGetEvent", {
     _id: eventId,

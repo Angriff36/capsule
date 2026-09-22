@@ -604,6 +604,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   property referralSourceId: uuid?
   property venueId: uuid?
   property assignedToId: uuid?
+  // Printed owner/salesperson name at plan / assign time. A later catalog
+  // Person.correctIdentity rename must not rewrite this Event. assignedToId
+  // stays the live Person link.
+  property ownerName: string?
   property required searchable title: string = ""
   // The 4-digit number the shop calls the event by: on the Event Tracker, the
   // binder spine and the chat channel. The numbering seam
@@ -841,6 +845,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional serviceRequirements: string,
     optional operationalRequirements: string,
     optional assignedToId: uuid,
+    optional ownerName: string,
     optional referralSourceId: uuid
   ) {
     guard self.stage == "planning"
@@ -878,6 +883,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate budgetAmount = budgetAmount
     mutate quotedPrice = quotedPrice
     mutate assignedToId = assignedToId
+    mutate ownerName = ownerName
     mutate referralSourceId = referralSourceId
     mutate stage = "planning"
     mutate plannedAt = now()
@@ -1426,10 +1432,11 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command assignOwner(optional assignedToId: uuid) {
+  command assignOwner(optional assignedToId: uuid, optional ownerName: string) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     mutate assignedToId = assignedToId
+    mutate ownerName = assignedToId == null ? null : (ownerName != null ? ownerName : self.ownerName)
     emit EventOwnerAssigned {
       eventId: self.id
       tenantId: self.tenantId

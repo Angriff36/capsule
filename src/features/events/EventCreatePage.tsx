@@ -469,6 +469,12 @@ export function EventCreatePage() {
       // The selected client row goes onto the event as the clientName
       // snapshot, so a later catalog edit cannot rewrite the booked client.
       const selectedClient = activeClients.find((row) => row._id === clientId);
+      // The selected salesperson row goes onto the event as the ownerName
+      // snapshot, so a later catalog rename cannot rewrite the booked owner
+      // (same as occasionName).
+      const selectedSalesperson = salespeople.find(
+        (person) => person._id === salespersonId,
+      );
       return eventPlanEngagementFormMapper.toCommandArgs({
         clientId,
         client: selectedClient
@@ -485,6 +491,16 @@ export function EventCreatePage() {
           ? { name: serviceStyle.name }
           : undefined,
         salespersonId,
+        salesperson: selectedSalesperson
+          ? {
+              name: [
+                selectedSalesperson.givenName,
+                selectedSalesperson.familyName,
+              ]
+                .filter(Boolean)
+                .join(" "),
+            }
+          : undefined,
         referralSourceId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
         endsAtRaw: String(data.get("endsAt") ?? ""),

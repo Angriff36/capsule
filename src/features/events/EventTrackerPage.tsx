@@ -475,6 +475,18 @@ export function EventTrackerPage() {
 
   const commitOwner = (event: CalendarEventFacts, personId: string) => {
     if ((event.ownerId ?? "") === personId) return;
+    // Stamp the chosen person's printed name as the ownerName snapshot (same
+    // as the create form); clearing the owner omits it so the command clears
+    // the snapshot with the link.
+    const person =
+      roster.find((row) => row._id === personId) ??
+      (people ?? []).find((row) => row._id === personId);
+    const ownerName = personId
+      ? [person?.givenName ?? "", person?.familyName ?? ""]
+          .filter(Boolean)
+          .join(" ")
+          .trim() || undefined
+      : undefined;
     void run(
       event,
       () =>
@@ -482,6 +494,7 @@ export function EventTrackerPage() {
           docId: event.id,
           version: event.version,
           assignedToId: personId || undefined,
+          ownerName,
         }),
       "Owner saved",
     );

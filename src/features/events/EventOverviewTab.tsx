@@ -41,6 +41,7 @@ type OverviewEvent = {
   serviceStyleName?: string | null;
   referralSourceId?: Id<"referralSources"> | null;
   assignedToId?: Id<"people"> | null;
+  ownerName?: string | null;
   recurrenceFrequency?: string | null;
   recurrenceNextStartsAt?: number | null;
   recurrenceGeneratedCount?: number | null;
@@ -153,7 +154,9 @@ export function EventOverviewTab({
           <EventSetupProgress eventId={eventId} event={event} />
           <EventOverviewRail
             assignedToId={event.assignedToId}
+            ownerName={event.ownerName}
             people={people}
+            peopleLoading={people === undefined}
             dishCount={dishCount}
             staffCount={staffCount}
             timelineCount={timelineCount}

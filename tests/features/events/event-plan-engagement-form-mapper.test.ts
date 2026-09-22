@@ -90,4 +90,18 @@ describe("EventPlanEngagementFormMapper", () => {
       clientName: "Acme Catering",
     });
   });
+
+  it("stamps the trimmed owner name next to the salesperson id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        salespersonId: "person-id",
+        salesperson: { name: "  Pat Owner  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      assignedToId: "person-id",
+      ownerName: "Pat Owner",
+    });
+  });
 });

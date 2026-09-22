@@ -8,6 +8,7 @@ import {
 import { useStorageUrls } from "../../../lib/fileStorageClient";
 import { useGetEvent } from "../../../lib/manifest-convex-react";
 import { useEventImportRetry } from "../../../lib/useEventImportRetry";
+import { eventSourceEvidenceKey } from "../eventSourceEvidenceLink";
 import { eventDetailPath } from "../eventRoutes";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
@@ -98,6 +99,10 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
       setBusy(false);
     }
   };
+  const sourceKey = eventSourceEvidenceKey({
+    storedKey: event.importSourceKey,
+    liveFileName: draft.sources[0]?.name,
+  });
   const facts = Object.entries(draft.facts).filter(
     ([key, value]) =>
       key !== "menu" &&
@@ -119,6 +124,9 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
         Saved source details for review. These reflect the import, not later
         edits to the event or confirmation that the event is ready.
       </p>
+      {sourceKey ? (
+        <p data-testid="event-source-evidence-key">Source link: {sourceKey}</p>
+      ) : null}
       {draft.status === "matching" || draft.status === "saved" ? (
         <p role="status">
           Menu matching is pending. Imported details are retained below.
