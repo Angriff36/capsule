@@ -24,6 +24,7 @@ import {
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
 import { ensureEventNumber } from "./eventNumbering";
+import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 
 /** Runs after declared reactions, inside the originating command transaction. */
@@ -109,6 +110,13 @@ export async function handleManifestEvent(
     (event.type === "EventPlanned" || event.type === "EventNumberSet")) {
     // Every planned event gets the next 4-digit number; a typed one is checked.
     await ensureEventNumber(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (event.entity === "Proposal" && event.type === "ProposalAccepted") {
+    // The acceptance transaction records WHICH revision was accepted
+    // (AC-413/AC-434); a validation failure here rolls the acceptance — and
+    // its cascade — back.
+    await recordAcceptedProposalRevision(ctx, event);
     return;
   }
   if (event.entity === "Invoice" &&

@@ -47,26 +47,65 @@ export const getEventBookingDetails = query({
       api.queries.getProposal,
       { id: proposal._id },
     );
-    const revisions = (
+    // Completed signature evidence for this proposal, earliest completion
+    // first (deterministic tiebreak by id). Scoped to the tenant like the
+    // generated reads.
+    const completions = (
       await ctx.db
-        .query("proposalRevisions")
-        .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+        .query("signatureRequests")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
+        .filter((q) => q.eq(q.field("proposalId"), proposal._id))
         .collect()
-    ).filter((r) => r.tenantId === event.tenantId && r.deletedAt == null);
-    const signatures = await ctx.db
-      .query("signatureRequests")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
-      .filter((q) => q.eq(q.field("proposalId"), proposal._id))
-      .collect();
-    const signed = signatures.find(
-      (s) => s.status === "completed" && s.deletedAt == null,
-    );
-    const signedRevision = revisions.find(
-      (r) => r._id === signed?.proposalRevisionId,
-    );
-    const latest = revisions.sort(
-      (a, b) => b.revisionNumber - a.revisionNumber,
-    )[0];
+    )
+      .filter((s) => s.status === "completed" && s.deletedAt == null)
+      .sort(
+        (a, b) =>
+          (a.completedAt ?? 0) - (b.completedAt ?? 0) ||
+          String(a._id).localeCompare(String(b._id)),
+      );
+    // The only thing that counts as revision evidence: live, captured, same
+    // tenant, and bound to THIS proposal.
+    const liveRevision = async (revisionId: Id<"proposalRevisions">) => {
+      const revision = await ctx.db.get(revisionId);
+      return revision &&
+        revision.tenantId === event.tenantId &&
+        revision.deletedAt == null &&
+        revision.capturedAt != null &&
+        revision.proposalId === proposal._id
+        ? revision
+        : null;
+    };
+
+    const stored = proposal.acceptedRevisionId;
+    let revisionLabel: string;
+    if (stored !== undefined) {
+      // The acceptance recorded its evidence (AC-413/AC-434): a validated
+      // id, or an explicit null — "no revision captured", never inferred
+      // from later revisions or later signatures.
+      const accepted = stored != null ? await liveRevision(stored) : null;
+      revisionLabel = accepted
+        ? completions.some((s) => s.proposalRevisionId === accepted._id)
+          ? `Revision ${accepted.revisionNumber} — signed digitally`
+          : `Revision ${accepted.revisionNumber}`
+        : "no revision captured";
+    } else {
+      // Pre-change record with no stored reference: the completed signature
+      // that was no later than the acceptance itself is equivalent evidence
+      // (immutable historical digital traceability, no migration/backfill).
+      // A later signature never re-labels the original acceptance.
+      revisionLabel = "no revision captured";
+      if (proposal.acceptedAt != null) {
+        for (const s of completions) {
+          if (s.completedAt == null || s.completedAt > proposal.acceptedAt)
+            continue;
+          const accepted = await liveRevision(s.proposalRevisionId);
+          if (accepted) {
+            revisionLabel = `Revision ${accepted.revisionNumber} — signed digitally`;
+            break;
+          }
+        }
+      }
+    }
     const enhancements = (
       await ctx.db
         .query("proposalEnhancements")
@@ -91,11 +130,7 @@ export const getEventBookingDetails = query({
       proposalId: proposal._id,
       label: proposal.proposalNumber || proposal.title || "Proposal",
       canOpenProposal: salesProposal !== null,
-      revisionLabel: signedRevision
-        ? `Revision ${signedRevision.revisionNumber} — signed digitally`
-        : latest
-          ? `Revision ${latest.revisionNumber}`
-          : "no revision captured",
+      revisionLabel,
       enhancements,
     };
   },

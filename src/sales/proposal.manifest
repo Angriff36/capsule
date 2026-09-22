@@ -36,6 +36,14 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // the event exists, is live, and belongs to this proposal's client — the
   // expression language cannot resolve a relation from a raw command param.
   property pendingEventId: uuid?
+  // The exact ProposalRevision the client accepted, stored durably at
+  // acceptance (AC-413/AC-434, spec §7.2.3). convex/lib/proposalAcceptanceRevision.ts
+  // resolves and validates it inside the accept transaction: an explicit id
+  // must be live, captured, and bound to this proposal and tenant; without one
+  // the highest captured revision AT ACCEPTANCE TIME is recorded, else
+  // explicit null. ABSENT (not null) marks a pre-change record. `accepted` is
+  // a terminal status, so a later revision can never re-label an acceptance.
+  property acceptedRevisionId: uuid?
   property unique proposalNumber: string?
   property required searchable title: string = ""
   property eventDate: datetime?
@@ -73,6 +81,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref pendingEvent: Event fields [tenantId, pendingEventId] references [tenantId, id]
+  ref acceptedRevision: ProposalRevision fields [tenantId, acceptedRevisionId] references [tenantId, id]
   ref supersededBy: Proposal fields [tenantId, supersededById] references [tenantId, id]
   ref replacesProposal: Proposal fields [tenantId, replacesProposalId] references [tenantId, id]
 
@@ -177,18 +186,24 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command accept(optional eventId: uuid) {
+  command accept(optional eventId: uuid, optional acceptedRevisionId: uuid) {
     guard self.status == "sent" or self.status == "viewed"
     guard self.deletedAt == null
     guard self.expiresAt == null or self.expiresAt > now()
     mutate status = "accepted"
     mutate eventId = eventId != null ? eventId : self.eventId
+    // Stored as-is here; the acceptance callback
+    // (convex/lib/proposalAcceptanceRevision.ts, same transaction) validates
+    // an explicit id or resolves the highest captured revision at this
+    // moment, and rolls the whole acceptance back on a bad reference.
+    mutate acceptedRevisionId = acceptedRevisionId != null ? acceptedRevisionId : null
     mutate acceptedAt = now()
     emit ProposalAccepted {
       proposalId: self.id
       tenantId: self.tenantId
       clientId: self.clientId
       eventId: eventId != null ? eventId : self.eventId
+      acceptedRevisionId: acceptedRevisionId != null ? acceptedRevisionId : null
       title: self.title
       eventDate: self.eventDate
       eventType: self.eventType
@@ -368,6 +383,10 @@ event ProposalAccepted: "proposal.accepted" {
   tenantId: string
   clientId: string
   eventId: string?
+  // Raw acceptedRevisionId command param; the acceptance callback resolves it
+  // (highest captured revision when absent) and patches the ledger row to the
+  // same reference it stores on the proposal.
+  acceptedRevisionId: string?
   title: string
   eventDate: datetime?
   eventType: string?

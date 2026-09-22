@@ -71,9 +71,15 @@ export const getPendingSignatureRequest = query({
     const revision: Doc<"proposalRevisions"> | null = await ctx.db.get(
       request.proposalRevisionId,
     );
+    // Unavailable also means not yet captured: an uncaptured revision is
+    // still mutable, so serving or accepting it would let a later capture
+    // retroactively relabel the acceptance (AC-413/AC-434). This binds only
+    // the request's named revision; the operator no-revision path (explicit
+    // null) is unchanged.
     if (
       !revision ||
       revision.deletedAt != null ||
+      revision.capturedAt == null ||
       revision.tenantId !== request.tenantId
     ) {
       return null;
@@ -141,9 +147,11 @@ export const getPendingSignatureRequest = query({
 /**
  * Complete a signature request and accept its proposal, token-authorized.
  * Mirrors the generated command semantics: same status/expiry guards, same
- * ledger events (SignatureCompleted, ProposalAccepted). A proposal that can no
- * longer be accepted (declined/expired/superseded) rolls the whole thing back;
- * an already-accepted proposal is treated as success (idempotent re-click).
+ * ledger events (SignatureCompleted, ProposalAccepted), and the signed
+ * revision stored as the proposal's acceptedRevisionId (AC-413). A proposal
+ * that can no longer be accepted (declined/expired/superseded) rolls the
+ * whole thing back; an already-accepted proposal is treated as success
+ * (idempotent re-click) and keeps its original accepted revision.
  */
 export const completeSignature = mutation({
   args: {
@@ -211,9 +219,14 @@ export const completeSignature = mutation({
       // the displayed revision's would accept B while showing A (sol review
       // 2026-07-28), so the accept target derives from the revision itself.
       const revision = await ctx.db.get(request.proposalRevisionId);
+      // Same captured check as the pending view: an uncaptured revision is
+      // mutable evidence, and acceptedRevisionId must never point at a row a
+      // later capture could rewrite. The throw rolls back the completion
+      // patch and SignatureCompleted insert above in the same transaction.
       if (
         !revision ||
         revision.deletedAt != null ||
+        revision.capturedAt == null ||
         revision.tenantId !== request.tenantId
       ) {
         throw new ConvexError(
@@ -257,6 +270,10 @@ export const completeSignature = mutation({
       await ctx.db.patch(proposal._id, {
         status: "accepted",
         acceptedAt: now,
+        // The revision the signer saw is the accepted evidence (AC-413) —
+        // validated above: live, captured, same tenant, and it owns this
+        // proposal.
+        acceptedRevisionId: revision._id,
         version: (proposal.version ?? 0) + 1,
       });
       // Same payload fields as generated Proposal_accept's ProposalAccepted.
@@ -269,6 +286,7 @@ export const completeSignature = mutation({
           tenantId: proposal.tenantId,
           clientId: proposal.clientId,
           eventId: proposal.eventId ?? null,
+          acceptedRevisionId: revision._id,
           title: proposal.title,
           eventDate: proposal.eventDate ?? null,
           eventType: proposal.eventType ?? null,
