@@ -2,19 +2,29 @@
  * Catalog reclassification planner (2026-09-21).
  * Design: docs/systems/culinary-catalog-reclassification.md
  *
- * For every Dish the TPP menus import created, decide what the row really is:
- * rules first (TPP category + verb from the recipe export, the owner's day-of
- * rule), then Jev (TypeSafe System One) only for rows the rules leave open.
+ * For every Dish the TPP menus import created, decide what the row really is.
+ * Order of authority:
+ *   1. The 2026-09-14 TPP recipe import's own map (.artifacts/tpp-recipe-import):
+ *      it already matched TPP items to Capsule dishes and wrote the recipes and
+ *      dish tasks. A row it matched as a dish IS a dish; a row whose TPP item it
+ *      made a recipe for IS that recipe; a row whose TPP item it wrote as tasks
+ *      under its parents IS a prep step. Exact ids, no guessing.
+ *   2. Rules over the TPP recipe export (category, verb, the owner's day-of rule).
+ *   3. Jev (TypeSafe System One) only for rows neither of the above settles.
  * Records the decisions as suggestions through the authored seam; a person
  * approves them on /kitchen/cleanup. Never writes a Dish, Component or task.
  *
  *   bun --env-file=.env.local scripts/catalog-reclassification-plan.ts [--dry-run] [--no-jev] [--url <convex url>]
+ *   bun scripts/catalog-reclassification-plan.ts --offline   # no backend: the production picture from the files alone
  *   Auth: CATALOG_PLAN_JWT (a Clerk session token for the account to run as) or the agent token.
+ *   --tpp-import-dir <dir>   where tpp-capsule-map.json + state.json live (default .artifacts/tpp-recipe-import)
  *
  * Reads:  work/tpp-recipes/tpp-recipes-full.json (TPP recipe export)
+ *         .artifacts/tpp-recipe-import/{tpp-capsule-map.json,state.json} (when present and for this backend)
  *         .artifacts/jev-menu-item-kind-probe/result.json (cached Jev answers, optional)
+ *         work/tpp-menus-1..3.json (offline mode only: the rows the menus import loaded)
  * Writes: .artifacts/catalog-reclassification/plan.json (always)
- *         suggestion links on the backend (unless --dry-run)
+ *         suggestion links on the backend (unless --dry-run / --offline)
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -30,6 +40,7 @@ import {
   decideReclassification,
   nameKey,
   TIMING_TAG,
+  TPP_PREP_LIST_CATEGORY,
   type JevRowKind,
   type ReclassifyDecision,
 } from "../convex/lib/culinaryModel/catalogReclassification";
@@ -43,8 +54,12 @@ const opt = (name: string, fallback = "") => {
     : fallback;
 };
 const DRY_RUN = flag("--dry-run");
-const NO_JEV = flag("--no-jev");
-const URL = opt("--url", process.env.CONVEX_URL ?? "");
+const OFFLINE = flag("--offline");
+const NO_JEV = flag("--no-jev") || OFFLINE;
+const IMPORT_DIR = resolve(
+  process.cwd(),
+  opt("--tpp-import-dir", ".artifacts/tpp-recipe-import"),
+);
 const EXPORT = resolve(process.cwd(), "work/tpp-recipes/tpp-recipes-full.json");
 const JEV_CACHE = resolve(
   process.cwd(),
@@ -53,8 +68,9 @@ const JEV_CACHE = resolve(
 const OUT_DIR = resolve(process.cwd(), ".artifacts/catalog-reclassification");
 const JEV_ENDPOINT = "https://api.typesafe.ai/v1/systemone";
 const JEV_MODEL = "jev-latest";
+const trimUrl = (u: string) => u.trim().replace(/\/$/, "");
 
-// ------------------------------------------------------------ TPP export
+// ------------------------------------------------------------ TPP recipe export
 interface ExportEntry {
   MenuItemSak: number;
   discontinued?: boolean;
@@ -80,6 +96,61 @@ for (const entry of tpp.items) {
     const child = String(row.recp_SubMenuItemSak);
     parentsOf.set(child, (parentsOf.get(child) ?? new Set()).add(sak));
   }
+}
+
+// ------------------------------------------------------------ the 2026-09-14 TPP recipe import (exact ids)
+interface ImportMap {
+  url: string;
+  components: Record<string, string>;
+  dishes: Record<string, string[]>;
+}
+interface ImportState {
+  dishTasks: Record<string, string>;
+}
+let importMap: ImportMap | null = null;
+let importState: ImportState | null = null;
+const mapPath = resolve(IMPORT_DIR, "tpp-capsule-map.json");
+const statePath = resolve(IMPORT_DIR, "state.json");
+function loadImportMap(targetUrl: string) {
+  if (!existsSync(mapPath) || !existsSync(statePath)) {
+    console.error(`no TPP import map under ${IMPORT_DIR}; matching by name`);
+    return;
+  }
+  const map = JSON.parse(readFileSync(mapPath, "utf8")) as ImportMap;
+  if (trimUrl(map.url) !== trimUrl(targetUrl)) {
+    console.error(
+      `TPP import map is for ${map.url}, not ${targetUrl}; its ids do not apply here, matching by name`,
+    );
+    return;
+  }
+  importMap = map;
+  importState = JSON.parse(readFileSync(statePath, "utf8")) as ImportState;
+  console.error(
+    `TPP import map: ${Object.keys(map.dishes).length} matched dishes, ${Object.keys(map.components).length} recipes, ${Object.keys(importState.dishTasks).length} dish tasks`,
+  );
+}
+const sakByDishId = () => {
+  const out = new Map<string, string>();
+  for (const [sak, ids] of Object.entries(importMap?.dishes ?? {}))
+    for (const id of ids) out.set(id, sak);
+  return out;
+};
+/** Dish task ids the import wrote for one child item under each parent dish. */
+function importTaskIds(childSak: string): string[] {
+  if (!importMap || !importState) return [];
+  const ids = new Set<string>();
+  for (const parentSak of parentsOf.get(childSak) ?? []) {
+    const parent = bySak.get(parentSak);
+    const parentDishIds = importMap.dishes[parentSak] ?? [];
+    for (const row of parent?.item.Recipe ?? []) {
+      if (String(row.recp_SubMenuItemSak) !== childSak) continue;
+      for (const dishId of parentDishIds) {
+        const id = importState.dishTasks[`${row.recp_RecipeSak}:${dishId}`];
+        if (id) ids.add(id);
+      }
+    }
+  }
+  return [...ids];
 }
 
 // ------------------------------------------------------------ Jev (cached + live)
@@ -121,19 +192,17 @@ const JEV_CRITERIA: Record<JevRowKind, string> = {
 let jevCalls = 0;
 async function askJev(
   name: string,
-  description: string | null,
-  portion: string | null,
 ): Promise<{ kind: JevRowKind; confidence: number } | null> {
   const apiKey = process.env.TYPESAFE_API_KEY ?? process.env.JEV_API_KEY;
   if (NO_JEV || !apiKey) return null;
   const body = {
-    state: { name, description, portion },
+    state: { name },
     model: JEV_MODEL,
     questions: {
       row_kind: {
         type: "choice",
         instructions:
-          "This is one row from a catering company's menu-item catalog. What kind of row is it? Judge from the name first; the portion and description help.",
+          "This is one row from a catering company's menu-item catalog. What kind of row is it? Judge from the name.",
         criteria: JEV_CRITERIA,
       },
     },
@@ -168,56 +237,112 @@ async function askJev(
   return null;
 }
 
-// ------------------------------------------------------------ backend
-if (!URL) {
-  console.error("CONVEX_URL (or --url) is required");
-  process.exit(2);
-}
-const client = new ConvexHttpClient(URL);
-// CATALOG_PLAN_JWT lets an operator run as a chosen account (a minted Clerk
-// session token); otherwise the usual agent token is used.
-client.setAuth(
-  process.env.CATALOG_PLAN_JWT?.trim() ||
-    (await new CapsuleAgentAuthManager().resolveJwt()),
-);
-const catalog = await client.query(api.catalogReclassification.candidates, {});
-console.log(
-  `${catalog.rows.length} imported dish rows, ${catalog.components.length} recipes, ${catalog.dishTasks.length} dish tasks, ${catalog.dishes.length} live dishes (${URL})`,
-);
+// ------------------------------------------------------------ candidates: backend, or the files (offline)
+type Catalog = {
+  rows: {
+    dishId: string;
+    name: string;
+    category: string | null;
+    externalId: string;
+  }[];
+  components: { componentId: string; name: string }[];
+  dishTasks: { dishTaskId: string; dishId: string; name: string }[];
+  dishes: { dishId: string; name: string }[];
+};
 
+let client: ConvexHttpClient | null = null;
+let catalog: Catalog;
+if (OFFLINE) {
+  // The rows the menus import loaded, with the production dish id where the
+  // TPP import map knows it. Everything else is planned without an id.
+  const mapUrl = existsSync(mapPath)
+    ? (JSON.parse(readFileSync(mapPath, "utf8")) as ImportMap).url
+    : "";
+  loadImportMap(mapUrl);
+  const dishIdBySak = importMap?.dishes ?? {};
+  const rows: Catalog["rows"] = [];
+  for (const n of [1, 2, 3]) {
+    const file = resolve(process.cwd(), `work/tpp-menus-${n}.json`);
+    for (const r of JSON.parse(readFileSync(file, "utf8")) as {
+      menu_item_id: string;
+      name: string;
+      category?: string | null;
+    }[]) {
+      const entries = byName.get(nameKey(r.name)) ?? [];
+      const sak = entries
+        .map((e) => String(e.MenuItemSak))
+        .find((s) => dishIdBySak[s]?.length);
+      rows.push({
+        dishId: sak ? dishIdBySak[sak]![0]! : `offline:${r.menu_item_id}`,
+        name: r.name,
+        category: r.category ?? null,
+        externalId: r.menu_item_id,
+      });
+    }
+  }
+  catalog = { rows, components: [], dishTasks: [], dishes: [] };
+  console.error(`offline: ${rows.length} menu rows from work/tpp-menus-*.json`);
+} else {
+  const URL = opt("--url", process.env.CONVEX_URL ?? "");
+  if (!URL) {
+    console.error("CONVEX_URL (or --url) is required");
+    process.exit(2);
+  }
+  client = new ConvexHttpClient(URL);
+  // CATALOG_PLAN_JWT lets an operator run as a chosen account (a minted Clerk
+  // session token); otherwise the usual agent token is used.
+  client.setAuth(
+    process.env.CATALOG_PLAN_JWT?.trim() ||
+      (await new CapsuleAgentAuthManager().resolveJwt()),
+  );
+  catalog = (await client.query(
+    api.catalogReclassification.candidates,
+    {},
+  )) as Catalog;
+  console.error(
+    `${catalog.rows.length} imported dish rows, ${catalog.components.length} recipes, ${catalog.dishTasks.length} dish tasks, ${catalog.dishes.length} live dishes (${URL})`,
+  );
+  loadImportMap(URL);
+}
+
+const dishSak = sakByDishId();
 const componentsByName = new Map<string, string>();
 for (const c of catalog.components) {
   const key = nameKey(c.name);
-  if (!componentsByName.has(key))
-    componentsByName.set(key, String(c.componentId));
+  if (!componentsByName.has(key)) componentsByName.set(key, c.componentId);
 }
 const tasksByName = new Map<string, string[]>();
 for (const t of catalog.dishTasks) {
   const key = nameKey(t.name);
-  tasksByName.set(key, [...(tasksByName.get(key) ?? []), String(t.dishTaskId)]);
+  tasksByName.set(key, [...(tasksByName.get(key) ?? []), t.dishTaskId]);
 }
 const dishesByName = new Map<string, string[]>();
 for (const d of catalog.dishes) {
   const key = nameKey(d.name);
-  dishesByName.set(key, [...(dishesByName.get(key) ?? []), String(d.dishId)]);
+  dishesByName.set(key, [...(dishesByName.get(key) ?? []), d.dishId]);
 }
 
 // ------------------------------------------------------------ plan
-type Suggestion = Parameters<
-  typeof client.mutation<typeof api.catalogReclassification.recordSuggestions>
->[1]["suggestions"][number];
-
-const suggestions: Suggestion[] = [];
+const suggestions: Record<string, unknown>[] = [];
 const tally = new Map<string, number>();
 const bump = (key: string) => tally.set(key, (tally.get(key) ?? 0) + 1);
+const sourceBucket = (source: string) =>
+  source.startsWith("rule:tpp-import")
+    ? "tpp-import"
+    : source.startsWith("rule")
+      ? "rule"
+      : "jev";
 
 for (const row of catalog.rows) {
   const key = nameKey(row.name);
-  // Prefer the export entry that is a prep-list item when several share a name.
   const entries = byName.get(key) ?? [];
+  // 1. The TPP import already matched this dish row to a TPP item → exact.
+  const importedSak = dishSak.get(row.dishId) ?? null;
+  // Otherwise prefer the export entry that is a prep-list item when several share a name.
   const entry =
+    (importedSak ? bySak.get(importedSak) : undefined) ??
     entries.find(
-      (e) => (e.item.mic_Category ?? "").trim() === "Prep List Item",
+      (e) => (e.item.mic_Category ?? "").trim() === TPP_PREP_LIST_CATEGORY,
     ) ??
     entries[0] ??
     null;
@@ -228,36 +353,71 @@ for (const row of catalog.rows) {
     : null;
   const parentSaks = sak ? [...(parentsOf.get(sak) ?? [])] : [];
   const hasOwnRows = (item?.Recipe?.length ?? 0) > 0;
+  const tppCategory = item?.mic_Category?.trim() || null;
+  const backfill =
+    tppCategory && tppCategory !== TPP_PREP_LIST_CATEGORY ? tppCategory : null;
 
-  let jev = jevCache.get(key) ?? null;
-  const rulesDecide =
-    TIMING_TAG.test(row.name) ||
-    (item?.mic_Category ?? "").trim() === "Prep List Item" ||
-    classification?.role === "supply";
-  if (!jev && !rulesDecide) {
-    jev = await askJev(row.name, null, null);
-    if (jev) jevCache.set(key, jev);
+  const importedComponentId =
+    sak && importMap ? (importMap.components[sak] ?? null) : null;
+  const importedTaskIds = sak ? importTaskIds(sak) : [];
+
+  let decision: ReclassifyDecision;
+  let jev: { kind: JevRowKind; confidence: number } | null = null;
+  if (importedSak) {
+    decision = {
+      kind: classification?.role === "supply" ? "supply" : "food",
+      source: "rule:tpp-import-dish",
+      confidence: 1,
+      ready: true,
+      category: backfill,
+    };
+  } else if (importedComponentId) {
+    decision = {
+      kind: "kitchen_batch",
+      source: "rule:tpp-import-recipe",
+      confidence: 1,
+      ready: true,
+      category: null,
+    };
+  } else if (importedTaskIds.length) {
+    decision = {
+      kind: "prep_step",
+      source: "rule:tpp-import-task",
+      confidence: 1,
+      ready: true,
+      category: null,
+    };
+  } else {
+    jev = jevCache.get(key) ?? null;
+    const rulesDecide =
+      TIMING_TAG.test(row.name) ||
+      tppCategory === TPP_PREP_LIST_CATEGORY ||
+      classification?.role === "supply";
+    if (!jev && !rulesDecide) {
+      jev = await askJev(row.name);
+      if (jev) jevCache.set(key, jev);
+    }
+    decision = decideReclassification({
+      name: row.name,
+      tppCategory,
+      tppRole: classification?.role ?? null,
+      hasParents: parentSaks.length > 0,
+      hasOwnRows,
+      jev,
+    });
   }
-
-  const decision: ReclassifyDecision = decideReclassification({
-    name: row.name,
-    tppCategory: item?.mic_Category?.trim() || null,
-    tppRole: classification?.role ?? null,
-    hasParents: parentSaks.length > 0,
-    hasOwnRows,
-    jev,
-  });
 
   const parents = parentSaks.map((parentSak) => {
     const parent = bySak.get(parentSak)!;
     const parentName = parent.item.mi_ItemName.trim();
-    const dishIds = (dishesByName.get(nameKey(parentName)) ?? []).filter(
-      (id) => id !== String(row.dishId),
+    const fromImport = importMap?.dishes[parentSak] ?? [];
+    const byNameIds = (dishesByName.get(nameKey(parentName)) ?? []).filter(
+      (id) => id !== row.dishId,
     );
     return {
       sak: parentSak,
       name: parentName,
-      dishId: (dishIds[0] ?? null) as never,
+      dishId: fromImport[0] ?? byNameIds[0] ?? null,
     };
   });
 
@@ -271,7 +431,7 @@ for (const row of catalog.rows) {
       `TPP yield unit "${yieldLabel}" has no Capsule unit; batch is used`,
     );
   if (!entry) notes.push("Not found in the TPP recipe export");
-  if (entries.length > 1)
+  if (entries.length > 1 && !importedSak)
     notes.push(`${entries.length} TPP items share this name`);
 
   suggestions.push({
@@ -286,7 +446,7 @@ for (const row of catalog.rows) {
       ? {
           sak: sak!,
           account: String(item.mi_SubBusinessSak),
-          category: item.mic_Category?.trim() || null,
+          category: tppCategory,
           role: classification?.role ?? null,
           yieldQuantity: Number(item.mi_YieldAmt) || 0,
           yieldUnit,
@@ -295,16 +455,20 @@ for (const row of catalog.rows) {
       : null,
     parents,
     existing: {
-      componentId: (decision.kind === "kitchen_batch"
-        ? (componentsByName.get(key) ?? null)
-        : null) as never,
-      dishTaskIds: (decision.kind === "prep_step"
-        ? (tasksByName.get(key) ?? [])
-        : []) as never,
+      componentId:
+        decision.kind === "kitchen_batch"
+          ? (importedComponentId ?? componentsByName.get(key) ?? null)
+          : null,
+      dishTaskIds:
+        decision.kind === "prep_step"
+          ? importedTaskIds.length
+            ? importedTaskIds
+            : (tasksByName.get(key) ?? [])
+          : [],
     },
     sourceText: entry
       ? [
-          `TPP menu item ${sak} (${item?.mic_Category?.trim() || "no category"})`,
+          `TPP menu item ${sak} (${tppCategory ?? "no category"})`,
           `Yield: ${item?.mi_YieldAmt ?? ""} ${yieldLabel}`.trim(),
           ...(item?.Recipe ?? []).map(
             (r) =>
@@ -315,24 +479,37 @@ for (const row of catalog.rows) {
     notes,
   });
   bump(
-    `${decision.kind} · ${decision.source.startsWith("rule") ? "rule" : "jev"} · ${decision.ready ? "ready" : "look"}`,
+    `${decision.kind} · ${sourceBucket(decision.source)} · ${decision.ready ? "ready" : "look"}`,
   );
 }
 
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(`${OUT_DIR}/plan.json`, JSON.stringify(suggestions, null, 2));
 const summary = Object.fromEntries([...tally.entries()].sort());
+const byKind: Record<string, number> = {};
+const byBucket: Record<string, number> = {};
+for (const [k, n] of tally) {
+  const [kind, bucket] = k.split(" · ");
+  byKind[kind!] = (byKind[kind!] ?? 0) + n;
+  byBucket[bucket!] = (byBucket[bucket!] ?? 0) + n;
+}
 console.log(
   JSON.stringify(
-    { rows: suggestions.length, jevLiveCalls: jevCalls, summary },
+    {
+      rows: suggestions.length,
+      jevLiveCalls: jevCalls,
+      byKind,
+      decidedBy: byBucket,
+      summary,
+    },
     null,
     2,
   ),
 );
 
-if (DRY_RUN) {
+if (DRY_RUN || OFFLINE || !client) {
   console.log(
-    `dry run: plan written to ${OUT_DIR}/plan.json, nothing recorded`,
+    `${OFFLINE ? "offline" : "dry run"}: plan written to ${OUT_DIR}/plan.json, nothing recorded`,
   );
   process.exit(0);
 }
@@ -342,9 +519,7 @@ let kept = 0;
 for (let i = 0; i < suggestions.length; i += 100) {
   const res = await client.mutation(
     api.catalogReclassification.recordSuggestions,
-    {
-      suggestions: suggestions.slice(i, i + 100),
-    },
+    { suggestions: suggestions.slice(i, i + 100) } as never,
   );
   inserted += res.inserted;
   refreshed += res.refreshed;

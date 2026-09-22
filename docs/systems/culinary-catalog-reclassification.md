@@ -93,6 +93,18 @@ the menus branch skips any external id that already has a link.
 
 Capsule keeps these apart on purpose. No layer does another layer's job.
 
+### 4.0 The TPP recipe import's own map (exact, first)
+
+The 2026-09-14 TPP recipe import (`.artifacts/tpp-recipe-import/tpp-capsule-map.json`
+and `state.json`) already matched 1,385 TPP items to the Capsule dishes the
+menus import had made, drafted 165 recipes, and wrote 3,906 dish tasks under
+their parent dishes. That map is the first authority, by id: a row it matched
+as a dish is a dish (category backfilled from TPP); a row whose TPP item it
+made a recipe for is that recipe; a row whose TPP item it wrote as tasks is a
+prep step, and the task ids are known. On production that settles 2,578 of
+the 2,783 rows before any rule or model runs. The map only applies to the
+backend it was written for; elsewhere the planner falls back to names.
+
 ### 4.1 Rules (deterministic, authored TypeScript, pure, tested)
 
 Run first. A row a rule decides never reaches Jev.
@@ -109,8 +121,8 @@ Run first. A row a rule decides never reaches Jev.
 
 ### 4.2 Jev (fast classification, one Choice question per row)
 
-Only for rows the rules leave as `dish` or cannot join to the export
-(about 600). Question: served_dish, supply, package, service, placeholder,
+Only for rows neither the import map nor the rules settle (11 rows on
+production; about 600 on a backend without the map). Question: served_dish, supply, package, service, placeholder,
 prep_step, kitchen_batch, other. Confidence ≥ 0.8 → the suggestion is
 "ready"; below → "needs a look". Jev never writes. Its answer is stored as a
 suggestion (§ 4.4), with `suggestedBy = "jev-1.13.0"`.
