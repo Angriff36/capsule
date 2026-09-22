@@ -9,9 +9,15 @@ quote form works.
 The reference tables that drive selectors (service styles, occasions, and the
 organization row the public quote resolves its tenant from) must be
 manageable from inside the app, so an empty catalog is a fixable condition,
-not a broken event spine. Today both production dropdowns render empty and
-the public quote fails when `organizations` has no active row (issue #119,
-root cause #113 seed no-op — generator-side, not fixable in-loop).
+not a broken event spine. Historical starting defect: when this spec was
+written, both production dropdowns rendered empty and the public quote failed
+when `organizations` had no active row (issue #119, root cause #113 seed
+no-op — generator-side, not fixable in-loop). This paragraph does not
+describe current production behavior. Current qualification is governed by
+ACCEPTANCE_TESTS.md: AC-012 and AC-013 are PENDING (reopened/partial
+evidence), while AC-014, AC-015 and AC-016 record existing PASS legs
+(public-quote fallback, retired-value resolution, create with empty and
+populated catalogs).
 
 ## Acceptance Criteria
 

@@ -10,6 +10,16 @@ cd /d C:\Projects\capsule
 set BUILDER_DIR=C:\Projects\builder
 for /L %%i in (1,1,4) do (
   findstr /C:"loop-pause-all" STATE.md >nul 2>&1 && exit /b 0
+  REM A hand-off left from an earlier run (no reviewer was available) is reviewed
+  REM again BEFORE a new fix starts. Still no reviewer -> stop this tick; making
+  REM more fixes that nothing can review just burns the maker's plan.
+  if exist ".loop-worktrees\_handoff\*.json" (
+    pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-land.ps1" >> ".claude\loop-tick.log" 2>&1
+    if exist ".loop-worktrees\_handoff\*.json" (
+      echo [%date% %time%] no reviewer available - fix kept, tick ends >> ".claude\loop-tick.log"
+      exit /b 0
+    )
+  )
   echo [%date% %time%] tick round %%i start >> ".claude\loop-tick.log"
   type ".claude\loop-tick-prompt.txt" | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Ryan\.claude\claude-glm.ps1" -p --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1
   if errorlevel 1 (

@@ -140,11 +140,13 @@ export function MangiaDashboardPage() {
   const weekToDateMetrics = useMemo(() => {
     const weekStart = new Date(today);
     weekStart.setDate(weekStart.getDate() - weekStart.getDay()); // Start of week (Sunday)
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekEnd.getDate() + 7); // Next Sunday: the whole week, not just to date
 
     const weekEvents = (events || []).filter((e) => {
       if (!e.startsAt) return false;
       const eventDate = new Date(e.startsAt);
-      return eventDate >= weekStart && eventDate <= today;
+      return eventDate >= weekStart && eventDate < weekEnd;
     });
 
     const weekRevenue = weekEvents.reduce(

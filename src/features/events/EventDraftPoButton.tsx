@@ -113,6 +113,12 @@ export function EventDraftPoButton({ eventId, eventStage }: Props) {
         })),
       });
       if (!result.ok) {
+        // An existing draft is not a failure: say so and open it.
+        if (result.existingOrderId) {
+          setOrderId(result.existingOrderId);
+          setNotice(result.reason);
+          return;
+        }
         setError(result.reason);
         return;
       }
