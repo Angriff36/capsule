@@ -76,6 +76,7 @@ import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
 import { EventArchiveMenuItems } from "./EventArchiveMenuItems";
+import { EventDuplicateMenuItem } from "./EventDuplicateMenuItem";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
@@ -442,6 +443,7 @@ function EventDetailContent({
           {action.label}
         </button>
       ))}
+      <EventDuplicateMenuItem event={event} busy={busy} run={run} />
       <EventArchiveMenuItems
         event={event}
         busy={busy}
