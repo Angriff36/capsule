@@ -131,10 +131,14 @@ build_cli_cmd() {
         codex)  # OpenAI Codex
             CLI_CMD=(codex exec --dangerously-bypass-approvals-and-sandbox
                      --json --model "$model") ;;
+        cursor)  # Cursor CLI (`agent`, a PowerShell script on Windows); model ids from `agent --list-models`
+            CLI_CMD=(pwsh -NoProfile -ExecutionPolicy Bypass
+                     -File "$LOCALAPPDATA/cursor-agent/agent.ps1"
+                     -p --trust -f --output-format text --model "$model") ;;
         opencode)
             CLI_CMD=(opencode run --model "$model") ;;
         *)
-            echo "Error: unknown RALPH_CLI '$RALPH_CLI' (expected claude|amp|codex|opencode)" >&2
+            echo "Error: unknown RALPH_CLI '$RALPH_CLI' (expected claude|amp|codex|cursor|opencode)" >&2
             exit 1 ;;
     esac
 }
@@ -279,6 +283,10 @@ $(ralph_integration_prompt)"
         # A completed turn is a completed iteration, however the process ended.
         grep -q '"type":"turn.completed"' "$OUT_LOG" && EXIT_CODE=0
         rm -f "$OUT_LOG"
+    elif [ "$RALPH_CLI" = "cursor" ]; then
+        # Cursor's `agent -p` takes the prompt as an argument, not on stdin.
+        "${CLI_CMD[@]}" "$PROMPT" 2> >(tee "$STDERR_LOG" >&2)
+        EXIT_CODE=$?
     else
         printf '%s' "$PROMPT" | "${CLI_CMD[@]}" 2> >(tee "$STDERR_LOG" >&2)
         EXIT_CODE=$?

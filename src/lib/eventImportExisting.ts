@@ -23,6 +23,7 @@ export function useLoadExistingEventRows(): () => Promise<BundleExistingEventRow
       packLists,
       packListItems,
       assignments,
+      venues,
     ] = await Promise.all([
       client.query(q.listEvent, {}),
       client.query(q.listClient, {}),
@@ -34,6 +35,7 @@ export function useLoadExistingEventRows(): () => Promise<BundleExistingEventRow
       client.query(q.listPackList, {}),
       client.query(q.listPackListItem, {}),
       client.query(q.listEventAssignment, {}),
+      client.query(q.listVenue, {}),
     ]);
     return {
       events,
@@ -46,6 +48,7 @@ export function useLoadExistingEventRows(): () => Promise<BundleExistingEventRow
       packLists,
       packListItems,
       assignments,
+      venues,
     };
   };
 }

@@ -140,5 +140,92 @@ export function planHeaderSteps(
       },
     });
 
+  steps.push(...planVenueFillStep(bundle, invoice, existing));
   return steps;
+}
+
+/** Every field Venue.updateDetails takes; it clears the ones it is not given. */
+const VENUE_DETAIL_FIELDS = [
+  "name",
+  "venueType",
+  "onPremise",
+  "kitchenAccess",
+  "parkingAvailable",
+  "hasFreightElevator",
+  "storageAvailable",
+  "logisticsNotes",
+  "loadInInstructions",
+  "powerAvailable",
+  "waterAccess",
+  "hasStairs",
+  "wasteRules",
+  "permitsInsuranceNotes",
+  "restrictions",
+  "addressLine1",
+  "addressLine2",
+  "city",
+  "region",
+  "postalCode",
+  "countryCode",
+  "latitude",
+  "longitude",
+  "contactName",
+  "contactEmail",
+  "contactPhone",
+  "accessNotes",
+  "cateringNotes",
+] as const;
+
+/**
+ * A venue is shared by every event held there, so a BEO only FILLS IN what
+ * the venue record lacks (its contact, its coordinates, the kitchen and
+ * load-in notes) and never overwrites a value the venue already has.
+ */
+function planVenueFillStep(
+  bundle: EventBundle,
+  invoice: string,
+  existing: CapsuleEventBundleExistingEvent,
+): PlannedStep[] {
+  const venue = existing.venue;
+  if (!venue || existing.venueId === undefined) return [];
+  const empty = (value: unknown) => value == null || value === "";
+  const fill = <T>(current: unknown, incoming: T | undefined) =>
+    empty(current) && incoming !== undefined && incoming !== ""
+      ? incoming
+      : undefined;
+  const fills: Record<string, unknown> = {
+    addressLine1: fill(venue.addressLine1, bundle.venue.addressLine1),
+    city: fill(venue.city, bundle.venue.city),
+    region: fill(venue.region, bundle.venue.region),
+    postalCode: fill(venue.postalCode, bundle.venue.postalCode),
+    latitude: fill(venue.latitude, bundle.venue.latitude),
+    longitude: fill(venue.longitude, bundle.venue.longitude),
+    contactName: fill(venue.contactName, bundle.venue.contactName),
+    contactPhone: fill(
+      venue.contactPhone,
+      bundle.venue.contactPhone ?? bundle.venue.phone,
+    ),
+    cateringNotes: fill(venue.cateringNotes, bundle.notes.cateringKitchen),
+    loadInInstructions: fill(
+      venue.loadInInstructions,
+      bundle.notes.serviceSetup,
+    ),
+  };
+  const changed = Object.entries(fills).filter(
+    ([, value]) => value !== undefined,
+  );
+  if (changed.length === 0) return [];
+  const current: Record<string, unknown> = {};
+  for (const field of VENUE_DETAIL_FIELDS)
+    current[field] = venue[field] ?? undefined;
+  return [
+    {
+      capabilityId: "Venue.updateDetails",
+      ref: "venue-details",
+      label: `Fill in the venue's ${changed.map(([key]) => key).join(", ")}`,
+      idempotencySuffix: `venue-details:${invoice}:${changed.map(([key]) => key).join(",")}`,
+      resolveRefs: ["docId"],
+      args: { docId: "venue", ...current, ...Object.fromEntries(changed) },
+    },
+  ];
 }

@@ -32,19 +32,56 @@ function splitForItems(value: string): string[] {
     .filter((entry) => entry.length > 0);
 }
 
+/**
+ * The workbook export prints the pack list grouped under each menu item: a
+ * lone "Menu Items" cell, then the dish name as a lone, un-indented cell and
+ * its items under it. That dish name is the group AND what the items are for.
+ */
+function looksLikeDishHeading(row: readonly string[]): string | undefined {
+  const filled = row.filter((cell) => cell.trim().length > 0);
+  if (filled.length !== 1) return undefined;
+  const text = filled[0]!.trim();
+  if (
+    /^(For:|Menu Items$|Pack List|Print(?:ed)? Date|Page\b|Grouped by)/i.test(
+      text,
+    )
+  )
+    return undefined;
+  const words = text.split(/\s+/);
+  if (words.length > 8 || /[.;!?]$/.test(text) || !/^[A-Z0-9]/.test(text))
+    return undefined;
+  return text;
+}
+
 /** Parse a pack list CSV into its bundle contribution. */
 export function parsePackList(rows: string[][]): EventBundlePart {
   const items: BundlePackListItem[] = [];
   let classification = "Unclassified";
+  let forDish: string | undefined;
+  const groupedByMenuItem = rows.some(
+    (row) =>
+      row.filter((cell) => cell.trim().length > 0).length === 1 &&
+      row.some((cell) => cell.trim() === "Menu Items"),
+  );
   /** Items created by the row above, in column order, awaiting their notes. */
   let pending: BundlePackListItem[] = [];
 
   for (const row of rows) {
     const first = (row[0] ?? "").trim();
-    if (PRINTED_FOOTER.test(first)) continue;
+    if (PRINTED_FOOTER.test(first) || /^Print Date:?$/i.test(first)) continue;
 
     const filled = row.filter((cell) => cell.trim().length > 0);
     if (filled.length === 0) continue;
+
+    if (groupedByMenuItem) {
+      const dish = looksLikeDishHeading(row);
+      if (dish !== undefined) {
+        classification = dish;
+        forDish = dish;
+        pending = [];
+        continue;
+      }
+    }
 
     const parsedItems = row
       .map((cell) => cell.trim().match(ITEM_LINE))
@@ -55,7 +92,7 @@ export function parsePackList(rows: string[][]): EventBundlePart {
         const item: BundlePackListItem = {
           classification,
           name: match[4]!.trim(),
-          forItems: [],
+          forItems: forDish === undefined ? [] : [forDish],
         };
         const quantity = Number(match[1]);
         if (Number.isFinite(quantity)) item.quantity = quantity;

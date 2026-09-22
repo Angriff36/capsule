@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  useListInventoryItem,
   useListStorageLocation,
   useStorageLocationActivate,
   useStorageLocationDeactivate,
@@ -38,6 +39,7 @@ const temperatureLabel = (location: {
 
 export function StorageLocationsPage() {
   const locations = useListStorageLocation();
+  const stockItems = useListInventoryItem();
   const reviseDetails = useStorageLocationReviseDetails();
   const deactivate = useStorageLocationDeactivate();
   const activate = useStorageLocationActivate();
@@ -48,6 +50,23 @@ export function StorageLocationsPage() {
   const rows = [...(locations ?? [])]
     .filter((location) => location.deletedAt == null)
     .sort((left, right) => String(left.name).localeCompare(String(right.name)));
+
+  // What is on the shelf in each place right now: stocked lines with a quantity.
+  const stockHeld = (locationId: string) => {
+    const held = (stockItems ?? []).filter(
+      (item) =>
+        item.deletedAt == null &&
+        item.removedAt == null &&
+        String(item.locationId) === locationId &&
+        Number(item.quantityOnHand) > 0,
+    );
+    if (held.length === 0) return "Empty";
+    const named = held
+      .slice(0, 3)
+      .map((item) => `${item.quantityOnHand} ${item.unit}`)
+      .join(", ");
+    return `${formatCountNoun(held.length, "line")} · ${named}${held.length > 3 ? ", …" : ""}`;
+  };
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -169,7 +188,7 @@ export function StorageLocationsPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Storage locations"
-        lead="Where stock is held, and which places stock may still be moved into."
+        lead="Every fridge, freezer and dry store, what sits in each one, and the temperature it should keep. Capsule does not read a thermometer: the range here is the target you set."
         actions={
           <Link to="/inventory/stock" className="btn btn-primary">
             Register a location
@@ -206,7 +225,8 @@ export function StorageLocationsPage() {
                   <th>Name</th>
                   <th>Type</th>
                   <th>Zone</th>
-                  <th>Temperature</th>
+                  <th>Target temp</th>
+                  <th>Stock held</th>
                   <th>State</th>
                   <th aria-label="Actions" />
                 </tr>
@@ -223,6 +243,18 @@ export function StorageLocationsPage() {
                       <td>{location.locationType || "—"}</td>
                       <td>{location.temperatureZone || "—"}</td>
                       <td>{temperatureLabel(location)}</td>
+                      <td>
+                        {stockItems === undefined ? (
+                          "…"
+                        ) : (
+                          <Link
+                            to="/inventory/stock"
+                            title="Open the stock book"
+                          >
+                            {stockHeld(String(location._id))}
+                          </Link>
+                        )}
+                      </td>
                       <td>
                         <StatusChip status={String(location.status)} />
                         {location.deactivationReason ? (

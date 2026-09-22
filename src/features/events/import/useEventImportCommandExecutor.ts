@@ -34,6 +34,7 @@ import {
   useEventChangeVenue,
   useEventReschedule,
   useEventSetEventNumber,
+  useVenueUpdateDetails,
   useEventDishChangeCourse,
   useInvoiceSend,
   useInvoiceSetDeposit,
@@ -76,6 +77,7 @@ export interface EventImportCommandExecutor {
 export function useEventImportCommandExecutor(): EventImportCommandExecutor {
   const runners: Record<string, CommandRunner> = {
     "Venue.register": useCreateVenue(),
+    "Venue.updateDetails": useVenueUpdateDetails(),
     "Client.register": useCreateClient(),
     "Client.changeContact": useClientChangeContact(),
     "ClientContact.add": useCreateClientContact(),

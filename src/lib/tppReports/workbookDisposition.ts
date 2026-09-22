@@ -1,4 +1,4 @@
-import { detectWorkbookSource } from "./loadEventBundle";
+import { detectWorkbookSource } from "./bundlePartFromSheets";
 import { readXlsxSheets } from "./xlsxReader";
 
 /**

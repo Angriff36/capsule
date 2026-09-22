@@ -12426,17 +12426,6 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const __targetServiceStyle = await ctx.db
-      .query("serviceStyles")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", __auth.tenantId))
-      .filter((q: any) => q.eq(q.field("_id"), serviceStyleId))
-      .first();
-    if (!__targetServiceStyle ||
-        __targetServiceStyle.tenantId !== __auth.tenantId ||
-        __targetServiceStyle.status !== "active" ||
-        __targetServiceStyle.deletedAt != null) {
-      throw new Error("Events must reference an active service style");
-    }
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
@@ -54285,7 +54274,7 @@ async function __runVenueNotePin(ctx: MutationCtx, { docId, version }: any, __cr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venue notes through commands");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue note commands");
     if (!((doc.postedAt != null))) throw new Error("Guard 0 failed");
@@ -54332,7 +54321,7 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venue notes through commands");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue note commands");
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
@@ -54425,7 +54414,7 @@ export const VenueNote_createViaPost = mutation({
       eventId: args.eventId,
       venueId: args.venueId
     };
-    if (!((checkRole(user, "eventAccess") && ((__draft.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venue notes through commands");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue note commands");
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
@@ -54466,7 +54455,7 @@ async function __runVenueNoteRemove(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venue notes through commands");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue note commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -54512,7 +54501,7 @@ async function __runVenueNoteRevise(ctx: MutationCtx, { docId, content, category
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venue notes through commands");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue note commands");
     if (!((doc.postedAt != null))) throw new Error("Guard 0 failed");
@@ -54565,7 +54554,7 @@ async function __runVenueNoteUnpin(ctx: MutationCtx, { docId, version }: any, __
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venue notes through commands");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue note commands");
     if (!((doc.postedAt != null))) throw new Error("Guard 0 failed");

@@ -773,15 +773,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   computed hasServiceStyle: boolean = self.serviceStyleId != null
   computed hasFinalLockTiming: boolean = self.timingStaffOnAt != null and self.timingDepartShopAt != null and self.timingOnsiteAt != null and self.timingStaffOffAt != null
   computed isFinalLockReady: boolean = self.hasServiceStyle and self.hasExpectedHeadcount and self.hasMenuDishes and self.hasFinalLockTiming
-  // Readiness: no incomplete prep, undelivered logistics work, or open pack lists.
-  // Staffing coverage math remains deferred (NO EVIDENCE) — assignments hasMany
-  // is navigation only until coverage is product-defined.
-  // builtins.md: count_of(arr, predicate) over hasMany; PB007 still blocks
-  // referencing this computed from beginExecution's guard.
-  // Draft pack lists do NOT block readiness (owner anti-tedium rule, issue
-  // #12): EventApproved auto-creates a draft; a plan is not in-flight work.
-  // packing/packed/loaded still block until dispatched. Same predicate
-  // inlined in beginExecution (PB007 twin).
+  // Readiness projection only — not a beginExecution/confirmSalesLock gate
+  // (issue #384; backend §4.3). Staffing coverage math is not product-defined
+  // yet (assignments hasMany is navigation only). Draft pack lists do not
+  // count as in-flight work (owner anti-tedium rule, issue #12).
   computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled" and p.status != "draft") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
   // Live internal food-cost estimate from menu dishes. Does NOT overwrite
   // budgets, invoices, quotedPrice, or locked customer prices.
@@ -1471,12 +1466,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command beginExecution() {
-    guard self.stage == "approved" or self.stage == "sales_lock"
+    // Readiness is a projection (isReadyForExecution), not a lifecycle gate:
+    // service start must not freeze on unfinished prep/pack/delivery.
+    guard self.stage == "sales_lock"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventAccess")
-    // Manifest 3.6.3 rejects computed-property references in guards (PB007).
-    // Inline the same readiness formula as isReadyForExecution.
-    guard count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled" and p.status != "draft") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
     mutate stage = "executing"
     mutate executionStartedAt = now()
     emit EventExecutionStarted {
@@ -1498,7 +1492,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command cancel(reason: string) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.stage == "quote" or self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock" or self.stage == "executing" or self.stage == "final"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     constraint cancellationReasonPresent: length(trim(reason)) > 0 "Cancellation reason is required"

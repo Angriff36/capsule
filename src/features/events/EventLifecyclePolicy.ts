@@ -63,9 +63,10 @@ const ACTIONS: ReadonlyArray<
     lifecycle: EventLockForSalesLifecycle,
   },
   {
-    // The domain command moves sales_lock → executing (a sales-side "go"
-    // without beginExecution's ops-readiness guards), so the label says so
-    // instead of implying the event merely stays locked.
+    // Both commands move sales_lock → executing. Sales uses confirmSalesLock
+    // (salesAccess, EventSalesLockConfirmed); event staff uses beginExecution
+    // (eventAccess, EventExecutionStarted). Neither freezes on unfinished
+    // prep/pack/delivery — readiness is a projection, not a gate.
     key: "confirmSalesLock",
     label: "Confirm sales lock & start execution",
     kind: "primary",
