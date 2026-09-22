@@ -231,6 +231,38 @@ it("prints the booked owner snapshot in the assigned-owner card, not a later cat
   expect(card.textContent).not.toContain("RENAMED");
 });
 
+it("prints the booked source-evidence key on the import draft, not a later live file name", async () => {
+  backend.values.set("useGetEvent", {
+    _id: eventId,
+    title: "Garden dinner",
+    eventType: "dinner",
+    stage: "planning",
+    startsAt: Date.UTC(2099, 6, 4, 17),
+    endsAt: Date.UTC(2099, 6, 4, 22),
+    expectedHeadcount: 40,
+    version: 3,
+    importSourceKey: "beo-worksheet-v1",
+    importDraftJson: JSON.stringify({
+      version: 1,
+      sourceKey: "beo-worksheet-v1",
+      sources: [{ storageId: "storage-proof", name: "worksheet-RENAMED.pdf" }],
+      facts: {},
+      menu: [],
+      missing: [],
+      issues: [],
+      status: "saved",
+    }),
+  });
+  await mount(page(), `/events/${eventId}`);
+  const link = container.querySelector(
+    '[data-testid="event-source-evidence-key"]',
+  );
+  expect(link?.textContent).toBe("Source link: beo-worksheet-v1");
+  // The Source files list may still show the later file name — that is the
+  // file, not the stored link.
+  expect(container.textContent).toContain("worksheet-RENAMED.pdf");
+});
+
 it("prints the booked commercial seed on the budget card, not a later proposal total", async () => {
   backend.values.set("useGetEvent", {
     _id: eventId,
