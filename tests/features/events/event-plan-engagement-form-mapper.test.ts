@@ -104,4 +104,12 @@ describe("EventPlanEngagementFormMapper", () => {
       ownerName: "Pat Owner",
     });
   });
+
+  it("stamps the referral source id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({ referralSourceId: "  ref-id  " }),
+    );
+
+    expect(args).toMatchObject({ referralSourceId: "ref-id" });
+  });
 });
