@@ -100,9 +100,15 @@ export const createEventFromAcceptedProposal = mutation({
         linked != null &&
         linked.deletedAt == null &&
         linked.tenantId === proposal.tenantId &&
-        String(linked.clientId) === String(proposal.clientId)
+        String(linked.clientId) === String(proposal.clientId) &&
+        linked.stage !== "cancelled"
       ) {
         return { docId: proposal.eventId };
+      }
+      if (linked != null && linked.stage === "cancelled") {
+        throw new Error(
+          "The event this proposal was booked into has been cancelled. Unlink the proposal from it before booking again.",
+        );
       }
       throw new Error(
         "This proposal is already linked to an event — open that event instead of creating another.",

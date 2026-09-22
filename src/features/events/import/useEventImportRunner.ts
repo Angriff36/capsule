@@ -185,13 +185,14 @@ export function useEventImportRunner(input: {
           raiseReviewFlags: true,
         });
       }
-      // An event the person deleted keeps its old command results. A new
-      // event for the same BEO needs its own scope, or the old results answer.
+      // An event the person deleted keeps its old command results. Every run
+      // for the same BEO after that, the one that makes the replacement AND
+      // the retries against it, uses the replacement's own scope, or the
+      // cancelled event's cached results would answer and skip writes.
       const deleted = (eventRows ?? []).filter(
         (row) => !isLive(row) && (matchesNumber(row) || matchesTitleDate(row)),
       ).length;
-      const runScope =
-        !target && deleted > 0 ? `${scope}:again${deleted}` : scope;
+      const runScope = deleted > 0 ? `${scope}:again${deleted}` : scope;
       const ids = await runPlannedSteps({
         steps: runPlan.steps,
         seedIds: runPlan.seedIds,
