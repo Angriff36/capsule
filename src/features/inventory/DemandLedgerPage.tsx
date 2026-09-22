@@ -135,10 +135,11 @@ export function DemandLedgerPage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Inventory · Demand ledger</p>
-          <h1 className="display-title mt-2">What service requires</h1>
+          <h1 className="display-title mt-2">What each event needs</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            What each event needs, ingredient by ingredient — where each amount
-            came from, and a clean handoff into purchasing.
+            Capsule works this list out for you: every event's dishes and
+            headcount become the ingredients and amounts below. Purchasing draws
+            from this list. You do not type it in.
           </p>
         </div>
         <div className="supply-masthead-actions">
@@ -160,18 +161,18 @@ export function DemandLedgerPage() {
             className="btn btn-primary"
             onClick={() => setShowCreate((value) => !value)}
           >
-            {showCreate ? "Close form" : "Calculate demand"}
+            {showCreate ? "Close form" : "Add a line by hand"}
           </button>
         </div>
       </header>
       <InventoryWorkspaceNav />
 
       <aside className="supply-degraded" role="note">
-        <strong>Approve releases purchasing</strong>
+        <strong>Worked out from the event, not typed</strong>
         <span>
-          Dish and headcount changes recalculate demand automatically. Event
-          approval opens PurchaseNeeds and maintains the shared weekly draft —
-          no manual create-need step.
+          Change a dish or the headcount on an event and these amounts update by
+          themselves. Approving the event turns them into purchase needs and
+          keeps the weekly draft order current.
         </span>
       </aside>
       {anomalies.size > 0 ? (
@@ -198,11 +199,15 @@ export function DemandLedgerPage() {
         <form className="supply-form" onSubmit={submitDemand}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">New requirement</p>
-              <h2>Calculate demand</h2>
+              <p className="eyebrow">By hand</p>
+              <h2>Add a line the dishes do not cover</h2>
+              <p className="mt-1 text-sm text-ink-2">
+                For something an event needs that no dish lists, such as ice or
+                a supply item. Pick the event, the product and the amount.
+              </p>
             </div>
             <button className="btn btn-primary" disabled={busy != null}>
-              {busy === "create-demand" ? "Calculating…" : "Calculate"}
+              {busy === "create-demand" ? "Adding…" : "Add line"}
             </button>
           </div>
           <div className="supply-form-grid">
@@ -257,8 +262,8 @@ export function DemandLedgerPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Where each amount comes from</p>
-            <h2>Event requirements</h2>
+            <p className="eyebrow">Per event, per ingredient</p>
+            <h2>What to have on hand</h2>
           </div>
           <span>{formatCountNoun(activeDemands.length, "line")}</span>
         </div>
@@ -268,11 +273,11 @@ export function DemandLedgerPage() {
           <TableSkeleton rows={7} />
         ) : activeDemands.length === 0 ? (
           <div className="document-empty">
-            <p>No ingredient demand yet</p>
+            <p>No event needs anything yet</p>
             <span>
-              Demand is what service requires per ingredient. It generates
-              automatically when you approve an event with dishes — then flows
-              into purchasing. You can also calculate a line by hand.
+              Put dishes on an event and this list fills in by itself, then
+              flows into purchasing. You can also add a line by hand for
+              something no dish covers.
             </span>
             <div className="mt-3 flex justify-center gap-2">
               <Link to="/events" className="btn btn-primary btn-sm">
@@ -283,7 +288,7 @@ export function DemandLedgerPage() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => setShowCreate(true)}
               >
-                Calculate demand
+                Add a line by hand
               </button>
             </div>
           </div>

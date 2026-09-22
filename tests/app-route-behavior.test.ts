@@ -29,7 +29,7 @@ it.each([
   ["/logistics/pack-templates", "Pack list templates"],
   ["/logistics/deliveries", "Delivery runs"],
   ["/reports", "Reports"],
-  ["/inventory/demand", "What service requires"],
+  ["/inventory/demand", "What each event needs"],
   ["/inventory/stock", "What the house holds"],
   ["/inventory/purchasing", "Weekly purchasing drafts"],
   ["/kitchen/components", "Components"],

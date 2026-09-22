@@ -18,12 +18,12 @@ it("calculates an ingredient demand with the chosen event, ingredient, quantity 
   ]);
   const calculate = command("useCreateIngredientDemand");
   await mount(createElement(DemandLedgerPage));
-  await click(button("Calculate demand", container.querySelector("header")!));
+  await click(button("Add a line by hand", container.querySelector("header")!));
   input("eventId", "event-a");
   await click(container.querySelector<HTMLElement>('[role="option"]')!);
   input("requiredQuantity", "12.5");
   input("unit", "pound");
-  await click(button("Calculate"));
+  await click(button("Add line"));
   expect(calculate).toHaveBeenCalledExactlyOnceWith({
     eventId: "event-a",
     ingredientId: "ingredient-a",
