@@ -25,6 +25,7 @@ import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { PageHeader, Section, Skeleton } from "../../ui/primitives";
 import { useCreateEventFromProposal } from "../clients/useCreateEventFromProposal";
+import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
@@ -35,6 +36,7 @@ import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolv
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
 import {
+  eventCreatePath,
   eventDetailPath,
   eventImportPath,
   eventsIndexPath,
@@ -438,8 +440,8 @@ export function EventCreatePage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const venue = activeVenues.find((item) => item._id === venueId);
-    void run("event", async () => {
-      const args = eventPlanEngagementFormMapper.toCommandArgs({
+    const buildArgs = async () =>
+      eventPlanEngagementFormMapper.toCommandArgs({
         clientId,
         venueId,
         venue,
@@ -465,18 +467,35 @@ export function EventCreatePage() {
           data.get("operationalRequirements") ?? "",
         ),
       });
-      // An accepted, still-unlinked proposal books through the seam: one
-      // transaction that creates the event, copies the proposal's menu
-      // selections, and links Proposal.eventId (issue #141). Everything else
-      // uses the plain generated create command, unchanged.
-      const created =
-        proposalLinkable && proposal
-          ? await createEventFromProposal({
-              proposalId: proposal._id,
-              proposalVersion: proposal.version,
-              event: args,
-            })
-          : await createEvent(args);
+    // A proposalId in the route NEVER falls through to generic unlinked
+    // creation (issue #392): the canonical seam books an accepted, unlinked
+    // proposal and returns the existing event when another booking won the
+    // race (spec §7.1). Every other proposal state — loading, deleted,
+    // not accepted, already linked — is read-only here: no generic write.
+    if (proposalId) {
+      if (!proposal) return;
+      if (!proposalLinkable) {
+        // A stale soft-deleted record is unavailable like a missing one — no
+        // write and no exit into an event.
+        if (proposal.deletedAt == null && proposal.eventId != null)
+          navigate(eventDetailPath(String(proposal.eventId)));
+        return;
+      }
+      void run("event", async () => {
+        const created = await createEventFromProposal({
+          proposalId: proposal._id,
+          proposalVersion: proposal.version,
+          event: await buildArgs(),
+        });
+        draftForm.clear();
+        navigate(eventDetailPath(created.docId));
+      });
+      return;
+    }
+    // Standalone creation (no proposal in the route): the plain generated
+    // create command, unchanged.
+    void run("event", async () => {
+      const created = await createEvent(await buildArgs());
       draftForm.clear();
       navigate(eventDetailPath(created.docId));
     });
@@ -827,10 +846,16 @@ export function EventCreatePage() {
                 <div className="p-3">
                   <Skeleton className="h-8" />
                 </div>
-              ) : proposal === null ? (
-                <p className="p-3 text-sm text-ink-3">
-                  This proposal no longer exists.
-                </p>
+              ) : proposal === null || proposal.deletedAt != null ? (
+                <div className="space-y-2 p-3 text-sm text-ink-3">
+                  <p role="status">This proposal no longer exists.</p>
+                  <Link
+                    to={eventCreatePath()}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    Start a standalone event
+                  </Link>
+                </div>
               ) : (
                 <div className="space-y-1.5 p-3 text-sm text-ink-2">
                   <p className="font-medium text-ink">{proposal.title}</p>
@@ -870,17 +895,51 @@ export function EventCreatePage() {
                         : "Creating this event links it to the proposal. It has no menu selections to copy."}
                     </p>
                   ) : proposal.eventId ? (
-                    <p className="pt-1 text-xs leading-relaxed text-ink-3">
-                      Already booked — this proposal is linked to an event.
-                      Creating another event here will not copy its menu.
-                    </p>
+                    <>
+                      <p
+                        role="status"
+                        className="pt-1 text-xs leading-relaxed text-ink-3"
+                      >
+                        Already booked — this proposal is linked to an event.
+                      </p>
+                      <div className="pt-1">
+                        <Link
+                          to={eventDetailPath(String(proposal.eventId))}
+                          className="btn btn-primary min-h-[40px]"
+                        >
+                          Open event
+                        </Link>
+                      </div>
+                    </>
                   ) : (
-                    <p className="pt-1 text-xs leading-relaxed text-ink-3">
-                      This proposal is {String(proposal.status)} — the event
-                      will be created without linking it.
-                    </p>
+                    <>
+                      <p
+                        role="status"
+                        className="pt-1 text-xs leading-relaxed text-ink-3"
+                      >
+                        This proposal is {String(proposal.status)} — only an
+                        accepted proposal can be booked into an event.
+                      </p>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        <Link
+                          to={CLIENTS_ROUTES.proposal(proposal._id)}
+                          className="btn btn-secondary btn-sm"
+                        >
+                          Open proposal
+                        </Link>
+                        <Link
+                          to={eventCreatePath()}
+                          className="btn btn-ghost btn-sm"
+                        >
+                          Start a standalone event
+                        </Link>
+                      </div>
+                    </>
                   )}
-                  {proposal.venueName && venues !== undefined && !venueId ? (
+                  {proposalLinkable &&
+                  proposal.venueName &&
+                  venues !== undefined &&
+                  !venueId ? (
                     <p className="text-xs leading-relaxed text-ink-3">
                       No saved venue matched “{proposal.venueName}” — pick or
                       create it in the Venue panel.
@@ -1049,18 +1108,26 @@ export function EventCreatePage() {
             ) : null}
           </Section>
 
-          <button
-            type="submit"
-            form="event-create-form"
-            disabled={busy !== null || !clientId || !venueId}
-            className="btn btn-primary w-full"
-          >
-            {busy === "event" ? "Creating event…" : "Create event"}
-          </button>
-          {clientRequiredCopy ? (
+          {proposalId && proposal === undefined ? (
             <p className="text-sm text-ink-3" role="status">
-              {clientRequiredCopy}
+              Loading proposal…
             </p>
+          ) : !proposalId || proposalLinkable ? (
+            <>
+              <button
+                type="submit"
+                form="event-create-form"
+                disabled={busy !== null || !clientId || !venueId}
+                className="btn btn-primary w-full"
+              >
+                {busy === "event" ? "Creating event…" : "Create event"}
+              </button>
+              {clientRequiredCopy ? (
+                <p className="text-sm text-ink-3" role="status">
+                  {clientRequiredCopy}
+                </p>
+              ) : null}
+            </>
           ) : null}
           <p className="text-xs leading-relaxed text-ink-3">
             Creation is policy-checked by the generated Client, Venue, and Event

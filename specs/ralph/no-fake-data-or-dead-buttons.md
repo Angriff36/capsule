@@ -30,7 +30,7 @@ active implementation plan records repairs and additional findings):
 
 ## Acceptance Criteria
 
-- [x] A sweep (plan mode, read-only subagents) inventories every mock, stub,
+- [ ] A sweep (plan mode, read-only subagents) inventories every mock, stub,
       placeholder, sample value, and dead command path reachable in the
       shipped UI, recorded as plan tasks — each becomes "finish it" or "file
       the platform blocker", never left silent
@@ -46,8 +46,13 @@ active implementation plan records repairs and additional findings):
       or fail loudly with what was created and a way to finish
 - [x] Estimates are labeled as estimates everywhere they appear (route
       planner, projected food cost); invented values never render as fact
-- [x] Nothing in this spec weakens a guard or policy to make a flow "work"
+- [ ] Nothing in this spec weakens a guard or policy to make a flow "work"
       (domain-gating-restraint still binds)
+
+Status note (2026-09-22): acceptance for this spec is governed by
+ACCEPTANCE_TESTS.md — the sweep box is AC-054 and the guard box is AC-055,
+and both remain PENDING. The checked implementation boxes above record
+historical starting-point work; they do not prove the reopened criteria.
 
 ## Out of Scope
 
