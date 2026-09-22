@@ -8,7 +8,7 @@
 
 ## 0. Implementation status (verified against live code 2026-09-05)
 
-Verdicts below reflect what exists in `src/**` today, checked section-by-section against this spec. Legend: ✅ done · 🟡 partial · ❌ not built. "Done" here means the core behavior exists; it does **not** certify the full "fully wired" bar in §1.17 (that requires per-slice wiring/command/UI proof per §13).
+Verdicts below reflect what exists in `src/**` today, checked section-by-section against this spec. Legend: ✅ done · 🟡 partial · ❌ not built. "Done" here means the core behavior exists; it does **not** certify the full "fully wired" bar in §1 (that requires per-slice wiring/command/UI proof per §13).
 
 | Spec § | Feature | Status | Evidence / gap |
 |--------|---------|--------|----------------|

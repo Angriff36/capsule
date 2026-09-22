@@ -1,6 +1,8 @@
 import { ConvexError, v } from "convex/values";
+import { api } from "./_generated/api";
 import type { Doc } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 
 /**
  * AUTHOR SEAM — public, token-authorized digital proposal acceptance (#115).
@@ -8,16 +10,24 @@ import { mutation, query, type QueryCtx } from "./_generated/server";
  * A SignatureRequest's Convex `_id` IS the public bearer token, same posture as
  * `shareLinks.ts` (`normalizeId` in-handler is the auth step; no Clerk). An
  * anonymous signer holds no sales/client role, so the generated
- * `SignatureRequest_complete` + `Proposal_accept` commands are unreachable from
- * the acceptance page — this seam performs both writes raw in one transaction.
+ * `SignatureRequest_complete` command is unreachable from the acceptance page —
+ * this seam performs the completion itself.
  *
- * KNOWN GAP (documented on #115): the generated `Proposal_accept` also runs the
- * ProposalDishSelection → EventDish.confirmFromProposal fanOut inline; that
- * cascade requires manageAccess and cascades further (component seeds,
- * ingredient contributions), so it is NOT replicated here. Digitally accepted
- * proposals flip to `accepted` and ledger `ProposalAccepted`, but dish
- * confirmation stays with the operator flows until reaction projection or an
- * internal system-authority command exists.
+ * The proposal acceptance is NOT re-implemented here. After the seam's own
+ * token/revision/proposal validations pass, the acceptance runs through the
+ * SAME generated `Proposal_accept` command the operator path uses, via the
+ * established tenant-system runner (convex/lib/tenantSystemCommandRunner.ts,
+ * as purchasingReschedule/invoiceNumbering do). The runner is pinned to the
+ * VALIDATED `request.tenantId` — never caller input — and substitutes only the
+ * identity: the command keeps its sales role policy, the tenant's capability
+ * kill-switch, its status/expiry guards, the ProposalAccepted ledger row, the
+ * accepted-revision recording (convex/lib/proposalAcceptanceRevision.ts) and
+ * the ProposalDishSelection → EventDish.confirmFromProposal menu cascade —
+ * issue #390 (AC-414/AC-435). It all runs in the CURRENT transaction, so a
+ * downstream rejection (a linked event that fails the generated tenant
+ * relation check, a disabled sales capability) rolls the signature completion
+ * back with the acceptance: signature and acceptance commit together or not
+ * at all.
  */
 
 type PendingSignatureView = {
@@ -146,11 +156,14 @@ export const getPendingSignatureRequest = query({
 
 /**
  * Complete a signature request and accept its proposal, token-authorized.
- * Mirrors the generated command semantics: same status/expiry guards, same
- * ledger events (SignatureCompleted, ProposalAccepted), and the signed
- * revision stored as the proposal's acceptedRevisionId (AC-413). A proposal
- * that can no longer be accepted (declined/expired/superseded) rolls the
- * whole thing back; an already-accepted proposal is treated as success
+ * Same status/expiry guards as the generated command. The completion patch +
+ * SignatureCompleted event are the seam's own writes; the acceptance itself is
+ * the canonical generated `Proposal_accept`, run as the tenant's system role
+ * (see header) so it executes the identical policy, ledger row, accepted
+ * revision and menu cascade as operator acceptance. One transaction end to
+ * end: signature completion and acceptance commit or roll back together. A
+ * proposal that can no longer be accepted (declined/expired/superseded) rolls
+ * the whole thing back; an already-accepted proposal is treated as success
  * (idempotent re-click) and keeps its original accepted revision.
  */
 export const completeSignature = mutation({
@@ -267,40 +280,28 @@ export const completeSignature = mutation({
         );
       }
 
-      await ctx.db.patch(proposal._id, {
-        status: "accepted",
-        acceptedAt: now,
-        // The revision the signer saw is the accepted evidence (AC-413) —
-        // validated above: live, captured, same tenant, and it owns this
-        // proposal.
+      // Canonical acceptance (#390, AC-414/AC-435): the generated command, not
+      // a re-implementation. Every validation above has already proven this
+      // tenant, revision and proposal, so the runner's tenant pin is the
+      // validated request.tenantId — never caller input — and the command's
+      // own guards (status, expiry, sales policy, capability kill-switch),
+      // ProposalAccepted ledger row, accepted-revision recording and the
+      // ProposalDishSelection → EventDish.confirmFromProposal menu cascade
+      // run exactly as operator acceptance. No catch: a downstream rejection
+      // throws out of this mutation, rolling the completion patch and
+      // SignatureCompleted insert back in the same transaction. The command
+      // derives the target and the ledger payload from the proposal row
+      // itself; acceptedRevisionId carries the signer's revision (AC-413) and
+      // proposalAcceptanceRevision re-validates it inside the command's own
+      // event handling.
+      const sales = TenantSystemCommandRunner.forTenant(
+        ctx,
+        request.tenantId,
+      ).context;
+      await sales.runMutation(api.mutations.Proposal_accept, {
+        docId: proposal._id,
         acceptedRevisionId: revision._id,
-        version: (proposal.version ?? 0) + 1,
-      });
-      // Same payload fields as generated Proposal_accept's ProposalAccepted.
-      await ctx.db.insert("manifestEvents", {
-        type: "ProposalAccepted",
-        entity: "Proposal",
-        entityId: proposal._id,
-        payload: {
-          proposalId: proposal._id,
-          tenantId: proposal.tenantId,
-          clientId: proposal.clientId,
-          eventId: proposal.eventId ?? null,
-          acceptedRevisionId: revision._id,
-          title: proposal.title,
-          eventDate: proposal.eventDate ?? null,
-          eventType: proposal.eventType ?? null,
-          guestCount: proposal.guestCount,
-          venueName: proposal.venueName ?? null,
-          venueAddress: proposal.venueAddress ?? null,
-          subtotal: proposal.subtotal,
-          taxAmount: proposal.taxAmount,
-          discountAmount: proposal.discountAmount,
-          total: proposal.total,
-          dishSelectionProposalId:
-            proposal.eventId != null ? proposal._id : null,
-        },
-        createdAt: now,
+        version: proposal.version,
       });
     }
 

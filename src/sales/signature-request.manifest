@@ -297,10 +297,13 @@ event SignatureRevoked: "signature_request.revoked" {
 // so the acceptance records the exact revision the signer saw
 // (convex/lib/proposalAcceptanceRevision.ts validates and stores it). The
 // reaction only fires when the request carries a proposalId; the authored
-// public seam convex/signatureAcceptance.ts persists the same accepted
-// revision identity for anonymous token clicks, which cannot pass the
-// generated command guards. It does not perform the full accept: the public
-// menu-cascade gap remains tracked as issue #390.
+// public seam convex/signatureAcceptance.ts serves anonymous token clicks,
+// which cannot pass the generated command guards. It validates the token and
+// the signed revision itself, then runs the SAME generated Proposal_accept
+// under the established tenant system runner
+// (convex/lib/tenantSystemCommandRunner.ts), so an anonymous acceptance
+// commits the identical guards, ProposalAccepted ledger row and menu cascade
+// in one transaction (issue #390).
 on SignatureCompleted run Proposal.accept resolve payload.proposalId
   params {
     acceptedRevisionId: payload.proposalRevisionId
