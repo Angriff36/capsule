@@ -74,7 +74,7 @@ bun run codegen          # convex codegen
 bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL
 bun run agent:mint-jwt   # write CAPSULE_AGENT_JWT (UI session + org first)
-bun run agent:enter-recipe -- <recipe.txt>
+bun run agent:enter-component -- <component.txt>
 bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is expected; needs CAPSULE_AGENT_JWT)
 # Note: agent:llm-tools / agent:mcp:verify are documented in docs/generation/capsule-agent-mcp.md
 # but are not package.json scripts in this checkout — use the MCP host + mint-jwt path above.
