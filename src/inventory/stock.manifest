@@ -351,7 +351,8 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     // Stage check uses belongsTo traversal (semantics.md relationship
     // resolution in guard expressions). Seed eventId before reserve so the
     // parent Event resolves; param must match the seeded FK.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // sales_lock is live ops, not a stock freeze (backend §4.2).
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     guard self.inventoryItem != null and self.inventoryItem.stockedAt != null and self.inventoryItem.deletedAt == null
     constraint reserveItemMatch: inventoryItemId == self.inventoryItemId "Reserve inventoryItemId must match the seeded stock reference"
     constraint reserveEventMatch: eventId == self.eventId "Reserve eventId must match the seeded event reference"

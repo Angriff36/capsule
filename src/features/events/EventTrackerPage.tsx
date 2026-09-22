@@ -51,8 +51,14 @@ import { FailureBanner } from "./FailureBanner";
 const LANE_DAYS = 14;
 // Mirrors the Event command guards in src/operations/event.manifest so a card
 // never offers an edit the command would refuse: reschedule / changeVenue /
-// assignOwner stop at approved; changeHeadcount also runs while executing.
-const RESCHEDULE_STAGES = new Set(["planning", "pending_approval", "approved"]);
+// changePrimaryContact / changeRequirements run through sales_lock;
+// changeHeadcount also runs while executing.
+const RESCHEDULE_STAGES = new Set([
+  "planning",
+  "pending_approval",
+  "approved",
+  "sales_lock",
+]);
 const HEADCOUNT_STAGES = new Set([...RESCHEDULE_STAGES, "executing"]);
 const DEFAULT_START_OFFSET = 10 * 60 * 60 * 1000;
 const DEFAULT_DURATION = 4 * 60 * 60 * 1000;

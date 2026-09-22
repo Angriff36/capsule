@@ -10,6 +10,9 @@ describe("Event planning foundation", () => {
   it("derives every legal Event lifecycle offer from generated transitions", () => {
     const policy = new EventLifecyclePolicy();
     expect(
+      policy.availableActions("quote").map((action) => action.key),
+    ).toEqual(["returnToPlanning", "cancel"]);
+    expect(
       policy.availableActions("planning").map((action) => action.key),
     ).toEqual(["submitForApproval", "cancel"]);
     expect(

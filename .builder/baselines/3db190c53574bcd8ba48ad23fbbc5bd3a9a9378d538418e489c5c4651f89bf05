@@ -11904,7 +11904,7 @@ async function __runEventAssignOwner(ctx: MutationCtx, { docId, assignedToId, ve
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
-    if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
+    if (!((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -12426,17 +12426,6 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
-    const __targetServiceStyle = await ctx.db
-      .query("serviceStyles")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", __auth.tenantId))
-      .filter((q: any) => q.eq(q.field("_id"), serviceStyleId))
-      .first();
-    if (!__targetServiceStyle ||
-        __targetServiceStyle.tenantId !== __auth.tenantId ||
-        __targetServiceStyle.status !== "active" ||
-        __targetServiceStyle.deletedAt != null) {
-      throw new Error("Events must reference an active service style");
-    }
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
@@ -13165,7 +13154,7 @@ async function __runEventNormalizePurchasingWeek(ctx: MutationCtx, { docId, vers
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
-    if (!((((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")) || (doc.stage === "executing")))) throw new Error("Guard 0 failed");
+    if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "executing")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.startsAt != null))) throw new Error("Guard 2 failed");
     const previousPurchasingWeekStart = doc.purchasingWeekStart;
@@ -15607,7 +15596,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
     if (!(((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")) || checkRole(user, "kitchenAccess")))) throw new Error("Managers, sales and kitchen staff may execute event dish commands");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "salesAccess")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((__rel_event != null) && (((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "sales_lock")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 2 failed");
+    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 2 failed");
     if (!((eventId === doc.eventId))) throw new Error("confirmFromProposal eventId must match the seeded event reference");
     if (!((quantityServings >= 0))) throw new Error("Event dish servings cannot be negative");
     const wasExistingLine = (doc.addedAt != null);

@@ -758,7 +758,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   // Binder color code (training part 4): red = cooked on site (full service),
   // green = limited service, blue = drop-off clipboard.
   computed binderColor: string? = self.serviceStyle != null and self.serviceStyle.name == "Full Service" ? "red" : (self.serviceStyle != null and self.serviceStyle.name == "Limited Service" ? "green" : (self.serviceStyle != null and self.serviceStyle.name == "Drop Off" ? "blue" : null))
-  computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+  computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
   // Setup readiness for approval / automation (UI EventSetupProgress). Distinct
   // from isReadyForExecution (in-flight prep/pack/delivery). Uses raw child
   // fields via count_of — not child computeds (parent rollup limitation).
@@ -1013,7 +1013,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command reschedule(startsAt: datetime, endsAt: datetime) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     constraint scheduleDates: endsAt > startsAt "Event end must be after its start"
     compute shiftedServiceStartsAt = self.serviceStartsAt != null and self.startsAt != null ? self.serviceStartsAt + (startsAt - self.startsAt) : self.serviceStartsAt
@@ -1045,7 +1045,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   // propagation a reschedule does. Safe to run again; a no-op week change
   // still refreshes copies and moves nothing.
   command normalizePurchasingWeek() {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock" or self.stage == "executing"
     guard self.deletedAt == null
     guard self.startsAt != null
     compute previousPurchasingWeekStart = self.purchasingWeekStart
@@ -1151,7 +1151,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional venueAddress: string,
     optional venueCapacity: number
   ) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     constraint changeVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
     mutate venueId = venueId
@@ -1169,7 +1169,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command changeHeadcount(newHeadcount: number) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock" or self.stage == "executing"
     guard self.deletedAt == null
     constraint headcountRange: newHeadcount >= 1 and newHeadcount <= 100000 "Headcount must be between 1 and 100000"
     compute previousHeadcount = self.expectedHeadcount
@@ -1201,7 +1201,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional primaryContactEmail: string,
     optional primaryContactPhone: string
   ) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     constraint contactName: length(trim(primaryContactName)) > 0 "Primary contact name is required"
     mutate primaryContactName = primaryContactName
@@ -1251,7 +1251,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional serviceRequirements: string,
     optional operationalRequirements: string
   ) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
     mutate serviceRequirements = serviceRequirements
@@ -1410,7 +1410,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command assignOwner(optional assignedToId: uuid) {
-    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     mutate assignedToId = assignedToId
     emit EventOwnerAssigned {
@@ -1434,7 +1434,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command returnToPlanning(reason: string) {
-    guard self.stage == "pending_approval" or self.stage == "approved"
+    // Transition table + EventReturnToPlanningLifecycle: quote→planning and
+    // pending_approval→planning. approved cannot regress (only sales_lock or cancelled).
+    guard self.stage == "quote" or self.stage == "pending_approval"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     constraint returnReason: length(trim(reason)) > 0 "Return reason is required"

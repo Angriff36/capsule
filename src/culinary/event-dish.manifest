@@ -89,8 +89,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     // To put the same Dish back after remove: allocate a NEW EventDish and call addToEvent.
     guard self.addedAt == null
     guard self.deletedAt == null
-    // Live event only — includes executing (86/swap mid-service). Not cancelled/done.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // Live event only — includes executing (86/swap mid-service) and sales_lock
+    // (live ops, not a menu freeze). Not cancelled/done.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     // Seed check: createVia pre-writes eventId on the row; the arg must match
     // that seed. Fails only on buggy/mismatched API calls — not a business "can't move dishes" rule.
     constraint addToEventEventMatch: eventId == self.eventId "addToEvent eventId must match the seeded event reference"
@@ -131,7 +132,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     // Live event + post-event correction. Zero = 86 without deleting the line.
     // Refunds are Invoice/Payment — not this field. Cancelled stays locked.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
     constraint adjustServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
     compute previousQuantityServings = self.quantityServings
     mutate quantityServings = quantityServings
@@ -153,7 +154,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     compute follows = self.followsEventHeadcount != null ? self.followsEventHeadcount : (self.quantityServings == previousHeadcount and (self.headcountOverride == null or self.headcountOverride == 0))
     compute previousQuantityServings = self.quantityServings
     mutate followsEventHeadcount = follows
@@ -174,7 +175,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
     constraint setHeadcountOverrideNonnegative: headcountOverride >= 0 "Headcount override cannot be negative"
     compute previousQuantityServings = self.quantityServings
     mutate headcountOverride = headcountOverride
@@ -202,7 +203,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     mutate course = course
     mutate serviceStyle = serviceStyle
     emit EventDishCourseChanged {
@@ -232,8 +233,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    // Notes are allowed through executing — kitchen/service still needs them.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // Notes are allowed through executing and sales_lock — kitchen/service still needs them.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     mutate specialInstructions = specialInstructions
     emit EventDishInstructionsUpdated {
       eventDishId: self.id
@@ -260,7 +261,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     // catalog refreshes through the shared entity policy.
     guard roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess")
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     constraint confirmFromProposalEventMatch: eventId == self.eventId "confirmFromProposal eventId must match the seeded event reference"
     constraint confirmFromProposalServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
     compute wasExistingLine = self.addedAt != null
@@ -324,8 +325,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
-    // Includes executing — ran out / pull from service. Not after the event is done/cancelled.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // Includes executing (ran out / pull from service) and sales_lock (live ops, not a menu freeze).
+    // Not after the event is done/cancelled.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "sales_lock" or self.event.stage == "executing")
     constraint removeEventDishReason: length(trim(reason)) > 0 "Removal reason is required"
     compute previousQuantityServings = self.quantityServings
     mutate deletedAt = now()

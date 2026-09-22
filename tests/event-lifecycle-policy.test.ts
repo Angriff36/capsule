@@ -11,4 +11,13 @@ describe("EventLifecyclePolicy", () => {
     );
     expect(detail).not.toMatch(/lifecycle|refresh|stage/i);
   });
+
+  it("keeps sales_lock editable and executing not", () => {
+    expect(policy.isEditableStage("sales_lock")).toBe(true);
+    expect(policy.isEditableStage("executing")).toBe(false);
+  });
+
+  it("allows headcount changes on sales_lock", () => {
+    expect(policy.canChangeHeadcount("sales_lock")).toBe(true);
+  });
 });
