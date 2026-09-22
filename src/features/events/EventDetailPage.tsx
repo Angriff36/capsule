@@ -53,6 +53,7 @@ import {
   UsersIcon,
 } from "../../ui/icons";
 import { MapPinIcon, TagIcon } from "./eventDetailIcons";
+import { eventCommercialQuotedPrice } from "./eventCommercialSeed";
 import { eventVenueLabel } from "./eventVenueLabel";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -489,7 +490,10 @@ function EventDetailContent({
           <p className="mt-3 border-t border-line pt-3 text-sm text-ink-2">
             <span className="font-semibold text-ink">Budget / quoted</span>{" "}
             {formatMoney(event.budgetAmount, currencyCode)} /{" "}
-            {formatMoney(event.quotedPrice, currencyCode)}
+            {formatMoney(
+              eventCommercialQuotedPrice({ quotedPrice: event.quotedPrice }),
+              currencyCode,
+            )}
           </p>
           <div className="mobile-actions mt-4 flex flex-wrap items-center justify-end gap-2">
             {headerActions}
@@ -543,9 +547,9 @@ function EventDetailContent({
                 </span>
                 <span className="inline-flex min-w-0 items-center gap-1.5">
                   <MapPinIcon width={14} height={14} />
-                  {venue ? (
+                  {event.venueId ? (
                     <Link to="/facilities" className="hover:underline">
-                      {venue.name}
+                      {venueLabel}
                     </Link>
                   ) : (
                     venueLabel

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { formatMoney } from "../../lib/format";
+import { eventCommercialQuotedPrice } from "./eventCommercialSeed";
 import { EventOverviewCard } from "./EventOverviewCard";
 
 function Tile({
@@ -68,7 +69,10 @@ export function EventBudgetCard({
         />
         <Tile
           label="Quoted price"
-          value={formatMoney(quotedPrice, currencyCode)}
+          value={formatMoney(
+            eventCommercialQuotedPrice({ quotedPrice }),
+            currencyCode,
+          )}
         />
         <Tile
           label={

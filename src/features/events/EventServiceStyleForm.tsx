@@ -55,8 +55,18 @@ export function EventServiceStyleForm({
           new FormData(formEvent.currentTarget).get("serviceStyleId") ?? "",
         );
         if (!next || next === serviceStyleId) return;
+        // Snapshot the chosen style's name onto the event so a later catalog
+        // rename cannot rewrite the printed service style.
+        const nextName =
+          (serviceStyles ?? []).find((style) => style._id === next)?.name ??
+          undefined;
         void run(() =>
-          changeServiceStyle({ docId: eventId, version, serviceStyleId: next }),
+          changeServiceStyle({
+            docId: eventId,
+            version,
+            serviceStyleId: next,
+            serviceStyleName: nextName,
+          }),
         );
       }}
     >

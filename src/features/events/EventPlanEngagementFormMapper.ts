@@ -2,12 +2,18 @@ import type { Doc, Id } from "../../lib/api";
 
 export type EventPlanEngagementFormInput = {
   clientId: string;
+  /** Selected client row — stamped as the snapshot. */
+  client?: { name: string } | undefined;
   venueId: string;
   venue: Doc<"venues"> | undefined;
   title: string;
   eventTypeRaw: string;
   occasionId: string;
+  /** Selected occasion row — stamped as the snapshot. */
+  occasion?: { name: string } | undefined;
   serviceStyleId: string;
+  /** Selected style row (or built-in catalog name) — stamped as the snapshot. */
+  serviceStyle?: { name: string } | undefined;
   salespersonId: string;
   referralSourceId: string;
   startsAtRaw: string;
@@ -59,8 +65,16 @@ export class EventPlanEngagementFormMapper {
       budgetAmount: schedule.budgetAmount,
       quotedPrice: schedule.quotedPrice,
     };
-    this.assignOptionalOccasionField(args, input.occasionId);
-    this.assignOptionalServiceStyleField(args, input.serviceStyleId);
+    // Snapshot the client printed name at booking so a later catalog edit
+    // cannot rewrite the event's printed client (same as occasionName).
+    const clientName = input.client?.name?.trim();
+    if (clientName) args.clientName = clientName;
+    this.assignOptionalOccasionField(args, input.occasionId, input.occasion);
+    this.assignOptionalServiceStyleField(
+      args,
+      input.serviceStyleId,
+      input.serviceStyle,
+    );
     this.assignOptionalSalespersonField(args, input.salespersonId);
     this.assignOptionalReferralSourceField(args, input.referralSourceId);
     this.assignOptionalVenueFields(args, input.venue);
@@ -113,20 +127,30 @@ export class EventPlanEngagementFormMapper {
   private assignOptionalOccasionField(
     args: Record<string, unknown>,
     occasionId: string,
+    occasion: { name: string } | undefined,
   ): void {
     const trimmed = occasionId.trim();
     if (trimmed) {
       args.occasionId = trimmed;
+      // Snapshot the occasion name at booking so a later catalog rename cannot
+      // rewrite the event's printed occasion (same as serviceStyleName).
+      const occasionName = occasion?.name?.trim();
+      if (occasionName) args.occasionName = occasionName;
     }
   }
 
   private assignOptionalServiceStyleField(
     args: Record<string, unknown>,
     serviceStyleId: string,
+    serviceStyle: { name: string } | undefined,
   ): void {
     const trimmed = serviceStyleId.trim();
     if (trimmed) {
       args.serviceStyleId = trimmed;
+      // Snapshot the style name at booking so a later catalog rename cannot
+      // rewrite the event's printed service style (same as venueName).
+      const serviceStyleName = serviceStyle?.name?.trim();
+      if (serviceStyleName) args.serviceStyleName = serviceStyleName;
     }
   }
 

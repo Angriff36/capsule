@@ -588,10 +588,19 @@ entity Event mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property clientId: uuid?
+  // Snapshot the booked client printed name so a later catalog edit cannot
+  // rewrite the Event (backend §4.1, AC-398 slice).
+  property clientName: string?
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
   property serviceStyleId: uuid?
+  // Snapshot the booked service-style label so a later catalog rename does
+  // not retroactively change the Event (backend §4.1, AC-398 slice).
+  property serviceStyleName: string?
   property occasionId: uuid?
+  // Snapshot the booked occasion label so a later catalog rename does
+  // not retroactively change the Event (backend §4.1, AC-398 slice).
+  property occasionName: string?
   property referralSourceId: uuid?
   property venueId: uuid?
   property assignedToId: uuid?
@@ -817,8 +826,11 @@ entity Event mixin TenantScoped, SoftDeletable {
     primaryContactName: string,
     budgetAmount: money(12, 2),
     quotedPrice: money(12, 2),
+    optional clientName: string,
     optional serviceStyleId: uuid,
+    optional serviceStyleName: string,
     optional occasionId: uuid,
+    optional occasionName: string,
     optional venueId: uuid,
     optional venueName: string,
     optional venueAddress: string,
@@ -842,13 +854,16 @@ entity Event mixin TenantScoped, SoftDeletable {
     constraint planContact: length(trim(primaryContactName)) > 0 "Primary contact name is required"
     constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
     mutate clientId = clientId
+    mutate clientName = clientName
     mutate title = title
     mutate eventType = eventType
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate purchasingWeekStart = startsAt - ((startsAt - 374400000) % 604800000)
     mutate serviceStyleId = serviceStyleId
+    mutate serviceStyleName = serviceStyleName
     mutate occasionId = occasionId
+    mutate occasionName = occasionName
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
@@ -1184,15 +1199,17 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   // Service corrections stay available during live operations; packet review
   // must use this command so the native reference and event audit agree.
-  command changeServiceStyle(serviceStyleId: uuid) {
+  command changeServiceStyle(serviceStyleId: uuid, optional serviceStyleName: string) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     constraint serviceStyleReferenceInput: length(trim(serviceStyleId)) > 0 "Events must reference a service style"
     mutate serviceStyleId = serviceStyleId
+    mutate serviceStyleName = serviceStyleName != null ? serviceStyleName : self.serviceStyleName
     emit EventServiceStyleChanged {
       eventId: self.id
       tenantId: self.tenantId
       serviceStyleId: serviceStyleId
+      serviceStyleName: serviceStyleName
     }
   }
 
@@ -2236,6 +2253,7 @@ event EventServiceStyleChanged: "event.service_style_changed" {
   eventId: string
   tenantId: string
   serviceStyleId: string
+  serviceStyleName: string?
 }
 
 event EventHeadcountChanged: "event.headcount_changed" {

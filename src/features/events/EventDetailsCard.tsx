@@ -21,7 +21,10 @@ import {
   TagIcon,
   UserIcon,
 } from "./eventDetailIcons";
+import { eventClientLabel } from "./eventClientLabel";
 import { EventOverviewCard } from "./EventOverviewCard";
+import { eventOccasionLabel } from "./eventOccasionLabel";
+import { eventServiceStyleLabel } from "./eventServiceStyleLabel";
 import { eventVenueLabel } from "./eventVenueLabel";
 
 type Named = { _id: string; name: string };
@@ -57,18 +60,27 @@ function Fact({
 export type EventDetailsCardProps = {
   readonly clientId?: string | null;
   readonly clients: Parameters<typeof clientDisplayName>[1];
+  /** Name snapshot the event stored at booking — wins over any later live catalog edit. */
+  readonly clientName?: string | null;
+  readonly clientsLoading?: boolean;
   readonly eventType: string;
   readonly startsAt?: number | null;
   readonly endsAt?: number | null;
   readonly expectedHeadcount?: number | null;
   readonly venue: { name: string } | null | undefined;
   readonly venueId?: string | null;
-  /** Name snapshot the event stored at booking — shown while the venue list loads. */
+  /** Name snapshot the event stored at booking — wins over any later live catalog rename. */
   readonly venueName?: string | null;
   readonly venuesLoading?: boolean;
   readonly venueAddress?: string | null;
   readonly occasionId?: Id<"occasions"> | null;
+  /** Name snapshot the event stored at booking — wins over any later live catalog rename. */
+  readonly occasionName?: string | null;
+  readonly occasionsLoading?: boolean;
   readonly serviceStyleId?: Id<"serviceStyles"> | null;
+  /** Name snapshot the event stored at booking — wins over any later live catalog rename. */
+  readonly serviceStyleName?: string | null;
+  readonly serviceStylesLoading?: boolean;
   readonly referralSourceId?: Id<"referralSources"> | null;
   readonly primaryContactName?: string | null;
   readonly primaryContactEmail?: string | null;
@@ -81,6 +93,8 @@ export type EventDetailsCardProps = {
 export function EventDetailsCard({
   clientId,
   clients,
+  clientName,
+  clientsLoading = false,
   eventType,
   startsAt,
   endsAt,
@@ -91,15 +105,35 @@ export function EventDetailsCard({
   venuesLoading = false,
   venueAddress,
   occasionId,
+  occasionName,
+  occasionsLoading = false,
   serviceStyleId,
+  serviceStyleName,
+  serviceStylesLoading = false,
   referralSourceId,
   primaryContactName,
   primaryContactEmail,
   accessibilityNeeds,
   editHref,
 }: EventDetailsCardProps) {
-  const occasion = nameOf(useListOccasion(), occasionId);
-  const serviceStyle = nameOf(useListServiceStyle(), serviceStyleId);
+  const occasionRow = (useListOccasion() ?? []).find(
+    (row) => row._id === occasionId,
+  );
+  const occasion = eventOccasionLabel({
+    occasionId,
+    occasionName,
+    occasion: occasionRow,
+    occasionsLoading,
+  });
+  const serviceStyleRow = (useListServiceStyle() ?? []).find(
+    (row) => row._id === serviceStyleId,
+  );
+  const serviceStyle = eventServiceStyleLabel({
+    serviceStyleId,
+    serviceStyleName,
+    serviceStyle: serviceStyleRow,
+    serviceStylesLoading,
+  });
   const referralSource = nameOf(useListReferralSource(), referralSourceId);
   const needs = (accessibilityNeeds ?? []).filter(Boolean);
   const contact = [primaryContactName, primaryContactEmail]
@@ -130,10 +164,20 @@ export function EventDetailsCard({
         <Fact icon={<UserIcon width={14} height={14} />} label="Client">
           {clientId ? (
             <Link to={`/clients/${clientId}`} className="hover:underline">
-              {clientDisplayName(clientId, clients)}
+              {eventClientLabel({
+                clientId,
+                clientName,
+                liveName: clientDisplayName(clientId, clients),
+                clientsLoading,
+              })}
             </Link>
           ) : (
-            "—"
+            eventClientLabel({
+              clientId,
+              clientName,
+              liveName: clientDisplayName(clientId, clients),
+              clientsLoading,
+            })
           )}
         </Fact>
         <Fact icon={<TagIcon width={14} height={14} />} label="Event type">

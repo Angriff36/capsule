@@ -12419,7 +12419,7 @@ export const Event_changeRequirements = mutation({
   },
 });
 
-async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceStyleId, version }: any, __creation = false) {
+async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceStyleId, serviceStyleName, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const context = (ctx as any);
@@ -12449,13 +12449,14 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     }
     const updates = {
       serviceStyleId: serviceStyleId,
+      serviceStyleName: ((serviceStyleName != null) ? serviceStyleName : doc.serviceStyleName),
       version: ((doc as any).version ?? 0) + 1
     };
     const __storedUpdates = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, serviceStyleId: serviceStyleId, _subject: { entity: "Event", command: "changeServiceStyle", id: docId } };
-    const __manifestEvent0 = { type: "EventServiceStyleChanged", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, serviceStyleId: serviceStyleId }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, serviceStyleId: serviceStyleId, serviceStyleName: serviceStyleName, _subject: { entity: "Event", command: "changeServiceStyle", id: docId } };
+    const __manifestEvent0 = { type: "EventServiceStyleChanged", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, serviceStyleId: serviceStyleId, serviceStyleName: serviceStyleName }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const fanRows0 = (await ctx.db.query("packLists").filter((q) => q.eq(q.field("activeEventId"), payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
@@ -12471,6 +12472,7 @@ export const Event_changeServiceStyle = mutation({
   args: {
     docId: v.id("events"),
     serviceStyleId: v.string(),
+    serviceStyleName: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -13206,7 +13208,7 @@ export const Event_normalizePurchasingWeek = mutation({
   },
 });
 
-async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, serviceStyleId, occasionId, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, referralSourceId, version }: any, __creation = false) {
+async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, clientName, serviceStyleId, serviceStyleName, occasionId, occasionName, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, referralSourceId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const context = (ctx as any);
@@ -13244,13 +13246,16 @@ async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, tit
     }
     const updates = {
       clientId: clientId,
+      clientName: clientName,
       title: title,
       eventType: eventType,
       startsAt: startsAt,
       endsAt: endsAt,
       purchasingWeekStart: (startsAt - ((startsAt - 374400000) % 604800000)),
       serviceStyleId: serviceStyleId,
+      serviceStyleName: serviceStyleName,
       occasionId: occasionId,
+      occasionName: occasionName,
       venueId: venueId,
       venueName: venueName,
       venueAddress: venueAddress,
@@ -13292,8 +13297,11 @@ export const Event_planEngagement = mutation({
     primaryContactName: v.string(),
     budgetAmount: v.number(),
     quotedPrice: v.number(),
+    clientName: v.optional(v.string()),
     serviceStyleId: v.optional(v.string()),
+    serviceStyleName: v.optional(v.string()),
     occasionId: v.optional(v.string()),
+    occasionName: v.optional(v.string()),
     venueId: v.optional(v.string()),
     venueName: v.optional(v.string()),
     venueAddress: v.optional(v.string()),
@@ -13332,8 +13340,11 @@ export const Event_createViaPlanEngagement = mutation({
     primaryContactName: v.string(),
     budgetAmount: v.number(),
     quotedPrice: v.number(),
+    clientName: v.optional(v.string()),
     serviceStyleId: v.optional(v.string()),
+    serviceStyleName: v.optional(v.string()),
     occasionId: v.optional(v.string()),
+    occasionName: v.optional(v.string()),
     venueId: v.optional(v.string()),
     venueName: v.optional(v.string()),
     venueAddress: v.optional(v.string()),
@@ -13355,7 +13366,7 @@ export const Event_createViaPlanEngagement = mutation({
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const context = (ctx as any);
-    const { clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, serviceStyleId, occasionId, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, referralSourceId } = args;
+    const { clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, clientName, serviceStyleId, serviceStyleName, occasionId, occasionName, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, referralSourceId } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       accessibilityNeeds: args.accessibilityNeeds !== undefined ? args.accessibilityNeeds : [],
@@ -13366,10 +13377,12 @@ export const Event_createViaPlanEngagement = mutation({
       assignedToId: args.assignedToId,
       budgetAmount: args.budgetAmount,
       clientId: args.clientId,
+      clientName: args.clientName,
       endsAt: args.endsAt,
       eventType: args.eventType,
       expectedHeadcount: args.expectedHeadcount,
       occasionId: args.occasionId,
+      occasionName: args.occasionName,
       operationalRequirements: args.operationalRequirements,
       primaryContactEmail: args.primaryContactEmail,
       primaryContactName: args.primaryContactName,
@@ -13378,6 +13391,7 @@ export const Event_createViaPlanEngagement = mutation({
       referralSourceId: args.referralSourceId,
       serviceRequirements: args.serviceRequirements,
       serviceStyleId: args.serviceStyleId,
+      serviceStyleName: args.serviceStyleName,
       startsAt: args.startsAt,
       title: args.title,
       venueAddress: args.venueAddress,
@@ -13403,13 +13417,16 @@ export const Event_createViaPlanEngagement = mutation({
       version: 1,
     };
     doc.clientId = clientId;
+    doc.clientName = clientName;
     doc.title = title;
     doc.eventType = eventType;
     doc.startsAt = startsAt;
     doc.endsAt = endsAt;
     doc.purchasingWeekStart = (startsAt - ((startsAt - 374400000) % 604800000));
     doc.serviceStyleId = serviceStyleId;
+    doc.serviceStyleName = serviceStyleName;
     doc.occasionId = occasionId;
+    doc.occasionName = occasionName;
     doc.venueId = venueId;
     doc.venueName = venueName;
     doc.venueAddress = venueAddress;
@@ -15148,7 +15165,7 @@ export const EventCloseout_finalize = mutation({
   },
 });
 
-async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dishId, quantityServings, headcountOverride, course, serviceStyle, specialInstructions, version }: any, __creation = false) {
+async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dishId, quantityServings, dishName, headcountOverride, course, serviceStyle, specialInstructions, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -15172,6 +15189,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
     const updates = {
       eventId: eventId,
       dishId: dishId,
+      dishName: dishName,
       recipeSyncDishId: dishId,
       quantityServings: quantityServings,
       followsEventHeadcount: ((quantityServings === __rel_event.expectedHeadcount) && ((headcountOverride == null) || (headcountOverride === 0))),
@@ -15292,6 +15310,7 @@ export const EventDish_addToEvent = mutation({
     eventId: v.string(),
     dishId: v.string(),
     quantityServings: v.any(),
+    dishName: v.optional(v.string()),
     headcountOverride: v.optional(v.number()),
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
@@ -15317,6 +15336,7 @@ export const EventDish_createViaAddToEvent = mutation({
     eventId: v.string(),
     dishId: v.string(),
     quantityServings: v.any(),
+    dishName: v.optional(v.string()),
     headcountOverride: v.optional(v.number()),
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
@@ -15330,7 +15350,7 @@ export const EventDish_createViaAddToEvent = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { eventId, dishId, quantityServings, headcountOverride, course, serviceStyle, specialInstructions } = args;
+    const { eventId, dishId, quantityServings, dishName, headcountOverride, course, serviceStyle, specialInstructions } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       headcountOverride: args.headcountOverride !== undefined ? args.headcountOverride : 0,
@@ -15338,6 +15358,7 @@ export const EventDish_createViaAddToEvent = mutation({
       updatedAt: Date.now(),
       course: args.course,
       dishId: args.dishId,
+      dishName: args.dishName,
       eventId: args.eventId,
       quantityServings: args.quantityServings,
       serviceStyle: args.serviceStyle,
@@ -15360,6 +15381,7 @@ export const EventDish_createViaAddToEvent = mutation({
     };
     doc.eventId = eventId;
     doc.dishId = dishId;
+    doc.dishName = dishName;
     doc.recipeSyncDishId = dishId;
     doc.quantityServings = quantityServings;
     doc.followsEventHeadcount = ((quantityServings === __rel_event.expectedHeadcount) && ((headcountOverride == null) || (headcountOverride === 0)));
@@ -15594,7 +15616,7 @@ export const EventDish_changeCourse = mutation({
   },
 });
 
-async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, eventId, dishId, quantityServings, course, serviceStyle, specialInstructions, version }: any, __creation = false) {
+async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, eventId, dishId, quantityServings, dishName, course, serviceStyle, specialInstructions, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -15617,6 +15639,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
     const updates = {
       eventId: eventId,
       dishId: dishId,
+      dishName: ((dishName != null) ? dishName : doc.dishName),
       recipeSyncDishId: dishId,
       quantityServings: ((doc.addedAt != null) ? doc.quantityServings : quantityServings),
       followsEventHeadcount: (wasExistingLine ? doc.followsEventHeadcount : (quantityServings === __rel_event.expectedHeadcount)),
@@ -15696,6 +15719,7 @@ export const EventDish_confirmFromProposal = mutation({
     eventId: v.string(),
     dishId: v.string(),
     quantityServings: v.any(),
+    dishName: v.optional(v.string()),
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
     specialInstructions: v.optional(v.string()),
@@ -37338,7 +37362,7 @@ async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, acceptedR
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","dishId","recipeSyncDishId","quantityServings","followsEventHeadcount","headcountOverride","purchasingWeekStart","sortOrder","course","serviceStyle","specialInstructions","addedAt","removedAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","dishId","dishName","recipeSyncDishId","quantityServings","followsEventHeadcount","headcountOverride","purchasingWeekStart","sortOrder","course","serviceStyle","specialInstructions","addedAt","removedAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishes", __elseDoc as any);
@@ -37734,7 +37758,7 @@ async function __runProposalLinkEvent(ctx: MutationCtx, { docId, version }: any,
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","dishId","recipeSyncDishId","quantityServings","followsEventHeadcount","headcountOverride","purchasingWeekStart","sortOrder","course","serviceStyle","specialInstructions","addedAt","removedAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","dishId","dishName","recipeSyncDishId","quantityServings","followsEventHeadcount","headcountOverride","purchasingWeekStart","sortOrder","course","serviceStyle","specialInstructions","addedAt","removedAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventDishes", __elseDoc as any);

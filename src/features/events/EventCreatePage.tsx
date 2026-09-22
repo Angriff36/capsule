@@ -32,6 +32,7 @@ import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
 import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
 import { EventCreateServiceStyleField } from "./EventCreateServiceStyleField";
+import { SERVICE_STYLE_CATALOG } from "./serviceStyleCatalog";
 import { EventCreateServiceStyleResolver } from "./EventCreateServiceStyleResolver";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
@@ -446,17 +447,43 @@ export function EventCreatePage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const venue = activeVenues.find((item) => item._id === venueId);
-    const buildArgs = async () =>
-      eventPlanEngagementFormMapper.toCommandArgs({
+    // The selected style row (or built-in catalog name) goes onto the event as
+    // the serviceStyleName snapshot, so a later catalog rename cannot rewrite
+    // the booked style (same as venueName).
+    const resolveServiceStyle = async () => {
+      const id = await new EventCreateServiceStyleResolver(
+        ensureBuiltInServiceStyle,
+      ).resolve(serviceStyleId, serviceStyles);
+      const name =
+        (serviceStyles ?? []).find((style) => style._id === id)?.name ??
+        SERVICE_STYLE_CATALOG.find((row) => row.code === serviceStyleId.trim())
+          ?.name;
+      return { id, name: name?.trim() || undefined };
+    };
+    const buildArgs = async () => {
+      const serviceStyle = await resolveServiceStyle();
+      // The selected occasion row goes onto the event as the occasionName
+      // snapshot, so a later catalog rename cannot rewrite the booked occasion
+      // (same as serviceStyleName).
+      const occasion = activeOccasions.find((row) => row._id === occasionId);
+      // The selected client row goes onto the event as the clientName
+      // snapshot, so a later catalog edit cannot rewrite the booked client.
+      const selectedClient = activeClients.find((row) => row._id === clientId);
+      return eventPlanEngagementFormMapper.toCommandArgs({
         clientId,
+        client: selectedClient
+          ? { name: clientDisplayName(selectedClient._id, [selectedClient]) }
+          : undefined,
         venueId,
         venue,
         title: String(data.get("title") ?? ""),
         eventTypeRaw: String(data.get("eventType") ?? ""),
         occasionId,
-        serviceStyleId: await new EventCreateServiceStyleResolver(
-          ensureBuiltInServiceStyle,
-        ).resolve(serviceStyleId, serviceStyles),
+        occasion: occasion ? { name: occasion.name } : undefined,
+        serviceStyleId: serviceStyle.id,
+        serviceStyle: serviceStyle.name
+          ? { name: serviceStyle.name }
+          : undefined,
         salespersonId,
         referralSourceId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
@@ -473,6 +500,7 @@ export function EventCreatePage() {
           data.get("operationalRequirements") ?? "",
         ),
       });
+    };
     // A proposalId in the route NEVER falls through to generic unlinked
     // creation (issue #392): the canonical seam books an accepted, unlinked
     // proposal and returns the existing event when another booking won the

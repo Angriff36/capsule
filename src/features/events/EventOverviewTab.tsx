@@ -31,11 +31,14 @@ type OverviewEvent = {
   hasMenuDishes?: boolean;
   hasStaffAssigned?: boolean;
   eventType: string;
+  clientName?: string | null;
   venueId?: Id<"venues"> | null;
   venueName?: string | null;
   venueAddress?: string | null;
   occasionId?: Id<"occasions"> | null;
+  occasionName?: string | null;
   serviceStyleId?: Id<"serviceStyles"> | null;
+  serviceStyleName?: string | null;
   referralSourceId?: Id<"referralSources"> | null;
   assignedToId?: Id<"people"> | null;
   recurrenceFrequency?: string | null;
@@ -112,6 +115,8 @@ export function EventOverviewTab({
           <EventDetailsCard
             clientId={clientId}
             clients={clients}
+            clientName={event.clientName}
+            clientsLoading={clients === undefined}
             eventType={event.eventType}
             startsAt={startsAt}
             endsAt={endsAt}
@@ -122,7 +127,9 @@ export function EventOverviewTab({
             venuesLoading={reviseProps.venuesLoading}
             venueAddress={event.venueAddress}
             occasionId={event.occasionId}
+            occasionName={event.occasionName}
             serviceStyleId={event.serviceStyleId}
+            serviceStyleName={event.serviceStyleName}
             referralSourceId={event.referralSourceId}
             primaryContactName={primaryContactName}
             primaryContactEmail={reviseProps.primaryContactEmail}

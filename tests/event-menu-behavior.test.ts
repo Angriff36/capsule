@@ -321,3 +321,28 @@ it.each(["menu", "prep"])(
     );
   },
 );
+
+it("prints the booked dish snapshot on the menu, not a later catalog rename", async () => {
+  menu();
+  backend.values.set("useListEventDish", [
+    {
+      _id: "menu-a",
+      eventId: "event-a",
+      dishId: "dish-a",
+      dishName: "Roast carrots",
+      quantityServings: 40,
+      course: "Side",
+      serviceStyle: "plated",
+      version: 7,
+    },
+  ]);
+  backend.values.set("useListDish", [
+    { _id: "dish-a", name: "Roast carrots RENAMED", status: "active" },
+  ]);
+  await mount(page());
+  const title = container.querySelector(
+    '[data-testid="event-menu-dish-name"]',
+  )!;
+  expect(title.textContent).toBe("Roast carrots");
+  expect(container.textContent).not.toContain("RENAMED");
+});

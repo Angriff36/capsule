@@ -48,4 +48,46 @@ describe("EventPlanEngagementFormMapper", () => {
       ),
     ).toThrow("Event type is required.");
   });
+
+  it("stamps the trimmed service style name next to the style id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        serviceStyleId: "style-id",
+        serviceStyle: { name: "  Full Service  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      serviceStyleId: "style-id",
+      serviceStyleName: "Full Service",
+    });
+  });
+
+  it("stamps the trimmed occasion name next to the occasion id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        occasionId: "occ-id",
+        occasion: { name: "  Wedding  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      occasionId: "occ-id",
+      occasionName: "Wedding",
+    });
+  });
+
+  it("stamps the trimmed client name next to the client id", () => {
+    const args = new EventPlanEngagementFormMapper().toCommandArgs(
+      validInput({
+        clientId: "client-id",
+        client: { name: "  Acme Catering  " },
+      }),
+    );
+
+    expect(args).toMatchObject({
+      clientId: "client-id",
+      clientName: "Acme Catering",
+    });
+  });
 });
