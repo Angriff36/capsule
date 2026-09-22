@@ -97,6 +97,13 @@ foreach ($file in Get-ChildItem $handoffDir -Filter *.json) {
   Remove-Item (Join-Path $wt '.loop-typecheck.log') -Force
 
   $r = Review $wt "$($h.item) - $($h.target)"
+  if ($r.verdict -eq 'NONE') {
+    # No reviewer could answer (OpenAI plan empty, Cursor not logged in, outage). That is
+    # not a verdict on the fix: keep the worktree and the hand-off, no strike, and the next
+    # run tries the review again (loop-tick.cmd runs the lander first when a hand-off waits).
+    Record $h 'NOREVIEW' "no reviewer produced a verdict (Codex: plan/outage; Cursor grok: $((($r.full -split "`n") | Select-String -Pattern 'Error|ERROR' | Select-Object -First 1) -replace '^\s+','')) - fix kept, review retried next run"
+    continue
+  }
   if ($r.verdict -ne 'APPROVE') {
     # Keep the WHOLE review and the rejected patch: the attempt is deleted, and the next maker run starts from this file.
     $fbDir = Join-Path $root '.loop-worktrees\_feedback'

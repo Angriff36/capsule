@@ -438,6 +438,146 @@
       "verdict": "FAIL",
       "timestamp": "2026-09-21T00:45:27.7025457Z",
       "reason": "review by gpt-5.6-sol: REJECT the candidate does not implement or test the requested new-menu validation and contains only unrelated edits"
+    },
+    {
+      "item": "#377 part 3: PackList.markPacked accepts 0 of N packed (no warning)",
+      "runId": "fix-20260920T1940-markpacked-zeron-warn",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-21T03:04:06.4018751Z",
+      "reason": "review by gpt-5.6-sol: REJECT unresolved item queries can bypass the required zero-packed warning"
+    },
+    {
+      "item": "#377 part 3: PackList.markPacked accepts 0 of N packed (no warning)",
+      "runId": "fix-20260920T2100-markpacked-zeron-warn",
+      "verdict": "LANDED",
+      "timestamp": "2026-09-21T03:56:15.1981441Z",
+      "reason": "on dev as ede51dc4, reviewed by gpt-5.6-sol"
+    },
+    {
+      "item": "#377 part 1 Delivery is Drop-Off only",
+      "runId": "fix-20260921T0919-delivery-dropoff-only",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-21T17:25:56.2547251Z",
+      "reason": "review by gpt-5.6-sol: REJECT Drop-Off scheduling is partial and rig double-booking is not reliably governed | full review + rejected patch: .loop-worktrees/_feedback/fix-20260921T0919-delivery-dropoff-only.md"
+    },
+    {
+      "item": "#377 part 1 Delivery is Drop-Off only",
+      "runId": "fix-20260921T1037-delivery-dropoff-only",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-21T18:36:05.3626651Z",
+      "reason": "review by gpt-5.6-sol: REJECT Drop-Off packing can commit without a scheduled delivery | full review + rejected patch: .loop-worktrees/_feedback/fix-20260921T1037-delivery-dropoff-only.md"
+    },
+    {
+      "item": "#377 part 1 Delivery is Drop-Off only",
+      "runId": "fix-20260921T1141-delivery-dropoff-only",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-21T19:18:16.5036551Z",
+      "reason": "review by gpt-5.6-sol: REJECT agent command paths still bypass the atomic pack-and-schedule seam | full review + rejected patch: .loop-worktrees/_feedback/fix-20260921T1141-delivery-dropoff-only.md"
+    },
+    {
+      "item": "#389 Accepted-proposal booking retry rejects instead of returning the saved Event",
+      "runId": "fix-20260921T1222-proposal-booking-retry",
+      "verdict": "LANDED",
+      "timestamp": "2026-09-21T19:48:04.4246187Z",
+      "reason": "on dev as 305c7473, reviewed by gpt-5.6-sol"
+    },
+    {
+      "item": "#383 QBO create retry can repeat a remote invoice or payment after lost local receipt",
+      "runId": "fix-20260921T2217-qbo-create-idempotency",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-21T23:03:54.7141459Z",
+      "reason": "review by gpt-5.6-sol: REJECT reconciliation lacks stable operation identity and can silently adopt or duplicate the wrong QBO record | full review + rejected patch: .loop-worktrees/_feedback/fix-20260921T2217-qbo-create-idempotency.md"
+    },
+    {
+      "item": "#383 QBO create retry can repeat a remote invoice or payment after lost local receipt",
+      "runId": "fix-20260921T2311-qbo-op-identity",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-22T00:13:13.5211095Z",
+      "reason": "review by gpt-5.6-sol: REJECT payment identity conflicts block valid subsequent payments | full review + rejected patch: .loop-worktrees/_feedback/fix-20260921T2311-qbo-op-identity.md"
+    },
+    {
+      "item": "#383 QBO create retry can repeat a remote invoice or payment after lost local receipt",
+      "runId": "fix-20260922T0018-qbo-op-token",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-22T01:00:41.8945362Z",
+      "reason": "review by gpt-5.6-sol: REJECT operation identity still relies on truncated DocNumber and payload comparison is incomplete | full review + rejected patch: .loop-worktrees/_feedback/fix-20260922T0018-qbo-op-token.md"
+    },
+    {
+      "item": "#387 Stock reservation availability is checked by the client but not the canonical transaction.",
+      "runId": "fix-20260922T0103-stock-canonical-reserve",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-22T01:58:50.9849893Z",
+      "reason": "review by gpt-5.6-sol: REJECT legacy holds are unsafe and the public releaseHold command bypasses the canonical invariant | full review + rejected patch: .loop-worktrees/_feedback/fix-20260922T0103-stock-canonical-reserve.md"
+    },
+    {
+      "item": "#387 Stock reservation availability is checked by the client but not the canonical transaction.",
+      "runId": "fix-20260922T0230-stock-canonical-reserve",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-22T03:05:00Z",
+      "reason": "maker stopped before review: the Manifest compiler denies any aggregate except one-hop count_of over an inverse hasMany in command bodies (functions.js relation planner, CONVEX_UNSUPPORTED_RELATION_ACCESS), so no canonical sum gate can compile; counter designs stay rejected per attempt 1 because reaction and public calls share one command body (no reaction-only visibility, no cross-entity mutate). Generator-level blocker, same family as #377 part 1. Evidence + reusable proof test: .loop-worktrees/_feedback/fix-20260922T0230-stock-canonical-reserve-attempt2-findings.md"
+    },
+    {
+      "item": "#384 Event lifecycle commands disagree with cancellation transitions and scoped readiness",
+      "runId": "fix-20260922T0318-event-lifecycle-cancel",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-22T03:55:57.8098294Z",
+      "reason": "review by gpt-5.6-sol: REJECT stale approved-stage lifecycle assertion breaks the full test suite | full review + rejected patch: .loop-worktrees/_feedback/fix-20260922T0318-event-lifecycle-cancel.md"
+    },
+    {
+      "item": "#384 Event lifecycle commands disagree with cancellation transitions and scoped readiness",
+      "runId": "fix-20260922T0400-event-lifecycle-cancel",
+      "verdict": "COLLISION",
+      "timestamp": "2026-09-22T05:40:06.5108013Z",
+      "reason": "newer dev work touches the same places - retry from a fresh worktree (not a strike)"
+    },
+    {
+      "item": "#384 Event lifecycle commands disagree with cancellation transitions and scoped readiness",
+      "runId": "fix-20260922T0545-event-lifecycle-cancel",
+      "verdict": "FAIL",
+      "timestamp": "2026-09-22T06:20:34.449576Z",
+      "reason": "review by gpt-5.6-sol: REJECT readiness freeze is not regression-tested | full review + rejected patch: .loop-worktrees/_feedback/fix-20260922T0545-event-lifecycle-cancel.md"
+    },
+    {
+      "item": "#384 Event lifecycle commands disagree with cancellation transitions and scoped readiness",
+      "runId": "fix-20260922T0625-event-lifecycle-cancel",
+      "verdict": "COLLISION",
+      "timestamp": "2026-09-22T06:54:05.9917788Z",
+      "reason": "push to dev refused (dev moved again or the regen check blocked it) - see loop-land.log; retry from a fresh worktree"
+    },
+    {
+      "item": "#384 Event lifecycle commands disagree with cancellation transitions and scoped readiness",
+      "runId": "fix-20260922T0658-event-lifecycle-cancel",
+      "verdict": "COLLISION",
+      "timestamp": "2026-09-22T07:50:09.0854225Z",
+      "reason": "push to dev refused (dev moved again or the regen check blocked it) - see loop-land.log; retry from a fresh worktree"
+    },
+    {
+      "item": "#384 Event lifecycle commands disagree with cancellation transitions and scoped readiness",
+      "runId": "fix-20260922T0818-event-lifecycle-cancel",
+      "verdict": "COLLISION",
+      "timestamp": "2026-09-22T08:50:04.1578531Z",
+      "reason": "push to dev refused (dev moved again or the regen check blocked it) - see loop-land.log; retry from a fresh worktree"
+    },
+    {
+      "item": "#384 Event lifecycle commands disagree with cancellation transitions and scoped readiness",
+      "runId": "fix-20260922T0902-event-lifecycle-cancel",
+      "verdict": "NOREVIEW",
+      "timestamp": "2026-09-22T09:09:13.5785378Z",
+      "reason": "no reviewer was reachable (OpenAI plan empty, Cursor CLI not logged in) - not a strike; relabeled by overseer 2026-09-22. review by none: NONE no reviewer produced a verdict | full review + rejected patch: .loop-worktrees/_feedback/fix-20260922T0902-event-lifecycle-cancel.md"
+    },
+    {
+      "item": "#385 Venue note management_only visibility is not enforced by the read policy.",
+      "runId": "fix-20260922T0917-venue-note-read-visibility",
+      "verdict": "NOREVIEW",
+      "timestamp": "2026-09-22T09:43:58.5689004Z",
+      "reason": "no reviewer was reachable (OpenAI plan empty, Cursor CLI not logged in) - not a strike; relabeled by overseer 2026-09-22. review by none: NONE no reviewer produced a verdict | full review + rejected patch: .loop-worktrees/_feedback/fix-20260922T0917-venue-note-read-visibility.md"
+    },
+    {
+      "item": "#385 Venue note management_only visibility is not enforced by the read policy.",
+      "runId": "fix-20260922T0947-venue-note-read-visibility",
+      "verdict": "NOREVIEW",
+      "timestamp": "2026-09-22T10:03:06.0130156Z",
+      "reason": "no reviewer was reachable (OpenAI plan empty, Cursor CLI not logged in) - not a strike; relabeled by overseer 2026-09-22. review by none: NONE no reviewer produced a verdict | full review + rejected patch: .loop-worktrees/_feedback/fix-20260922T0947-venue-note-read-visibility.md"
     }
   ]
 }
