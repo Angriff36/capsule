@@ -145,6 +145,7 @@ export class CapsuleEventBundleStateLoader {
       packLists,
       packListItems,
       assignments,
+      venues,
     ] = await Promise.all([
       client.query(api.queries.listEvent, {}),
       client.query(api.queries.listClient, {}),
@@ -156,6 +157,7 @@ export class CapsuleEventBundleStateLoader {
       client.query(api.queries.listPackList, {}),
       client.query(api.queries.listPackListItem, {}),
       client.query(api.queries.listEventAssignment, {}),
+      client.query(api.queries.listVenue, {}),
     ]);
     return mapBundleExistingEvent(eventId, {
       events,
@@ -168,6 +170,7 @@ export class CapsuleEventBundleStateLoader {
       packLists,
       packListItems,
       assignments,
+      venues,
     });
   }
 
