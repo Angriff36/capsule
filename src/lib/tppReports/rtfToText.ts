@@ -82,6 +82,13 @@ export function rtfToText(rtf: string): string {
         else if (name === "par" || name === "line" || name === "row")
           emit("\n");
         else if (name === "tab" || name === "cell") emit("\t");
+        // Punctuation TPP writes as control words; dropping the dash between
+        // two times loses the event's end time.
+        else if (name === "endash") emit("\u2013");
+        else if (name === "emdash") emit("\u2014");
+        else if (name === "lquote" || name === "rquote") emit("'");
+        else if (name === "ldblquote" || name === "rdblquote") emit('"');
+        else if (name === "bullet") emit("\u2022");
         else if (name === "uc") top().uc = Number(arg ?? 1);
         else if (name === "u" && arg !== undefined) {
           const code = Number(arg);

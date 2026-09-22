@@ -32,7 +32,7 @@ import {
 const CLOCK = /\d{1,2}:\d{2}\s*[AaPp]\.?[Mm]\.?/;
 const LEADING_CLOCK = new RegExp(`^(${CLOCK.source})\\s*(.*)$`);
 const CLOCK_RANGE = new RegExp(
-  `(${CLOCK.source})\\s*(?:-|–|to)\\s*(${CLOCK.source})`,
+  `(${CLOCK.source})\\s*(?:-|–|—|to)\\s*(${CLOCK.source})`,
 );
 const SERVING_UNIT =
   /(?:x\s+|(?:servings?|serv|each|ea|pcs?|pieces?|portions?|ppl|people|guests?)\b\.?\s*)/i;

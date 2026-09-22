@@ -1,10 +1,13 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { warningsNeedingDecision } from "../../../agent/CapsuleEventBundleWarnings";
 import type {
   CapsuleEventBundleCatalogMatch,
   CapsuleEventBundleDirectory,
 } from "../../../agent/CapsuleEventBundleExistingState";
-import { mapBundleExistingEvent } from "../../../agent/CapsuleEventBundleExistingEventMapper";
+import {
+  mapBundleExistingEvent,
+  type BundleExistingEventRows,
+} from "../../../agent/CapsuleEventBundleExistingEventMapper";
 import { eventBundleIdempotencyScope } from "../../../agent/CapsuleEventBundleIdempotencyScope";
 import { normalizeName } from "../../../agent/CapsuleEventBundleShared";
 import { useLoadExistingEventRows } from "../../../lib/eventImportExisting";
@@ -76,22 +79,114 @@ export function useEventImportRunner(input: {
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [result, setResult] = useState<EventImportResult | null>(null);
 
-  // No plan until the directory, the events and the invoices are in: planning
-  // against an empty list would draw fresh parents for a bundle that is
-  // already half-entered, or make a second event for one that exists.
+  // The event this BEO belongs to (owner rule, 2026-09-20: a BEO fills in
+  // and overwrites the event it belongs to): the live one with this TPP
+  // number, typed on the event or held only by its invoice; else the same
+  // title on the same date for the client chosen on the review screen.
+  // Resolved BEFORE the plan, so the steps a person reviews are the steps
+  // that run.
+  const match = useMemo(() => {
+    const header = input.bundle?.header;
+    if (!header || eventRows === undefined || invoiceRows === undefined)
+      return null;
+    const isLive = (row: Record<string, unknown>) =>
+      row.deletedAt == null && row.stage !== "cancelled";
+    const number = header.invoiceNumber?.trim() || undefined;
+    const invoiceEventIds = new Set(
+      invoiceRows
+        .filter(
+          (invoice) =>
+            invoice.deletedAt == null &&
+            number !== undefined &&
+            String(invoice.invoiceNumber ?? "").trim() === number &&
+            invoice.eventId,
+        )
+        .map((invoice) => String(invoice.eventId)),
+    );
+    const matchesNumber = (row: Record<string, unknown>) =>
+      number !== undefined &&
+      (String(row.eventNumber ?? "").trim() === number ||
+        invoiceEventIds.has(String(row._id)));
+    const chosenClientId = input.catalog?.clientId;
+    const matchesTitleDate = (row: Record<string, unknown>) =>
+      chosenClientId !== undefined &&
+      String(row.clientId ?? "") === chosenClientId &&
+      normalizeName(String(row.title ?? "")) ===
+        normalizeName(header.title ?? "") &&
+      typeof row.startsAt === "number" &&
+      localIsoDate(row.startsAt) === header.eventDate;
+    const live = eventRows.filter(isLive);
+    const byNumber = live.filter(matchesNumber);
+    const byTitleDate = byNumber.length ? [] : live.filter(matchesTitleDate);
+    const candidates = byNumber.length ? byNumber : byTitleDate;
+    // An event the person deleted keeps its old command results: every run
+    // for the same BEO after that uses the replacement's own scope.
+    const deleted = eventRows.filter(
+      (row) => !isLive(row) && (matchesNumber(row) || matchesTitleDate(row)),
+    ).length;
+    if (candidates.length > 1) {
+      return {
+        targetId: null as string | null,
+        deleted,
+        ambiguous: `${candidates.length} live events match this BEO by ${byNumber.length ? `number ${number}` : "title and date"}. Cancel or renumber the extra one, then import again.`,
+      };
+    }
+    return {
+      targetId: candidates[0] ? String(candidates[0]._id) : null,
+      deleted,
+      ambiguous: null as string | null,
+    };
+  }, [input.bundle, input.catalog?.clientId, eventRows, invoiceRows]);
+
+  // The matched event's current rows, loaded once per target, so the plan
+  // adds what is missing and overwrites what the BEO carries.
+  const [existingRows, setExistingRows] = useState<{
+    targetId: string;
+    rows: BundleExistingEventRows;
+  } | null>(null);
+  const targetId = match?.targetId ?? null;
+  const loadedTargetId = existingRows?.targetId ?? null;
+  useEffect(() => {
+    if (!targetId || loadedTargetId === targetId) return;
+    let stale = false;
+    void loadExistingRows().then((rows) => {
+      if (!stale) setExistingRows({ targetId, rows });
+    });
+    return () => {
+      stale = true;
+    };
+  }, [targetId, loadedTargetId, loadExistingRows]);
+
+  // Two live events claim this BEO: say so where failures show, and plan
+  // nothing until a person settles it.
+  const ambiguous = match?.ambiguous ?? null;
+  useEffect(() => {
+    if (ambiguous) setFailure(classifyCommandFailure(new Error(ambiguous)));
+  }, [ambiguous]);
+
+  // No plan until the directory, the events, the invoices and, for a matched
+  // event, its rows are in: planning against an empty list would draw fresh
+  // parents for a bundle that is already half-entered, or make a second
+  // event for one that exists.
   const plan: EventBundlePlan | null = useMemo(() => {
     if (
       !input.bundle ||
       !input.directory ||
       serviceStyleRows === undefined ||
-      eventRows === undefined ||
-      invoiceRows === undefined
+      !match ||
+      match.ambiguous
     )
       return null;
+    const existing =
+      match.targetId && existingRows?.targetId === match.targetId
+        ? mapBundleExistingEvent(match.targetId, existingRows.rows)
+        : undefined;
+    if (match.targetId && !existing) return null;
     return buildEventBundlePlan(input.bundle, {
       catalog: input.catalog,
       directory: input.directory,
       serviceStyles,
+      existing,
       unmatchedStaffAsOpenShifts: true,
       raiseReviewFlags: true,
     });
@@ -101,8 +196,8 @@ export function useEventImportRunner(input: {
     input.directory,
     serviceStyleRows,
     serviceStyles,
-    eventRows,
-    invoiceRows,
+    match,
+    existingRows,
   ]);
 
   const decisions = useMemo(
@@ -111,7 +206,7 @@ export function useEventImportRunner(input: {
   );
 
   const run = useCallback(async () => {
-    if (!plan || !input.bundle) return;
+    if (!plan || !input.bundle || !match) return;
     setFailure(null);
     setResult(null);
     try {
@@ -125,77 +220,11 @@ export function useEventImportRunner(input: {
           `This screen cannot run ${unsupported.join(", ")} yet — enter this bundle through the agent importer.`,
         );
       }
-      // The rule (owner, 2026-09-20): a BEO fills in and overwrites the event
-      // it belongs to. That event is the live one with this TPP number (or,
-      // for an event from before numbers were written, this title and date).
-      // No such event: the import makes one.
-      const header = input.bundle.header;
-      const isLive = (row: Record<string, unknown>) =>
-        row.deletedAt == null && row.stage !== "cancelled";
-      const live = (eventRows ?? []).filter(isLive);
-      const number = header.invoiceNumber?.trim() || undefined;
-      // 1. The event that carries this TPP number: typed on the event, or held
-      //    only by its invoice (events from before numbers were written).
-      const invoiceEventIds = new Set(
-        (invoiceRows ?? [])
-          .filter(
-            (invoice) =>
-              invoice.deletedAt == null &&
-              number !== undefined &&
-              String(invoice.invoiceNumber ?? "").trim() === number &&
-              invoice.eventId,
-          )
-          .map((invoice) => String(invoice.eventId)),
-      );
-      const matchesNumber = (row: Record<string, unknown>) =>
-        number !== undefined &&
-        (String(row.eventNumber ?? "").trim() === number ||
-          invoiceEventIds.has(String(row._id)));
-      // 2. Only when no number matches: the same title on the same date for
-      //    the client chosen on the review screen. Another client's "Wedding"
-      //    on that date is a different event.
-      const chosenClientId = input.catalog?.clientId;
-      const matchesTitleDate = (row: Record<string, unknown>) =>
-        chosenClientId !== undefined &&
-        String(row.clientId ?? "") === chosenClientId &&
-        normalizeName(String(row.title ?? "")) ===
-          normalizeName(header.title ?? "") &&
-        typeof row.startsAt === "number" &&
-        localIsoDate(row.startsAt) === header.eventDate;
-      const byNumber = live.filter(matchesNumber);
-      const byTitleDate = byNumber.length ? [] : live.filter(matchesTitleDate);
-      const candidates = byNumber.length ? byNumber : byTitleDate;
-      if (candidates.length > 1) {
-        throw new Error(
-          `${candidates.length} live events match this BEO by ${byNumber.length ? `number ${number}` : "title and date"}. Cancel or renumber the extra one, then import again.`,
-        );
-      }
-      const target = candidates[0];
-      let runPlan = plan;
-      if (target) {
-        runPlan = buildEventBundlePlan(input.bundle, {
-          catalog: input.catalog,
-          directory: input.directory ?? undefined,
-          serviceStyles,
-          existing: mapBundleExistingEvent(
-            String(target._id),
-            await loadExistingRows(),
-          ),
-          unmatchedStaffAsOpenShifts: true,
-          raiseReviewFlags: true,
-        });
-      }
-      // An event the person deleted keeps its old command results. Every run
-      // for the same BEO after that, the one that makes the replacement AND
-      // the retries against it, uses the replacement's own scope, or the
-      // cancelled event's cached results would answer and skip writes.
-      const deleted = (eventRows ?? []).filter(
-        (row) => !isLive(row) && (matchesNumber(row) || matchesTitleDate(row)),
-      ).length;
-      const runScope = deleted > 0 ? `${scope}:again${deleted}` : scope;
+      const runScope =
+        match.deleted > 0 ? `${scope}:again${match.deleted}` : scope;
       const ids = await runPlannedSteps({
-        steps: runPlan.steps,
-        seedIds: runPlan.seedIds,
+        steps: plan.steps,
+        seedIds: plan.seedIds,
         executor: commands.executor,
         idempotencyKeyFor: (step) =>
           `${runScope}:${step.capabilityId}:${step.idempotencySuffix}`,
@@ -230,7 +259,7 @@ export function useEventImportRunner(input: {
           );
         }
       }
-      setResult({ eventId, executedSteps: runPlan.steps.length });
+      setResult({ eventId, executedSteps: plan.steps.length });
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     } finally {
@@ -239,13 +268,9 @@ export function useEventImportRunner(input: {
   }, [
     attachPacketSources,
     commands,
-    eventRows,
     input.bundle,
-    input.catalog,
-    input.directory,
-    loadExistingRows,
-    serviceStyles,
     input.pastedText,
+    match,
     plan,
     tenantId,
   ]);
