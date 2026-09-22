@@ -359,8 +359,11 @@ for (const row of catalog.rows) {
   let decision: ReclassifyDecision;
   let jev: { kind: JevRowKind; confidence: number } | null = null;
   if (importedSak) {
+    // TPP filed this item under a menu category and the import matched it to
+    // a dish. TPP's own category is the answer (owner, 2026-09-22): the row
+    // stays a dish with that exact category. No word rule, no model.
     decision = {
-      kind: classification?.role === "supply" ? "supply" : "food",
+      kind: "food",
       source: "rule:tpp-import-dish",
       confidence: 1,
       ready: true,
