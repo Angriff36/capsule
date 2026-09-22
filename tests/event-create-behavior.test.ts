@@ -434,3 +434,45 @@ it("prefills distinct proposal start and end dates, headcount, client, and venue
   expect(field("clientId").value).toBe("client-a");
   expect(field("venueId").value).toBe("venue-a");
 });
+
+// Issue #393: two active venues share the proposal's venue NAME — the form
+// must not silently book the first match; the operator picks deliberately.
+it("leaves a duplicate-name venue unpicked and makes the operator choose", async () => {
+  bookingOptions();
+  backend.values.set("useListVenue", [
+    {
+      _id: "venue-a",
+      name: "Garden",
+      status: "active",
+      registeredAt: 1,
+      capacity: 200,
+    },
+    {
+      _id: "venue-b",
+      name: "Garden",
+      status: "active",
+      registeredAt: 2,
+      capacity: 60,
+      addressLine1: "12 Lake Road",
+    },
+  ]);
+  backend.values.set(
+    "useGetProposal",
+    acceptedProposal({ venueName: "Garden" }),
+  );
+  await mount(
+    createElement(EventCreatePage),
+    "/events/new?proposalId=proposal-a",
+  );
+  // Nothing is selected on the operator's behalf…
+  expect(field("venueId").value).toBe("");
+  // …and the form says the name is ambiguous rather than unmatched.
+  expect(container.textContent).toContain("2 saved venues match “Garden”");
+  expect(container.textContent).toContain(
+    "pick the right one in the Venue panel",
+  );
+  expect(container.textContent).not.toContain("No saved venue matched");
+  // The choice stays real: typing the second Garden's street picks that row.
+  await chooseAccountOrVenue("venueId", "12 Lake Road");
+  expect(field("venueId").value).toBe("venue-b");
+});

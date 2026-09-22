@@ -38,14 +38,31 @@ export class ProposalEventPrefill {
     };
   }
 
-  /** The proposal only stores a venue NAME — resolve it against real venues. */
+  /**
+   * Every saved venue whose name matches the proposal's venue NAME (case and
+   * whitespace-insensitive).
+   */
+  venueMatches(
+    proposal: Doc<"proposals"> | null | undefined,
+    venues: readonly Doc<"venues">[],
+  ): Doc<"venues">[] {
+    const wanted = proposal?.venueName?.trim().toLowerCase();
+    if (!wanted) return [];
+    return venues.filter((venue) => venue.name.trim().toLowerCase() === wanted);
+  }
+
+  /**
+   * The proposal only stores a venue NAME — resolve it against real venues.
+   * Auto-select only a UNIQUE match (issue #393): when several saved venues
+   * share the name, silently booking the first could attach the wrong
+   * identity, so the choice stays with the operator.
+   */
   matchVenue(
     proposal: Doc<"proposals"> | null | undefined,
     venues: readonly Doc<"venues">[],
   ): Doc<"venues"> | undefined {
-    const wanted = proposal?.venueName?.trim().toLowerCase();
-    if (!wanted) return undefined;
-    return venues.find((venue) => venue.name.trim().toLowerCase() === wanted);
+    const matches = this.venueMatches(proposal, venues);
+    return matches.length === 1 ? matches[0] : undefined;
   }
 
   /**

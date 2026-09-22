@@ -260,6 +260,12 @@ export function EventCreatePage() {
     const match = proposalEventPrefill.matchVenue(proposal, activeVenues);
     if (match) setVenueId((current) => current || match._id);
   }, [proposal, venues]);
+  // Issue #393: a proposal venue NAME can match several saved venues — the
+  // form must say so instead of implying the proposal named exactly one.
+  const proposalVenueMatches =
+    proposal != null && proposalLinkable && proposal.venueName
+      ? proposalEventPrefill.venueMatches(proposal, activeVenues)
+      : [];
 
   const run = async (
     kind: "client" | "venue" | "event",
@@ -940,10 +946,18 @@ export function EventCreatePage() {
                   proposal.venueName &&
                   venues !== undefined &&
                   !venueId ? (
-                    <p className="text-xs leading-relaxed text-ink-3">
-                      No saved venue matched “{proposal.venueName}” — pick or
-                      create it in the Venue panel.
-                    </p>
+                    proposalVenueMatches.length > 1 ? (
+                      <p className="text-xs leading-relaxed text-ink-3">
+                        {proposalVenueMatches.length} saved venues match “
+                        {proposal.venueName}” — pick the right one in the Venue
+                        panel.
+                      </p>
+                    ) : (
+                      <p className="text-xs leading-relaxed text-ink-3">
+                        No saved venue matched “{proposal.venueName}” — pick or
+                        create it in the Venue panel.
+                      </p>
+                    )
                   ) : null}
                 </div>
               )}

@@ -31,4 +31,30 @@ describe("ProposalEventPrefill", () => {
       } as never),
     ).toBe(false);
   });
+
+  // Issue #393: a venue-name match is automatic only when it is unambiguous —
+  // two saved venues with the same name must never silently pick the first.
+  it("auto-selects a unique venue-name match and refuses to pick between same-named venues", () => {
+    const garden = { _id: "venue-a", name: "Garden" };
+    const gardenLake = { _id: "venue-b", name: "garden" };
+    const hall = { _id: "venue-c", name: "Hall" };
+    const proposal = { venueName: "  GARDEN  " };
+    const venues = [garden, gardenLake, hall] as never;
+
+    expect(proposalEventPrefill.matchVenue(proposal as never, venues)).toBe(
+      undefined,
+    );
+    expect(
+      proposalEventPrefill.venueMatches(proposal as never, venues),
+    ).toEqual([garden, gardenLake]);
+    expect(
+      proposalEventPrefill.matchVenue(proposal as never, [garden] as never),
+    ).toBe(garden);
+    expect(
+      proposalEventPrefill.matchVenue(proposal as never, [hall] as never),
+    ).toBeUndefined();
+    expect(
+      proposalEventPrefill.matchVenue({ venueName: "   " } as never, venues),
+    ).toBeUndefined();
+  });
 });
