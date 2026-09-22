@@ -1437,6 +1437,28 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // AC-228: completion freezes Event.changePricing. An authorized
+  // correction with a reason still updates the commercial seed and
+  // writes one EventCommercialCorrected ledger row. Allowed at
+  // completed and closed_out only — sales_lock change-orders are
+  // PL-COMMERCIAL-CHANGE, not this command.
+  command correctCommercial(reason: string, budgetAmount: money(12, 2), quotedPrice: money(12, 2)) {
+    guard self.stage == "completed" or self.stage == "closed_out"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "salesManageAccess")
+    constraint correctionReasonPresent: length(trim(reason)) > 0 "Correction reason is required"
+    constraint correctionPricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    mutate budgetAmount = budgetAmount
+    mutate quotedPrice = quotedPrice
+    emit EventCommercialCorrected {
+      eventId: self.id
+      tenantId: self.tenantId
+      reason: reason
+      budgetAmount: budgetAmount
+      quotedPrice: quotedPrice
+    }
+  }
+
   command assignOwner(optional assignedToId: uuid, optional ownerName: string) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
@@ -2320,6 +2342,14 @@ event EventRequirementsChanged: "event.requirements_changed" {
 event EventPricingChanged: "event.pricing_changed" {
   eventId: string
   tenantId: string
+  budgetAmount: money(12, 2)
+  quotedPrice: money(12, 2)
+}
+
+event EventCommercialCorrected: "event.commercial_corrected" {
+  eventId: string
+  tenantId: string
+  reason: string
   budgetAmount: money(12, 2)
   quotedPrice: money(12, 2)
 }
