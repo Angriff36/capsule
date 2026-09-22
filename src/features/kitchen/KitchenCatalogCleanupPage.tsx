@@ -18,7 +18,18 @@ import { useSuccessToast } from "../../ui/useSuccessToast";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { KitchenBookNav } from "./KitchenBookNav";
 
-const APPLY_BATCH = 25;
+// Rows that stay dishes are one command each; a batch or prep step creates
+// records under every parent dish, so those go in small batches.
+const APPLY_BATCH: Record<ReclassifyKind, number> = {
+  food: 25,
+  supply: 25,
+  package: 25,
+  service: 25,
+  placeholder: 25,
+  orphan: 25,
+  kitchen_batch: 5,
+  prep_step: 5,
+};
 const PREVIEW_ROWS = 40;
 
 const sourceLabel = (row: PlanRow) =>
@@ -121,6 +132,9 @@ function GroupSection({
                 {row.outcome ? (
                   <span className="ml-2 text-xs text-ink-2">{row.outcome}</span>
                 ) : null}
+                {row.note ? (
+                  <span className="ml-2 text-xs text-danger">{row.note}</span>
+                ) : null}
               </td>
               <td>{row.parentCount}</td>
               <td>{row.existingCount}</td>
@@ -128,7 +142,7 @@ function GroupSection({
                 {row.applied ? null : (
                   <div className="flex flex-wrap items-center gap-1">
                     <select
-                      className="input"
+                      className="input w-auto"
                       aria-label="Kind"
                       value={row.kind}
                       disabled={busy}
@@ -227,13 +241,14 @@ export function KitchenCatalogCleanupPage() {
       const stamp = Date.now();
       let done = 0;
       let failed = 0;
-      for (let i = 0; i < ids.length; i += APPLY_BATCH) {
+      const batch = APPLY_BATCH[group.kind];
+      for (let i = 0; i < ids.length; i += batch) {
         setProgress(
           `${RECLASSIFY_KIND_LABEL[group.kind]}: ${done}/${ids.length}`,
         );
         const result = await apply({
           operationKey: `cleanup:${group.kind}:${stamp}:${i}`,
-          linkIds: ids.slice(i, i + APPLY_BATCH),
+          linkIds: ids.slice(i, i + batch),
         });
         done += result.outcomes.filter((o) => !o.error).length;
         failed += result.outcomes.filter((o) => o.error).length;

@@ -9,6 +9,7 @@
  * approves them on /kitchen/cleanup. Never writes a Dish, Component or task.
  *
  *   bun --env-file=.env.local scripts/catalog-reclassification-plan.ts [--dry-run] [--no-jev] [--url <convex url>]
+ *   Auth: CATALOG_PLAN_JWT (a Clerk session token for the account to run as) or the agent token.
  *
  * Reads:  work/tpp-recipes/tpp-recipes-full.json (TPP recipe export)
  *         .artifacts/jev-menu-item-kind-probe/result.json (cached Jev answers, optional)
@@ -173,7 +174,12 @@ if (!URL) {
   process.exit(2);
 }
 const client = new ConvexHttpClient(URL);
-client.setAuth(await new CapsuleAgentAuthManager().resolveJwt());
+// CATALOG_PLAN_JWT lets an operator run as a chosen account (a minted Clerk
+// session token); otherwise the usual agent token is used.
+client.setAuth(
+  process.env.CATALOG_PLAN_JWT?.trim() ||
+    (await new CapsuleAgentAuthManager().resolveJwt()),
+);
 const catalog = await client.query(api.catalogReclassification.candidates, {});
 console.log(
   `${catalog.rows.length} imported dish rows, ${catalog.components.length} recipes, ${catalog.dishTasks.length} dish tasks, ${catalog.dishes.length} live dishes (${URL})`,

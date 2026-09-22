@@ -1,6 +1,28 @@
 # Catalog reclassification: TPP menu items that are not dishes
 
-**Status:** Design (owner asked for it 2026-09-21). Not built.
+**Status:** Built on `dev` 2026-09-21 (owner: "design it", then "do it").
+Qualified on the local backend against the real 2,783 imported rows: 414
+kitchen batches, 70 orphans, 27 supplies and a sample of 8 prep steps
+applied through the page with no failures. Not yet run on production.
+
+**Where it lives:** engine `convex/lib/culinaryModel/catalogReclassification.ts`,
+seam `convex/catalogReclassification.ts` (candidates, recordSuggestions, plan,
+decide, apply), planner `scripts/catalog-reclassification-plan.ts`, page
+`/kitchen/cleanup`, proof `tests/proofs/catalog-reclassification.runtime.test.ts`.
+
+**Lessons from the local run:** two TPP parents can share one Capsule dish,
+so parents are deduped by dish before attaching or adding tasks; a retry
+after a partial failure reuses a same-name recipe or task instead of making
+a second one; kitchen batches and prep steps apply five per call because each
+one writes under every parent dish (about 15 s per five locally); the planner
+runs as the signed-in account, so the operator needs kitchen access
+(`CATALOG_PLAN_JWT` takes a minted session token for a chosen account).
+**Not built in this pass:** ingredient lines on a drafted recipe, the "Make …"
+task on its parents, and the `DishTaskMaterial` link on a prep step. The TPP
+rows travel in the recipe's `sourceText`, so the recipe shows as
+"ingredients missing" on the unresolved-work page until a person or a later
+pass adds them. On production most batches and prep steps already exist
+from the 2026-09-14 recipe import, so apply mostly links and retires there.
 **Scope:** the 2,783 TPP menu items imported as `Dish` rows on 2026-09-03, of
 which 1,893 carry no category and about 1,033 are not dishes at all.
 **Out of scope:** new entities, schema changes, any reasoning-model call.

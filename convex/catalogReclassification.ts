@@ -22,6 +22,7 @@ import { requireKitchenAccess } from "./lib/kitchenAccessGate";
 import { buildLinkKey } from "./lib/culinaryModel/importMapping";
 import {
   CAPSULE_ENTITY_FOR_KIND,
+  nameKey,
   PLACEHOLDER_CATEGORY,
   RECLASSIFY_KINDS,
   type ReclassifyKind,
@@ -303,6 +304,8 @@ export interface PlanRow {
   decision: string;
   applied: boolean;
   outcome: string | null;
+  /** Why the last apply attempt failed, when it did. */
+  note: string | null;
   category: string | null;
   parentCount: number;
   existingCount: number;
@@ -357,6 +360,10 @@ export const plan = query({
         decision: String(link.decision ?? "suggested"),
         applied,
         outcome: applied ? (link.appliedValues ?? null) : null,
+        note:
+          !applied && link.resolutionNote?.includes(" failed: ")
+            ? link.resolutionNote.replace(/^dish:\w+ failed: /, "")
+            : null,
         category: meta.category,
         parentCount: meta.parents.length,
         existingCount:
@@ -463,6 +470,26 @@ async function liveDishById(ctx: MutationCtx, id: string, tenantId: string) {
   }
 }
 
+/** Parents resolved to distinct live, active dishes (two TPP parents can share one dish). */
+async function liveParentDishes(
+  ctx: MutationCtx,
+  tenantId: string,
+  meta: SuggestionMetadata,
+  exclude: Id<"dishes">,
+): Promise<Doc<"dishes">[]> {
+  const seen = new Set<string>();
+  const dishes: Doc<"dishes">[] = [];
+  for (const parent of meta.parents) {
+    if (!parent.dishId || seen.has(parent.dishId)) continue;
+    seen.add(parent.dishId);
+    const dish = await liveDishById(ctx, parent.dishId, tenantId);
+    if (!dish || String(dish.status) !== "active" || dish._id === exclude)
+      continue;
+    dishes.push(dish);
+  }
+  return dishes;
+}
+
 async function backfillCategory(
   ctx: MutationCtx,
   dish: Doc<"dishes">,
@@ -556,6 +583,21 @@ async function applyOne(
       )
         componentId = null;
     }
+    if (!componentId) {
+      const key = nameKey(dish.name);
+      const sameName = (
+        await ctx.db
+          .query("components")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .collect()
+      ).find(
+        (c) =>
+          c.deletedAt == null &&
+          String(c.status) !== "retired" &&
+          nameKey(c.name) === key,
+      );
+      componentId = sameName ? String(sameName._id) : null;
+    }
     if (componentId) {
       done.push("recipe already exists");
     } else {
@@ -577,11 +619,12 @@ async function applyOne(
       componentId = created.docId;
       done.push("recipe drafted");
       let attached = 0;
-      for (const parent of meta.parents) {
-        const parentDish = parent.dishId
-          ? await liveDishById(ctx, parent.dishId, tenantId)
-          : null;
-        if (!parentDish || String(parentDish.status) !== "active") continue;
+      for (const parentDish of await liveParentDishes(
+        ctx,
+        tenantId,
+        meta,
+        dish._id,
+      )) {
         await ctx.runMutation(api.mutations.DishComponent_createViaAttach, {
           dishId: parentDish._id,
           componentId,
@@ -612,16 +655,28 @@ async function applyOne(
     if (taskIds.length) {
       done.push(`already tracked as ${taskIds.length} dish task(s)`);
     } else {
-      for (const parent of meta.parents) {
-        const parentDish = parent.dishId
-          ? await liveDishById(ctx, parent.dishId, tenantId)
-          : null;
-        if (
-          !parentDish ||
-          String(parentDish.status) !== "active" ||
-          parentDish._id === dish._id
-        )
+      const key = nameKey(dish.name);
+      for (const parentDish of await liveParentDishes(
+        ctx,
+        tenantId,
+        meta,
+        dish._id,
+      )) {
+        const already = (
+          await ctx.db
+            .query("dishTasks")
+            .withIndex("by_dishId", (q) => q.eq("dishId", parentDish._id))
+            .collect()
+        ).find(
+          (t) =>
+            t.deletedAt == null &&
+            String(t.status) === "active" &&
+            nameKey(t.name) === key,
+        );
+        if (already) {
+          taskIds.push(String(already._id));
           continue;
+        }
         const created = (await ctx.runMutation(
           api.mutations.DishTask_createViaAdd,
           {
