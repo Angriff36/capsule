@@ -10,51 +10,23 @@ import {
   field,
   button,
   click,
-  change,
   submit,
   location,
 } from "./support/mounted-app";
 import { EventCreatePage } from "../src/features/events/EventCreatePage";
+import {
+  selectWith,
+  bookingOptions,
+  chooseAccountOrVenue,
+  SEAM_COMMAND,
+  CLIENT_ROUTE,
+  acceptedProposal,
+  fillEventForm,
+  mountProposalRoute,
+  fillValidProposalForm,
+  expectNoCreateButton,
+} from "./event-create-behavior.helpers";
 
-function selectWith(label: string) {
-  const select = [...container.querySelectorAll("select")].find((node) =>
-    [...node.options].some((option) => option.text === label),
-  );
-  expect(select, label).toBeDefined();
-  return select!;
-}
-function bookingOptions() {
-  backend.values.set("useListClient", [
-    {
-      _id: "client-a",
-      companyName: "Client A",
-      clientType: "company",
-      status: "active",
-      registeredAt: 1,
-    },
-  ]);
-  backend.values.set("useListVenue", [
-    {
-      _id: "venue-a",
-      name: "Garden",
-      status: "active",
-      registeredAt: 1,
-      capacity: 200,
-    },
-  ]);
-}
-async function chooseAccountOrVenue(name: string, label: string) {
-  const control =
-    field(name).parentElement!.querySelector<HTMLInputElement>(
-      '[role="combobox"]',
-    )!;
-  change(control, label);
-  await act(async () => {
-    control.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
-    );
-  });
-}
 it("explains a missing client, then enforces the required contact before sending the event", async () => {
   bookingOptions();
   const create = command("useCreateEvent");
@@ -114,78 +86,6 @@ it("renders empty catalog recovery links and updates the selectors when live cat
   expect(container.textContent).not.toContain("Add the standard list");
 });
 
-const SEAM_COMMAND =
-  "lib/proposalEventCreation:createEventFromAcceptedProposal";
-
-// Route with the client preselected in the URL: used by the proposal states
-// that cannot auto-fill the account from a proposal row (loading, missing,
-// tombstoned).
-const CLIENT_ROUTE = "/events/new?proposalId=proposal-a&clientId=client-a";
-
-function acceptedProposal(overrides: Record<string, unknown> = {}) {
-  return {
-    _id: "proposal-a",
-    title: "Anniversary dinner",
-    clientId: "client-a",
-    venueName: "Garden",
-    status: "accepted",
-    version: 3,
-    eventDate: new Date("2099-07-04T17:30").getTime(),
-    eventEndDate: new Date("2099-07-04T22:00").getTime(),
-    guestCount: 40,
-    total: 2000,
-    ...overrides,
-  };
-}
-
-async function fillEventForm() {
-  input("title", "Summer dinner");
-  input("eventType", "dinner");
-  input("expectedHeadcount", "40");
-  input("startsAt", "2099-07-04T17:30");
-  input("endsAt", "2099-07-04T22:00");
-  input("budgetAmount", "1000");
-  input("quotedPrice", "2000");
-  input("primaryContactName", "Ada Cook");
-}
-
-async function mountProposalRoute(
-  proposal: unknown,
-  route = "/events/new?proposalId=proposal-a",
-) {
-  bookingOptions();
-  backend.values.set("useGetProposal", proposal);
-  await mount(createElement(EventCreatePage), route);
-}
-
-// AC-411: a refusal only proves the guard when the submitted form is genuinely
-// valid. Fill every text field, guarantee the client/venue choice, and refuse
-// to dispatch submit until FormData carries both ids and the form checks valid.
-async function fillValidProposalForm(route: string) {
-  await fillEventForm();
-  if (!route.includes("clientId="))
-    await chooseAccountOrVenue("clientId", "Client A");
-  await chooseAccountOrVenue("venueId", "Garden");
-  const form = container.querySelector<HTMLFormElement>("#event-create-form");
-  expect(form).not.toBeNull();
-  const data = new FormData(form!);
-  expect(data.get("clientId")).toBe("client-a");
-  expect(data.get("venueId")).toBe("venue-a");
-  expect(form!.checkValidity()).toBe(true);
-  return form!;
-}
-
-// The dead CTA must be gone, not merely disabled — a disabled button proves
-// nothing about the submit handler behind it, so negative cases dispatch the
-// submit event directly.
-function expectNoCreateButton() {
-  expect(
-    [...container.querySelectorAll("button")].map((node) =>
-      node.textContent?.trim(),
-    ),
-  ).not.toContain("Create event");
-}
-
 it("books an accepted unlinked proposal through the canonical seam and navigates to the returned event", async () => {
   const book = command(SEAM_COMMAND, { docId: "event-booked" });
   const generic = command("useCreateEvent");
@@ -216,6 +116,52 @@ it("books an accepted unlinked proposal through the canonical seam and navigates
   // the real replay when another operator booked first; this mock only pins
   // the page contract.
   expect(location).toBe("/events/event-booked?tab=overview");
+});
+
+it("lists which proposal values will carry over before create", async () => {
+  bookingOptions();
+  backend.values.set("useListProposalDishSelection", [
+    { _id: "sel-1", proposalId: "proposal-a", deletedAt: null },
+  ]);
+  backend.values.set("useListProposalEnhancement", [
+    {
+      _id: "enh-1",
+      proposalId: "proposal-a",
+      deletedAt: null,
+      removedAt: null,
+    },
+  ]);
+  await mountProposalRoute(acceptedProposal({ eventType: "dinner" }));
+  expect(
+    container.querySelector('[data-testid="proposal-carryover-preview"]'),
+  ).not.toBeNull();
+  const text = container.textContent ?? "";
+  for (const label of [
+    "Title",
+    "Type",
+    "Date",
+    "Times",
+    "Headcount",
+    "Venue",
+    "Menu",
+    "Enhancements",
+  ]) {
+    expect(text).toContain(label);
+  }
+  expect(text).toContain("Anniversary dinner");
+  expect(text).toContain("dinner");
+  expect(text).toContain("Garden");
+  expect(text).toContain("1 menu selection");
+  expect(text).toContain("1 enhancement");
+  expect(text).toContain(
+    "Creating this event links it to the proposal and copies its 1 menu selection onto the event.",
+  );
+  // The primary action survives the preview swap.
+  expect(
+    [...container.querySelectorAll("button")].map((node) =>
+      node.textContent?.trim(),
+    ),
+  ).toContain("Create event");
 });
 
 it("keeps the venue reconciliation hint for an accepted unlinked proposal and books the venue the operator picks", async () => {

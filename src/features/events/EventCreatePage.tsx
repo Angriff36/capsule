@@ -1,7 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
-import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateClient,
@@ -19,7 +19,6 @@ import {
   useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
-import { formatMoneyExact } from "../../lib/format";
 import { ArrowLeftIcon, ChevronRightIcon } from "../../ui/icons";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
@@ -27,6 +26,7 @@ import { PageHeader, Section, Skeleton } from "../../ui/primitives";
 import { useCreateEventFromProposal } from "../clients/useCreateEventFromProposal";
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
+import { ProposalEventCarryoverPreview } from "./ProposalEventCarryoverPreview";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
@@ -908,84 +908,38 @@ export function EventCreatePage() {
                 </div>
               ) : (
                 <div className="space-y-1.5 p-3 text-sm text-ink-2">
-                  <p className="font-medium text-ink">{proposal.title}</p>
-                  <p>
-                    {proposal.eventType ? `${proposal.eventType} · ` : ""}
-                    {Number(proposal.guestCount ?? 0)} guests ·{" "}
-                    {formatMoneyExact(Number(proposal.total ?? 0))}
-                  </p>
-                  <p>
-                    {proposal.eventDate != null
-                      ? `Starts: ${formatDate(proposal.eventDate)} · ${formatTime(proposal.eventDate)}`
-                      : "No start date on the proposal — set the start time on the event."}
-                  </p>
-                  <p>
-                    {proposal.eventEndDate != null
-                      ? `Ends: ${formatDate(proposal.eventEndDate)} · ${formatTime(proposal.eventEndDate)}`
-                      : "No end time on the proposal — set the end time on the event."}
-                  </p>
-                  {proposalEnhancementCount > 0 ? (
-                    <p>
-                      Enhancements: {proposalEnhancementCount} on the proposal —
-                      they will show on the event.
-                    </p>
-                  ) : null}
-                  {proposal.venueName ? (
-                    <p>
-                      Venue: {proposal.venueName}
-                      {proposal.venueAddress
-                        ? ` — ${proposal.venueAddress}`
-                        : ""}
-                    </p>
-                  ) : null}
-                  {proposalLinkable ? (
-                    <p className="pt-1 text-xs leading-relaxed text-ink-3">
-                      {proposalMenuCount > 0
-                        ? `Creating this event links it to the proposal and copies its ${proposalMenuCount} menu selection${proposalMenuCount === 1 ? "" : "s"} onto the event.`
-                        : "Creating this event links it to the proposal. It has no menu selections to copy."}
-                    </p>
-                  ) : proposal.eventId ? (
-                    <>
-                      <p
-                        role="status"
-                        className="pt-1 text-xs leading-relaxed text-ink-3"
+                  <ProposalEventCarryoverPreview
+                    preview={proposalEventPrefill.carryoverPreview({
+                      proposal,
+                      menuCount: proposalMenuCount,
+                      enhancementCount: proposalEnhancementCount,
+                    })}
+                  />
+                  {!proposalLinkable && proposal.eventId != null ? (
+                    <div className="pt-1">
+                      <Link
+                        to={eventDetailPath(String(proposal.eventId))}
+                        className="btn btn-primary min-h-[40px]"
                       >
-                        Already booked — this proposal is linked to an event.
-                      </p>
-                      <div className="pt-1">
-                        <Link
-                          to={eventDetailPath(String(proposal.eventId))}
-                          className="btn btn-primary min-h-[40px]"
-                        >
-                          Open event
-                        </Link>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <p
-                        role="status"
-                        className="pt-1 text-xs leading-relaxed text-ink-3"
+                        Open event
+                      </Link>
+                    </div>
+                  ) : !proposalLinkable ? (
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <Link
+                        to={CLIENTS_ROUTES.proposal(proposal._id)}
+                        className="btn btn-secondary btn-sm"
                       >
-                        This proposal is {String(proposal.status)} — only an
-                        accepted proposal can be booked into an event.
-                      </p>
-                      <div className="flex flex-wrap gap-2 pt-1">
-                        <Link
-                          to={CLIENTS_ROUTES.proposal(proposal._id)}
-                          className="btn btn-secondary btn-sm"
-                        >
-                          Open proposal
-                        </Link>
-                        <Link
-                          to={eventCreatePath()}
-                          className="btn btn-ghost btn-sm"
-                        >
-                          Start a standalone event
-                        </Link>
-                      </div>
-                    </>
-                  )}
+                        Open proposal
+                      </Link>
+                      <Link
+                        to={eventCreatePath()}
+                        className="btn btn-ghost btn-sm"
+                      >
+                        Start a standalone event
+                      </Link>
+                    </div>
+                  ) : null}
                   {proposalLinkable &&
                   proposal.venueName &&
                   venues !== undefined &&
