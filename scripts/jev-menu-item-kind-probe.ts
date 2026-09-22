@@ -65,6 +65,14 @@ interface JevResponse {
   usage: { input_tokens: number; output_tokens: number };
 }
 
+/**
+ * Rule before Jev (owner, 2026-09-21): a timing tag in the name — "(day of)",
+ * "(1 day prior)", "close to day of", "night before" — means a prep step,
+ * every time. Those rows never go to the model.
+ */
+const TIMING_TAG =
+  /\b(day of|days? prior|day before|night before|morning of)\b/i;
+
 /** The export's description column mostly holds a numeric id; keep only prose. */
 function proseOrNull(value: string | null | undefined): string | null {
   const text = (value ?? "").trim();
@@ -154,11 +162,25 @@ async function main(): Promise<void> {
     confidence: number;
     probabilities: Record<string, number>;
     input_tokens: number;
+    source: "rule" | "jev";
   }[] = [];
   let cursor = 0;
   const worker = async () => {
     while (cursor < rows.length) {
       const row = rows[cursor++]!;
+      if (TIMING_TAG.test(row.name)) {
+        results.push({
+          menu_item_id: row.menu_item_id,
+          name: row.name,
+          category: (row.category ?? "").trim(),
+          choice: "prep_step",
+          confidence: 1,
+          probabilities: { prep_step: 1 },
+          input_tokens: 0,
+          source: "rule",
+        });
+        continue;
+      }
       const res = await askJev(apiKey, row);
       const a = res.answers.row_kind;
       results.push({
@@ -169,6 +191,7 @@ async function main(): Promise<void> {
         confidence: a.confidence,
         probabilities: a.probabilities,
         input_tokens: res.usage.input_tokens,
+        source: "jev",
       });
       if (results.length % 250 === 0)
         console.log(`${results.length}/${rows.length}`);
@@ -197,6 +220,7 @@ async function main(): Promise<void> {
     model: MODEL,
     confidence_bar: CONFIDENCE_BAR,
     rows: results.length,
+    rows_decided_by_rule: results.filter((r) => r.source === "rule").length,
     uncategorized_rows: uncategorized.length,
     uncategorized_kinds: count(uncategorized),
     uncategorized_clearing_bar: sure(uncategorized).length,
@@ -211,9 +235,16 @@ async function main(): Promise<void> {
   mkdirSync(OUT_DIR, { recursive: true });
   writeFileSync(`${OUT_DIR}/result.json`, JSON.stringify(results, null, 2));
   writeFileSync(`${OUT_DIR}/summary.json`, JSON.stringify(summary, null, 2));
-  const header = "menu_item_id,name,tpp_category,jev_kind,confidence";
+  const header = "menu_item_id,name,tpp_category,kind,confidence,source";
   const lines = results.map((r) =>
-    [r.menu_item_id, r.name, r.category, r.choice, r.confidence.toFixed(3)]
+    [
+      r.menu_item_id,
+      r.name,
+      r.category,
+      r.choice,
+      r.confidence.toFixed(3),
+      r.source,
+    ]
       .map(csvCell)
       .join(","),
   );
