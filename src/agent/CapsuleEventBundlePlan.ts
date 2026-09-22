@@ -402,11 +402,17 @@ export function buildEventBundlePlan(
       warnings.push(
         "A pack list is created here with the packed items. Approving the event later opens a second, empty pack list, because Event.approve does that by reaction.",
       );
+      // A closed list from an earlier run must not answer this open through
+      // the idempotency cache: the key changes with every closed list.
+      const closed = existing?.closedPackLists ?? 0;
       steps.push({
         capabilityId: "PackList.open",
         ref: "packList",
         label: `Open the pack list`,
-        idempotencySuffix: `pack-list:${invoice}`,
+        idempotencySuffix:
+          closed > 0
+            ? `pack-list:${invoice}:again${closed}`
+            : `pack-list:${invoice}`,
         resolveRefs: ["eventId"],
         args: {
           eventId: "event",

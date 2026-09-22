@@ -23,8 +23,18 @@ function Record($h, $verdict, $reason) {
 }
 
 function Discard($h, $file) {
-  git -C $root worktree remove --force $h.worktree 2>$null
-  git -C $root branch -D $h.branch 2>$null
+  # The hand-off is model-written: destroy only the worktree and branch that
+  # belong to this run, never whatever path or branch name the file says.
+  $expectedWt = Join-Path $root ".loop-worktrees\$($h.runId)"
+  $expectedBranch = "loop/$($h.runId)"
+  $actualWt = try { (Resolve-Path $h.worktree -ErrorAction Stop).Path } catch { '' }
+  $checkedOut = if ($actualWt) { (git -C $actualWt rev-parse --abbrev-ref HEAD 2>$null) } else { '' }
+  if ($actualWt -and $actualWt -ieq $expectedWt -and $h.branch -eq $expectedBranch -and $checkedOut -eq $expectedBranch) {
+    git -C $root worktree remove --force $actualWt 2>$null
+    git -C $root branch -D $expectedBranch 2>$null
+  } else {
+    Say "$($h.runId): refusing to discard '$($h.worktree)' / '$($h.branch)' - expected $expectedWt on $expectedBranch (left in place)"
+  }
   Remove-Item $file -Force
 }
 

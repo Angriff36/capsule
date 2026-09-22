@@ -133,6 +133,9 @@ async function tenantLinks(ctx: Ctx, tenantId: string): Promise<Link[]> {
       q.and(
         q.eq(q.field("deletedAt"), null),
         q.eq(q.field("recordType"), MENU_RECORD_TYPE),
+        // Only rows the TPP menus import made; other import sources are not
+        // this cleanup's business.
+        q.eq(q.field("sourceSystem"), SOURCE_SYSTEM),
       ),
     )
     .collect();

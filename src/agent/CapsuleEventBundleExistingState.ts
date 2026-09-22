@@ -86,6 +86,12 @@ export interface CapsuleEventBundleExistingEvent {
   timelineNames: string[];
   prepTasks: Array<{ dishName: string; name: string }>;
   packList?: { id: string; itemDescriptions: string[] };
+  /**
+   * Live pack lists of the event that can no longer take items (packed,
+   * loaded, dispatched, cancelled). A later BEO then opens a new list under
+   * a new idempotency key instead of replaying the closed one.
+   */
+  closedPackLists?: number;
   assignedPersonIds: string[];
 }
 

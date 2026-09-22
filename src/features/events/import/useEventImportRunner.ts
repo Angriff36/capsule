@@ -151,8 +151,13 @@ export function useEventImportRunner(input: {
         number !== undefined &&
         (String(row.eventNumber ?? "").trim() === number ||
           invoiceEventIds.has(String(row._id)));
-      // 2. Only when no number matches: the same title on the same date.
+      // 2. Only when no number matches: the same title on the same date for
+      //    the client chosen on the review screen. Another client's "Wedding"
+      //    on that date is a different event.
+      const chosenClientId = input.catalog?.clientId;
       const matchesTitleDate = (row: Record<string, unknown>) =>
+        chosenClientId !== undefined &&
+        String(row.clientId ?? "") === chosenClientId &&
         normalizeName(String(row.title ?? "")) ===
           normalizeName(header.title ?? "") &&
         typeof row.startsAt === "number" &&
