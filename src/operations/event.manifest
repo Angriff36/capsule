@@ -662,6 +662,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   property salesLockedAt: datetime?
   property finalizedAt: datetime?
   property cancellationReason: string?
+  // Archive is a visibility flag (AC-239): hide the Event from the active list
+  // without moving its stage or cancelling work. Not a new EventStage.
+  property archivedAt: datetime?
+  property archiveReason: string?
   property recurrenceFrequency: EventRecurrenceFrequency?
   property recurrenceEndCondition: EventRecurrenceEndCondition?
   property recurrenceEndsAt: datetime?
@@ -751,6 +755,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   hasMany layoutSections: EventLayoutSection
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
+  computed isArchived: boolean = self.archivedAt != null
   computed timingCanRecalculate: boolean = self.deletedAt == null and self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled"
   // Same authority as the staffing commands, evaluated for the current reader.
   computed staffingCanManage: boolean = roleAllows(user.role, "workforceManageAccess") or (roleAllows(user.role, "workforceSelfAccess") and roleAllows(user.role, "eventManageAccess"))
@@ -1549,6 +1554,35 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Archive hides the Event from the active list (AC-239). It is a visibility
+  // flag, not a stage move: any live stage can be archived, and stage, money,
+  // and headcount stay exactly as they are.
+  command archive(reason: string) {
+    guard self.deletedAt == null
+    guard self.archivedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint archiveReasonPresent: length(trim(reason)) > 0 "Archive reason is required"
+    mutate archivedAt = now()
+    mutate archiveReason = reason
+    emit EventArchived {
+      eventId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.deletedAt == null
+    guard self.archivedAt != null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate archivedAt = null
+    mutate archiveReason = null
+    emit EventReactivated {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Sales Lock pipeline commands per spec §3.3
   command lockForSales() {
     guard self.stage == "approved"
@@ -2335,6 +2369,17 @@ event EventCancelled: "event.cancelled" {
   tenantId: string
   clientId: string
   reason: string
+}
+
+event EventArchived: "event.archived" {
+  eventId: string
+  tenantId: string
+  reason: string
+}
+
+event EventReactivated: "event.reactivated" {
+  eventId: string
+  tenantId: string
 }
 
 event EventClosedOut: "event.closed_out" {

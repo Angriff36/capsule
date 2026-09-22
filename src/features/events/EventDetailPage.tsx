@@ -14,6 +14,7 @@ import { useRouteRecord } from "../../lib/routeRecord";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useEventApprove,
+  useEventArchive,
   useEventBeginExecution,
   useEventCancel,
   useEventChangeHeadcount,
@@ -74,6 +75,7 @@ import { downloadBeoPdf } from "./beoPdf";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
+import { EventArchiveMenuItems } from "./EventArchiveMenuItems";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
@@ -195,6 +197,7 @@ function EventDetailContent({
   const complete = useEventComplete();
   const closeOut = useEventCloseOut();
   const cancel = useEventCancel();
+  const archive = useEventArchive();
   const returnToPlanning = useEventReturnToPlanning();
   const changeHeadcount = useEventChangeHeadcount();
   const changePricing = useEventChangePricing();
@@ -204,7 +207,7 @@ function EventDetailContent({
   const reschedule = useEventReschedule();
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [reasonFor, setReasonFor] = useState<
-    "cancel" | "returnToPlanning" | null
+    "cancel" | "returnToPlanning" | "archive" | null
   >(null);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
@@ -439,6 +442,16 @@ function EventDetailContent({
           {action.label}
         </button>
       ))}
+      <EventArchiveMenuItems
+        event={event}
+        busy={busy}
+        version={version}
+        run={run}
+        onArchive={() => {
+          setReasonFor("archive");
+          setReason("");
+        }}
+      />
     </ActionMenu>,
   ];
 
@@ -597,6 +610,16 @@ function EventDetailContent({
               void run(() =>
                 cancel({ docId: event._id, reason: reason.trim(), version }),
               );
+            else if (reasonFor === "archive")
+              void run(
+                () =>
+                  archive({
+                    docId: event._id,
+                    reason: reason.trim(),
+                    version,
+                  }),
+                "Event archived",
+              );
             else
               void run(() =>
                 returnToPlanning({
@@ -610,7 +633,9 @@ function EventDetailContent({
           <label className="field-label min-w-0 flex-1 basis-48">
             {reasonFor === "cancel"
               ? "Reason for cancelling"
-              : "Reason for returning to planning"}
+              : reasonFor === "archive"
+                ? "Reason for archiving"
+                : "Reason for returning to planning"}
             <input
               autoFocus
               value={reason}
@@ -623,7 +648,9 @@ function EventDetailContent({
             type="submit"
             disabled={busy || !reason.trim()}
             className={
-              reasonFor === "cancel" ? "btn btn-danger" : "btn btn-primary"
+              reasonFor === "cancel" || reasonFor === "archive"
+                ? "btn btn-danger"
+                : "btn btn-primary"
             }
           >
             Confirm
