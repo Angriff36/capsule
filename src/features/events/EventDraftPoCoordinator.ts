@@ -43,6 +43,8 @@ export type EventDraftPoOk = {
 export type EventDraftPoFail = {
   ok: false;
   reason: string;
+  /** The draft that already covers the event, so the screen can open it. */
+  existingOrderId?: string;
 };
 
 export type EventDraftPoResult = EventDraftPoOk | EventDraftPoFail;
@@ -176,6 +178,7 @@ export class EventDraftPoCoordinator {
       return {
         ok: false,
         reason: "A draft PO already covers this event's needs.",
+        existingOrderId: existing.id,
       };
     }
 
