@@ -319,3 +319,20 @@ export function venueAddressLine(venue: {
     return undefined;
   return `${Math.abs(venue.latitude)}° ${venue.latitude < 0 ? "S" : "N"}, ${Math.abs(venue.longitude)}° ${venue.longitude < 0 ? "W" : "E"}`;
 }
+
+/** "47.01359° N, 116.52979° W" / "47.01359, -116.52979" → decimal degrees. */
+const GPS_PAIR =
+  /(-?\d{1,2}\.\d{3,})\s*°?\s*([NSns])?\s*,?\s*(-?\d{1,3}\.\d{3,})\s*°?\s*([EWew])?/;
+
+export function readCoordinates(
+  text: string,
+): { latitude: number; longitude: number; matched: string } | undefined {
+  const match = text.match(GPS_PAIR);
+  if (!match) return undefined;
+  let latitude = Number(match[1]);
+  let longitude = Number(match[3]);
+  if (match[2]?.toLowerCase() === "s") latitude = -Math.abs(latitude);
+  if (match[4]?.toLowerCase() === "w") longitude = -Math.abs(longitude);
+  if (Math.abs(latitude) > 90 || Math.abs(longitude) > 180) return undefined;
+  return { latitude, longitude, matched: match[0] };
+}

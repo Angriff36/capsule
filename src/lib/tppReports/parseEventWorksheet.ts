@@ -11,6 +11,7 @@ import {
   parsePersonBlob,
   parsePhone,
   parseReportDate,
+  readCoordinates,
 } from "./reportValues";
 
 /**
@@ -108,12 +109,31 @@ function readMenu(rows: readonly string[][]): BundleMenuItem[] {
 /** Parse an event worksheet CSV into its bundle contribution. */
 export function parseEventWorksheet(rows: string[][]): EventBundlePart {
   const label = (name: string) => findLabelledValue(rows, name);
-  const contact = parsePersonBlob(label("Contact"));
+  // The workbook export prints the contact block ("Kamini Singh 207 SE 7th
+  // St ... Home: 406-...") in the row ABOVE its empty "Contact:" label.
+  const contactBlob =
+    label("Contact") ||
+    rows
+      .map((row, index) =>
+        /^contact:?$/i.test(row[0]?.trim() ?? "")
+          ? (rows[index - 1]?.[0]?.trim() ?? "")
+          : "",
+      )
+      .find((text) => text.length > 0);
+  const contact = parsePersonBlob(contactBlob);
   const venueBlob = label("Venue");
-  const venueName = venueBlob?.split(/\s*\d/)[0]?.trim();
-  const venueAddress = parseAddressBlob(
-    venueName === undefined ? venueBlob : venueBlob?.slice(venueName.length),
-  );
+  // A remote site (a campsite) prints its GPS pair where a street goes; the
+  // pair is the venue location, never a street "47." with ZIP "01359".
+  const coordinates = venueBlob ? readCoordinates(venueBlob) : undefined;
+  const venueText = coordinates
+    ? venueBlob?.replace(coordinates.matched, " ").trim()
+    : venueBlob;
+  const venueName = venueText?.split(/\s*\d/)[0]?.trim();
+  const venueStreet =
+    venueName === undefined ? venueText : venueText?.slice(venueName.length);
+  const venueAddress = venueStreet?.trim()
+    ? parseAddressBlob(venueStreet)
+    : undefined;
 
   return {
     source: "eventWorksheet",
@@ -143,6 +163,8 @@ export function parseEventWorksheet(rows: string[][]): EventBundlePart {
       city: venueAddress?.city,
       region: venueAddress?.region,
       postalCode: venueAddress?.postalCode,
+      latitude: coordinates?.latitude,
+      longitude: coordinates?.longitude,
       phone: parsePhone(
         venueBlob?.match(/(?:Work|Phone|Main)\s*:\s*([\d()\-. ]+)/i)?.[1],
       ),

@@ -16,6 +16,7 @@ import {
   parsePersonBlob,
   parsePhone,
   parseReportDate,
+  readCoordinates,
 } from "./reportValues";
 import type { XlsxSheet } from "./xlsxReader";
 
@@ -28,7 +29,9 @@ import type { XlsxSheet } from "./xlsxReader";
  */
 
 const PRINTED_FOOTER = /^printed date:/i;
-const SERVING_QUANTITY = /^([\d.]+)\s+Serving/i;
+// "30 Serving Charcuterie Display", "30 Each Black Disposable Place Setting".
+const SERVING_QUANTITY =
+  /^([\d.]+)\s+(?:Serving|Each|Ea|Pcs?|Pieces?|Portions?)\b/i;
 
 /** Excel stores dates as days since 1899-12-30. */
 function fromExcelSerial(value: string | undefined): string | undefined {
@@ -138,13 +141,21 @@ export function parseBeoWorkbook(
     /Venue Contact:[\s\S]*$/i,
     "",
   );
+  // A remote site (a campsite) prints its GPS pair where a street goes; the
+  // pair is the venue location, never a street "47." with ZIP "01359".
+  const coordinates = locationBeforeContact
+    ? readCoordinates(locationBeforeContact)
+    : undefined;
+  const locationText = coordinates
+    ? locationBeforeContact?.replace(coordinates.matched, " ").trim()
+    : locationBeforeContact;
   // The venue name runs ahead of the street address with no separator.
-  const venueName = locationBeforeContact?.split(/\s*\d/)[0]?.trim();
-  const address = parseAddressBlob(
+  const venueName = locationText?.split(/\s*\d/)[0]?.trim();
+  const streetText =
     venueName === undefined
-      ? locationBeforeContact
-      : locationBeforeContact?.slice(venueName.length),
-  );
+      ? locationText
+      : locationText?.slice(venueName.length);
+  const address = streetText?.trim() ? parseAddressBlob(streetText) : undefined;
   const contact = parsePersonBlob(label("Contact"));
   const salesperson = label("Salesperson");
   const salespersonEmail = parseEmail(salesperson);
@@ -156,12 +167,32 @@ export function parseBeoWorkbook(
     ?.match(/^[A-Za-z'.\- ]+/)?.[0]
     ?.trim();
 
-  const noteBlob = rows
-    .map(rowText)
-    .filter(
-      (text) => text.includes("Event Overview") || text.includes("Theme:"),
-    )
-    .join(" ");
+  // Every row between "Setup Notes" and the timeline header is note prose:
+  // the workbook splits the notes over pages, one long cell per page, so a
+  // page-2 cell holds Operations Notes and page 3 the Additional Tasks.
+  const noteRows: string[] = [];
+  let inNotes = false;
+  for (const row of rows) {
+    const first = row[0]?.trim() ?? "";
+    if (/^Setup Notes$/i.test(first)) {
+      inNotes = true;
+      continue;
+    }
+    if (first === "Time" && row[2] === "Name") break;
+    if (!inNotes || PRINTED_FOOTER.test(first)) continue;
+    const text = rowText(row);
+    if (text.trim()) noteRows.push(text);
+  }
+  const noteBlob =
+    noteRows.length > 0
+      ? noteRows.join(" ")
+      : rows
+          .map(rowText)
+          .filter(
+            (text) =>
+              text.includes("Event Overview") || text.includes("Theme:"),
+          )
+          .join(" ");
   const sections = splitBeoNoteSections(noteBlob);
 
   const part: EventBundlePart = {
@@ -190,10 +221,11 @@ export function parseBeoWorkbook(
       city: address?.city,
       region: address?.region,
       postalCode: address?.postalCode,
+      latitude: coordinates?.latitude,
+      longitude: coordinates?.longitude,
+      // "Kamini (bride)": the role in brackets is part of the name TPP prints.
       contactName: location
-        ?.match(
-          /Venue Contact:\s*([A-Za-z'.\- ]+?)\s*(?:Contact Phone|$)/i,
-        )?.[1]
+        ?.match(/Venue Contact:\s*(.+?)\s*(?:Contact Phone|$)/i)?.[1]
         ?.trim(),
       contactPhone: parsePhone(
         location?.match(/Contact Phone #:\s*([\d()\-. ]+)/i)?.[1],
