@@ -594,8 +594,20 @@ export const processQuoteSubmission = action({
       }
     }
 
-    // Event — reused from the checkpoint on retry, else created fresh.
+    // Event — reused from the checkpoint on retry, else created fresh. Before
+    // considering a create, recover a lost event checkpoint (issue #391): a
+    // saved proposal that already references a live event IS the converted
+    // event, so the retry reuses it instead of minting a duplicate.
     let eventId: Id<"events"> | null = submission.eventId ?? null;
+    if (!eventId && submission.proposalId) {
+      const saved: Doc<"proposals"> | null = await ctx.runQuery(
+        api.queries.getProposal,
+        { id: submission.proposalId },
+      );
+      if (saved?.eventId) {
+        eventId = saved.eventId;
+      }
+    }
     if (!eventId) {
       try {
         if (clientId) {
@@ -692,6 +704,28 @@ export const processQuoteSubmission = action({
         errors.push(
           `proposal: ${error instanceof Error ? error.message : String(error)}`,
         );
+      }
+    }
+
+    // Convergence repair (issue #391, spec §7.2-2 / §23.3): before the
+    // conversion completes, the saved proposal and ONE event must point at
+    // each other. The link is reconciled atomically through the domain's
+    // staged handshake: already linked to the same event is a no-op (replays
+    // never bump the proposal version), an unlinked draft gets linked, and a
+    // different existing link is refused, never overwritten.
+    if (proposalId && eventId) {
+      try {
+        await ctx.runMutation(
+          internal.lib.proposalEventCreation.linkConvertedQuoteProposal,
+          { proposalId, eventId },
+        );
+      } catch (error) {
+        errors.push(
+          `proposal event link: ${error instanceof Error ? error.message : String(error)}`,
+        );
+        // Both recorded ids stay on the row (checkpoint below) and the
+        // proposal's relationship is untouched — the conversion fails
+        // instead of completing unlinked or overwritten.
       }
     }
 
