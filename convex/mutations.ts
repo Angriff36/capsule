@@ -24360,8 +24360,8 @@ async function __runIntegrationConnectionAuthorize(ctx: MutationCtx, { docId, pr
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may write integration connections through commands");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may execute integration connection commands");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24454,8 +24454,8 @@ export const IntegrationConnection_createViaAuthorize = mutation({
       scopes: args.scopes
     };
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may write integration connections through commands");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may execute integration connection commands");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((__draft.connectedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24490,8 +24490,8 @@ async function __runIntegrationConnectionDisconnect(ctx: MutationCtx, { docId, r
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may write integration connections through commands");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may execute integration connection commands");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
     {
@@ -24552,8 +24552,8 @@ async function __runIntegrationConnectionMarkConnected(ctx: MutationCtx, { docId
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may write integration connections through commands");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may execute integration connection commands");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24623,8 +24623,8 @@ async function __runIntegrationConnectionReauthorize(ctx: MutationCtx, { docId, 
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may write integration connections through commands");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may execute integration connection commands");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -24684,8 +24684,8 @@ async function __runIntegrationConnectionRecordFailure(ctx: MutationCtx, { docId
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may write integration connections through commands");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may execute integration connection commands");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Failure reason is required");
@@ -24746,8 +24746,8 @@ async function __runIntegrationConnectionRecordSyncSuccess(ctx: MutationCtx, { d
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may write integration connections through commands");
-    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may execute integration connection commands");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
+    if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
