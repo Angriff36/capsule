@@ -367,7 +367,7 @@ export function buildEventBundlePlan(
     if (measure === undefined) {
       summary.skippedPrepTasks += 1;
       warnings.push(
-        `Prep task "${task.name}" was skipped: quantity or unit "${task.quantity ?? "(none)"} ${task.unit ?? "(none)"}" could not be mapped.`,
+        `Prep task "${task.name}" was skipped: the amount "${task.quantity ?? "(none)"} ${task.unit ?? "(none)"}" was not understood.`,
       );
       return;
     }
@@ -401,7 +401,7 @@ export function buildEventBundlePlan(
       // Approving an event opens its own pack list by Manifest reaction, so an
       // approval after this run leaves a second, empty one. Say so plainly.
       warnings.push(
-        "A pack list is created here with the packed items. Approving the event later opens a second, empty pack list, because Event.approve does that by reaction.",
+        "This import creates the pack list with the packed items. When you approve the event later, Capsule will open a second, empty pack list. Delete that one.",
       );
       // A closed list from an earlier run must not answer this open through
       // the idempotency cache: the key changes with every closed list.
@@ -427,7 +427,7 @@ export function buildEventBundlePlan(
       const measure = toCapsuleMeasure(item.quantity, item.unit);
       if (!measure) {
         warnings.push(
-          `Packing item "${item.name}" was skipped: quantity or unit could not be mapped.`,
+          `Packing item "${item.name}" was skipped: its amount was not understood.`,
         );
         return;
       }

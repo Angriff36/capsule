@@ -205,7 +205,7 @@ export function EventImportPage() {
               {busy
                 ? `Creating… ${runner.progress?.completed ?? 0} of ${runner.progress?.total ?? 0}`
                 : runner.plan
-                  ? `Create event (${runner.plan.steps.length} steps)`
+                  ? "Create event"
                   : bundle && !directory
                     ? "Checking existing records…"
                     : "Create event"}
