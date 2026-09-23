@@ -31,8 +31,10 @@ describe("bulk run failure", () => {
       expect(error).toBeInstanceOf(BulkRunFailure);
       expect(classifyCommandFailure(error)).toMatchObject({
         category: "conflict",
-        title: "This record changed elsewhere",
-        detail: expect.stringContaining("1 completed, 1 failed, 1 remaining"),
+        title: "Someone else changed this",
+        detail: expect.stringContaining(
+          "1 saved, 1 didn't go through, 1 still waiting",
+        ),
       });
     }
   });

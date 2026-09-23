@@ -155,12 +155,12 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
         {draft.sources.length > 0 ? (
           <SourceFiles sources={draft.sources} />
         ) : (
-          <p className="text-ink-2">No source files recorded.</p>
+          <p className="text-ink-2">No source files on this import.</p>
         )}
       </div>
       {draft.missing.length > 0 ? (
         <div>
-          <h3 className="font-semibold">Not recorded in the source</h3>
+          <h3 className="font-semibold">Not on the worksheet</h3>
           <ul className="mt-1 list-disc space-y-1 pl-5 text-ink-2">
             {draft.missing.map((key, index) => (
               <li key={`${key}-${index}`}>{factLabels[key] ?? key}</li>
@@ -184,7 +184,7 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
             Unresolved menu lines ({unresolved.length})
           </h3>
           <p className="text-ink-2">
-            These source lines have not been linked to event dishes.
+            These menu lines are not yet tied to a dish on the event.
           </p>
           <ol className="divide-y divide-line">
             {unresolved.map((line, index) => (
@@ -194,12 +194,14 @@ export function EventImportDraftPanel({ eventId }: { eventId: Id<"events"> }) {
                   <div>
                     <dt className="inline font-medium">Quantity: </dt>
                     <dd className="inline">
-                      {line.quantity ?? "Not recorded"}
+                      {line.quantity ?? "Not on the worksheet"}
                     </dd>
                   </div>
                   <div>
                     <dt className="inline font-medium">Unit: </dt>
-                    <dd className="inline">{line.unit || "Not recorded"}</dd>
+                    <dd className="inline">
+                      {line.unit || "Not on the worksheet"}
+                    </dd>
                   </div>
                   {line.course ? (
                     <div>

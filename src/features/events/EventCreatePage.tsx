@@ -1142,8 +1142,8 @@ export function EventCreatePage() {
             </>
           ) : null}
           <p className="text-xs leading-relaxed text-ink-3">
-            Creation is policy-checked by the generated Client, Venue, and Event
-            commands. Any denial or guard failure appears above.
+            If something can't be created, the reason appears above. Fix it and
+            try again.
           </p>
         </aside>
       </div>

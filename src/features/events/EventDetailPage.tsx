@@ -784,7 +784,7 @@ function EventDetailContent({
           <section className="space-y-4" data-testid="event-guests-tab">
             <EventTabIntro
               title="Guests"
-              description="Invite guests, track RSVPs and table assignments, and record dietary needs that feed the allergen briefing."
+              description="Invite guests, track RSVPs and table assignments, and note dietary needs so they show up on the allergen briefing."
             />
             <EventGuestPanel
               eventId={event._id}

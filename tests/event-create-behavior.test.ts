@@ -349,7 +349,7 @@ it("keeps the entered details and never falls back to generic creation when the 
   expect(book).toHaveBeenCalledTimes(1);
   expect(generic).not.toHaveBeenCalled();
   expect(container.querySelector('[role="alert"]')?.textContent).toContain(
-    "This record changed elsewhere",
+    "Someone else changed this",
   );
   expect(field("title").value).toBe("Summer dinner");
   expect(field("primaryContactName").value).toBe("Ada Cook");
