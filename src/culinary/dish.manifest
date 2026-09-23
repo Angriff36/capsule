@@ -450,7 +450,7 @@ entity DishComponent mixin TenantScoped, SoftDeletable {
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo portionSpec: ComponentPortionSpec fields [tenantId, portionSpecId] references [tenantId, id]
 
-  default policy dishComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish component composition"
+  default policy dishComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see dish recipes"
   default policy dishComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update dish recipes"
   default policy dishComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change dish recipes"
 

@@ -87,4 +87,54 @@ describe("plain words on culinary manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover culinary READ copy free of component jargon", () => {
+    const files = [
+      "src/culinary/component.manifest",
+      "src/culinary/component-import.manifest",
+      "src/culinary/dish.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Kitchen staff may read components",
+      "Kitchen staff may read component ingredient lines",
+      "Kitchen staff may read component steps",
+      "Kitchen staff may read component version history",
+      "Kitchen staff may read portion specs",
+      "Kitchen staff may read component imports",
+      "Kitchen staff may read component import lines",
+      "Kitchen staff may read dish component composition",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Kitchen staff may see recipes",
+      "Kitchen staff may see recipe ingredient lines",
+      "Kitchen staff may see recipe steps",
+      "Kitchen staff may see recipe versions",
+      "Kitchen staff may see portion sizes",
+      "Kitchen staff may see recipe imports",
+      "Kitchen staff may see recipe import lines",
+      "Kitchen staff may see dish recipes",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Kitchen staff may update recipes");
+    expect(visible).toContain("Kitchen staff may update recipe imports");
+    expect(visible).toContain("Kitchen staff may update portion sizes");
+    expect(visible).toContain("Kitchen staff may update dish recipes");
+
+    // later leftovers stay as-is
+    expect(visible).toContain("Kitchen staff may read nested recipe lines");
+    expect(visible).toContain("Portion spec name is required");
+  });
 });

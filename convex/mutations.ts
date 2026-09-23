@@ -3417,7 +3417,7 @@ async function __runComponentDraft(ctx: MutationCtx, { docId, name, yieldQuantit
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -3522,7 +3522,7 @@ export const Component_createViaDraft = mutation({
       yieldQuantity: args.yieldQuantity,
       yieldUnit: args.yieldUnit
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -3567,7 +3567,7 @@ async function __runComponentPublishVersion(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -3628,7 +3628,7 @@ async function __runComponentPurge(ctx: MutationCtx, { docId, version }: any, __
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -3689,7 +3689,7 @@ async function __runComponentRetire(ctx: MutationCtx, { docId, reason, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!(((doc.status === "draft") || (doc.status === "published")))) throw new Error("Guard 0 failed");
@@ -3752,7 +3752,7 @@ async function __runComponentRetract(ctx: MutationCtx, { docId, version }: any, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "published"))) throw new Error("Guard 0 failed");
@@ -3814,7 +3814,7 @@ async function __runComponentReviseDraft(ctx: MutationCtx, { docId, name, yieldQ
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -3881,7 +3881,7 @@ async function __runComponentSetServesPerYield(ctx: MutationCtx, { docId, serves
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -3928,7 +3928,7 @@ async function __runComponentSetStorageWindow(ctx: MutationCtx, { docId, storage
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Component not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Component not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read components");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -4208,7 +4208,7 @@ async function __runComponentImportApproveReview(ctx: MutationCtx, { docId, vers
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "reviewing"))) throw new Error("Guard 0 failed");
@@ -4270,7 +4270,7 @@ async function __runComponentImportBeginFinalization(ctx: MutationCtx, { docId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "ready"))) throw new Error("Guard 0 failed");
@@ -4332,7 +4332,7 @@ async function __runComponentImportBeginReview(ctx: MutationCtx, { docId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "parsed"))) throw new Error("Guard 0 failed");
@@ -4392,7 +4392,7 @@ async function __runComponentImportCancel(ctx: MutationCtx, { docId, reason, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status !== "completed"))) throw new Error("Guard 0 failed");
@@ -4465,7 +4465,7 @@ async function __runComponentImportComplete(ctx: MutationCtx, { docId, version }
       }
       if ((__agg0 as any).matchedIngredient && (__agg0 as any).matchedIngredient.tenantId !== __auth.tenantId) (__agg0 as any).matchedIngredient = null;
     }
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "finalizing"))) throw new Error("Guard 0 failed");
@@ -4528,7 +4528,7 @@ async function __runComponentImportMarkFailed(ctx: MutationCtx, { docId, failure
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status !== "completed"))) throw new Error("Guard 0 failed");
@@ -4594,7 +4594,7 @@ async function __runComponentImportRecordComponent(ctx: MutationCtx, { docId, re
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "finalizing"))) throw new Error("Guard 0 failed");
@@ -4642,7 +4642,7 @@ async function __runComponentImportRecordParse(ctx: MutationCtx, { docId, parsed
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "uploaded"))) throw new Error("Guard 0 failed");
@@ -4725,7 +4725,7 @@ async function __runComponentImportRecordResolutionProgress(ctx: MutationCtx, { 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "reviewing"))) throw new Error("Guard 0 failed");
@@ -4775,7 +4775,7 @@ async function __runComponentImportResumeReview(ctx: MutationCtx, { docId, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((((doc.status === "failed") || (doc.status === "finalizing")) || (doc.status === "ready")))) throw new Error("Guard 0 failed");
@@ -4837,7 +4837,7 @@ async function __runComponentImportReviseReview(ctx: MutationCtx, { docId, expec
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.status === "reviewing"))) throw new Error("Guard 0 failed");
@@ -4905,7 +4905,7 @@ async function __runComponentImportUpload(ctx: MutationCtx, { docId, sourceKind,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImport not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImport not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.uploadedAt == null))) throw new Error("Guard 0 failed");
@@ -5010,7 +5010,7 @@ export const ComponentImport_createViaUpload = mutation({
       sourceFingerprint: args.sourceFingerprint,
       sourceKind: args.sourceKind
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component imports");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe imports");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((__draft.uploadedAt == null))) throw new Error("Guard 0 failed");
@@ -5050,7 +5050,7 @@ async function __runComponentImportLineAttachCreatedIngredient(ctx: MutationCtx,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImportLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.matchStatus === "confirmed_new"))) throw new Error("Guard 0 failed");
@@ -5100,7 +5100,7 @@ async function __runComponentImportLineConfirmExisting(ctx: MutationCtx, { docId
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
     const __rel_matchedIngredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.matchedIngredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).matchedIngredient = __rel_matchedIngredient;
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.resolvedAt == null))) throw new Error("Guard 0 failed");
@@ -5151,7 +5151,7 @@ async function __runComponentImportLineConfirmNew(ctx: MutationCtx, { docId, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImportLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.resolvedAt == null))) throw new Error("Guard 0 failed");
@@ -5199,7 +5199,7 @@ async function __runComponentImportLineDiscard(ctx: MutationCtx, { docId, reason
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImportLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -5246,7 +5246,7 @@ async function __runComponentImportLineMarkNew(ctx: MutationCtx, { docId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImportLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.resolvedAt == null))) throw new Error("Guard 0 failed");
@@ -5294,7 +5294,7 @@ async function __runComponentImportLineResetResolution(ctx: MutationCtx, { docId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImportLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -5344,7 +5344,7 @@ async function __runComponentImportLineReviseMeasurements(ctx: MutationCtx, { do
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
     const __rel_import = await __resolveRelation(ctx, "componentImports", [__auth.tenantId, doc.importId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).import = __rel_import;
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((__rel_import != null))) throw new Error("Guard 0 failed");
@@ -5403,7 +5403,7 @@ async function __runComponentImportLineStage(ctx: MutationCtx, { docId, importId
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
     const __rel_import = await __resolveRelation(ctx, "componentImports", [__auth.tenantId, doc.importId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).import = __rel_import;
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.resolvedAt == null))) throw new Error("Guard 0 failed");
@@ -5494,7 +5494,7 @@ export const ComponentImportLine_createViaStage = mutation({
       sourceOrder: args.sourceOrder
     };
     const __rel_import = await __resolveRelation(ctx, "componentImports", [__auth.tenantId, __draft.importId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((__draft.resolvedAt == null))) throw new Error("Guard 0 failed");
@@ -5534,7 +5534,7 @@ async function __runComponentImportLineSuggestExactMatch(ctx: MutationCtx, { doc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImportLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.resolvedAt == null))) throw new Error("Guard 0 failed");
@@ -5583,7 +5583,7 @@ async function __runComponentImportLineSuggestPossibleMatches(ctx: MutationCtx, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentImportLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentImportLine not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component import lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe import lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe import lines");
     if (!((doc.resolvedAt == null))) throw new Error("Guard 0 failed");
@@ -5632,7 +5632,7 @@ async function __runComponentIngredientAdd(ctx: MutationCtx, { docId, componentI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentIngredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentIngredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -5725,7 +5725,7 @@ export const ComponentIngredient_createViaAdd = mutation({
       quantity: args.quantity,
       unit: args.unit
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -5769,7 +5769,7 @@ async function __runComponentIngredientAdjustQuantity(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentIngredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentIngredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -5835,7 +5835,7 @@ async function __runComponentIngredientRemove(ctx: MutationCtx, { docId, reason,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentIngredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentIngredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -5892,7 +5892,7 @@ async function __runComponentIngredientSetWasteFactor(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentIngredient not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentIngredient not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component ingredient lines");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe ingredient lines");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe ingredient lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -5940,7 +5940,7 @@ async function __runComponentPortionSpecDefine(ctx: MutationCtx, { docId, compon
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentPortionSpec not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentPortionSpec not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read portion specs");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
@@ -6024,7 +6024,7 @@ export const ComponentPortionSpec_createViaDefine = mutation({
       pieceUnit: args.pieceUnit,
       source: args.source
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read portion specs");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
@@ -6062,7 +6062,7 @@ async function __runComponentPortionSpecRetire(ctx: MutationCtx, { docId, reason
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentPortionSpec not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentPortionSpec not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read portion specs");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
@@ -6110,7 +6110,7 @@ async function __runComponentPortionSpecRevise(ctx: MutationCtx, { docId, name, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentPortionSpec not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentPortionSpec not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read portion specs");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update portion sizes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
@@ -6167,7 +6167,7 @@ async function __runComponentSnapshotCapture(ctx: MutationCtx, { docId, componen
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentSnapshot not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentSnapshot not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component version history");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe versions");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe versions");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe versions");
     if (!((doc.capturedAt == null))) throw new Error("Guard 0 failed");
@@ -6247,7 +6247,7 @@ export const ComponentSnapshot_createViaCapture = mutation({
       snapshot: args.snapshot,
       versionNumber: args.versionNumber
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component version history");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe versions");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe versions");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe versions");
     if (!((__draft.capturedAt == null))) throw new Error("Guard 0 failed");
@@ -6284,7 +6284,7 @@ async function __runComponentStepAdd(ctx: MutationCtx, { docId, componentId, ins
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentStep not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentStep not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component steps");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -6359,7 +6359,7 @@ export const ComponentStep_createViaAdd = mutation({
       durationMinutes: args.durationMinutes,
       instruction: args.instruction
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component steps");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -6394,7 +6394,7 @@ async function __runComponentStepRemove(ctx: MutationCtx, { docId, reason, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentStep not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentStep not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component steps");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -6442,7 +6442,7 @@ async function __runComponentStepRevise(ctx: MutationCtx, { docId, instruction, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ComponentStep not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ComponentStep not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read component steps");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update recipe steps");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe steps");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -9079,7 +9079,7 @@ async function __runDishComponentAttach(ctx: MutationCtx, { docId, dishId, compo
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishComponent not found");
     const __rel_dish = await __resolveRelation(ctx, "dishes", [__auth.tenantId, doc.dishId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).dish = __rel_dish;
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish component composition");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish recipes");
     if (!((doc.attachedAt == null))) throw new Error("Guard 0 failed");
@@ -9192,7 +9192,7 @@ export const DishComponent_createViaAttach = mutation({
       yieldQuantity: args.yieldQuantity
     };
     const __rel_dish = await __resolveRelation(ctx, "dishes", [__auth.tenantId, __draft.dishId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish component composition");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish recipes");
     if (!((__draft.attachedAt == null))) throw new Error("Guard 0 failed");
@@ -9258,7 +9258,7 @@ async function __runDishComponentDetach(ctx: MutationCtx, { docId, reason, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishComponent not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishComponent not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish component composition");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish recipes");
     if (!((doc.attachedAt != null))) throw new Error("Guard 0 failed");
@@ -9324,7 +9324,7 @@ async function __runDishComponentSetPortionSpec(ctx: MutationCtx, { docId, porti
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("DishComponent not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("DishComponent not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read dish component composition");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update dish recipes");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change dish recipes");
     if (!((doc.attachedAt != null))) throw new Error("Guard 0 failed");

@@ -61,7 +61,7 @@ entity Component mixin TenantScoped, SoftDeletable {
   transition status from "published" to ["draft", "retired"]
   transition status from "retired" to []
 
-  default policy componentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read components"
+  default policy componentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipes"
   default policy componentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipes"
   default policy componentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipes"
 
@@ -269,7 +269,7 @@ entity ComponentIngredient mixin TenantScoped, SoftDeletable {
   constraint lineQuantityPositive: self.addedAt == null or self.quantity > 0 "Component ingredient quantity must be positive"
   constraint lineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
 
-  default policy componentIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component ingredient lines"
+  default policy componentIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe ingredient lines"
   default policy componentIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe ingredient lines"
   default policy componentIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe ingredient lines"
 
@@ -374,7 +374,7 @@ entity ComponentStep mixin TenantScoped, SoftDeletable {
 
   constraint stepInstructionComplete: self.addedAt == null or length(trim(self.instruction)) > 0 "Component steps require an instruction"
 
-  default policy componentStepRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component steps"
+  default policy componentStepRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe steps"
   default policy componentStepWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe steps"
   default policy componentStepExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe steps"
 
@@ -461,7 +461,7 @@ entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
 
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
 
-  default policy componentSnapshotRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component version history"
+  default policy componentSnapshotRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe versions"
   default policy componentSnapshotWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe versions"
   default policy componentSnapshotExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe versions"
 
@@ -743,7 +743,7 @@ entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
   constraint portionSpecNamed: self.definedAt == null or length(trim(self.name)) > 0 "Portion spec name is required"
   constraint portionSpecPiecePositive: self.definedAt == null or self.pieceQuantity > 0 "Piece quantity must be positive"
 
-  default policy componentPortionSpecRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read portion specs"
+  default policy componentPortionSpecRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see portion sizes"
   default policy componentPortionSpecWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update portion sizes"
   default policy componentPortionSpecExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change portion sizes"
 
