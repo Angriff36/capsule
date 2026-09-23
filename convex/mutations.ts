@@ -21329,7 +21329,7 @@ async function __runImportDatasetActivate(ctx: MutationCtx, { docId, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportDataset not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportDataset not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import datasets");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import lists");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
@@ -21374,7 +21374,7 @@ async function __runImportDatasetDeactivate(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportDataset not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportDataset not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import datasets");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import lists");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
@@ -21419,7 +21419,7 @@ async function __runImportDatasetRecordLastImport(ctx: MutationCtx, { docId, imp
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportDataset not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportDataset not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import datasets");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import lists");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");
@@ -21466,7 +21466,7 @@ async function __runImportDatasetRegister(ctx: MutationCtx, { docId, datasetCate
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportDataset not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportDataset not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import datasets");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import lists");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt == null))) throw new Error("Guard 1 failed");
@@ -21532,7 +21532,7 @@ async function __runImportDatasetUpdateConfig(ctx: MutationCtx, { docId, config,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportDataset not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportDataset not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import datasets");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import lists");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import lists");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.createdAt != null))) throw new Error("Guard 1 failed");

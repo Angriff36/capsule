@@ -125,8 +125,22 @@ describe("plain words on leftover import manifests", () => {
 
     expect(visible).not.toContain("Staff may write import datasets");
     expect(visible).toContain("Staff may update import lists");
-    expect(visible).toContain("Staff may read import datasets");
+    expect(visible).toContain("Staff may see import lists");
     expectPlain("Staff may update import lists");
+  });
+
+  it("keeps leftover import-dataset READ copy free of read-dataset jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/import/import-dataset.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Staff may read import datasets");
+    expect(visible).toContain("Staff may see import lists");
+    expectPlain("Staff may see import lists");
+    expect(visible).toContain("Staff may update import lists");
+    expect(visible).toContain("Dataset category is required");
   });
 
   it("keeps leftover admin nav labels free of run and record jargon", () => {
