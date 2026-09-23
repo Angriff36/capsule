@@ -6,6 +6,8 @@
 // drafts are intent, not revenue; voided / written-off / deleted rows are
 // dead money.
 
+import { centsToDollars, dollarsToCents } from "../../lib/ledgerMoney";
+
 /** Statuses with money still owed — the hub's "needs attention" pool. */
 export const OPEN_INVOICE_STATUSES = [
   "sent",
@@ -64,23 +66,27 @@ export function rollupEventBilling(
   invoices: readonly BillingInvoice[],
   eventId: string,
 ): EventBillingRollup {
-  const rollup: EventBillingRollup = {
-    billedTotal: 0,
-    billedCount: 0,
-    collectedTotal: 0,
-    draftTotal: 0,
-    draftCount: 0,
-  };
+  let billedCents = 0;
+  let collectedCents = 0;
+  let draftCents = 0;
+  let billedCount = 0;
+  let draftCount = 0;
   for (const invoice of invoices) {
     if (String(invoice.eventId ?? "") !== eventId) continue;
     if (isBilledInvoice(invoice)) {
-      rollup.billedTotal += moneyAmount(invoice.total);
-      rollup.collectedTotal += moneyAmount(invoice.amountPaid);
-      rollup.billedCount += 1;
+      billedCents += dollarsToCents(moneyAmount(invoice.total));
+      collectedCents += dollarsToCents(moneyAmount(invoice.amountPaid));
+      billedCount += 1;
     } else if (isDraftInvoice(invoice)) {
-      rollup.draftTotal += moneyAmount(invoice.total);
-      rollup.draftCount += 1;
+      draftCents += dollarsToCents(moneyAmount(invoice.total));
+      draftCount += 1;
     }
   }
-  return rollup;
+  return {
+    billedTotal: centsToDollars(billedCents),
+    billedCount,
+    collectedTotal: centsToDollars(collectedCents),
+    draftTotal: centsToDollars(draftCents),
+    draftCount,
+  };
 }

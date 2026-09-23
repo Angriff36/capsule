@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { LedgerMoney, roundMoney } from "../src/lib/ledgerMoney";
+import { InvoiceMoneyLedger } from "../src/lib/invoiceMoneyLedger";
 import { computeProposalPricing } from "../src/lib/pricing";
 import { calculateInvoiceTax } from "../src/features/finance/invoiceTax";
+import { rollupEventBilling } from "../src/features/finance/invoiceBilling";
 
 const toCents = (dollars: number) => LedgerMoney.fromDollars(dollars).toCents();
 
@@ -125,5 +127,104 @@ describe("finance precision reconciliation", () => {
     // 1.005 × 100 = 100.49999999999999 → Math.round lands on 100 cents.
     expect(roundMoney(1.005)).toBe(1);
     expect(toCents(1.005)).toBe(100);
+  });
+
+  it("statement charges minus payments minus credits equal due to the cent", () => {
+    const ledger = new InvoiceMoneyLedger();
+
+    expect(ledger.statementDue(100.1, 40.03, 10.02)).toBe(50.05);
+    // 1000 − 100 − 900 nets to zero exactly, not a float whisper.
+    expect(ledger.statementDue(1000, 100, 900)).toBe(0);
+    // Overpay / overcredit stays exact — never clamped positive.
+    expect(ledger.statementDue(100, 100, 40)).toBe(-40);
+    // 0.1 + 0.2 float residue never reaches the statement line.
+    expect(ledger.statementDue(0.3, 0.1, 0.2)).toBe(0);
+    expect(toCents(ledger.statementDue(0.1, 0, 0))).toBe(10);
+    expect(ledger.statementDue(59.99, 0)).toBe(59.99);
+  });
+
+  it("payment allocations close invoices to the cent and keep remainder", () => {
+    const ledger = new InvoiceMoneyLedger();
+
+    const first = ledger.allocateAcross([1000], 100);
+    expect(first).toEqual({ applied: [100], remainder: 0 });
+    const second = ledger.allocateAcross([900], 900);
+    expect(second).toEqual({ applied: [900], remainder: 0 });
+    expect(1000 - 100 - 900).toBe(0);
+
+    const partial = ledger.allocateAcross([10.1, 20.2, 0.05], 30.4);
+    expect(partial.applied).toEqual([10.1, 20.2, 0.05]);
+    expect(partial.remainder).toBe(0.05);
+
+    const exact = ledger.allocateAcross([0.1, 0.2], 0.3);
+    expect(exact.applied).toEqual([0.1, 0.2]);
+    expect(exact.remainder).toBe(0);
+    // Every leftover due is exactly zero cents after the waterfall.
+    expect(toCents(exact.applied[0]) + toCents(exact.applied[1])).toBe(30);
+
+    const single = ledger.applyPayment(0.1, 0.3);
+    expect(single.applied).toBe(0.1);
+    expect(single.nextDue).toBe(0);
+    expect(single.remainder).toBe(0.2);
+  });
+
+  it("aging bucket cents sum to the outstanding total", () => {
+    const ledger = new InvoiceMoneyLedger();
+    const asOf = Date.UTC(2026, 8, 22);
+    const day = 86_400_000;
+
+    const totals = ledger.ageOpenBalances(
+      [
+        { amountDue: 10.1, dueDate: null },
+        { amountDue: 20.2, dueDate: asOf - 10 * day },
+        { amountDue: 0.05, dueDate: asOf - 40 * day },
+        { amountDue: 1.01, dueDate: asOf - 90 * day },
+      ],
+      asOf,
+    );
+
+    expect(totals.current).toBe(10.1);
+    expect(totals.days1to30).toBe(20.2);
+    expect(totals.days31to60).toBe(0.05);
+    expect(totals.days61plus).toBe(1.01);
+    expect(totals.outstanding).toBe(31.36);
+    expect(totals.overdue).toBe(21.26);
+
+    const bucketCents =
+      toCents(totals.current) +
+      toCents(totals.days1to30) +
+      toCents(totals.days31to60) +
+      toCents(totals.days61plus);
+    expect(bucketCents).toBe(toCents(totals.outstanding));
+    expect(toCents(totals.overdue)).toBe(
+      toCents(totals.days1to30) +
+        toCents(totals.days31to60) +
+        toCents(totals.days61plus),
+    );
+  });
+
+  it("reporting rollup billed cents equal invoice cents", () => {
+    const invoice = (eventId: string, status: string, total: number) => ({
+      eventId,
+      status,
+      total,
+      amountPaid: 0,
+    });
+    const invoices = [
+      { ...invoice("e1", "sent", 10.1), amountPaid: 10.1 },
+      invoice("e1", "paid", 20.2),
+      invoice("e1", "partial", 0.05),
+      invoice("e1", "draft", 99.99),
+      invoice("e2", "sent", 5.55),
+    ];
+
+    const rollup = rollupEventBilling(invoices, "e1");
+
+    expect(rollup.billedTotal).toBe(30.35);
+    expect(rollup.collectedTotal).toBe(10.1);
+    expect(rollup.billedCount).toBe(3);
+    expect(toCents(rollup.billedTotal)).toBe(
+      toCents(10.1) + toCents(20.2) + toCents(0.05),
+    );
   });
 });
