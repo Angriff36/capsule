@@ -58,8 +58,8 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
 
   // Read wide: the Event Tracker shows every role which truck goes to which event.
   default policy vehicleRead read: roleAllows(user.role, "staffAccess") "Staff may read vehicles"
-  default policy vehicleWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write vehicles through commands"
-  default policy vehicleExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute vehicle commands"
+  default policy vehicleWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update vehicles"
+  default policy vehicleExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change vehicles"
 
   command register(
     make: string,
@@ -280,8 +280,8 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   transition operationalStatus from "retired" to ["available", "in_use", "maintenance", "out_of_service"]
 
   default policy trailerRead read: roleAllows(user.role, "staffAccess") "Staff may read trailers"
-  default policy trailerWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write trailers through commands"
-  default policy trailerExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute trailer commands"
+  default policy trailerWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update trailers"
+  default policy trailerExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change trailers"
 
   command register(
     make: string,
@@ -475,8 +475,8 @@ entity VehicleFuelLog mixin TenantScoped, SoftDeletable {
   constraint vehicleFuelComplete: self.loggedAt == null or (self.odometer >= 0 and self.fuelCost >= 0 and self.filledAt != null) "Fuel logs require a nonnegative odometer, nonnegative cost, and fill date"
 
   default policy vehicleFuelRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read fuel logs"
-  default policy vehicleFuelWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may record fuel logs"
-  default policy vehicleFuelExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute fuel log commands"
+  default policy vehicleFuelWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may add fuel logs"
+  default policy vehicleFuelExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change fuel logs"
 
   command record(
     vehicleId: uuid,
@@ -546,7 +546,7 @@ entity VehicleMaintenanceSchedule mixin TenantScoped, SoftDeletable {
 
   default policy vehicleMaintenanceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicle maintenance"
   default policy vehicleMaintenanceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update vehicle maintenance"
-  default policy vehicleMaintenanceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute vehicle maintenance commands"
+  default policy vehicleMaintenanceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change vehicle maintenance"
 
   command schedule(
     vehicleId: uuid,
@@ -652,8 +652,8 @@ entity VehicleServiceEntry mixin TenantScoped, SoftDeletable {
   constraint vehicleServiceComplete: self.loggedAt == null or (length(trim(self.vendor)) > 0 and self.cost >= 0 and self.odometer >= 0 and self.completedAt != null) "Completed service requires a vendor, nonnegative cost, odometer reading, and completion time"
 
   default policy vehicleServiceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicle service history"
-  default policy vehicleServiceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may record vehicle service"
-  default policy vehicleServiceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute vehicle service commands"
+  default policy vehicleServiceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may add vehicle service"
+  default policy vehicleServiceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change vehicle service"
 
   command record(
     maintenanceScheduleId: uuid,

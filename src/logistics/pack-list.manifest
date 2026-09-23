@@ -65,8 +65,8 @@ entity PackList mixin TenantScoped, SoftDeletable {
   // Read wide: the Event Tracker shows pack status to the whole crew. Event
   // and sales staff write because they open a pack list from the tracker row.
   default policy packListRead read: roleAllows(user.role, "staffAccess") "Staff may read pack lists"
-  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may write pack lists through commands"
-  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may execute pack list commands"
+  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may update pack lists"
+  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may change pack lists"
 
   // Idempotent open: Event.approve reaction may re-fire; do not fail or duplicate.
   command open(
@@ -344,8 +344,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // Kitchen and logistics share physical packing; recipe corrections also
   // reconcile container requirements through these same commands.
   default policy packListItemRead read: roleAllows(user.role, "staffAccess") "Staff may read pack list items"
-  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may write pack list items through commands"
-  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may execute pack list item commands"
+  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may update pack list items"
+  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may change pack list items"
 
   command addItem(
     packListId: uuid,

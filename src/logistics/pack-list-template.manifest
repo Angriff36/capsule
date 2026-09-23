@@ -58,8 +58,8 @@ entity PackListTemplate mixin TenantScoped, SoftDeletable {
   transition status from "archived" to ["active"]
 
   default policy packListTemplateRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack list templates"
-  default policy packListTemplateWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack list templates through commands"
-  default policy packListTemplateExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list template commands"
+  default policy packListTemplateWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update pack list templates"
+  default policy packListTemplateExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change pack list templates"
 
   command define(
     name: string,

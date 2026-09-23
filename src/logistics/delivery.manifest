@@ -48,8 +48,8 @@ entity Delivery mixin TenantScoped, SoftDeletable {
 
   // manageAccess: reserved for manager-driven cascade; logisticsAccess: packing staff.
   default policy deliveryRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read deliveries"
-  default policy deliveryWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write deliveries through commands"
-  default policy deliveryExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute delivery commands"
+  default policy deliveryWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update deliveries"
+  default policy deliveryExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change deliveries"
 
   // Idempotent schedule: PackListPacked reaction may re-fire; do not duplicate.
   command schedule(
