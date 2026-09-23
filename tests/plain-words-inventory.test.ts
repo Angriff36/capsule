@@ -63,4 +63,64 @@ describe("plain words on inventory manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover inventory READ copy free of read jargon", () => {
+    const files = [
+      "src/inventory/stock.manifest",
+      "src/inventory/demand.manifest",
+      "src/inventory/transfer.manifest",
+      "src/inventory/stock-count.manifest",
+      "src/inventory/location.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Inventory staff and managers may read stock items",
+      "Inventory staff or event managers may read inventory reservations",
+      "Inventory staff and event managers may read ingredient demand",
+      "Inventory staff may read waste records",
+      "Inventory staff may read stock transfers",
+      "Inventory staff may read stock count sessions",
+      "Inventory staff may read stock count lines",
+      "Inventory staff may read storage locations",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Inventory staff and managers may see stock items",
+      "Inventory staff or event managers may see inventory reservations",
+      "Inventory staff and event managers may see ingredient demand",
+      "Inventory staff may see waste entries",
+      "Inventory staff may see stock transfers",
+      "Inventory staff may see stock count sessions",
+      "Inventory staff may see stock count lines",
+      "Inventory staff may see storage locations",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain(
+      "Inventory staff and managers may update stock items",
+    );
+    expect(visible).toContain(
+      "Inventory staff or event managers may update inventory reservations",
+    );
+    expect(visible).toContain(
+      "Inventory staff and event managers may update ingredient demand",
+    );
+    expect(visible).toContain("Inventory staff may update waste entries");
+    expect(visible).toContain("Inventory staff may update stock transfers");
+    expect(visible).toContain(
+      "Inventory staff may update stock count sessions",
+    );
+    expect(visible).toContain("Inventory staff may update stock count lines");
+    expect(visible).toContain("Inventory staff may update storage locations");
+  });
 });

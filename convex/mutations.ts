@@ -23596,7 +23596,7 @@ async function __runIngredientDemandCalculate(ctx: MutationCtx, { docId, eventId
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     ((doc as any) as any).ingredient = __rel_ingredient;
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!((doc.calculatedAt == null))) throw new Error("Guard 0 failed");
@@ -23723,7 +23723,7 @@ export const IngredientDemand_createViaCalculate = mutation({
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!((__draft.calculatedAt == null))) throw new Error("Guard 0 failed");
@@ -23782,7 +23782,7 @@ async function __runIngredientDemandConfirm(ctx: MutationCtx, { docId, version }
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!((doc.status === "calculated"))) throw new Error("Guard 0 failed");
@@ -23849,7 +23849,7 @@ async function __runIngredientDemandEnsurePurchaseEligible(ctx: MutationCtx, { d
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -23891,7 +23891,7 @@ async function __runIngredientDemandFulfill(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IngredientDemand not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!((doc.status === "confirmed"))) throw new Error("Guard 0 failed");
@@ -23953,7 +23953,7 @@ async function __runIngredientDemandMarkReleased(ctx: MutationCtx, { docId, vers
     if (!doc) throw new Error("IngredientDemand not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -24015,7 +24015,7 @@ async function __runIngredientDemandRecalculate(ctx: MutationCtx, { docId, newQu
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IngredientDemand not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!(((doc.status === "calculated") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
@@ -24068,7 +24068,7 @@ async function __runIngredientDemandSupersede(ctx: MutationCtx, { docId, reason,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IngredientDemand not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!(((doc.status === "calculated") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
@@ -24135,7 +24135,7 @@ async function __runIngredientDemandSyncFromContributions(ctx: MutationCtx, { do
     if (!doc) throw new Error("IngredientDemand not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may read ingredient demand");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may see ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may update ingredient demand");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and event managers may change ingredient demand");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -24982,7 +24982,7 @@ async function __runInventoryItemAdjustQuantity(ctx: MutationCtx, { docId, delta
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25036,7 +25036,7 @@ async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, l
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).ingredient = __rel_ingredient;
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt == null))) throw new Error("Guard 0 failed");
@@ -25130,7 +25130,7 @@ export const InventoryItem_createViaOpen = mutation({
       unit: args.unit
     };
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((__draft.stockedAt == null))) throw new Error("Guard 0 failed");
@@ -25176,7 +25176,7 @@ async function __runInventoryItemReceiveDelivery(ctx: MutationCtx, { docId, ingr
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).ingredient = __rel_ingredient;
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -25241,7 +25241,7 @@ async function __runInventoryItemReceiveStock(ctx: MutationCtx, { docId, quantit
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25294,7 +25294,7 @@ async function __runInventoryItemRecount(ctx: MutationCtx, { docId, actualQuanti
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25345,7 +25345,7 @@ async function __runInventoryItemRemove(ctx: MutationCtx, { docId, reason, versi
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
     (doc as any).reservations = await ctx.db.query("inventoryReservations").withIndex("by_inventoryItemId", (q: any) => q.eq("inventoryItemId", docId)).collect();
     (doc as any).reservations = (doc as any).reservations.filter((row: any) => row.tenantId === __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25397,7 +25397,7 @@ async function __runInventoryItemSetExpiry(ctx: MutationCtx, { docId, bestBefore
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25447,7 +25447,7 @@ async function __runInventoryItemTransferIn(ctx: MutationCtx, { docId, quantity,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25498,7 +25498,7 @@ async function __runInventoryItemTransferOut(ctx: MutationCtx, { docId, quantity
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25550,7 +25550,7 @@ async function __runInventoryItemUpdateLevels(ctx: MutationCtx, { docId, parLeve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read stock items");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may see stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update stock items");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change stock items");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
@@ -25813,7 +25813,7 @@ async function __runInventoryReservationConsume(ctx: MutationCtx, { docId, versi
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryReservation not found");
     const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, doc.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).inventoryItem = __rel_inventoryItem;
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may see inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may update inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may change inventory reservations");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -25878,7 +25878,7 @@ async function __runInventoryReservationRelease(ctx: MutationCtx, { docId, reaso
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryReservation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryReservation not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may see inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may update inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may change inventory reservations");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -25948,7 +25948,7 @@ async function __runInventoryReservationReserve(ctx: MutationCtx, { docId, inven
     ((doc as any) as any).event = __rel_event;
     ((doc as any) as any).inventoryItem = __rel_inventoryItem;
     ((doc as any) as any).inventoryLot = __rel_inventoryLot;
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may see inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may update inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may change inventory reservations");
     if (!((doc.reservedAt == null))) throw new Error("Guard 0 failed");
@@ -26050,7 +26050,7 @@ export const InventoryReservation_createViaReserve = mutation({
     const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, __draft.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_inventoryLot = await __resolveRelation(ctx, "inventoryLots", [__auth.tenantId, __draft.inventoryLotId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may see inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may update inventory reservations");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Inventory staff or event managers may change inventory reservations");
     if (!((__draft.reservedAt == null))) throw new Error("Guard 0 failed");
@@ -46556,7 +46556,7 @@ async function __runStockCountLineConfirmLedgerMatch(ctx: MutationCtx, { docId, 
     const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, doc.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).session = __rel_session;
     ((doc as any) as any).inventoryItem = __rel_inventoryItem;
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count lines");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count lines");
     if (!((doc.status === "counted"))) throw new Error("Guard 0 failed");
@@ -46625,7 +46625,7 @@ async function __runStockCountLineFreeze(ctx: MutationCtx, { docId, stockCountSe
     const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, doc.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).session = __rel_session;
     ((doc as any) as any).inventoryItem = __rel_inventoryItem;
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count lines");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count lines");
     if (!((doc.frozenAt == null))) throw new Error("Guard 0 failed");
@@ -46719,7 +46719,7 @@ export const StockCountLine_createViaFreeze = mutation({
     };
     const __rel_session = await __resolveRelation(ctx, "stockCountSessions", [__auth.tenantId, __draft.stockCountSessionId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, __draft.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count lines");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count lines");
     if (!((__draft.frozenAt == null))) throw new Error("Guard 0 failed");
@@ -46770,7 +46770,7 @@ async function __runStockCountLineReconcileVariance(ctx: MutationCtx, { docId, r
     const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, doc.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).session = __rel_session;
     ((doc as any) as any).inventoryItem = __rel_inventoryItem;
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count lines");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count lines");
     if (!((doc.status === "counted"))) throw new Error("Guard 0 failed");
@@ -46844,7 +46844,7 @@ async function __runStockCountLineRecordCount(ctx: MutationCtx, { docId, counted
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StockCountLine not found");
     const __rel_session = await __resolveRelation(ctx, "stockCountSessions", [__auth.tenantId, doc.stockCountSessionId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).session = __rel_session;
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count lines");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count lines");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -46915,7 +46915,7 @@ async function __runStockCountLineReviseCount(ctx: MutationCtx, { docId, counted
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StockCountLine not found");
     const __rel_session = await __resolveRelation(ctx, "stockCountSessions", [__auth.tenantId, doc.stockCountSessionId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).session = __rel_session;
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count lines");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count lines");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count lines");
     if (!((doc.status === "counted"))) throw new Error("Guard 0 failed");
@@ -46972,7 +46972,7 @@ async function __runStockCountSessionClose(ctx: MutationCtx, { docId, version }:
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StockCountSession not found");
     (doc as any).lines = await ctx.db.query("stockCountLines").withIndex("by_stockCountSessionId", (q: any) => q.eq("stockCountSessionId", docId)).collect();
     (doc as any).lines = (doc as any).lines.filter((row: any) => row.tenantId === __auth.tenantId);
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count sessions");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count sessions");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count sessions");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count sessions");
     if (!((doc.status === "in_progress"))) throw new Error("Guard 0 failed");
@@ -47035,7 +47035,7 @@ async function __runStockCountSessionStart(ctx: MutationCtx, { docId, label, loc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("StockCountSession not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StockCountSession not found");
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count sessions");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count sessions");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count sessions");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count sessions");
     if (!((doc.startedAt == null))) throw new Error("Guard 0 failed");
@@ -47115,7 +47115,7 @@ export const StockCountSession_createViaStart = mutation({
       locationIds: args.locationIds,
       locationNames: args.locationNames
     };
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock count sessions");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock count sessions");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock count sessions");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock count sessions");
     if (!((__draft.startedAt == null))) throw new Error("Guard 0 failed");
@@ -47158,7 +47158,7 @@ async function __runStockTransferRecord(ctx: MutationCtx, { docId, sourceInvento
     const __rel_destinationItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, doc.destinationInventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).sourceItem = __rel_sourceItem;
     ((doc as any) as any).destinationItem = __rel_destinationItem;
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock transfers");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock transfers");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock transfers");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock transfers");
     if (!((doc.transferredAt == null))) throw new Error("Guard 0 failed");
@@ -47267,7 +47267,7 @@ export const StockTransfer_createViaRecord = mutation({
     };
     const __rel_sourceItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, __draft.sourceInventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_destinationItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, __draft.destinationInventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock transfers");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see stock transfers");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update stock transfers");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change stock transfers");
     if (!((__draft.transferredAt == null))) throw new Error("Guard 0 failed");
@@ -47322,7 +47322,7 @@ async function __runStorageLocationActivate(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("StorageLocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StorageLocation not found");
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read storage locations");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change storage locations");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
@@ -47383,7 +47383,7 @@ async function __runStorageLocationDeactivate(ctx: MutationCtx, { docId, reason,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("StorageLocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StorageLocation not found");
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read storage locations");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change storage locations");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -47447,7 +47447,7 @@ async function __runStorageLocationRegister(ctx: MutationCtx, { docId, name, loc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("StorageLocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StorageLocation not found");
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read storage locations");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change storage locations");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -47530,7 +47530,7 @@ export const StorageLocation_createViaRegister = mutation({
       temperatureUnit: args.temperatureUnit,
       temperatureZone: args.temperatureZone
     };
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read storage locations");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change storage locations");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -47566,7 +47566,7 @@ async function __runStorageLocationReviseDetails(ctx: MutationCtx, { docId, name
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("StorageLocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StorageLocation not found");
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read storage locations");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update storage locations");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change storage locations");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -55385,7 +55385,7 @@ async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, l
     const __rel_location = await __resolveRelation(ctx, "storageLocations", [__auth.tenantId, doc.locationId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).ingredient = __rel_ingredient;
     ((doc as any) as any).location = __rel_location;
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read waste records");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see waste entries");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update waste entries");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change waste entries");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -55505,7 +55505,7 @@ export const WasteRecord_createViaRecord = mutation({
     };
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_location = await __resolveRelation(ctx, "storageLocations", [__auth.tenantId, __draft.locationId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read waste records");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see waste entries");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update waste entries");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change waste entries");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -55555,7 +55555,7 @@ async function __runWasteRecordVoidRecord(ctx: MutationCtx, { docId, reason, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("WasteRecord not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("WasteRecord not found");
-    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read waste records");
+    if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may see waste entries");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may update waste entries");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may change waste entries");
     if (!((doc.status === "recorded"))) throw new Error("Guard 0 failed");

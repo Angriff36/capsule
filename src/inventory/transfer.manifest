@@ -31,7 +31,7 @@ entity StockTransfer mixin TenantScoped, SoftDeletable {
 
   constraint transferQuantityPositive: self.transferredAt == null or self.quantity > 0 "Transfer quantity must be positive once recorded"
 
-  default policy stockTransferRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock transfers"
+  default policy stockTransferRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may see stock transfers"
   default policy stockTransferWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update stock transfers"
   default policy stockTransferExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may change stock transfers"
 

@@ -81,7 +81,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   transition status from "fulfilled" to []
   transition status from "superseded" to []
 
-  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may read ingredient demand"
+  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may see ingredient demand"
   default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may update ingredient demand"
   default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may change ingredient demand"
 
@@ -349,7 +349,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   transition status from "recorded" to ["voided"]
   transition status from "voided" to []
 
-  default policy wasteRecordRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read waste records"
+  default policy wasteRecordRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may see waste entries"
   default policy wasteRecordWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update waste entries"
   default policy wasteRecordExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may change waste entries"
 

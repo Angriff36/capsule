@@ -49,7 +49,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   constraint stockReorderNonnegative: self.reorderThreshold >= 0 "Reorder threshold cannot be negative"
   constraint stockCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
 
-  default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may read stock items"
+  default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see stock items"
   default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may update stock items"
   default policy inventoryItemExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may change stock items"
 
@@ -334,7 +334,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   transition status from "consumed" to []
 
   // Event managers need read+execute so EventCancelled/Completed fanOut can see rows.
-  default policy inventoryReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may read inventory reservations"
+  default policy inventoryReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may see inventory reservations"
   default policy inventoryReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may update inventory reservations"
   default policy inventoryReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may change inventory reservations"
 
