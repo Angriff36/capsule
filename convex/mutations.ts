@@ -968,7 +968,7 @@ async function __runAttachmentAttach(ctx: MutationCtx, { docId, parentType, pare
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Attachment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Attachment not found");
-    if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
+    if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may see attached files; chat files show up with their message");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((doc.uploadedById == null))) throw new Error("Guard 0 failed");
@@ -1058,7 +1058,7 @@ export const Attachment_createViaAttach = mutation({
       parentType: args.parentType,
       storageId: args.storageId
     };
-    if (!((checkRole(user, "staffAccess") && ((__draft.parentType !== "staffMessage") || (__draft.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
+    if (!((checkRole(user, "staffAccess") && ((__draft.parentType !== "staffMessage") || (__draft.uploadedById == null))))) throw new Error("Staff may see attached files; chat files show up with their message");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((__draft.uploadedById == null))) throw new Error("Guard 0 failed");
@@ -1099,7 +1099,7 @@ async function __runAttachmentRemove(ctx: MutationCtx, { docId, version }: any, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Attachment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Attachment not found");
-    if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
+    if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may see attached files; chat files show up with their message");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -1144,7 +1144,7 @@ async function __runAttachmentSetSurveySelection(ctx: MutationCtx, { docId, incl
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Attachment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Attachment not found");
-    if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
+    if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may see attached files; chat files show up with their message");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

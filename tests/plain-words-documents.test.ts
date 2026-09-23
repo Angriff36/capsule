@@ -48,14 +48,34 @@ describe("plain words on leftover documents manifests", () => {
     expect(visible).toContain("This file needs something to attach to");
     expectPlain("This file needs something to attach to");
 
-    // later leftovers, unchanged
-    expect(visible).toContain(
-      "Staff may read attachments; chat files are read through their message",
-    );
+    // later leftover, unchanged
     expect(visible).toContain("Chat files are attached through their message");
 
     // already-done write/execute copy stays
     expect(visible).toContain("Staff may update attachments");
     expect(visible).toContain("Staff may change attachments");
+  });
+
+  it("keeps leftover documents READ copy free of read-attachment jargon", () => {
+    const source = readFileSync("src/documents/attachment.manifest", "utf8");
+    // strip // comments so developer notes are not treated as user copy
+    const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain(
+      "Staff may read attachments; chat files are read through their message",
+    );
+    expect(visible).toContain(
+      "Staff may see attached files; chat files show up with their message",
+    );
+    expectPlain(
+      "Staff may see attached files; chat files show up with their message",
+    );
+
+    // write/execute leftovers stay for a later slice
+    expect(visible).toContain("Staff may update attachments");
+    expect(visible).toContain("Staff may change attachments");
+
+    // later leftover, unchanged
+    expect(visible).toContain("Chat files are attached through their message");
   });
 });
