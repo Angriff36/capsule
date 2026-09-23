@@ -96,7 +96,7 @@ export function ComponentPrepContext({
       </p>
       <p className="font-medium text-ink">{task.name}</p>
       <p>
-        {settled ? "Recorded prep amount" : "Prep amount"}:{" "}
+        {settled ? "Prep amount on file" : "Prep amount"}:{" "}
         {readableRecipeAmount(task.quantity, task.unit)} ·{" "}
         {formatStatusLabel(task.status)}
         {settled ? " · Current recipe" : ""}

@@ -207,7 +207,7 @@ export function PreferredVendorRankingEditor({
       ) : (
         <div className="document-empty mt-4">
           <p>No preferred vendors yet.</p>
-          <span>Purchasing will use the tenant-wide default vendor.</span>
+          <span>Purchasing will use this kitchen's usual vendor.</span>
         </div>
       )}
 

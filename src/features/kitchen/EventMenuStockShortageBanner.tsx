@@ -127,8 +127,8 @@ export function EventMenuStockShortageBanner({
                   ) : (
                     <p className="mt-2 text-xs text-ink-3">
                       {mappedCount
-                        ? "Mapped substitutes have no unreserved stock in this unit."
-                        : "No substitutes are mapped for this ingredient yet."}
+                        ? "Saved substitutes have no leftover stock in this unit."
+                        : "No substitutes are on file for this ingredient yet."}
                     </p>
                   )}
                 </li>

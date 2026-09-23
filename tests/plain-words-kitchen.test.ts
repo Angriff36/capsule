@@ -143,4 +143,90 @@ describe("plain words on kitchen screens", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen cleanup prep and substitute copy free of record jargon", () => {
+    const files = [
+      "src/features/kitchen/KitchenCatalogCleanupPage.tsx",
+      "src/features/kitchen/DishContainersPanel.tsx",
+      "src/features/kitchen/ComponentRecipeStatusPanel.tsx",
+      "src/features/kitchen/ComponentPrepContext.tsx",
+      "src/features/kitchen/CulinaryRecordPicker.tsx",
+      "src/features/kitchen/AllergenMatrixPage.tsx",
+      "src/features/kitchen/EventPrepTaskSynchronizer.ts",
+      "src/features/kitchen/IngredientDetailPage.tsx",
+      "src/features/kitchen/IngredientSubstitutionEditor.tsx",
+      "src/features/kitchen/EventMenuStockShortageBanner.tsx",
+    ];
+    const contents = Object.fromEntries(
+      files.map((path) => [path, readFileSync(path, "utf8")]),
+    );
+    const all = Object.values(contents).join("\n");
+
+    for (const old of [
+      "names the new record",
+      "No suggestions recorded yet",
+      "Run the planner script",
+      "catalog-reclassification-plan.ts",
+      "No serving containers recorded",
+      "unavailable for this record",
+      "Recorded prep amount",
+      "distinct record",
+      "no allergen is recorded",
+      "Cannot reconcile remaining work",
+      "recorded work has incompatible",
+      "tenant-wide default vendor",
+      "Mapped substitutes",
+      "mapped</span>",
+      "Mapped ingredient substitutes",
+      "No substitutes mapped yet",
+      "Map same-unit ingredients",
+      "Mapped substitutes have no unreserved",
+      "No substitutes are mapped",
+    ]) {
+      expect(all).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "names the new item",
+      "No suggestions on file yet",
+      "Ask someone who can plan catalog cleanup",
+      "No serving containers on file",
+      "isn't available for this item",
+      "Prep amount on file",
+      "create a separate item only if",
+      "no allergen is on file",
+      "Can't update leftover prep",
+      "amounts already done use different units",
+      "this kitchen's usual vendor",
+      "Saved substitutes",
+      "on file</span>",
+      "Saved ingredient substitutes",
+      "No substitutes on file yet",
+      "Add same-unit ingredients",
+      "Saved substitutes have no leftover stock",
+      "No substitutes are on file for this ingredient yet",
+    ]) {
+      expect(all).toContain(fresh);
+    }
+
+    // The fresh user-visible strings must themselves be plain catering English.
+    for (const fresh of [
+      "and its link names the new item.",
+      "No suggestions on file yet. Ask someone who can plan catalog cleanup to generate them for this kitchen.",
+      "No serving containers on file.",
+      "Recipe status isn't available for this item.",
+      "Prep amount on file",
+      "create a separate item only if",
+      "no allergen is on file",
+      "Can't update leftover prep for Chocolate Sauce: the amounts already done use different units or aren't valid numbers.",
+      "Purchasing will use this kitchen's usual vendor.",
+      "Saved substitutes",
+      "No substitutes on file yet.",
+      "Add same-unit ingredients so shortages come with options.",
+      "Saved substitutes have no leftover stock in this unit.",
+      "No substitutes are on file for this ingredient yet.",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });

@@ -270,7 +270,7 @@ export function AllergenMatrixPage() {
           <p className="allergen-matrix-footnote">
             Flags derive from the allergen classifications of every recipe
             ingredient (direct lines and components) plus dish-level
-            declarations. Unflagged cells mean no allergen is recorded, not a
+            declarations. Unflagged cells mean no allergen is on file, not a
             certified absence — verify with the kitchen before guaranteeing
             allergen-free service.
           </p>
