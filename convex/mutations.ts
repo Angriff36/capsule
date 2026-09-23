@@ -29613,7 +29613,7 @@ async function __runOrganizationConfigureBranding(ctx: MutationCtx, { docId, dis
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -29665,7 +29665,7 @@ async function __runOrganizationDeactivate(ctx: MutationCtx, { docId, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!(((doc.status === "active") || (doc.status === "suspended")))) throw new Error("Guard 0 failed");
@@ -29723,7 +29723,7 @@ async function __runOrganizationReactivate(ctx: MutationCtx, { docId, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.status === "suspended"))) throw new Error("Guard 0 failed");
@@ -29781,7 +29781,7 @@ async function __runOrganizationRegister(ctx: MutationCtx, { docId, name, brandD
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -29860,7 +29860,7 @@ export const Organization_createViaRegister = mutation({
       brandPrimaryColor: args.brandPrimaryColor,
       name: args.name
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -29894,7 +29894,7 @@ async function __runOrganizationRename(ctx: MutationCtx, { docId, name, version 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -29942,7 +29942,7 @@ async function __runOrganizationSetBrandLogo(ctx: MutationCtx, { docId, storageI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -29989,7 +29989,7 @@ async function __runOrganizationSetDefaultCurrency(ctx: MutationCtx, { docId, cu
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -30037,7 +30037,7 @@ async function __runOrganizationSuspend(ctx: MutationCtx, { docId, reason, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");

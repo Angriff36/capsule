@@ -186,7 +186,7 @@ entity Organization mixin TenantScoped, SoftDeletable {
   transition status from "suspended" to ["active", "deactivated"]
   transition status from "deactivated" to []
 
-  default policy organizationRead read: roleAllows(user.role, "staffAccess") "Staff may read organization records"
+  default policy organizationRead read: roleAllows(user.role, "staffAccess") "Staff may see the company profile"
   default policy organizationWrite write: roleAllows(user.role, "manageAccess") "Managers may update the company profile"
   default policy organizationExecute execute: roleAllows(user.role, "manageAccess") "Managers may change the company profile"
 

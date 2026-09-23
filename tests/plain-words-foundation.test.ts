@@ -42,4 +42,31 @@ describe("plain words on leftover foundation manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover foundation READ copy free of record jargon", () => {
+    const files = [
+      "src/foundation/base.manifest",
+      "src/foundation/materialization-receipt.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Staff may read organization records");
+    expect(visible).not.toContain(
+      "Materialization receipts are private implementation records",
+    );
+    expect(visible).toContain("Staff may see the company profile");
+    expect(visible).toContain("These receipts stay behind the scenes");
+    expectPlain("Staff may see the company profile");
+    expectPlain("These receipts stay behind the scenes");
+
+    // write/execute leftovers stay for a later slice
+    expect(visible).toContain("Managers may update the company profile");
+    expect(visible).toContain("Managers may change the company profile");
+    expect(visible).toContain("The system keeps these receipts");
+    expect(visible).toContain("Staff cannot change these receipts");
+  });
 });
