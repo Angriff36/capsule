@@ -98,7 +98,7 @@ entity Attachment mixin TenantScoped, SoftDeletable {
     // transaction as their message, after the blob and the parent message are
     // verified; the public command never creates one.
     constraint attachNotChat: parentType != "staffMessage" "Chat files are attached through their message"
-    constraint attachParent: length(trim(parentId)) > 0 "Parent record is required"
+    constraint attachParent: length(trim(parentId)) > 0 "This file needs something to attach to"
     constraint attachFileName: length(trim(fileName)) > 0 "File name is required"
     constraint attachStorage: length(trim(storageId)) > 0 "Stored file reference is required"
     constraint attachSize: fileSize >= 0 "File size cannot be negative"

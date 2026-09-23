@@ -36,4 +36,26 @@ describe("plain words on leftover documents manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover documents parent-constraint copy free of record jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/documents/attachment.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Parent record is required");
+    expect(visible).toContain("This file needs something to attach to");
+    expectPlain("This file needs something to attach to");
+
+    // later leftovers, unchanged
+    expect(visible).toContain(
+      "Staff may read attachments; chat files are read through their message",
+    );
+    expect(visible).toContain("Chat files are attached through their message");
+
+    // already-done write/execute copy stays
+    expect(visible).toContain("Staff may update attachments");
+    expect(visible).toContain("Staff may change attachments");
+  });
 });

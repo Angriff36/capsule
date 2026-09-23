@@ -973,7 +973,7 @@ async function __runAttachmentAttach(ctx: MutationCtx, { docId, parentType, pare
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((doc.uploadedById == null))) throw new Error("Guard 0 failed");
     if (!((parentType !== "staffMessage"))) throw new Error("Chat files are attached through their message");
-    if (!((((parentId).trim()).length > 0))) throw new Error("Parent record is required");
+    if (!((((parentId).trim()).length > 0))) throw new Error("This file needs something to attach to");
     if (!((((fileName).trim()).length > 0))) throw new Error("File name is required");
     if (!((((storageId).trim()).length > 0))) throw new Error("Stored file reference is required");
     if (!((fileSize >= 0))) throw new Error("File size cannot be negative");
@@ -1063,7 +1063,7 @@ export const Attachment_createViaAttach = mutation({
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((__draft.uploadedById == null))) throw new Error("Guard 0 failed");
     if (!((parentType !== "staffMessage"))) throw new Error("Chat files are attached through their message");
-    if (!((((parentId).trim()).length > 0))) throw new Error("Parent record is required");
+    if (!((((parentId).trim()).length > 0))) throw new Error("This file needs something to attach to");
     if (!((((fileName).trim()).length > 0))) throw new Error("File name is required");
     if (!((((storageId).trim()).length > 0))) throw new Error("Stored file reference is required");
     if (!((fileSize >= 0))) throw new Error("File size cannot be negative");
