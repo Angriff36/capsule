@@ -184,7 +184,7 @@ export function ComponentPortionSpecsPanel({
         <TableSkeleton rows={2} />
       ) : rows.length === 0 ? (
         <div className="document-empty">
-          <p>No portion size recorded. One batch is the only unit on file.</p>
+          <p>No portion size on file. One batch is the only unit on file.</p>
         </div>
       ) : (
         <ul className="ingredient-list">

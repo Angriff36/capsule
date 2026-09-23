@@ -18,7 +18,7 @@ export class CulinaryCatalogCardCopy {
   ): string {
     if (item.category) return item.category;
     if (section === "components" && item.cuisine) return item.cuisine;
-    return "No description recorded";
+    return "No description on file";
   }
 
   static glyph(section: KitchenSection, index: number): string {

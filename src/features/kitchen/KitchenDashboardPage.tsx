@@ -1073,7 +1073,7 @@ export function KitchenDashboardPage() {
           <p className="mt-3 text-base text-danger">
             {String(
               (row.task as { blockReason?: string | null }).blockReason ??
-                "Blocked — reason not recorded.",
+                "Blocked — no reason on file.",
             )}
           </p>
         ) : null}

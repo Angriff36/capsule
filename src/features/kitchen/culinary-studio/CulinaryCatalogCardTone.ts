@@ -13,7 +13,7 @@ export class CulinaryCatalogCardTone {
       case "menus":
         return "Menu";
       default:
-        return "Record";
+        return "Kitchen item";
     }
   }
 

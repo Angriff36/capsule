@@ -547,7 +547,7 @@ export function IngredientDetailPage() {
                 ? (ingredient.allergens ?? []).join(", ")
                 : ingredient.isGlutenFree
                   ? "None flagged"
-                  : "None recorded"}
+                  : "None on file"}
             </dd>
           </div>
         </dl>

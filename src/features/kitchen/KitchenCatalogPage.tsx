@@ -182,7 +182,7 @@ function KitchenCatalogPageContent({
       });
     }
     return [
-      { value: "all", label: "All records", count: visibleRows.length },
+      { value: "all", label: "All items", count: visibleRows.length },
       ...Array.from(counts, ([value, entry]) => ({
         value,
         label: entry.label,
@@ -491,8 +491,7 @@ function KitchenCatalogPageContent({
             {title}
           </h1>
           <p className="mt-0.5 text-sm text-ink-2">
-            Browse and open {section} — then drill into the record that needs
-            work.
+            Browse and open {section} — then open the one that needs work.
           </p>
         </div>
         <div className="component-book-masthead-actions">
@@ -533,7 +532,7 @@ function KitchenCatalogPageContent({
           <h2 className="text-lg font-semibold text-ink">
             All {section}
             <span className="ml-2 text-sm font-medium text-ink-2">
-              {formatCountNoun(displayRows.length, "record")}
+              {formatCountNoun(displayRows.length, "item")}
             </span>
           </h2>
         </div>
@@ -596,7 +595,7 @@ function KitchenCatalogPageContent({
         ) : displayRows.length === 0 ? (
           search ? (
             <div className="component-filter-empty">
-              <p>No records match this search.</p>
+              <p>Nothing matches this search.</p>
             </div>
           ) : (
             <div className="component-empty-state">
