@@ -104,8 +104,8 @@ entity Person mixin TenantScoped, SoftDeletable {
   transition status from "terminated" to []
 
   default policy personRead read: roleAllows(user.role, "staffAccess") "Staff may read people"
-  default policy personWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write people"
-  default policy personExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute people commands"
+  default policy personWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update people"
+  default policy personExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change people"
 
   command hire(
     givenName: string,

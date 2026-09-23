@@ -14,8 +14,8 @@ entity AssistantLlmConfig mixin TenantScoped, SoftDeletable {
   property configuredAt: datetime?
 
   default policy assistantLlmConfigRead read: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may read assistant configuration"
-  default policy assistantLlmConfigWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may write assistant configuration"
-  default policy assistantLlmConfigExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may execute assistant configuration"
+  default policy assistantLlmConfigWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may update assistant configuration"
+  default policy assistantLlmConfigExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may change assistant configuration"
 
   // Configure is also the creation path (createViaConfigure) so first-time
   // setup and later correction are the same form — settings stay correctable.
@@ -47,7 +47,7 @@ entity AssistantUpload mixin TenantScoped {
 
   default policy assistantUploadRead read: user.id != null "Staff may see assistant upload registrations"
   default policy assistantUploadWrite write: user.id != null "Staff may register assistant uploads"
-  default policy assistantUploadExecute execute: user.id != null "Staff may execute assistant upload commands"
+  default policy assistantUploadExecute execute: user.id != null "Staff may change assistant uploads"
 
   store AssistantUpload in durable
 }

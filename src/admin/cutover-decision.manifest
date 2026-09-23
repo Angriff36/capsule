@@ -22,8 +22,8 @@ entity CutoverDecision mixin TenantScoped {
   property businessApproved: boolean = false
   property tppReadOnlyAt: int?
   default policy cutoverDecisionRead read: user.id != null "Authenticated staff may read cutover decisions"
-  default policy cutoverDecisionWrite write: user.id != null "Authenticated staff may write cutover decisions"
-  default policy cutoverDecisionExecute execute: user.id != null "Authenticated staff may execute cutover decision commands"
+  default policy cutoverDecisionWrite write: user.id != null "Authenticated staff may update cutover decisions"
+  default policy cutoverDecisionExecute execute: user.id != null "Authenticated staff may change cutover decisions"
   // Creation command. CutoverDecision is tenant-scoped and historically created
   // via a raw insert (convex/cutover.ts findOrCreateCutoverDecision); declaring a
   // literal `create` makes it a governed capability and, per creation-entry rules,

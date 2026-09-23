@@ -66,8 +66,8 @@ entity Equipment mixin TenantScoped, SoftDeletable {
 
   // Logistics staff read/execute too: pack-out and event checkout consume this catalog.
   default policy equipmentRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment"
-  default policy equipmentWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may write equipment through commands"
-  default policy equipmentExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment commands"
+  default policy equipmentWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment"
+  default policy equipmentExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment"
 
   command register(
     name: string,
@@ -271,7 +271,7 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   // Event managers need execute so EventCancelled can stand down reserved rows.
   default policy equipmentReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event"
   default policy equipmentReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"
-  default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event"
+  default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"
 
   command checkOut(condition: EquipmentCondition, optional note: string) {
     guard self.status == "reserved"
@@ -385,7 +385,7 @@ entity EquipmentMaintenanceTask mixin TenantScoped, SoftDeletable {
 
   default policy maintenanceTaskRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment maintenance"
   default policy maintenanceTaskWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment maintenance"
-  default policy maintenanceTaskExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment maintenance commands"
+  default policy maintenanceTaskExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment maintenance"
 
   command schedule(
     equipmentId: uuid,
@@ -473,8 +473,8 @@ entity EquipmentServiceEntry mixin TenantScoped, SoftDeletable {
   constraint equipmentServiceComplete: self.loggedAt == null or (length(trim(self.technician)) > 0 and self.cost >= 0 and self.completedAt != null and self.nextDueAt != null) "Completed service requires a technician, nonnegative cost, completion time, and next due date"
 
   default policy equipmentServiceRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment service history"
-  default policy equipmentServiceWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may record equipment service"
-  default policy equipmentServiceExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment service commands"
+  default policy equipmentServiceWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may add equipment service"
+  default policy equipmentServiceExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may change equipment service"
 
   command record(
     maintenanceTaskId: uuid,

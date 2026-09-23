@@ -624,8 +624,8 @@ async function __runAnnouncementPost(ctx: MutationCtx, { docId, title, body, cat
     if (!doc) throw new Error("Announcement not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Announcement not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcements");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write announcements through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute announcement commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update announcements");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 1 failed");
     if (!((((title).trim()).length > 0))) throw new Error("Announcement title is required");
@@ -699,8 +699,8 @@ export const Announcement_createViaPost = mutation({
       title: args.title
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcements");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write announcements through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute announcement commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update announcements");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 1 failed");
     if (!((((title).trim()).length > 0))) throw new Error("Announcement title is required");
@@ -734,8 +734,8 @@ async function __runAnnouncementRemove(ctx: MutationCtx, { docId, version }: any
     if (!doc) throw new Error("Announcement not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Announcement not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcements");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write announcements through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute announcement commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update announcements");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -780,7 +780,7 @@ async function __runAnnouncementDismissalDismiss(ctx: MutationCtx, { docId, anno
     if (!doc) throw new Error("AnnouncementDismissal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("AnnouncementDismissal not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcement dismissals");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write their own announcement dismissals through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update their own announcement dismissals");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may dismiss announcements for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -841,7 +841,7 @@ export const AnnouncementDismissal_createViaDismiss = mutation({
       announcementId: args.announcementId
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcement dismissals");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write their own announcement dismissals through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update their own announcement dismissals");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may dismiss announcements for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     const doc: Record<string, any> = {
@@ -871,8 +871,8 @@ async function __runAssistantLlmConfigConfigure(ctx: MutationCtx, { docId, baseU
     if (!doc) throw new Error("AssistantLlmConfig not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("AssistantLlmConfig not found");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may read assistant configuration");
-    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may write assistant configuration");
-    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may execute assistant configuration");
+    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may update assistant configuration");
+    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may change assistant configuration");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((baseUrl).startsWith("https://") || (baseUrl).startsWith("http://localhost")) || (baseUrl).startsWith("http://127.0.0.1")))) throw new Error("Base URL must be an HTTP(S) endpoint");
     if (!(((apiKey).trim() !== ""))) throw new Error("API key cannot be empty");
@@ -939,8 +939,8 @@ export const AssistantLlmConfig_createViaConfigure = mutation({
       model: args.model
     };
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may read assistant configuration");
-    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may write assistant configuration");
-    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may execute assistant configuration");
+    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may update assistant configuration");
+    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may change assistant configuration");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((baseUrl).startsWith("https://") || (baseUrl).startsWith("http://localhost")) || (baseUrl).startsWith("http://127.0.0.1")))) throw new Error("Base URL must be an HTTP(S) endpoint");
     if (!(((apiKey).trim() !== ""))) throw new Error("API key cannot be empty");
@@ -7562,8 +7562,8 @@ async function __runCutoverDecisionCreate(ctx: MutationCtx, args: any) {
       businessApproved: ((args.businessApproved != null) ? args.businessApproved : false)
     };
     if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute cutover decision commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
     if (!((((args.reason).trim()).length > 0))) throw new Error("Reason is required to open a cutover decision");
     const _id = await ctx.db.insert("cutoverDecisions", doc as any);
@@ -7599,8 +7599,8 @@ async function __runCutoverDecisionExecute(ctx: MutationCtx, { docId, decision, 
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
     if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute cutover decision commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
     const updates = {
       status: decision,
@@ -7639,8 +7639,8 @@ async function __runCutoverDecisionRecordApprovals(ctx: MutationCtx, { docId, bu
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
     if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute cutover decision commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
     const updates = {
       businessApproved: businessApproved,
@@ -7679,8 +7679,8 @@ async function __runCutoverDecisionRollback(ctx: MutationCtx, { docId, reason }:
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
     if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute cutover decision commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!((doc.status === "go"))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     const updates = {
@@ -7719,8 +7719,8 @@ async function __runCutoverDecisionSetTppReadOnly(ctx: MutationCtx, { docId, rea
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
     if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write cutover decisions");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute cutover decision commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!((doc.status === "go"))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     const updates = {
@@ -10657,7 +10657,7 @@ async function __runEmailNotificationSubscriptionConfigure(ctx: MutationCtx, { d
     if (!doc) throw new Error("EmailNotificationSubscription not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EmailNotificationSubscription not found");
     if (!(((doc.ownerId == null) || (doc.ownerId === user.id)))) throw new Error("Users may read unowned creation drafts or their own email subscriptions");
-    if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may write only their own email subscriptions");
+    if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may update only their own email subscriptions");
     if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may configure only their own email subscriptions");
     if (!((doc.configuredAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
@@ -10732,7 +10732,7 @@ export const EmailNotificationSubscription_createViaConfigure = mutation({
       shiftChanges: args.shiftChanges
     };
     if (!(((__draft.ownerId == null) || (__draft.ownerId === user.id)))) throw new Error("Users may read unowned creation drafts or their own email subscriptions");
-    if (!(((user.id != null) && ((__draft.ownerId == null) || (__draft.ownerId === user.id))))) throw new Error("Users may write only their own email subscriptions");
+    if (!(((user.id != null) && ((__draft.ownerId == null) || (__draft.ownerId === user.id))))) throw new Error("Users may update only their own email subscriptions");
     if (!(((user.id != null) && ((__draft.ownerId == null) || (__draft.ownerId === user.id))))) throw new Error("Users may configure only their own email subscriptions");
     if (!((__draft.configuredAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
@@ -10767,7 +10767,7 @@ async function __runEmailNotificationSubscriptionUpdateSubscriptions(ctx: Mutati
     if (!doc) throw new Error("EmailNotificationSubscription not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EmailNotificationSubscription not found");
     if (!(((doc.ownerId == null) || (doc.ownerId === user.id)))) throw new Error("Users may read unowned creation drafts or their own email subscriptions");
-    if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may write only their own email subscriptions");
+    if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may update only their own email subscriptions");
     if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may configure only their own email subscriptions");
     if (!((doc.configuredAt != null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
@@ -10821,8 +10821,8 @@ async function __runEquipmentReactivate(ctx: MutationCtx, { docId, version }: an
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may write equipment through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "inventoryManageAccess") || checkRole(user, "logisticsManageAccess")))) throw new Error("Guard 2 failed");
@@ -10882,8 +10882,8 @@ async function __runEquipmentRecount(ctx: MutationCtx, { docId, actualQuantity, 
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may write equipment through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((actualQuantity >= 0))) throw new Error("Recount quantity cannot be negative");
@@ -10931,8 +10931,8 @@ async function __runEquipmentRegister(ctx: MutationCtx, { docId, name, assetTag,
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may write equipment through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Equipment name is required");
@@ -11022,8 +11022,8 @@ export const Equipment_createViaRegister = mutation({
       ownership: args.ownership
     };
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may write equipment through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Equipment name is required");
@@ -11063,8 +11063,8 @@ async function __runEquipmentRetire(ctx: MutationCtx, { docId, reason, version }
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may write equipment through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.registeredAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -11127,8 +11127,8 @@ async function __runEquipmentReviseDetails(ctx: MutationCtx, { docId, name, cate
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may write equipment through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -11188,8 +11188,8 @@ async function __runEquipmentUpdateCondition(ctx: MutationCtx, { docId, conditio
     if (!doc) throw new Error("Equipment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Equipment not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may write equipment through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     const previousCondition = doc.condition;
@@ -11239,7 +11239,7 @@ async function __runEquipmentMaintenanceTaskApplyService(ctx: MutationCtx, { doc
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EquipmentMaintenanceTask not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment maintenance");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment maintenance");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment maintenance commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment maintenance");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((nextDueAt > completedAt))) throw new Error("Next maintenance due date must be after the completed service");
@@ -11292,7 +11292,7 @@ async function __runEquipmentMaintenanceTaskSchedule(ctx: MutationCtx, { docId, 
     ((doc as any) as any).equipment = __rel_equipment;
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment maintenance");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment maintenance");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment maintenance commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment maintenance");
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_equipment != null))) throw new Error("Guard 2 failed");
@@ -11373,7 +11373,7 @@ export const EquipmentMaintenanceTask_createViaSchedule = mutation({
     const __rel_equipment = await __resolveRelation(ctx, "equipments", [__auth.tenantId, __draft.equipmentId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment maintenance");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment maintenance");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment maintenance commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment maintenance");
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_equipment != null))) throw new Error("Guard 2 failed");
@@ -11410,7 +11410,7 @@ async function __runEquipmentReservationCancel(ctx: MutationCtx, { docId, reason
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EquipmentReservation not found");
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event");
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event");
-    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event");
     if (!((doc.status === "reserved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -11473,7 +11473,7 @@ async function __runEquipmentReservationCheckOut(ctx: MutationCtx, { docId, cond
     ((doc as any) as any).equipment = __rel_equipment;
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event");
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event");
-    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event");
     if (!((doc.status === "reserved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_equipment != null) && (__rel_equipment.condition !== "out_of_service")))) throw new Error("Equipment marked out of service cannot be checked out");
@@ -11537,7 +11537,7 @@ async function __runEquipmentReservationMarkReturned(ctx: MutationCtx, { docId, 
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EquipmentReservation not found");
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event");
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event");
-    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event");
     if (!((doc.status === "checked_out"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -11611,8 +11611,8 @@ async function __runEquipmentServiceEntryRecord(ctx: MutationCtx, { docId, maint
     ((doc as any) as any).maintenanceTask = __rel_maintenanceTask;
     ((doc as any) as any).equipment = __rel_equipment;
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment service history");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may record equipment service");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment service commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may add equipment service");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment service");
     if (!((doc.loggedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_maintenanceTask != null))) throw new Error("Guard 2 failed");
@@ -11707,8 +11707,8 @@ export const EquipmentServiceEntry_createViaRecord = mutation({
     const __rel_maintenanceTask = await __resolveRelation(ctx, "equipmentMaintenanceTasks", [__auth.tenantId, __draft.maintenanceTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_equipment = await __resolveRelation(ctx, "equipments", [__auth.tenantId, __draft.equipmentId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment service history");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may record equipment service");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment service commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may add equipment service");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may change equipment service");
     if (!((__draft.loggedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_maintenanceTask != null))) throw new Error("Guard 2 failed");
@@ -30097,8 +30097,8 @@ async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { do
     if (!doc) throw new Error("OrganizationCapabilitySetting not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OrganizationCapabilitySetting not found");
     if (!((user.id != null))) throw new Error("Authenticated staff may read capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute capability setting commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.registeredAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
@@ -30162,8 +30162,8 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
       updatedBy: args.updatedBy
     };
     if (!((user.id != null))) throw new Error("Authenticated staff may read capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute capability setting commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
@@ -30191,8 +30191,8 @@ async function __runOrganizationCapabilitySettingSetEnabled(ctx: MutationCtx, { 
     if (!doc) throw new Error("OrganizationCapabilitySetting not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OrganizationCapabilitySetting not found");
     if (!((user.id != null))) throw new Error("Authenticated staff may read capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may write capability settings");
-    if (!((user.id != null))) throw new Error("Authenticated staff may execute capability setting commands");
+    if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
+    if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -34090,8 +34090,8 @@ async function __runPersonAssignRole(ctx: MutationCtx, { docId, role, version }:
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
@@ -34142,8 +34142,8 @@ async function __runPersonChangeAddress(ctx: MutationCtx, { docId, addressLine1,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status !== "terminated"))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -34201,8 +34201,8 @@ async function __runPersonCorrectEmail(ctx: MutationCtx, { docId, email, version
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status !== "terminated"))) throw new Error("Guard 1 failed");
     if (!((((email).trim()).length > 0))) throw new Error("Email is required");
@@ -34253,8 +34253,8 @@ async function __runPersonCorrectIdentity(ctx: MutationCtx, { docId, givenName, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((givenName).trim()).length > 0))) throw new Error("First name is required");
@@ -34310,8 +34310,8 @@ async function __runPersonDeactivate(ctx: MutationCtx, { docId, version }: any, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -34372,8 +34372,8 @@ async function __runPersonHire(ctx: MutationCtx, { docId, givenName, familyName,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((givenName).trim()).length > 0))) throw new Error("First name is required");
     if (!((((familyName).trim()).length > 0))) throw new Error("Last name is required");
@@ -34468,8 +34468,8 @@ export const Person_createViaHire = mutation({
       phone: args.phone
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((givenName).trim()).length > 0))) throw new Error("First name is required");
     if (!((((familyName).trim()).length > 0))) throw new Error("Last name is required");
@@ -34510,8 +34510,8 @@ async function __runPersonLinkAccount(ctx: MutationCtx, { docId, authSubjectId, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -34564,8 +34564,8 @@ async function __runPersonReactivate(ctx: MutationCtx, { docId, version }: any, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -34626,8 +34626,8 @@ async function __runPersonSetEmployeeNumber(ctx: MutationCtx, { docId, employeeN
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((employeeNumber).trim()).length > 0))) throw new Error("Employee number is required");
     if (version !== undefined && (doc as any).version !== version) {
@@ -34677,8 +34677,8 @@ async function __runPersonSetPayRate(ctx: MutationCtx, { docId, hourlyRate, vers
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((hourlyRate >= 0))) throw new Error("Hourly rate must be zero or more");
     if (version !== undefined && (doc as any).version !== version) {
@@ -34728,8 +34728,8 @@ async function __runPersonSetSmsAlerts(ctx: MutationCtx, { docId, optIn, version
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -34778,8 +34778,8 @@ async function __runPersonTerminate(ctx: MutationCtx, { docId, reason, version }
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!(((doc.status === "active") || (doc.status === "inactive")))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     {
@@ -34843,8 +34843,8 @@ async function __runPersonUnlinkAccount(ctx: MutationCtx, { docId, version }: an
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "adminAccess") || (!checkRole(doc.role, "adminAccess"))))) throw new Error("Guard 2 failed");
