@@ -42704,8 +42704,8 @@ async function __runSavedReportDefinitionArchive(ctx: MutationCtx, { docId, vers
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
     if (!(((((doc.ownerId == null) || (doc.ownerId === user.personId)) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update saved reports");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change saved reports");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -42767,8 +42767,8 @@ async function __runSavedReportDefinitionChangeSharing(ctx: MutationCtx, { docId
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
     if (!(((((doc.ownerId == null) || (doc.ownerId === user.personId)) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update saved reports");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change saved reports");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -42817,8 +42817,8 @@ async function __runSavedReportDefinitionCreateDefinition(ctx: MutationCtx, { do
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
     if (!(((((doc.ownerId == null) || (doc.ownerId === user.personId)) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update saved reports");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change saved reports");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -42900,8 +42900,8 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
       subjectArea: args.subjectArea
     };
     if (!(((((__draft.ownerId == null) || (__draft.ownerId === user.personId)) || (__draft.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update saved reports");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change saved reports");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -42939,8 +42939,8 @@ async function __runSavedReportDefinitionRename(ctx: MutationCtx, { docId, name,
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
     if (!(((((doc.ownerId == null) || (doc.ownerId === user.personId)) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update saved reports");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change saved reports");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -42990,8 +42990,8 @@ async function __runSavedReportDefinitionRestore(ctx: MutationCtx, { docId, vers
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
     if (!(((((doc.ownerId == null) || (doc.ownerId === user.personId)) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update saved reports");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change saved reports");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -43053,8 +43053,8 @@ async function __runSavedReportDefinitionUpdateDefinition(ctx: MutationCtx, { do
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
     if (!(((((doc.ownerId == null) || (doc.ownerId === user.personId)) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update saved reports");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change saved reports");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");

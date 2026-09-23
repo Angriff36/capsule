@@ -61,8 +61,8 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
   // tenant_wide readable by any staffAccess principal (semantics.md read gate).
   // Undefined drafts (ownerId == null) are readable by staff for create flow.
   default policy savedReportRead read: self.ownerId == null or self.ownerId == user.personId or self.sharingScope != "owner_only" or roleAllows(user.role, "manageAccess") "Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess"
-  default policy savedReportWrite write: roleAllows(user.role, "staffAccess") "Staff may write saved reports through commands"
-  default policy savedReportExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute saved report commands"
+  default policy savedReportWrite write: roleAllows(user.role, "staffAccess") "Staff may update saved reports"
+  default policy savedReportExecute execute: roleAllows(user.role, "staffAccess") "Staff may change saved reports"
 
   // Not the reserved `create` auto-create path (trap #3) — harness seeds a blank
   // instance; createDefinition mutates ownership + definition onto it.
