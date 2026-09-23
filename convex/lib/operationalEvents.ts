@@ -13,6 +13,7 @@ import { reconcileEventTiming } from "./eventTimingOperations";
 import { eventStaffingReconciliation } from "./staffingReconciliation";
 import { eventHeadcountReconciliation } from "./headcountReconciliation";
 import { eventPackReconciliation } from "./packReconciliation";
+import { eventDemandReconciliation } from "./demandReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -105,9 +106,10 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventHeadcountChanged") {
-    // Menu + pack sides: the EventDish.syncHeadcount and
-    // PackListItem.syncContainerServings fan-outs already ran; these record
-    // the §8.2 receipts (once per input shape, one per domain).
+    // Menu + pack + demand sides: the EventDish.syncHeadcount,
+    // PackListItem.syncContainerServings, and EventIngredientContribution
+    // demand-sync fan-outs already ran; these record the §8.2 receipts (once
+    // per input shape, one per domain).
     await eventHeadcountReconciliation.run(
       ctx,
       event.entityId as Id<"events">,
@@ -118,6 +120,15 @@ export async function handleManifestEvent(
       },
     );
     await eventPackReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    await eventDemandReconciliation.run(
       ctx,
       event.entityId as Id<"events">,
       { triggerEventId: String(event.eventId), triggerType: event.type },

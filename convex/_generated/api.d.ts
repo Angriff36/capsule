@@ -65,6 +65,7 @@ import type * as lib_culinaryModel_importMapping from "../lib/culinaryModel/impo
 import type * as lib_culinaryModel_tppImport from "../lib/culinaryModel/tppImport.js";
 import type * as lib_culinaryModel_units from "../lib/culinaryModel/units.js";
 import type * as lib_culinaryOperations from "../lib/culinaryOperations.js";
+import type * as lib_demandReconciliation from "../lib/demandReconciliation.js";
 import type * as lib_dishRecipeRepair from "../lib/dishRecipeRepair.js";
 import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
@@ -243,6 +244,7 @@ declare const fullApi: ApiFromModules<{
   "lib/culinaryModel/tppImport": typeof lib_culinaryModel_tppImport;
   "lib/culinaryModel/units": typeof lib_culinaryModel_units;
   "lib/culinaryOperations": typeof lib_culinaryOperations;
+  "lib/demandReconciliation": typeof lib_demandReconciliation;
   "lib/dishRecipeRepair": typeof lib_dishRecipeRepair;
   "lib/encryption": typeof lib_encryption;
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
