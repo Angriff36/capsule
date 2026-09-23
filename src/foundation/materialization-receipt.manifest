@@ -15,8 +15,8 @@ entity MaterializationReceipt mixin TenantScoped {
   property output: json?
 
   default policy materializationReceiptRead read: roleAllows(user.role, "materializationReceiptSeamOnly") "Materialization receipts are private implementation records"
-  default policy materializationReceiptWrite write: roleAllows(user.role, "materializationReceiptSeamOnly") "Materialization receipts are managed only by the transaction seam"
-  default policy materializationReceiptExecute execute: roleAllows(user.role, "materializationReceiptSeamOnly") "Materialization receipts expose no generated commands"
+  default policy materializationReceiptWrite write: roleAllows(user.role, "materializationReceiptSeamOnly") "The system keeps these receipts"
+  default policy materializationReceiptExecute execute: roleAllows(user.role, "materializationReceiptSeamOnly") "Staff cannot change these receipts"
 
   store MaterializationReceipt in durable
 }

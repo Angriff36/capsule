@@ -187,8 +187,8 @@ entity Organization mixin TenantScoped, SoftDeletable {
   transition status from "deactivated" to []
 
   default policy organizationRead read: roleAllows(user.role, "staffAccess") "Staff may read organization records"
-  default policy organizationWrite write: roleAllows(user.role, "manageAccess") "Managers may write organization records"
-  default policy organizationExecute execute: roleAllows(user.role, "manageAccess") "Managers may execute organization commands"
+  default policy organizationWrite write: roleAllows(user.role, "manageAccess") "Managers may update the company profile"
+  default policy organizationExecute execute: roleAllows(user.role, "manageAccess") "Managers may change the company profile"
 
   // Stricter than default manageAccess: admin-only registration.
   // Named non-default policies do not attach to commands on Manifest 3.6.3 —

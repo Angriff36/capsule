@@ -29614,8 +29614,8 @@ async function __runOrganizationConfigureBranding(ctx: MutationCtx, { docId, dis
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -29666,8 +29666,8 @@ async function __runOrganizationDeactivate(ctx: MutationCtx, { docId, version }:
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!(((doc.status === "active") || (doc.status === "suspended")))) throw new Error("Guard 0 failed");
     {
       const __cur = doc.status;
@@ -29724,8 +29724,8 @@ async function __runOrganizationReactivate(ctx: MutationCtx, { docId, version }:
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.status === "suspended"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -29782,8 +29782,8 @@ async function __runOrganizationRegister(ctx: MutationCtx, { docId, name, brandD
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Organization name is required");
@@ -29861,8 +29861,8 @@ export const Organization_createViaRegister = mutation({
       name: args.name
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Organization name is required");
@@ -29895,8 +29895,8 @@ async function __runOrganizationRename(ctx: MutationCtx, { docId, name, version 
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Organization name is required");
@@ -29943,8 +29943,8 @@ async function __runOrganizationSetBrandLogo(ctx: MutationCtx, { docId, storageI
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     const previousStorageId = doc.brandLogoStorageId;
     if (version !== undefined && (doc as any).version !== version) {
@@ -29990,8 +29990,8 @@ async function __runOrganizationSetDefaultCurrency(ctx: MutationCtx, { docId, cu
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((currencyCode).trim()).length === 3))) throw new Error("Currency code must be a three-letter ISO 4217 code");
     const normalizedCode = (currencyCode).toUpperCase();
@@ -30038,8 +30038,8 @@ async function __runOrganizationSuspend(ctx: MutationCtx, { docId, reason, versi
     if (!doc) throw new Error("Organization not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Organization not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may write organization records");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may update the company profile");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may change the company profile");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
