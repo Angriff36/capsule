@@ -36,4 +36,24 @@ describe("plain words on leftover insights manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover insights READ copy free of draft-and-access jargon", () => {
+    const source = readFileSync("src/insights/report.manifest", "utf8");
+    // strip // comments so developer notes are not treated as user copy
+    const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain(
+      "Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess",
+    );
+    expect(visible).toContain(
+      "Staff may see unfinished reports; a just-for-you report can only be seen by its owner or a manager",
+    );
+    expectPlain(
+      "Staff may see unfinished reports; a just-for-you report can only be seen by its owner or a manager",
+    );
+
+    // write/execute leftovers stay for a later slice
+    expect(visible).toContain("Staff may update saved reports");
+    expect(visible).toContain("Staff may change saved reports");
+  });
 });
