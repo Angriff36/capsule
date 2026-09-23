@@ -268,9 +268,10 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   transition status from "reserved" to ["checked_out", "cancelled"]
   transition status from "checked_out" to ["returned"]
 
-  default policy equipmentReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment reservations"
-  default policy equipmentReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment handoffs"
-  default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment handoff commands"
+  // Event managers need execute so EventCancelled can stand down reserved rows.
+  default policy equipmentReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event"
+  default policy equipmentReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"
+  default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "eventManageAccess") "Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event"
 
   command checkOut(condition: EquipmentCondition, optional note: string) {
     guard self.status == "reserved"

@@ -3461,7 +3461,7 @@ export const listEquipmentReservation = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => (checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) return [];
+    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => ((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("equipmentReservations").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -3475,7 +3475,7 @@ export const getEquipmentReservation = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => (checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) return null;
+    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => ((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -3492,7 +3492,7 @@ export const listEquipmentReservationByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => (checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) return [];
+    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => ((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("equipmentReservations").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
@@ -3507,7 +3507,7 @@ export const listEquipmentReservationByEquipmentId = query({
   handler: async (ctx, { equipmentId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => (checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) return [];
+    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => ((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("equipmentReservations").withIndex("by_equipmentId", (q) => q.eq("equipmentId", equipmentId)).collect();
@@ -3523,7 +3523,7 @@ export const listEquipmentReservationByEventId = query({
   handler: async (ctx, { eventId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => (checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) return [];
+    if (!__allowsRead("equipmentReservationRead", "EquipmentReservation", () => ((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (__tenant == null) return [];
     let rows = await ctx.db.query("equipmentReservations").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();

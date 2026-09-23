@@ -4,7 +4,11 @@ import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
 import { releaseEventInventoryHolds } from "./inventoryEvents";
-import { standDownEventLogisticsAndBilling } from "./eventCancellation";
+import {
+  standDownEventAssignments,
+  standDownEventEquipmentReservations,
+  standDownEventLogisticsAndBilling,
+} from "./eventCancellation";
 import { reconcileEventTiming } from "./eventTimingOperations";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
@@ -199,6 +203,11 @@ export async function handleManifestEvent(
       ctx,
       event.entityId as Id<"events">,
     );
+    await standDownEventEquipmentReservations(
+      ctx,
+      event.entityId as Id<"events">,
+    );
+    await standDownEventAssignments(ctx, event.entityId as Id<"events">);
     await standDownEventPurchasing(ctx, event.entityId as Id<"events">);
     await standDownEventPrep(
       ctx,

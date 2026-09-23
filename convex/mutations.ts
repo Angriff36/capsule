@@ -11408,9 +11408,9 @@ async function __runEquipmentReservationCancel(ctx: MutationCtx, { docId, reason
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EquipmentReservation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EquipmentReservation not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event");
     if (!((doc.status === "reserved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -11471,9 +11471,9 @@ async function __runEquipmentReservationCheckOut(ctx: MutationCtx, { docId, cond
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EquipmentReservation not found");
     const __rel_equipment = await __resolveRelation(ctx, "equipments", [__auth.tenantId, doc.equipmentId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).equipment = __rel_equipment;
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event");
     if (!((doc.status === "reserved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_equipment != null) && (__rel_equipment.condition !== "out_of_service")))) throw new Error("Equipment marked out of service cannot be checked out");
@@ -11535,9 +11535,9 @@ async function __runEquipmentReservationMarkReturned(ctx: MutationCtx, { docId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EquipmentReservation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EquipmentReservation not found");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may read equipment reservations, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event");
+    if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "eventManageAccess")))) throw new Error("Inventory or logistics staff may execute equipment handoff commands, or event managers stand down a cancelled event");
     if (!((doc.status === "checked_out"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
