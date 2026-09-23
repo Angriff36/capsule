@@ -230,7 +230,7 @@ describe("runtime proof: completion freezes changePricing, correction restates t
         budgetAmount: 2800,
         quotedPrice: 5200,
       }),
-    ).rejects.toThrow(/Event and sales staff may write events/);
+    ).rejects.toThrow(/Event and sales staff may update events/);
     expect((await readEvent(kitchen, eventId)).quotedPrice).toBe(S.quotedPrice);
 
     await expect(

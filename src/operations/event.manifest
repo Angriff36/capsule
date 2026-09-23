@@ -131,8 +131,8 @@ entity Client mixin TenantScoped, SoftDeletable {
   // Write policies gate command mutation (semantics.md § policy enforcement:
   // "enforced only at command execution"; no separate store-level write gate).
   // Staff tier here; manager-only commands carry explicit roleAllows guards.
-  default policy clientWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write client accounts through commands"
-  default policy clientExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute client commands"
+  default policy clientWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update client accounts"
+  default policy clientExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change client accounts"
 
   command register(
     clientType: ClientType,
@@ -385,8 +385,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
   transition status from "inactive" to ["active"]
 
   default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may read venues"
-  default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venues through commands"
-  default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue commands"
+  default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venues"
+  default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venues"
 
   command register(
     name: string,
@@ -822,8 +822,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   default policy eventRead read: roleAllows(user.role, "staffAccess") "Staff may read shared event plans and operational context"
   // Write policies gate command mutation (see Client note); staff tier here,
   // manager-only commands (approve/cancel/changePricing/...) carry guards.
-  default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write events through commands"
-  default policy eventExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may execute event commands"
+  default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may update events"
+  default policy eventExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may change events"
 
   command planEngagement(
     clientId: uuid,
@@ -1097,7 +1097,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
-    constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their recorded timing; correct individual blocks if needed"
+    constraint activeEventTiming: self.stage != "completed" and self.stage != "closed_out" and self.stage != "cancelled" "Finished or cancelled events keep their saved timing; correct individual blocks if needed"
     constraint timingSetupNonnegative: setupMinutes == null or setupMinutes >= 0 "Setup minutes cannot be negative"
     constraint timingLoadNonnegative: loadMinutes == null or loadMinutes >= 0 "Load minutes cannot be negative"
     constraint timingOutboundNonnegative: outboundTravelMinutes == null or outboundTravelMinutes >= 0 "Travel minutes cannot be negative"
@@ -1698,8 +1698,8 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   transition rsvpStatus from "declined" to []
 
   default policy eventGuestRead read: roleAllows(user.role, "eventAccess") "Event staff may read guest attendance"
-  default policy eventGuestWrite write: roleAllows(user.role, "eventAccess") "Event staff may write guest attendance through commands"
-  default policy eventGuestExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute guest attendance commands"
+  default policy eventGuestWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the guest list"
+  default policy eventGuestExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change the guest list"
 
   command invite(
     eventId: uuid,
@@ -1849,8 +1849,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
 
   default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may read the shared event timeline"
-  default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may record timeline work through commands"
-  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute timeline work commands"
+  default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may add timeline work"
+  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "staffAccess") "Staff may change timeline work"
 
   command schedule(
     eventId: uuid,
@@ -1958,7 +1958,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.scheduledAt != null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
-    constraint activeTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their recorded times"
+    constraint activeTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their saved times"
     constraint sameTimingMilestone: self.timingMilestone == null or self.timingMilestone == milestone "This block already represents another timing milestone"
     constraint plannedTimingWindow: startsAt == null or endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
     compute keepTiming = self.completedAt != null or self.timingPerformedAt != null or self.timingManuallyAdjustedAt != null or (self.timingMilestone == null and (self.startsAt != null or self.endsAt != null))
@@ -1977,9 +1977,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.timingMilestone != null
     guard roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Event staff and managers may plan the event timeline"
-    constraint activeCalculatedTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their recorded times"
+    constraint activeCalculatedTimingParent: self.event != null and self.event.deletedAt == null and self.event.stage != "completed" and self.event.stage != "closed_out" and self.event.stage != "cancelled" "Calculated timing requires an active event; historical blocks keep their saved times"
     // An explicit return to the plan may change manual times, not work history.
-    constraint preservePerformedTiming: self.completedAt == null and self.timingPerformedAt == null "Performed work keeps its recorded time"
+    constraint preservePerformedTiming: self.completedAt == null and self.timingPerformedAt == null "Performed work keeps its saved time"
     mutate timingManuallyAdjustedAt = null
     emit EventTimelineCalculatedTimingRequested {
       activityId: self.id
@@ -2036,8 +2036,8 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
   constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Timeline comment text is required"
 
   default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may read timeline comments"
-  default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may write timeline comments through commands"
-  default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute timeline comment commands"
+  default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may add timeline comments"
+  default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change timeline comments"
 
   command post(
     eventId: uuid,
@@ -2102,8 +2102,8 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Layout section sort order cannot be negative"
 
   default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may read event layout sections"
-  default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may write event layout sections through commands"
-  default policy eventLayoutSectionExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute event layout section commands"
+  default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the floor plan"
+  default policy eventLayoutSectionExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change the floor plan"
 
   command add(
     eventId: uuid,

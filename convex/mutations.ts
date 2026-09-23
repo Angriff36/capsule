@@ -1711,8 +1711,8 @@ async function __runClientArchive(ctx: MutationCtx, { docId, reason, version }: 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Guard 2 failed");
@@ -1777,8 +1777,8 @@ async function __runClientAssignOwner(ctx: MutationCtx, { docId, assignedToId, v
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -1828,8 +1828,8 @@ async function __runClientChangeBillingProfile(ctx: MutationCtx, { docId, paymen
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Guard 2 failed");
@@ -1885,8 +1885,8 @@ async function __runClientChangeContact(ctx: MutationCtx, { docId, email, phone,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code must contain two characters");
@@ -1957,8 +1957,8 @@ async function __runClientMarkMerged(ctx: MutationCtx, { docId, clientId, versio
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergedIntoClient = __rel_mergedIntoClient;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
@@ -2032,8 +2032,8 @@ async function __runClientReactivate(ctx: MutationCtx, { docId, version }: any, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Guard 2 failed");
@@ -2096,8 +2096,8 @@ async function __runClientRegister(ctx: MutationCtx, { docId, clientType, compan
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((((clientType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((clientType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Company clients require a company name; person clients require a given name");
@@ -2232,8 +2232,8 @@ export const Client_createViaRegister = mutation({
       website: args.website
     };
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((((clientType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((clientType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Company clients require a company name; person clients require a given name");
@@ -2284,8 +2284,8 @@ async function __runClientSetBirthday(ctx: MutationCtx, { docId, birthday, versi
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((birthday == null) || (((birthday).trim()).length === 10)))) throw new Error("Birthday must be a YYYY-MM-DD date");
@@ -2336,8 +2336,8 @@ async function __runClientStageClientMerge(ctx: MutationCtx, { docId, clientMerg
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Client not found");
     const doc = await __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","birthday","taxId"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "salesAccess") || checkRole(user, "financeAccess")))) throw new Error("Sales and finance may read client accounts for CRM and billing");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client accounts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client accounts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 2 failed");
@@ -11754,8 +11754,8 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "pending_approval"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -11902,8 +11902,8 @@ async function __runEventArchive(ctx: MutationCtx, { docId, reason, version }: a
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.archivedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -11955,8 +11955,8 @@ async function __runEventAssignOwner(ctx: MutationCtx, { docId, assignedToId, ow
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -12007,8 +12007,8 @@ async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: an
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "sales_lock"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Guard 2 failed");
@@ -12070,8 +12070,8 @@ async function __runEventCancel(ctx: MutationCtx, { docId, reason, version }: an
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((((((((doc.stage === "quote") || (doc.stage === "planning")) || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")) || (doc.stage === "executing")) || (doc.stage === "final")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -12157,8 +12157,8 @@ async function __runEventCaptureDraft(ctx: MutationCtx, { docId, title, clientId
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((doc.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -12262,8 +12262,8 @@ async function __runEventChangeHeadcount(ctx: MutationCtx, { docId, newHeadcount
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")) || (doc.stage === "executing")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((newHeadcount >= 1) && (newHeadcount <= 100000)))) throw new Error("Headcount must be between 1 and 100000");
@@ -12320,8 +12320,8 @@ async function __runEventChangePricing(ctx: MutationCtx, { docId, budgetAmount, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventManageAccess") || checkRole(user, "salesManageAccess")))) throw new Error("Guard 2 failed");
@@ -12374,8 +12374,8 @@ async function __runEventChangePrimaryContact(ctx: MutationCtx, { docId, primary
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((primaryContactName).trim()).length > 0))) throw new Error("Primary contact name is required");
@@ -12429,8 +12429,8 @@ async function __runEventChangeRequirements(ctx: MutationCtx, { docId, accessibi
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -12494,8 +12494,8 @@ async function __runEventChangeServiceStyle(ctx: MutationCtx, { docId, serviceSt
     }
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 1 failed");
     if (!((((serviceStyleId).trim()).length > 0))) throw new Error("Events must reference a service style");
@@ -12553,8 +12553,8 @@ async function __runEventChangeVenue(ctx: MutationCtx, { docId, venueId, venueNa
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((venueCapacity == null) || (venueCapacity >= 0)))) throw new Error("Venue capacity cannot be negative");
@@ -12610,8 +12610,8 @@ async function __runEventClearBinderBuilt(ctx: MutationCtx, { docId, version }: 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.binderBuiltAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -12659,8 +12659,8 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "completed"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -12756,8 +12756,8 @@ async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __c
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "final"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -12835,8 +12835,8 @@ async function __runEventConfigureRecurrence(ctx: MutationCtx, { docId, frequenc
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")))) throw new Error("Guard 0 failed");
     if (!((doc.plannedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.startsAt != null))) throw new Error("Guard 2 failed");
@@ -12908,11 +12908,11 @@ async function __runEventConfigureTiming(ctx: MutationCtx, { docId, serviceStart
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 1 failed");
-    if (!((((doc.stage !== "completed") && (doc.stage !== "closed_out")) && (doc.stage !== "cancelled")))) throw new Error("Finished or cancelled events keep their recorded timing; correct individual blocks if needed");
+    if (!((((doc.stage !== "completed") && (doc.stage !== "closed_out")) && (doc.stage !== "cancelled")))) throw new Error("Finished or cancelled events keep their saved timing; correct individual blocks if needed");
     if (!(((setupMinutes == null) || (setupMinutes >= 0)))) throw new Error("Setup minutes cannot be negative");
     if (!(((loadMinutes == null) || (loadMinutes >= 0)))) throw new Error("Load minutes cannot be negative");
     if (!(((outboundTravelMinutes == null) || (outboundTravelMinutes >= 0)))) throw new Error("Travel minutes cannot be negative");
@@ -12978,8 +12978,8 @@ async function __runEventConfirmSalesLock(ctx: MutationCtx, { docId, version }: 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "sales_lock"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Guard 2 failed");
@@ -13041,8 +13041,8 @@ async function __runEventCorrectCommercial(ctx: MutationCtx, { docId, reason, bu
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((doc.stage === "completed") || (doc.stage === "closed_out")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventManageAccess") || checkRole(user, "salesManageAccess")))) throw new Error("Guard 2 failed");
@@ -13097,8 +13097,8 @@ async function __runEventFinalizeEvent(ctx: MutationCtx, { docId, version }: any
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "executing"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -13160,8 +13160,8 @@ async function __runEventLockForSales(ctx: MutationCtx, { docId, version }: any,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "approved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Guard 2 failed");
@@ -13228,8 +13228,8 @@ async function __runEventMarkBinderBuilt(ctx: MutationCtx, { docId, version }: a
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -13276,8 +13276,8 @@ async function __runEventNormalizePurchasingWeek(ctx: MutationCtx, { docId, vers
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")) || (doc.stage === "executing")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.startsAt != null))) throw new Error("Guard 2 failed");
@@ -13328,8 +13328,8 @@ async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, tit
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((doc.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -13515,8 +13515,8 @@ export const Event_createViaPlanEngagement = mutation({
       venueName: args.venueName
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((__draft.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((__draft.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -13583,8 +13583,8 @@ async function __runEventReactivate(ctx: MutationCtx, { docId, version }: any, _
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.archivedAt != null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -13638,8 +13638,8 @@ async function __runEventReassignClient(ctx: MutationCtx, { docId, version }: an
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     if (!((__rel_clientMergeAuthorization != null))) throw new Error("Guard 2 failed");
@@ -13696,8 +13696,8 @@ async function __runEventReschedule(ctx: MutationCtx, { docId, startsAt, endsAt,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")) || (doc.stage === "sales_lock")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((endsAt > startsAt))) throw new Error("Event end must be after its start");
@@ -13757,8 +13757,8 @@ async function __runEventReturnToPlanning(ctx: MutationCtx, { docId, reason, ver
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!(((doc.stage === "quote") || (doc.stage === "pending_approval")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -13822,8 +13822,8 @@ async function __runEventSetEventNumber(ctx: MutationCtx, { docId, eventNumber, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -13871,8 +13871,8 @@ async function __runEventStageClientMerge(ctx: MutationCtx, { docId, clientMerge
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 1 failed");
     if (!((clientId !== doc.clientId))) throw new Error("Event already belongs to this client");
@@ -13927,8 +13927,8 @@ async function __runEventStopRecurrence(ctx: MutationCtx, { docId, version }: an
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.recurrenceActive === true))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -13978,8 +13978,8 @@ async function __runEventSubmitForApproval(ctx: MutationCtx, { docId, version }:
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((doc.plannedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14040,8 +14040,8 @@ async function __runEventUpdateDaySheet(ctx: MutationCtx, { docId, barService, c
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -14119,8 +14119,8 @@ async function __runEventUpdateImportDraft(ctx: MutationCtx, { docId, title, cli
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((doc.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14219,8 +14219,8 @@ async function __runEventUpdateSetupNotes(ctx: MutationCtx, { docId, linenColorT
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -14278,8 +14278,8 @@ async function __runEventUpdateTaskBreakdown(ctx: MutationCtx, { docId, servingw
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -16915,8 +16915,8 @@ async function __runEventGuestAssignTable(ctx: MutationCtx, { docId, tableAssign
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventGuest not found");
     const doc = await __decryptDoc(ctx, "EventGuest", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read guest attendance");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((doc.rsvpStatus !== "declined"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((tableAssignment).trim()).length > 0))) throw new Error("Table assignment is required");
@@ -16965,8 +16965,8 @@ async function __runEventGuestCheckIn(ctx: MutationCtx, { docId, version }: any,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventGuest not found");
     const doc = await __decryptDoc(ctx, "EventGuest", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read guest attendance");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((doc.rsvpStatus === "confirmed"))) throw new Error("Guard 0 failed");
     if (!((doc.checkedInAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -17015,8 +17015,8 @@ async function __runEventGuestInvite(ctx: MutationCtx, { docId, eventId, name, e
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventGuest not found");
     const doc = await __decryptDoc(ctx, "EventGuest", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read guest attendance");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((doc.invitedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Guest name is required");
@@ -17120,8 +17120,8 @@ export const EventGuest_createViaInvite = mutation({
       phone: args.phone
     };
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read guest attendance");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((__draft.invitedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Guest name is required");
@@ -17161,8 +17161,8 @@ async function __runEventGuestRsvpConfirm(ctx: MutationCtx, { docId, version }: 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventGuest not found");
     const doc = await __decryptDoc(ctx, "EventGuest", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read guest attendance");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!(((doc.rsvpStatus === "pending") || (doc.rsvpStatus === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -17223,8 +17223,8 @@ async function __runEventGuestRsvpDecline(ctx: MutationCtx, { docId, reason, ver
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventGuest not found");
     const doc = await __decryptDoc(ctx, "EventGuest", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read guest attendance");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!(((doc.rsvpStatus === "pending") || (doc.rsvpStatus === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -17286,8 +17286,8 @@ async function __runEventGuestWithdraw(ctx: MutationCtx, { docId, reason, versio
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventGuest not found");
     const doc = await __decryptDoc(ctx, "EventGuest", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read guest attendance");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the guest list");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the guest list");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Withdrawal reason is required");
     if (version !== undefined && (doc as any).version !== version) {
@@ -18167,8 +18167,8 @@ async function __runEventLayoutSectionAdd(ctx: MutationCtx, { docId, eventId, ty
     if (!doc) throw new Error("EventLayoutSection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventLayoutSection not found");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read event layout sections");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write event layout sections through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event layout section commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the floor plan");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the floor plan");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((type).trim()).length > 0))) throw new Error("Layout section type is required");
@@ -18242,8 +18242,8 @@ export const EventLayoutSection_createViaAdd = mutation({
       type: args.type
     };
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read event layout sections");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write event layout sections through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event layout section commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the floor plan");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the floor plan");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((type).trim()).length > 0))) throw new Error("Layout section type is required");
@@ -18277,8 +18277,8 @@ async function __runEventLayoutSectionRemove(ctx: MutationCtx, { docId, version 
     if (!doc) throw new Error("EventLayoutSection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventLayoutSection not found");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read event layout sections");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write event layout sections through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event layout section commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the floor plan");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the floor plan");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -18322,8 +18322,8 @@ async function __runEventLayoutSectionUpdate(ctx: MutationCtx, { docId, type, in
     if (!doc) throw new Error("EventLayoutSection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventLayoutSection not found");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read event layout sections");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write event layout sections through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute event layout section commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update the floor plan");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change the floor plan");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((type == null) || (((type).trim()).length > 0)))) throw new Error("Layout section type cannot be blanked");
@@ -19332,8 +19332,8 @@ async function __runEventTimelineActivityAdjust(ctx: MutationCtx, { docId, name,
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
@@ -19407,8 +19407,8 @@ async function __runEventTimelineActivityComplete(ctx: MutationCtx, { docId, com
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -19457,12 +19457,12 @@ async function __runEventTimelineActivityPlanTiming(ctx: MutationCtx, { docId, m
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
-    if (!((((((__rel_event != null) && (__rel_event.deletedAt == null)) && (__rel_event.stage !== "completed")) && (__rel_event.stage !== "closed_out")) && (__rel_event.stage !== "cancelled")))) throw new Error("Calculated timing requires an active event; historical blocks keep their recorded times");
+    if (!((((((__rel_event != null) && (__rel_event.deletedAt == null)) && (__rel_event.stage !== "completed")) && (__rel_event.stage !== "closed_out")) && (__rel_event.stage !== "cancelled")))) throw new Error("Calculated timing requires an active event; historical blocks keep their saved times");
     if (!(((doc.timingMilestone == null) || (doc.timingMilestone === milestone)))) throw new Error("This block already represents another timing milestone");
     if (!((((startsAt == null) || (endsAt == null)) || (endsAt >= startsAt)))) throw new Error("Activity end must not precede its start");
     const keepTiming = ((((doc.completedAt != null) || (doc.timingPerformedAt != null)) || (doc.timingManuallyAdjustedAt != null)) || ((doc.timingMilestone == null) && ((doc.startsAt != null) || (doc.endsAt != null))));
@@ -19514,8 +19514,8 @@ async function __runEventTimelineActivityRemove(ctx: MutationCtx, { docId, versi
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -19560,8 +19560,8 @@ async function __runEventTimelineActivityReopen(ctx: MutationCtx, { docId, versi
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -19606,8 +19606,8 @@ async function __runEventTimelineActivitySchedule(ctx: MutationCtx, { docId, eve
     if (!doc) throw new Error("EventTimelineActivity not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineActivity not found");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
@@ -19711,8 +19711,8 @@ export const EventTimelineActivity_createViaSchedule = mutation({
       startsAt: args.startsAt
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
@@ -19757,13 +19757,13 @@ async function __runEventTimelineActivityUseCalculatedTiming(ctx: MutationCtx, {
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read the shared event timeline");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may record timeline work through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute timeline work commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add timeline work");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change timeline work");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.timingMilestone != null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
-    if (!((((((__rel_event != null) && (__rel_event.deletedAt == null)) && (__rel_event.stage !== "completed")) && (__rel_event.stage !== "closed_out")) && (__rel_event.stage !== "cancelled")))) throw new Error("Calculated timing requires an active event; historical blocks keep their recorded times");
-    if (!(((doc.completedAt == null) && (doc.timingPerformedAt == null)))) throw new Error("Performed work keeps its recorded time");
+    if (!((((((__rel_event != null) && (__rel_event.deletedAt == null)) && (__rel_event.stage !== "completed")) && (__rel_event.stage !== "closed_out")) && (__rel_event.stage !== "cancelled")))) throw new Error("Calculated timing requires an active event; historical blocks keep their saved times");
+    if (!(((doc.completedAt == null) && (doc.timingPerformedAt == null)))) throw new Error("Performed work keeps its saved time");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -19806,8 +19806,8 @@ async function __runEventTimelineCommentPost(ctx: MutationCtx, { docId, eventId,
     if (!doc) throw new Error("EventTimelineComment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineComment not found");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read timeline comments");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write timeline comments through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute timeline comment commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may add timeline comments");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change timeline comments");
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -19887,8 +19887,8 @@ export const EventTimelineComment_createViaPost = mutation({
       eventId: args.eventId
     };
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read timeline comments");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write timeline comments through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute timeline comment commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may add timeline comments");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change timeline comments");
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -19925,8 +19925,8 @@ async function __runEventTimelineCommentRemove(ctx: MutationCtx, { docId, versio
     if (!doc) throw new Error("EventTimelineComment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTimelineComment not found");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read timeline comments");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write timeline comments through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute timeline comment commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may add timeline comments");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change timeline comments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((doc.authorAuthSubjectId === user.id) || checkRole(user, "adminAccess")))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -53478,8 +53478,8 @@ async function __runVenueActivate(ctx: MutationCtx, { docId, version }: any, __c
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venues");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venues through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -53541,8 +53541,8 @@ async function __runVenueChangeCapacity(ctx: MutationCtx, { docId, capacity, ver
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venues");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venues through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((capacity >= 0))) throw new Error("Venue capacity cannot be negative");
@@ -53592,8 +53592,8 @@ async function __runVenueDeactivate(ctx: MutationCtx, { docId, reason, version }
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venues");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venues through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -53657,8 +53657,8 @@ async function __runVenueRegister(ctx: MutationCtx, { docId, name, venueType, ca
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venues");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venues through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -53835,8 +53835,8 @@ export const Venue_createViaRegister = mutation({
       waterAccess: args.waterAccess
     };
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venues");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venues through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Guard 2 failed");
@@ -53898,8 +53898,8 @@ async function __runVenueUpdateDetails(ctx: MutationCtx, { docId, name, venueTyp
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Venue not found");
     const doc = await __decryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venues");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may write venues through commands");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may execute venue commands");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Venue name is required");
@@ -56133,8 +56133,8 @@ export const Event_createViaCaptureDraft = mutation({
       venueName: args.venueName
     };
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read shared event plans and operational context");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
     if (!((__draft.stage === "planning"))) throw new Error("Guard 0 failed");
     if (!((__draft.plannedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");

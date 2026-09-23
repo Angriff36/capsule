@@ -367,4 +367,56 @@ describe("plain words on event screens", () => {
     expect(card).toContain("Open dish ↗");
     expectPlain("Open dish ↗");
   });
+
+  it("keeps leftover event.manifest policy and constraint copy free of command jargon", () => {
+    const manifest = readFileSync("src/operations/event.manifest", "utf8");
+    // strip // comments so developer notes are not treated as user copy
+    const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "through commands",
+      "execute client commands",
+      "execute venue commands",
+      "execute event commands",
+      "execute guest attendance commands",
+      "record timeline work",
+      "execute timeline work commands",
+      "execute timeline comment commands",
+      "execute event layout section commands",
+      "recorded timing",
+      "recorded times",
+      "recorded time",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Sales staff may update client accounts",
+      "Sales staff may change client accounts",
+      "Event staff may update venues",
+      "Event staff may change venues",
+      "Event and sales staff may update events",
+      "Event and sales staff may change events",
+      "Event staff may update the guest list",
+      "Event staff may change the guest list",
+      "Staff may add timeline work",
+      "Staff may change timeline work",
+      "Event staff may add timeline comments",
+      "Event staff may change timeline comments",
+      "Event staff may update the floor plan",
+      "Event staff may change the floor plan",
+      "Finished or cancelled events keep their saved timing; correct individual blocks if needed",
+      "historical blocks keep their saved times",
+      "Performed work keeps its saved time",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    const staffDenied = classifyCommandFailure(
+      "Event and sales staff may update events",
+    );
+    expect(staffDenied.category).toBe("denied");
+    expectPlain(`${staffDenied.title} ${staffDenied.detail}`);
+  });
 });
