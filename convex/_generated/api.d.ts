@@ -86,6 +86,7 @@ import type * as lib_foodDatabaseImage from "../lib/foodDatabaseImage.js";
 import type * as lib_foodDensityFromLookup from "../lib/foodDensityFromLookup.js";
 import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_headcountReconciliation from "../lib/headcountReconciliation.js";
+import type * as lib_headcountStaffingReconciliation from "../lib/headcountStaffingReconciliation.js";
 import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
 import type * as lib_ingredientAllergenParser from "../lib/ingredientAllergenParser.js";
 import type * as lib_ingredientCatalogImageImport from "../lib/ingredientCatalogImageImport.js";
@@ -266,6 +267,7 @@ declare const fullApi: ApiFromModules<{
   "lib/foodDensityFromLookup": typeof lib_foodDensityFromLookup;
   "lib/googleCalendar": typeof lib_googleCalendar;
   "lib/headcountReconciliation": typeof lib_headcountReconciliation;
+  "lib/headcountStaffingReconciliation": typeof lib_headcountStaffingReconciliation;
   "lib/householdVolumeParse": typeof lib_householdVolumeParse;
   "lib/ingredientAllergenParser": typeof lib_ingredientAllergenParser;
   "lib/ingredientCatalogImageImport": typeof lib_ingredientCatalogImageImport;

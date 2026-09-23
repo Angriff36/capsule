@@ -15,6 +15,7 @@ import { eventHeadcountReconciliation } from "./headcountReconciliation";
 import { eventPackReconciliation } from "./packReconciliation";
 import { eventDemandReconciliation } from "./demandReconciliation";
 import { eventPrepReconciliation } from "./prepReconciliation";
+import { eventHeadcountStaffingReconciliation } from "./headcountStaffingReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -139,6 +140,17 @@ export async function handleManifestEvent(
       },
     );
     await eventPrepReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    // Staffing does not scale with guest count: live staff needs keep their
+    // role, status, and window — this records the §8.2 staffing receipt only.
+    await eventHeadcountStaffingReconciliation.run(
       ctx,
       event.entityId as Id<"events">,
       { triggerEventId: String(event.eventId), triggerType: event.type },
