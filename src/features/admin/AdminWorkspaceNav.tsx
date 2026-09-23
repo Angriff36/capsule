@@ -12,7 +12,7 @@ const sections = [
   { label: "Imports", path: "/admin/imports" },
   { label: "Compare with TPP", path: "/admin/parallel-run" },
   { label: "Match leftover items", path: "/admin/reconcile" },
-  { label: "Cutover", path: "/admin/cutover" },
+  { label: "Switch from TPP", path: "/admin/cutover" },
 ] as const;
 
 export function AdminWorkspaceNav() {

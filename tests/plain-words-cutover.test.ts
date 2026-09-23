@@ -214,4 +214,18 @@ describe("plain words on leftover cutover screen", () => {
     expect(page).toContain("finalDeltaImport");
     expect(page).toContain("View Imports");
   });
+
+  it("keeps leftover Admin nav Cutover label in catering English", () => {
+    const nav = readFileSync(
+      "src/features/admin/AdminWorkspaceNav.tsx",
+      "utf8",
+    );
+
+    expect(nav).not.toContain('label: "Cutover"');
+    expect(nav).toContain('label: "Switch from TPP"');
+    expectPlain("Switch from TPP");
+
+    // path and later leftovers stay
+    expect(nav).toContain('path: "/admin/cutover"');
+  });
 });
