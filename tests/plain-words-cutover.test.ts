@@ -180,4 +180,23 @@ describe("plain words on leftover cutover screen", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover Provider Readiness card title and details in catering English", () => {
+    const page = readFileSync(
+      "src/features/admin/import/CutoverPage.tsx",
+      "utf8",
+    );
+
+    for (const old of ["Provider Readiness", "SMS integrations operational"]) {
+      expect(page).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Outside services ready",
+      "QuickBooks, calendar, and texts are working",
+    ]) {
+      expect(page).toContain(fresh);
+      expectPlain(fresh);
+    }
+  });
 });

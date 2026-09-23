@@ -368,9 +368,9 @@ export function CutoverPage() {
           />
 
           <ValidationCard
-            title="Provider Readiness"
+            title="Outside services ready"
             check={validation.checks.providerReadiness}
-            details="QuickBooks, Calendar, SMS integrations operational"
+            details="QuickBooks, calendar, and texts are working"
           />
 
           <ValidationCard
