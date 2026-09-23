@@ -182,4 +182,71 @@ describe("plain words on leftover import manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover compare and match table and body copy free of run and record jargon", () => {
+    const files = [
+      "src/features/admin/import/ParallelRunDashboardPage.tsx",
+      "src/features/admin/import/ExternalRecordsReconcilePage.tsx",
+    ];
+    // strip // comments and JSX {/* */} comments so developer notes are not
+    // treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      .replace(/\{\/\*[\s\S]*?\*\//g, " ");
+
+    for (const old of [
+      "Imported records that still need",
+      "Capsule record",
+      "All mappings verified",
+      "Unmapped",
+      "unresolved mappings",
+      "<th>Records</th>",
+      "Understanding the Dashboard",
+      "Imported records to",
+      "individual records",
+      '"run" : "runs"',
+      "record(s) selected",
+      "record(s) successfully",
+      "Failed to verify records",
+      "Failed to skip records",
+      "Records marked",
+      "Select multiple records",
+      "Skipped during reconciliation",
+      "during reconciliation",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Imported items that still need to be checked or matched up.",
+      "In Capsule",
+      "Everything is matched",
+      "Not matched",
+      "leftover items",
+      "What these numbers mean",
+      "Imported items to",
+      "individual items",
+      "Checked ",
+      "Couldn't check those items.",
+      "Couldn't skip those items.",
+      "item(s) selected",
+      "Items marked",
+      "Select multiple items",
+      "Skipped while matching leftover items",
+      "Matched to a Capsule payment while matching leftover items",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    expect(visible).toContain(
+      'formatCountNoun(unresolvedMappings.length, "item")',
+    );
+    expect(visible).not.toContain(
+      'formatCountNoun(unresolvedMappings.length, "record")',
+    );
+    expect(visible).toContain("<th>Items</th>");
+  });
 });

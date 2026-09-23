@@ -618,8 +618,8 @@ export function ParallelRunDashboardPage() {
                 </p>
               </div>
               <span>
-                {menuCatalogComparison.runCount} menu import{" "}
-                {menuCatalogComparison.runCount === 1 ? "run" : "runs"}
+                {menuCatalogComparison.runCount} menu import
+                {menuCatalogComparison.runCount === 1 ? "" : "s"}
               </span>
             </div>
             {menuCatalogComparison.tppTotal === 0 &&
@@ -963,12 +963,10 @@ export function ParallelRunDashboardPage() {
               <div>
                 <h2>Still to match</h2>
                 <p className="text-xs text-ink-2">
-                  Imported records that still need to be checked or matched up.
+                  Imported items that still need to be checked or matched up.
                 </p>
               </div>
-              <span>
-                {formatCountNoun(unresolvedMappings.length, "record")}
-              </span>
+              <span>{formatCountNoun(unresolvedMappings.length, "item")}</span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">
@@ -977,7 +975,7 @@ export function ParallelRunDashboardPage() {
                     <th>Old system</th>
                     <th>Type</th>
                     <th>Reference in the old system</th>
-                    <th>Capsule record</th>
+                    <th>In Capsule</th>
                     <th>Status</th>
                     <th>Actions</th>
                   </tr>
@@ -986,7 +984,7 @@ export function ParallelRunDashboardPage() {
                   {unresolvedMappings.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="text-center text-ok">
-                        ✓ All mappings verified
+                        ✓ Everything is matched
                       </td>
                     </tr>
                   ) : (
@@ -1004,7 +1002,7 @@ export function ParallelRunDashboardPage() {
                           {link.externalId.slice(0, 16)}…
                         </td>
                         <td title={link.capsuleId || undefined}>
-                          {link.capsuleId ? "Linked" : "Unmapped"}
+                          {link.capsuleId ? "Linked" : "Not matched"}
                         </td>
                         <td>
                           <StatusChip status={String(link.conflictStatus)} />
@@ -1034,7 +1032,7 @@ export function ParallelRunDashboardPage() {
             </div>
             {unresolvedMappings.length > 50 && (
               <p className="mt-3 text-xs text-center text-ink-3">
-                Showing 50 of {unresolvedMappings.length} unresolved mappings
+                Showing 50 of {unresolvedMappings.length} leftover items
               </p>
             )}
           </section>
@@ -1060,7 +1058,7 @@ export function ParallelRunDashboardPage() {
                     <th>Dataset</th>
                     <th>Status</th>
                     <th>Date</th>
-                    <th>Records</th>
+                    <th>Items</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -1119,9 +1117,7 @@ export function ParallelRunDashboardPage() {
 
           {/* Help Text */}
           <section className="mt-6 p-4 bg-info-soft border border-info/40 rounded-sm">
-            <h3 className="font-semibold text-info">
-              Understanding the Dashboard
-            </h3>
+            <h3 className="font-semibold text-info">What these numbers mean</h3>
             <ul className="mt-2 space-y-1 text-xs text-info">
               <li>
                 • <strong>Match status</strong>: Capsule and TPP counts are
@@ -1136,7 +1132,7 @@ export function ParallelRunDashboardPage() {
                 (&gt;5-10%) - investigation required
               </li>
               <li>
-                • <strong>Still to match</strong>: Imported records to
+                • <strong>Still to match</strong>: Imported items to
                 double-check before the final switch
               </li>
               <li>
@@ -1145,7 +1141,7 @@ export function ParallelRunDashboardPage() {
               </li>
               <li>
                 • <strong>Drill-down</strong>: Click "View" links to inspect
-                individual records
+                individual items
               </li>
             </ul>
           </section>
