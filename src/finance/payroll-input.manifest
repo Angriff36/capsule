@@ -52,8 +52,8 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
   transition status from "voided" to []
 
   default policy payrollInputRead read: roleAllows(user.role, "financeManageAccess") "Finance managers may read payroll inputs"
-  default policy payrollInputWrite write: roleAllows(user.role, "financeManageAccess") "Finance managers may write payroll inputs through commands"
-  default policy payrollInputExecute execute: roleAllows(user.role, "financeManageAccess") "Finance managers may execute payroll input commands"
+  default policy payrollInputWrite write: roleAllows(user.role, "financeManageAccess") "Finance managers may update payroll inputs"
+  default policy payrollInputExecute execute: roleAllows(user.role, "financeManageAccess") "Finance managers may change payroll inputs"
 
   command prepare(
     personId: uuid,

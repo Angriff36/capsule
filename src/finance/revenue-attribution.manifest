@@ -33,8 +33,8 @@ entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
   constraint commissionPercentValid: self.commissionPercent >= 0 and self.commissionPercent <= 100 "Commission percent must be between 0 and 100"
 
   default policy venueTermRead read: roleAllows(user.role, "financeAccess") "Finance staff may read venue commission terms"
-  default policy venueTermWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write venue commission terms"
-  default policy venueTermExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute venue term commands"
+  default policy venueTermWrite write: roleAllows(user.role, "financeAccess") "Finance staff may update venue commission terms"
+  default policy venueTermExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may change venue commission terms"
 
   command define(
     venueId: uuid,
@@ -160,8 +160,8 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   transition status from "applied" to []
 
   default policy attributionRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesAccess") "Finance and sales staff may read attributions"
-  default policy attributionWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write attributions"
-  default policy attributionExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute attribution commands"
+  default policy attributionWrite write: roleAllows(user.role, "financeAccess") "Finance staff may update attributions"
+  default policy attributionExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may change attributions"
 
   command create(
     eventId: uuid,
