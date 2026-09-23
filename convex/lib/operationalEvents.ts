@@ -16,6 +16,7 @@ import { eventProposalReconciliation } from "./proposalReconciliation";
 import { eventPacketReconciliation } from "./packetReconciliation";
 import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
+import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
@@ -226,6 +227,24 @@ export async function handleManifestEvent(
           event.payload.venueCapacity == null
             ? null
             : Number(event.payload.venueCapacity),
+      },
+    );
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventServiceStyleChanged") {
+    // Style snapshot already written by Event.changeServiceStyle. The
+    // generated pack-kit fanOut already ran. This records one §8.2 style
+    // receipt and flags the issued packet stale without rewriting it.
+    await eventStyleReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        serviceStyleId: String(event.payload.serviceStyleId),
+        serviceStyleName:
+          event.payload.serviceStyleName == null
+            ? null
+            : String(event.payload.serviceStyleName),
       },
     );
     return;

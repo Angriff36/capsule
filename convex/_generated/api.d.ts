@@ -139,6 +139,7 @@ import type * as lib_shiftSchedulingEvents from "../lib/shiftSchedulingEvents.js
 import type * as lib_staffSignInMailer from "../lib/staffSignInMailer.js";
 import type * as lib_staffSignInPassword from "../lib/staffSignInPassword.js";
 import type * as lib_staffingReconciliation from "../lib/staffingReconciliation.js";
+import type * as lib_styleReconciliation from "../lib/styleReconciliation.js";
 import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
 import type * as lib_tenantSystemCommandRunner from "../lib/tenantSystemCommandRunner.js";
@@ -326,6 +327,7 @@ declare const fullApi: ApiFromModules<{
   "lib/staffSignInMailer": typeof lib_staffSignInMailer;
   "lib/staffSignInPassword": typeof lib_staffSignInPassword;
   "lib/staffingReconciliation": typeof lib_staffingReconciliation;
+  "lib/styleReconciliation": typeof lib_styleReconciliation;
   "lib/teamChatRead": typeof lib_teamChatRead;
   "lib/teamChatScan": typeof lib_teamChatScan;
   "lib/tenantSystemCommandRunner": typeof lib_tenantSystemCommandRunner;
