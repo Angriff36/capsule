@@ -111,6 +111,7 @@ import type * as lib_packReconciliation from "../lib/packReconciliation.js";
 import type * as lib_parseSearchQuery from "../lib/parseSearchQuery.js";
 import type * as lib_personAuthPick from "../lib/personAuthPick.js";
 import type * as lib_prepRecipeEvents from "../lib/prepRecipeEvents.js";
+import type * as lib_prepReconciliation from "../lib/prepReconciliation.js";
 import type * as lib_prepTaskQuantity from "../lib/prepTaskQuantity.js";
 import type * as lib_prepWorkReconciliation from "../lib/prepWorkReconciliation.js";
 import type * as lib_proposalAcceptanceRevision from "../lib/proposalAcceptanceRevision.js";
@@ -290,6 +291,7 @@ declare const fullApi: ApiFromModules<{
   "lib/parseSearchQuery": typeof lib_parseSearchQuery;
   "lib/personAuthPick": typeof lib_personAuthPick;
   "lib/prepRecipeEvents": typeof lib_prepRecipeEvents;
+  "lib/prepReconciliation": typeof lib_prepReconciliation;
   "lib/prepTaskQuantity": typeof lib_prepTaskQuantity;
   "lib/prepWorkReconciliation": typeof lib_prepWorkReconciliation;
   "lib/proposalAcceptanceRevision": typeof lib_proposalAcceptanceRevision;

@@ -14,6 +14,7 @@ import { eventStaffingReconciliation } from "./staffingReconciliation";
 import { eventHeadcountReconciliation } from "./headcountReconciliation";
 import { eventPackReconciliation } from "./packReconciliation";
 import { eventDemandReconciliation } from "./demandReconciliation";
+import { eventPrepReconciliation } from "./prepReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -129,6 +130,15 @@ export async function handleManifestEvent(
       },
     );
     await eventDemandReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    await eventPrepReconciliation.run(
       ctx,
       event.entityId as Id<"events">,
       { triggerEventId: String(event.eventId), triggerType: event.type },
