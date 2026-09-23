@@ -24359,7 +24359,7 @@ async function __runIntegrationConnectionAuthorize(ctx: MutationCtx, { docId, pr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt == null))) throw new Error("Guard 0 failed");
@@ -24453,7 +24453,7 @@ export const IntegrationConnection_createViaAuthorize = mutation({
       provider: args.provider,
       scopes: args.scopes
     };
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((__draft.connectedAt == null))) throw new Error("Guard 0 failed");
@@ -24489,7 +24489,7 @@ async function __runIntegrationConnectionDisconnect(ctx: MutationCtx, { docId, r
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -24551,7 +24551,7 @@ async function __runIntegrationConnectionMarkConnected(ctx: MutationCtx, { docId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
@@ -24622,7 +24622,7 @@ async function __runIntegrationConnectionReauthorize(ctx: MutationCtx, { docId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
@@ -24683,7 +24683,7 @@ async function __runIntegrationConnectionRecordFailure(ctx: MutationCtx, { docId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");
@@ -24745,7 +24745,7 @@ async function __runIntegrationConnectionRecordSyncSuccess(ctx: MutationCtx, { d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IntegrationConnection not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IntegrationConnection not found");
-    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read integration connections");
+    if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may see outside-service connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may update integration connections");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Admins may change integration connections");
     if (!((doc.connectedAt != null))) throw new Error("Guard 0 failed");

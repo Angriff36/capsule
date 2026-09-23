@@ -36,4 +36,21 @@ describe("plain words on leftover integrations manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover integrations READ copy free of read-integration jargon", () => {
+    const source = readFileSync(
+      "src/integrations/integration-connection.manifest",
+      "utf8",
+    );
+    // strip // comments so developer notes are not treated as user copy
+    const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Managers may read integration connections");
+    expect(visible).toContain("Managers may see outside-service connections");
+    expectPlain("Managers may see outside-service connections");
+
+    // write/execute leftovers stay for a later slice
+    expect(visible).toContain("Admins may update integration connections");
+    expect(visible).toContain("Admins may change integration connections");
+  });
 });
