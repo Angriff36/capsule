@@ -109,6 +109,7 @@ import type * as lib_operationalEvents from "../lib/operationalEvents.js";
 import type * as lib_operationalTransactions from "../lib/operationalTransactions.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
 import type * as lib_packReconciliation from "../lib/packReconciliation.js";
+import type * as lib_packetReconciliation from "../lib/packetReconciliation.js";
 import type * as lib_parseSearchQuery from "../lib/parseSearchQuery.js";
 import type * as lib_personAuthPick from "../lib/personAuthPick.js";
 import type * as lib_prepRecipeEvents from "../lib/prepRecipeEvents.js";
@@ -291,6 +292,7 @@ declare const fullApi: ApiFromModules<{
   "lib/operationalTransactions": typeof lib_operationalTransactions;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
   "lib/packReconciliation": typeof lib_packReconciliation;
+  "lib/packetReconciliation": typeof lib_packetReconciliation;
   "lib/parseSearchQuery": typeof lib_parseSearchQuery;
   "lib/personAuthPick": typeof lib_personAuthPick;
   "lib/prepRecipeEvents": typeof lib_prepRecipeEvents;
