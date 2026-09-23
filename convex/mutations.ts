@@ -31969,10 +31969,11 @@ async function __runPackListItemSyncContainerServings(ctx: MutationCtx, { docId,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_dishContainer = await __resolveRelation(ctx, "dishContainers", [__auth.tenantId, doc.dishContainerId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_eventDish = await __resolveRelation(ctx, "eventDishes", [__auth.tenantId, doc.eventDishId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may write pack list items through commands");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may execute pack list item commands");
-    const eligible = (((((((((((doc.deletedAt == null) && (doc.followsDishServings === true)) && (__rel_dishContainer != null)) && (__rel_packList != null)) && (__rel_packList.status !== "dispatched")) && (__rel_packList.status !== "cancelled")) && (__rel_packList.event != null)) && (__rel_packList.event.deletedAt == null)) && (__rel_packList.event.stage !== "completed")) && (__rel_packList.event.stage !== "closed_out")) && (__rel_packList.event.stage !== "cancelled"));
+    const eligible = (((((((((doc.deletedAt == null) && (doc.followsDishServings === true)) && (__rel_dishContainer != null)) && (__rel_packList != null)) && (__rel_packList.status !== "dispatched")) && (__rel_packList.status !== "cancelled")) && (__rel_eventDish != null)) && (__rel_eventDish.deletedAt == null)) && (__rel_eventDish.removedAt == null));
     const planned = (((((quantityServings > 0) && (__rel_dishContainer != null)) && (__rel_dishContainer.deletedAt == null)) && (__rel_dishContainer.status === "active")) ? (Math.ceil((quantityServings / __rel_dishContainer.servingsPerContainer)) + __rel_dishContainer.baseQuantity) : 0);
     {
       const __cur = doc.status;

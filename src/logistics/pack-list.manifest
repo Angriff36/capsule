@@ -470,8 +470,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   }
 
   command syncContainerServings(quantityServings: number) {
-    // Catalog edits update active planning, never the recorded completed event.
-    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.packList.event != null and self.packList.event.deletedAt == null and self.packList.event.stage != "completed" and self.packList.event.stage != "closed_out" and self.packList.event.stage != "cancelled"
+    // Active planning only: list not terminal, line still follows, EventDish still live. Event.changeHeadcount already refuses completed/closed_out/cancelled — do not use self.packList.event (generator never loads that hop).
+    compute eligible = self.deletedAt == null and self.followsDishServings == true and self.dishContainer != null and self.packList != null and self.packList.status != "dispatched" and self.packList.status != "cancelled" and self.eventDish != null and self.eventDish.deletedAt == null and self.eventDish.removedAt == null
     compute planned = quantityServings > 0 and self.dishContainer != null and self.dishContainer.deletedAt == null and self.dishContainer.status == "active" ? ceil(quantityServings / self.dishContainer.servingsPerContainer) + self.dishContainer.baseQuantity : 0
     mutate requiredQuantity = eligible ? planned : self.requiredQuantity
     mutate containerServings = eligible ? quantityServings : self.containerServings
