@@ -48,8 +48,8 @@ entity VendorContract mixin TenantScoped, SoftDeletable {
   transition status from "terminated" to []
 
   default policy vendorContractRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor contracts"
-  default policy vendorContractWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor contracts through commands"
-  default policy vendorContractExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor contract commands"
+  default policy vendorContractWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may update vendor contracts"
+  default policy vendorContractExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may change vendor contracts"
 
   command draft(
     vendorId: uuid,
@@ -194,8 +194,8 @@ entity VendorContractPriceTier mixin TenantScoped, SoftDeletable {
   constraint tierUnitPrice: self.unitPrice >= 0 "Unit price cannot be negative"
 
   default policy vendorContractTierRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read contract price tiers"
-  default policy vendorContractTierWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write contract price tiers through commands"
-  default policy vendorContractTierExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute contract price tier commands"
+  default policy vendorContractTierWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may update contract price tiers"
+  default policy vendorContractTierExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may change contract price tiers"
 
   command add(
     contractId: uuid,

@@ -17335,8 +17335,8 @@ async function __runEventIngredientContributionRecord(ctx: MutationCtx, { docId,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventIngredientContribution not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may read event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may write event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may execute event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may update event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((quantity >= 0))) throw new Error("Contribution quantity cannot be negative");
     if (!((servings >= 0))) throw new Error("Contribution servings cannot be negative");
@@ -17546,8 +17546,8 @@ export const EventIngredientContribution_createViaRecord = mutation({
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may read event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may write event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may execute event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may update event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((quantity >= 0))) throw new Error("Contribution quantity cannot be negative");
     if (!((servings >= 0))) throw new Error("Contribution servings cannot be negative");
@@ -17666,8 +17666,8 @@ async function __runEventIngredientContributionRefreshRecipeSync(ctx: MutationCt
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventIngredientContribution not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may read event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may write event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may execute event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may update event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -17707,8 +17707,8 @@ async function __runEventIngredientContributionRetire(ctx: MutationCtx, { docId,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventIngredientContribution not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may read event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may write event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may execute event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may update event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Retire reason is required");
@@ -17821,8 +17821,8 @@ async function __runEventIngredientContributionRetirePreviousUnit(ctx: MutationC
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventIngredientContribution not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may read event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may write event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may execute event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may update event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     const changedUnit = (doc.unit !== currentUnit);
     if (version !== undefined && (doc as any).version !== version) {
@@ -17934,8 +17934,8 @@ async function __runEventIngredientContributionRevise(ctx: MutationCtx, { docId,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventIngredientContribution not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may read event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may write event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may execute event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may update event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((quantity >= 0))) throw new Error("Contribution quantity cannot be negative");
@@ -18051,8 +18051,8 @@ async function __runEventIngredientContributionSupersede(ctx: MutationCtx, { doc
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventIngredientContribution not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may read event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may write event ingredient contributions");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may execute event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may update event ingredient contributions");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory and managers may change event ingredient contributions");
     if (!((doc.recordedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Supersede reason is required");
@@ -24237,8 +24237,8 @@ async function __runIngredientPriceObservationRecord(ctx: MutationCtx, { docId, 
     if (!doc) throw new Error("IngredientPriceObservation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientPriceObservation not found");
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, procurement, and managers may read confirmed ingredient prices");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may record confirmed ingredient prices");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute confirmed ingredient price commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update confirmed ingredient prices");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change confirmed ingredient prices");
     if (!(((doc.observedAt == null) || ((((((((doc.ingredientId === ingredientId) && (doc.vendorId === vendorId)) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorOrderLineId === vendorOrderLineId)) && (doc.receiptQuantity === receiptQuantity)) && (doc.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (doc.unit === unit)) && (doc.unitPrice === unitPrice))))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((receiptQuantity > 0))) throw new Error("Price observation receipt quantity must be positive");
@@ -24324,8 +24324,8 @@ export const IngredientPriceObservation_createViaRecord = mutation({
       vendorOrderLineId: args.vendorOrderLineId
     };
     if (!(((checkRole(user, "kitchenAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, procurement, and managers may read confirmed ingredient prices");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may record confirmed ingredient prices");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute confirmed ingredient price commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update confirmed ingredient prices");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change confirmed ingredient prices");
     if (!(((__draft.observedAt == null) || ((((((((__draft.ingredientId === ingredientId) && (__draft.vendorId === vendorId)) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorOrderLineId === vendorOrderLineId)) && (__draft.receiptQuantity === receiptQuantity)) && (__draft.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (__draft.unit === unit)) && (__draft.unitPrice === unitPrice))))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((receiptQuantity > 0))) throw new Error("Price observation receipt quantity must be positive");
@@ -25606,8 +25606,8 @@ async function __runInventoryLotRecord(ctx: MutationCtx, { docId, supplierLotNum
     if (!doc) throw new Error("InventoryLot not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryLot not found");
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Inventory, procurement, and managers may read receipt lots");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may record receipt lots");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute receipt lot commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update receipt lots");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt lots");
     if (!(((doc.receivedAt == null) || ((((((((((((doc.supplierLotNumber === supplierLotNumber) && (doc.vendorOrderLineId === vendorOrderLineId)) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorId === vendorId)) && (doc.ingredientId === ingredientId)) && (doc.ingredientDemandId === ingredientDemandId)) && (doc.eventId === eventId)) && (doc.locationId === locationId)) && (doc.receiptQuantity === receiptQuantity)) && (doc.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (doc.unit === unit)) && (doc.unitCost === unitCost))))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required for traceability");
@@ -25741,8 +25741,8 @@ export const InventoryLot_createViaRecord = mutation({
       vendorOrderLineId: args.vendorOrderLineId
     };
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Inventory, procurement, and managers may read receipt lots");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may record receipt lots");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute receipt lot commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update receipt lots");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt lots");
     if (!(((__draft.receivedAt == null) || ((((((((((((__draft.supplierLotNumber === supplierLotNumber) && (__draft.vendorOrderLineId === vendorOrderLineId)) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorId === vendorId)) && (__draft.ingredientId === ingredientId)) && (__draft.ingredientDemandId === ingredientDemandId)) && (__draft.eventId === eventId)) && (__draft.locationId === locationId)) && (__draft.receiptQuantity === receiptQuantity)) && (__draft.cumulativeReceivedQuantity === cumulativeReceivedQuantity)) && (__draft.unit === unit)) && (__draft.unitCost === unitCost))))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required for traceability");
@@ -39516,8 +39516,8 @@ async function __runPurchaseNeedAssignToDraft(ctx: MutationCtx, { docId, vendorO
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -39568,8 +39568,8 @@ async function __runPurchaseNeedCancel(ctx: MutationCtx, { docId, reason, versio
     if (!doc) throw new Error("PurchaseNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PurchaseNeed not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!(((doc.status === "open") || (doc.status === "ordered")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "inventoryManageAccess"))) throw new Error("Guard 2 failed");
@@ -39651,8 +39651,8 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
       version: 1
     };
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!(((args.openedAt == null) || ((args.eventId === args.eventId) && (args.ingredientDemandId === args.ingredientDemandId))))) throw new Error("Guard 0 failed");
     if (!((args.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((args.requiredQuantity > 0))) throw new Error("Required quantity must be positive");
@@ -39715,8 +39715,8 @@ async function __runPurchaseNeedMarkDraftOrdered(ctx: MutationCtx, { docId, vers
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -39778,8 +39778,8 @@ async function __runPurchaseNeedMarkFulfilled(ctx: MutationCtx, { docId, version
     if (!doc) throw new Error("PurchaseNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PurchaseNeed not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!((doc.status === "ordered"))) throw new Error("Guard 0 failed");
     if (!((doc.orderedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -39839,8 +39839,8 @@ async function __runPurchaseNeedMarkOrdered(ctx: MutationCtx, { docId, vendorOrd
     if (!doc) throw new Error("PurchaseNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PurchaseNeed not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -39905,8 +39905,8 @@ async function __runPurchaseNeedMoveToWeek(ctx: MutationCtx, { docId, purchasing
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PurchaseNeed not found");
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -39965,8 +39965,8 @@ async function __runPurchaseNeedReleaseCancelledDraft(ctx: MutationCtx, { docId,
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!((doc.status === "cancelled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && ((__rel_vendorOrder.status === "draft") || ((__rel_vendorOrder.status === "cancelled") && (__rel_vendorOrder.submittedAt == null)))))) throw new Error("Guard 2 failed");
@@ -40015,8 +40015,8 @@ async function __runPurchaseNeedReviseRequired(ctx: MutationCtx, { docId, requir
     if (!doc) throw new Error("PurchaseNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PurchaseNeed not found");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!((((doc.status === "open") || (doc.status === "ordered")) || (doc.status === "fulfilled")))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -40095,8 +40095,8 @@ async function __runPurchaseNeedStandDownWithEvent(ctx: MutationCtx, { docId, ve
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
-    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may update purchase needs");
+    if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!(((doc.status === "open") || (doc.status === "ordered")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && (__rel_event.stage === "cancelled")))) throw new Error("Guard 2 failed");
@@ -50190,8 +50190,8 @@ async function __runVendorOnboard(ctx: MutationCtx, { docId, name, email, phone,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendors");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendors through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Vendor name is required");
@@ -50292,8 +50292,8 @@ export const Vendor_createViaOnboard = mutation({
       region: args.region
     };
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendors");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendors through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((__draft.onboardedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Vendor name is required");
@@ -50336,8 +50336,8 @@ async function __runVendorReinstate(ctx: MutationCtx, { docId, version }: any, _
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendors");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendors through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "suspended"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -50400,8 +50400,8 @@ async function __runVendorSuspend(ctx: MutationCtx, { docId, reason, version }: 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendors");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendors through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -50466,8 +50466,8 @@ async function __runVendorTerminate(ctx: MutationCtx, { docId, reason, version }
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendors");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendors through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "active") || (doc.status === "suspended")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -50533,8 +50533,8 @@ async function __runVendorUpdateDetails(ctx: MutationCtx, { docId, name, email, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Vendor not found");
     const doc = await __decryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendors");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendors through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendors");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendors");
     if (!((doc.onboardedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -50606,8 +50606,8 @@ async function __runVendorContactAdd(ctx: MutationCtx, { docId, vendorId, name, 
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendor = __rel_vendor;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contacts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contacts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contact commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -50692,8 +50692,8 @@ export const VendorContact_createViaAdd = mutation({
     };
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, __draft.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contacts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contacts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contact commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -50732,8 +50732,8 @@ async function __runVendorContactRemove(ctx: MutationCtx, { docId, version }: an
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("VendorContact not found");
     const doc = await __decryptDoc(ctx, "VendorContact", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contacts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contacts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contact commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -50780,8 +50780,8 @@ async function __runVendorContactUpdate(ctx: MutationCtx, { docId, name, role, e
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("VendorContact not found");
     const doc = await __decryptDoc(ctx, "VendorContact", ["email","phone"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contacts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contacts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contact commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contacts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contacts");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Contact name is required");
@@ -50837,8 +50837,8 @@ async function __runVendorContractActivate(ctx: MutationCtx, { docId, version }:
     if (!doc) throw new Error("VendorContract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorContract not found");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contracts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contracts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contract commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contracts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contracts");
     if (!((doc.draftedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -50901,8 +50901,8 @@ async function __runVendorContractDraft(ctx: MutationCtx, { docId, vendorId, tit
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendor = __rel_vendor;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contracts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contracts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contract commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contracts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contracts");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -51002,8 +51002,8 @@ export const VendorContract_createViaDraft = mutation({
     };
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, __draft.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contracts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contracts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contract commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contracts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contracts");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendor != null) && (__rel_vendor.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -51046,8 +51046,8 @@ async function __runVendorContractMarkExpired(ctx: MutationCtx, { docId, version
     if (!doc) throw new Error("VendorContract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorContract not found");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contracts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contracts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contract commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contracts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contracts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((doc.endsAt != null) && (doc.endsAt <= Date.now())))) throw new Error("Guard 2 failed");
@@ -51106,8 +51106,8 @@ async function __runVendorContractTerminate(ctx: MutationCtx, { docId, reason, v
     if (!doc) throw new Error("VendorContract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorContract not found");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contracts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contracts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contract commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contracts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contracts");
     if (!(((doc.status === "draft") || (doc.status === "active")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Termination reason is required");
@@ -51168,8 +51168,8 @@ async function __runVendorContractUpdateTerms(ctx: MutationCtx, { docId, title, 
     if (!doc) throw new Error("VendorContract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorContract not found");
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read vendor contracts");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write vendor contracts through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute vendor contract commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update vendor contracts");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change vendor contracts");
     if (!((doc.draftedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -51236,8 +51236,8 @@ async function __runVendorContractPriceTierAdd(ctx: MutationCtx, { docId, contra
     const __rel_contract = await __resolveRelation(ctx, "vendorContracts", [__auth.tenantId, doc.contractId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).contract = __rel_contract;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read contract price tiers");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write contract price tiers through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute contract price tier commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update contract price tiers");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change contract price tiers");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_contract != null) && (__rel_contract.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -51324,8 +51324,8 @@ export const VendorContractPriceTier_createViaAdd = mutation({
     };
     const __rel_contract = await __resolveRelation(ctx, "vendorContracts", [__auth.tenantId, __draft.contractId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read contract price tiers");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write contract price tiers through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute contract price tier commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update contract price tiers");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change contract price tiers");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_contract != null) && (__rel_contract.deletedAt == null)))) throw new Error("Guard 2 failed");
@@ -51367,8 +51367,8 @@ async function __runVendorContractPriceTierRemove(ctx: MutationCtx, { docId, ver
     const __rel_contract = await __resolveRelation(ctx, "vendorContracts", [__auth.tenantId, doc.contractId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).contract = __rel_contract;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read contract price tiers");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write contract price tiers through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute contract price tier commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update contract price tiers");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change contract price tiers");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_contract != null) && (__rel_contract.status === "draft")))) throw new Error("Guard 2 failed");
@@ -51416,8 +51416,8 @@ async function __runVendorContractPriceTierUpdate(ctx: MutationCtx, { docId, ite
     const __rel_contract = await __resolveRelation(ctx, "vendorContracts", [__auth.tenantId, doc.contractId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).contract = __rel_contract;
     if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may read contract price tiers");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may write contract price tiers through commands");
-    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may execute contract price tier commands");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may update contract price tiers");
+    if (!(checkRole(user, "procurementAccess"))) throw new Error("Procurement staff may change contract price tiers");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_contract != null) && (__rel_contract.status === "draft")))) throw new Error("Guard 2 failed");
@@ -51476,8 +51476,8 @@ async function __runVendorOrderApprove(ctx: MutationCtx, { docId, version }: any
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.status === "pending_approval"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 2 failed");
@@ -51552,8 +51552,8 @@ async function __runVendorOrderCancel(ctx: MutationCtx, { docId, reason, version
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((((((doc.status === "draft") || (doc.status === "pending_approval")) || (doc.status === "submitted")) || (doc.status === "confirmed")) || (doc.status === "partially_received")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "inventoryManageAccess") || (((doc.status === "draft") || (doc.status === "pending_approval")) && checkRole(user, "procurementAccess"))))) throw new Error("Guard 2 failed");
@@ -51622,8 +51622,8 @@ async function __runVendorOrderConfirm(ctx: MutationCtx, { docId, version }: any
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.status === "submitted"))) throw new Error("Guard 0 failed");
     if (!((doc.submittedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -51685,8 +51685,8 @@ async function __runVendorOrderEnsureWeeklyDraft(ctx: MutationCtx, { docId, vend
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendor = __rel_vendor;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((((__rel_vendor != null) && (__rel_vendor.status === "active")) && (__rel_vendor.onboardedAt != null)))) throw new Error("Guard 2 failed");
@@ -51789,8 +51789,8 @@ async function __runVendorOrderMarkPartiallyReceived(ctx: MutationCtx, { docId, 
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.status === "confirmed"))) throw new Error("Guard 0 failed");
     if (!((doc.confirmedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -51849,8 +51849,8 @@ async function __runVendorOrderMarkReceived(ctx: MutationCtx, { docId, version }
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!(((doc.status === "confirmed") || (doc.status === "partially_received")))) throw new Error("Guard 0 failed");
     if (!((doc.confirmedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -51912,8 +51912,8 @@ async function __runVendorOrderOpen(ctx: MutationCtx, { docId, vendorId, eventId
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendor = __rel_vendor;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52005,8 +52005,8 @@ export const VendorOrder_createViaOpen = mutation({
     };
     const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, __draft.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52046,8 +52046,8 @@ async function __runVendorOrderRequestChanges(ctx: MutationCtx, { docId, notes, 
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.status === "pending_approval"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 2 failed");
@@ -52117,8 +52117,8 @@ async function __runVendorOrderRetireEmptyDraft(ctx: MutationCtx, { docId, versi
     (doc as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", docId)).collect();
     (doc as any).lines = (doc as any).lines.filter((row: any) => row.tenantId === __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!(((doc.status === "draft") && (doc.deletedAt == null)))) throw new Error("Guard 0 failed");
     if (!((doc.sourceRangeStart != null))) throw new Error("Guard 1 failed");
     if (!((((doc.lines) ?? []).filter((line: Doc<"vendorOrderLines">) => (((line.deletedAt == null) && (line.status !== "cancelled")))).length === 0))) throw new Error("Guard 2 failed");
@@ -52187,8 +52187,8 @@ async function __runVendorOrderSubmit(ctx: MutationCtx, { docId, version }: any,
     const __rel_purchasingConfig = await __resolveRelation(ctx, "weeklyPurchasingConfigs", [__auth.tenantId], ["tenantId"], "tenantId", __auth.tenantId);
     ((doc as any) as any).purchasingConfig = __rel_purchasingConfig;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.openedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52261,8 +52261,8 @@ async function __runVendorOrderSubmitForApproval(ctx: MutationCtx, { docId, vers
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.openedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52327,8 +52327,8 @@ async function __runVendorOrderSyncLineTotals(ctx: MutationCtx, { docId, lineSub
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "draft") || (doc.status === "submitted")))) throw new Error("Guard 1 failed");
     if (!((lineSubtotal >= 0))) throw new Error("Order money amounts cannot be negative");
@@ -52378,8 +52378,8 @@ async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, subtotal,
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor orders");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor orders");
     if (!((doc.openedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "draft") || (doc.status === "submitted")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52438,8 +52438,8 @@ async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrde
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     ((doc as any) as any).ingredient = __rel_ingredient;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52561,8 +52561,8 @@ export const VendorOrderLine_createViaAddLine = mutation({
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, __draft.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52620,8 +52620,8 @@ async function __runVendorOrderLineCancelLine(ctx: MutationCtx, { docId, reason,
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "added") || (doc.status === "receiving")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -52688,8 +52688,8 @@ async function __runVendorOrderLineCommitSupply(ctx: MutationCtx, { docId, purch
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((((__rel_vendorOrder != null) && (__rel_vendorOrder.status !== "draft")) && (__rel_vendorOrder.status !== "cancelled")))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -52735,8 +52735,8 @@ async function __runVendorOrderLineEnsureWeeklyLine(ctx: MutationCtx, { docId, v
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     ((doc as any) as any).ingredient = __rel_ingredient;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 1 failed");
     if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 2 failed");
@@ -52858,8 +52858,8 @@ async function __runVendorOrderLineReconcileDraftRequirement(ctx: MutationCtx, {
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!(((doc.addedAt != null) && (doc.status === "added")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
@@ -52927,8 +52927,8 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "added") || (doc.status === "receiving")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -53059,8 +53059,8 @@ async function __runVendorOrderLineReleaseSupply(ctx: MutationCtx, { docId, vers
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrderLine not found");
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -53103,8 +53103,8 @@ async function __runVendorOrderLineRetireEmptyDraft(ctx: MutationCtx, { docId, v
     (doc as any).demandLinks = await ctx.db.query("vendorOrderLineDemands").withIndex("by_vendorOrderLineId", (q: any) => q.eq("vendorOrderLineId", docId)).collect();
     (doc as any).demandLinks = (doc as any).demandLinks.filter((row: any) => row.tenantId === __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!(((doc.status === "added") && (doc.deletedAt == null)))) throw new Error("Guard 0 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 1 failed");
     if (!((((doc.quantityIsManual === false) && (doc.plannedQuantity === 0)) && (doc.orderedQuantity === 0)))) throw new Error("Guard 2 failed");
@@ -53175,8 +53175,8 @@ async function __runVendorOrderLineReviseQuantity(ctx: MutationCtx, { docId, ord
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read vendor order lines");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor order lines through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order line commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update vendor order lines");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change vendor order lines");
     if (!((doc.status === "added"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
@@ -53244,8 +53244,8 @@ async function __runVendorOrderLineDemandLink(ctx: MutationCtx, { docId, vendorO
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     ((doc as any) as any).ingredientDemand = __rel_ingredientDemand;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read order demand links");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write order demand links through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute order demand link commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update order demand links");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change order demand links");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__rel_vendorOrderLine != null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
@@ -53332,8 +53332,8 @@ export const VendorOrderLineDemand_createViaLink = mutation({
     const __rel_ingredientDemand = await __resolveRelation(ctx, "ingredientDemands", [__auth.tenantId, __draft.ingredientDemandId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, __draft.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read order demand links");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write order demand links through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute order demand link commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update order demand links");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change order demand links");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__rel_vendorOrderLine != null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
@@ -53376,8 +53376,8 @@ async function __runVendorOrderLineDemandRetire(ctx: MutationCtx, { docId, reaso
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read order demand links");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write order demand links through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute order demand link commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update order demand links");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change order demand links");
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
@@ -53428,8 +53428,8 @@ async function __runVendorOrderLineDemandRevise(ctx: MutationCtx, { docId, contr
     const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vendorOrder = __rel_vendorOrder;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read order demand links");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write order demand links through commands");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute order demand link commands");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update order demand links");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change order demand links");
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")))) throw new Error("Guard 2 failed");
@@ -55625,8 +55625,8 @@ async function __runWeeklyPurchasingConfigConfigure(ctx: MutationCtx, { docId, d
     const __rel_defaultVendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.defaultVendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).defaultVendor = __rel_defaultVendor;
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change weekly purchasing config");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((__rel_defaultVendor != null) && (__rel_defaultVendor.status === "active")))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -55682,8 +55682,8 @@ export const WeeklyPurchasingConfig_createViaConfigure = mutation({
     };
     const __rel_defaultVendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, __draft.defaultVendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change weekly purchasing config");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(((__rel_defaultVendor != null) && (__rel_defaultVendor.status === "active")))) throw new Error("Guard 1 failed");
     const doc: Record<string, any> = {
@@ -55708,8 +55708,8 @@ async function __runWeeklyPurchasingConfigRouteNeed(ctx: MutationCtx, { docId, p
     if (!doc) throw new Error("WeeklyPurchasingConfig not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("WeeklyPurchasingConfig not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change weekly purchasing config");
     if (!((doc.configuredAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
@@ -55789,8 +55789,8 @@ async function __runWeeklyPurchasingConfigSetOrderApprovalThreshold(ctx: Mutatio
     if (!doc) throw new Error("WeeklyPurchasingConfig not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("WeeklyPurchasingConfig not found");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may read weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write weekly purchasing config");
-    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update weekly purchasing config");
+    if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change weekly purchasing config");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!(checkRole(user, "manageAccess"))) throw new Error("Guard 1 failed");
     if (!(((amount == null) || (amount >= 0)))) throw new Error("Approval threshold cannot be negative");

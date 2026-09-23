@@ -91,8 +91,8 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   // manageAccess: Event.approve reaction chain ensures the weekly DRAFT.
   // procurementAccess: day-to-day purchasing. Submit stays a buyer action.
   default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor orders"
-  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor orders through commands"
-  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order commands"
+  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update vendor orders"
+  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change vendor orders"
 
   command open(
     vendorId: uuid,
@@ -473,8 +473,8 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
 
   default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor order lines"
-  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor order lines through commands"
-  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order line commands"
+  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update vendor order lines"
+  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change vendor order lines"
 
   command addLine(
     vendorOrderId: uuid,
@@ -791,8 +791,8 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   constraint inventoryLotCostNonnegative: self.unitCost >= 0 "Inventory lot unit cost cannot be negative"
 
   default policy inventoryLotRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may read receipt lots"
-  default policy inventoryLotWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may record receipt lots"
-  default policy inventoryLotExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute receipt lot commands"
+  default policy inventoryLotWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update receipt lots"
+  default policy inventoryLotExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change receipt lots"
 
   command record(
     supplierLotNumber: string,
@@ -889,8 +889,8 @@ entity IngredientPriceObservation mixin TenantScoped, SoftDeletable {
   constraint observationPriceNonnegative: self.unitPrice >= 0 "Price observation unit price cannot be negative"
 
   default policy ingredientPriceObservationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Kitchen, procurement, and managers may read confirmed ingredient prices"
-  default policy ingredientPriceObservationWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may record confirmed ingredient prices"
-  default policy ingredientPriceObservationExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute confirmed ingredient price commands"
+  default policy ingredientPriceObservationWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update confirmed ingredient prices"
+  default policy ingredientPriceObservationExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change confirmed ingredient prices"
 
   command record(
     ingredientId: uuid,
@@ -946,8 +946,8 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity >= 0 "Demand link contribution cannot be negative"
 
   default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read order demand links"
-  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write order demand links through commands"
-  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute order demand link commands"
+  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update order demand links"
+  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change order demand links"
 
   command link(
     vendorOrderLineId: uuid,
