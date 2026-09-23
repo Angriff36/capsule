@@ -18,6 +18,7 @@ import { eventPrepReconciliation } from "./prepReconciliation";
 import { eventHeadcountStaffingReconciliation } from "./headcountStaffingReconciliation";
 import { eventProposalReconciliation } from "./proposalReconciliation";
 import { eventPacketReconciliation } from "./packetReconciliation";
+import { eventRecipeReconciliation } from "./recipeReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -181,6 +182,22 @@ export async function handleManifestEvent(
       {
         previousHeadcount: Number(event.payload.previousHeadcount),
         newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
+    return;
+  }
+  if (event.entity === "ComponentIngredient" && event.type === "ComponentIngredientQuantityAdjusted") {
+    // Recipe line edit: declared fan-outs already re-recorded contributions
+    // and synced demand. This records one §8.2 recipe receipt per live Event.
+    await eventRecipeReconciliation.run(
+      ctx,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        componentId: event.payload.componentId as Id<"components">,
+        componentIngredientId: String(event.entityId),
+        ingredientId: String(event.payload.ingredientId),
+        quantity: Number(event.payload.quantity),
+        unit: String(event.payload.unit),
       },
     );
     return;
