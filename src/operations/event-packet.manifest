@@ -20,8 +20,8 @@ entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
   constraint packetArtifactSize: self.byteSize >= 0 "Source byte size cannot be negative"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetArtifactRead read: roleAllows(user.role, "eventPacketSeamOnly") "Source bytes and private evidence require the scoped packet seam"
-  default policy packetArtifactWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Only the scoped packet transaction writes source records"
-  default policy packetArtifactExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Packet records have no direct generated commands"
+  default policy packetArtifactWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the source files"
+  default policy packetArtifactExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet files"
   store EventPacketArtifact in durable
 }
 
@@ -36,7 +36,7 @@ entity EventPacketIssue mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetIssueRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private issue evidence is projected through the packet seam"
   default policy packetIssueWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Reconciliation owns issue lifecycle"
-  default policy packetIssueExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Packet issues have no direct generated commands"
+  default policy packetIssueExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet issues"
   store EventPacketIssue in durable
 }
 
@@ -55,7 +55,7 @@ entity EventPacketResolution mixin TenantScoped {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetResolutionRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private approvals remain behind manager review"
   default policy packetResolutionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Authenticated transactional decisions are immutable"
-  default policy packetResolutionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Decisions have no direct generated commands"
+  default policy packetResolutionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet decisions"
   store EventPacketResolution in durable
 }
 
@@ -74,6 +74,6 @@ entity EventPacketRevision mixin TenantScoped {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetRevisionRead read: roleAllows(user.role, "eventPacketSeamOnly") "PDF and source snapshots need scoped manager access"
   default policy packetRevisionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Only exact-current immutable prints are recorded"
-  default policy packetRevisionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Print revisions have no direct generated commands"
+  default policy packetRevisionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet prints"
   store EventPacketRevision in durable
 }
