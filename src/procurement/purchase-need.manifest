@@ -72,14 +72,15 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     optional purchasingWeekStart: datetime,
     optional preferredVendorId: uuid
   ) {
-    guard self.openedAt == null
+    // Idempotent create: EventApproved may re-run; unique demand key still binds.
+    guard self.openedAt == null or (self.eventId == eventId and self.ingredientDemandId == ingredientDemandId)
     guard self.deletedAt == null
     constraint createNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
     // Full event requirement — weekly line applies on-hand once across consolidated needs.
-    mutate requiredQuantity = requiredQuantity
-    mutate purchasingWeekStart = purchasingWeekStart
-    mutate preferredVendorId = preferredVendorId
-    mutate openedAt = now()
+    mutate requiredQuantity = self.openedAt != null ? self.requiredQuantity : requiredQuantity
+    mutate purchasingWeekStart = self.openedAt != null ? self.purchasingWeekStart : purchasingWeekStart
+    mutate preferredVendorId = self.openedAt != null ? self.preferredVendorId : preferredVendorId
+    mutate openedAt = self.openedAt != null ? self.openedAt : now()
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
       tenantId: self.tenantId

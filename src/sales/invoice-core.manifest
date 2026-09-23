@@ -124,7 +124,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     optional currencyCode: string,
     optional exchangeRate: decimal(18, 8)
   ) {
-    guard self.issuedAt == null
+    // Idempotent issue: EventApproved match may re-run; do not fail or remint.
+    guard self.issuedAt == null or self.eventId == eventId
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.client != null
@@ -138,34 +139,35 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     compute normalizedCurrencyCode = currencyCode != null ? toUpperCase(currencyCode) : null
     compute resolvedExchangeRate = exchangeRate != null ? exchangeRate : 1.0
     compute resolvedInvoiceNumber = invoiceNumber != null ? invoiceNumber : "INV-" + (invoiceSequence + 1)
+    compute alreadyIssued = self.issuedAt != null
     mutate clientId = clientId
     mutate eventId = eventId != null ? eventId : self.eventId
-    mutate invoiceNumber = resolvedInvoiceNumber
-    mutate subtotal = subtotal
-    mutate taxAmount = taxAmount
-    mutate discountAmount = discountAmount
-    mutate total = total
-    mutate amountPaid = 0
-    mutate amountDue = total
-    mutate amountCredited = 0
-    mutate creditMemoAmount = 0
-    mutate lineItems = lineItems != null ? lineItems : []
-    mutate taxBreakdown = taxBreakdown != null ? taxBreakdown : []
-    mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : 30
-    mutate dueDate = dueDate
-    mutate notes = notes
-    mutate currencyCode = normalizedCurrencyCode
-    mutate exchangeRate = resolvedExchangeRate
-    mutate issuedAt = now()
+    mutate invoiceNumber = alreadyIssued ? self.invoiceNumber : resolvedInvoiceNumber
+    mutate subtotal = alreadyIssued ? self.subtotal : subtotal
+    mutate taxAmount = alreadyIssued ? self.taxAmount : taxAmount
+    mutate discountAmount = alreadyIssued ? self.discountAmount : discountAmount
+    mutate total = alreadyIssued ? self.total : total
+    mutate amountPaid = alreadyIssued ? self.amountPaid : 0
+    mutate amountDue = alreadyIssued ? self.amountDue : total
+    mutate amountCredited = alreadyIssued ? self.amountCredited : 0
+    mutate creditMemoAmount = alreadyIssued ? self.creditMemoAmount : 0
+    mutate lineItems = alreadyIssued ? self.lineItems : (lineItems != null ? lineItems : [])
+    mutate taxBreakdown = alreadyIssued ? self.taxBreakdown : (taxBreakdown != null ? taxBreakdown : [])
+    mutate paymentTermsDays = alreadyIssued ? self.paymentTermsDays : (paymentTermsDays != null ? paymentTermsDays : 30)
+    mutate dueDate = alreadyIssued ? self.dueDate : dueDate
+    mutate notes = alreadyIssued ? self.notes : notes
+    mutate currencyCode = alreadyIssued ? self.currencyCode : normalizedCurrencyCode
+    mutate exchangeRate = alreadyIssued ? self.exchangeRate : resolvedExchangeRate
+    mutate issuedAt = alreadyIssued ? self.issuedAt : now()
     emit InvoiceIssued {
       invoiceId: self.id
       tenantId: self.tenantId
       clientId: clientId
       eventId: eventId != null ? eventId : self.eventId
-      invoiceNumber: resolvedInvoiceNumber
-      autoNumbered: invoiceNumber == null
-      total: total
-      amountDue: total
+      invoiceNumber: alreadyIssued ? self.invoiceNumber : resolvedInvoiceNumber
+      autoNumbered: alreadyIssued ? false : (invoiceNumber == null)
+      total: alreadyIssued ? self.total : total
+      amountDue: alreadyIssued ? self.amountDue : total
       currencyCode: normalizedCurrencyCode
       exchangeRate: resolvedExchangeRate
     }

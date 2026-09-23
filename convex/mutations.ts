@@ -26283,7 +26283,7 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
-    if (!((doc.issuedAt == null))) throw new Error("Guard 0 failed");
+    if (!(((doc.issuedAt == null) || (doc.eventId === eventId)))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
@@ -26297,35 +26297,36 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     const normalizedCurrencyCode = ((currencyCode != null) ? (currencyCode).toUpperCase() : null);
     const resolvedExchangeRate = ((exchangeRate != null) ? exchangeRate : 1);
     const resolvedInvoiceNumber = ((invoiceNumber != null) ? invoiceNumber : ("INV-" + (invoiceSequence + 1)));
+    const alreadyIssued = (doc.issuedAt != null);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       clientId: clientId,
       eventId: ((eventId != null) ? eventId : doc.eventId),
-      invoiceNumber: resolvedInvoiceNumber,
-      subtotal: subtotal,
-      taxAmount: taxAmount,
-      discountAmount: discountAmount,
-      total: total,
-      amountPaid: 0,
-      amountDue: total,
-      amountCredited: 0,
-      creditMemoAmount: 0,
-      lineItems: ((lineItems != null) ? lineItems : []),
-      taxBreakdown: ((taxBreakdown != null) ? taxBreakdown : []),
-      paymentTermsDays: ((paymentTermsDays != null) ? paymentTermsDays : 30),
-      dueDate: dueDate,
-      notes: notes,
-      currencyCode: normalizedCurrencyCode,
-      exchangeRate: resolvedExchangeRate,
-      issuedAt: Date.now(),
+      invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber),
+      subtotal: (alreadyIssued ? doc.subtotal : subtotal),
+      taxAmount: (alreadyIssued ? doc.taxAmount : taxAmount),
+      discountAmount: (alreadyIssued ? doc.discountAmount : discountAmount),
+      total: (alreadyIssued ? doc.total : total),
+      amountPaid: (alreadyIssued ? doc.amountPaid : 0),
+      amountDue: (alreadyIssued ? doc.amountDue : total),
+      amountCredited: (alreadyIssued ? doc.amountCredited : 0),
+      creditMemoAmount: (alreadyIssued ? doc.creditMemoAmount : 0),
+      lineItems: (alreadyIssued ? doc.lineItems : ((lineItems != null) ? lineItems : [])),
+      taxBreakdown: (alreadyIssued ? doc.taxBreakdown : ((taxBreakdown != null) ? taxBreakdown : [])),
+      paymentTermsDays: (alreadyIssued ? doc.paymentTermsDays : ((paymentTermsDays != null) ? paymentTermsDays : 30)),
+      dueDate: (alreadyIssued ? doc.dueDate : dueDate),
+      notes: (alreadyIssued ? doc.notes : notes),
+      currencyCode: (alreadyIssued ? doc.currencyCode : normalizedCurrencyCode),
+      exchangeRate: (alreadyIssued ? doc.exchangeRate : resolvedExchangeRate),
+      issuedAt: (alreadyIssued ? doc.issuedAt : Date.now()),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: resolvedInvoiceNumber, autoNumbered: (invoiceNumber == null), total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
-    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: resolvedInvoiceNumber, autoNumbered: (invoiceNumber == null), total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: (alreadyIssued ? __after.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? __after.total : total), amountDue: (alreadyIssued ? __after.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
+    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: __after.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : __after.eventId), invoiceNumber: (alreadyIssued ? __after.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? __after.total : total), amountDue: (alreadyIssued ? __after.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     return { ...doc, ...updates };
@@ -26416,7 +26417,7 @@ export const Invoice_createViaIssue = mutation({
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
-    if (!((__draft.issuedAt == null))) throw new Error("Guard 0 failed");
+    if (!(((__draft.issuedAt == null) || (__draft.eventId === eventId)))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((__rel_client != null))) throw new Error("Guard 3 failed");
@@ -26434,28 +26435,29 @@ export const Invoice_createViaIssue = mutation({
     const normalizedCurrencyCode = ((currencyCode != null) ? (currencyCode).toUpperCase() : null);
     const resolvedExchangeRate = ((exchangeRate != null) ? exchangeRate : 1);
     const resolvedInvoiceNumber = ((invoiceNumber != null) ? invoiceNumber : ("INV-" + (invoiceSequence + 1)));
+    const alreadyIssued = (doc.issuedAt != null);
     doc.clientId = clientId;
     doc.eventId = ((eventId != null) ? eventId : doc.eventId);
-    doc.invoiceNumber = resolvedInvoiceNumber;
-    doc.subtotal = subtotal;
-    doc.taxAmount = taxAmount;
-    doc.discountAmount = discountAmount;
-    doc.total = total;
-    doc.amountPaid = 0;
-    doc.amountDue = total;
-    doc.amountCredited = 0;
-    doc.creditMemoAmount = 0;
-    doc.lineItems = ((lineItems != null) ? lineItems : []);
-    doc.taxBreakdown = ((taxBreakdown != null) ? taxBreakdown : []);
-    doc.paymentTermsDays = ((paymentTermsDays != null) ? paymentTermsDays : 30);
-    doc.dueDate = dueDate;
-    doc.notes = notes;
-    doc.currencyCode = normalizedCurrencyCode;
-    doc.exchangeRate = resolvedExchangeRate;
-    doc.issuedAt = Date.now();
+    doc.invoiceNumber = (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber);
+    doc.subtotal = (alreadyIssued ? doc.subtotal : subtotal);
+    doc.taxAmount = (alreadyIssued ? doc.taxAmount : taxAmount);
+    doc.discountAmount = (alreadyIssued ? doc.discountAmount : discountAmount);
+    doc.total = (alreadyIssued ? doc.total : total);
+    doc.amountPaid = (alreadyIssued ? doc.amountPaid : 0);
+    doc.amountDue = (alreadyIssued ? doc.amountDue : total);
+    doc.amountCredited = (alreadyIssued ? doc.amountCredited : 0);
+    doc.creditMemoAmount = (alreadyIssued ? doc.creditMemoAmount : 0);
+    doc.lineItems = (alreadyIssued ? doc.lineItems : ((lineItems != null) ? lineItems : []));
+    doc.taxBreakdown = (alreadyIssued ? doc.taxBreakdown : ((taxBreakdown != null) ? taxBreakdown : []));
+    doc.paymentTermsDays = (alreadyIssued ? doc.paymentTermsDays : ((paymentTermsDays != null) ? paymentTermsDays : 30));
+    doc.dueDate = (alreadyIssued ? doc.dueDate : dueDate);
+    doc.notes = (alreadyIssued ? doc.notes : notes);
+    doc.currencyCode = (alreadyIssued ? doc.currencyCode : normalizedCurrencyCode);
+    doc.exchangeRate = (alreadyIssued ? doc.exchangeRate : resolvedExchangeRate);
+    doc.issuedAt = (alreadyIssued ? doc.issuedAt : Date.now());
     const docId = await ctx.db.insert("invoices", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: resolvedInvoiceNumber, autoNumbered: (invoiceNumber == null), total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
-    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: resolvedInvoiceNumber, autoNumbered: (invoiceNumber == null), total: total, amountDue: total, currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? doc.total : total), amountDue: (alreadyIssued ? doc.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate, _subject: { entity: "Invoice", command: "issue", id: docId } };
+    const __manifestEvent0 = { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: clientId, eventId: ((eventId != null) ? eventId : doc.eventId), invoiceNumber: (alreadyIssued ? doc.invoiceNumber : resolvedInvoiceNumber), autoNumbered: (alreadyIssued ? false : (invoiceNumber == null)), total: (alreadyIssued ? doc.total : total), amountDue: (alreadyIssued ? doc.amountDue : total), currencyCode: normalizedCurrencyCode, exchangeRate: resolvedExchangeRate }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "issue", emitIndex: 0 });
     const __result = { docId };
@@ -39641,16 +39643,16 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
       cancellationReason: args.cancellationReason,
       createdAt: args.createdAt,
       updatedAt: args.updatedAt,
-      requiredQuantity: args.requiredQuantity,
-      purchasingWeekStart: args.purchasingWeekStart,
-      preferredVendorId: args.preferredVendorId,
-      openedAt: Date.now(),
+      requiredQuantity: ((args.openedAt != null) ? args.requiredQuantity : args.requiredQuantity),
+      purchasingWeekStart: ((args.openedAt != null) ? args.purchasingWeekStart : args.purchasingWeekStart),
+      preferredVendorId: ((args.openedAt != null) ? args.preferredVendorId : args.preferredVendorId),
+      openedAt: ((args.openedAt != null) ? args.openedAt : Date.now()),
       version: 1
     };
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may read purchase needs");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may write purchase needs through commands");
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may execute purchase need commands");
-    if (!((args.openedAt == null))) throw new Error("Guard 0 failed");
+    if (!(((args.openedAt == null) || ((args.eventId === args.eventId) && (args.ingredientDemandId === args.ingredientDemandId))))) throw new Error("Guard 0 failed");
     if (!((args.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((args.requiredQuantity > 0))) throw new Error("Required quantity must be positive");
     const _id = await ctx.db.insert("purchaseNeeds", doc as any);
