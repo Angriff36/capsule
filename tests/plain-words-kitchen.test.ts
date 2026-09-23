@@ -254,4 +254,24 @@ describe("plain words on kitchen screens", () => {
     expectPlain("Prep board");
     expectPlain("Open prep board");
   });
+
+  it("keeps leftover kitchen shortage banner copy free of mapped jargon", () => {
+    const banner = readFileSync(
+      "src/features/kitchen/EventMenuStockShortageBanner.tsx",
+      "utf8",
+    );
+
+    expect(banner).not.toContain("Mapped alternatives");
+    expect(banner).not.toContain("Component demand could not be fully held");
+    expect(banner).not.toContain("source component has not been changed");
+
+    const visible = banner.replace(/\s+/g, " ");
+    expect(visible).toContain("Not enough of this ingredient is on hold");
+    expect(visible).toContain("Saved substitutes are ranked for the kitchen");
+    expect(visible).toContain("the original ingredient is unchanged");
+
+    expectPlain(
+      "Not enough of this ingredient is on hold. Saved substitutes are ranked for the kitchen; the original ingredient is unchanged.",
+    );
+  });
 });

@@ -38,8 +38,8 @@ export function EventMenuStockShortageBanner({
             Stock shortages · substitute options
           </p>
           <p className="mt-1 text-ink-2">
-            Component demand could not be fully held. Mapped alternatives are
-            ranked for the kitchen; the source component has not been changed.
+            Not enough of this ingredient is on hold. Saved substitutes are
+            ranked for the kitchen; the original ingredient is unchanged.
           </p>
           <ul className="mt-3 space-y-3 text-ink-2">
             {shortages.map((row) => {
