@@ -116,9 +116,9 @@ export function QuickFileImport() {
           </p>
           {totalPending > 0 || totalErrors > 0 ? (
             <p className="mt-1 text-xs text-ink-3">
-              Records that need review are in the{" "}
+              Items that need review are in the{" "}
               <Link to="/admin/reconcile" className="text-brand">
-                reconcile queue
+                leftover match list
               </Link>
               .
             </p>

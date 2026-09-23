@@ -63,7 +63,7 @@ const DISPOSITION_LABELS: Record<string, string> = {
 // Stage transitions allowed from each status
 const STAGE_TRANSITIONS: Record<string, { next: string; label: string }[]> = {
   started: [
-    { next: "parsing", label: "Record Parse" },
+    { next: "parsing", label: "Count items" },
     { next: "failed", label: "Fail" },
   ],
   parsing: [
@@ -189,7 +189,7 @@ export function ImportRunDetailPage() {
     try {
       JSON.parse(recordCountsInput);
     } catch {
-      setError("Invalid JSON format for record counts");
+      setError("Those counts aren't valid. Check the numbers and try again.");
       return;
     }
     void run("recordParse", async () => {
@@ -230,7 +230,7 @@ export function ImportRunDetailPage() {
     try {
       JSON.parse(finalCountsInput);
     } catch {
-      setError("Invalid JSON format for record counts");
+      setError("Those counts aren't valid. Check the numbers and try again.");
       return;
     }
     void run("approveReview", async () => {
@@ -314,7 +314,7 @@ export function ImportRunDetailPage() {
     const confirmed = await prompt.askConfirm({
       title: "Revert Import",
       description:
-        "The records this import linked are marked superseded. Imported venues and other entities stay in place — deactivate them yourself if needed.",
+        "The items this import linked are marked as replaced. Imported venues and other items stay in place — deactivate them yourself if needed.",
       confirmLabel: "Revert import",
       tone: "danger",
     });
@@ -487,7 +487,7 @@ export function ImportRunDetailPage() {
         <div className="card mt-4">
           <div className="border-b border-line px-3">
             <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-              Record Parse Counts
+              Item counts
             </h2>
           </div>
           <div className="p-4">
@@ -495,7 +495,7 @@ export function ImportRunDetailPage() {
               htmlFor="recordCounts"
               className="block text-xs font-medium text-ink mb-2"
             >
-              Record Counts (JSON)
+              Item counts
             </label>
             <textarea
               id="recordCounts"
@@ -506,7 +506,7 @@ export function ImportRunDetailPage() {
               placeholder='{"events": 100, "contacts": 50}'
             />
             <p className="text-2xs text-ink-2 mt-2">
-              Enter the count of each record type parsed from the source data.
+              Enter how many of each kind of item were found in the file.
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -537,7 +537,7 @@ export function ImportRunDetailPage() {
         <div className="card mt-4">
           <div className="border-b border-line px-3">
             <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-              Confirm Final Record Counts
+              Confirm final item counts
             </h2>
           </div>
           <div className="p-4">
@@ -545,7 +545,7 @@ export function ImportRunDetailPage() {
               htmlFor="finalRecordCounts"
               className="block text-xs font-medium text-ink mb-2"
             >
-              Final record counts (JSON)
+              Final item counts
             </label>
             <textarea
               id="finalRecordCounts"
@@ -690,11 +690,11 @@ export function ImportRunDetailPage() {
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink">Total Records</dt>
+              <dt className="font-medium text-ink">Total items</dt>
               <dd className="mt-1 text-ink-2">{totalRecords}</dd>
             </div>
             <div>
-              <dt className="font-medium text-ink">Unaccounted Records</dt>
+              <dt className="font-medium text-ink">Unaccounted items</dt>
               <dd
                 className={
                   unaccountedRecords > 0
@@ -799,7 +799,7 @@ export function ImportRunDetailPage() {
         <div className="card mt-4">
           <div className="border-b border-line px-3">
             <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-              Record Counts by Type
+              Item counts by type
             </h2>
           </div>
           <div className="p-4">
@@ -850,9 +850,9 @@ export function ImportRunDetailPage() {
               </p>
             )}
             <p className="mt-3 text-xs text-ink-3">
-              Dispositions describe the source archive, not operational records
-              — unsupported, duplicate and linked-reference content stays listed
-              here after commit.
+              Dispositions describe the source archive, not live kitchen or
+              office items — unsupported, duplicate and linked-reference content
+              stays listed here after commit.
             </p>
           </div>
         </div>
@@ -888,7 +888,7 @@ export function ImportRunDetailPage() {
           <h3 className="font-medium text-xs mb-2">Moving an import forward</h3>
           <ul className="text-xs text-ink-2 space-y-1">
             <li>
-              • <strong>Record Parse</strong>: After the file is read, enter how
+              • <strong>Count items</strong>: After the file is read, enter how
               many rows were found to move on to checking
             </li>
             <li>
@@ -901,9 +901,9 @@ export function ImportRunDetailPage() {
             </li>
             <li>
               • <strong>Approve &amp; Commit</strong>: Confirm the counts, then
-              paste rows from your old system to create the real records —
-              venues, client accounts, events, leads, payment references, menu
-              dishes, and pack lists — all tied to this import
+              paste rows from your old system to create the real items — venues,
+              client accounts, events, leads, payment references, menu dishes,
+              and pack lists — all tied to this import
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires

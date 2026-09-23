@@ -387,7 +387,7 @@ export function ImportRunsListPage() {
                 <th className="text-left py-3 px-4 font-medium">Source</th>
                 <th className="text-left py-3 px-4 font-medium">Dataset</th>
                 <th className="text-left py-3 px-4 font-medium">Status</th>
-                <th className="text-left py-3 px-4 font-medium">Records</th>
+                <th className="text-left py-3 px-4 font-medium">Items</th>
                 <th className="text-left py-3 px-4 font-medium">Started</th>
                 <th className="text-left py-3 px-4 font-medium">Completed</th>
                 <th className="text-left py-3 px-4 font-medium">Actions</th>

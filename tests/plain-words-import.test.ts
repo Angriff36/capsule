@@ -249,4 +249,64 @@ describe("plain words on leftover import manifests", () => {
     );
     expect(visible).toContain("<th>Items</th>");
   });
+
+  it("keeps leftover import records column and record-parse copy free of record jargon", () => {
+    const files = [
+      "src/features/admin/import/ImportRunsListPage.tsx",
+      "src/features/admin/import/ImportRunDetailPage.tsx",
+      "src/features/admin/import/QuickFileImport.tsx",
+    ];
+    // strip // comments and JSX {/* */} comments so developer notes are not
+    // treated as user copy; also join JSX text splits ({" "}) and line wraps
+    const raw = files.map((path) => readFileSync(path, "utf8")).join("\n");
+    const visible = raw
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      .replace(/\{\/\*[\s\S]*?\*\//g, " ")
+      .replace(/<Link[^>]*>|<\/Link>/g, " ")
+      .replace(/\{" "\}/g, " ")
+      .replace(/\s+/g, " ");
+
+    for (const old of [
+      "Record Parse",
+      ">Records</th>",
+      "Record Parse Counts",
+      "Record Counts (JSON)",
+      "each record type parsed",
+      "Confirm Final Record Counts",
+      "Final record counts (JSON)",
+      "Total Records",
+      "Unaccounted Records",
+      "Record Counts by Type",
+      "operational records",
+      "create the real records",
+      "The records this import linked",
+      "Invalid JSON format for record counts",
+      "Records that need review",
+      "reconcile queue",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Count items",
+      ">Items</th>",
+      "Item counts",
+      "Enter how many of each kind of item were found in the file.",
+      "Confirm final item counts",
+      "Final item counts",
+      "Total items",
+      "Unaccounted items",
+      "Item counts by type",
+      "not live kitchen or office items",
+      "create the real items",
+      "The items this import linked are marked as replaced.",
+      "Those counts aren't valid. Check the numbers and try again.",
+      "Items that need review are in the leftover match list",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    expect(raw).toContain('to="/admin/reconcile"');
+  });
 });
