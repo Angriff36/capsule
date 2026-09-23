@@ -147,4 +147,39 @@ describe("plain words on leftover import manifests", () => {
     expect(visible).toContain("/admin/parallel-run");
     expect(visible).toContain("/admin/reconcile");
   });
+
+  it("keeps leftover compare and match page headings free of run and record jargon", () => {
+    const files = [
+      "src/features/admin/import/ParallelRunDashboardPage.tsx",
+      "src/features/admin/import/ExternalRecordsReconcilePage.tsx",
+    ];
+    // strip // comments and JSX {/* */} comments so developer notes are not
+    // treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      .replace(/\{\/\*[\s\S]*?\*\//g, " ");
+
+    for (const old of [
+      "Parallel Run Dashboard",
+      "Unresolved Mappings",
+      "Record Counts Comparison",
+      "Records still to match",
+      "Imported records to match up",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Compare with TPP",
+      "Not matched yet",
+      "How the counts compare",
+      "Still to match",
+      "Match leftover items",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+  });
 });

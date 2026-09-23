@@ -215,7 +215,7 @@ export function ExternalRecordsReconcilePage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Import · Matching</p>
-          <h1 className="display-title mt-2">Imported records to match up</h1>
+          <h1 className="display-title mt-2">Match leftover items</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Check what came over from your old system and confirm each record
             matches the right thing in Capsule. Anything still waiting shows

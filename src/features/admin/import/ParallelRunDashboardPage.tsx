@@ -462,7 +462,7 @@ export function ParallelRunDashboardPage() {
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div>
-          <h1 className="display-title">Parallel Run Dashboard</h1>
+          <h1 className="display-title">Compare with TPP</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             A daily side-by-side of TPP and Capsule events over the last 30
             days, so you can confirm everything came over correctly before
@@ -513,7 +513,7 @@ export function ParallelRunDashboardPage() {
             </div>
             <div className="bg-white p-4 rounded-sm shadow">
               <h3 className="text-xs font-medium text-ink-3">
-                Unresolved Mappings
+                Not matched yet
               </h3>
               <p
                 className={`text-xl font-bold ${
@@ -534,7 +534,7 @@ export function ParallelRunDashboardPage() {
           <section className="working-ledger mt-6">
             <div className="ledger-heading">
               <div>
-                <h2>Record Counts Comparison</h2>
+                <h2>How the counts compare</h2>
               </div>
               <span>{formatCountNoun(comparisonMetrics.length, "metric")}</span>
             </div>
@@ -961,7 +961,7 @@ export function ParallelRunDashboardPage() {
           <section className="working-ledger mt-6">
             <div className="ledger-heading">
               <div>
-                <h2>Records still to match</h2>
+                <h2>Still to match</h2>
                 <p className="text-xs text-ink-2">
                   Imported records that still need to be checked or matched up.
                 </p>
@@ -1136,7 +1136,7 @@ export function ParallelRunDashboardPage() {
                 (&gt;5-10%) - investigation required
               </li>
               <li>
-                • <strong>Records still to match</strong>: Imported records to
+                • <strong>Still to match</strong>: Imported records to
                 double-check before the final switch
               </li>
               <li>
