@@ -54,7 +54,7 @@ describe("eventVenueLabel", () => {
         venue: null,
         venuesLoading: false,
       }),
-    ).toBe("Venue record unavailable");
+    ).toBe("Venue isn't available");
   });
 
   it("says no venue yet only when the event has no venueId at all", () => {

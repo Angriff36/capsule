@@ -126,7 +126,7 @@ export function useEventImportCommandExecutor(): EventImportCommandExecutor {
         const run = latest.current[invocation.capabilityId];
         if (!run) {
           throw new Error(
-            `The import screen cannot run '${invocation.capabilityId}' — enter this bundle through the agent importer.`,
+            `This screen can't do that step. Enter this bundle through the agent importer.`,
           );
         }
         return run(

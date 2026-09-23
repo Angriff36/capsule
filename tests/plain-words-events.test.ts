@@ -297,4 +297,62 @@ describe("plain words on event screens", () => {
       expect(all).toContain(fresh);
     }
   });
+
+  it("keeps leftover event timeline venue guest and import copy free of run and record jargon", () => {
+    const files = [
+      "src/features/events/EventTimelinePanel.tsx",
+      "src/features/events/TimelineBlockPicker.tsx",
+      "src/features/events/EventTimelineSidebar.tsx",
+      "src/features/events/EventTimelineRunSheetHeader.tsx",
+      "src/features/events/EventTimelineCommentsPanel.tsx",
+      "src/features/events/eventVenueLabel.ts",
+      "src/features/events/EventGuestPanel.tsx",
+      "src/features/events/useEventMenuNutrition.ts",
+      "src/features/events/import/useEventImportCommandExecutor.ts",
+      "src/features/events/import/useEventImportRunner.ts",
+    ];
+    const all = files.map((path) => readFileSync(path, "utf8")).join("\n");
+    // The executor's JSDoc on line ~73 says "cannot run" and stays; only the
+    // runner's user-visible thrown error must be free of it.
+    const runner = readFileSync(
+      "src/features/events/import/useEventImportRunner.ts",
+      "utf8",
+    );
+
+    for (const old of [
+      "day-of run sheet",
+      "Already on this run",
+      "Questions on this run sheet",
+      "Posted on the blocks of this run sheet.",
+      "Run sheet window",
+      "Event run sheet",
+      'aria-label="Run sheet"',
+      "run-sheet block",
+      "Venue record unavailable",
+      ': "recorded"',
+      "with recorded nutrition",
+      "run-of-show",
+    ]) {
+      expect(all).not.toContain(old);
+    }
+    expect(runner).not.toContain("cannot run");
+    for (const fresh of [
+      "build the day-of timeline.",
+      "Already on this timeline",
+      "Questions on this timeline",
+      "Posted on the timeline blocks.",
+      "Timeline window",
+      "Event timeline",
+      'aria-label="Day-of timeline"',
+      "questions about a timeline block",
+      "Venue isn't available",
+      ': "on the list"',
+      "with nutrition on file",
+      "Choose timeline blocks",
+      "This screen can't do that step. Enter this bundle through the agent importer.",
+      "This screen can't do every step in this bundle yet. Enter it through the agent importer.",
+    ]) {
+      expect(all).toContain(fresh);
+    }
+  });
 });

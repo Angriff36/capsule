@@ -69,7 +69,7 @@ export function useEventMenuNutrition(dishIds: readonly string[]) {
   const coverageNote =
     totals.componentCount === 0
       ? "Add dishes with components to estimate per-guest nutrition."
-      : `Estimated across ${totals.componentCount} component${totals.componentCount === 1 ? "" : "s"} on this event${totals.isComplete ? "" : ` (${totals.measuredComponentCount} with recorded nutrition)`}.`;
+      : `Estimated across ${totals.componentCount} component${totals.componentCount === 1 ? "" : "s"} on this event${totals.isComplete ? "" : ` (${totals.measuredComponentCount} with nutrition on file)`}.`;
 
   return { totals, loading, coverageNote };
 }

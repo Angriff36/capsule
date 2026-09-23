@@ -18,7 +18,7 @@ export function eventVenueLabel(input: {
   const liveName = input.venue?.name?.trim();
   if (liveName) return liveName;
   if (input.venueId) {
-    return input.venuesLoading ? "Loading venue…" : "Venue record unavailable";
+    return input.venuesLoading ? "Loading venue…" : "Venue isn't available";
   }
   return "No venue yet";
 }
