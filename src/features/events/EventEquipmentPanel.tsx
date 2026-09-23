@@ -194,7 +194,7 @@ export function EventEquipmentPanel({
       setNotice(
         mode === "checkout"
           ? "Checkout confirmed — equipment is out with the event."
-          : "Return confirmed — condition is recorded in the equipment catalog.",
+          : "Return confirmed — condition is saved on the equipment.",
       );
     });
   };

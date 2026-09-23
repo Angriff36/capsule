@@ -40,7 +40,7 @@ export function EventSourceProvenancePanel({
   return (
     <EventTabPanel
       eyebrow="Source"
-      title="Imported record"
+      title="Imported from"
       description="This event was brought in from another system. Here's where it came from and how it was matched up."
       testId="event-source-provenance-panel"
     >

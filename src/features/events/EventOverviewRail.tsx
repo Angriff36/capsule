@@ -158,7 +158,7 @@ export function EventOverviewRail(props: EventOverviewRailProps) {
       >
         <p className="text-base leading-relaxed text-ink-2">
           {props.operationalRequirements?.trim() ||
-            "No operational requirements recorded."}
+            "No operational requirements on file."}
         </p>
         <a
           href={props.editHref}

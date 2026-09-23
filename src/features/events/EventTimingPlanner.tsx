@@ -140,8 +140,8 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
       </p>
       {!plan.event.timingCanRecalculate && (
         <p className="mt-2 text-base text-ink-2">
-          This event keeps its recorded timing. Individual timeline blocks
-          remain available for corrections.
+          This event keeps its saved timing. Individual timeline blocks remain
+          available for corrections.
         </p>
       )}
       {failure && (
@@ -151,7 +151,7 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
       )}
       {saved && (
         <p role="status" className="mt-3 text-base text-success">
-          Timing saved to the shared run.
+          Timing saved on this event.
         </p>
       )}
       {draft && (
@@ -246,7 +246,7 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
                     </p>
                     <p className="text-base">
                       {milestone.removed
-                        ? "Removed from the run"
+                        ? "Removed from this event"
                         : `${milestone.matches.length > 1 ? "Calculated: " : ""}${timeLabel(row ? row.startsAt : milestone.startsAt)}`}
                       {!milestone.removed &&
                         (row ? row.endsAt : milestone.endsAt) != null &&

@@ -475,8 +475,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       return expectedHeadcount;
     const values = await prompt.askFields({
       title,
-      description:
-        "The event guest count is not recorded. Enter the servings to add.",
+      description: "This event has no guest count. Enter the servings to add.",
       fields: [
         {
           name: "servings",
@@ -1030,7 +1029,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                                 <Link
                                   to={dishPath(dish._id)}
                                   className="text-xs text-ink-3 underline decoration-dotted hover:text-ink"
-                                  title="Opens the shared catalog record. Edits there change this dish on every event — use the kitchen note below for event-only instructions."
+                                  title="Opens the shared dish. Edits there change this dish on every event — use the kitchen note below for this event only."
                                   data-testid="event-menu-catalog-link"
                                 >
                                   Catalog dish ↗

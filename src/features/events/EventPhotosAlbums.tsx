@@ -117,7 +117,7 @@ export function EventPhotoActivity({
               <p className="mt-1 text-xs text-ink-3">
                 {photo.uploadedAt != null
                   ? `${formatDate(photo.uploadedAt)} · ${formatTime(photo.uploadedAt)}`
-                  : "Time not recorded"}
+                  : "Time not listed"}
               </p>
             </div>
           </li>

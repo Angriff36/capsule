@@ -445,8 +445,8 @@ export function EventStaffingTab({ eventId }: Props) {
                       : "Cancel open shift",
                   description:
                     need.status === "filled"
-                      ? "Remove this staffing requirement and its future coverage. Other assigned roles and recorded work stay intact."
-                      : "Record why this open shift is coming down.",
+                      ? "Remove this staffing requirement and its future coverage. Other assigned roles and hours already entered stay intact."
+                      : "Say why this open shift is coming down.",
                   label: "Cancellation reason",
                   placeholder: "e.g. Covered by a reassignment",
                   confirmLabel:
@@ -471,7 +471,7 @@ export function EventStaffingTab({ eventId }: Props) {
                 const values = await prompt.askFields({
                   title: `Change ${need.role} coverage`,
                   description:
-                    "Choose another staff member or reopen for volunteers. The role and instructions carry over; recorded work stays with its original staff member.",
+                    "Choose another staff member or reopen for volunteers. The role and instructions carry over; hours already entered stay with the original staff member.",
                   fields: [
                     {
                       name: "personId",

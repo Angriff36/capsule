@@ -34,7 +34,7 @@ export type GuestSummary = {
 };
 
 /** Guests carrying no recorded dietary need. Not a claim that they have none. */
-export const NO_DIETARY_LABEL = "None recorded";
+export const NO_DIETARY_LABEL = "None noted";
 
 function tally(values: string[]): GuestTally[] {
   const counts = new Map<string, number>();

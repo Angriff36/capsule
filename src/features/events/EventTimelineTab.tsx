@@ -14,7 +14,7 @@ export function EventTimelineTab({ eventId }: Props) {
     <section className="space-y-5" data-testid="event-timeline-tab">
       <EventTabIntro
         title="Timeline"
-        description="Build the day-of run sheet from templates or custom blocks. Leave times blank until known. Drag fully timed, uncompleted blocks to move their time slots; other reorders keep recorded times. Assign teams or event staff, and open Questions for crew notes."
+        description="Build the day-of timeline from templates or custom blocks. Leave times blank until known. Drag fully timed, uncompleted blocks to move their time slots; other reorders keep the saved times. Assign teams or event staff, and open Questions for crew notes."
       />
       <EventTimingPlanner eventId={eventId} />
       <div data-testid="event-timeline-blocks">

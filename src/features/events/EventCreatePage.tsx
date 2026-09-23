@@ -1087,7 +1087,7 @@ export function EventCreatePage() {
                   {selectedVenue &&
                   Number(selectedVenue.capacity ?? 0) === 0 ? (
                     <p className="text-xs leading-relaxed text-ink-3">
-                      This venue has no capacity recorded — set it in Facilities
+                      This venue has no capacity on file — set it in Facilities
                       → Venues if it matters for this booking.
                     </p>
                   ) : null}

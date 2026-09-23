@@ -27,7 +27,7 @@ import { WORKBOOK_REVIEW_PARAM } from "../eventRoutes";
 function valueText(value: unknown) {
   return Array.isArray(value)
     ? value.join(", ")
-    : String(value ?? "Not recorded");
+    : String(value ?? "Not on file");
 }
 function openBlank() {
   const target = window.open("about:blank", "_blank");
@@ -302,7 +302,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
         </label>
       </div>
       <p className="mt-2 text-sm text-ink-3">
-        Current Capsule records stay authoritative. Imported approvals require
+        What's already on this event stays in charge. Imported approvals require
         local review. Live TPP, Nowsta, rentals and document checks remain open
         until verified.
       </p>
@@ -419,7 +419,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
                     (view.latestRevision?.id === revision.id &&
                       view.latestRevision.stale)
                       ? "Superseded / out of date"
-                      : "Recorded revision"}
+                      : "This version"}
                   </span>
                   <button
                     className="btn-link"
@@ -631,7 +631,7 @@ function IssueRow({
             )}
             {targets.length > 0 && (
               <label className="block text-sm">
-                Update native record
+                Update what's on this event
                 <select
                   className="input mt-1 block w-full"
                   value={target}
@@ -656,7 +656,7 @@ function IssueRow({
               />
             </label>
             <button className="btn btn-secondary" disabled={busy || !choice}>
-              {signature ? "Sign off" : "Record decision"}
+              {signature ? "Sign off" : "Save this choice"}
             </button>
           </form>
         </details>
