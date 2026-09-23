@@ -97,6 +97,7 @@ describe("API-key gateway for the command API", () => {
       role: "owner",
       userId: "user_admin",
       __auth: { role: "system" },
+      idempotencyKey: "client-register-1",
     };
     const res = await h.handle(
       new Request(`${APP}/api/manifest/Client/commands/register`, {
@@ -116,7 +117,89 @@ describe("API-key gateway for the command API", () => {
     expect(h.minted).toEqual([OWNER]);
     expect(sent.headers.get("authorization")).toBe(`Bearer jwt-for-${OWNER}-1`);
     // This gateway test establishes forwarding and JWT selection only.
+    // Identity spoof fields stay in the body; server auth ignores them.
     expect(JSON.parse(await sent.text())).toEqual(body);
+  });
+
+  it("dispatcher rejects retryable external call without idempotency key", async () => {
+    const h = harness();
+    const res = await h.handle(
+      new Request(`${APP}/api/manifest/Client/commands/register`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${VALID_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          clientType: "company",
+          companyName: "No Key Co",
+        }),
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "Idempotency key required for retryable external commands",
+    });
+    expect(h.forwarded).toHaveLength(0);
+    expect(h.minted).toHaveLength(0);
+  });
+
+  it("dispatcher rejects a blank idempotency key", async () => {
+    const h = harness();
+    const res = await h.handle(
+      new Request(`${APP}/api/manifest/Client/commands/register`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${VALID_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ idempotencyKey: "   " }),
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({
+      error: "Idempotency key required for retryable external commands",
+    });
+    expect(h.forwarded).toHaveLength(0);
+    expect(h.minted).toHaveLength(0);
+  });
+
+  it("dispatcher accepts an Idempotency-Key header and forwards it on the body", async () => {
+    const h = harness();
+    const res = await h.handle(
+      new Request(`${APP}/api/manifest/Client/commands/register`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${VALID_KEY}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": "header-key-9",
+        },
+        body: JSON.stringify({
+          clientType: "company",
+          companyName: "Keyed Co",
+        }),
+      }),
+    );
+    expect(res.status).toBe(200);
+    const sent = h.forwarded[0]!;
+    expect(JSON.parse(await sent.text())).toEqual({
+      clientType: "company",
+      companyName: "Keyed Co",
+      idempotencyKey: "header-key-9",
+    });
+  });
+
+  it("discovery GET does not require an idempotency key", async () => {
+    const h = harness();
+    const res = await h.handle(
+      new Request(`${APP}/api/manifest/commands`, {
+        headers: { Authorization: `Bearer ${VALID_KEY}` },
+      }),
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ data: { ok: true } });
+    expect(h.forwarded).toHaveLength(1);
+    expect(h.forwarded[0]!.method).toBe("GET");
   });
 
   it("reuses the owner's session token briefly, then mints again", async () => {
