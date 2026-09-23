@@ -63,7 +63,14 @@ describe("runtime proof: §8.2 reconciliation receipts on Event timing", () => {
     const before = await snapshot(events, eventId);
 
     const receipts = await readReconciliationReceipts(events, tenantId);
-    const receipt = receipts.find((row) => row.eventId === eventId);
+    // configureTiming also persists a staffing receipt (AC-390); select the
+    // timing receipt, not the first eventId match.
+    const receipt = receipts.find(
+      (row) =>
+        row.eventId === eventId &&
+        row.affectedDomains.length === 1 &&
+        row.affectedDomains[0] === "timing",
+    );
     expect(receipt).toBeDefined();
     expect(receipt!.tenantId).toBe(tenantId);
     expect(receipt!.triggerType).toBe("EventTimingConfigured");
@@ -114,9 +121,14 @@ describe("runtime proof: §8.2 reconciliation receipts on Event timing", () => {
     const first = await liveTimeline(events, eventId);
     const firstIds = first.map((row) => row.id).sort();
     const firstReceipts = await readReconciliationReceipts(events, tenantId);
+    // Compare against the TIMING checkpoint, not a staffing receipt's.
     const firstCheckpoint =
-      firstReceipts.find((row) => row.eventId === eventId)?.inputVersions
-        .checkpoint ?? "";
+      firstReceipts.find(
+        (row) =>
+          row.eventId === eventId &&
+          row.affectedDomains.length === 1 &&
+          row.affectedDomains[0] === "timing",
+      )?.inputVersions.checkpoint ?? "";
     expect(firstCheckpoint).not.toBe("");
 
     // Shorter setup moves staff_on / load windows → new checkpoint.
@@ -132,6 +144,8 @@ describe("runtime proof: §8.2 reconciliation receipts on Event timing", () => {
     const newer = changedReceipts.find(
       (row) =>
         row.eventId === eventId &&
+        row.affectedDomains.length === 1 &&
+        row.affectedDomains[0] === "timing" &&
         row.inputVersions.checkpoint !== firstCheckpoint,
     );
     expect(newer).toBeDefined();

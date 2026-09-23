@@ -10,6 +10,7 @@ import {
   standDownEventLogisticsAndBilling,
 } from "./eventCancellation";
 import { reconcileEventTiming } from "./eventTimingOperations";
+import { eventStaffingReconciliation } from "./staffingReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -97,7 +98,8 @@ export async function handleManifestEvent(
     ["EventTimingConfigured", "EventScheduleChanged"].includes(event.type)) {
     await reconcileEventTiming(ctx, event.entityId as Id<"events">,
       { triggerEventId: String(event.eventId), triggerType: event.type });
-    await reconcileEventStaffing(ctx, event.entityId as Id<"events">);
+    await eventStaffingReconciliation.run(ctx, event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
     return;
   }
   if (event.entity === "Organization" && event.type === "OrganizationBrandLogoSet") {
@@ -139,7 +141,8 @@ export async function handleManifestEvent(
     event.type === "EventTimelineCalculatedTimingRequested") {
     await reconcileEventTiming(ctx, event.payload.eventId as Id<"events">,
       { triggerEventId: String(event.eventId), triggerType: event.type });
-    await reconcileEventStaffing(ctx, event.payload.eventId as Id<"events">);
+    await eventStaffingReconciliation.run(ctx, event.payload.eventId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
     return;
   }
   if ((event.entity === "EventAssignment" &&
