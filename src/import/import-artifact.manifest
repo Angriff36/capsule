@@ -63,8 +63,8 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
 
   // Policies
   default policy importArtifactRead read: roleAllows(user.role, "importAccess") "Staff may read import artifacts"
-  default policy importArtifactWrite write: roleAllows(user.role, "importAccess") "Staff may write import artifacts through commands"
-  default policy importArtifactExecute execute: roleAllows(user.role, "importAccess") "Staff may execute import artifact commands"
+  default policy importArtifactWrite write: roleAllows(user.role, "importAccess") "Staff may update imported files"
+  default policy importArtifactExecute execute: roleAllows(user.role, "importAccess") "Staff may change imported files"
 
   // register - Inventory one workbook of an archive into a durable row.
   command register(
