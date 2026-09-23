@@ -27,7 +27,7 @@ function ContactLines({
   phone?: string | null;
 }) {
   if (!email && !phone)
-    return <p className="mt-1.5 text-base text-ink-3">No contact recorded.</p>;
+    return <p className="mt-1.5 text-base text-ink-3">No contact on file.</p>;
   return (
     <p className="mt-1.5 flex flex-wrap items-center gap-x-5 gap-y-1 text-base">
       {email ? (
@@ -55,7 +55,7 @@ export function EventClientContactsPanel({ eventContact, contacts }: Props) {
       <div className="section-rule">
         <span>Contacts</span>
         <i />
-        <em>{contacts.length} on the client record</em>
+        <em>{contacts.length} on the client page</em>
       </div>
 
       <div className="mt-3.5 rounded-sm border border-brand/40 bg-brand-soft/50 p-3">
@@ -72,8 +72,9 @@ export function EventClientContactsPanel({ eventContact, contacts }: Props) {
 
       {contacts.length === 0 ? (
         <p className="mt-3 text-base text-ink-3">
-          This client has no contact roster yet. Add contacts on the client
-          record.
+          {
+            "This client has no contact roster yet. Add contacts on the client page."
+          }
         </p>
       ) : (
         <ul className="mt-3 divide-y divide-line border-t border-line">

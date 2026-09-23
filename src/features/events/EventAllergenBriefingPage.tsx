@@ -280,14 +280,14 @@ export function EventAllergenBriefingPage() {
                 guestListCoverage != null ? (
                   <p className="mt-2 text-base text-ink-2">
                     {guestListCoverage.severity === "empty"
-                      ? "No guests are recorded for this event, so dietary restrictions are unknown — not absent. Fill in the Guests tab before relying on this briefing."
-                      : `Only ${guestListCoverage.guestCount} of ${guestListCoverage.expectedHeadcount} expected guests are recorded, and none list restrictions so far. Restrictions for the missing guests are unknown — not absent.`}
+                      ? "No guests are on the list for this event, so dietary restrictions are unknown — not absent. Fill in the Guests tab before relying on this briefing."
+                      : `Only ${guestListCoverage.guestCount} of ${guestListCoverage.expectedHeadcount} expected guests are on the list, and none list restrictions so far. Restrictions for the missing guests are unknown — not absent.`}
                   </p>
                 ) : (
                   <p className="mt-2 text-base text-ink-2">
-                    No guest dietary restrictions were captured at booking.
-                    Record them on the event&rsquo;s Guests tab as RSVPs come
-                    in.
+                    {
+                      "No guest dietary restrictions were captured at booking. Add them on the event’s Guests tab as RSVPs come in."
+                    }
                   </p>
                 )
               ) : (

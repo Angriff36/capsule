@@ -142,4 +142,59 @@ describe("plain words on event screens", () => {
       "Something on this tab failed. Try again. If it keeps failing, reload the page.",
     );
   });
+
+  it("keeps leftover event screens free of record jargon", () => {
+    const files = [
+      "src/features/events/beoPdf.ts",
+      "src/features/events/EventClientBillingPanel.tsx",
+      "src/features/events/EventClientTab.tsx",
+      "src/features/events/EventClientContactsPanel.tsx",
+      "src/features/events/EventCapacityPlannerPage.tsx",
+      "src/features/events/EventAllergenBriefingPage.tsx",
+      "src/features/events/GuestListCoverageNotice.tsx",
+    ];
+    const all = files.map((path) => readFileSync(path, "utf8")).join("\n");
+
+    for (const old of [
+      "Not recorded",
+      "Live event record",
+      "client record",
+      "Client record not found",
+      "Open client record",
+      "None recorded for this event",
+      "No contact recorded",
+      "Capacity not recorded",
+      "capacity not recorded",
+      "Recorded capacity",
+      "guests are recorded",
+      "No guests recorded",
+      "not recorded yet",
+      "Record them on the event",
+    ]) {
+      expect(all).not.toContain(old);
+    }
+    for (const fresh of [
+      "Not listed",
+      "BEO | This event",
+      "Not on file",
+      "Owned on the client page",
+      "Open client",
+      "None noted for this event.",
+      "No notes on this client yet.",
+      "Edit on the client page",
+      "live on the client page.",
+      "No contact on file.",
+      "on the client page",
+      "Add contacts on the client page",
+      "Capacity not on file",
+      "Capacity on file",
+      "No guests are on the list for this event",
+      "expected guests are on the list",
+      "Add them on the event",
+      "No guests on the list — this event expects",
+      "not on the list yet",
+    ]) {
+      expect(all).toContain(fresh);
+    }
+  });
 });

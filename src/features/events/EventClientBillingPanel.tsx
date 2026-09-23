@@ -20,12 +20,12 @@ function postalAddress(client: Doc<"clients">): string {
     .join(" ");
   return (
     [street, locality, client.countryCode].filter(Boolean).join(", ") ||
-    "Not recorded"
+    "Not on file"
   );
 }
 
 /**
- * Billing facts as the client record holds them. This tab reads them; the
+ * Billing facts as the client page holds them. This tab reads them; the
  * client workspace owns the edits, so nothing here writes.
  */
 export function EventClientBillingPanel({ client }: Props) {
@@ -35,7 +35,7 @@ export function EventClientBillingPanel({ client }: Props) {
       <div className="section-rule">
         <span>Billing information</span>
         <i />
-        <em>Owned by the client record</em>
+        <em>Owned on the client page</em>
       </div>
       <div className="mt-3.5 grid gap-4 sm:grid-cols-2">
         <Fact
@@ -43,7 +43,7 @@ export function EventClientBillingPanel({ client }: Props) {
           value={
             client.companyName ||
             [client.givenName, client.familyName].filter(Boolean).join(" ") ||
-            "Not recorded"
+            "Not on file"
           }
         />
         <Fact
@@ -51,11 +51,11 @@ export function EventClientBillingPanel({ client }: Props) {
           value={
             Number.isFinite(client.paymentTermsDays)
               ? `Net ${client.paymentTermsDays}`
-              : "Not recorded"
+              : "Not on file"
           }
         />
         <Fact label="Address" value={postalAddress(client)} />
-        <Fact label="Tax ID" value={client.taxId || "Not recorded"} />
+        <Fact label="Tax ID" value={client.taxId || "Not on file"} />
         <div>
           <p className="eyebrow">Tax exempt status</p>
           <p className="mt-0.5 flex items-center gap-2 text-base text-ink">

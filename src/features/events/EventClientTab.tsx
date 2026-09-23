@@ -116,7 +116,7 @@ export function EventClientTab({
                   : client
                     ? "Individual account"
                     : clientId
-                      ? "Client record not found"
+                      ? "Client not found"
                       : "Client not assigned"}
               </p>
               <p className="mt-1 flex flex-wrap items-center gap-x-5 gap-y-1 text-base text-ink-2">
@@ -135,7 +135,7 @@ export function EventClientTab({
             </div>
             {client ? (
               <Link className="btn btn-ghost" to={`/clients/${client._id}`}>
-                Open client record
+                Open client
               </Link>
             ) : null}
           </div>
@@ -146,7 +146,7 @@ export function EventClientTab({
                 value={
                   client.registeredAt != null
                     ? formatDate(client.registeredAt)
-                    : "Not recorded"
+                    : "Not on file"
                 }
               />
               <Fact label="Events booked" value={String(clientEvents.length)} />
@@ -181,7 +181,7 @@ export function EventClientTab({
             <div>
               <dt className="eyebrow">Dietary / accessibility</dt>
               <dd className="mt-0.5 text-base whitespace-pre-wrap text-ink">
-                {accessibilityNeeds || "None recorded for this event."}
+                {accessibilityNeeds || "None noted for this event."}
               </dd>
             </div>
             <div>
@@ -224,7 +224,7 @@ export function EventClientTab({
             </p>
           ) : (
             <p className="mt-2 text-base text-ink-3">
-              No notes on the client record yet.
+              No notes on this client yet.
             </p>
           )}
           {client ? (
@@ -232,7 +232,7 @@ export function EventClientTab({
               className="text-link mt-3 inline-flex"
               to={`/clients/${client._id}`}
             >
-              Edit on the client record
+              Edit on the client page
             </Link>
           ) : null}
         </div>
@@ -241,7 +241,7 @@ export function EventClientTab({
           <p className="eyebrow">Where this is owned</p>
           <p className="mt-2 text-base text-ink-2">
             Contact and requirement edits for this booking live on the Overview
-            tab. Company, billing, and roster edits live on the client record.
+            tab. Company, billing, and roster edits live on the client page.
           </p>
         </div>
       </aside>

@@ -35,7 +35,7 @@ const percent = new Intl.NumberFormat("en-US", {
 });
 
 const HEAT_LABEL = {
-  unknown: "Capacity not recorded",
+  unknown: "Capacity not on file",
   quiet: "Under 35%",
   steady: "35–69%",
   busy: "70–99%",
@@ -58,7 +58,7 @@ function CapacityTile({ card }: { card: CapacityEventCard }) {
       : `${formatCount(card.confirmedHeadcount)} / ${formatCount(card.capacity)}`;
   const accessibleOccupancy =
     card.capacity == null
-      ? `${card.confirmedHeadcount} confirmed guests; capacity not recorded`
+      ? `${card.confirmedHeadcount} confirmed guests; capacity not on file`
       : `${card.confirmedHeadcount} confirmed guests of ${card.capacity} capacity`;
 
   return (
@@ -184,7 +184,7 @@ export function EventCapacityPlannerPage() {
           <small>guest RSVPs</small>
         </article>
         <article>
-          <span>Recorded capacity</span>
+          <span>Capacity on file</span>
           <strong>{formatCount(plan.recordedCapacity)}</strong>
           <small>seats across events</small>
         </article>
