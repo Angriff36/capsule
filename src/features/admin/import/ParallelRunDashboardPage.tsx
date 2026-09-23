@@ -1043,12 +1043,14 @@ export function ParallelRunDashboardPage() {
           <section className="working-ledger mt-6">
             <div className="ledger-heading">
               <div>
-                <h2>Recent Import Runs</h2>
+                <h2>Recent imports</h2>
                 <p className="text-xs text-ink-2">
                   The imports these comparisons are based on.
                 </p>
               </div>
-              <span>{formatCountNoun(completedImportRuns.length, "run")}</span>
+              <span>
+                {formatCountNoun(completedImportRuns.length, "import")}
+              </span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">

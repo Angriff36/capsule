@@ -124,7 +124,7 @@ export function QuickFileImport() {
             </p>
           ) : null}
           <p className="mt-1 text-xs text-ink-3">
-            {results.length} import run{results.length === 1 ? "" : "s"}:{" "}
+            {results.length} import{results.length === 1 ? "" : "s"}:{" "}
             {results.map((r, i) => (
               <span key={r.importRunId}>
                 {i > 0 ? ", " : ""}

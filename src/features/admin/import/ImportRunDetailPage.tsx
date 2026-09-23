@@ -129,12 +129,12 @@ export function ImportRunDetailPage() {
     return (
       <div className="flex h-64 items-center justify-center">
         <div className="text-center text-ink-3">
-          <p>Import run not found</p>
+          <p>Import not found</p>
           <Link
             to={importRunsListPath()}
             className="text-brand hover:text-brand"
           >
-            Back to Import Runs
+            Back to imports
           </Link>
         </div>
       </div>
@@ -294,7 +294,7 @@ export function ImportRunDetailPage() {
     const reason = await prompt.askReason({
       title: "Mark Import Failed",
       description:
-        "Record why this run failed so the next attempt knows what went wrong.",
+        "Write why this import failed so the next attempt knows what went wrong.",
       label: "Failure details",
       placeholder: "What went wrong…",
       confirmLabel: "Mark failed",
@@ -371,13 +371,13 @@ export function ImportRunDetailPage() {
             to={importRunsListPath()}
             className="text-ink-2 hover:text-ink text-xs"
           >
-            ← Import Runs
+            ← Imports
           </Link>
           <div className="h-6 w-px bg-line" />
         </div>
         <div className="mt-2">
           <div className="flex items-center gap-3">
-            <h1 className="display-title">Import Run Details</h1>
+            <h1 className="display-title">Import details</h1>
             <StatusChip status={statusLabel} />
           </div>
           <p className="mt-1 text-ink-2">
@@ -386,12 +386,12 @@ export function ImportRunDetailPage() {
             <button
               type="button"
               className="ml-3 font-mono text-xs text-ink-3 hover:text-ink"
-              title="Copy the internal run ID for support"
+              title="Copy the import ID for support"
               onClick={() =>
                 void navigator.clipboard.writeText(String(importRun._id))
               }
             >
-              Copy run ID
+              Copy import ID
             </button>
           </p>
         </div>
@@ -664,7 +664,7 @@ export function ImportRunDetailPage() {
       <div className="card mt-4">
         <div className="border-b border-line px-3">
           <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-            Import Run Details
+            Import details
           </h2>
         </div>
         <div className="p-4">
@@ -881,7 +881,7 @@ export function ImportRunDetailPage() {
       <div className="card mt-4">
         <div className="border-b border-line px-3">
           <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-            Import Run Actions Guide
+            What you can do
           </h2>
         </div>
         <div className="p-4">

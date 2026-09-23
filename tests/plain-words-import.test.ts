@@ -52,4 +52,67 @@ describe("plain words on leftover import manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover import-screen copy free of import-run jargon", () => {
+    const files = [
+      "src/features/admin/import/ImportRunsListPage.tsx",
+      "src/features/admin/import/ImportRunDetailPage.tsx",
+      "src/features/admin/import/QuickFileImport.tsx",
+      "src/features/admin/import/ParallelRunDashboardPage.tsx",
+      "src/features/admin/AdminWorkspaceNav.tsx",
+    ];
+    // strip // comments and JSX {/* */} comments so developer notes are not
+    // treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      .replace(/\{\/\*[\s\S]*?\*\//g, " ");
+
+    for (const old of [
+      "Import Runs",
+      "New import run",
+      "Start New Import Run",
+      "import run(s)",
+      "No import runs found",
+      "Create a new import run",
+      "Import Run Workflow",
+      "import run information",
+      "stuck runs",
+      "this run failed",
+      "Import run not found",
+      "Back to Import Runs",
+      "Import Run Details",
+      "Import Run Actions Guide",
+      "Copy run ID",
+      "internal run ID",
+      "Recent Import Runs",
+      '"Import runs"',
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Imports",
+      "New import",
+      "Start new import",
+      "import(s)",
+      "No imports found",
+      "Start a new import.",
+      "How an import works",
+      "See the import details",
+      "stuck imports",
+      "Write why this import failed so the next attempt knows what went wrong.",
+      "Import not found",
+      "Back to imports",
+      "Import details",
+      "What you can do",
+      "Copy import ID",
+      "Copy the import ID for support",
+      "Recent imports",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+  });
 });
