@@ -39,8 +39,8 @@ export function ComponentNutritionPanel({
       </div>
       <p className="max-w-160 text-base text-ink-2">
         Aggregated from each ingredient's per-unit values, converted into the
-        ingredient's catalog unit. Ingredients without recorded nutrition are
-        not counted.
+        ingredient's catalog unit. Ingredients without nutrition on file are not
+        counted.
       </p>
 
       <dl

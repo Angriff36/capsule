@@ -248,7 +248,7 @@ export function MenuDetailPage() {
   const menuNutritionNote =
     menuNutrition.componentCount === 0
       ? "Add dishes with components to estimate per-guest nutrition."
-      : `Estimated across ${menuNutrition.componentCount} component${menuNutrition.componentCount === 1 ? "" : "s"} on this menu${menuNutrition.isComplete ? "" : ` (${menuNutrition.measuredComponentCount} with recorded nutrition)`}.`;
+      : `Estimated across ${menuNutrition.componentCount} component${menuNutrition.componentCount === 1 ? "" : "s"} on this menu${menuNutrition.isComplete ? "" : ` (${menuNutrition.measuredComponentCount} with nutrition on file)`}.`;
 
   if (!id) return <ErrorState title="Menu not found" />;
   if (menu === undefined) {
