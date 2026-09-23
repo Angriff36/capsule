@@ -247,7 +247,7 @@ async function evaluateProviderReadiness(
     if (!connected) {
       const state = canonical ? canonical.status : "disconnected";
       blockers.push(
-        `${label} is ${state} but this workspace has used it. Reconnect it or remove it fully before cutover.`,
+        `${label} is ${state} but this workspace has used it. Connect it again or take it off before you switch.`,
       );
       lines.push(`${label}: ${state}`);
       continue;
@@ -259,7 +259,7 @@ async function evaluateProviderReadiness(
     if (ledger != null) {
       if (ledger.lastReconcile == null) {
         blockers.push(
-          `${label} is connected but no sync has completed since it was connected. Run a sync before cutover.`,
+          `${label} is connected but no sync has completed since it was connected. Sync it before you switch.`,
         );
         lines.push(`${label}: connected, never synced on this connection`);
         continue;
@@ -268,7 +268,7 @@ async function evaluateProviderReadiness(
       if (failed > 0 || ledger.lastReconcile.error != null) {
         blockers.push(
           failed > 0
-            ? `${label} is connected but its latest sync failed (${failed} item(s)). Sync clean before cutover.`
+            ? `${label} is connected but its latest sync failed (${failed} item(s)). Sync clean before you switch.`
             : `${label} is connected but its latest sync reported an error: ${ledger.lastReconcile.error}.`,
         );
         lines.push(`${label}: sync failed`);
@@ -293,7 +293,7 @@ async function evaluateProviderReadiness(
       !(canonical.chargesEnabled && canonical.payoutsEnabled)
     ) {
       blockers.push(
-        `${label} is connected but cannot accept charges and payouts yet. Finish Stripe onboarding before cutover.`,
+        `${label} is connected but cannot accept charges and payouts yet. Finish Stripe setup before you switch.`,
       );
       lines.push(`${label}: not payout-ready`);
       continue;
@@ -303,10 +303,10 @@ async function evaluateProviderReadiness(
 
   const message =
     blockers.length > 0
-      ? `Provider readiness needs attention: ${blockers.join(" ")}`
+      ? `Outside services need attention: ${blockers.join(" ")}`
       : lines.length > 0
-        ? `Integrations: ${lines.join("; ")}`
-        : "No integrations in use (OK for cutover)";
+        ? `Outside services: ${lines.join("; ")}`
+        : "No outside services in use (OK to switch)";
 
   return { passed: blockers.length === 0, message, blockers, warnings };
 }

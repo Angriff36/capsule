@@ -228,4 +228,45 @@ describe("plain words on leftover cutover screen", () => {
     // path and later leftovers stay
     expect(nav).toContain('path: "/admin/cutover"');
   });
+
+  it("keeps leftover evaluateProviderReadiness strings in catering English", () => {
+    const source = readFileSync("convex/cutover.ts", "utf8");
+    // strip // comments so developer notes are not treated as user copy
+    const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "before cutover.",
+      "Run a sync",
+      "Provider readiness needs attention",
+      "No integrations in use (OK for cutover)",
+      "Finish Stripe onboarding before cutover",
+      "Reconnect it or remove it fully before cutover",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Connect it again or take it off before you switch.",
+      "Sync it before you switch.",
+      "Sync clean before you switch.",
+      "Finish Stripe setup before you switch.",
+      "Outside services need attention:",
+      "No outside services in use (OK to switch)",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // #386 proof phrases stay
+    for (const kept of [
+      "is connected but no sync has completed since it was connected",
+      "is connected but its latest sync failed",
+      "is connected but cannot accept charges",
+    ]) {
+      expect(visible).toContain(kept);
+    }
+
+    // function name stays
+    expect(visible).toContain("evaluateProviderReadiness");
+  });
 });

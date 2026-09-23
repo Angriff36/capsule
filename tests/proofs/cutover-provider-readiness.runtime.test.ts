@@ -128,7 +128,7 @@ describe("runtime proof: cutover provider readiness (#386)", () => {
     const before = await readiness(ownerB);
     expect(before.checks.providerReadiness.passed).toBe(true);
     expect(before.checks.providerReadiness.message).toContain(
-      "No integrations in use",
+      "No outside services in use",
     );
 
     // Tenant A engages providers in every unresolved shape.
