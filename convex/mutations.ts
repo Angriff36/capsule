@@ -969,8 +969,8 @@ async function __runAttachmentAttach(ctx: MutationCtx, { docId, parentType, pare
     if (!doc) throw new Error("Attachment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Attachment not found");
     if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write attachments through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute attachment commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((doc.uploadedById == null))) throw new Error("Guard 0 failed");
     if (!((parentType !== "staffMessage"))) throw new Error("Chat files are attached through their message");
     if (!((((parentId).trim()).length > 0))) throw new Error("Parent record is required");
@@ -1059,8 +1059,8 @@ export const Attachment_createViaAttach = mutation({
       storageId: args.storageId
     };
     if (!((checkRole(user, "staffAccess") && ((__draft.parentType !== "staffMessage") || (__draft.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write attachments through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute attachment commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((__draft.uploadedById == null))) throw new Error("Guard 0 failed");
     if (!((parentType !== "staffMessage"))) throw new Error("Chat files are attached through their message");
     if (!((((parentId).trim()).length > 0))) throw new Error("Parent record is required");
@@ -1100,8 +1100,8 @@ async function __runAttachmentRemove(ctx: MutationCtx, { docId, version }: any, 
     if (!doc) throw new Error("Attachment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Attachment not found");
     if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write attachments through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute attachment commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -1145,8 +1145,8 @@ async function __runAttachmentSetSurveySelection(ctx: MutationCtx, { docId, incl
     if (!doc) throw new Error("Attachment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Attachment not found");
     if (!((checkRole(user, "staffAccess") && ((doc.parentType !== "staffMessage") || (doc.uploadedById == null))))) throw new Error("Staff may read attachments; chat files are read through their message");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write attachments through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute attachment commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update attachments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change attachments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);

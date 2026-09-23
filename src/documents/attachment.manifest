@@ -77,8 +77,8 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   // create-time draft escape alone (the read policy runs before mutates), and
   // a copied sign-in id is never an authorization.
   default policy attachmentRead read: roleAllows(user.role, "staffAccess") and (self.parentType != "staffMessage" or self.uploadedById == null) "Staff may read attachments; chat files are read through their message"
-  default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may write attachments through commands"
-  default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute attachment commands"
+  default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may update attachments"
+  default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may change attachments"
 
   command attach(
     parentType: AttachmentParentType,
