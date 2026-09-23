@@ -119,6 +119,7 @@ import type * as lib_proposalRevision from "../lib/proposalRevision.js";
 import type * as lib_purchasingEvents from "../lib/purchasingEvents.js";
 import type * as lib_purchasingReschedule from "../lib/purchasingReschedule.js";
 import type * as lib_qboSync from "../lib/qboSync.js";
+import type * as lib_reconciliationIsolation from "../lib/reconciliationIsolation.js";
 import type * as lib_reconciliationReceipt from "../lib/reconciliationReceipt.js";
 import type * as lib_runOfShowAlertLoop from "../lib/runOfShowAlertLoop.js";
 import type * as lib_safeMaterialization from "../lib/safeMaterialization.js";
@@ -293,6 +294,7 @@ declare const fullApi: ApiFromModules<{
   "lib/purchasingEvents": typeof lib_purchasingEvents;
   "lib/purchasingReschedule": typeof lib_purchasingReschedule;
   "lib/qboSync": typeof lib_qboSync;
+  "lib/reconciliationIsolation": typeof lib_reconciliationIsolation;
   "lib/reconciliationReceipt": typeof lib_reconciliationReceipt;
   "lib/runOfShowAlertLoop": typeof lib_runOfShowAlertLoop;
   "lib/safeMaterialization": typeof lib_safeMaterialization;

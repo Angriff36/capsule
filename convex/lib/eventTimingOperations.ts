@@ -66,6 +66,13 @@ export async function reconcileEventTiming(
 ) {
   const { event, milestones, nextSortOrder } = await readEventTimingPlan(ctx, eventId);
   if (event.timingConfiguredAt == null) return;
+  // Same rule as EventTimelineActivity.planTiming: a cancelled parent keeps
+  // its historical times; calculated timing must not re-plan them (AC-424).
+  if (event.stage === "cancelled") {
+    throw new Error(
+      "Calculated timing requires an active event; historical blocks keep their recorded times",
+    );
+  }
   const windows: TimingWindow[] = milestones.map((milestone) => ({
     key: milestone.key, startsAt: milestone.startsAt, endsAt: milestone.endsAt,
   }));

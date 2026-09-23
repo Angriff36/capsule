@@ -34,6 +34,8 @@ export type ReconciliationReceiptOutput = {
   exceptionCount: number;
   unresolved: { code: string; recordIds: string[] }[];
   checkpoint: { state: "complete" | "partial"; key: string };
+  /** AC-424 isolation receipts set this; absent means the legacy happy path. */
+  fullyReconciled?: boolean;
 };
 
 /** Identity + storage for one domain's Event reconciliation receipts. */
