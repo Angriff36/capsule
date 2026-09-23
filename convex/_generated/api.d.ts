@@ -120,6 +120,7 @@ import type * as lib_proposalBookingVenue from "../lib/proposalBookingVenue.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
 import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
+import type * as lib_proposalReconciliation from "../lib/proposalReconciliation.js";
 import type * as lib_proposalRevision from "../lib/proposalRevision.js";
 import type * as lib_purchasingEvents from "../lib/purchasingEvents.js";
 import type * as lib_purchasingReschedule from "../lib/purchasingReschedule.js";
@@ -301,6 +302,7 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalDraft": typeof lib_proposalDraft;
   "lib/proposalEventCreation": typeof lib_proposalEventCreation;
   "lib/proposalPricing": typeof lib_proposalPricing;
+  "lib/proposalReconciliation": typeof lib_proposalReconciliation;
   "lib/proposalRevision": typeof lib_proposalRevision;
   "lib/purchasingEvents": typeof lib_purchasingEvents;
   "lib/purchasingReschedule": typeof lib_purchasingReschedule;
