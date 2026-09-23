@@ -315,6 +315,28 @@ $(ralph_integration_prompt)"
     fi
     rm -f "$STDERR_LOG"
 
+    # A failed round that ended in under a minute did no work: the provider refused
+    # us (subscription empty, rate limit, logged out) or the CLI crashed at start.
+    # Seen 2026-09-22: 500 such rounds at one per 11 s on an empty OpenAI plan.
+    # Wait 15 minutes and try again - never stop (owner rule), never spin.
+    if [ "$EXIT_CODE" -ne 0 ] && [ "$ELAPSED" -lt 60 ]; then
+        echo "Ralph: round failed in ${ELAPSED}s (provider limit or login?) - waiting 15 min before the next try"
+        sleep 900
+    fi
+
+    # The pre-push hook regenerates Builder output and refuses the push when the
+    # committed output is behind the manifest sources. The brain does not act on
+    # "commit it and push again" (10 refused pushes 2026-09-22), so do it here:
+    # when the only dirty files are Builder-owned, commit the Builder's own output.
+    if [ "$EXIT_CODE" -eq 0 ] && ! bun scripts/manifest-regen-check.ts >/dev/null 2>&1; then
+        OWNED=$(git status --porcelain -- .builder/ownership.json convex/ manifest-context-summary.json src/generated/ wiring/ schemas/ scripts/seed-convex.ts src/lib/manifest-convex-react.ts | awk '{print $2}')
+        if [ -n "$OWNED" ] && git diff --quiet -- . ':(exclude).builder' ':(exclude)convex' ':(exclude)manifest-context-summary.json' ':(exclude)src/generated' ':(exclude)wiring' ':(exclude)schemas' ':(exclude)scripts/seed-convex.ts' ':(exclude)src/lib/manifest-convex-react.ts'; then
+            echo "Ralph: committing regenerated Builder output so the push gate passes"
+            # shellcheck disable=SC2086
+            git add -- $OWNED && git commit --quiet -m "[loop] regen: generated output catches up with the manifest sources" || true
+        fi
+    fi
+
     # Push changes after each iteration. Record the completed iteration count to
     # the checkpoint only on a successful push, so --resume never skips work that
     # never made it upstream.
