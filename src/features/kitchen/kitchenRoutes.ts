@@ -17,7 +17,7 @@ export const KITCHEN_SECTIONS: readonly {
   { key: "ingredients", label: "Ingredients", path: "/kitchen/ingredients" },
   { key: "dishes", label: "Dishes", path: "/kitchen/dishes" },
   { key: "menus", label: "Menus", path: "/kitchen/menus" },
-  { key: "prep", label: "Command deck", path: "/kitchen/prep" },
+  { key: "prep", label: "Prep board", path: "/kitchen/prep" },
   { key: "unresolved", label: "Unresolved", path: "/kitchen/unresolved" },
   { key: "stations", label: "Stations", path: "/kitchen/stations" },
   { key: "cleanup", label: "Cleanup", path: "/kitchen/cleanup" },

@@ -150,7 +150,7 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
           {busy ? "Syncing…" : "Sync prep from menu"}
         </button>
         <Link className="btn btn-ghost" to="/kitchen/prep">
-          Open command deck
+          Open prep board
         </Link>
       </div>
       {error ? (

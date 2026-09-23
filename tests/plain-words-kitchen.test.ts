@@ -229,4 +229,29 @@ describe("plain words on kitchen screens", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen command-deck copy free of command jargon", () => {
+    const files = [
+      "src/features/kitchen/kitchenRoutes.ts",
+      "src/features/events/EventPrepTab.tsx",
+    ];
+    const all = files.map((path) => readFileSync(path, "utf8")).join("\n");
+
+    // Strip comments and hyphenated identifiers (kitchen-command-deck) so the
+    // "command deck" phrase check only sees user-visible text.
+    const visible = all
+      .replace(/\/\*[\s\S]*?\*\//g, " ")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      .replace(/\b[A-Za-z]+(?:-[A-Za-z]+)+\b/g, " ");
+
+    expect(all).not.toContain("Command deck");
+    expect(all).not.toContain("Open command deck");
+    expect(visible).not.toMatch(/command\s+deck/i);
+
+    expect(all).toContain('label: "Prep board"');
+    expect(all).toContain("Open prep board");
+
+    expectPlain("Prep board");
+    expectPlain("Open prep board");
+  });
 });
