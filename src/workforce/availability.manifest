@@ -184,8 +184,8 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
   transition status from "withdrawn" to []
 
   default policy availabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read availability windows"
-  default policy availabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write availability through commands"
-  default policy availabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute availability commands"
+  default policy availabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update availability"
+  default policy availabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change availability"
 
   command declare(
     personId: uuid,
@@ -289,8 +289,8 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
   transition status from "withdrawn" to []
 
   default policy recurringAvailabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read recurring availability"
-  default policy recurringAvailabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may write recurring availability through commands"
-  default policy recurringAvailabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may execute recurring availability commands"
+  default policy recurringAvailabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update recurring availability"
+  default policy recurringAvailabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change recurring availability"
 
   command declare(
     personId: uuid,

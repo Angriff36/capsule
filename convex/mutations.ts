@@ -1187,8 +1187,8 @@ async function __runAvailabilityWindowDeclare(ctx: MutationCtx, { docId, personI
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("AvailabilityWindow not found");
     const doc = await __decryptDoc(ctx, "AvailabilityWindow", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read availability windows");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write availability through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute availability commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update availability");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change availability");
     if (!((doc.declaredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -1271,8 +1271,8 @@ export const AvailabilityWindow_createViaDeclare = mutation({
       startsAt: args.startsAt
     };
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read availability windows");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write availability through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute availability commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update availability");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change availability");
     if (!((__draft.declaredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -1312,8 +1312,8 @@ async function __runAvailabilityWindowWithdraw(ctx: MutationCtx, { docId, versio
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("AvailabilityWindow not found");
     const doc = await __decryptDoc(ctx, "AvailabilityWindow", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read availability windows");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write availability through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute availability commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update availability");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change availability");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.declaredAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -1376,8 +1376,8 @@ async function __runCandidateAdvance(ctx: MutationCtx, { docId, toStage, version
     if (!doc) throw new Error("Candidate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Candidate not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read candidates");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write candidates through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute candidate commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update candidates");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change candidates");
     if (!((doc.appliedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -1427,8 +1427,8 @@ async function __runCandidateApply(ctx: MutationCtx, { docId, fullName, email, p
     if (!doc) throw new Error("Candidate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Candidate not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read candidates");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write candidates through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute candidate commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update candidates");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change candidates");
     if (!((doc.appliedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -1516,8 +1516,8 @@ export const Candidate_createViaApply = mutation({
       sourceSystem: args.sourceSystem
     };
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read candidates");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write candidates through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute candidate commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update candidates");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change candidates");
     if (!((__draft.appliedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -1555,8 +1555,8 @@ async function __runCandidateHire(ctx: MutationCtx, { docId, hiredPersonId, vers
     if (!doc) throw new Error("Candidate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Candidate not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read candidates");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write candidates through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute candidate commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update candidates");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change candidates");
     if (!((doc.appliedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.stage !== "hired"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -1606,8 +1606,8 @@ async function __runCandidateReject(ctx: MutationCtx, { docId, reason, version }
     if (!doc) throw new Error("Candidate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Candidate not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read candidates");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write candidates through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute candidate commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update candidates");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change candidates");
     if (!((doc.appliedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.stage !== "rejected"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -1657,8 +1657,8 @@ async function __runCandidateRevokeHire(ctx: MutationCtx, { docId, toStage, reas
     if (!doc) throw new Error("Candidate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Candidate not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read candidates");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write candidates through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute candidate commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update candidates");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change candidates");
     if (!((doc.appliedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.stage === "hired"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14494,8 +14494,8 @@ async function __runEventAssignmentApplyApprovedShiftSwap(ctx: MutationCtx, { do
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "assigned") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((doc.checkedInAt == null) && (doc.checkedOutAt == null)) && (doc.noShowAt == null)))) throw new Error("Guard 2 failed");
@@ -14567,8 +14567,8 @@ async function __runEventAssignmentAssign(ctx: MutationCtx, { docId, eventId, pe
     ((doc as any) as any).event = __rel_event;
     ((doc as any) as any).person = __rel_person;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((doc.assignedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "assigned"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14661,8 +14661,8 @@ export const EventAssignment_createViaAssign = mutation({
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((__draft.assignedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "assigned"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14707,8 +14707,8 @@ async function __runEventAssignmentCheckIn(ctx: MutationCtx, { docId, version }:
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "assigned") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.assignedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14772,8 +14772,8 @@ async function __runEventAssignmentCheckOut(ctx: MutationCtx, { docId, version }
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((doc.status === "checked_in"))) throw new Error("Guard 0 failed");
     if (!((doc.checkedInAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14837,8 +14837,8 @@ async function __runEventAssignmentConfirm(ctx: MutationCtx, { docId, version }:
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((doc.status === "assigned"))) throw new Error("Guard 0 failed");
     if (!((doc.assignedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14902,8 +14902,8 @@ async function __runEventAssignmentMarkNoShow(ctx: MutationCtx, { docId, version
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "assigned") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.assignedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -14966,8 +14966,8 @@ async function __runEventAssignmentPlanTiming(ctx: MutationCtx, { docId, startsA
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "assigned") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || ((checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess")) || (((checkRole(user, "workforceSelfAccess") && (followsEventTiming === true)) && ((doc.followsEventTiming === true) || (((doc.followsEventTiming == null) && (doc.startsAt == null)) && (doc.endsAt == null)))) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess"))))))) throw new Error("Guard 2 failed");
@@ -15022,8 +15022,8 @@ async function __runEventAssignmentUnassign(ctx: MutationCtx, { docId, version }
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "assigned") || (doc.status === "confirmed")))) throw new Error("Guard 0 failed");
     if (!((doc.assignedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -18375,8 +18375,8 @@ async function __runEventStaffNeedApplyApprovedShiftSwap(ctx: MutationCtx, { doc
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((doc.status === "filled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -18430,8 +18430,8 @@ async function __runEventStaffNeedCancel(ctx: MutationCtx, { docId, reason, vers
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((((doc.status === "open") || (doc.status === "claimed")) || (doc.status === "filled")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
@@ -18493,8 +18493,8 @@ async function __runEventStaffNeedChangeCoverage(ctx: MutationCtx, { docId, pers
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "filled") || (doc.status === "cancelled")))) throw new Error("Guard 0 failed");
     if (!(((doc.postedAt != null) && (doc.deletedAt == null)))) throw new Error("Guard 1 failed");
     if (!((doc.coverageContinuedAt == null))) throw new Error("Guard 2 failed");
@@ -18564,8 +18564,8 @@ async function __runEventStaffNeedClaim(ctx: MutationCtx, { docId, personId, ver
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")) || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 0 failed");
     if (!((doc.status === "open"))) throw new Error("Guard 1 failed");
     if (!((doc.postedAt != null))) throw new Error("Guard 2 failed");
@@ -18627,8 +18627,8 @@ async function __runEventStaffNeedFill(ctx: MutationCtx, { docId, personId, vers
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "open") || (doc.status === "claimed")))) throw new Error("Guard 0 failed");
     if (!((doc.postedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -18691,8 +18691,8 @@ async function __runEventStaffNeedPlanTiming(ctx: MutationCtx, { docId, startsAt
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((doc.status !== "cancelled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || ((checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess")) || (((checkRole(user, "workforceSelfAccess") && (followsEventTiming === true)) && ((doc.followsEventTiming === true) || (((doc.followsEventTiming == null) && (doc.startsAt == null)) && (doc.endsAt == null)))) && (checkRole(user, "eventAccess") || checkRole(user, "manageAccess"))))))) throw new Error("Guard 2 failed");
@@ -18745,8 +18745,8 @@ async function __runEventStaffNeedPostOpen(ctx: MutationCtx, { docId, eventId, r
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
@@ -18855,8 +18855,8 @@ export const EventStaffNeed_createViaPostOpen = mutation({
       startsAt: args.startsAt
     };
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
@@ -18897,8 +18897,8 @@ async function __runEventStaffNeedPrepareCoverageContinuation(ctx: MutationCtx, 
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((doc.status === "cancelled") && (doc.coverageContinuedAt != null)))) throw new Error("Guard 0 failed");
     if (!(((doc.coverageWindowsJson == null) && (doc.deletedAt == null)))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
@@ -18945,8 +18945,8 @@ async function __runEventStaffNeedReleaseClaim(ctx: MutationCtx, { docId, versio
     if (!doc) throw new Error("EventStaffNeed not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventStaffNeed not found");
     if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may read shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
-    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may use commands to update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may update shared event staffing");
+    if (!((checkRole(user, "workforceAccess") || checkRole(user, "workforceSelfAccess")))) throw new Error("Crew may change shared event staffing");
     if (!(((((doc.claimedByPersonId === user.personId) || ((user.personId == null) && (doc.claimedByPersonId === user.id))) || checkRole(user, "workforceManageAccess")) || (checkRole(user, "workforceSelfAccess") && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 0 failed");
     if (!((doc.status === "claimed"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -24807,8 +24807,8 @@ async function __runInterviewRecordOutcome(ctx: MutationCtx, { docId, outcome, n
     if (!doc) throw new Error("Interview not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Interview not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read interviews");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write interviews through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute interview commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update interviews");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change interviews");
     if (!((doc.outcome === "pending"))) throw new Error("Guard 0 failed");
     if (!((doc.bookedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -24861,8 +24861,8 @@ async function __runInterviewSchedule(ctx: MutationCtx, { docId, candidateId, sc
     const __rel_candidate = await __resolveRelation(ctx, "candidates", [__auth.tenantId, doc.candidateId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).candidate = __rel_candidate;
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read interviews");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write interviews through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute interview commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update interviews");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change interviews");
     if (!((doc.bookedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_candidate != null))) throw new Error("Guard 2 failed");
@@ -24946,8 +24946,8 @@ export const Interview_createViaSchedule = mutation({
     };
     const __rel_candidate = await __resolveRelation(ctx, "candidates", [__auth.tenantId, __draft.candidateId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read interviews");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write interviews through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute interview commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update interviews");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change interviews");
     if (!((__draft.bookedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_candidate != null))) throw new Error("Guard 2 failed");
@@ -29309,8 +29309,8 @@ async function __runOneOnOneHold(ctx: MutationCtx, { docId, leadPersonId, staffM
     if (!doc) throw new Error("OneOnOne not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OneOnOne not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read one-on-ones");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write one-on-ones through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute one-on-one commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update one-on-ones");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change one-on-ones");
     if (!((doc.heldAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -29399,8 +29399,8 @@ export const OneOnOne_createViaHold = mutation({
       staffMemberId: args.staffMemberId
     };
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read one-on-ones");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write one-on-ones through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute one-on-one commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update one-on-ones");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change one-on-ones");
     if (!((__draft.heldAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -29439,8 +29439,8 @@ async function __runOneOnOneActionCapture(ctx: MutationCtx, { docId, oneOnOneId,
     const __rel_oneOnOne = await __resolveRelation(ctx, "oneOnOnes", [__auth.tenantId, doc.oneOnOneId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).oneOnOne = __rel_oneOnOne;
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read one-on-one actions");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write one-on-one actions through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute one-on-one action commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update one-on-one actions");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change one-on-one actions");
     if (!((doc.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_oneOnOne != null) && (__rel_oneOnOne.heldAt != null)))) throw new Error("Guard 2 failed");
@@ -29517,8 +29517,8 @@ export const OneOnOneAction_createViaCapture = mutation({
     };
     const __rel_oneOnOne = await __resolveRelation(ctx, "oneOnOnes", [__auth.tenantId, __draft.oneOnOneId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read one-on-one actions");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write one-on-one actions through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute one-on-one action commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update one-on-one actions");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change one-on-one actions");
     if (!((__draft.capturedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_oneOnOne != null) && (__rel_oneOnOne.heldAt != null)))) throw new Error("Guard 2 failed");
@@ -29553,8 +29553,8 @@ async function __runOneOnOneActionClose(ctx: MutationCtx, { docId, version }: an
     if (!doc) throw new Error("OneOnOneAction not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OneOnOneAction not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read one-on-one actions");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write one-on-one actions through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute one-on-one action commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update one-on-one actions");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change one-on-one actions");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
     if (!((doc.capturedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -33948,8 +33948,8 @@ async function __runPerformanceReviewRecord(ctx: MutationCtx, { docId, personId,
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).person = __rel_person;
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read performance reviews");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write performance reviews through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute performance review commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update performance reviews");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change performance reviews");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
@@ -34045,8 +34045,8 @@ export const PerformanceReview_createViaRecord = mutation({
     };
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "manageAccess"))) throw new Error("Managers may read performance reviews");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write performance reviews through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute performance review commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update performance reviews");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change performance reviews");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
@@ -40319,8 +40319,8 @@ async function __runQualificationExpire(ctx: MutationCtx, { docId, version }: an
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Qualification not found");
     const doc = await __decryptDoc(ctx, "Qualification", ["notes"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read qualifications");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write qualifications through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute qualification commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update qualifications");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change qualifications");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.grantedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.expiresAt != null))) throw new Error("Guard 2 failed");
@@ -40386,8 +40386,8 @@ async function __runQualificationGrant(ctx: MutationCtx, { docId, personId, name
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).person = __rel_person;
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read qualifications");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write qualifications through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute qualification commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update qualifications");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change qualifications");
     if (!((doc.grantedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -40486,8 +40486,8 @@ export const Qualification_createViaGrant = mutation({
     };
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read qualifications");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write qualifications through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute qualification commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update qualifications");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change qualifications");
     if (!((__draft.grantedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -40533,8 +40533,8 @@ async function __runQualificationRevoke(ctx: MutationCtx, { docId, notes, versio
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Qualification not found");
     const doc = await __decryptDoc(ctx, "Qualification", ["notes"], __storedDoc) as Record<string, any>;
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read qualifications");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write qualifications through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute qualification commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update qualifications");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change qualifications");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.grantedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -41242,8 +41242,8 @@ async function __runRecurringAvailabilityDeclare(ctx: MutationCtx, { docId, pers
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("RecurringAvailability not found");
     const doc = await __decryptDoc(ctx, "RecurringAvailability", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read recurring availability");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write recurring availability through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute recurring availability commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update recurring availability");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change recurring availability");
     if (!((doc.declaredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -41327,8 +41327,8 @@ export const RecurringAvailability_createViaDeclare = mutation({
       startMinute: args.startMinute
     };
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read recurring availability");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write recurring availability through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute recurring availability commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update recurring availability");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change recurring availability");
     if (!((__draft.declaredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -41369,8 +41369,8 @@ async function __runRecurringAvailabilityWithdraw(ctx: MutationCtx, { docId, ver
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("RecurringAvailability not found");
     const doc = await __decryptDoc(ctx, "RecurringAvailability", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read recurring availability");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write recurring availability through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute recurring availability commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update recurring availability");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change recurring availability");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.declaredAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -42466,8 +42466,8 @@ async function __runRoleScorecardArchive(ctx: MutationCtx, { docId, reason, vers
     if (!doc) throw new Error("RoleScorecard not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RoleScorecard not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read role scorecards");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write role scorecards through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute role scorecard commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update role scorecards");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change role scorecards");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -42531,8 +42531,8 @@ async function __runRoleScorecardDefine(ctx: MutationCtx, { docId, role, title, 
     if (!doc) throw new Error("RoleScorecard not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RoleScorecard not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read role scorecards");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write role scorecards through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute role scorecard commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update role scorecards");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change role scorecards");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -42607,8 +42607,8 @@ export const RoleScorecard_createViaDefine = mutation({
       title: args.title
     };
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read role scorecards");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write role scorecards through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute role scorecard commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update role scorecards");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change role scorecards");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -42642,8 +42642,8 @@ async function __runRoleScorecardReactivate(ctx: MutationCtx, { docId, version }
     if (!doc) throw new Error("RoleScorecard not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RoleScorecard not found");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may read role scorecards");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may write role scorecards through commands");
-    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may execute role scorecard commands");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update role scorecards");
+    if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change role scorecards");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -43849,8 +43849,8 @@ async function __runShiftApplyApprovedSwap(ctx: MutationCtx, { docId, version }:
     ((doc as any) as any).swapTargetQualification = __rel_swapTargetQualification;
     ((doc as any) as any).swapTargetTrainingCompletion = __rel_swapTargetTrainingCompletion;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -43918,8 +43918,8 @@ async function __runShiftCancel(ctx: MutationCtx, { docId, reason, version }: an
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!(((doc.status === "scheduled") || (doc.status === "started")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((doc.eventId != null) && checkRole(user, "workforceSelfAccess")) && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
@@ -43984,8 +43984,8 @@ async function __runShiftComplete(ctx: MutationCtx, { docId, version }: any, __c
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.status === "started"))) throw new Error("Guard 0 failed");
     if (!((doc.startedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -44049,8 +44049,8 @@ async function __runShiftMarkNoShow(ctx: MutationCtx, { docId, version }: any, _
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!(((doc.status === "scheduled") || (doc.status === "started")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -44112,8 +44112,8 @@ async function __runShiftPlanEventTiming(ctx: MutationCtx, { docId, startsAt, en
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.eventStaffingManagedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -44171,8 +44171,8 @@ async function __runShiftRemoveStaffNeedCoverage(ctx: MutationCtx, { docId, staf
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.eventId != null))) throw new Error("Guard 2 failed");
@@ -44242,8 +44242,8 @@ async function __runShiftReschedule(ctx: MutationCtx, { docId, startsAt, endsAt,
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "workforceManageAccess") || (((doc.eventId != null) && checkRole(user, "workforceSelfAccess")) && checkRole(user, "eventManageAccess"))))) throw new Error("Guard 2 failed");
@@ -44297,8 +44297,8 @@ async function __runShiftRetireEventTiming(ctx: MutationCtx, { docId, reason, ve
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((doc.eventStaffingManagedAt != null) && (doc.eventId != null)))) throw new Error("Guard 2 failed");
@@ -44373,8 +44373,8 @@ async function __runShiftSchedule(ctx: MutationCtx, { docId, personId, startsAt,
     ((doc as any) as any).requiredTrainingCompletion = __rel_requiredTrainingCompletion;
     ((doc as any) as any).requiredQualification = __rel_requiredQualification;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -44493,8 +44493,8 @@ export const Shift_createViaSchedule = mutation({
     const __rel_requiredQualification = await __resolveRelation(ctx, "qualifications", [__auth.tenantId, __draft.requiredQualificationId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_requiredTrainingCompletion = await __resolveRelation(ctx, "trainingCompletions", [__auth.tenantId, __draft.requiredTrainingCompletionId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (__draft.personId === user.personId)) || (__draft.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (__draft.personId === user.personId)) || (__draft.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (__draft.personId === user.personId)) || (__draft.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (__draft.personId === user.personId)) || (__draft.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (__draft.personId === user.personId)) || (__draft.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -44550,8 +44550,8 @@ async function __runShiftStageApprovedSwap(ctx: MutationCtx, { docId, shiftSwapR
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -44614,8 +44614,8 @@ async function __runShiftStart(ctx: MutationCtx, { docId, version }: any, __crea
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Workforce staff may read shifts; crew may read their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
-    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may use commands to update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may update their own shifts and the shared event schedule");
+    if (!((checkRole(user, "workforceAccess") || (checkRole(user, "workforceSelfAccess") && (((user.personId != null) && (doc.personId === user.personId)) || (doc.eventId != null)))))) throw new Error("Crew may change their own shifts and the shared event schedule");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -45260,8 +45260,8 @@ async function __runShiftTypeDefine(ctx: MutationCtx, { docId, name, description
     const __rel_requiredTrainingModule = await __resolveRelation(ctx, "trainingModules", [__auth.tenantId, doc.requiredTrainingModuleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).requiredTrainingModule = __rel_requiredTrainingModule;
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read shift types");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write shift types through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute shift type commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update shift types");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change shift types");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -45347,8 +45347,8 @@ export const ShiftType_createViaDefine = mutation({
     };
     const __rel_requiredTrainingModule = await __resolveRelation(ctx, "trainingModules", [__auth.tenantId, __draft.requiredTrainingModuleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read shift types");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write shift types through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute shift type commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update shift types");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change shift types");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -45383,8 +45383,8 @@ async function __runShiftTypeReactivate(ctx: MutationCtx, { docId, version }: an
     if (!doc) throw new Error("ShiftType not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ShiftType not found");
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read shift types");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write shift types through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute shift type commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update shift types");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change shift types");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -45443,8 +45443,8 @@ async function __runShiftTypeRetire(ctx: MutationCtx, { docId, version }: any, _
     if (!doc) throw new Error("ShiftType not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ShiftType not found");
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read shift types");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write shift types through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute shift type commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update shift types");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change shift types");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -45852,7 +45852,7 @@ async function __runStaffChatReadCursorOpen(ctx: MutationCtx, { docId, channelKe
     if (!doc) throw new Error("StaffChatReadCursor not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StaffChatReadCursor not found");
     if (!((checkRole(user, "staffAccess") && ((doc.authSubjectId == null) || ((user.id != null) && (doc.authSubjectId === user.id)))))) throw new Error("Staff may read their own chat read cursors");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write their own chat read cursors through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark which chats they have read");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark chat channels read for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((doc.authSubjectId == null))) throw new Error("Guard 1 failed");
@@ -45918,7 +45918,7 @@ export const StaffChatReadCursor_createViaOpen = mutation({
       channelKey: args.channelKey
     };
     if (!((checkRole(user, "staffAccess") && ((__draft.authSubjectId == null) || ((user.id != null) && (__draft.authSubjectId === user.id)))))) throw new Error("Staff may read their own chat read cursors");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write their own chat read cursors through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark which chats they have read");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark chat channels read for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((__draft.authSubjectId == null))) throw new Error("Guard 1 failed");
@@ -45951,7 +45951,7 @@ async function __runStaffChatReadCursorTouch(ctx: MutationCtx, { docId, readUpTo
     if (!doc) throw new Error("StaffChatReadCursor not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("StaffChatReadCursor not found");
     if (!((checkRole(user, "staffAccess") && ((doc.authSubjectId == null) || ((user.id != null) && (doc.authSubjectId === user.id)))))) throw new Error("Staff may read their own chat read cursors");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write their own chat read cursors through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark which chats they have read");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may mark chat channels read for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
     if (!((doc.authSubjectId === user.id))) throw new Error("Guard 1 failed");
@@ -46000,8 +46000,8 @@ async function __runStaffMessageEdit(ctx: MutationCtx, { docId, body, mentionedP
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("StaffMessage not found");
     const doc = await __decryptDoc(ctx, "StaffMessage", ["body"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || ((doc.senderAuthSubjectId == null) && (doc.senderPersonId == null))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update staff messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change staff messages");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
     if (!(((user.personId != null) && (doc.senderPersonId === user.personId)))) throw new Error("Guard 2 failed");
@@ -46054,8 +46054,8 @@ async function __runStaffMessageMarkRead(ctx: MutationCtx, { docId, version }: a
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("StaffMessage not found");
     const doc = await __decryptDoc(ctx, "StaffMessage", ["body"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || ((doc.senderAuthSubjectId == null) && (doc.senderPersonId == null))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update staff messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change staff messages");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.readAt == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -46105,8 +46105,8 @@ async function __runStaffMessageRemove(ctx: MutationCtx, { docId, version }: any
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("StaffMessage not found");
     const doc = await __decryptDoc(ctx, "StaffMessage", ["body"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || ((doc.senderAuthSubjectId == null) && (doc.senderPersonId == null))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update staff messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change staff messages");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((user.id != null))) throw new Error("Guard 1 failed");
     if (!((((user.personId != null) && (doc.senderPersonId === user.personId)) || checkRole(user, "manageAccess")))) throw new Error("Guard 2 failed");
@@ -46158,8 +46158,8 @@ async function __runStaffMessageSend(ctx: MutationCtx, { docId, recipientPersonI
     ((doc as any) as any).event = __rel_event;
     ((doc as any) as any).recipient = __rel_recipient;
     if (!((checkRole(user, "staffAccess") && (((doc.eventId != null) || ((doc.senderAuthSubjectId == null) && (doc.senderPersonId == null))) || ((user.personId != null) && ((doc.senderPersonId === user.personId) || (doc.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update staff messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change staff messages");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.senderPersonId == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -46244,8 +46244,8 @@ export const StaffMessage_createViaSend = mutation({
     const __rel_recipient = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.recipientPersonId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "staffAccess") && (((__draft.eventId != null) || ((__draft.senderAuthSubjectId == null) && (__draft.senderPersonId == null))) || ((user.personId != null) && ((__draft.senderPersonId === user.personId) || (__draft.recipientPersonId === user.personId))))))) throw new Error("Staff may read channel messages and their own direct messages");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write staff messages through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute staff message commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update staff messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change staff messages");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.senderPersonId == null))) throw new Error("Guard 1 failed");
     if (!((user.id != null))) throw new Error("Guard 2 failed");
@@ -48336,8 +48336,8 @@ async function __runTimeRecordClockIn(ctx: MutationCtx, { docId, personId, shift
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).person = __rel_person;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read time records");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write time records through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute time record commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update time entries");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change time entries");
     if (!((doc.clockInAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "open"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -48420,8 +48420,8 @@ export const TimeRecord_createViaClockIn = mutation({
     };
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read time records");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write time records through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute time record commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update time entries");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change time entries");
     if (!((__draft.clockInAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "open"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -48462,8 +48462,8 @@ async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, 
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("TimeRecord not found");
     const doc = await __decryptDoc(ctx, "TimeRecord", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read time records");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write time records through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute time record commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update time entries");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change time entries");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
     if (!((doc.clockInAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.clockOutAt == null))) throw new Error("Guard 2 failed");
@@ -48532,8 +48532,8 @@ async function __runTimeRecordCorrect(ctx: MutationCtx, { docId, clockInAt, cloc
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("TimeRecord not found");
     const doc = await __decryptDoc(ctx, "TimeRecord", ["notes"], __storedDoc) as Record<string, any>;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read time records");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write time records through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute time record commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update time entries");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change time entries");
     if (!(((doc.status === "closed") || (doc.status === "corrected")))) throw new Error("Guard 0 failed");
     if (!((doc.clockInAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.clockOutAt != null))) throw new Error("Guard 2 failed");
@@ -48976,8 +48976,8 @@ async function __runTrainingCompletionRecord(ctx: MutationCtx, { docId, personId
     ((doc as any) as any).person = __rel_person;
     ((doc as any) as any).trainingModule = __rel_trainingModule;
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read training completions");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write training completions through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute training completion commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update training completions");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change training completions");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
@@ -49063,8 +49063,8 @@ export const TrainingCompletion_createViaRecord = mutation({
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_trainingModule = await __resolveRelation(ctx, "trainingModules", [__auth.tenantId, __draft.trainingModuleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read training completions");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write training completions through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute training completion commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update training completions");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change training completions");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 2 failed");
@@ -49105,8 +49105,8 @@ async function __runTrainingModuleDefine(ctx: MutationCtx, { docId, name, catego
     if (!doc) throw new Error("TrainingModule not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("TrainingModule not found");
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read training modules");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write training modules through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute training module commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update training modules");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change training modules");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -49195,8 +49195,8 @@ export const TrainingModule_createViaDefine = mutation({
       passingScore: args.passingScore
     };
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read training modules");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write training modules through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute training module commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update training modules");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change training modules");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -49232,8 +49232,8 @@ async function __runTrainingModuleReactivate(ctx: MutationCtx, { docId, version 
     if (!doc) throw new Error("TrainingModule not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("TrainingModule not found");
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read training modules");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write training modules through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute training module commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update training modules");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change training modules");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
@@ -49292,8 +49292,8 @@ async function __runTrainingModuleRetire(ctx: MutationCtx, { docId, version }: a
     if (!doc) throw new Error("TrainingModule not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("TrainingModule not found");
     if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may read training modules");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may write training modules through commands");
-    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may execute training module commands");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may update training modules");
+    if (!(checkRole(user, "workforceAccess"))) throw new Error("Workforce staff may change training modules");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -55832,8 +55832,8 @@ async function __runWeeklyScheduleNoticeAcknowledge(ctx: MutationCtx, { docId, v
     if (!doc) throw new Error("WeeklyScheduleNotice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("WeeklyScheduleNotice not found");
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read schedule notices");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write schedule notices through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute schedule notice commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update schedule notices");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change schedule notices");
     if (!((doc.publishedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.acknowledgedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -55883,8 +55883,8 @@ async function __runWeeklyScheduleNoticePublishSchedule(ctx: MutationCtx, { docI
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).person = __rel_person;
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read schedule notices");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write schedule notices through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute schedule notice commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update schedule notices");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change schedule notices");
     if (!((doc.publishedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_person != null))) throw new Error("Guard 2 failed");
@@ -55972,8 +55972,8 @@ export const WeeklyScheduleNotice_createViaPublishSchedule = mutation({
     };
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read schedule notices");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write schedule notices through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute schedule notice commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update schedule notices");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (__draft.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change schedule notices");
     if (!((__draft.publishedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_person != null))) throw new Error("Guard 2 failed");
@@ -56014,8 +56014,8 @@ async function __runWeeklyScheduleNoticeRepublishSchedule(ctx: MutationCtx, { do
     if (!doc) throw new Error("WeeklyScheduleNotice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("WeeklyScheduleNotice not found");
     if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may read schedule notices");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may write schedule notices through commands");
-    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may execute schedule notice commands");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may update schedule notices");
+    if (!((checkRole(user, "workforceAccess") || ((checkRole(user, "workforceSelfAccess") && (user.personId != null)) && (doc.personId === user.personId))))) throw new Error("Workforce staff or the linked person may change schedule notices");
     if (!((doc.publishedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 2 failed");
