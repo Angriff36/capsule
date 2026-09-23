@@ -78,7 +78,7 @@ it("reports proposal publication and contract sent-recording as internal status 
   ]);
   const send = command("useContractSend");
   await mount(createElement(ContractsPage));
-  await click(button("Record sent"));
+  await click(button("Mark sent"));
   expect(send).toHaveBeenCalledExactlyOnceWith({
     docId: "contract-a",
     version: 4,

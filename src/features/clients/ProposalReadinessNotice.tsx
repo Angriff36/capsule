@@ -96,7 +96,7 @@ export function ProposalReadinessNotice({
             .join(", ")}
           <span className="text-ink-3">
             {" "}
-            — check mapped fields against the source before sending.
+            — check the copied fields against the source before sending.
           </span>
         </p>
       ) : null}

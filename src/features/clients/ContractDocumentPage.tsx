@@ -109,7 +109,7 @@ export function ContractDocumentPage() {
     return (
       <ErrorState
         title="Contract not found"
-        detail="This contract is missing or belongs to another tenant."
+        detail="This contract is missing or belongs to another workspace."
       />
     );
   }
@@ -309,9 +309,7 @@ export function ContractDocumentPage() {
               {contract.notes ? (
                 <p className="whitespace-pre-wrap">{String(contract.notes)}</p>
               ) : (
-                <p className="text-ink-2">
-                  No additional terms recorded on this contract.
-                </p>
+                <p className="text-ink-2">No extra terms on this contract.</p>
               )}
               {contract.expiresAt != null ? (
                 <p className="mt-2">
@@ -326,7 +324,7 @@ export function ContractDocumentPage() {
               ) : null}
             </Section>
 
-            <Section label="Cancellation policy">
+            <Section label="If you cancel">
               <p>
                 Either party may cancel with written notice. Cancellations more
                 than 30 days before the event date incur no charge beyond
@@ -353,8 +351,8 @@ export function ContractDocumentPage() {
               </div>
               {signed ? (
                 <p className="mt-4 text-sm text-ink-2">
-                  Signature recorded in Capsule by {String(contract.signedBy)}{" "}
-                  on {formatDate(contract.signedAt)}.
+                  Signed in Capsule by {String(contract.signedBy)} on{" "}
+                  {formatDate(contract.signedAt)}.
                 </p>
               ) : null}
             </Section>

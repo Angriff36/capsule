@@ -564,7 +564,7 @@ export function QuoteSubmissionPage() {
                 <label htmlFor="consent" className="ml-3 text-xs text-ink-2">
                   I consent to the processing of my personal data for the
                   purpose of preparing a quote for my event. I understand my
-                  data will be handled according to the privacy policy.
+                  data will be handled according to our privacy notice.
                 </label>
               </div>
               <FieldError name="consent" errors={errors} touched={touched} />

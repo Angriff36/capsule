@@ -52,7 +52,7 @@ function mediumLabel(value: string): string {
 
 function occurredLabel(value?: number | null): string {
   return value == null
-    ? "Date not recorded"
+    ? "No date on file"
     : `${formatDate(value)} ${formatTime(value)}`;
 }
 
@@ -199,7 +199,7 @@ export function ClientCommunicationPanelView({
 
         {target.kind === "contacts" && activeContacts.length === 0 ? (
           <p className="rounded-xs border border-line bg-inset/40 p-3 text-sm text-ink-2">
-            Add an active contact before recording a conversation.
+            Add an active contact before saving a conversation.
           </p>
         ) : null}
         {failure ? <CrmFailureBanner error={failure} /> : null}

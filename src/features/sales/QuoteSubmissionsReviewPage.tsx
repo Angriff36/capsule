@@ -107,7 +107,7 @@ export function QuoteSubmissionsReviewPage() {
         setPartialErrors(
           `Conversion incomplete — some steps failed: ${result.errors.join(
             "; ",
-          )}. The submission is marked failed. Records already created are linked on its row, and Retry conversion reuses them.`,
+          )}. The submission is marked failed. Anything already created is linked on its row, and Retry conversion reuses them.`,
         );
       } else {
         setLastConverted({
@@ -236,7 +236,7 @@ export function QuoteSubmissionsReviewPage() {
       {publicFormOffline && (
         <div className="mb-4 p-3 bg-warn-soft border border-warn/40 rounded-sm text-xs text-warn">
           The public quote form is offline — this workspace has no active
-          organization record, so new quote requests are refused. Create one in{" "}
+          company profile, so new quote requests are refused. Create one in{" "}
           <Link to="/admin/branding" className="underline font-medium">
             Admin → Branding
           </Link>
