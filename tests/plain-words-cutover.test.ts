@@ -199,4 +199,19 @@ describe("plain words on leftover cutover screen", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover Final Delta Import card title in catering English", () => {
+    const page = readFileSync(
+      "src/features/admin/import/CutoverPage.tsx",
+      "utf8",
+    );
+
+    expect(page).not.toContain("Final Delta Import");
+    expect(page).toContain("Last import");
+    expectPlain("Last import");
+
+    // identifier and later leftovers stay
+    expect(page).toContain("finalDeltaImport");
+    expect(page).toContain("View Imports");
+  });
 });

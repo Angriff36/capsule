@@ -313,7 +313,7 @@ export function CutoverPage() {
         {/* Individual checks */}
         <div className="grid gap-4">
           <ValidationCard
-            title="Final Delta Import"
+            title="Last import"
             check={validation.checks.finalDeltaImport}
             details={validation.checks.finalDeltaImport.details}
             action={
