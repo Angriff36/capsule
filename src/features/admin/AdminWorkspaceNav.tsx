@@ -10,8 +10,8 @@ const sections = [
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },
   { label: "Imports", path: "/admin/imports" },
-  { label: "Parallel run", path: "/admin/parallel-run" },
-  { label: "Reconcile records", path: "/admin/reconcile" },
+  { label: "Compare with TPP", path: "/admin/parallel-run" },
+  { label: "Match leftover items", path: "/admin/reconcile" },
   { label: "Cutover", path: "/admin/cutover" },
 ] as const;
 

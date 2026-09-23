@@ -128,4 +128,23 @@ describe("plain words on leftover import manifests", () => {
     expect(visible).toContain("Staff may read import datasets");
     expectPlain("Staff may update import lists");
   });
+
+  it("keeps leftover admin nav labels free of run and record jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/features/admin/AdminWorkspaceNav.tsx",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Parallel run");
+    expect(visible).not.toContain("Reconcile records");
+
+    for (const fresh of ["Compare with TPP", "Match leftover items"]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    expect(visible).toContain("/admin/parallel-run");
+    expect(visible).toContain("/admin/reconcile");
+  });
 });
