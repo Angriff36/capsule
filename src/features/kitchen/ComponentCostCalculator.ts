@@ -1,54 +1,8 @@
 import type { UnitOfMeasure } from "./import/UnitOfMeasureMapper";
-
-// The prep-sheet units are opaque labels — nothing converts a melon into an
-// each — so each gets its own dimension and only ever matches itself.
-type UnitDimension =
-  | "mass"
-  | "volume"
-  | "count"
-  | "serving"
-  | "batch"
-  | "melon"
-  | "bottle"
-  | "piece"
-  | "slice"
-  | "pizza"
-  | "package"
-  | "case"
-  | "can"
-  | "tub";
-
-const UNIT_FACTORS: Record<
-  UnitOfMeasure,
-  { dimension: UnitDimension; factor: number }
-> = {
-  each: { dimension: "count", factor: 1 },
-  gram: { dimension: "mass", factor: 1 },
-  kilogram: { dimension: "mass", factor: 1_000 },
-  ounce: { dimension: "mass", factor: 28.349523125 },
-  pound: { dimension: "mass", factor: 453.59237 },
-  milliliter: { dimension: "volume", factor: 1 },
-  liter: { dimension: "volume", factor: 1_000 },
-  teaspoon: { dimension: "volume", factor: 4.92892159375 },
-  tablespoon: { dimension: "volume", factor: 14.78676478125 },
-  cup: { dimension: "volume", factor: 236.5882365 },
-  pint: { dimension: "volume", factor: 473.176473 },
-  quart: { dimension: "volume", factor: 946.352946 },
-  gallon: { dimension: "volume", factor: 3_785.411784 },
-  portion: { dimension: "count", factor: 1 },
-  serving: { dimension: "serving", factor: 1 },
-  batch: { dimension: "batch", factor: 1 },
-  melon: { dimension: "melon", factor: 1 },
-  bottle: { dimension: "bottle", factor: 1 },
-  fluid_ounce: { dimension: "volume", factor: 29.5735295625 },
-  piece: { dimension: "piece", factor: 1 },
-  slice: { dimension: "slice", factor: 1 },
-  pizza: { dimension: "pizza", factor: 1 },
-  package: { dimension: "package", factor: 1 },
-  case: { dimension: "case", factor: 1 },
-  can: { dimension: "can", factor: 1 },
-  tub: { dimension: "tub", factor: 1 },
-};
+import {
+  QuantityMoney,
+  type RecordedUnitMapping,
+} from "../../lib/quantityMoney";
 
 export type ComponentCostLineStatus =
   "priced" | "missing_ingredient" | "missing_price" | "incompatible_unit";
@@ -95,22 +49,30 @@ export interface CalculateComponentCostInput {
   ingredients: ComponentCostIngredientInput[];
   batchMultiplier: number;
   yieldQuantity: number;
+  mappings?: readonly RecordedUnitMapping[];
 }
 
+/**
+ * Thin wrapper around `QuantityMoney.convert`: refuses unmapped count,
+ * cross-dimension and density conversions instead of defaulting. With no
+ * mappings the behavior matches the old same-dimension-only table
+ * (`fluid_ounce` included), so the 3-arg call keeps working.
+ */
 export function convertComponentQuantity(
   quantity: number,
   fromUnit: UnitOfMeasure,
   toUnit: UnitOfMeasure,
+  mappings?: readonly RecordedUnitMapping[],
+  ingredientId?: string,
 ): number | null {
-  if (fromUnit === toUnit) return quantity;
-
-  const from = UNIT_FACTORS[fromUnit];
-  const to = UNIT_FACTORS[toUnit];
-  if (from.dimension !== to.dimension || from.dimension === "count") {
-    return null;
-  }
-
-  return (quantity * from.factor) / to.factor;
+  const result = new QuantityMoney().convert({
+    quantity,
+    from: fromUnit,
+    to: toUnit,
+    mappings,
+    ingredientId,
+  });
+  return result.status === "resolved" ? result.quantity : null;
 }
 
 export function calculateComponentCost({
@@ -118,6 +80,7 @@ export function calculateComponentCost({
   ingredients,
   batchMultiplier,
   yieldQuantity,
+  mappings,
 }: CalculateComponentCostInput): ComponentCostSummary {
   const ingredientsById = new Map(
     ingredients.map((ingredient) => [ingredient.id, ingredient]),
@@ -155,6 +118,8 @@ export function calculateComponentCost({
       Number(line.quantity),
       line.unit,
       ingredient.unit,
+      mappings,
+      line.ingredientId,
     );
     if (quantityInPricingUnits === null) {
       return {
@@ -165,12 +130,26 @@ export function calculateComponentCost({
       };
     }
 
+    const extendedCost = new QuantityMoney().lineCost({
+      quantity: quantityInPricingUnits * multiplier,
+      costPerUnit,
+    });
+    if (extendedCost === null) {
+      return {
+        ...base,
+        pricingUnit: ingredient.unit,
+        costPerPricingUnit: costPerUnit,
+        quantityInPricingUnits,
+        status: "missing_price",
+      };
+    }
+
     return {
       ...base,
       pricingUnit: ingredient.unit,
       costPerPricingUnit: costPerUnit,
       quantityInPricingUnits,
-      extendedCost: quantityInPricingUnits * costPerUnit * multiplier,
+      extendedCost,
       status: "priced",
     };
   });
@@ -193,7 +172,10 @@ export function calculateComponentCost({
     pricedLineCount,
     totalLineCount: costLines.length,
     incompleteLineCount,
-    isComplete: incompleteLineCount === 0,
+    isComplete: new QuantityMoney().isCompleteCoverage({
+      pricedLineCount,
+      incompleteLineCount,
+    }),
     lines: costLines,
   };
 }

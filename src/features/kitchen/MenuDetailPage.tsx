@@ -7,6 +7,7 @@ import {
   useListDishIngredient,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListMenuDish,
   useListComponent,
   useListComponentIngredient,
@@ -27,6 +28,7 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
+import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
 import {
   calculateComponentNutrition,
@@ -67,6 +69,7 @@ export function MenuDetailPage() {
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
+  const itemUnitMappings = useListItemUnitMapping();
   const { branding } = useTenantBranding();
   const publish = useMenuMarkPublished();
   const unpublish = useMenuUnpublish();
@@ -164,6 +167,7 @@ export function MenuDetailPage() {
           deletedAt: ingredient.deletedAt,
         })),
         priceObservations: priceObservations ?? [],
+        unitMappings: RecordedUnitMappings.fromRows(itemUnitMappings),
       }),
     [
       dishes,
@@ -171,6 +175,7 @@ export function MenuDetailPage() {
       components,
       dishIngredients,
       ingredients,
+      itemUnitMappings,
       priceObservations,
       componentIngredients,
       selectedMenuDishes,

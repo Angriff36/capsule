@@ -291,7 +291,9 @@ describe("runtime proof: menu profitability direct DishIngredient lines", () => 
         dishId: mismatchedDish.docId,
         ingredientId: pricedIngredient.docId,
         quantity: S.qtyPerServing,
-        unit: "kilogram",
+        // Count vs mass stays unconvertible without a recorded mapping
+        // (AC-406); same-dimension mass units now convert by design.
+        unit: "each",
         wasteFactor: 1,
       },
     );
@@ -437,5 +439,59 @@ describe("runtime proof: menu profitability direct DishIngredient lines", () => 
     expect(row?.costComplete).toBe(true);
     expect(row?.status).toBe("on_target");
     expect(row?.componentCount).toBe(1);
+  });
+});
+
+describe("menu profitability with recorded unit mappings", () => {
+  it("prices a mismatched direct line through a recorded pack mapping", () => {
+    const analysis = buildMenuProfitability({
+      menuDishes: [
+        {
+          id: "md-1",
+          version: 1,
+          dishId: "dish-1",
+          sortOrder: 0,
+          sellingPrice: 24,
+        },
+      ],
+      dishes: [{ id: "dish-1", name: "Mapped dish" }],
+      dishComponents: [],
+      components: [],
+      dishIngredients: [
+        {
+          id: "line-1",
+          dishId: "dish-1",
+          ingredientId: "ing-1",
+          quantity: 1,
+          unit: "each" as never,
+          wasteFactor: 1,
+          addedAt: 1,
+        },
+      ],
+      componentIngredients: [],
+      ingredients: [
+        {
+          id: "ing-1",
+          name: "Tomato",
+          unit: "kilogram" as never,
+          costPerUnit: 6.25,
+        },
+      ],
+      priceObservations: [],
+      unitMappings: [
+        {
+          ingredientId: "ing-1",
+          kind: "pack",
+          unit: "each",
+          equalsQuantity: 1,
+          equalsUnit: "kilogram",
+        },
+      ],
+    });
+
+    const row = analysis.rows[0];
+    expect(row?.componentCost).toBeCloseTo(6.25);
+    expect(row?.costComplete).toBe(true);
+    expect(row?.status).toBe("on_target");
   });
 });

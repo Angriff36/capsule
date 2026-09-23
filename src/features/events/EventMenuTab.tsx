@@ -19,11 +19,13 @@ import {
   useListEventGuest,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListInventoryItem,
   useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
+import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
 import {
   CateringPackagePicker,
@@ -118,6 +120,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
+  const itemUnitMappings = useListItemUnitMapping();
   const priceObservations = useListIngredientPriceObservation();
   const containers = useListDishContainer();
   const inventoryItems = useListInventoryItem();
@@ -263,6 +266,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           deletedAt: row.deletedAt,
         })),
         priceObservations: priceObservations ?? [],
+        unitMappings: RecordedUnitMappings.fromRows(itemUnitMappings),
       }),
     [
       componentIngredients,
@@ -271,6 +275,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       dishIngredients,
       eventId,
       expectedHeadcount,
+      itemUnitMappings,
       ingredients,
       priceObservations,
       selections,

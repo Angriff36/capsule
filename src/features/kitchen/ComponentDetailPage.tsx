@@ -11,6 +11,7 @@ import {
   useListDishComponent,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListItemUnitMapping,
   useListPerson,
   useListComponentIngredient,
   useListComponentSnapshot,
@@ -46,6 +47,7 @@ import {
   resolveIngredientPrice,
 } from "./IngredientPriceHistory";
 import { calculateComponentCost } from "./ComponentCostCalculator";
+import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { ComponentCostPanel } from "./ComponentCostPanel";
 import {
   calculateComponentNutrition,
@@ -93,6 +95,7 @@ export function ComponentDetailPage() {
   useTrackRecent("Component", component?.name);
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
+  const itemUnitMappings = useListItemUnitMapping();
   const lines = useListComponentIngredient();
   const dishes = useListDish();
   const dishComponents = useListDishComponent();
@@ -281,6 +284,7 @@ export function ComponentDetailPage() {
       }),
     batchMultiplier: Number(component.batchMultiplier),
     yieldQuantity: Number(component.yieldQuantity),
+    mappings: RecordedUnitMappings.fromRows(itemUnitMappings),
   });
   const servesPerYield = Number(
     (component as { servesPerYield?: number }).servesPerYield ?? 1,
