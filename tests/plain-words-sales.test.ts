@@ -92,4 +92,107 @@ describe("plain words on sales screens", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover sales-manifest policy copy free of command jargon", () => {
+    const files = [
+      "src/sales/client-communication.manifest",
+      "src/sales/client-retention.manifest",
+      "src/sales/contact.manifest",
+      "src/sales/contract.manifest",
+      "src/sales/credit-memo.manifest",
+      "src/sales/invoice-core.manifest",
+      "src/sales/invoice-number-sequence.manifest",
+      "src/sales/lead.manifest",
+      "src/sales/message-thread.manifest",
+      "src/sales/message.manifest",
+      "src/sales/payment-method.manifest",
+      "src/sales/payment.manifest",
+      "src/sales/proposal-dish-selection.manifest",
+      "src/sales/proposal-enhancement.manifest",
+      "src/sales/proposal-line-item.manifest",
+      "src/sales/proposal-revision.manifest",
+      "src/sales/proposal-template.manifest",
+      "src/sales/proposal.manifest",
+      "src/sales/quote-submission.manifest",
+      "src/sales/referral-source.manifest",
+      "src/sales/share-link.manifest",
+      "src/sales/signature-request.manifest",
+      "src/sales/sync-error.manifest",
+      "src/sales/tax-rate.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "through commands",
+      "execute invoice commands",
+      "execute proposal commands",
+      "execute quote submission",
+      "numbering seam",
+      "implementation records",
+      "generated commands",
+      "record client communication",
+      "Recorded communication",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Finance staff and managers may update invoices",
+      "Finance staff and managers may change invoices",
+      "Sales staff may update proposal dish selections",
+      "Sales staff may change proposal dish selections",
+      "Sales staff may update proposals",
+      "Sales staff may change proposals",
+      "Sales staff may update signature requests",
+      "Sales staff and clients may change signature requests",
+      "Anyone may check a quote request",
+      "Anyone may send a quote request",
+      "Invoice numbers are assigned automatically",
+      "Only Capsule can update invoice number counters",
+      "Invoice number counters stay behind the scenes",
+      "Sales staff may update proposal templates",
+      "Sales staff may change proposal templates",
+      "Sales staff may update proposal enhancements",
+      "Sales staff may change proposal enhancements",
+      "Staff may update connection problems",
+      "Staff may change connection problems",
+      "Sales staff may update share links",
+      "Sales staff may change share links",
+      "Sales staff may update proposal line items",
+      "Sales staff may change proposal line items",
+      "Sales staff may update proposal revisions",
+      "Sales staff may change proposal revisions",
+      "Staff may update conversations",
+      "Staff may change conversations",
+      "Staff may update messages",
+      "Staff may change messages",
+      "Finance staff may update payments",
+      "Finance staff may change payments",
+      "Finance staff may change tax rates",
+      "Sales managers may update referral sources",
+      "Sales managers may change referral sources",
+      "Finance staff may update payment methods",
+      "Finance staff may change payment methods",
+      "Sales staff may update leads",
+      "Sales staff may change leads",
+      "Finance staff may update credit memos",
+      "Finance staff may change credit memos",
+      "Sales staff may update contracts",
+      "Sales staff may change contracts",
+      "Sales staff may update client contacts",
+      "Sales staff may change client contacts",
+      "Sales staff may update client follow-up reminders",
+      "Sales staff may change client follow-up reminders",
+      "Staff may add client notes",
+      "Staff may change client notes",
+      "A saved note needs one contact or event, date, summary, and author",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+  });
 });

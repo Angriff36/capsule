@@ -29,8 +29,8 @@ entity ProposalRevision mixin TenantScoped, SoftDeletable {
   belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
 
   default policy proposalRevisionRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal revisions"
-  default policy proposalRevisionWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal revisions through commands"
-  default policy proposalRevisionExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal revision commands"
+  default policy proposalRevisionWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposal revisions"
+  default policy proposalRevisionExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change proposal revisions"
 
   command capture(
     proposalId: uuid,

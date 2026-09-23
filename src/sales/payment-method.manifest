@@ -52,8 +52,8 @@ entity PaymentMethod mixin TenantScoped, SoftDeletable {
   transition status from "removed" to []
 
   default policy paymentMethodRead read: roleAllows(user.role, "financeAccess") "Finance staff may read payment methods"
-  default policy paymentMethodWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write payment methods through commands"
-  default policy paymentMethodExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute payment method commands"
+  default policy paymentMethodWrite write: roleAllows(user.role, "financeAccess") "Finance staff may update payment methods"
+  default policy paymentMethodExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may change payment methods"
 
   command register(
     clientId: uuid,

@@ -25,11 +25,11 @@ entity ClientCommunication mixin TenantScoped {
   belongsTo clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint communicationComplete: self.recordedAt == null or (((self.clientContactId != null and self.eventId == null) or (self.clientContactId == null and self.eventId != null)) and self.occurredAt != null and length(trim(self.summary)) > 0 and self.authorId != null and length(trim(self.authorId)) > 0 and length(trim(self.authorName)) > 0) "Recorded communication requires one contact or event, date, summary, and author"
+  constraint communicationComplete: self.recordedAt == null or (((self.clientContactId != null and self.eventId == null) or (self.clientContactId == null and self.eventId != null)) and self.occurredAt != null and length(trim(self.summary)) > 0 and self.authorId != null and length(trim(self.authorId)) > 0 and length(trim(self.authorName)) > 0) "A saved note needs one contact or event, date, summary, and author"
 
   default policy clientCommunicationRead read: roleAllows(user.role, "staffAccess") "Staff may read client communication history"
-  default policy clientCommunicationWrite write: roleAllows(user.role, "staffAccess") "Staff may record client communication through commands"
-  default policy clientCommunicationExecute execute: roleAllows(user.role, "staffAccess") "Staff may record client communication"
+  default policy clientCommunicationWrite write: roleAllows(user.role, "staffAccess") "Staff may add client notes"
+  default policy clientCommunicationExecute execute: roleAllows(user.role, "staffAccess") "Staff may change client notes"
 
   command record(
     optional clientContactId: uuid,

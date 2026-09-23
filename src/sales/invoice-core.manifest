@@ -97,8 +97,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   transition status from "written_off" to []
 
   default policy invoiceRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may read invoices"
-  default policy invoiceWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may write invoices through commands"
-  default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may execute invoice commands"
+  default policy invoiceWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may update invoices"
+  default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change invoices"
 
   // invoiceNumber is what finance typed. When it is absent the number is
   // "INV-<invoiceSequence + 1>" — the EventApproved cascade passes

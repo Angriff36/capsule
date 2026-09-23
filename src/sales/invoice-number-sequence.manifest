@@ -17,9 +17,9 @@ entity InvoiceNumberSequence mixin TenantScoped {
 
   property required lastNumber: int
 
-  default policy invoiceNumberSequenceRead read: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice number sequences are private implementation records"
-  default policy invoiceNumberSequenceWrite write: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice number sequences are managed only by the numbering seam"
-  default policy invoiceNumberSequenceExecute execute: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice number sequences expose no generated commands"
+  default policy invoiceNumberSequenceRead read: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice numbers are assigned automatically"
+  default policy invoiceNumberSequenceWrite write: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Only Capsule can update invoice number counters"
+  default policy invoiceNumberSequenceExecute execute: roleAllows(user.role, "invoiceNumberSequenceSeamOnly") "Invoice number counters stay behind the scenes"
 
   store InvoiceNumberSequence in durable
 }

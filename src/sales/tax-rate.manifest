@@ -21,7 +21,7 @@ entity TaxRate mixin TenantScoped, SoftDeletable {
 
   default policy taxRateRead read: roleAllows(user.role, "financeAccess") "Finance staff may read tax rates"
   default policy taxRateWrite write: roleAllows(user.role, "financeAccess") "Finance staff may maintain tax rates"
-  default policy taxRateExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute tax-rate commands"
+  default policy taxRateExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may change tax rates"
 
   command define(
     name: string,

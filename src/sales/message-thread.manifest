@@ -59,8 +59,8 @@ entity MessageThread mixin TenantScoped, SoftDeletable {
   belongsTo lead: Lead? fields [tenantId, leadId] references [tenantId, id]
 
   default policy messageThreadRead read: roleAllows(user.role, "staffAccess") "Staff may read message threads"
-  default policy messageThreadWrite write: roleAllows(user.role, "staffAccess") "Staff may write message threads through commands"
-  default policy messageThreadExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute message thread commands"
+  default policy messageThreadWrite write: roleAllows(user.role, "staffAccess") "Staff may update conversations"
+  default policy messageThreadExecute execute: roleAllows(user.role, "staffAccess") "Staff may change conversations"
 
   // Create a new conversation thread. Provider ids are supplied targets used by
   // the ingest action for match-or-create; the creator identity is stamped from

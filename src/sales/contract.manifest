@@ -54,8 +54,8 @@ entity Contract mixin TenantScoped, SoftDeletable {
   transition status from "voided" to []
 
   default policy contractRead read: roleAllows(user.role, "salesAccess") "Sales staff may read contracts"
-  default policy contractWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write contracts through commands"
-  default policy contractExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute contract commands"
+  default policy contractWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update contracts"
+  default policy contractExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change contracts"
 
   command draft(
     eventId: uuid,

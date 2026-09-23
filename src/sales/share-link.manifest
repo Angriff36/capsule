@@ -75,8 +75,8 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
   belongsTo proposalRevision: ProposalRevision fields [tenantId, proposalRevisionId] references [tenantId, id]
 
   default policy shareLinkRead read: roleAllows(user.role, "salesAccess") "Sales staff may read share links"
-  default policy shareLinkWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write share links through commands"
-  default policy shareLinkExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute share link commands"
+  default policy shareLinkWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update share links"
+  default policy shareLinkExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change share links"
 
   // Issue a new revocable link pinned to a published revision. The caller (UI)
   // supplies the proposal's latest captured revision id. The new row's _id (the

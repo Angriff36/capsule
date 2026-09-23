@@ -98,8 +98,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   transition status from "superseded" to []
 
   default policy proposalRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposals"
-  default policy proposalWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposals through commands"
-  default policy proposalExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal commands"
+  default policy proposalWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposals"
+  default policy proposalExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change proposals"
 
   command draft(
     clientId: uuid,
