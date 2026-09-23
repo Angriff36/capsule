@@ -41,8 +41,8 @@ entity VenueLayoutTemplate mixin TenantScoped, SoftDeletable {
   transition status from "archived" to ["active"]
 
   default policy venueLayoutTemplateRead read: roleAllows(user.role, "eventAccess") "Event staff may read venue layout templates"
-  default policy venueLayoutTemplateWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venue layout templates through commands"
-  default policy venueLayoutTemplateExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue layout template commands"
+  default policy venueLayoutTemplateWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venue layout templates"
+  default policy venueLayoutTemplateExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venue layout templates"
 
   command define(
     venueId: uuid,
