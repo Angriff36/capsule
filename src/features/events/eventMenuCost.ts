@@ -9,6 +9,7 @@ import {
   type IngredientPriceObservationInput,
 } from "../kitchen/IngredientPriceHistory";
 import type { UnitOfMeasure } from "../kitchen/import/UnitOfMeasureMapper";
+import { CommercialMoney } from "../../lib/commercialMoney";
 
 type SoftDelete = { deletedAt?: unknown };
 
@@ -356,7 +357,9 @@ export function buildEventMenuCost(
       };
     });
 
-  const foodCost = dishes.reduce((sum, dish) => sum + dish.foodCost, 0);
+  const foodCost = new CommercialMoney().sum(
+    dishes.map((dish) => dish.foodCost),
+  );
   const servings = eventMenuHeaderServings(
     input.expectedHeadcount,
     dishes.map((dish) => dish.servings),

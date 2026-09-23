@@ -1,5 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useState, useEffect, useMemo, useRef, type FormEvent } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import {
   useGetRevenueAttribution,
   useGetEvent,
@@ -19,7 +19,10 @@ import {
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { useActionNotice } from "../../ui/action-result";
-import { eventRevenueEstimate } from "./revenueAttributionValues";
+import {
+  eventRevenueEstimate,
+  allocateRevenueShare,
+} from "./revenueAttributionValues";
 
 const usd = formatMoneyExact;
 
@@ -119,12 +122,12 @@ export function RevenueAttributionDetailPage() {
     }
   }, [event, attribution, isApplyMode]);
 
-  const calculatedAllocation = useMemo(() => {
-    if (allocationMethod === "percent" && eventRevenue > 0) {
-      return (eventRevenue * percentBasis) / 100;
-    }
-    return fixedAmount;
-  }, [allocationMethod, percentBasis, fixedAmount, eventRevenue]);
+  const calculatedAllocation = allocateRevenueShare({
+    method: allocationMethod,
+    revenue: eventRevenue,
+    percent: percentBasis,
+    fixed: fixedAmount,
+  });
 
   const activeVenues = (venues ?? []).filter((v) => v.deletedAt == null);
   const activePeople = (people ?? []).filter((p) => p.deletedAt == null);

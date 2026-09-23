@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { LedgerMoney, roundMoney } from "../src/lib/ledgerMoney";
 import { InvoiceMoneyLedger } from "../src/lib/invoiceMoneyLedger";
+import { CommercialMoney } from "../src/lib/commercialMoney";
 import { computeProposalPricing } from "../src/lib/pricing";
 import { calculateInvoiceTax } from "../src/features/finance/invoiceTax";
 import { rollupEventBilling } from "../src/features/finance/invoiceBilling";
+import { calculateCommissionMetrics } from "../src/features/reports/compMasterValues";
+import { allocateRevenueShare } from "../src/features/finance/revenueAttributionValues";
 
 const toCents = (dollars: number) => LedgerMoney.fromDollars(dollars).toCents();
 
@@ -226,5 +229,117 @@ describe("finance precision reconciliation", () => {
     expect(toCents(rollup.billedTotal)).toBe(
       toCents(10.1) + toCents(20.2) + toCents(0.05),
     );
+  });
+
+  it("commission percent of revenue lands on whole cents", () => {
+    const money = new CommercialMoney();
+
+    expect(money.percentOf(100.1, 10)).toBe(10.01);
+    expect(money.percentOf(0.3, 10)).toBe(0.03);
+    // 10010 × 3 / 100 = 300.3 → 300 cents.
+    expect(
+      money.allocate({
+        method: "percent",
+        revenue: 100.1,
+        percent: 3,
+        fixed: 99,
+      }),
+    ).toBe(3);
+    // $0 revenue still returns the stored fixed amount, not 0.
+    expect(
+      money.allocate({
+        method: "percent",
+        revenue: 0,
+        percent: 10,
+        fixed: 5.55,
+      }),
+    ).toBe(5.55);
+    expect(
+      money.allocate({
+        method: "fixed",
+        revenue: 1000,
+        percent: 10,
+        fixed: 10.1,
+      }),
+    ).toBe(10.1);
+    expect(
+      allocateRevenueShare({
+        method: "fixed",
+        revenue: 0,
+        percent: 0,
+        fixed: 5.55,
+      }),
+    ).toBe(5.55);
+  });
+
+  it("applied commission allocations sum to the cent", () => {
+    const asOf = Date.UTC(2026, 8, 1);
+    const attribution = (
+      eventId: string,
+      salespersonId: string,
+      allocatedAmount: number,
+    ) => ({
+      eventId,
+      salespersonId,
+      attributionType: "sales_commission",
+      status: "applied",
+      allocatedAmount,
+      appliedAt: asOf,
+    });
+    const base = {
+      periodStart: asOf,
+      periodEnd: asOf + 86_400_000,
+      cancelledEventIds: new Set<string>(),
+      people: [
+        { _id: "p1", givenName: "Ada", familyName: "Lee" },
+        { _id: "p2", givenName: "Bo", familyName: "Chan" },
+      ],
+    };
+    const first = calculateCommissionMetrics({
+      ...base,
+      attributions: [
+        attribution("e1", "p1", 10.1),
+        attribution("e2", "p1", 20.2),
+        attribution("e3", "p1", 0.05),
+      ],
+    });
+
+    expect(first.totalCommission).toBe(30.35);
+    expect(toCents(10.1) + toCents(20.2) + toCents(0.05)).toBe(
+      toCents(first.totalCommission),
+    );
+
+    const second = calculateCommissionMetrics({
+      ...base,
+      attributions: [
+        attribution("e4", "p2", 0.1),
+        attribution("e5", "p2", 0.2),
+      ],
+    });
+    expect(
+      second.salespeople.find((person) => person.name === "Bo Chan")
+        ?.commission,
+    ).toBe(0.3);
+    // Both people together: cent totals still reconcile across salespeople.
+    expect(
+      new CommercialMoney().sum([
+        first.totalCommission,
+        second.totalCommission,
+      ]),
+    ).toBe(30.65);
+  });
+
+  it("food-cost cents sum and percent use the money utility", () => {
+    const money = new CommercialMoney();
+
+    expect(money.sum([10.1, 20.2, 0.05])).toBe(30.35);
+    expect(money.sum([0.1, 0.2])).toBe(0.3);
+    expect(money.sum([])).toBe(0);
+    expect(money.foodCostPercent(30.35, 100.1)).toBe((3035 / 10010) * 100);
+    expect(money.foodCostPercent(0.1, 0.3)).toBe((10 / 30) * 100);
+    // Missing revenue is not a $0 margin.
+    expect(money.foodCostPercent(10, 0)).toBeNull();
+    // 0.001 dollars rounds to 0 cents → still no ratio.
+    expect(money.foodCostPercent(10, 0.001)).toBeNull();
   });
 });
