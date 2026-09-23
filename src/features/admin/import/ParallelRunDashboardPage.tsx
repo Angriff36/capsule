@@ -36,6 +36,29 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   pack_list: "Pack Lists",
 };
 
+// Item type labels
+const RECORD_TYPE_LABELS: Record<string, string> = {
+  event_record: "Event",
+  contact: "Contact",
+  lead: "Lead",
+  menu: "Menu",
+  venue: "Venue",
+  payment: "Payment",
+  invoice: "Invoice",
+  contract: "Contract",
+  proposal: "Proposal",
+  client: "Client",
+  vendor: "Vendor",
+  person: "Person",
+  task: "Task",
+  batch: "Batch",
+  order: "Order",
+  delivery: "Delivery",
+  stock: "Stock",
+  location: "Location",
+  pack_list: "Pack List",
+};
+
 // This dashboard compares the events dataset — events are the spine every
 // other imported record hangs off, so they are the §6.5 parallel-run gate.
 const COMPARISON_DATASET = "events";
@@ -994,7 +1017,11 @@ export function ParallelRunDashboardPage() {
                           {SOURCE_SYSTEM_LABELS[link.sourceSystem] ??
                             link.sourceSystem}
                         </td>
-                        <td>{link.recordType}</td>
+                        <td>
+                          {RECORD_TYPE_LABELS[link.recordType] ||
+                            RECORD_TYPE_LABELS[link.capsuleEntity] ||
+                            link.recordType}
+                        </td>
                         <td
                           className="font-mono text-xs text-ink-3"
                           title={link.externalId}
@@ -1140,8 +1167,8 @@ export function ParallelRunDashboardPage() {
                 24 hours for review
               </li>
               <li>
-                • <strong>Drill-down</strong>: Click "View" links to inspect
-                individual items
+                • <strong>Look closer</strong>: Click View to open individual
+                items
               </li>
             </ul>
           </section>

@@ -14,7 +14,7 @@ const DISPOSITION_LABELS: Record<string, string> = {
   normalized: "Normalized",
   linked_reference: "Linked reference",
   duplicate_view: "Duplicate view",
-  needs_mapping: "Needs mapping",
+  needs_mapping: "Needs a match",
   unsupported: "Unsupported",
   invalid: "Invalid",
 };

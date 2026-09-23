@@ -55,7 +55,7 @@ const DISPOSITION_LABELS: Record<string, string> = {
   normalized: "Normalized",
   linked_reference: "Linked reference",
   duplicate_view: "Duplicate view",
-  needs_mapping: "Needs mapping",
+  needs_mapping: "Needs a match",
   unsupported: "Unsupported",
   invalid: "Invalid",
 };
@@ -325,7 +325,9 @@ export function ImportRunDetailPage() {
     void (async () => {
       try {
         const result = await revertImportRun({ importRunId: importRun._id });
-        setNotice(`Reverted — ${result.rolledBack} link(s) superseded.`);
+        setNotice(
+          `Reverted — ${result.rolledBack} match(es) marked as replaced.`,
+        );
       } catch (cause) {
         setError(cause instanceof Error ? cause.message : "Revert failed");
       } finally {
@@ -625,7 +627,7 @@ export function ImportRunDetailPage() {
                   : commitNoun === "lead"
                     ? "Lead (an inquiry — it links to a client if it converts)"
                     : commitNoun === "payment"
-                      ? "payment reference in the matching queue (it gets matched to a Capsule payment later)"
+                      ? "payment reference in the leftover match list (it gets matched to a Capsule payment later)"
                       : commitNoun === "menu"
                         ? "Dish in your menu catalog (needs kitchen access; the old price is kept with the import details)"
                         : commitNoun === "pack list"

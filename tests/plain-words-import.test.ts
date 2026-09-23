@@ -189,12 +189,13 @@ describe("plain words on leftover import manifests", () => {
       "src/features/admin/import/ExternalRecordsReconcilePage.tsx",
     ];
     // strip // comments and JSX {/* */} comments so developer notes are not
-    // treated as user copy
+    // treated as user copy; also join JSX text splits ({" "}) and line wraps
     const visible = files
       .map((path) => readFileSync(path, "utf8"))
       .join("\n")
       .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
-      .replace(/\{\/\*[\s\S]*?\*\//g, " ");
+      .replace(/\{\/\*[\s\S]*?\*\//g, " ")
+      .replace(/\s+/g, " ");
 
     for (const old of [
       "Imported records that still need",
@@ -308,5 +309,46 @@ describe("plain words on leftover import manifests", () => {
     }
 
     expect(raw).toContain('to="/admin/reconcile"');
+  });
+
+  it("keeps leftover import match labels and compare help free of mapping jargon", () => {
+    const files = [
+      "src/features/admin/import/ImportRunDetailPage.tsx",
+      "src/features/admin/import/ImportProvenancePanel.tsx",
+      "src/features/admin/import/ParallelRunDashboardPage.tsx",
+    ];
+    // strip // comments and JSX {/* */} comments so developer notes are not
+    // treated as user copy; also join JSX text splits ({" "}) and line wraps
+    const raw = files.map((path) => readFileSync(path, "utf8")).join("\n");
+    const visible = raw
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      .replace(/\{\/\*[\s\S]*?\*\//g, " ")
+      .replace(/<Link[^>]*>|<\/Link>/g, " ")
+      .replace(/\{" "\}/g, " ")
+      .replace(/\s+/g, " ");
+
+    for (const old of [
+      "Needs mapping",
+      "matching queue",
+      "link(s) superseded",
+      "Drill-down",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Needs a match",
+      "leftover match list",
+      "match(es) marked as replaced.",
+      "Look closer",
+      'event_record: "Event"',
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // identifier comparisons stay raw — only user-facing labels change
+    expect(raw).toContain('link.capsuleEntity === "event_record"');
+    expect(raw).toContain("needs_mapping:");
   });
 });
