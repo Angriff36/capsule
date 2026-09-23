@@ -144,6 +144,7 @@ import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_typicalKitchenDensity from "../lib/typicalKitchenDensity.js";
 import type * as lib_usdaCountPortionGrams from "../lib/usdaCountPortionGrams.js";
 import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
+import type * as lib_venueReconciliation from "../lib/venueReconciliation.js";
 import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as mutations from "../mutations.js";
@@ -328,6 +329,7 @@ declare const fullApi: ApiFromModules<{
   "lib/typicalKitchenDensity": typeof lib_typicalKitchenDensity;
   "lib/usdaCountPortionGrams": typeof lib_usdaCountPortionGrams;
   "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
+  "lib/venueReconciliation": typeof lib_venueReconciliation;
   "lib/volumeUnitMl": typeof lib_volumeUnitMl;
   messageInbox: typeof messageInbox;
   mutations: typeof mutations;

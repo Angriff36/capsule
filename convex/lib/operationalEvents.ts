@@ -19,6 +19,7 @@ import { eventHeadcountStaffingReconciliation } from "./headcountStaffingReconci
 import { eventProposalReconciliation } from "./proposalReconciliation";
 import { eventPacketReconciliation } from "./packetReconciliation";
 import { eventRecipeReconciliation } from "./recipeReconciliation";
+import { eventVenueReconciliation } from "./venueReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -198,6 +199,33 @@ export async function handleManifestEvent(
         ingredientId: String(event.payload.ingredientId),
         quantity: Number(event.payload.quantity),
         unit: String(event.payload.unit),
+      },
+    );
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventVenueChanged") {
+    // Venue snapshot already written by Event.changeVenue. This records
+    // one §8.2 venue receipt and flags the issued packet stale without
+    // rewriting it.
+    await eventVenueReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        venueId:
+          event.payload.venueId == null ? null : String(event.payload.venueId),
+        venueName:
+          event.payload.venueName == null
+            ? null
+            : String(event.payload.venueName),
+        venueAddress:
+          event.payload.venueAddress == null
+            ? null
+            : String(event.payload.venueAddress),
+        venueCapacity:
+          event.payload.venueCapacity == null
+            ? null
+            : Number(event.payload.venueCapacity),
       },
     );
     return;
