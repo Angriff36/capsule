@@ -8,7 +8,7 @@
 
 Protected Manifest fields are decrypted only inside the authenticated, tenant-scoped authored report queries. The browser never receives encryption envelopes. Staff Earnings reads finalized payroll inputs and remains limited to the existing management tiers; report favorites grant no source-data access.
 
-Two fields present in the TPP catalog have no Capsule source property yet: contact birthdays and staff postal addresses. Their reports remain in the catalog without fabricated values; the domain gap is tracked in [issue #272](https://github.com/Angriff36/capsule/issues/272).
+Contact birthdays and staff postal addresses now have Capsule source properties; the [issue #272](https://github.com/Angriff36/capsule/issues/272) domain gap is closed on dev and the issue closes at the next release. `Client.birthday` is an optional encrypted `YYYY-MM-DD` date, set through the `Client.setBirthday` command or the client detail form (the field itself notes it feeds the Birthday List). Each Person carries optional encrypted postal address lines, set through the governed `Person.changeAddress` command. The Birthday List and Staff Address & Phone List resolvers project these fields and still never fabricate values: rows stay blank when no entry fills them.
 
 The implementation source of truth is `src/features/reports/tpp/catalog.ts`. This matrix records parity evidence; it is not an allowlist and does not remove any report from the delivery.
 
