@@ -4,11 +4,7 @@ import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
 import { releaseEventInventoryHolds } from "./inventoryEvents";
-import {
-  standDownEventAssignments,
-  standDownEventEquipmentReservations,
-  standDownEventLogisticsAndBilling,
-} from "./eventCancellation";
+import { eventCancellationReconciliation } from "./cancellationReconciliation";
 import { reconcileEventTiming } from "./eventTimingOperations";
 import { eventStaffingReconciliation } from "./staffingReconciliation";
 import { eventHeadcountReconciliation } from "./headcountReconciliation";
@@ -34,12 +30,10 @@ import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
   retireUnusedAutomaticDraft,
-  standDownEventPurchasing,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
 import { ensureEventNumber } from "./eventNumbering";
-import { eventReconciliationIsolation } from "./reconciliationIsolation";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
 import { deleteBlobIfOrphan } from "./blobs";
 
@@ -337,31 +331,12 @@ export async function handleManifestEvent(
     return;
   }
   if (event.entity === "Event" && event.type === "EventCancelled") {
-    const eventId = event.entityId as Id<"events">;
-    const trigger = {
-      triggerEventId: String(event.eventId),
-      triggerType: event.type,
-    };
-    await reconcileEventStaffing(ctx, eventId);
-    await releaseEventInventoryHolds(ctx, eventId);
-    await standDownEventLogisticsAndBilling(ctx, eventId);
-    await standDownEventEquipmentReservations(ctx, eventId);
-    await standDownEventAssignments(ctx, eventId);
-    const row = await ctx.db.get(eventId);
-    if (row) {
-      // AC-424: timing refuses a cancelled parent, so a bare throw here
-      // would abort the cascade before purchasing stands down. Isolate.
-      await eventReconciliationIsolation.run(ctx, {
-        eventId: String(eventId),
-        tenantId: row.tenantId,
-        trigger,
-        domains: [
-          { name: "timing", run: () => reconcileEventTiming(ctx, eventId, trigger) },
-          { name: "purchasing", run: () => standDownEventPurchasing(ctx, eventId) },
-        ],
-      });
-    }
-    await standDownEventPrep(ctx, { eventId }, String(event.payload.reason));
+    await eventCancellationReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      String(event.payload.reason),
+    );
     return;
   }
   if (event.entity === "Event" && event.type === "EventCompleted") {

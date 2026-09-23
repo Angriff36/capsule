@@ -52,6 +52,7 @@ import type * as laborSummary from "../laborSummary.js";
 import type * as lib_assistantToolSurface from "../lib/assistantToolSurface.js";
 import type * as lib_authContext from "../lib/authContext.js";
 import type * as lib_blobs from "../lib/blobs.js";
+import type * as lib_cancellationReconciliation from "../lib/cancellationReconciliation.js";
 import type * as lib_catalogUnitGrams from "../lib/catalogUnitGrams.js";
 import type * as lib_cateringPackageOperations from "../lib/cateringPackageOperations.js";
 import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
@@ -238,6 +239,7 @@ declare const fullApi: ApiFromModules<{
   "lib/assistantToolSurface": typeof lib_assistantToolSurface;
   "lib/authContext": typeof lib_authContext;
   "lib/blobs": typeof lib_blobs;
+  "lib/cancellationReconciliation": typeof lib_cancellationReconciliation;
   "lib/catalogUnitGrams": typeof lib_catalogUnitGrams;
   "lib/cateringPackageOperations": typeof lib_cateringPackageOperations;
   "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
