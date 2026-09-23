@@ -38,8 +38,8 @@ entity StorageLocation mixin TenantScoped, SoftDeletable {
   transition status from "inactive" to ["active"]
 
   default policy storageLocationRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read storage locations"
-  default policy storageLocationWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write storage locations through commands"
-  default policy storageLocationExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute storage location commands"
+  default policy storageLocationWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update storage locations"
+  default policy storageLocationExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may change storage locations"
 
   command register(
     name: string,

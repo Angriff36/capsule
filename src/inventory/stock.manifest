@@ -50,8 +50,8 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   constraint stockCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
 
   default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may read stock items"
-  default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may write stock items through commands"
-  default policy inventoryItemExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may execute stock item commands"
+  default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may update stock items"
+  default policy inventoryItemExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may change stock items"
 
   command open(
     ingredientId: uuid,
@@ -335,8 +335,8 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
 
   // Event managers need read+execute so EventCancelled/Completed fanOut can see rows.
   default policy inventoryReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may read inventory reservations"
-  default policy inventoryReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may write inventory reservations through commands"
-  default policy inventoryReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may execute reservation commands"
+  default policy inventoryReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may update inventory reservations"
+  default policy inventoryReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may change inventory reservations"
 
   command reserve(
     inventoryItemId: uuid,

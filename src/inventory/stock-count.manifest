@@ -36,8 +36,8 @@ entity StockCountSession mixin TenantScoped, SoftDeletable {
   transition status from "closed" to []
 
   default policy stockCountSessionRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock count sessions"
-  default policy stockCountSessionWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write stock count sessions through commands"
-  default policy stockCountSessionExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute stock count session commands"
+  default policy stockCountSessionWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update stock count sessions"
+  default policy stockCountSessionExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may change stock count sessions"
 
   command start(
     label: string,
@@ -128,8 +128,8 @@ entity StockCountLine mixin TenantScoped, SoftDeletable {
   transition status from "reconciled" to []
 
   default policy stockCountLineRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock count lines"
-  default policy stockCountLineWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write stock count lines through commands"
-  default policy stockCountLineExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute stock count line commands"
+  default policy stockCountLineWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may update stock count lines"
+  default policy stockCountLineExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may change stock count lines"
 
   command freeze(
     stockCountSessionId: uuid,
