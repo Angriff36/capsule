@@ -89,8 +89,8 @@ export function CutoverPage() {
         decision,
         reason:
           decision === "go"
-            ? `Cutover approved - all checks passed. Rollback plan: ${rollbackPlan}`
-            : `Cutover rejected - ${rollbackPlan}`,
+            ? `Switch approved - every check passed. Switch-back plan: ${rollbackPlan}`
+            : `Switch stopped - ${rollbackPlan}`,
       });
       window.location.reload();
     } catch (err) {
@@ -351,9 +351,9 @@ export function CutoverPage() {
           />
 
           <ValidationCard
-            title="Business Validation"
+            title="Manager sign-off"
             check={validation.checks.businessValidation}
-            details="Requires manual sign-off from business stakeholders"
+            details="A manager still needs to sign off"
             action={
               <label className="flex items-center gap-2 text-xs">
                 <input
@@ -362,7 +362,7 @@ export function CutoverPage() {
                   onChange={(e) => setLocalApproval(e.target.checked)}
                   disabled={!isAdmin}
                 />
-                I approve this cutover
+                I approve this switch
               </label>
             }
           />

@@ -408,11 +408,14 @@ export const validateCutoverReadiness = query({
     const checks: CutoverValidationResult["checks"] = {
       finalDeltaImport: { passed: false, message: "Checking..." },
       zeroCriticalMappings: { passed: false, message: "Checking..." },
-      businessValidation: { passed: false, message: "Pending manual sign-off" },
+      businessValidation: {
+        passed: false,
+        message: "Waiting for a manager to sign off",
+      },
       providerReadiness: { passed: false, message: "Checking integrations..." },
       rollbackPlan: {
         passed: false,
-        message: "No rollback plan documented",
+        message: "No switch-back plan written yet",
         hasPlan: false,
       },
     };
@@ -504,12 +507,12 @@ export const validateCutoverReadiness = query({
     checks.businessValidation = {
       passed: hasBusinessApproval,
       message: hasBusinessApproval
-        ? "Business sign-off confirmed"
-        : "Requires manual sign-off",
+        ? "A manager has signed off"
+        : "A manager still needs to sign off",
     };
 
     if (!hasBusinessApproval) {
-      blockers.push("Business validation requires explicit approval");
+      blockers.push("A manager still needs to sign off on this switch");
     }
 
     // Check 4: Provider readiness (TENANT-ISOLATED)
@@ -540,13 +543,13 @@ export const validateCutoverReadiness = query({
     checks.rollbackPlan = {
       passed: hasRollbackPlan,
       message: hasRollbackPlan
-        ? "Rollback plan documented"
-        : "Rollback plan not documented",
+        ? "Switch-back plan is written"
+        : "No switch-back plan written yet",
       hasPlan: hasRollbackPlan,
     };
 
     if (!hasRollbackPlan) {
-      blockers.push("Rollback plan must be documented before cutover");
+      blockers.push("Write the switch-back plan before you switch");
     }
 
     const canProceed = blockers.length === 0 && criticalUnresolved.length === 0;

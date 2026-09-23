@@ -131,4 +131,53 @@ describe("plain words on leftover cutover screen", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover cutover check-status copy free of validation jargon", () => {
+    const serverSource = readFileSync("convex/cutover.ts", "utf8");
+    // strip // comments so developer notes are not treated as user copy
+    const serverVisible = serverSource.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    const page = readFileSync(
+      "src/features/admin/import/CutoverPage.tsx",
+      "utf8",
+    );
+    const visible = `${serverVisible}\n${page}`;
+
+    for (const old of [
+      // page file, raw
+      "Business Validation",
+      "Requires manual sign-off from business stakeholders",
+      "I approve this cutover",
+      "Cutover approved",
+      "Cutover rejected",
+      "Rollback plan:",
+      // server file, comments stripped
+      "Pending manual sign-off",
+      "No rollback plan documented",
+      "Business sign-off confirmed",
+      "Requires manual sign-off",
+      "Business validation requires explicit approval",
+      "Rollback plan documented",
+      "Rollback plan not documented",
+      "Rollback plan must be documented before cutover",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Waiting for a manager to sign off",
+      "No switch-back plan written yet",
+      "A manager has signed off",
+      "A manager still needs to sign off",
+      "A manager still needs to sign off on this switch",
+      "Switch-back plan is written",
+      "Write the switch-back plan before you switch",
+      "Manager sign-off",
+      "I approve this switch",
+      "Switch approved - every check passed. Switch-back plan:",
+      "Switch stopped -",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+  });
 });
