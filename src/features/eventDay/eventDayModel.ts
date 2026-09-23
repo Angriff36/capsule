@@ -369,33 +369,17 @@ export function deriveSections(inputs: EventDayInputs): EventDaySection[] {
     }
   }
 
+  // The event workbook's unanswered checklist items ride along so a manager
+  // can jump to them from the sheet. They are a printed checklist, not the
+  // state of the event: status, caption and the ring come from real records.
   return out.map((row) => {
-    const packet = inputs.packetReadiness;
-    const caution = packet?.sections.find((item) => item.section === row.key);
-    if (caution && (caution.status !== "ready" || caution.openIssueCount > 0)) {
-      return {
-        ...row,
-        status:
-          row.status === "blocked" || caution.status === "blocked"
-            ? "blocked"
-            : "review",
-        openIssueCount: caution.openIssueCount,
-        openIssues: caution.openIssues,
-        urgentAction: caution.urgentAction,
-        caption: `${caution.openIssueCount > 0 ? `${caution.openIssueCount} open ${caution.openIssueCount === 1 ? "issue" : "issues"}` : "Verification pending"}${caution.urgentAction ? ` · ${caution.urgentAction}` : ""}`,
-      };
-    }
-    if (row.key === "staffing" && (!packet || !packet.finalSignoffsComplete)) {
-      return {
-        ...row,
-        status: row.status === "blocked" ? "blocked" : "review",
-        urgentAction: "Confirm final readiness with the manager.",
-        caption: "Final checks not yet verified",
-      };
-    }
+    const caution = inputs.packetReadiness?.sections.find(
+      (item) => item.section === row.key,
+    );
     return {
       ...row,
       openIssueCount: caution?.openIssueCount ?? 0,
+      openIssues: caution?.openIssues,
       urgentAction: null,
     };
   });
@@ -419,20 +403,13 @@ export function deriveEventDay(
     (row) => CRITICAL.has(row.key) || row.status !== "dormant",
   );
   const total = scored.reduce((sum, row) => sum + STATUS_SCORE[row.status], 0);
-  const packetReady =
-    inputs.packetReadiness?.ready === true &&
-    inputs.packetReadiness.finalSignoffsComplete &&
-    inputs.packetReadiness.requiredOpenIssueCount === 0;
-  const readinessPct = Math.min(
-    packetReady ? 100 : 99,
-    scored.length === 0 ? 0 : Math.round((total / scored.length) * 100),
-  );
+  const readinessPct =
+    scored.length === 0 ? 0 : Math.round((total / scored.length) * 100);
 
   const blockers = sections
     .filter((row) => row.status === "blocked")
     .map((row) => ({ key: row.key, label: row.label, caption: row.caption }));
-  const anyReview =
-    !packetReady || sections.some((row) => row.status === "review");
+  const anyReview = sections.some((row) => row.status === "review");
   const ringTone =
     blockers.length > 0 ? "danger" : anyReview ? "warn" : ("ok" as const);
   const ringLabel =

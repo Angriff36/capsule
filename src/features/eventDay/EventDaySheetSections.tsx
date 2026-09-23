@@ -36,14 +36,14 @@ export function PacketSectionCaution({
     <>
       <div role="status" className="evd-note">
         <p className="evd-kicker">
-          Needs attention
+          Workbook
           {section.openIssueCount
-            ? ` · ${section.openIssueCount} open ${section.openIssueCount === 1 ? "issue" : "issues"}`
+            ? ` · ${section.openIssueCount} unanswered ${section.openIssueCount === 1 ? "check" : "checks"}`
             : ""}
         </p>
         <p>
           {section.urgentAction ??
-            "Check this section with the manager before service."}
+            "Checklist items from the event workbook. They do not change this section's status."}
         </p>
       </div>
       {section.openIssues?.map((issue) => (
