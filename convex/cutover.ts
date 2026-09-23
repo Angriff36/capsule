@@ -430,17 +430,17 @@ export const validateCutoverReadiness = query({
     if (!latestImport) {
       checks.finalDeltaImport = {
         passed: false,
-        message: "No import runs found",
-        details: "At least one successful import run is required",
+        message: "No imports found",
+        details: "At least one finished import is required",
       };
-      blockers.push("No import runs have been executed");
+      blockers.push("No imports have been finished");
     } else if (latestImport.status !== "completed") {
       checks.finalDeltaImport = {
         passed: false,
         message: `Latest import is ${latestImport.status}`,
         details: `Import ID: ${latestImport._id}`,
       };
-      blockers.push(`Latest import run has status: ${latestImport.status}`);
+      blockers.push(`Latest import has status: ${latestImport.status}`);
     } else {
       // Check if it's recent (last 7 days) for "final delta"
       const daysSinceImport = latestImport.completionTime
@@ -451,9 +451,9 @@ export const validateCutoverReadiness = query({
         checks.finalDeltaImport = {
           passed: false,
           message: "Latest import is stale",
-          details: `${Math.floor(daysSinceImport)} days old. Run a final delta import.`,
+          details: `${Math.floor(daysSinceImport)} days old. Do one last import.`,
         };
-        blockers.push("Latest import run is more than 7 days old");
+        blockers.push("Latest import is more than 7 days old");
       } else {
         checks.finalDeltaImport = {
           passed: true,
@@ -480,18 +480,16 @@ export const validateCutoverReadiness = query({
       passed: criticalUnresolved.length === 0,
       message:
         criticalUnresolved.length === 0
-          ? "All critical mappings verified"
-          : `${criticalUnresolved.length} unresolved TPP mappings`,
+          ? "Every leftover TPP item is matched up"
+          : `${criticalUnresolved.length} leftover TPP items still need matching`,
       count: criticalUnresolved.length,
     };
 
     if (criticalUnresolved.length > 0) {
       blockers.push(
-        `${criticalUnresolved.length} critical TPP record mappings are unverified`,
+        `${criticalUnresolved.length} leftover TPP items still need matching`,
       );
-      warnings.push(
-        "Use the Reconcile Records page to verify or resolve unverified mappings",
-      );
+      warnings.push("Use the match-up page to finish leftover TPP items");
     }
 
     // Check 3: Business validation (manual sign-off)
@@ -655,16 +653,14 @@ export const recordCutoverApprovals = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can record cutover approvals.",
-      );
+      throw new ConvexError("Only admins can save the switch sign-off.");
     }
 
     const docId = await findOrCreateCutoverDecision(ctx, tenantId);
 
     // Inline the logic from CutoverDecision_recordApprovals
     const doc = await ctx.db.get(docId);
-    if (!doc) throw new ConvexError("CutoverDecision not found");
+    if (!doc) throw new ConvexError("Switch decision isn't on file");
     const updates = {
       businessApproved: args.businessApproved,
       rollbackPlan: args.rollbackPlan,
@@ -675,7 +671,7 @@ export const recordCutoverApprovals = mutation({
 
     return {
       success: true,
-      message: "Cutover approvals recorded",
+      message: "Switch sign-off saved",
     };
   },
 });
@@ -695,9 +691,7 @@ export const executeCutoverDecision = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can execute cutover.",
-      );
+      throw new ConvexError("Only admins can approve or stop this switch.");
     }
 
     const cutoverDecision = args.decision as "go" | "no_go";
@@ -717,7 +711,7 @@ export const executeCutoverDecision = mutation({
       // Validate business approval
       if (!currentDecision?.businessApproved) {
         throw new ConvexError(
-          "Cannot proceed: Business validation requires explicit approval. Use recordCutoverApprovals first.",
+          "Can't switch yet: someone still needs to sign off.",
         );
       }
 
@@ -727,7 +721,7 @@ export const executeCutoverDecision = mutation({
         currentDecision.rollbackPlan.length === 0
       ) {
         throw new ConvexError(
-          "Cannot proceed: Rollback plan must be documented. Use recordCutoverApprovals first.",
+          "Can't switch yet: write the switch-back plan first.",
         );
       }
 
@@ -746,7 +740,7 @@ export const executeCutoverDecision = mutation({
 
       if (criticalUnresolved.length > 0) {
         throw new ConvexError(
-          `Cannot proceed: ${criticalUnresolved.length} critical TPP mappings are unverified. Resolve all critical mappings before cutover.`,
+          `Can't switch yet: ${criticalUnresolved.length} leftover TPP items still need matching.`,
         );
       }
 
@@ -759,7 +753,7 @@ export const executeCutoverDecision = mutation({
 
       if (!latestImport || latestImport.status !== "completed") {
         throw new ConvexError(
-          "Cannot proceed: Latest import run is not completed. Run a successful final delta import first.",
+          "Can't switch yet: finish one last import first.",
         );
       }
 
@@ -769,7 +763,7 @@ export const executeCutoverDecision = mutation({
 
       if (daysSinceImport > 7) {
         throw new ConvexError(
-          `Cannot proceed: Latest import run is stale (${Math.floor(daysSinceImport)} days old). Run a final delta import first.`,
+          `Can't switch yet: the latest import is ${Math.floor(daysSinceImport)} days old. Do one last import first.`,
         );
       }
 
@@ -780,7 +774,7 @@ export const executeCutoverDecision = mutation({
       const providers = await evaluateProviderReadiness(ctx.db, tenantId);
       if (!providers.passed) {
         throw new ConvexError(
-          `Cannot proceed: ${providers.blockers.join(" ")} Resolve provider readiness, or record NO-GO.`,
+          `Can't switch yet: ${providers.blockers.join(" ")} Fix the connections, or choose Don't switch yet.`,
         );
       }
     }
@@ -788,7 +782,7 @@ export const executeCutoverDecision = mutation({
     // Inline the logic from CutoverDecision_execute
     const executeDecision = args.decision as "go" | "no_go";
     const executeDoc = await ctx.db.get(docId);
-    if (!executeDoc) throw new ConvexError("CutoverDecision not found");
+    if (!executeDoc) throw new ConvexError("Switch decision isn't on file");
 
     const executeUpdates = {
       status: executeDecision,
@@ -801,7 +795,7 @@ export const executeCutoverDecision = mutation({
     return {
       success: true,
       status: executeDecision,
-      message: `Cutover decision recorded: ${executeDecision.toUpperCase()}`,
+      message: `Switch decision saved: ${executeDecision.toUpperCase()}`,
     };
   },
 });
@@ -819,9 +813,7 @@ export const setTppReadOnly = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can set TPP read-only.",
-      );
+      throw new ConvexError("Only admins can set TPP to read-only.");
     }
 
     // Find existing cutover decision
@@ -832,13 +824,13 @@ export const setTppReadOnly = mutation({
 
     if (!decision) {
       throw new ConvexError(
-        "Cutover decision not found. Initialize cutover first.",
+        "No switch decision is on file yet. Start the switch checks first.",
       );
     }
 
     if (decision.status !== "go") {
       throw new ConvexError(
-        "TPP cannot be set to read-only until cutover is approved (GO decision).",
+        "TPP can be set to read-only only after the switch is approved.",
       );
     }
 
@@ -850,7 +842,7 @@ export const setTppReadOnly = mutation({
 
     return {
       success: true,
-      message: "TPP system marked as read-only. Scheduled imports disabled.",
+      message: "TPP is now read-only. Scheduled imports are off.",
     };
   },
 });
@@ -868,9 +860,7 @@ export const rollbackCutover = mutation({
 
     // Restrict to admin/owner only
     if (auth.role !== "admin" && auth.role !== "owner") {
-      throw new ConvexError(
-        "Only organization administrators can rollback cutover.",
-      );
+      throw new ConvexError("Only admins can undo the switch.");
     }
 
     // Find existing cutover decision
@@ -880,11 +870,11 @@ export const rollbackCutover = mutation({
       .first();
 
     if (!decision) {
-      throw new ConvexError("Cutover decision not found. Cannot rollback.");
+      throw new ConvexError("No switch decision is on file. Nothing to undo.");
     }
 
     if (decision.status !== "go") {
-      throw new ConvexError("Cannot rollback: cutover was not approved (GO).");
+      throw new ConvexError("Can't undo: the switch was not approved.");
     }
 
     // Inline the logic from CutoverDecision_rollback
@@ -898,7 +888,7 @@ export const rollbackCutover = mutation({
 
     return {
       success: true,
-      message: "Cutover rolled back. TPP re-enabled for writes.",
+      message: "Switch undone. TPP writes are back on.",
     };
   },
 });

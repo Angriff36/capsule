@@ -327,7 +327,9 @@ describe("runtime proof: cutover provider readiness (#386)", () => {
         decision: "go",
         reason: "attempting GO with unresolved providers",
       }),
-    ).rejects.toThrow(/provider readiness/i);
+    ).rejects.toThrow(
+      /Can't switch yet:.*Fix the connections, or choose Don't switch yet/,
+    );
 
     // Recovery: a clean Calendar sync and Stripe payout qualification clear
     // every blocker.
