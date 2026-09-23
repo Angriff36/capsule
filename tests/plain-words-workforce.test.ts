@@ -96,4 +96,92 @@ describe("plain words on workforce manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover workforce READ copy free of read jargon", () => {
+    const files = [
+      "src/workforce/time.manifest",
+      "src/workforce/shift.manifest",
+      "src/workforce/hiring.manifest",
+      "src/workforce/availability.manifest",
+      "src/workforce/assignment.manifest",
+      "src/workforce/staff-message.manifest",
+      "src/workforce/performance-review.manifest",
+      "src/workforce/one-on-one.manifest",
+      "src/workforce/role-scorecard.manifest",
+      "src/workforce/training.manifest",
+      "src/workforce/shift-swap.manifest",
+      "src/workforce/push-subscription.manifest",
+      "src/workforce/chat-notify-preference.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Workforce staff may read training modules",
+      "Workforce staff may read training completions",
+      "Workforce staff may read shift types",
+      "Staff may read their own push devices",
+      "Managers may read performance reviews",
+      "Workforce managers may read one-on-ones",
+      "Workforce managers may read one-on-one actions",
+      "Crew may read shared event staffing",
+      "Staff may read their own time-off requests",
+      "Workforce staff or the linked person may read availability windows",
+      "Workforce staff or the linked person may read recurring availability",
+      "Staff may read channel messages and their own direct messages",
+      "Staff may read their own chat read cursors",
+      "Workforce managers may read role scorecards",
+      "Users may read their own chat notification preference",
+      "Workforce managers may read candidates",
+      "Workforce managers may read interviews",
+      "Crew may read their own shift swaps",
+      "Workforce staff or the linked person may read time records",
+      "Workforce staff may read qualifications",
+      "Workforce staff may read shifts",
+      "crew may read their own shifts",
+      "Workforce staff or the linked person may read schedule notices",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Workforce staff may see training modules",
+      "Workforce staff may see training completions",
+      "Workforce staff may see shift types",
+      "Staff may see their own push devices",
+      "Managers may see performance reviews",
+      "Workforce managers may see one-on-ones",
+      "Workforce managers may see one-on-one actions",
+      "Crew may see shared event staffing",
+      "Staff may see their own time-off requests",
+      "Workforce staff or the linked person may see availability windows",
+      "Workforce staff or the linked person may see recurring availability",
+      "Staff may see channel messages and their own direct messages",
+      "Staff may see how far they have gotten in a chat",
+      "Workforce managers may see role scorecards",
+      "Users may see their own chat notification preference",
+      "Workforce managers may see candidates",
+      "Workforce managers may see interviews",
+      "Crew may see their own shift swaps",
+      "Workforce staff or the linked person may see time entries",
+      "Workforce staff may see qualifications",
+      "Workforce staff may see shifts",
+      "crew may see their own shifts",
+      "Workforce staff or the linked person may see schedule notices",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain(
+      "Workforce staff or the linked person may update time entries",
+    );
+    expect(visible).toContain("Crew may update shared event staffing");
+    expect(visible).toContain("Staff may mark which chats they have read");
+    expect(visible).toContain("Workforce staff may update training modules");
+  });
 });

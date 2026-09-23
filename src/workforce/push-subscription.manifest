@@ -34,7 +34,7 @@ entity PushSubscription mixin TenantScoped, SoftDeletable {
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
   // Own rows only. `self.authSubjectId == null` is the create-time draft escape.
-  default policy pushSubscriptionRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id)) "Staff may read their own push devices"
+  default policy pushSubscriptionRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id)) "Staff may see their own push devices"
   // Write and execute require a capability no role is granted, so the
   // GENERATED register/unregister commands can never run. Every row is
   // created, re-owned and retired only by the authored seam

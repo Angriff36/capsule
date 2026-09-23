@@ -67,7 +67,7 @@ entity StaffMessage mixin TenantScoped, SoftDeletable {
   // draft only (createVia checks this policy against the draft before the
   // sender is stamped); a stored row always has both, so no persisted DM is
   // ever readable through this branch.
-  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or (self.senderAuthSubjectId == null and self.senderPersonId == null) or (user.personId != null and (self.senderPersonId == user.personId or self.recipientPersonId == user.personId))) "Staff may read channel messages and their own direct messages"
+  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") and (self.eventId != null or (self.senderAuthSubjectId == null and self.senderPersonId == null) or (user.personId != null and (self.senderPersonId == user.personId or self.recipientPersonId == user.personId))) "Staff may see channel messages and their own direct messages"
   default policy staffMessageWrite write: roleAllows(user.role, "staffAccess") "Staff may update staff messages"
   default policy staffMessageExecute execute: roleAllows(user.role, "staffAccess") "Staff may change staff messages"
 
@@ -187,7 +187,7 @@ entity StaffChatReadCursor mixin TenantScoped {
 
   // Own rows only; the chat seam reads cursors by index for the caller.
   // `authSubjectId == null` is the create-time draft escape.
-  default policy staffChatReadCursorRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id)) "Staff may read their own chat read cursors"
+  default policy staffChatReadCursorRead read: roleAllows(user.role, "staffAccess") and (self.authSubjectId == null or (user.id != null and self.authSubjectId == user.id)) "Staff may see how far they have gotten in a chat"
   default policy staffChatReadCursorWrite write: roleAllows(user.role, "staffAccess") "Staff may mark which chats they have read"
   default policy staffChatReadCursorExecute execute: roleAllows(user.role, "staffAccess") "Staff may mark chat channels read for themselves"
 

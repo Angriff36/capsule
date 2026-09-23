@@ -49,7 +49,7 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   transition status from "closed" to ["corrected"]
   transition status from "corrected" to ["corrected"]
 
-  default policy timeRecordRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read time records"
+  default policy timeRecordRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may see time entries"
   default policy timeRecordWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update time entries"
   default policy timeRecordExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change time entries"
 
@@ -182,7 +182,7 @@ entity Qualification mixin TenantScoped, SoftDeletable {
   transition status from "expired" to []
   transition status from "revoked" to []
 
-  default policy qualificationRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read qualifications"
+  default policy qualificationRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see qualifications"
   default policy qualificationWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update qualifications"
   default policy qualificationExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may change qualifications"
 

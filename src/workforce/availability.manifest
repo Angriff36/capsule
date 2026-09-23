@@ -38,7 +38,7 @@ entity TimeOffRequest mixin TenantScoped, SoftDeletable {
   transition status from "approved" to []
   transition status from "denied" to []
 
-  default policy timeOffRequestRead read: roleAllows(user.role, "workforceManageAccess") or (user.id != null and self.requesterAuthSubjectId == user.id) or self.requesterAuthSubjectId == null "Staff may read their own time-off requests; workforce managers may review all requests"
+  default policy timeOffRequestRead read: roleAllows(user.role, "workforceManageAccess") or (user.id != null and self.requesterAuthSubjectId == user.id) or self.requesterAuthSubjectId == null "Staff may see their own time-off requests; workforce managers may review all requests"
   default policy timeOffRequestWrite write: roleAllows(user.role, "workforceManageAccess") or (user.id != null and (self.requesterAuthSubjectId == null or self.requesterAuthSubjectId == user.id)) "Staff may submit their own time-off requests; workforce managers may review them"
   default policy timeOffRequestExecute execute: roleAllows(user.role, "workforceManageAccess") or (user.id != null and (self.requesterAuthSubjectId == null or self.requesterAuthSubjectId == user.id)) "Staff may submit their own time-off requests; workforce managers may review them"
 
@@ -183,7 +183,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["withdrawn"]
   transition status from "withdrawn" to []
 
-  default policy availabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read availability windows"
+  default policy availabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may see availability windows"
   default policy availabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update availability"
   default policy availabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change availability"
 
@@ -288,7 +288,7 @@ entity RecurringAvailability mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["withdrawn"]
   transition status from "withdrawn" to []
 
-  default policy recurringAvailabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read recurring availability"
+  default policy recurringAvailabilityRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may see recurring availability"
   default policy recurringAvailabilityWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update recurring availability"
   default policy recurringAvailabilityExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change recurring availability"
 

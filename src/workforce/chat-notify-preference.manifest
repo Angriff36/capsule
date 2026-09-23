@@ -22,7 +22,7 @@ entity ChatNotifyPreference mixin TenantScoped {
   property required enabled: boolean = false
 
   // Owner-only. `ownerId == null` is the create-time draft escape.
-  default policy chatNotifyPreferenceRead read: self.ownerId == null or self.ownerId == user.id "Users may read their own chat notification preference"
+  default policy chatNotifyPreferenceRead read: self.ownerId == null or self.ownerId == user.id "Users may see their own chat notification preference"
   // The authored seam does raw writes (policy-exempt); the generated commands
   // require a capability no role is granted, so they can never run.
   default policy chatNotifyPreferenceWrite write: roleAllows(user.role, "pushDeviceManage") "Chat notification preference is set only through the app"

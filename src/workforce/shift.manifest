@@ -62,7 +62,7 @@ entity Shift mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
   transition status from "no_show" to []
 
-  default policy shiftRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Workforce staff may read shifts; crew may read their own shifts and the shared event schedule"
+  default policy shiftRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Workforce staff may see shifts; crew may see their own shifts and the shared event schedule"
   default policy shiftWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may update their own shifts and the shared event schedule"
   default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and ((user.personId != null and self.personId == user.personId) or self.eventId != null)) "Crew may change their own shifts and the shared event schedule"
 
@@ -381,7 +381,7 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
   constraint weeklyScheduleHasShifts: self.publishedAt == null or self.shiftCount > 0 "Published schedules require at least one shift"
   constraint weeklyScheduleHasSummary: self.publishedAt == null or length(trim(self.shiftSummary)) > 0 "Published schedules require a staff summary"
 
-  default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may read schedule notices"
+  default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may see schedule notices"
   default policy weeklyScheduleNoticeWrite write: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may update schedule notices"
   default policy weeklyScheduleNoticeExecute execute: roleAllows(user.role, "workforceAccess") or (roleAllows(user.role, "workforceSelfAccess") and user.personId != null and self.personId == user.personId) "Workforce staff or the linked person may change schedule notices"
 

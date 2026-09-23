@@ -53,7 +53,7 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   transition status from "no_show" to []
   transition status from "unassigned" to []
 
-  default policy eventAssignmentRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may read shared event staffing"
+  default policy eventAssignmentRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may see shared event staffing"
   default policy eventAssignmentWrite write: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may update shared event staffing"
   default policy eventAssignmentExecute execute: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may change shared event staffing"
 
@@ -289,7 +289,7 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   transition status from "filled" to ["cancelled"]
   transition status from "cancelled" to []
 
-  default policy eventStaffNeedRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may read shared event staffing"
+  default policy eventStaffNeedRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may see shared event staffing"
   default policy eventStaffNeedWrite write: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may update shared event staffing"
   default policy eventStaffNeedExecute execute: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "workforceSelfAccess") "Crew may change shared event staffing"
 

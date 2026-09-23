@@ -30,7 +30,7 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
 
   // Manager-only visibility: performance reviews inform shift assignment and
   // compensation, so reads are gated to managers rather than all staff.
-  default policy performanceReviewRead read: roleAllows(user.role, "manageAccess") "Managers may read performance reviews"
+  default policy performanceReviewRead read: roleAllows(user.role, "manageAccess") "Managers may see performance reviews"
   default policy performanceReviewWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may update performance reviews"
   default policy performanceReviewExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may change performance reviews"
 
