@@ -115,4 +115,17 @@ describe("plain words on leftover import manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover import-dataset write copy free of write-dataset jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/import/import-dataset.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Staff may write import datasets");
+    expect(visible).toContain("Staff may update import lists");
+    expect(visible).toContain("Staff may read import datasets");
+    expectPlain("Staff may update import lists");
+  });
 });

@@ -85,7 +85,7 @@ entity ImportDataset mixin TenantScoped, SoftDeletable {
 
   // Policies
   default policy importDatasetRead read: roleAllows(user.role, "importAccess") "Staff may read import datasets"
-  default policy importDatasetWrite write: roleAllows(user.role, "importAccess") "Staff may write import datasets"
+  default policy importDatasetWrite write: roleAllows(user.role, "importAccess") "Staff may update import lists"
 
   // register - Create a new dataset definition
   command register(
