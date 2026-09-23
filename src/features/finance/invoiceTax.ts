@@ -1,3 +1,5 @@
+import { LedgerMoney } from "../../lib/ledgerMoney";
+
 export const INVOICE_LINE_CATEGORIES = ["food", "service", "rental"] as const;
 
 export type InvoiceLineCategory = (typeof INVOICE_LINE_CATEGORIES)[number];
@@ -64,7 +66,7 @@ const finite = (value: unknown) => {
 };
 
 export const roundMoney = (value: number) =>
-  Math.round((value + Number.EPSILON) * 100) / 100;
+  LedgerMoney.fromDollars(value).toDollars();
 
 export const taxRateApplies = (
   rate: TaxRateRecord,
@@ -84,7 +86,10 @@ export function calculateInvoiceTax(
   const lineItems = lines.map<InvoiceLineSnapshot>((line) => {
     const quantity = Math.max(0, finite(line.quantity));
     const unitPrice = Math.max(0, finite(line.unitPrice));
-    const subtotal = roundMoney(quantity * unitPrice);
+    const subtotal = LedgerMoney.fromDollars(unitPrice)
+      .times(quantity)
+      .toDollars();
+    const subtotalCents = LedgerMoney.fromDollars(subtotal).toCents();
     const appliedTaxRates = taxExempt
       ? []
       : taxRates
@@ -95,12 +100,16 @@ export function calculateInvoiceTax(
               taxRateId: String(rate._id),
               name: String(rate.name ?? "Tax rate"),
               percentage,
-              amount: roundMoney((subtotal * percentage) / 100),
+              amount: LedgerMoney.fromCents(subtotalCents)
+                .percent(percentage)
+                .toDollars(),
             };
           });
-    const taxAmount = roundMoney(
-      appliedTaxRates.reduce((sum, rate) => sum + rate.amount, 0),
+    const taxCents = appliedTaxRates.reduce(
+      (sum, rate) => sum + LedgerMoney.fromDollars(rate.amount).toCents(),
+      0,
     );
+    const taxAmount = LedgerMoney.fromCents(taxCents).toDollars();
 
     return {
       description: line.description.trim(),
@@ -109,7 +118,7 @@ export function calculateInvoiceTax(
       unitPrice,
       subtotal,
       taxAmount,
-      total: roundMoney(subtotal + taxAmount),
+      total: LedgerMoney.fromCents(subtotalCents + taxCents).toDollars(),
       appliedTaxRates,
     };
   });
@@ -120,27 +129,34 @@ export function calculateInvoiceTax(
       const current = taxByRate.get(rate.taxRateId);
       taxByRate.set(rate.taxRateId, {
         ...rate,
-        amount: roundMoney((current?.amount ?? 0) + rate.amount),
+        amount: LedgerMoney.fromCents(
+          LedgerMoney.fromDollars(current?.amount ?? 0).toCents() +
+            LedgerMoney.fromDollars(rate.amount).toCents(),
+        ).toDollars(),
       });
     }
   }
 
-  const subtotal = roundMoney(
-    lineItems.reduce((sum, line) => sum + line.subtotal, 0),
+  const subtotalCents = lineItems.reduce(
+    (sum, line) => sum + LedgerMoney.fromDollars(line.subtotal).toCents(),
+    0,
   );
+  const subtotal = LedgerMoney.fromCents(subtotalCents).toDollars();
   const taxBreakdown = [...taxByRate.values()].sort((a, b) =>
     a.name.localeCompare(b.name),
   );
-  const taxAmount = roundMoney(
-    taxBreakdown.reduce((sum, rate) => sum + rate.amount, 0),
+  const taxCents = taxBreakdown.reduce(
+    (sum, rate) => sum + LedgerMoney.fromDollars(rate.amount).toCents(),
+    0,
   );
+  const taxAmount = LedgerMoney.fromCents(taxCents).toDollars();
 
   return {
     lineItems,
     taxBreakdown,
     subtotal,
     taxAmount,
-    total: roundMoney(subtotal + taxAmount),
+    total: LedgerMoney.fromCents(subtotalCents + taxCents).toDollars(),
   };
 }
 

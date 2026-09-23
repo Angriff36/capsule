@@ -15,6 +15,8 @@
 // Internal food cost / vendor cost / margin are deliberately NOT handled here
 // — spec §4.2 keeps those private; they live only in finance/kitchen reports.
 
+import { LedgerMoney } from "./ledgerMoney";
+
 export type PricingBasis =
   | "per_person" // unitPrice × guestCount
   | "per_unit" // unitPrice × quantity
@@ -70,11 +72,6 @@ export interface ProposalPricing {
   total: number;
 }
 
-// Round to 2dp so stored money(12,2) stays stable across compute/store/render.
-// ponytail: plain float math is fine for sell-price display values; switch to a
-// fixed-point/cents type if this ever feeds a GL accounting ledger.
-const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
-
 const nonNegative = (n: number) => (Number.isFinite(n) && n > 0 ? n : 0);
 
 // Amount for a single non-percentage line. `percentage` lines need the running
@@ -85,14 +82,16 @@ export function computeLineAmount(
 ): number {
   switch (line.pricingBasis) {
     case "per_person":
-      return round2(nonNegative(line.unitPrice) * nonNegative(guestCount));
+      return LedgerMoney.fromDollars(nonNegative(line.unitPrice))
+        .times(nonNegative(guestCount))
+        .toDollars();
     case "per_unit":
-      return round2(
-        nonNegative(line.unitPrice) * nonNegative(line.quantity ?? 0),
-      );
+      return LedgerMoney.fromDollars(nonNegative(line.unitPrice))
+        .times(nonNegative(line.quantity ?? 0))
+        .toDollars();
     case "flat":
     case "package":
-      return round2(nonNegative(line.unitPrice));
+      return LedgerMoney.fromDollars(nonNegative(line.unitPrice)).toDollars();
     case "percentage":
       // Resolved in computeProposalPricing against the base subtotal.
       return 0;
@@ -106,23 +105,41 @@ export function computeProposalPricing(
 ): ProposalPricing {
   const guestCount = nonNegative(input.guestCount);
   // Pass 1: base (non-percentage) lines — these define the subtotal percentage
-  // lines are taken against.
-  const baseSubtotal = input.lines
+  // lines are taken against. Combined in integer cents.
+  const baseCents = input.lines
     .filter((line) => line.pricingBasis !== "percentage")
-    .reduce((sum, line) => sum + computeLineAmount(line, guestCount), 0);
+    .reduce(
+      (sum, line) =>
+        sum +
+        LedgerMoney.fromDollars(computeLineAmount(line, guestCount)).toCents(),
+      0,
+    );
   // Pass 2: resolve every line, percentage lines against the base subtotal.
   const lines: PricingLine[] = input.lines.map((line) => {
     if (line.pricingBasis === "percentage") {
       return {
         ...line,
-        amount: round2((nonNegative(line.unitPrice) / 100) * baseSubtotal),
+        amount: LedgerMoney.fromCents(baseCents)
+          .percent(nonNegative(line.unitPrice))
+          .toDollars(),
       };
     }
     return { ...line, amount: computeLineAmount(line, guestCount) };
   });
-  const subtotal = round2(lines.reduce((sum, line) => sum + line.amount, 0));
-  const discountAmount = round2(nonNegative(input.discountAmount ?? 0));
-  const taxAmount = round2(nonNegative(input.taxAmount ?? 0));
-  const total = round2(subtotal + taxAmount - discountAmount);
+  const subtotalCents = lines.reduce(
+    (sum, line) => sum + LedgerMoney.fromDollars(line.amount).toCents(),
+    0,
+  );
+  const subtotal = LedgerMoney.fromCents(subtotalCents).toDollars();
+  const discountAmount = LedgerMoney.fromDollars(
+    nonNegative(input.discountAmount ?? 0),
+  ).toDollars();
+  const taxAmount = LedgerMoney.fromDollars(
+    nonNegative(input.taxAmount ?? 0),
+  ).toDollars();
+  const total = LedgerMoney.fromCents(subtotalCents)
+    .add(LedgerMoney.fromDollars(taxAmount))
+    .subtract(LedgerMoney.fromDollars(discountAmount))
+    .toDollars();
   return { lines, subtotal, discountAmount, taxAmount, total };
 }
