@@ -72,8 +72,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
   // Kitchen catalog edits may request packing refresh; composition commands
   // retain their own manager/sales authority checks below.
-  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may write event dishes through commands"
-  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may execute event dish commands"
+  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may update event dishes"
+  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "kitchenAccess") "Managers, sales and kitchen staff may change event dishes"
 
   // Add this dish to the event (create).
   command addToEvent(
@@ -484,8 +484,8 @@ entity EventDishLineOverride mixin TenantScoped, SoftDeletable {
   constraint overridePortionsNonnegative: self.portionsAffected >= 0 "Portions affected cannot be negative"
 
   default policy eventDishLineOverrideRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dish overrides"
-  default policy eventDishLineOverrideWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may write event dish overrides through commands"
-  default policy eventDishLineOverrideExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may execute event dish override commands"
+  default policy eventDishLineOverrideWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may update event dish overrides"
+  default policy eventDishLineOverrideExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "kitchenAccess") "Managers and kitchen staff may change event dish overrides"
 
   command apply(
     eventDishId: uuid,

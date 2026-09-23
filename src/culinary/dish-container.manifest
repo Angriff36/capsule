@@ -65,8 +65,8 @@ entity DishContainer mixin TenantScoped, SoftDeletable {
   transition status from "retired" to ["active"]
 
   default policy dishContainerRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish containers"
-  default policy dishContainerWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish containers through commands"
-  default policy dishContainerExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish container commands"
+  default policy dishContainerWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update dish containers"
+  default policy dishContainerExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change dish containers"
 
   command define(
     dishId: uuid,

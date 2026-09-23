@@ -84,8 +84,8 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
 
   default policy componentImportRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component imports"
-  default policy componentImportWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component imports through commands"
-  default policy componentImportExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component import commands"
+  default policy componentImportWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe imports"
+  default policy componentImportExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe imports"
 
   command upload(
     sourceKind: ComponentImportSourceKind,
@@ -367,8 +367,8 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
   constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null or self.resolvedAt != null "Confirmed new lines link their created ingredient only after resolution"
 
   default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component import lines"
-  default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component import lines through commands"
-  default policy componentImportLineExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component import line commands"
+  default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may update recipe import lines"
+  default policy componentImportLineExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may change recipe import lines"
 
   command stage(
     importId: uuid,
