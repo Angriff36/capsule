@@ -11,6 +11,7 @@ import {
 } from "./eventCancellation";
 import { reconcileEventTiming } from "./eventTimingOperations";
 import { eventStaffingReconciliation } from "./staffingReconciliation";
+import { eventHeadcountReconciliation } from "./headcountReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -100,6 +101,20 @@ export async function handleManifestEvent(
       { triggerEventId: String(event.eventId), triggerType: event.type });
     await eventStaffingReconciliation.run(ctx, event.entityId as Id<"events">,
       { triggerEventId: String(event.eventId), triggerType: event.type });
+    return;
+  }
+  if (event.entity === "Event" && event.type === "EventHeadcountChanged") {
+    // Menu side only: the EventDish.syncHeadcount fan-out already ran, this
+    // records the §8.2 receipt (once per input shape).
+    await eventHeadcountReconciliation.run(
+      ctx,
+      event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type },
+      {
+        previousHeadcount: Number(event.payload.previousHeadcount),
+        newHeadcount: Number(event.payload.newHeadcount),
+      },
+    );
     return;
   }
   if (event.entity === "Organization" && event.type === "OrganizationBrandLogoSet") {
