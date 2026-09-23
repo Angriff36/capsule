@@ -51,6 +51,23 @@ export function eventReportRequest(
 }
 
 /**
+ * Prints the rail's report as the one sheet on the paper. The class on <html>
+ * is the print stylesheet's signal that THIS print belongs to the rail, so a
+ * page's own print never drags the rail's sheet onto its paper (issue #374
+ * item 3).
+ */
+function printRailReport() {
+  const root = document.documentElement;
+  root.classList.add("home-report-printing");
+  window.addEventListener(
+    "afterprint",
+    () => root.classList.remove("home-report-printing"),
+    { once: true },
+  );
+  window.print();
+}
+
+/**
  * Renders one event report inline and, when asked, sends it to the printer as
  * soon as the rows arrive. The print stylesheet only shows `.print-sheet`, so
  * the rest of the calendar stays out of the paper.
@@ -118,10 +135,19 @@ export function EventReportView({
     // cleanup, effect, and a mark set up front would swallow the print.
     const timer = window.setTimeout(() => {
       printedFor.current = key;
-      window.print();
+      printRailReport();
     }, 80);
     return () => window.clearTimeout(timer);
   }, [autoPrint, definition.id, event.id, printable]);
+
+  // Drop the print tag if the rail unmounts before the browser fires
+  // afterprint, so a later page print cannot pull the rail's sheet along.
+  useEffect(
+    () => () => {
+      document.documentElement.classList.remove("home-report-printing");
+    },
+    [],
+  );
 
   return (
     <div className="home-report-view">
@@ -134,7 +160,7 @@ export function EventReportView({
           type="button"
           className="btn btn-primary btn-sm"
           disabled={!printable}
-          onClick={() => window.print()}
+          onClick={printRailReport}
         >
           Print
         </button>
