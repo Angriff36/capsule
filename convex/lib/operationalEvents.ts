@@ -94,7 +94,8 @@ export async function handleManifestEvent(
   }
   if (event.entity === "Event" &&
     ["EventTimingConfigured", "EventScheduleChanged"].includes(event.type)) {
-    await reconcileEventTiming(ctx, event.entityId as Id<"events">);
+    await reconcileEventTiming(ctx, event.entityId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
     await reconcileEventStaffing(ctx, event.entityId as Id<"events">);
     return;
   }
@@ -135,7 +136,8 @@ export async function handleManifestEvent(
   }
   if (event.entity === "EventTimelineActivity" &&
     event.type === "EventTimelineCalculatedTimingRequested") {
-    await reconcileEventTiming(ctx, event.payload.eventId as Id<"events">);
+    await reconcileEventTiming(ctx, event.payload.eventId as Id<"events">,
+      { triggerEventId: String(event.eventId), triggerType: event.type });
     await reconcileEventStaffing(ctx, event.payload.eventId as Id<"events">);
     return;
   }
