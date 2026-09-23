@@ -20,6 +20,7 @@ import { eventProposalReconciliation } from "./proposalReconciliation";
 import { eventPacketReconciliation } from "./packetReconciliation";
 import { eventRecipeReconciliation } from "./recipeReconciliation";
 import { eventVenueReconciliation } from "./venueReconciliation";
+import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   reconcileEventStaffing, reflectManualEventShiftTiming, validateAutomaticEventShift,
   validateEventStaffingReferences, validateEventStaffingTiming,
@@ -109,6 +110,11 @@ export async function handleManifestEvent(
       { triggerEventId: String(event.eventId), triggerType: event.type });
     await eventStaffingReconciliation.run(ctx, event.entityId as Id<"events">,
       { triggerEventId: String(event.eventId), triggerType: event.type });
+    // Rental holds move only on a reschedule: a timing reconfiguration keeps
+    // the same event window, so there is no hold still sitting on an old one.
+    if (event.type === "EventScheduleChanged")
+      await eventRentalReconciliation.run(ctx, event.entityId as Id<"events">,
+        { triggerEventId: String(event.eventId), triggerType: event.type });
     return;
   }
   if (event.entity === "Event" && event.type === "EventHeadcountChanged") {

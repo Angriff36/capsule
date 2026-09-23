@@ -129,6 +129,7 @@ import type * as lib_qboSync from "../lib/qboSync.js";
 import type * as lib_recipeReconciliation from "../lib/recipeReconciliation.js";
 import type * as lib_reconciliationIsolation from "../lib/reconciliationIsolation.js";
 import type * as lib_reconciliationReceipt from "../lib/reconciliationReceipt.js";
+import type * as lib_rentalReconciliation from "../lib/rentalReconciliation.js";
 import type * as lib_runOfShowAlertLoop from "../lib/runOfShowAlertLoop.js";
 import type * as lib_safeMaterialization from "../lib/safeMaterialization.js";
 import type * as lib_savedViewOperations from "../lib/savedViewOperations.js";
@@ -314,6 +315,7 @@ declare const fullApi: ApiFromModules<{
   "lib/recipeReconciliation": typeof lib_recipeReconciliation;
   "lib/reconciliationIsolation": typeof lib_reconciliationIsolation;
   "lib/reconciliationReceipt": typeof lib_reconciliationReceipt;
+  "lib/rentalReconciliation": typeof lib_rentalReconciliation;
   "lib/runOfShowAlertLoop": typeof lib_runOfShowAlertLoop;
   "lib/safeMaterialization": typeof lib_safeMaterialization;
   "lib/savedViewOperations": typeof lib_savedViewOperations;
