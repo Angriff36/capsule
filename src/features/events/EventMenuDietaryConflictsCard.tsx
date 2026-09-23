@@ -253,7 +253,7 @@ function ConflictRow({
           rel="noopener"
           className="text-xs text-brand underline"
         >
-          Catalog record ↗
+          Open dish ↗
         </Link>
       </div>
     </li>

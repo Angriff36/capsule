@@ -355,4 +355,16 @@ describe("plain words on event screens", () => {
       expect(all).toContain(fresh);
     }
   });
+
+  it("keeps leftover event dietary conflict copy free of record jargon", () => {
+    const card = readFileSync(
+      "src/features/events/EventMenuDietaryConflictsCard.tsx",
+      "utf8",
+    );
+
+    expect(card).not.toContain("Catalog record ↗");
+    expect(card).not.toContain("Catalog record");
+    expect(card).toContain("Open dish ↗");
+    expectPlain("Open dish ↗");
+  });
 });
