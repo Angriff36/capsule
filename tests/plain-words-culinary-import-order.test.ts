@@ -42,7 +42,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
     ).toBe(2);
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Confirmed new lines link their created ingredient only after resolution",
+      "This new line isn't finished yet. Finish it before you attach the ingredient you created.",
     );
     // Already-landed copy stays.
     expect(visible).toContain(
