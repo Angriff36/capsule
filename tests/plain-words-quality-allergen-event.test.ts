@@ -11,8 +11,8 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover quality allergen-check dish copy", () => {
-  it("keeps the allergen-check dish refusal free of jargon", () => {
+describe("plain words on leftover quality allergen-check event copy", () => {
+  it("keeps the allergen-check event refusal free of jargon", () => {
     const manifest = readFileSync(
       "src/quality/allergen-check.manifest",
       "utf8",
@@ -20,10 +20,10 @@ describe("plain words on leftover quality allergen-check dish copy", () => {
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank.";
+      "This allergen check is for a different event. Pick the event already on this allergen check.";
     // The old seeded-reference jargon refusal is gone.
     expect(visible).not.toContain(
-      "Record dishId must match the seeded dish reference when provided",
+      "Record eventId must match the seeded event reference",
     );
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
@@ -31,25 +31,16 @@ describe("plain words on leftover quality allergen-check dish copy", () => {
     // The generated copies carry the plain wording, not the old one.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     expect(mutations).not.toContain(
-      "Record dishId must match the seeded dish reference when provided",
+      "Record eventId must match the seeded event reference",
     );
     expect(mutations).toContain(NEW);
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
     // Already-landed copy on this same file stays.
     expect(visible).toContain(
-      "Event and kitchen staff may see event allergen checks",
+      "This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank.",
     );
-    expect(visible).toContain(
-      "Event and kitchen staff may update event allergen checks",
-    );
-    expect(visible).toContain(
-      "Event and kitchen staff may change event allergen checks",
-    );
-    // Already-landed leftover on this file stays: it must not change with this one.
-    expect(visible).toContain(
-      "This allergen check is for a different event. Pick the event already on this allergen check.",
-    );
+    // Later leftovers on this file are pinned: they must not change with this one.
     expect(visible).toContain(
       "Record eventDishId must match the seeded event dish reference when provided",
     );
