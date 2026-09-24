@@ -15,7 +15,7 @@ describe("ImportSourceReadinessChecker", () => {
     ).toEqual({
       ready: false,
       kind: "none",
-      message: "Paste component text before parsing.",
+      message: "Paste recipe text before parsing.",
     });
   });
 

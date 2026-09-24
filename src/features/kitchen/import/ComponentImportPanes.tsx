@@ -110,7 +110,7 @@ export function ComponentImportSourcePane({
       {mode === "paste" ? (
         <>
           <label className="field-label" htmlFor="component-import-source">
-            Component text
+            Recipe text
           </label>
           <textarea
             id="component-import-source"
@@ -124,7 +124,7 @@ export function ComponentImportSourcePane({
       ) : (
         <div className="component-import-files">
           <label className="field-label">
-            Component sheet CSV
+            Recipe sheet CSV
             <input
               type="file"
               accept=".csv,text/csv"
@@ -144,7 +144,7 @@ export function ComponentImportSourcePane({
             ) : null}
           </label>
           <label className="field-label">
-            Component lines CSV
+            Recipe lines CSV
             <input
               type="file"
               accept=".csv,text/csv"
@@ -164,7 +164,7 @@ export function ComponentImportSourcePane({
             ) : null}
           </label>
           <label className="field-label">
-            Plain text component (.txt)
+            Plain text recipe (.txt)
             <input
               type="file"
               accept=".txt,text/plain"
@@ -254,8 +254,8 @@ export function ComponentImportReviewPane({
             Structure the house book entry.
           </h3>
           <p>
-            Paste component text or choose `.txt` / CSV files, then parse to
-            review ingredient matches before saving.
+            Paste recipe text or choose `.txt` / CSV files, then parse to review
+            ingredient matches before saving.
           </p>
         </div>
       </section>
@@ -332,7 +332,7 @@ export function ComponentImportReviewPane({
       ) : null}
 
       <label className="field-label">
-        Component name
+        Recipe name
         <input
           value={review.name}
           onChange={(event) =>
@@ -383,7 +383,7 @@ export function ComponentImportReviewPane({
       </div>
 
       <div className="component-import-lines-head">
-        <h3>Components</h3>
+        <h3>Ingredients</h3>
         <span className="font-mono text-xs text-ink-3">
           {formatCountNoun(review.lines.length, "line")}
         </span>
@@ -592,7 +592,7 @@ export function ComponentImportReviewPane({
           aria-busy={busy}
           onClick={onFinalize}
         >
-          {busy ? "Finalizing…" : "Save and edit component"}
+          {busy ? "Finalizing…" : "Save and edit recipe"}
         </button>
       </div>
     </section>

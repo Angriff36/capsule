@@ -505,7 +505,7 @@ export function ComponentImportPage() {
           <h1 className="display-title mt-2">Import recipe</h1>
           <p className="mt-3 max-w-150 text-ink-2">
             Paste text or upload `.txt` / CSV exports, review ingredient
-            matches, then save through generated commands.
+            matches, then save the review and open the recipe.
           </p>
         </div>
         <div className="component-import-actions">
@@ -529,7 +529,7 @@ export function ComponentImportPage() {
           {recoveryNotice}{" "}
           {recoveredComponentId ? (
             <Link to={componentPath(recoveredComponentId)} className="link">
-              Open saved component
+              Open saved recipe
             </Link>
           ) : null}
         </p>
@@ -672,7 +672,7 @@ export function ComponentImportPage() {
                       This import is complete.
                     </h3>
                     <p>
-                      The corrected formula lives on its component. The original
+                      The corrected formula lives on its recipe. The original
                       source stays readable beside it.
                     </p>
                     {storedImport?.resultingComponentId ? (
@@ -682,7 +682,7 @@ export function ComponentImportPage() {
                           String(storedImport.resultingComponentId),
                         )}
                       >
-                        Open component
+                        Open recipe
                       </Link>
                     ) : null}
                   </div>

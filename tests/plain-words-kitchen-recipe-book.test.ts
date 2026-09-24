@@ -135,4 +135,74 @@ describe("plain words on the kitchen recipe book", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen import workbench copy free of component jargon", () => {
+    const page = readFileSync(
+      "src/features/kitchen/import/ComponentImportPage.tsx",
+      "utf8",
+    );
+    const panes = readFileSync(
+      "src/features/kitchen/import/ComponentImportPanes.tsx",
+      "utf8",
+    );
+    const readiness = readFileSync(
+      "src/features/kitchen/import/ImportSourceReadiness.ts",
+      "utf8",
+    );
+    const recovery = readFileSync(
+      "src/features/kitchen/culinaryRecovery.ts",
+      "utf8",
+    );
+    const all = [page, panes, readiness, recovery].join("\n");
+
+    // The old leftover words a kitchen person could read are gone. File
+    // names, identifiers, CSS classes, and the component_lines.csv /
+    // component_sheet.csv file names are not user text — they stay.
+    expect(all).not.toContain("Open saved component");
+    expect(all).not.toContain("Open component");
+    expect(all).not.toContain("generated commands");
+    expect(all).not.toContain("Component text");
+    expect(all).not.toContain("Component sheet CSV");
+    expect(all).not.toContain("Component lines CSV");
+    expect(all).not.toContain("Plain text component");
+    expect(all).not.toContain("Paste component text");
+    expect(all).not.toContain("Component name");
+    expect(all).not.toContain("<h3>Components</h3>");
+    expect(all).not.toContain("Save and edit component");
+    expect(all).not.toContain("Paste component text before parsing");
+    expect(all).not.toContain("Component sheet loaded");
+    expect(all).not.toContain("Component lines loaded");
+    expect(all).not.toContain("saved component import");
+    expect(all).not.toContain("Save component again");
+
+    expect(page).toContain("then save the review and open the recipe.");
+    expect(page).toContain("Open saved recipe");
+    expect(page).toContain("The corrected formula lives on its recipe.");
+    expect(panes).toContain("Recipe text");
+    expect(panes).toContain("Recipe sheet CSV");
+    expect(panes).toContain("Recipe lines CSV");
+    expect(panes).toContain("Plain text recipe (.txt)");
+    expect(panes).toContain("Paste recipe text or choose");
+    expect(panes).toContain("Recipe name");
+    expect(panes).toContain("<h3>Ingredients</h3>");
+    expect(panes).toContain("Save and edit recipe");
+    expect(readiness).toContain("Paste recipe text before parsing.");
+    expect(readiness).toContain("Recipe sheet loaded");
+    expect(readiness).toContain("Recipe lines loaded");
+    expect(readiness).toContain("component_lines.csv");
+    expect(readiness).toContain("component_sheet.csv");
+    expect(recovery).toContain("Recovered a previously saved recipe import");
+
+    for (const fresh of [
+      "Recipe text",
+      "Recipe name",
+      "Ingredients",
+      "Save and edit recipe",
+      "Open recipe",
+      "Paste recipe text before parsing.",
+      "The corrected formula lives on its recipe.",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });
