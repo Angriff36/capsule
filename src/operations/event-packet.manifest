@@ -35,7 +35,7 @@ entity EventPacketIssue mixin TenantScoped, SoftDeletable {
   constraint packetIssueKey: length(trim(self.issueKey)) > 0 "An issue needs a stable key"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetIssueRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private packet issues stay behind the scenes"
-  default policy packetIssueWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Reconciliation owns issue lifecycle"
+  default policy packetIssueWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the packet issues"
   default policy packetIssueExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet issues"
   store EventPacketIssue in durable
 }
@@ -54,7 +54,7 @@ entity EventPacketResolution mixin TenantScoped {
   constraint packetDecisionActor: length(trim(self.actor)) > 0 "A decision needs its authenticated actor"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetResolutionRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private approvals remain behind manager review"
-  default policy packetResolutionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Authenticated transactional decisions are immutable"
+  default policy packetResolutionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the packet decisions"
   default policy packetResolutionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet decisions"
   store EventPacketResolution in durable
 }
@@ -73,7 +73,7 @@ entity EventPacketRevision mixin TenantScoped {
   constraint packetRevisionFingerprint: length(trim(self.snapshotFingerprint)) > 0 "A print needs its exact input fingerprint"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   default policy packetRevisionRead read: roleAllows(user.role, "eventPacketSeamOnly") "PDF and source snapshots need scoped manager access"
-  default policy packetRevisionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Only exact-current immutable prints are recorded"
+  default policy packetRevisionWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the packet prints"
   default policy packetRevisionExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet prints"
   store EventPacketRevision in durable
 }

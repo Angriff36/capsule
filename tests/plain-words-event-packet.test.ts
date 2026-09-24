@@ -102,9 +102,9 @@ describe("plain words on leftover event-packet manifests", () => {
       "utf8",
     ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     for (const later of [
-      "Reconciliation owns issue lifecycle",
-      "Authenticated transactional decisions are immutable",
-      "Only exact-current immutable prints are recorded",
+      "The event packet keeps the packet issues",
+      "The event packet keeps the packet decisions",
+      "The event packet keeps the packet prints",
     ]) {
       expect(packet).toContain(later);
     }
@@ -144,11 +144,65 @@ describe("plain words on leftover event-packet manifests", () => {
 
     // lock the later event-packet leftovers; this test does not change them
     for (const later of [
+      "The event packet keeps the packet issues",
+      "The event packet keeps the packet decisions",
+      "The event packet keeps the packet prints",
+    ]) {
+      expect(visible).toContain(later);
+    }
+  });
+
+  it("keeps leftover event-packet write copy free of lifecycle jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/operations/event-packet.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
       "Reconciliation owns issue lifecycle",
       "Authenticated transactional decisions are immutable",
       "Only exact-current immutable prints are recorded",
     ]) {
-      expect(visible).toContain(later);
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "The event packet keeps the packet issues",
+      "The event packet keeps the packet decisions",
+      "The event packet keeps the packet prints",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    for (const landed of [
+      "The event packet keeps the source files",
+      "Staff cannot change packet files",
+      "Staff cannot change packet issues",
+      "Staff cannot change packet decisions",
+      "Staff cannot change packet prints",
+      "The original packet files stay behind the scenes",
+      "Private packet issues stay behind the scenes",
+      "Private approvals remain behind manager review",
+    ]) {
+      expect(visible).toContain(landed);
+    }
+
+    const summary = readFileSync("manifest-context-summary.json", "utf8");
+    for (const old of [
+      "Reconciliation owns issue lifecycle",
+      "Authenticated transactional decisions are immutable",
+      "Only exact-current immutable prints are recorded",
+    ]) {
+      expect(summary).not.toContain(old);
+    }
+    for (const fresh of [
+      "The event packet keeps the packet issues",
+      "The event packet keeps the packet decisions",
+      "The event packet keeps the packet prints",
+    ]) {
+      expect(summary).toContain(fresh);
     }
   });
 });
