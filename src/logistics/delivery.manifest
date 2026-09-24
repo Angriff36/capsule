@@ -66,9 +66,9 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     guard self.packList != null and (self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
     guard self.event != null
     guard self.scheduledAt == null or self.packListId == packListId
-    constraint schedulePackListMatch: packListId == self.packListId "Schedule packListId must match the seeded pack list reference"
+    constraint schedulePackListMatch: packListId == self.packListId "This delivery is for a different pack list. Pick the pack list already on this delivery."
     constraint scheduleEventMatch: eventId == self.eventId "This delivery is for a different event. Pick the event already on this delivery."
-    constraint scheduleDriverMatch: driverId == null or self.driverId == null or driverId == self.driverId "Schedule driverId must match the seeded driver reference when provided"
+    constraint scheduleDriverMatch: driverId == null or self.driverId == null or driverId == self.driverId "This delivery is for a different driver. Leave the driver blank or pick the one already on this delivery."
     constraint scheduleDestinationPresent: length(trim(destination)) > 0 or length(trim(self.destination)) > 0 "Delivery destination is required"
     constraint scheduleWindowDates: (self.scheduledAt != null) or (windowEndsAt > windowStartsAt) "Delivery window end must be after its start"
     mutate packListId = packListId

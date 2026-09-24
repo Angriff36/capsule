@@ -7966,9 +7966,9 @@ async function __runDeliverySchedule(ctx: MutationCtx, { docId, packListId, even
     if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((doc.scheduledAt == null) || (doc.packListId === packListId)))) throw new Error("Guard 4 failed");
-    if (!((packListId === doc.packListId))) throw new Error("Schedule packListId must match the seeded pack list reference");
+    if (!((packListId === doc.packListId))) throw new Error("This delivery is for a different pack list. Pick the pack list already on this delivery.");
     if (!((eventId === doc.eventId))) throw new Error("This delivery is for a different event. Pick the event already on this delivery.");
-    if (!((((driverId == null) || (doc.driverId == null)) || (driverId === doc.driverId)))) throw new Error("Schedule driverId must match the seeded driver reference when provided");
+    if (!((((driverId == null) || (doc.driverId == null)) || (driverId === doc.driverId)))) throw new Error("This delivery is for a different driver. Leave the driver blank or pick the one already on this delivery.");
     if (!(((((destination).trim()).length > 0) || (((doc.destination).trim()).length > 0)))) throw new Error("Delivery destination is required");
     if (!(((doc.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("Delivery window end must be after its start");
     if (version !== undefined && (doc as any).version !== version) {
@@ -8063,9 +8063,9 @@ export const Delivery_createViaSchedule = mutation({
     if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 2 failed");
     if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!(((__draft.scheduledAt == null) || (__draft.packListId === packListId)))) throw new Error("Guard 4 failed");
-    if (!((packListId === __draft.packListId))) throw new Error("Schedule packListId must match the seeded pack list reference");
+    if (!((packListId === __draft.packListId))) throw new Error("This delivery is for a different pack list. Pick the pack list already on this delivery.");
     if (!((eventId === __draft.eventId))) throw new Error("This delivery is for a different event. Pick the event already on this delivery.");
-    if (!((((driverId == null) || (__draft.driverId == null)) || (driverId === __draft.driverId)))) throw new Error("Schedule driverId must match the seeded driver reference when provided");
+    if (!((((driverId == null) || (__draft.driverId == null)) || (driverId === __draft.driverId)))) throw new Error("This delivery is for a different driver. Leave the driver blank or pick the one already on this delivery.");
     if (!(((((destination).trim()).length > 0) || (((__draft.destination).trim()).length > 0)))) throw new Error("Delivery destination is required");
     if (!(((__draft.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("Delivery window end must be after its start");
     const doc: Record<string, any> = {

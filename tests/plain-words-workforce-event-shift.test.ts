@@ -74,9 +74,9 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     expect(visible).toContain(
       "Payroll period end must be at or after period start",
     );
-    // The delivery pack list leftover keeps its wording, pinned from the generated file.
+    // The time-off person leftover keeps its wording, pinned from the generated file.
     expect(mutations).toContain(
-      "Schedule packListId must match the seeded pack list reference",
+      "Time-off person must match the seeded staff profile",
     );
     // Already-landed person match copy stays.
     expect(visible).toContain(
