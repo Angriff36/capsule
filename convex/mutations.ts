@@ -15086,7 +15086,7 @@ async function __runEventCloseoutCapture(ctx: MutationCtx, { docId, eventId, act
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventCloseout not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may read event closeouts");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may see event closeouts");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may update event closeouts");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may change event closeouts");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -15222,7 +15222,7 @@ export const EventCloseout_createViaCapture = mutation({
       unresolvedIssues: args.unresolvedIssues
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may read event closeouts");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may see event closeouts");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may update event closeouts");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may change event closeouts");
     if (!((__draft.status === "draft"))) throw new Error("Guard 0 failed");
@@ -15277,7 +15277,7 @@ async function __runEventCloseoutFinalize(ctx: MutationCtx, { docId, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventCloseout not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventCloseout not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may read event closeouts");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may see event closeouts");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may update event closeouts");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "eventManageAccess")))) throw new Error("Finance staff and event coordinators may change event closeouts");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -33628,7 +33628,7 @@ async function __runPayrollInputFinalize(ctx: MutationCtx, { docId, version }: a
     if (!__storedDoc) throw new Error("PayrollInput not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PayrollInput not found");
     const doc = await __decryptDoc(ctx, "PayrollInput", ["hourlyRate","overtimeRate","grossAmount","notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may read payroll inputs");
+    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may see payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may update payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may change payroll inputs");
     if (!((doc.status === "prepared"))) throw new Error("Guard 0 failed");
@@ -33692,7 +33692,7 @@ async function __runPayrollInputMarkVoided(ctx: MutationCtx, { docId, reason, ve
     if (!__storedDoc) throw new Error("PayrollInput not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PayrollInput not found");
     const doc = await __decryptDoc(ctx, "PayrollInput", ["hourlyRate","overtimeRate","grossAmount","notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may read payroll inputs");
+    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may see payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may update payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may change payroll inputs");
     if (!((((doc.status === "draft") || (doc.status === "prepared")) || (doc.status === "finalized")))) throw new Error("Guard 0 failed");
@@ -33760,7 +33760,7 @@ async function __runPayrollInputPrepare(ctx: MutationCtx, { docId, personId, per
     const doc = await __decryptDoc(ctx, "PayrollInput", ["hourlyRate","overtimeRate","grossAmount","notes"], __storedDoc) as Record<string, any>;
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).person = __rel_person;
-    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may read payroll inputs");
+    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may see payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may update payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may change payroll inputs");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -33892,7 +33892,7 @@ export const PayrollInput_createViaPrepare = mutation({
       totalMinutes: args.totalMinutes
     };
     const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may read payroll inputs");
+    if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may see payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may update payroll inputs");
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Finance managers may change payroll inputs");
     if (!((__draft.status === "draft"))) throw new Error("Guard 0 failed");
@@ -41737,7 +41737,7 @@ async function __runRevenueAttributionApply(ctx: MutationCtx, { docId, eventReve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("RevenueAttribution not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RevenueAttribution not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may read attributions");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may see attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -41795,7 +41795,7 @@ async function __runRevenueAttributionApprove(ctx: MutationCtx, { docId, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("RevenueAttribution not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RevenueAttribution not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may read attributions");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may see attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -41878,7 +41878,7 @@ async function __runRevenueAttributionCreate(ctx: MutationCtx, args: any) {
       requestedAt: Date.now(),
       version: 1
     };
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may read attributions");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may see attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((args.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -41933,7 +41933,7 @@ async function __runRevenueAttributionReject(ctx: MutationCtx, { docId, rejectio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("RevenueAttribution not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RevenueAttribution not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may read attributions");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may see attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -41990,7 +41990,7 @@ async function __runRevenueAttributionRequestApproval(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("RevenueAttribution not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RevenueAttribution not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may read attributions");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may see attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -42043,7 +42043,7 @@ async function __runRevenueAttributionUpdate(ctx: MutationCtx, { docId, percentB
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("RevenueAttribution not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("RevenueAttribution not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may read attributions");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "salesAccess")))) throw new Error("Finance and sales staff may see attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -54000,7 +54000,7 @@ async function __runVenueCommissionTermDefine(ctx: MutationCtx, { docId, venueId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueCommissionTerm not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueCommissionTerm not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read venue commission terms");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change venue commission terms");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -54073,7 +54073,7 @@ export const VenueCommissionTerm_createViaDefine = mutation({
       notes: args.notes,
       venueId: args.venueId
     };
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read venue commission terms");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change venue commission terms");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -54103,7 +54103,7 @@ async function __runVenueCommissionTermRetire(ctx: MutationCtx, { docId, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueCommissionTerm not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueCommissionTerm not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read venue commission terms");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change venue commission terms");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -54147,7 +54147,7 @@ async function __runVenueCommissionTermRevise(ctx: MutationCtx, { docId, commiss
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueCommissionTerm not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueCommissionTerm not found");
-    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may read venue commission terms");
+    if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may see venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update venue commission terms");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change venue commission terms");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

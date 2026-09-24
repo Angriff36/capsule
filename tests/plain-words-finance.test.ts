@@ -52,4 +52,46 @@ describe("plain words on leftover finance manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover finance READ copy free of read jargon", () => {
+    const files = [
+      "src/finance/payroll-input.manifest",
+      "src/finance/event-closeout.manifest",
+      "src/finance/revenue-attribution.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Finance managers may read payroll inputs",
+      "Finance staff and event coordinators may read event closeouts",
+      "Finance staff may read venue commission terms",
+      "Finance and sales staff may read attributions",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Finance managers may see payroll inputs",
+      "Finance staff and event coordinators may see event closeouts",
+      "Finance staff may see venue commission terms",
+      "Finance and sales staff may see attributions",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Finance managers may update payroll inputs");
+    expect(visible).toContain(
+      "Finance staff and event coordinators may update event closeouts",
+    );
+    expect(visible).toContain(
+      "Finance staff may update venue commission terms",
+    );
+    expect(visible).toContain("Finance staff may update attributions");
+  });
 });
