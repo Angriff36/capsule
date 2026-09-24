@@ -10656,7 +10656,7 @@ async function __runEmailNotificationSubscriptionConfigure(ctx: MutationCtx, { d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EmailNotificationSubscription not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EmailNotificationSubscription not found");
-    if (!(((doc.ownerId == null) || (doc.ownerId === user.id)))) throw new Error("Users may read unowned creation drafts or their own email subscriptions");
+    if (!(((doc.ownerId == null) || (doc.ownerId === user.id)))) throw new Error("Users may see unfinished email subscriptions or their own email subscriptions");
     if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may update only their own email subscriptions");
     if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may configure only their own email subscriptions");
     if (!((doc.configuredAt == null))) throw new Error("Guard 0 failed");
@@ -10731,7 +10731,7 @@ export const EmailNotificationSubscription_createViaConfigure = mutation({
       lowStockAlerts: args.lowStockAlerts,
       shiftChanges: args.shiftChanges
     };
-    if (!(((__draft.ownerId == null) || (__draft.ownerId === user.id)))) throw new Error("Users may read unowned creation drafts or their own email subscriptions");
+    if (!(((__draft.ownerId == null) || (__draft.ownerId === user.id)))) throw new Error("Users may see unfinished email subscriptions or their own email subscriptions");
     if (!(((user.id != null) && ((__draft.ownerId == null) || (__draft.ownerId === user.id))))) throw new Error("Users may update only their own email subscriptions");
     if (!(((user.id != null) && ((__draft.ownerId == null) || (__draft.ownerId === user.id))))) throw new Error("Users may configure only their own email subscriptions");
     if (!((__draft.configuredAt == null))) throw new Error("Guard 0 failed");
@@ -10766,7 +10766,7 @@ async function __runEmailNotificationSubscriptionUpdateSubscriptions(ctx: Mutati
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EmailNotificationSubscription not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EmailNotificationSubscription not found");
-    if (!(((doc.ownerId == null) || (doc.ownerId === user.id)))) throw new Error("Users may read unowned creation drafts or their own email subscriptions");
+    if (!(((doc.ownerId == null) || (doc.ownerId === user.id)))) throw new Error("Users may see unfinished email subscriptions or their own email subscriptions");
     if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may update only their own email subscriptions");
     if (!(((user.id != null) && ((doc.ownerId == null) || (doc.ownerId === user.id))))) throw new Error("Users may configure only their own email subscriptions");
     if (!((doc.configuredAt != null))) throw new Error("Guard 0 failed");
@@ -34089,7 +34089,7 @@ async function __runPersonAssignRole(ctx: MutationCtx, { docId, role, version }:
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -34141,7 +34141,7 @@ async function __runPersonChangeAddress(ctx: MutationCtx, { docId, addressLine1,
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -34200,7 +34200,7 @@ async function __runPersonCorrectEmail(ctx: MutationCtx, { docId, email, version
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -34252,7 +34252,7 @@ async function __runPersonCorrectIdentity(ctx: MutationCtx, { docId, givenName, 
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -34309,7 +34309,7 @@ async function __runPersonDeactivate(ctx: MutationCtx, { docId, version }: any, 
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -34371,7 +34371,7 @@ async function __runPersonHire(ctx: MutationCtx, { docId, givenName, familyName,
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -34467,7 +34467,7 @@ export const Person_createViaHire = mutation({
       givenName: args.givenName,
       phone: args.phone
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -34509,7 +34509,7 @@ async function __runPersonLinkAccount(ctx: MutationCtx, { docId, authSubjectId, 
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -34563,7 +34563,7 @@ async function __runPersonReactivate(ctx: MutationCtx, { docId, version }: any, 
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
@@ -34625,7 +34625,7 @@ async function __runPersonSetEmployeeNumber(ctx: MutationCtx, { docId, employeeN
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -34676,7 +34676,7 @@ async function __runPersonSetPayRate(ctx: MutationCtx, { docId, hourlyRate, vers
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -34727,7 +34727,7 @@ async function __runPersonSetSmsAlerts(ctx: MutationCtx, { docId, optIn, version
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -34777,7 +34777,7 @@ async function __runPersonTerminate(ctx: MutationCtx, { docId, reason, version }
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!(((doc.status === "active") || (doc.status === "inactive")))) throw new Error("Guard 0 failed");
@@ -34842,7 +34842,7 @@ async function __runPersonUnlinkAccount(ctx: MutationCtx, { docId, version }: an
     if (!__storedDoc) throw new Error("Person not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Person not found");
     const doc = await __decryptDoc(ctx, "Person", ["email","phone","addressLine1","addressLine2","city","region","postalCode"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may update people");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Workforce managers may change people");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

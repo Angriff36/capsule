@@ -19,7 +19,7 @@ entity EmailNotificationSubscription mixin TenantScoped {
 
   // ownerId is null only for Builder's transient create-via draft. Persisted
   // configured rows are visible solely to their owner.
-  default policy emailNotificationSubscriptionRead read: self.ownerId == null or self.ownerId == user.id "Users may read unowned creation drafts or their own email subscriptions"
+  default policy emailNotificationSubscriptionRead read: self.ownerId == null or self.ownerId == user.id "Users may see unfinished email subscriptions or their own email subscriptions"
   default policy emailNotificationSubscriptionWrite write: user.id != null and (self.ownerId == null or self.ownerId == user.id) "Users may update only their own email subscriptions"
   default policy emailNotificationSubscriptionExecute execute: user.id != null and (self.ownerId == null or self.ownerId == user.id) "Users may configure only their own email subscriptions"
 
