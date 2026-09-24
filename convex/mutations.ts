@@ -4648,7 +4648,7 @@ async function __runComponentImportRecordParse(ctx: MutationCtx, { docId, parsed
     if (!((doc.status === "uploaded"))) throw new Error("Guard 0 failed");
     if (!((doc.uploadedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((parsedName).trim()).length > 0))) throw new Error("Parsed component name is required");
+    if (!((((parsedName).trim()).length > 0))) throw new Error("Parsed recipe name is required");
     if (!((parsedLineCount >= 0))) throw new Error("Parsed line count cannot be negative");
     if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("Parsed yield quantity must be positive when present");
     if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("Parsed batch multiplier must be positive when present");
@@ -4844,7 +4844,7 @@ async function __runComponentImportReviseReview(ctx: MutationCtx, { docId, expec
     if (!((doc.reviewStartedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.reviewRevision === expectedReviewRevision))) throw new Error("Guard 2 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
-    if (!((((parsedName).trim()).length > 0))) throw new Error("Reviewed component name is required");
+    if (!((((parsedName).trim()).length > 0))) throw new Error("Reviewed recipe name is required");
     if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("Reviewed yield quantity must be positive when present");
     if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("Reviewed batch multiplier must be positive when present");
     if (version !== undefined && (doc as any).version !== version) {

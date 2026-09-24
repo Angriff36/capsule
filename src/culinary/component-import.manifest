@@ -133,7 +133,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.status == "uploaded"
     guard self.uploadedAt != null
     guard self.deletedAt == null
-    constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed component name is required"
+    constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed recipe name is required"
     constraint parseLineCountNonnegative: parsedLineCount >= 0 "Parsed line count cannot be negative"
     constraint parseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "Parsed yield quantity must be positive when present"
     constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
@@ -188,7 +188,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.reviewStartedAt != null
     guard self.reviewRevision == expectedReviewRevision
     guard self.deletedAt == null
-    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed component name is required"
+    constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed recipe name is required"
     constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "Reviewed yield quantity must be positive when present"
     constraint reviseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Reviewed batch multiplier must be positive when present"
     mutate parsedName = parsedName
