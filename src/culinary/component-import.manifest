@@ -100,7 +100,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint uploadSourcePresent: length(trim(rawSourceText)) > 0 "Paste recipe text before parsing."
     constraint uploadByteCountNonnegative: sourceByteCount >= 0 "This recipe's size can't be negative. Use zero or more."
-    constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "Source fingerprint is required"
+    constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "This recipe isn't identified. Paste the recipe text first."
     mutate sourceKind = sourceKind
     mutate sourceFilename = sourceFilename
     mutate csvSheetText = csvSheetText

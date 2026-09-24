@@ -46,7 +46,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
     );
     expect(summary).toContain("Completed imports require a resulting recipe");
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source fingerprint is required");
+    expect(visible).toContain("Source line is required");
     // Already-landed recipe leftovers stay.
     expect(visible).toContain("Kitchen staff may see recipe imports");
     expect(visible).toContain("Kitchen staff may update recipe imports");
@@ -93,7 +93,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(visible).toContain("Reviewed recipe name is required");
     expect(visible).toContain("Completed imports require a resulting recipe");
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source fingerprint is required");
+    expect(visible).toContain("Source line is required");
   });
 
   it("keeps leftover culinary import reviewed-yield and parsed-batch copy free of quantity jargon", () => {
@@ -146,7 +146,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
       "When you enter a yield, it must be more than zero.",
     );
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source fingerprint is required");
+    expect(visible).toContain("Source line is required");
   });
 
   it("keeps leftover culinary import reviewed-batch and line-count copy free of multiplier jargon", () => {
@@ -205,7 +205,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
       "When you enter a batch size, it must be more than zero.",
     );
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source fingerprint is required");
+    expect(visible).toContain("Source line is required");
   });
 
   it("keeps leftover culinary import resolved-line-count copy free of parsed jargon", () => {
@@ -277,7 +277,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
       "This recipe's line counts can't be negative. Use zero or more.",
     );
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source fingerprint is required");
+    expect(visible).toContain("Source line is required");
   });
 
   it("keeps leftover culinary import source-present copy free of source-content jargon", () => {
@@ -300,7 +300,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
       mutations.split("Paste recipe text before parsing.").length - 1,
     ).toBe(2);
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source fingerprint is required");
+    expect(visible).toContain("Source line is required");
   });
 
   it("keeps leftover culinary import stage-import match copy free of importId jargon", () => {
@@ -330,7 +330,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
       "This line is for a different recipe import. Pick the recipe import already on this line.",
     );
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source fingerprint is required");
+    expect(visible).toContain("Source line is required");
     expect(visible).toContain("Source line is required");
     expect(visible).toContain("Source order cannot be negative");
   });
