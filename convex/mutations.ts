@@ -10522,7 +10522,7 @@ async function __runDishTaskSpecifyWork(ctx: MutationCtx, { docId, stage, resolu
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((leadTimeMinDays == null) || (leadTimeMinDays >= 0)) && ((leadTimeMaxDays == null) || (leadTimeMaxDays >= 0))))) throw new Error("Lead time cannot be negative");
+    if (!((((leadTimeMinDays == null) || (leadTimeMinDays >= 0)) && ((leadTimeMaxDays == null) || (leadTimeMaxDays >= 0))))) throw new Error("This dish task's lead time can't be negative. Use zero or more days.");
     if (!(((sequenceAfterDishTaskId == null) || (sequenceAfterDishTaskId !== doc._id)))) throw new Error("A step cannot follow itself");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);

@@ -42,6 +42,10 @@ describe("plain words on leftover culinary dish task quantity copy", () => {
       "This dish task's place in the list can't be negative. Use zero or more.",
     );
     // Later leftovers on this file are pinned: they must not change with this one.
-    expect(visible).toContain("Lead time cannot be negative");
+    expect(visible).toContain(
+      "This dish task's lead time can't be negative. Use zero or more days.",
+    );
+    // Later leftovers on this file are pinned: they must not change with this one.
+    expect(visible).toContain("A step cannot follow itself");
   });
 });
