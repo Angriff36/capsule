@@ -397,7 +397,7 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.person != null
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint publishSchedulePersonMatch: personId == self.personId "Schedule recipient must match the seeded person reference"
+    constraint publishSchedulePersonMatch: personId == self.personId "This schedule notice is for a different person. Pick the person already on this schedule notice."
     constraint publishScheduleWindow: weekEndsAt > weekStartsAt "Work week end must be after its start"
     constraint publishScheduleShiftCount: shiftCount > 0 "Publish requires at least one scheduled shift"
     constraint publishScheduleSummary: length(trim(shiftSummary)) > 0 "Publish requires a shift summary"

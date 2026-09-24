@@ -44955,7 +44955,7 @@ async function __runShiftSwapRequestPropose(ctx: MutationCtx, { docId, shiftId, 
     if (!(((targetTrainingCompletionId == null) || (((__rel_targetTrainingCompletion != null) && (__rel_targetTrainingCompletion.deletedAt == null)) && (__rel_targetTrainingCompletion.recordedAt != null))))) throw new Error("Guard 13 failed");
     if (!((shiftId === doc.shiftId))) throw new Error("Swap shift must match the seeded shift reference");
     if (!(((requesterPersonId === doc.requesterPersonId) && (__rel_shift.personId === requesterPersonId)))) throw new Error("Only the assigned staff member may propose this swap");
-    if (!((recipientPersonId === doc.recipientPersonId))) throw new Error("Swap recipient must match the seeded person reference");
+    if (!((recipientPersonId === doc.recipientPersonId))) throw new Error("This swap is for a different person. Pick the person already on this swap.");
     if (!((requesterPersonId !== recipientPersonId))) throw new Error("Choose another staff member for the swap");
     if (!((shiftTypeId === __rel_shift.shiftTypeId))) throw new Error("Shift type must match the scheduled shift");
     if (!((sourceQualificationId === __rel_shift.requiredQualificationId))) throw new Error("Source certification must match the scheduled shift");
@@ -45079,7 +45079,7 @@ export const ShiftSwapRequest_createViaPropose = mutation({
     if (!(((targetTrainingCompletionId == null) || (((__rel_targetTrainingCompletion != null) && (__rel_targetTrainingCompletion.deletedAt == null)) && (__rel_targetTrainingCompletion.recordedAt != null))))) throw new Error("Guard 13 failed");
     if (!((shiftId === __draft.shiftId))) throw new Error("Swap shift must match the seeded shift reference");
     if (!(((requesterPersonId === __draft.requesterPersonId) && (__rel_shift.personId === requesterPersonId)))) throw new Error("Only the assigned staff member may propose this swap");
-    if (!((recipientPersonId === __draft.recipientPersonId))) throw new Error("Swap recipient must match the seeded person reference");
+    if (!((recipientPersonId === __draft.recipientPersonId))) throw new Error("This swap is for a different person. Pick the person already on this swap.");
     if (!((requesterPersonId !== recipientPersonId))) throw new Error("Choose another staff member for the swap");
     if (!((shiftTypeId === __rel_shift.shiftTypeId))) throw new Error("Shift type must match the scheduled shift");
     if (!((sourceQualificationId === __rel_shift.requiredQualificationId))) throw new Error("Source certification must match the scheduled shift");
@@ -55889,7 +55889,7 @@ async function __runWeeklyScheduleNoticePublishSchedule(ctx: MutationCtx, { docI
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_person != null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((personId === doc.personId))) throw new Error("Schedule recipient must match the seeded person reference");
+    if (!((personId === doc.personId))) throw new Error("This schedule notice is for a different person. Pick the person already on this schedule notice.");
     if (!((weekEndsAt > weekStartsAt))) throw new Error("Work week end must be after its start");
     if (!((shiftCount > 0))) throw new Error("Publish requires at least one scheduled shift");
     if (!((((shiftSummary).trim()).length > 0))) throw new Error("Publish requires a shift summary");
@@ -55978,7 +55978,7 @@ export const WeeklyScheduleNotice_createViaPublishSchedule = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_person != null))) throw new Error("Guard 2 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 3 failed");
-    if (!((personId === __draft.personId))) throw new Error("Schedule recipient must match the seeded person reference");
+    if (!((personId === __draft.personId))) throw new Error("This schedule notice is for a different person. Pick the person already on this schedule notice.");
     if (!((weekEndsAt > weekStartsAt))) throw new Error("Work week end must be after its start");
     if (!((shiftCount > 0))) throw new Error("Publish requires at least one scheduled shift");
     if (!((((shiftSummary).trim()).length > 0))) throw new Error("Publish requires a shift summary");

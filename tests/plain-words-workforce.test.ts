@@ -344,7 +344,7 @@ describe("plain words on workforce manifests", () => {
 
     // later leftovers, unchanged
     expect(visible).toContain(
-      "Schedule recipient must match the seeded person reference",
+      "This schedule notice is for a different person. Pick the person already on this schedule notice.",
     );
     expect(visible).toContain(
       "Assign eventId must match the seeded event reference",
