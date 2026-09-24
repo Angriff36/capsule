@@ -787,7 +787,7 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
 
-  constraint inventoryLotComplete: self.receivedAt == null or (length(trim(self.supplierLotNumber)) > 0 and self.receiptQuantity > 0 and self.cumulativeReceivedQuantity > 0) "Recorded inventory lots require a supplier lot number and positive receipt quantities"
+  constraint inventoryLotComplete: self.receivedAt == null or (length(trim(self.supplierLotNumber)) > 0 and self.receiptQuantity > 0 and self.cumulativeReceivedQuantity > 0) "Receipt lots require a supplier lot number and positive receipt quantities"
   constraint inventoryLotCostNonnegative: self.unitCost >= 0 "Inventory lot unit cost cannot be negative"
 
   default policy inventoryLotRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may see receipt lots"

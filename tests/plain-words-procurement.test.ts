@@ -154,4 +154,36 @@ describe("plain words on leftover procurement manifests", () => {
       expect(visible).toContain(kept);
     }
   });
+
+  it("keeps leftover procurement inventory-lot constraint copy free of record jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/procurement/order.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain(
+      "Recorded inventory lots require a supplier lot number and positive receipt quantities",
+    );
+    expect(visible).toContain(
+      "Receipt lots require a supplier lot number and positive receipt quantities",
+    );
+    expectPlain(
+      "Receipt lots require a supplier lot number and positive receipt quantities",
+    );
+
+    // already-landed write/read leftovers must stay put
+    expect(visible).toContain(
+      "Inventory, procurement, and managers may see receipt lots",
+    );
+    expect(visible).toContain(
+      "Procurement and managers may update receipt lots",
+    );
+    expect(visible).toContain(
+      "Procurement and managers may change receipt lots",
+    );
+
+    // later leftover, unchanged
+    expect(visible).toContain("Inventory lot unit cost cannot be negative");
+  });
 });
