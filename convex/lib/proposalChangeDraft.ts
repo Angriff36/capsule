@@ -4,6 +4,8 @@
 // copies, so it must not be used here. This mutation opens a new draft that
 // points at the accepted proposal and copies the live priced lines, the
 // dishes the client already chose, and the optional extras still on offer.
+// A dish whose menu is no longer published, or that is no longer active,
+// is left off the draft instead of blocking the whole change.
 // The accepted proposal stays as it is.
 //
 // Nested generated commands share one Convex transaction. A failed confirm
@@ -17,6 +19,7 @@ import { getAuthContext } from "./authContext";
 export interface StartProposalChangeResult {
   docId: Id<"proposals">;
   alreadyStarted: boolean;
+  leftOffDishNames: string[];
 }
 
 function presentText(value: string | null | undefined): string | undefined {
@@ -99,11 +102,33 @@ async function copyLivePricedLines(
   }
 }
 
+function dishLabel(name: string | null | undefined): string {
+  if (name == null || name.trim() === "") return "A dish";
+  return name;
+}
+
+async function dishStillOnOffer(
+  ctx: MutationCtx,
+  menuId: Id<"menus">,
+  dishId: Id<"dishes">,
+): Promise<{ offered: boolean; name: string }> {
+  const menu = await ctx.db.get(menuId);
+  const dish = await ctx.db.get(dishId);
+  const offered =
+    menu != null &&
+    menu.deletedAt == null &&
+    menu.status === "published" &&
+    dish != null &&
+    dish.deletedAt == null &&
+    dish.status === "active";
+  return { offered, name: dishLabel(dish?.name) };
+}
+
 async function copyLiveMenuChoices(
   ctx: MutationCtx,
   sourceId: Id<"proposals">,
   targetId: Id<"proposals">,
-): Promise<void> {
+): Promise<string[]> {
   const rows = await ctx.db
     .query("proposalDishSelections")
     .withIndex("by_proposalId", (q) => q.eq("proposalId", sourceId))
@@ -112,7 +137,17 @@ async function copyLiveMenuChoices(
     (row) =>
       row.deletedAt == null && row.removedAt == null && row.selectedAt != null,
   );
+  const leftOff: string[] = [];
   for (const choice of live) {
+    const availability = await dishStillOnOffer(
+      ctx,
+      choice.menuId,
+      choice.dishId,
+    );
+    if (!availability.offered) {
+      leftOff.push(availability.name);
+      continue;
+    }
     await ctx.runMutation(api.mutations.ProposalDishSelection_createViaSelect, {
       proposalId: targetId,
       menuId: choice.menuId,
@@ -123,6 +158,7 @@ async function copyLiveMenuChoices(
       specialInstructions: presentText(choice.specialInstructions),
     });
   }
+  return leftOff;
 }
 
 async function copyLiveExtras(
@@ -156,6 +192,7 @@ export const startProposalChange = mutation({
   returns: v.object({
     docId: v.id("proposals"),
     alreadyStarted: v.boolean(),
+    leftOffDishNames: v.array(v.string()),
   }),
   handler: async (ctx, args): Promise<StartProposalChangeResult> => {
     const proposal = await ctx.db.get(args.proposalId);
@@ -169,7 +206,13 @@ export const startProposalChange = mutation({
       throw new Error("Only an accepted proposal can start a change.");
     }
     const existing = await openChangeDraft(ctx, proposal);
-    if (existing) return { docId: existing._id, alreadyStarted: true };
+    if (existing) {
+      return {
+        docId: existing._id,
+        alreadyStarted: true,
+        leftOffDishNames: [],
+      };
+    }
 
     const created = await ctx.runMutation(
       api.mutations.Proposal_createViaDraft,
@@ -181,8 +224,12 @@ export const startProposalChange = mutation({
       version: 1,
     });
     await copyLivePricedLines(ctx, proposal._id, created.docId);
-    await copyLiveMenuChoices(ctx, proposal._id, created.docId);
+    const leftOffDishNames = await copyLiveMenuChoices(
+      ctx,
+      proposal._id,
+      created.docId,
+    );
     await copyLiveExtras(ctx, proposal._id, created.docId);
-    return { docId: created.docId, alreadyStarted: false };
+    return { docId: created.docId, alreadyStarted: false, leftOffDishNames };
   },
 });

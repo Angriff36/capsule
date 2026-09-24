@@ -1,5 +1,19 @@
-import { useStartProposalChange } from "./useStartProposalChange";
+import {
+  useStartProposalChange,
+  type StartProposalChangeResult,
+} from "./useStartProposalChange";
 import type { Id } from "../../lib/api";
+
+function changeNotice(result: StartProposalChangeResult): string {
+  if (result.alreadyStarted) {
+    return "A change draft is already open for this proposal.";
+  }
+  if (result.leftOffDishNames.length === 0) {
+    return "A change draft is ready. The accepted proposal is unchanged.";
+  }
+  const names = result.leftOffDishNames.join(", ");
+  return `A change draft is ready. The accepted proposal is unchanged. These dishes were left off because they are no longer available: ${names}.`;
+}
 
 /**
  * One click on an accepted proposal opens an editable draft. The accepted
@@ -26,11 +40,7 @@ export function ProposalChangeAction({
       onClick={() => {
         void run(key, async () => {
           const result = await start({ proposalId });
-          onNotice(
-            result.alreadyStarted
-              ? "A change draft is already open for this proposal."
-              : "A change draft is ready. The accepted proposal is unchanged.",
-          );
+          onNotice(changeNotice(result));
         });
       }}
     >

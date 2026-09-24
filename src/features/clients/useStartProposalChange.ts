@@ -4,6 +4,7 @@ import { api, type Id } from "../../lib/api";
 export type StartProposalChangeResult = {
   docId: Id<"proposals">;
   alreadyStarted: boolean;
+  leftOffDishNames: string[];
 };
 
 /**
