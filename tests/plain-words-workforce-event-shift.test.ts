@@ -230,10 +230,6 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     expect(mutations).toContain(
       "Time-off person must match the seeded staff profile",
     );
-    expect(mutations).toContain("Parsed line count cannot be negative");
-    expect(mutations).toContain(
-      "Parsed yield quantity must be positive when present",
-    );
     expect(mutations).toContain(
       "Add item packListId must match the seeded pack list reference",
     );

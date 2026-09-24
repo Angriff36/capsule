@@ -4649,8 +4649,8 @@ async function __runComponentImportRecordParse(ctx: MutationCtx, { docId, parsed
     if (!((doc.uploadedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((parsedName).trim()).length > 0))) throw new Error("Parsed recipe name is required");
-    if (!((parsedLineCount >= 0))) throw new Error("Parsed line count cannot be negative");
-    if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("Parsed yield quantity must be positive when present");
+    if (!((parsedLineCount >= 0))) throw new Error("This recipe can't have a negative number of lines. Use zero or more.");
+    if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("When you enter a yield, it must be more than zero.");
     if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("Parsed batch multiplier must be positive when present");
     {
       const __cur = doc.status;
