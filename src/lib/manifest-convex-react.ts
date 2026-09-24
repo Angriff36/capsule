@@ -507,6 +507,7 @@ import {
   ProductionBatchReconcilePlanParamsSchema,
   ProductionBatchStartParamsSchema,
   ProposalAcceptParamsSchema,
+  ProposalConfirmChangeSourceParamsSchema,
   ProposalDeclineParamsSchema,
   ProposalDishSelectionAdjustServingsParamsSchema,
   ProposalDishSelectionRemoveParamsSchema,
@@ -7748,6 +7749,16 @@ export function useProposalAccept() {
   };
 }
 
+/** Mutation hook for Proposal.confirmChangeSource. */
+export function useProposalConfirmChangeSource() {
+  const mutate = useMutation(api.mutations.Proposal_confirmChangeSource);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalConfirmChangeSourceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.decline. */
 export function useProposalDecline() {
   const mutate = useMutation(api.mutations.Proposal_decline);
@@ -11313,4 +11324,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1203 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1204 as const;

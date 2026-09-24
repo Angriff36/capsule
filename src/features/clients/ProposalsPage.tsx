@@ -37,6 +37,7 @@ import {
   type ProposalPdfRecord,
 } from "./proposalPdf";
 import { ProposalSignatureRevokeAction } from "../sales/ProposalSignatureRevokeAction";
+import { ProposalChangeAction } from "./ProposalChangeAction";
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
@@ -790,29 +791,37 @@ export function ProposalsPage() {
                             </button>
                           ))}
                         {String(row.status) === "accepted" ? (
-                          // A linked event means the booking already exists —
-                          // offering Create Event again risks a duplicate.
-                          row.eventId ? (
-                            <Link
-                              className="btn btn-ghost"
-                              to={eventDetailPath(String(row.eventId))}
-                            >
-                              View event
-                            </Link>
-                          ) : (
-                            <Link
-                              className="btn btn-ghost"
-                              // proposalId pre-fills the form from the
-                              // proposal and links the new event + copies the
-                              // accepted menu onto it (issue #141).
-                              to={eventCreatePath({
-                                clientId: String(row.clientId),
-                                proposalId: row._id,
-                              })}
-                            >
-                              Create Event
-                            </Link>
-                          )
+                          <>
+                            <ProposalChangeAction
+                              proposalId={row._id}
+                              busy={busy}
+                              run={run}
+                              onNotice={setNotice}
+                            />
+                            {/* A linked event means the booking already exists —
+                              offering Create Event again risks a duplicate. */}
+                            {row.eventId ? (
+                              <Link
+                                className="btn btn-ghost"
+                                to={eventDetailPath(String(row.eventId))}
+                              >
+                                View event
+                              </Link>
+                            ) : (
+                              <Link
+                                className="btn btn-ghost"
+                                // proposalId pre-fills the form from the
+                                // proposal and links the new event + copies the
+                                // accepted menu onto it (issue #141).
+                                to={eventCreatePath({
+                                  clientId: String(row.clientId),
+                                  proposalId: row._id,
+                                })}
+                              >
+                                Create Event
+                              </Link>
+                            )}
+                          </>
                         ) : null}
                       </td>
                     </tr>

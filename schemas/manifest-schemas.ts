@@ -8377,6 +8377,11 @@ export const ProposalAcceptParamsSchema = z.object({
 
 export type ProposalAcceptParams = z.infer<typeof ProposalAcceptParamsSchema>;
 
+// Command: confirmChangeSource on Proposal
+export const ProposalConfirmChangeSourceParamsSchema = z.object({});
+
+export type ProposalConfirmChangeSourceParams = z.infer<typeof ProposalConfirmChangeSourceParamsSchema>;
+
 // Command: decline on Proposal
 export const ProposalDeclineParamsSchema = z.object({});
 
@@ -8402,6 +8407,7 @@ export const ProposalDraftParamsSchema = z.object({
   terms: z.string().optional(),
   visibleSections: z.array(z.string()).optional(),
   eventId: z.string().min(1).optional(),
+  replacesProposalId: z.string().min(1).optional(),
 });
 
 export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;

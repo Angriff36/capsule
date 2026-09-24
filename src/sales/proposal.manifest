@@ -119,7 +119,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     optional notes: string,
     optional terms: string,
     optional visibleSections: list<string>,
-    optional eventId: uuid
+    optional eventId: uuid,
+    optional replacesProposalId: uuid
   ) {
     guard self.draftedAt == null
     guard self.status == "draft"
@@ -148,6 +149,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate terms = terms
     mutate visibleSections = visibleSections
     mutate eventId = eventId
+    mutate replacesProposalId = replacesProposalId
     mutate draftedAt = now()
     emit ProposalDrafted {
       proposalId: self.id
@@ -156,6 +158,19 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       title: title
       total: total
     }
+  }
+
+  // Confirms a change draft points at a live accepted proposal for the same
+  // client. Does not rewrite that accepted proposal.
+  command confirmChangeSource() {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.replacesProposalId != null
+    guard self.replacesProposal != null
+    guard self.replacesProposal.deletedAt == null
+    guard self.replacesProposal.status == "accepted"
+    constraint changeSameClient: self.replacesProposal.clientId == self.clientId "A change stays with the client who accepted the proposal"
+    mutate replacesProposalId = self.replacesProposalId
   }
 
   command send() {
