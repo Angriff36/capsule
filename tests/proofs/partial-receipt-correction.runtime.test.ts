@@ -181,5 +181,46 @@ describe("partial receipt correction", () => {
       TENANT,
     );
     expect(correctionsFinal).toHaveLength(1);
+
+    const restored = await readRow<LineVersion>(
+      roles.procurement,
+      seeded.lineAId,
+    );
+    await runProcurement(api.mutations.VendorOrderLine_correctReceipt, {
+      docId: seeded.lineAId,
+      version: restored.version,
+      correctedQuantity: 40,
+      reason: "The missing case was in the walk-in",
+      supplierLotNumber: LOT,
+    });
+    const afterRestore = (
+      await liveRows<StockRow>(roles.inventory, "inventoryItems", TENANT)
+    ).find((row) => row._id === stock._id);
+    expect(Number(afterRestore?.quantityOnHand)).toBe(35);
+
+    const restoredLine = await readRow<LineVersion>(
+      roles.procurement,
+      seeded.lineAId,
+    );
+    await runProcurement(api.mutations.VendorOrderLine_correctReceipt, {
+      docId: seeded.lineAId,
+      version: restoredLine.version,
+      correctedQuantity: 32,
+      reason: REASON,
+      supplierLotNumber: LOT,
+    });
+    const afterRepeat = (
+      await liveRows<StockRow>(roles.inventory, "inventoryItems", TENANT)
+    ).find((row) => row._id === stock._id);
+    expect(Number(afterRepeat?.quantityOnHand)).toBe(27);
+    const correctionsRepeated = await liveRows<CorrectionRow>(
+      roles.procurement,
+      "receiptCorrections",
+      TENANT,
+    );
+    expect(correctionsRepeated).toHaveLength(3);
+    expect(
+      correctionsRepeated.map((row) => Number(row.delta)).sort((a, b) => a - b),
+    ).toEqual([-8, -8, 8]);
   });
 });

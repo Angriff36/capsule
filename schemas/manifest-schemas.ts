@@ -2894,6 +2894,7 @@ export const ReceiptCorrectionSchema = z.object({
   delta: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
   reason: z.string().default(""),
+  correctionSequence: z.number().int().default(0),
   recordedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -3788,6 +3789,7 @@ export const VendorOrderLineSchema = z.object({
   quantityIsManual: z.boolean().nullable().optional(),
   quantityReviewReason: z.string().nullable().optional(),
   receivedQuantity: z.number().min(0).default(0),
+  receiptCorrectionCount: z.number().int().nullable().optional(),
   supplyWeekStart: z.coerce.date().nullable().optional(),
   pendingSupplyQuantity: z.number().nullable().optional(),
   stockAppliedQuantity: z.number().nullable().optional(),
@@ -8793,6 +8795,7 @@ export const ReceiptCorrectionRecordParamsSchema = z.object({
   delta: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   reason: z.string(),
+  correctionSequence: z.number().int(),
 });
 
 export type ReceiptCorrectionRecordParams = z.infer<typeof ReceiptCorrectionRecordParamsSchema>;

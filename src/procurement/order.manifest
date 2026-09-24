@@ -439,6 +439,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   property quantityIsManual: boolean?
   property quantityReviewReason: string?
   property required receivedQuantity: decimal(12, 4) = 0
+  // Each buyer correction gets its own number so a later correction of the
+  // same two counts still moves stock. A retry of one save keeps this number.
+  property receiptCorrectionCount: int?
   // Outstanding supply already committed outside the editable weekly draft.
   property supplyWeekStart: datetime?
   property pendingSupplyQuantity: decimal(12, 4)?
@@ -741,7 +744,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     constraint correctLotRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
     compute priorReceived = self.receivedQuantity
     compute nextStatus = correctedQuantity == self.orderedQuantity ? "complete" : "receiving"
+    compute correctionSequence = (self.receiptCorrectionCount != null ? self.receiptCorrectionCount : 0) + 1
     mutate receivedQuantity = correctedQuantity
+    mutate receiptCorrectionCount = correctionSequence
     mutate pendingSupplyQuantity = self.pendingSupplyQuantity != null ? max(0, self.orderedQuantity - correctedQuantity) : self.pendingSupplyQuantity
     mutate status = nextStatus
     mutate completedAt = correctedQuantity == self.orderedQuantity ? (self.completedAt != null ? self.completedAt : now()) : null
@@ -760,6 +765,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       lineStillShort: correctedQuantity < self.orderedQuantity
       unit: self.unit
       reason: reason
+      correctionSequence: correctionSequence
     }
   }
 
@@ -895,10 +901,10 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
 }
 
 // One reasoned difference against a delivery. The original lot is never rewritten.
-// Replaying the same prior and corrected totals records no second stock move.
+// Each correction number moves stock once. Replaying that same number does not.
 entity ReceiptCorrection mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
-  unique [tenantId, vendorOrderLineId, priorReceivedQuantity, correctedReceivedQuantity]
+  unique [tenantId, vendorOrderLineId, correctionSequence]
   timestamps
   versionProperty version: number
 
@@ -913,6 +919,7 @@ entity ReceiptCorrection mixin TenantScoped, SoftDeletable {
   property required delta: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
   property required reason: string = ""
+  property required correctionSequence: int = 0
   property recordedAt: datetime?
 
   belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
@@ -938,9 +945,10 @@ entity ReceiptCorrection mixin TenantScoped, SoftDeletable {
     correctedReceivedQuantity: decimal(12, 4),
     delta: decimal(12, 4),
     unit: UnitOfMeasure,
-    reason: string
+    reason: string,
+    correctionSequence: int
   ) {
-    guard self.recordedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.locationId == locationId and self.supplierLotNumber == supplierLotNumber and self.priorReceivedQuantity == priorReceivedQuantity and self.correctedReceivedQuantity == correctedReceivedQuantity and self.delta == delta and self.unit == unit and self.reason == reason)
+    guard self.recordedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.locationId == locationId and self.supplierLotNumber == supplierLotNumber and self.priorReceivedQuantity == priorReceivedQuantity and self.correctedReceivedQuantity == correctedReceivedQuantity and self.delta == delta and self.unit == unit and self.reason == reason and self.correctionSequence == correctionSequence)
     guard self.deletedAt == null
     constraint recordCorrectionReason: length(trim(reason)) > 0 "Say why this count changed."
     constraint recordCorrectionLot: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
@@ -956,6 +964,7 @@ entity ReceiptCorrection mixin TenantScoped, SoftDeletable {
     mutate delta = delta
     mutate unit = unit
     mutate reason = reason
+    mutate correctionSequence = correctionSequence
     mutate recordedAt = self.recordedAt == null ? now() : self.recordedAt
     emit ReceiptCorrectionStock {
       tenantId: self.tenantId
@@ -1338,6 +1347,7 @@ event VendorOrderLineReceiptCorrected: "vendor_order_line.receipt_corrected" {
   lineStillShort: boolean
   unit: UnitOfMeasure
   reason: string
+  correctionSequence: int
 }
 
 event VendorOrderLineQuantityRevised: "vendor_order_line.quantity_revised" {
@@ -1461,7 +1471,7 @@ on VendorOrderLineReceived run InventoryLot.record
   }
 
 on VendorOrderLineReceiptCorrected run ReceiptCorrection.record
-  match vendorOrderLineId = payload.vendorOrderLineId, priorReceivedQuantity = payload.priorReceivedQuantity, correctedReceivedQuantity = payload.correctedReceivedQuantity
+  match vendorOrderLineId = payload.vendorOrderLineId, correctionSequence = payload.correctionSequence
   else create
   params {
     vendorOrderLineId: payload.vendorOrderLineId
@@ -1475,6 +1485,7 @@ on VendorOrderLineReceiptCorrected run ReceiptCorrection.record
     delta: payload.delta
     unit: payload.unit
     reason: payload.reason
+    correctionSequence: payload.correctionSequence
   }
 
 on VendorOrderLineReceiptCorrected run VendorOrder.noteReceiptCorrection

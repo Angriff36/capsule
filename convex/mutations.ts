@@ -41488,7 +41488,7 @@ export const QuoteSubmission_startProcessing = mutation({
   },
 });
 
-async function __runReceiptCorrectionRecord(ctx: MutationCtx, { docId, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, locationId, supplierLotNumber, priorReceivedQuantity, correctedReceivedQuantity, delta, unit, reason, version }: any, __creation = false) {
+async function __runReceiptCorrectionRecord(ctx: MutationCtx, { docId, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, locationId, supplierLotNumber, priorReceivedQuantity, correctedReceivedQuantity, delta, unit, reason, correctionSequence, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -41497,7 +41497,7 @@ async function __runReceiptCorrectionRecord(ctx: MutationCtx, { docId, vendorOrd
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Inventory, procurement, and managers may see receipt corrections");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update receipt corrections");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt corrections");
-    if (!(((doc.recordedAt == null) || (((((((((((doc.vendorOrderLineId === vendorOrderLineId) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorId === vendorId)) && (doc.ingredientId === ingredientId)) && (doc.locationId === locationId)) && (doc.supplierLotNumber === supplierLotNumber)) && (doc.priorReceivedQuantity === priorReceivedQuantity)) && (doc.correctedReceivedQuantity === correctedReceivedQuantity)) && (doc.delta === delta)) && (doc.unit === unit)) && (doc.reason === reason))))) throw new Error("Guard 0 failed");
+    if (!(((doc.recordedAt == null) || ((((((((((((doc.vendorOrderLineId === vendorOrderLineId) && (doc.vendorOrderId === vendorOrderId)) && (doc.vendorId === vendorId)) && (doc.ingredientId === ingredientId)) && (doc.locationId === locationId)) && (doc.supplierLotNumber === supplierLotNumber)) && (doc.priorReceivedQuantity === priorReceivedQuantity)) && (doc.correctedReceivedQuantity === correctedReceivedQuantity)) && (doc.delta === delta)) && (doc.unit === unit)) && (doc.reason === reason)) && (doc.correctionSequence === correctionSequence))))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why this count changed.");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required so this delivery can be traced.");
@@ -41517,6 +41517,7 @@ async function __runReceiptCorrectionRecord(ctx: MutationCtx, { docId, vendorOrd
       delta: delta,
       unit: unit,
       reason: reason,
+      correctionSequence: correctionSequence,
       recordedAt: ((doc.recordedAt == null) ? Date.now() : doc.recordedAt),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -41548,6 +41549,7 @@ export const ReceiptCorrection_record = mutation({
     delta: v.number(),
     unit: v.any(),
     reason: v.string(),
+    correctionSequence: v.number(),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -41577,6 +41579,7 @@ export const ReceiptCorrection_createViaRecord = mutation({
     delta: v.number(),
     unit: v.any(),
     reason: v.string(),
+    correctionSequence: v.number(),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -41586,12 +41589,13 @@ export const ReceiptCorrection_createViaRecord = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { vendorOrderLineId, vendorOrderId, vendorId, ingredientId, locationId, supplierLotNumber, priorReceivedQuantity, correctedReceivedQuantity, delta, unit, reason } = args;
+    const { vendorOrderLineId, vendorOrderId, vendorId, ingredientId, locationId, supplierLotNumber, priorReceivedQuantity, correctedReceivedQuantity, delta, unit, reason, correctionSequence } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
       correctedReceivedQuantity: args.correctedReceivedQuantity,
+      correctionSequence: args.correctionSequence,
       delta: args.delta,
       ingredientId: args.ingredientId,
       locationId: args.locationId,
@@ -41606,7 +41610,7 @@ export const ReceiptCorrection_createViaRecord = mutation({
     if (!(((checkRole(user, "inventoryAccess") || checkRole(user, "procurementAccess")) || checkRole(user, "manageAccess")))) throw new Error("Inventory, procurement, and managers may see receipt corrections");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may update receipt corrections");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may change receipt corrections");
-    if (!(((__draft.recordedAt == null) || (((((((((((__draft.vendorOrderLineId === vendorOrderLineId) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorId === vendorId)) && (__draft.ingredientId === ingredientId)) && (__draft.locationId === locationId)) && (__draft.supplierLotNumber === supplierLotNumber)) && (__draft.priorReceivedQuantity === priorReceivedQuantity)) && (__draft.correctedReceivedQuantity === correctedReceivedQuantity)) && (__draft.delta === delta)) && (__draft.unit === unit)) && (__draft.reason === reason))))) throw new Error("Guard 0 failed");
+    if (!(((__draft.recordedAt == null) || ((((((((((((__draft.vendorOrderLineId === vendorOrderLineId) && (__draft.vendorOrderId === vendorOrderId)) && (__draft.vendorId === vendorId)) && (__draft.ingredientId === ingredientId)) && (__draft.locationId === locationId)) && (__draft.supplierLotNumber === supplierLotNumber)) && (__draft.priorReceivedQuantity === priorReceivedQuantity)) && (__draft.correctedReceivedQuantity === correctedReceivedQuantity)) && (__draft.delta === delta)) && (__draft.unit === unit)) && (__draft.reason === reason)) && (__draft.correctionSequence === correctionSequence))))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why this count changed.");
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required so this delivery can be traced.");
@@ -41626,6 +41630,7 @@ export const ReceiptCorrection_createViaRecord = mutation({
     doc.delta = delta;
     doc.unit = unit;
     doc.reason = reason;
+    doc.correctionSequence = correctionSequence;
     doc.recordedAt = ((doc.recordedAt == null) ? Date.now() : doc.recordedAt);
     const docId = await ctx.db.insert("receiptCorrections", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, tenantId: doc.tenantId, ingredientId: ingredientId, locationId: locationId, delta: stockDelta, unit: unit, reason: reason, _subject: { entity: "ReceiptCorrection", command: "record", id: docId } };
@@ -52155,7 +52160,7 @@ async function __runVendorOrderEnsureWeeklyDraft(ctx: MutationCtx, { docId, vend
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","vendorOrderId","ingredientId","ingredientDemandId","locationId","orderedQuantity","plannedQuantity","quantityIsManual","quantityReviewReason","receivedQuantity","supplyWeekStart","pendingSupplyQuantity","stockAppliedQuantity","unit","unitCost","lineTotalAmount","discrepancyQuantity","discrepancyNotes","status","addedAt","completedAt","cancelledAt","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","vendorOrderId","ingredientId","ingredientDemandId","locationId","orderedQuantity","plannedQuantity","quantityIsManual","quantityReviewReason","receivedQuantity","receiptCorrectionCount","supplyWeekStart","pendingSupplyQuantity","stockAppliedQuantity","unit","unitCost","lineTotalAmount","discrepancyQuantity","discrepancyNotes","status","addedAt","completedAt","cancelledAt","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("vendorOrderLines", __elseDoc as any);
@@ -53215,6 +53220,7 @@ async function __runVendorOrderLineCorrectReceipt(ctx: MutationCtx, { docId, cor
     if (!((((supplierLotNumber).trim()).length > 0))) throw new Error("Supplier lot number is required so this delivery can be traced.");
     const priorReceived = doc.receivedQuantity;
     const nextStatus = ((correctedQuantity === doc.orderedQuantity) ? "complete" : "receiving");
+    const correctionSequence = (((doc.receiptCorrectionCount != null) ? doc.receiptCorrectionCount : 0) + 1);
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -53232,6 +53238,7 @@ async function __runVendorOrderLineCorrectReceipt(ctx: MutationCtx, { docId, cor
     }
     const updates = {
       receivedQuantity: correctedQuantity,
+      receiptCorrectionCount: correctionSequence,
       pendingSupplyQuantity: ((doc.pendingSupplyQuantity != null) ? Math.max(0, (doc.orderedQuantity - correctedQuantity)) : doc.pendingSupplyQuantity),
       status: nextStatus,
       completedAt: ((correctedQuantity === doc.orderedQuantity) ? ((doc.completedAt != null) ? doc.completedAt : Date.now()) : null),
@@ -53239,17 +53246,17 @@ async function __runVendorOrderLineCorrectReceipt(ctx: MutationCtx, { docId, cor
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, locationId: __after.locationId, supplierLotNumber: supplierLotNumber, priorReceivedQuantity: priorReceived, correctedReceivedQuantity: correctedQuantity, delta: (correctedQuantity - priorReceived), orderedQuantity: __after.orderedQuantity, lineStillShort: (correctedQuantity < __after.orderedQuantity), unit: __after.unit, reason: reason, _subject: { entity: "VendorOrderLine", command: "correctReceipt", id: docId } };
-    const __manifestEvent0 = { type: "VendorOrderLineReceiptCorrected", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, locationId: __after.locationId, supplierLotNumber: supplierLotNumber, priorReceivedQuantity: priorReceived, correctedReceivedQuantity: correctedQuantity, delta: (correctedQuantity - priorReceived), orderedQuantity: __after.orderedQuantity, lineStillShort: (correctedQuantity < __after.orderedQuantity), unit: __after.unit, reason: reason }, createdAt: Date.now() };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, locationId: __after.locationId, supplierLotNumber: supplierLotNumber, priorReceivedQuantity: priorReceived, correctedReceivedQuantity: correctedQuantity, delta: (correctedQuantity - priorReceived), orderedQuantity: __after.orderedQuantity, lineStillShort: (correctedQuantity < __after.orderedQuantity), unit: __after.unit, reason: reason, correctionSequence: correctionSequence, _subject: { entity: "VendorOrderLine", command: "correctReceipt", id: docId } };
+    const __manifestEvent0 = { type: "VendorOrderLineReceiptCorrected", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, vendorId: __rel_vendorOrder.vendorId, ingredientId: __after.ingredientId, locationId: __after.locationId, supplierLotNumber: supplierLotNumber, priorReceivedQuantity: priorReceived, correctedReceivedQuantity: correctedQuantity, delta: (correctedQuantity - priorReceived), orderedQuantity: __after.orderedQuantity, lineStillShort: (correctedQuantity < __after.orderedQuantity), unit: __after.unit, reason: reason, correctionSequence: correctionSequence }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
     const __match0_raw = await ctx.db.query("receiptCorrections").withIndex("by_vendorOrderLineId", (q) => q.eq("vendorOrderLineId", payload.vendorOrderLineId)).collect();
-    const __match0_rows = __match0_raw.filter((d) => (d as any).vendorOrderLineId === payload.vendorOrderLineId && (d as any).priorReceivedQuantity === payload.priorReceivedQuantity && (d as any).correctedReceivedQuantity === payload.correctedReceivedQuantity && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+    const __match0_rows = __match0_raw.filter((d) => (d as any).vendorOrderLineId === payload.vendorOrderLineId && (d as any).correctionSequence === payload.correctionSequence && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match0_id = __match0_rows.length > 0 ? (__match0_rows[0] as any)._id : null;
     if (__match0_id) {
-      await __runReceiptCorrectionRecord(ctx, { docId: __match0_id, vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, locationId: payload.locationId, supplierLotNumber: payload.supplierLotNumber, priorReceivedQuantity: payload.priorReceivedQuantity, correctedReceivedQuantity: payload.correctedReceivedQuantity, delta: payload.delta, unit: payload.unit, reason: payload.reason } as any);
+      await __runReceiptCorrectionRecord(ctx, { docId: __match0_id, vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, locationId: payload.locationId, supplierLotNumber: payload.supplierLotNumber, priorReceivedQuantity: payload.priorReceivedQuantity, correctedReceivedQuantity: payload.correctedReceivedQuantity, delta: payload.delta, unit: payload.unit, reason: payload.reason, correctionSequence: payload.correctionSequence } as any);
     } else {
-      const __elseArgs: Record<string, any> = { vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, locationId: payload.locationId, supplierLotNumber: payload.supplierLotNumber, priorReceivedQuantity: payload.priorReceivedQuantity, correctedReceivedQuantity: payload.correctedReceivedQuantity, delta: payload.delta, unit: payload.unit, reason: payload.reason };
+      const __elseArgs: Record<string, any> = { vendorOrderLineId: payload.vendorOrderLineId, vendorOrderId: payload.vendorOrderId, vendorId: payload.vendorId, ingredientId: payload.ingredientId, locationId: payload.locationId, supplierLotNumber: payload.supplierLotNumber, priorReceivedQuantity: payload.priorReceivedQuantity, correctedReceivedQuantity: payload.correctedReceivedQuantity, delta: payload.delta, unit: payload.unit, reason: payload.reason, correctionSequence: payload.correctionSequence };
       const __elseDoc: Record<string, any> = {
         tenantId: __auth.tenantId,
         supplierLotNumber: "",
@@ -53258,11 +53265,12 @@ async function __runVendorOrderLineCorrectReceipt(ctx: MutationCtx, { docId, cor
         delta: 0,
         unit: "each",
         reason: "",
+        correctionSequence: 0,
         createdAt: Date.now(),
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","vendorOrderLineId","vendorOrderId","vendorId","ingredientId","locationId","supplierLotNumber","priorReceivedQuantity","correctedReceivedQuantity","delta","unit","reason","recordedAt","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","vendorOrderLineId","vendorOrderId","vendorId","ingredientId","locationId","supplierLotNumber","priorReceivedQuantity","correctedReceivedQuantity","delta","unit","reason","correctionSequence","recordedAt","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("receiptCorrections", __elseDoc as any);
