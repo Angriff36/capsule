@@ -114,11 +114,11 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/kitchen/components",
-    title: "Recipes & components",
+    title: "Recipes",
     purpose:
       "Your recipe book — the sauces, sides, and building blocks that dishes are made from.",
     steps: [
-      "Create a component with its ingredients and yield.",
+      "Create a recipe with its ingredients and yield.",
       "Publish it so dishes and prep lists can use it.",
     ],
   },

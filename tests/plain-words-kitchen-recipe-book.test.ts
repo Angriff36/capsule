@@ -59,4 +59,24 @@ describe("plain words on the kitchen recipe book", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen recipe-book crumbs and page guide free of component jargon", () => {
+    const guides = readFileSync("src/app/guide/pageGuides.ts", "utf8");
+    const crumbs = readFileSync("src/app/shell/breadcrumbs.ts", "utf8");
+    const all = [guides, crumbs].join("\n");
+
+    expect(all).not.toContain("Recipes & components");
+    expect(all).not.toContain("Create a component");
+    expect(guides).toContain('title: "Recipes"');
+    expect(crumbs).toContain('Recipes: "Recipe"');
+    expect(guides).toContain("Create a recipe with its ingredients and yield.");
+
+    for (const fresh of [
+      "Recipes",
+      "Recipe",
+      "Create a recipe with its ingredients and yield.",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });

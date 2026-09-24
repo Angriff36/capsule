@@ -5,7 +5,7 @@ export type Breadcrumb = { label: string; to?: string };
 
 const KITCHEN_CATALOG_DETAIL_TERMINAL: Record<string, string> = {
   Dishes: "Dish",
-  "Recipes & components": "Component",
+  Recipes: "Recipe",
   Ingredients: "Ingredient",
   Menus: "Menu",
 };
