@@ -250,6 +250,16 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
   }
 
+  // Reschedule moves live demand onto the event's week. Fulfilled and
+  // superseded rows stay on the week they were already bought for.
+  private command alignPurchasingWeek() {
+    guard self.deletedAt == null
+    guard self.status == "pending" or self.status == "calculated" or self.status == "confirmed"
+    guard self.event != null
+    guard self.event.purchasingWeekStart != null
+    mutate purchasingWeekStart = self.event.purchasingWeekStart
+  }
+
   command recalculate(newQuantity: decimal(12, 4), reason: string) {
     guard self.status == "calculated" or self.status == "confirmed"
     guard self.calculatedAt != null

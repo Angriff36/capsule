@@ -1055,9 +1055,9 @@ entity Event mixin TenantScoped, SoftDeletable {
       startsAt: startsAt
       endsAt: endsAt
     }
-    // Purchasing follows the event to its new week (#328). Declared consumers
-    // refresh the recipe/demand week copies; the transactional handler moves
-    // open purchase needs between weekly drafts (submitted orders stay put).
+    // Purchasing follows the event to its new week (#328). The handler moves
+    // live ingredient demand and open purchase needs. Fulfilled demand and
+    // submitted orders stay on the week they were already bought for.
     emit EventPurchasingWeekChanged {
       eventId: self.id
       tenantId: self.tenantId

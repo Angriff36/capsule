@@ -299,6 +299,7 @@ import {
   IngredientClassifyAllergensParamsSchema,
   IngredientClearPrimaryImageParamsSchema,
   IngredientConfigureSubstitutesParamsSchema,
+  IngredientDemandAlignPurchasingWeekParamsSchema,
   IngredientDemandCalculateParamsSchema,
   IngredientDemandConfirmParamsSchema,
   IngredientDemandEnsurePurchaseEligibleParamsSchema,
@@ -5077,6 +5078,16 @@ export function useListIngredientDemand() {
 /** Reactive get-by-id for IngredientDemand. Pass "skip" to suspend. */
 export function useGetIngredientDemand(id: string | "skip") {
   return useQuery(api.queries.getIngredientDemand, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for IngredientDemand.alignPurchasingWeek. */
+export function useIngredientDemandAlignPurchasingWeek() {
+  const mutate = useMutation(api.mutations.IngredientDemand_alignPurchasingWeek);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientDemandAlignPurchasingWeekParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Mutation hook for IngredientDemand.calculate. */
@@ -11215,4 +11226,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1193 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1194 as const;

@@ -6733,6 +6733,11 @@ export const IngredientUpdateDetailsParamsSchema = z.object({
 
 export type IngredientUpdateDetailsParams = z.infer<typeof IngredientUpdateDetailsParamsSchema>;
 
+// Command: alignPurchasingWeek on IngredientDemand
+export const IngredientDemandAlignPurchasingWeekParamsSchema = z.object({});
+
+export type IngredientDemandAlignPurchasingWeekParams = z.infer<typeof IngredientDemandAlignPurchasingWeekParamsSchema>;
+
 // Command: calculate on IngredientDemand
 export const IngredientDemandCalculateParamsSchema = z.object({
   eventId: z.string().min(1),
