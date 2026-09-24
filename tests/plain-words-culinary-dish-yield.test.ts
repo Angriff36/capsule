@@ -57,5 +57,8 @@ describe("plain words on leftover culinary dish yield copy", () => {
     expect(visible).toContain(
       "When you enter a quantity on this dish task, it must be more than zero.",
     );
+    expect(visible).toContain(
+      "This dish task's place in the list can't be negative. Use zero or more.",
+    );
   });
 });

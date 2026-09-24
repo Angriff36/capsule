@@ -602,7 +602,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
 
   constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "This dish task has no name. Type a name for it."
   constraint dishTaskQuantityPositive: self.defaultQuantity == null or self.defaultQuantity > 0 "When you enter a quantity on this dish task, it must be more than zero."
-  constraint dishTaskSortNonnegative: self.sortOrder >= 0 "Dish task sort order cannot be negative"
+  constraint dishTaskSortNonnegative: self.sortOrder >= 0 "This dish task's place in the list can't be negative. Use zero or more."
 
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
@@ -632,7 +632,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     constraint addDishMatch: dishId == self.dishId "This dish task is for a different dish. Pick the dish already on this dish task."
     constraint addNamePresent: length(trim(name)) > 0 "This dish task has no name. Type a name for it."
     constraint addQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "When you enter a quantity on this dish task, it must be more than zero."
-    constraint addSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
+    constraint addSortNonnegative: sortOrder == null or sortOrder >= 0 "This dish task's place in the list can't be negative. Use zero or more."
     mutate dishId = dishId
     mutate activeDishId = dishId
     mutate name = name
@@ -682,7 +682,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     guard self.dish != null and self.dish.status == "active"
     constraint reviseNamePresent: length(trim(name)) > 0 "This dish task has no name. Type a name for it."
     constraint reviseQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "When you enter a quantity on this dish task, it must be more than zero."
-    constraint reviseSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
+    constraint reviseSortNonnegative: sortOrder == null or sortOrder >= 0 "This dish task's place in the list can't be negative. Use zero or more."
     mutate name = name
     mutate category = category != null ? category : self.category
     mutate taskType = taskType != null ? taskType : self.taskType

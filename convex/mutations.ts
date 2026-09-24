@@ -10192,7 +10192,7 @@ async function __runDishTaskAdd(ctx: MutationCtx, { docId, dishId, name, categor
     if (!((dishId === doc.dishId))) throw new Error("This dish task is for a different dish. Pick the dish already on this dish task.");
     if (!((((name).trim()).length > 0))) throw new Error("This dish task has no name. Type a name for it.");
     if (!(((defaultQuantity == null) || (defaultQuantity > 0)))) throw new Error("When you enter a quantity on this dish task, it must be more than zero.");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Dish task sort order cannot be negative");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("This dish task's place in the list can't be negative. Use zero or more.");
     const syncPrepRequested = ((synchronizePrep != null) ? synchronizePrep : true);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -10304,7 +10304,7 @@ export const DishTask_createViaAdd = mutation({
     if (!((dishId === __draft.dishId))) throw new Error("This dish task is for a different dish. Pick the dish already on this dish task.");
     if (!((((name).trim()).length > 0))) throw new Error("This dish task has no name. Type a name for it.");
     if (!(((defaultQuantity == null) || (defaultQuantity > 0)))) throw new Error("When you enter a quantity on this dish task, it must be more than zero.");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Dish task sort order cannot be negative");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("This dish task's place in the list can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -10454,7 +10454,7 @@ async function __runDishTaskRevise(ctx: MutationCtx, { docId, name, category, ta
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 2 failed");
     if (!((((name).trim()).length > 0))) throw new Error("This dish task has no name. Type a name for it.");
     if (!(((defaultQuantity == null) || (defaultQuantity > 0)))) throw new Error("When you enter a quantity on this dish task, it must be more than zero.");
-    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Dish task sort order cannot be negative");
+    if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("This dish task's place in the list can't be negative. Use zero or more.");
     const syncPrepRequested = ((synchronizePrep != null) ? synchronizePrep : true);
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
