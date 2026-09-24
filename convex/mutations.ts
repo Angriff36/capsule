@@ -4731,8 +4731,8 @@ async function __runComponentImportRecordResolutionProgress(ctx: MutationCtx, { 
     if (!((doc.status === "reviewing"))) throw new Error("Guard 0 failed");
     if (!((doc.reviewStartedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((resolvedLineCount >= 0))) throw new Error("Resolved line count cannot be negative");
-    if (!((resolvedLineCount <= doc.parsedLineCount))) throw new Error("Resolved line count cannot exceed parsed line count");
+    if (!((resolvedLineCount >= 0))) throw new Error("You can't have a negative number of finished lines. Use zero or more.");
+    if (!((resolvedLineCount <= doc.parsedLineCount))) throw new Error("You can't finish more lines than this recipe has. Check the numbers.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

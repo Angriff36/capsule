@@ -71,7 +71,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
   constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
   constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "This recipe's line counts can't be negative. Use zero or more."
-  constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
+  constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "You can't finish more lines than this recipe has. Check the numbers."
   constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting recipe"
 
   transition status from "uploaded" to ["parsed", "failed", "cancelled"]
@@ -211,8 +211,8 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.status == "reviewing"
     guard self.reviewStartedAt != null
     guard self.deletedAt == null
-    constraint progressNonnegative: resolvedLineCount >= 0 "Resolved line count cannot be negative"
-    constraint progressWithinParsed: resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
+    constraint progressNonnegative: resolvedLineCount >= 0 "You can't have a negative number of finished lines. Use zero or more."
+    constraint progressWithinParsed: resolvedLineCount <= self.parsedLineCount "You can't finish more lines than this recipe has. Check the numbers."
     mutate resolvedLineCount = resolvedLineCount
     emit ComponentImportResolutionProgressRecorded {
       componentImportId: self.id
