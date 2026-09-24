@@ -38,7 +38,7 @@ entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo checkedBy: Person fields [tenantId, checkedById] references [tenantId, id]
 
-  constraint allergenCheckImmutable: self.checkedAt == null or self.status == "recorded" "Recorded allergen checks are immutable"
+  constraint allergenCheckImmutable: self.checkedAt == null or self.status == "recorded" "This allergen check is already saved. You can't change it. Start a new check if something changed."
   constraint allergenCheckFlagConsistency: self.checkedAt == null or (self.result == "pass" and length(self.flaggedAllergens) == 0) or (self.result == "flagged" and length(self.flaggedAllergens) > 0) "Pass requires no flagged allergens; flagged requires at least one"
 
   transition status from "pending" to ["recorded"]

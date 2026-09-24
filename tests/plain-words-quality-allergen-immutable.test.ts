@@ -11,31 +11,29 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover quality allergen-check event-dish copy", () => {
-  it("keeps the allergen-check event-dish refusal free of jargon", () => {
+describe("plain words on leftover quality allergen-check immutable copy", () => {
+  it("keeps the allergen-check already-saved refusal free of jargon", () => {
     const manifest = readFileSync(
       "src/quality/allergen-check.manifest",
       "utf8",
     );
-    // Strip // comments the same way the culinary leftover tests do.
+    // Strip // comments the same way the quality leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This allergen check is for a different event dish. Pick the event dish already on this allergen check, or leave that blank.";
-    // The old seeded-reference jargon refusal is gone.
-    expect(visible).not.toContain(
-      "Record eventDishId must match the seeded event dish reference when provided",
-    );
+      "This allergen check is already saved. You can't change it. Start a new check if something changed.";
+    // The old recorded/immutable refusal is gone.
+    expect(visible).not.toContain("Recorded allergen checks are immutable");
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
     expectPlain(NEW);
-    // The generated copies carry the plain wording, not the old one.
-    const mutations = readFileSync("convex/mutations.ts", "utf8");
-    expect(mutations).not.toContain(
-      "Record eventDishId must match the seeded event dish reference when provided",
-    );
-    expect(mutations).toContain(NEW);
+    // The generated summary carries the plain wording, not the old one.
     const summary = readFileSync("manifest-context-summary.json", "utf8");
+    expect(summary).not.toContain("Recorded allergen checks are immutable");
     expect(summary).toContain(NEW);
+    // This leftover is entity-level: mutations.ts is not expected to carry it,
+    // but if it ever does, it must not carry the old one.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain("Recorded allergen checks are immutable");
     // Already-landed copy on this same file stays.
     expect(visible).toContain(
       "This allergen check is for a different event. Pick the event already on this allergen check.",
@@ -44,7 +42,7 @@ describe("plain words on leftover quality allergen-check event-dish copy", () =>
       "This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank.",
     );
     expect(visible).toContain(
-      "This allergen check is already saved. You can't change it. Start a new check if something changed.",
+      "This allergen check is for a different event dish. Pick the event dish already on this allergen check, or leave that blank.",
     );
     // Later leftovers on this file are pinned: they must not change with this one.
     expect(visible).toContain(
