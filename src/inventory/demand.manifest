@@ -86,8 +86,9 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may change ingredient demand"
 
   // Manifest-owned BOM reconcile (match else create from contributions).
+  // System-callable only: staff are not offered this action.
   // Initialization-capable: mutates required eventId/ingredientId/quantity/unit.
-  command syncFromContributions(
+  private command syncFromContributions(
     eventId: uuid,
     ingredientId: uuid,
     requiredQuantity: decimal(12, 4),

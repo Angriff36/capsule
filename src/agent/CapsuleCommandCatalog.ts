@@ -1,5 +1,13 @@
+import type {
+  WiringActionPresentation,
+  WiringCommandDescriptor,
+  WiringInvalidationTarget,
+} from "@angriff36/manifest/projections/wiring";
 import wiringContract from "../generated/manifest-wiring-contract.json";
+import { CapsuleGeneratedWiringFacts } from "./CapsuleGeneratedWiringFacts";
 import { mutationNameForCapability } from "./CapsuleCommandMutationMap";
+
+type WiringFailureRule = WiringCommandDescriptor["failures"][number];
 import {
   CapsuleCommandUiCoverage,
   type CapsuleCommandUiSurface,
@@ -39,6 +47,11 @@ export interface CapsuleCommandDescriptor {
   clientParameterNames: string[];
   parameters: CapsuleCommandParameter[];
   emits: string[];
+  resultKind: "created" | "allocation" | "instance" | "empty";
+  failures: WiringFailureRule[];
+  invalidation: WiringInvalidationTarget[];
+  serverParameterNames: string[];
+  presentation: WiringActionPresentation;
 }
 
 interface WiringCapability {
@@ -71,6 +84,7 @@ interface WiringContractFile {
 export class CapsuleCommandCatalog {
   private readonly byId: Map<string, CapsuleCommandDescriptor>;
   private readonly uiCoverage: CapsuleCommandUiCoverage;
+  private readonly wiringFacts: CapsuleGeneratedWiringFacts;
 
   constructor(
     contract: WiringContractFile = wiringContract as WiringContractFile,
@@ -78,6 +92,7 @@ export class CapsuleCommandCatalog {
     uiCoverage: CapsuleCommandUiCoverage = new CapsuleCommandUiCoverage(),
   ) {
     this.uiCoverage = uiCoverage;
+    this.wiringFacts = new CapsuleGeneratedWiringFacts();
     this.uiCoverage.assertAcSurfacesRecorded();
     this.byId = new Map();
     for (const id of capabilityIds) {
@@ -89,6 +104,7 @@ export class CapsuleCommandCatalog {
       }
       const mutationName = mutationNameForCapability(raw.capabilityId);
       const uiSurface = this.uiCoverage.surface(raw.capabilityId);
+      const generated = this.wiringFacts.command(raw.capabilityId);
       this.byId.set(id, {
         capabilityId: raw.capabilityId,
         entity: raw.entity,
@@ -110,19 +126,38 @@ export class CapsuleCommandCatalog {
           constraints: p.constraints,
         })),
         emits: raw.emits,
+        resultKind: generated.resultKind,
+        failures: generated.failures,
+        invalidation: generated.invalidation,
+        serverParameterNames: generated.serverParameterNames,
+        presentation: generated.presentation,
       });
     }
   }
 
   /** Capabilities with no authored UI call site. */
   uiGaps(): string[] {
-    return this.uiCoverage.gaps(this.list().map((c) => c.capabilityId));
+    return this.uiCoverage.gaps(
+      this.offeredToPeople().map((c) => c.capabilityId),
+    );
   }
 
   list(): CapsuleCommandDescriptor[] {
     return [...this.byId.values()].sort((a, b) =>
       a.capabilityId.localeCompare(b.capabilityId),
     );
+  }
+
+  /** Actions a person may be offered. Internal commands stay callable via get(). */
+  offeredToPeople(): CapsuleCommandDescriptor[] {
+    const offered = this.wiringFacts.offeredCapabilityIds();
+    return this.list().filter((descriptor) =>
+      offered.has(descriptor.capabilityId),
+    );
+  }
+
+  generatedFacts(): CapsuleGeneratedWiringFacts {
+    return this.wiringFacts;
   }
 
   get(capabilityId: string): CapsuleCommandDescriptor {

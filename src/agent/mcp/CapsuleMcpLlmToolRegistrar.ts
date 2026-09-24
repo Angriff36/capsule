@@ -27,7 +27,10 @@ export class CapsuleMcpLlmToolRegistrar {
     executor: CapsuleCommandExecutor,
   ) {
     this.bridge = new CapsuleAgentToolBridge(executor, catalog);
-    this.nameMapper = new CapsuleAgentToolNameMapper(catalog.list(), "snake");
+    this.nameMapper = new CapsuleAgentToolNameMapper(
+      catalog.offeredToPeople(),
+      "snake",
+    );
   }
 
   register(server: McpServer): void {
