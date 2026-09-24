@@ -44,7 +44,7 @@ entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
   transition status from "pending" to ["recorded"]
   transition status from "recorded" to []
 
-  default policy allergenCheckRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may read event allergen checks"
+  default policy allergenCheckRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may see event allergen checks"
   default policy allergenCheckWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may update event allergen checks"
   default policy allergenCheckExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may change event allergen checks"
 

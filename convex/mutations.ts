@@ -7050,7 +7050,7 @@ async function __runCorrectiveActionClose(ctx: MutationCtx, { docId, resolutionN
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CorrectiveAction not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CorrectiveAction not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read corrective actions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see corrective actions");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update corrective actions");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change corrective actions");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
@@ -7118,7 +7118,7 @@ async function __runCorrectiveActionOpen(ctx: MutationCtx, { docId, incidentId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CorrectiveAction not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CorrectiveAction not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read corrective actions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see corrective actions");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update corrective actions");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change corrective actions");
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
@@ -7194,7 +7194,7 @@ export const CorrectiveAction_createViaOpen = mutation({
       eventId: args.eventId,
       incidentId: args.incidentId
     };
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read corrective actions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see corrective actions");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update corrective actions");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change corrective actions");
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
@@ -14342,7 +14342,7 @@ async function __runEventAllergenCheckRecord(ctx: MutationCtx, { docId, eventId,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventAllergenCheck not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read event allergen checks");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see event allergen checks");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update event allergen checks");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change event allergen checks");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -14447,7 +14447,7 @@ export const EventAllergenCheck_createViaRecord = mutation({
       result: args.result
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read event allergen checks");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see event allergen checks");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update event allergen checks");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change event allergen checks");
     if (!((__draft.status === "pending"))) throw new Error("Guard 0 failed");
@@ -22329,7 +22329,7 @@ async function __runIncidentBeginInvestigation(ctx: MutationCtx, { docId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Incident not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Incident not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change incidents");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
@@ -22390,7 +22390,7 @@ async function __runIncidentClearCorrectiveActionLock(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Incident not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Incident not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change incidents");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -22435,7 +22435,7 @@ async function __runIncidentDismiss(ctx: MutationCtx, { docId, reason, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Incident not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Incident not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change incidents");
     if (!(((doc.status === "open") || (doc.status === "investigating")))) throw new Error("Guard 0 failed");
@@ -22501,7 +22501,7 @@ async function __runIncidentMarkResolved(ctx: MutationCtx, { docId, resolution, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Incident not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Incident not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change incidents");
     if (!(((doc.status === "open") || (doc.status === "investigating")))) throw new Error("Guard 0 failed");
@@ -22568,7 +22568,7 @@ async function __runIncidentReport(ctx: MutationCtx, { docId, eventId, severity,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Incident not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change incidents");
     if (!((doc.reportedAt == null))) throw new Error("Guard 0 failed");
@@ -22665,7 +22665,7 @@ export const Incident_createViaReport = mutation({
       shiftId: args.shiftId
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may see incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may update incidents");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "kitchenAccess")))) throw new Error("Event and kitchen staff may change incidents");
     if (!((__draft.reportedAt == null))) throw new Error("Guard 0 failed");
@@ -42097,7 +42097,7 @@ async function __runReviewFlagDismiss(ctx: MutationCtx, { docId, reason, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReviewFlag not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReviewFlag not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may read review flags");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may see review flags");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
@@ -42160,7 +42160,7 @@ async function __runReviewFlagMarkResolved(ctx: MutationCtx, { docId, resolution
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReviewFlag not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReviewFlag not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may read review flags");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may see review flags");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
@@ -42226,7 +42226,7 @@ async function __runReviewFlagRaise(ctx: MutationCtx, { docId, eventId, targetKi
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReviewFlag not found");
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may read review flags");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may see review flags");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!((doc.raisedAt == null))) throw new Error("Guard 0 failed");
@@ -42323,7 +42323,7 @@ export const ReviewFlag_createViaRaise = mutation({
       targetKind: args.targetKind
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may read review flags");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may see review flags");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!((__draft.raisedAt == null))) throw new Error("Guard 0 failed");
@@ -42363,7 +42363,7 @@ async function __runReviewFlagReopen(ctx: MutationCtx, { docId, version }: any, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReviewFlag not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReviewFlag not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may read review flags");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may see review flags");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!(((doc.status === "resolved") || (doc.status === "dismissed")))) throw new Error("Guard 0 failed");
@@ -42423,7 +42423,7 @@ async function __runReviewFlagReviseQuestion(ctx: MutationCtx, { docId, question
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReviewFlag not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReviewFlag not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may read review flags");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may see review flags");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Any staff member may raise or settle a review flag");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

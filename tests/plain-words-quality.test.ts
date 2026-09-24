@@ -49,4 +49,48 @@ describe("plain words on leftover quality manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover quality READ copy free of read jargon", () => {
+    const files = [
+      "src/quality/review-flag.manifest",
+      "src/quality/allergen-check.manifest",
+      "src/quality/incident.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Event and kitchen staff may read incidents",
+      "Event and kitchen staff may read corrective actions",
+      "Event and kitchen staff may read event allergen checks",
+      "Any staff member may read review flags",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Event and kitchen staff may see incidents",
+      "Event and kitchen staff may see corrective actions",
+      "Event and kitchen staff may see event allergen checks",
+      "Any staff member may see review flags",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Event and kitchen staff may update incidents");
+    expect(visible).toContain(
+      "Event and kitchen staff may update corrective actions",
+    );
+    expect(visible).toContain(
+      "Event and kitchen staff may update event allergen checks",
+    );
+    expect(visible).toContain(
+      "Any staff member may raise or settle a review flag",
+    );
+  });
 });
