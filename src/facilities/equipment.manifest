@@ -263,7 +263,7 @@ entity EquipmentReservation mixin TenantScoped, SoftDeletable {
   belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
-  constraint equipmentReservationComplete: self.reservedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.quantity > 0) "Equipment reservations require a valid date range and positive quantity"
+  constraint equipmentReservationComplete: self.reservedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.quantity > 0) "Equipment handoffs require a valid date range and positive quantity"
 
   transition status from "reserved" to ["checked_out", "cancelled"]
   transition status from "checked_out" to ["returned"]
