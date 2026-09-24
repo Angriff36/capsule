@@ -2,8 +2,9 @@
 //
 // Accepted proposals are frozen. supersede only rewrites sent or viewed
 // copies, so it must not be used here. This mutation opens a new draft that
-// points at the accepted proposal and copies the live priced lines and the
-// dishes the client already chose. The accepted proposal stays as it is.
+// points at the accepted proposal and copies the live priced lines, the
+// dishes the client already chose, and the optional extras still on offer.
+// The accepted proposal stays as it is.
 //
 // Nested generated commands share one Convex transaction. A failed confirm
 // or line copy rolls the new draft back.
@@ -124,6 +125,32 @@ async function copyLiveMenuChoices(
   }
 }
 
+async function copyLiveExtras(
+  ctx: MutationCtx,
+  sourceId: Id<"proposals">,
+  targetId: Id<"proposals">,
+): Promise<void> {
+  const rows = await ctx.db
+    .query("proposalEnhancements")
+    .withIndex("by_proposalId", (q) => q.eq("proposalId", sourceId))
+    .collect();
+  const live = rows
+    .filter(
+      (row) =>
+        row.deletedAt == null && row.removedAt == null && row.addedAt != null,
+    )
+    .sort((left, right) => left.sortOrder - right.sortOrder);
+  for (const extra of live) {
+    await ctx.runMutation(api.mutations.ProposalEnhancement_createViaOffer, {
+      proposalId: targetId,
+      name: extra.name,
+      price: extra.price,
+      description: presentText(extra.description),
+      sortOrder: extra.sortOrder,
+    });
+  }
+}
+
 export const startProposalChange = mutation({
   args: { proposalId: v.id("proposals") },
   returns: v.object({
@@ -155,6 +182,7 @@ export const startProposalChange = mutation({
     });
     await copyLivePricedLines(ctx, proposal._id, created.docId);
     await copyLiveMenuChoices(ctx, proposal._id, created.docId);
+    await copyLiveExtras(ctx, proposal._id, created.docId);
     return { docId: created.docId, alreadyStarted: false };
   },
 });
