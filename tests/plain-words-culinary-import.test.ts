@@ -47,10 +47,7 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(summary).toContain("Completed imports require a resulting recipe");
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Reviewed yield quantity must be positive when present",
-    );
-    expect(visible).toContain(
-      "Parsed batch multiplier must be positive when present",
+      "Reviewed batch multiplier must be positive when present",
     );
     expect(visible).toContain("Import line counts cannot be negative");
     // Already-landed recipe leftovers stay.
@@ -100,10 +97,63 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(visible).toContain("Completed imports require a resulting recipe");
     // Later leftovers keep their current wording.
     expect(visible).toContain(
+      "Reviewed batch multiplier must be positive when present",
+    );
+    expect(visible).toContain("Import line counts cannot be negative");
+  });
+
+  it("keeps leftover culinary import reviewed-yield and parsed-batch copy free of quantity jargon", () => {
+    const manifest = readFileSync(
+      "src/culinary/component-import.manifest",
+      "utf8",
+    );
+    // Strip // comments the same way the culinary leftover tests do.
+    const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    // The old reviewed-yield and parsed-batch refusals are gone.
+    expect(visible).not.toContain(
       "Reviewed yield quantity must be positive when present",
     );
-    expect(visible).toContain(
+    expect(visible).not.toContain(
       "Parsed batch multiplier must be positive when present",
+    );
+    // The refusals now speak in plain catering words.
+    expect(visible).toContain(
+      "When you enter a yield on this review, it must be more than zero.",
+    );
+    expect(visible).toContain(
+      "When you enter a batch size, it must be more than zero.",
+    );
+    expectPlain(
+      "When you enter a yield on this review, it must be more than zero.",
+    );
+    expectPlain("When you enter a batch size, it must be more than zero.");
+    // The generated mutation file carries the same plain wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain(
+      "Reviewed yield quantity must be positive when present",
+    );
+    expect(mutations).not.toContain(
+      "Parsed batch multiplier must be positive when present",
+    );
+    expect(mutations).toContain(
+      "When you enter a yield on this review, it must be more than zero.",
+    );
+    expect(mutations).toContain(
+      "When you enter a batch size, it must be more than zero.",
+    );
+    // Already-landed copy stays.
+    expect(visible).toContain("Parsed recipe name is required");
+    expect(visible).toContain("Reviewed recipe name is required");
+    expect(visible).toContain("Completed imports require a resulting recipe");
+    expect(visible).toContain(
+      "This recipe can't have a negative number of lines. Use zero or more.",
+    );
+    expect(visible).toContain(
+      "When you enter a yield, it must be more than zero.",
+    );
+    // Later leftovers keep their current wording.
+    expect(visible).toContain(
+      "Reviewed batch multiplier must be positive when present",
     );
     expect(visible).toContain("Import line counts cannot be negative");
   });

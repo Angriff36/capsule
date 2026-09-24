@@ -69,7 +69,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
 
   constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Import source content is required"
   constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
-  constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
+  constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
   constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "Import line counts cannot be negative"
   constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
   constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting recipe"
@@ -136,7 +136,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed recipe name is required"
     constraint parseLineCountNonnegative: parsedLineCount >= 0 "This recipe can't have a negative number of lines. Use zero or more."
     constraint parseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
-    constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
+    constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
     mutate parsedName = parsedName
     mutate parsedDescription = parsedDescription
     mutate parsedCategory = parsedCategory
@@ -189,7 +189,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
     guard self.reviewRevision == expectedReviewRevision
     guard self.deletedAt == null
     constraint reviseNamePresent: length(trim(parsedName)) > 0 "Reviewed recipe name is required"
-    constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "Reviewed yield quantity must be positive when present"
+    constraint reviseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "When you enter a yield on this review, it must be more than zero."
     constraint reviseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Reviewed batch multiplier must be positive when present"
     mutate parsedName = parsedName
     mutate parsedDescription = parsedDescription

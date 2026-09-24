@@ -4651,7 +4651,7 @@ async function __runComponentImportRecordParse(ctx: MutationCtx, { docId, parsed
     if (!((((parsedName).trim()).length > 0))) throw new Error("Parsed recipe name is required");
     if (!((parsedLineCount >= 0))) throw new Error("This recipe can't have a negative number of lines. Use zero or more.");
     if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("When you enter a yield, it must be more than zero.");
-    if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("Parsed batch multiplier must be positive when present");
+    if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("When you enter a batch size, it must be more than zero.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -4845,7 +4845,7 @@ async function __runComponentImportReviseReview(ctx: MutationCtx, { docId, expec
     if (!((doc.reviewRevision === expectedReviewRevision))) throw new Error("Guard 2 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (!((((parsedName).trim()).length > 0))) throw new Error("Reviewed recipe name is required");
-    if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("Reviewed yield quantity must be positive when present");
+    if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("When you enter a yield on this review, it must be more than zero.");
     if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("Reviewed batch multiplier must be positive when present");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
