@@ -109,7 +109,7 @@ export function CommandPalette({
         ? [
             {
               key: "import-component",
-              label: "Import component",
+              label: "Import recipe",
               hint: "Create",
               icon: <PlusIcon />,
               run: go("/kitchen/components/import"),

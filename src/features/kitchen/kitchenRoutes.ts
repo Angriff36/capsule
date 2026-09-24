@@ -2,7 +2,7 @@ export type KitchenSection = "components" | "ingredients" | "dishes" | "menus";
 
 /** "dishes".slice(0, -1) is "dishe" — spell the singulars out instead. */
 export const KITCHEN_SECTION_SINGULAR: Record<KitchenSection, string> = {
-  components: "component",
+  components: "recipe",
   ingredients: "ingredient",
   dishes: "dish",
   menus: "menu",

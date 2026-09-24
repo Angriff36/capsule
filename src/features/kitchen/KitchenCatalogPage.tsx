@@ -499,7 +499,7 @@ function KitchenCatalogPageContent({
         <div className="component-book-masthead-actions">
           {section === "components" ? (
             <Link to={COMPONENT_IMPORT_PATH} className="btn btn-ghost">
-              Import component
+              Import recipe
             </Link>
           ) : null}
           <button
@@ -532,7 +532,7 @@ function KitchenCatalogPageContent({
       <section className="component-catalog">
         <div className="component-index-heading">
           <h2 className="text-lg font-semibold text-ink">
-            All {section}
+            All {sectionLabel.toLowerCase()}
             <span className="ml-2 text-sm font-medium text-ink-2">
               {formatCountNoun(displayRows.length, "item")}
             </span>
@@ -544,8 +544,8 @@ function KitchenCatalogPageContent({
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder={`Search ${section} by name or category…`}
-              aria-label={`Search ${section}`}
+              placeholder={`Search ${sectionLabel.toLowerCase()} by name or category…`}
+              aria-label={`Search ${sectionLabel.toLowerCase()}`}
             />
           </label>
           <label className="culinary-toolbar-field culinary-category-select">
@@ -606,7 +606,7 @@ function KitchenCatalogPageContent({
               </div>
               <div>
                 <h3 className="text-xl font-semibold text-ink">
-                  No {section} yet
+                  No {sectionLabel.toLowerCase()} yet
                 </h3>
                 <p className="mt-2 max-w-110 text-ink-2">
                   Add the first {KITCHEN_SECTION_SINGULAR[section]} with the

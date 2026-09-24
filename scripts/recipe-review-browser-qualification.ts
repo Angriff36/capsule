@@ -261,7 +261,7 @@ async function main(): Promise<void> {
     // Vite dev serves unbundled modules — a cold first load takes a while.
     for (let i = 0; i < 20; i++) {
       await page.waitForTimeout(1000);
-      if ((await bodyText()).includes("Component import")) return;
+      if ((await bodyText()).includes("Import recipe")) return;
       if (await signInVisible()) return;
     }
   }
@@ -283,7 +283,7 @@ async function main(): Promise<void> {
   await gotoImport();
   record(
     "A2 authenticated sign-in",
-    (await has("Component import")) && !(await signInVisible()),
+    (await has("Import recipe")) && !(await signInVisible()),
     `${signInOutcome}; import route reached`,
     await shot("02-after-signin.png"),
   );
