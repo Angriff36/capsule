@@ -5,6 +5,7 @@
  * Proposal.confirmChangeSource (src/sales/proposal.manifest):
  *   - the accepted proposal keeps its status, total, and lines
  *   - a new draft stores replacesProposalId and copies live priced lines
+ *   - live menu choices copy onto the draft; a removed choice does not
  *   - a removed line is not copied
  *   - a second click returns the same draft
  *   - a proposal that is not accepted is refused
@@ -226,6 +227,132 @@ describe("accepted proposal → start a change", () => {
     expect(
       rows.filter(
         (row) => (row as { deletedAt?: number | null }).deletedAt == null,
+      ),
+    ).toHaveLength(1);
+  });
+
+  it("copies the dishes the client kept and leaves the accepted menu alone", async () => {
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-menu",
+      role: "owner",
+      tenantId: "tenant-menu",
+    });
+    const client = (await proof.executeCommand(
+      owner,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Menu client" },
+    )) as { docId: string };
+    const proposal = (await proof.executeCommand(
+      owner,
+      api.mutations.Proposal_createViaDraft,
+      {
+        clientId: client.docId,
+        title: "Menu change proposal",
+        subtotal: 500,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 500,
+      },
+    )) as { docId: string };
+    const menu = (await proof.executeCommand(
+      owner,
+      api.mutations.Menu_createViaDraft,
+      { name: "Gala menu" },
+    )) as { docId: string };
+    await proof.executeCommand(owner, api.mutations.Menu_markPublished, {
+      docId: menu.docId,
+    });
+    const kept = (await proof.executeCommand(
+      owner,
+      api.mutations.Dish_createViaIntroduce,
+      { name: "Cedar salmon", portionSize: 1, portionUnit: "serving" },
+    )) as { docId: string };
+    const dropped = (await proof.executeCommand(
+      owner,
+      api.mutations.Dish_createViaIntroduce,
+      { name: "Dropped side", portionSize: 1, portionUnit: "serving" },
+    )) as { docId: string };
+    await proof.executeCommand(
+      owner,
+      api.mutations.ProposalDishSelection_createViaSelect,
+      {
+        proposalId: proposal.docId,
+        menuId: menu.docId,
+        dishId: kept.docId,
+        quantityServings: 80,
+        course: "main",
+      },
+    );
+    const removed = (await proof.executeCommand(
+      owner,
+      api.mutations.ProposalDishSelection_createViaSelect,
+      {
+        proposalId: proposal.docId,
+        menuId: menu.docId,
+        dishId: dropped.docId,
+        quantityServings: 40,
+        course: "side",
+      },
+    )) as { docId: string };
+    await proof.executeCommand(
+      owner,
+      api.mutations.ProposalDishSelection_remove,
+      { docId: removed.docId },
+    );
+    await proof.executeCommand(owner, api.mutations.Proposal_send, {
+      docId: proposal.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_markViewed, {
+      docId: proposal.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_accept, {
+      docId: proposal.docId,
+    });
+
+    const started = (await proof.executeCommand(
+      owner,
+      api.lib.proposalChangeDraft.startProposalChange,
+      { proposalId: proposal.docId },
+    )) as { docId: string; alreadyStarted: boolean };
+
+    const choices = await owner.run(async (ctx) =>
+      ctx.db.query("proposalDishSelections").collect(),
+    );
+    const liveFor = (id: string) =>
+      choices.filter(
+        (row) =>
+          (row as { proposalId?: string }).proposalId === id &&
+          (row as { deletedAt?: number | null }).deletedAt == null &&
+          (row as { removedAt?: number | null }).removedAt == null,
+      );
+    expect(liveFor(proposal.docId)).toHaveLength(1);
+    expect((liveFor(proposal.docId)[0] as { dishId: string }).dishId).toBe(
+      kept.docId,
+    );
+    const draftChoices = liveFor(started.docId);
+    expect(draftChoices).toHaveLength(1);
+    expect((draftChoices[0] as { dishId: string }).dishId).toBe(kept.docId);
+    expect(
+      (draftChoices[0] as { quantityServings: number }).quantityServings,
+    ).toBe(80);
+    expect((draftChoices[0] as { course?: string | null }).course).toBe("main");
+    expect(started.alreadyStarted).toBe(false);
+
+    const again = (await proof.executeCommand(
+      owner,
+      api.lib.proposalChangeDraft.startProposalChange,
+      { proposalId: proposal.docId },
+    )) as { docId: string; alreadyStarted: boolean };
+    expect(again.alreadyStarted).toBe(true);
+    const after = await owner.run(async (ctx) =>
+      ctx.db.query("proposalDishSelections").collect(),
+    );
+    expect(
+      after.filter(
+        (row) =>
+          (row as { proposalId?: string }).proposalId === started.docId &&
+          (row as { deletedAt?: number | null }).deletedAt == null,
       ),
     ).toHaveLength(1);
   });
