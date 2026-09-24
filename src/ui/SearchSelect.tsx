@@ -66,6 +66,19 @@ export function SearchSelect({
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const hiddenRef = useRef<HTMLInputElement>(null);
+  // The draft saver listens on the form. These pickers sit outside that form
+  // and are tied to it only by the form attribute, so a bubbling event on the
+  // hidden field never reaches the saver (#368 item 4).
+  const announceChoice = useRef(false);
+
+  useEffect(() => {
+    if (!announceChoice.current) return;
+    announceChoice.current = false;
+    const field = hiddenRef.current;
+    const owner = field?.form ?? field;
+    owner?.dispatchEvent(new Event("input", { bubbles: true }));
+  }, [value]);
 
   const selected = useMemo(
     () => options.find((option) => option.id === value),
@@ -103,6 +116,7 @@ export function SearchSelect({
   }, [query, open]);
 
   const choose = (id: string) => {
+    announceChoice.current = true;
     onChange(id);
     setOpen(false);
     setQuery("");
@@ -128,6 +142,7 @@ export function SearchSelect({
         setQuery("");
       }
     } else if (event.key === "Backspace" && query === "" && value) {
+      announceChoice.current = true;
       onChange("");
     }
   };
@@ -138,6 +153,7 @@ export function SearchSelect({
     <div ref={rootRef} className="relative">
       {name ? (
         <input
+          ref={hiddenRef}
           type="hidden"
           name={name}
           value={value}
