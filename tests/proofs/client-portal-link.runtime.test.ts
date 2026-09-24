@@ -2,7 +2,7 @@
  * Client portal links stop working when staff turn them off, when they
  * expire, and when a newer link replaces them. An older signed link keeps
  * working only until a saved link exists for that event. Another company's
- * link does not open this event.
+ * link does not open this event. The client's tax ID stays off the page.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -64,7 +64,7 @@ async function bookEvent(
       quotedPrice: 2400,
     },
   )) as { docId: string };
-  return { owner, eventId: event.docId };
+  return { owner, eventId: event.docId, clientId: client.docId };
 }
 
 describe("runtime proof: client portal links expire and turn off", () => {
@@ -77,10 +77,14 @@ describe("runtime proof: client portal links expire and turn off", () => {
       eventId: first.eventId,
       tenantId: S.tenantA,
     });
+    await first.owner.run(async (ctx) => {
+      await ctx.db.patch(first.clientId, { taxId: "12-3456789" });
+    });
     const legacyView = (await first.owner.query(api.clientPortal.getEvent, {
       token: legacy,
     })) as { event?: { title?: string } } | null;
     expect(legacyView?.event?.title).toBe("Porter dinner");
+    expect(JSON.stringify(legacyView)).not.toContain("12-3456789");
 
     const firstLink = (await proof.executeCommand(
       first.owner,

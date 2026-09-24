@@ -177,7 +177,6 @@ export const getEvent = query({
       postalCode: clientRecord?.postalCode ?? null,
       countryCode: clientRecord?.countryCode ?? null,
       email: clientRecord?.email ?? null,
-      taxId: clientRecord?.taxId ?? null,
       paymentTermsDays: clientRecord?.paymentTermsDays ?? 30,
       taxExempt: clientRecord?.taxExempt ?? false,
     };
