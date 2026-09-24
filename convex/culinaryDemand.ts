@@ -668,95 +668,101 @@ export interface ReconcileEventDemandResult {
 }
 
 /** Write the authoritative demand for an event: idempotent replace by sourceKey. */
+export async function writeReconciledEventDemand(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+): Promise<ReconcileEventDemandResult> {
+  const tenantId = requireTenant(await getAuthContext(ctx));
+  const event = await requireEvent(ctx, tenantId, eventId);
+  const review = await reviewEvent(ctx, tenantId, eventId);
+  const existingRows = (
+    await byTenant(ctx, "eventIngredientContributions", tenantId)
+  ).filter((r) => String(r.eventId) === String(eventId));
+  const existing: ExistingContributionRow[] = existingRows.map((r) => ({
+    id: String(r._id),
+    sourceKey: r.sourceKey ?? null,
+    eventDishId: String(r.eventDishId),
+    componentId: r.componentId ? String(r.componentId) : null,
+    ingredientId: String(r.ingredientId),
+    unit: unitOf(r.unit),
+    quantity: Number(r.quantity),
+    deletedAt: r.deletedAt ?? null,
+  }));
+  const rowById = new Map(existingRows.map((r) => [String(r._id), r]));
+  const result: ReconcileEventDemandResult = {
+    eventId: String(eventId),
+    created: 0,
+    updated: 0,
+    superseded: 0,
+    unchanged: 0,
+    unresolvedCount: review.unresolvedCount,
+    purchasingComplete: review.purchasing.complete,
+  };
+  const week =
+    typeof event.purchasingWeekStart === "number"
+      ? event.purchasingWeekStart
+      : undefined;
+  const activeAllocations = new Set(review.activeAllocationIds);
+  for (const ed of review.eventDishes) {
+    const dishId = ed.contributions[0]?.dishId ?? null;
+    const plan = reconcileContributions(
+      existing,
+      ed.contributions,
+      ed.eventDishId,
+    );
+    for (const c of plan.create) {
+      await ctx.runMutation(
+        api.mutations.EventIngredientContribution_createViaRecord,
+        contributionArgs(c, c.dishId, week),
+      );
+      result.created += 1;
+    }
+    for (const u of plan.update) {
+      const row = rowById.get(u.id);
+      if (!row) continue;
+      // Event-dish rows the engine does not own (batch shares) are left alone.
+      await ctx.runMutation(api.mutations.EventIngredientContribution_record, {
+        docId: row._id,
+        ...contributionArgs(u.next, u.next.dishId, week),
+      });
+      result.updated += 1;
+    }
+    for (const s of plan.supersede) {
+      const row = rowById.get(s.id);
+      if (!row) continue;
+      const batchOwned =
+        row.ownership === "batch_allocation" ||
+        row.ownership === "batch_surplus";
+      // Live batch shares are left alone; shares of a released allocation or
+      // a cancelled batch are stale and must not be counted twice.
+      if (
+        batchOwned &&
+        row.productionBatchAllocationId &&
+        activeAllocations.has(String(row.productionBatchAllocationId))
+      )
+        continue;
+      await ctx.runMutation(
+        api.mutations.EventIngredientContribution_supersede,
+        {
+          docId: row._id,
+          reason: batchOwned
+            ? "batch allocation released or cancelled"
+            : "replaced by demand reconcile",
+          supersededBySourceKey: s.replacedBy ?? undefined,
+        },
+      );
+      result.superseded += 1;
+    }
+    result.unchanged += plan.unchanged.length;
+    void dishId;
+  }
+  return result;
+}
+
 export const reconcileEventDemand = mutation({
   args: { eventId: v.id("events") },
-  handler: async (ctx, args): Promise<ReconcileEventDemandResult> => {
-    const tenantId = requireTenant(await getAuthContext(ctx));
-    const event = await requireEvent(ctx, tenantId, args.eventId);
-    const review = await reviewEvent(ctx, tenantId, args.eventId);
-    const existingRows = (
-      await byTenant(ctx, "eventIngredientContributions", tenantId)
-    ).filter((r) => String(r.eventId) === String(args.eventId));
-    const existing: ExistingContributionRow[] = existingRows.map((r) => ({
-      id: String(r._id),
-      sourceKey: r.sourceKey ?? null,
-      eventDishId: String(r.eventDishId),
-      componentId: r.componentId ? String(r.componentId) : null,
-      ingredientId: String(r.ingredientId),
-      unit: unitOf(r.unit),
-      quantity: Number(r.quantity),
-      deletedAt: r.deletedAt ?? null,
-    }));
-    const rowById = new Map(existingRows.map((r) => [String(r._id), r]));
-    const result: ReconcileEventDemandResult = {
-      eventId: String(args.eventId),
-      created: 0,
-      updated: 0,
-      superseded: 0,
-      unchanged: 0,
-      unresolvedCount: review.unresolvedCount,
-      purchasingComplete: review.purchasing.complete,
-    };
-    const week =
-      typeof event.purchasingWeekStart === "number"
-        ? event.purchasingWeekStart
-        : undefined;
-    const activeAllocations = new Set(review.activeAllocationIds);
-    for (const ed of review.eventDishes) {
-      const dishId = ed.contributions[0]?.dishId ?? null;
-      const plan = reconcileContributions(
-        existing,
-        ed.contributions,
-        ed.eventDishId,
-      );
-      for (const c of plan.create) {
-        await ctx.runMutation(
-          api.mutations.EventIngredientContribution_createViaRecord,
-          contributionArgs(c, c.dishId, week),
-        );
-        result.created += 1;
-      }
-      for (const u of plan.update) {
-        const row = rowById.get(u.id);
-        if (!row) continue;
-        // Event-dish rows the engine does not own (batch shares) are left alone.
-        await ctx.runMutation(
-          api.mutations.EventIngredientContribution_record,
-          { docId: row._id, ...contributionArgs(u.next, u.next.dishId, week) },
-        );
-        result.updated += 1;
-      }
-      for (const s of plan.supersede) {
-        const row = rowById.get(s.id);
-        if (!row) continue;
-        const batchOwned =
-          row.ownership === "batch_allocation" ||
-          row.ownership === "batch_surplus";
-        // Live batch shares are left alone; shares of a released allocation or
-        // a cancelled batch are stale and must not be counted twice.
-        if (
-          batchOwned &&
-          row.productionBatchAllocationId &&
-          activeAllocations.has(String(row.productionBatchAllocationId))
-        )
-          continue;
-        await ctx.runMutation(
-          api.mutations.EventIngredientContribution_supersede,
-          {
-            docId: row._id,
-            reason: batchOwned
-              ? "batch allocation released or cancelled"
-              : "replaced by demand reconcile",
-            supersededBySourceKey: s.replacedBy ?? undefined,
-          },
-        );
-        result.superseded += 1;
-      }
-      result.unchanged += plan.unchanged.length;
-      void dishId;
-    }
-    return result;
-  },
+  handler: (ctx, args): Promise<ReconcileEventDemandResult> =>
+    writeReconciledEventDemand(ctx, args.eventId),
 });
 
 /**
