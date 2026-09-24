@@ -2,7 +2,7 @@
  * Client portal links stop working when staff turn them off, when they
  * expire, and when a newer link replaces them. An older signed link keeps
  * working only until a saved link exists for that event. Another company's
- * link does not open this event. The client's tax ID stays off the page.
+ * link does not open this event. The client's tax ID and crew notes stay off the page.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -79,12 +79,37 @@ describe("runtime proof: client portal links expire and turn off", () => {
     });
     await first.owner.run(async (ctx) => {
       await ctx.db.patch(first.clientId, { taxId: "12-3456789" });
+      const personId = await ctx.db.insert("people", {
+        tenantId: S.tenantA,
+        givenName: "Jamie",
+        familyName: "Server",
+        email: "jamie@example.com",
+        role: "event_staff",
+        employmentType: "full_time",
+        status: "active",
+        deletedAt: null,
+        version: 1,
+      });
+      await ctx.db.insert("eventAssignments", {
+        tenantId: S.tenantA,
+        eventId: first.eventId as never,
+        personId,
+        role: "Captain",
+        notes: "Do not mention the surprise cake",
+        status: "assigned",
+        deletedAt: null,
+        version: 1,
+      });
     });
     const legacyView = (await first.owner.query(api.clientPortal.getEvent, {
       token: legacy,
     })) as { event?: { title?: string } } | null;
     expect(legacyView?.event?.title).toBe("Porter dinner");
     expect(JSON.stringify(legacyView)).not.toContain("12-3456789");
+    expect(JSON.stringify(legacyView)).not.toContain(
+      "Do not mention the surprise cake",
+    );
+    expect(JSON.stringify(legacyView)).toContain("Captain");
 
     const firstLink = (await proof.executeCommand(
       first.owner,
