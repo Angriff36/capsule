@@ -5499,7 +5499,7 @@ async function __runComponentImportLineStage(ctx: MutationCtx, { docId, importId
     if (!((doc.resolvedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_import != null))) throw new Error("Guard 2 failed");
-    if (!((importId === doc.importId))) throw new Error("Stage importId must match the seeded import reference");
+    if (!((importId === doc.importId))) throw new Error("This line is for a different recipe import. Pick the recipe import already on this line.");
     if (!((((sourceLine).trim()).length > 0))) throw new Error("Source line is required");
     if (!((sourceOrder >= 0))) throw new Error("Source order cannot be negative");
     if (version !== undefined && (doc as any).version !== version) {
@@ -5590,7 +5590,7 @@ export const ComponentImportLine_createViaStage = mutation({
     if (!((__draft.resolvedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_import != null))) throw new Error("Guard 2 failed");
-    if (!((importId === __draft.importId))) throw new Error("Stage importId must match the seeded import reference");
+    if (!((importId === __draft.importId))) throw new Error("This line is for a different recipe import. Pick the recipe import already on this line.");
     if (!((((sourceLine).trim()).length > 0))) throw new Error("Source line is required");
     if (!((sourceOrder >= 0))) throw new Error("Source order cannot be negative");
     const doc: Record<string, any> = {

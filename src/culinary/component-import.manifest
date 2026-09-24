@@ -382,7 +382,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
     guard self.resolvedAt == null
     guard self.deletedAt == null
     guard self.import != null
-    constraint stageImportMatch: importId == self.importId "Stage importId must match the seeded import reference"
+    constraint stageImportMatch: importId == self.importId "This line is for a different recipe import. Pick the recipe import already on this line."
     constraint stageSourceLinePresent: length(trim(sourceLine)) > 0 "Source line is required"
     constraint stageOrderNonnegative: sourceOrder >= 0 "Source order cannot be negative"
     mutate importId = importId
