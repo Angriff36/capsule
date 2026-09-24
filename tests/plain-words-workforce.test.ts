@@ -184,4 +184,36 @@ describe("plain words on workforce manifests", () => {
     expect(visible).toContain("Staff may mark which chats they have read");
     expect(visible).toContain("Workforce staff may update training modules");
   });
+
+  it("keeps leftover workforce clock-out constraint copy free of record jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync("src/workforce/time.manifest", "utf8").replace(
+      /(^|[^:])\/\/[^\n]*/g,
+      "$1 ",
+    );
+
+    expect(visible).not.toContain(
+      "Closed or corrected time records require clock-out at or after clock-in",
+    );
+    expect(visible).toContain(
+      "Closed or corrected time entries require clock-out at or after clock-in",
+    );
+    expectPlain(
+      "Closed or corrected time entries require clock-out at or after clock-in",
+    );
+
+    // already-landed write/read leftovers must stay put
+    expect(visible).toContain(
+      "Workforce staff or the linked person may see time entries",
+    );
+    expect(visible).toContain(
+      "Workforce staff or the linked person may update time entries",
+    );
+    expect(visible).toContain(
+      "Workforce staff or the linked person may change time entries",
+    );
+
+    // later leftover, unchanged
+    expect(visible).toContain("Break minutes must be non-negative");
+  });
 });

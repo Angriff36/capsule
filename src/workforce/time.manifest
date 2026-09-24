@@ -42,7 +42,7 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   // no now() in computed. Named workedMinutes to avoid shadowing the builtin.
   computed workedMinutes: number? = self.clockOutAt != null and self.clockInAt != null ? durationBetween(self.clockInAt, self.clockOutAt) / durationMinutes(1) : null
 
-  constraint timeRecordClosedComplete: self.status == "open" or (self.clockInAt != null and self.clockOutAt != null and self.clockOutAt >= self.clockInAt) "Closed or corrected time records require clock-out at or after clock-in"
+  constraint timeRecordClosedComplete: self.status == "open" or (self.clockInAt != null and self.clockOutAt != null and self.clockOutAt >= self.clockInAt) "Closed or corrected time entries require clock-out at or after clock-in"
   constraint timeRecordBreakNonNegative: self.breakMinutes == null or self.breakMinutes >= 0 "Break minutes must be non-negative"
 
   transition status from "open" to ["closed"]
