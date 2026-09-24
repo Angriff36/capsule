@@ -11,39 +11,29 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover culinary dish task copy", () => {
-  it("keeps leftover culinary dish-task match copy free of dishId jargon", () => {
+describe("plain words on leftover culinary dish task name copy", () => {
+  it("keeps the dish task name refusal free of jargon", () => {
     const manifest = readFileSync("src/culinary/dish.manifest", "utf8");
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
-    const NEW =
-      "This dish task is for a different dish. Pick the dish already on this dish task.";
-    // The old dishId / seeded-reference jargon refusal is gone.
-    expect(visible).not.toContain(
-      "Dish task dishId must match the seeded Dish reference",
-    );
+    const NEW = "This dish task has no name. Type a name for it.";
+    // The old jargon refusal is gone.
+    expect(visible).not.toContain("Dish task name is required");
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
     expectPlain(NEW);
     // The generated copies carry the plain wording, not the old one.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
-    expect(mutations).not.toContain(
-      "Dish task dishId must match the seeded Dish reference",
-    );
+    expect(mutations).not.toContain("Dish task name is required");
     expect(mutations).toContain(NEW);
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
     // Already-landed copy on this same dish file stays.
     expect(visible).toContain(
-      "This subrecipe is for a different dish. Pick the dish already on this subrecipe.",
+      "This dish task is for a different dish. Pick the dish already on this dish task.",
     );
-    // Later leftovers on this file are pinned: they must not change with this one.
     expect(visible).toContain("This subrecipe's yield must be more than zero.");
-    expect(visible).toContain(
-      "When you enter a batch size on this subrecipe, it must be more than zero.",
-    );
-    expect(visible).toContain(
-      "This dish task has no name. Type a name for it.",
-    );
+    // Later leftovers on this file are pinned: they must not change with this one.
+    expect(visible).toContain("Dish task quantity must be positive");
   });
 });

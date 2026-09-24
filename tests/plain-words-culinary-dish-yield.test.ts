@@ -51,6 +51,8 @@ describe("plain words on leftover culinary dish yield copy", () => {
     );
     expect(visible).toContain("Kitchen staff may see dish recipes");
     // Later leftovers on this file are pinned: they must not change with this one.
-    expect(visible).toContain("Dish task name is required");
+    expect(visible).toContain(
+      "This dish task has no name. Type a name for it.",
+    );
   });
 });

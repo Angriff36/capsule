@@ -600,7 +600,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   hasMany materials: DishTaskMaterial
 
-  constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "Dish task name is required"
+  constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "This dish task has no name. Type a name for it."
   constraint dishTaskQuantityPositive: self.defaultQuantity == null or self.defaultQuantity > 0 "Dish task quantity must be positive"
   constraint dishTaskSortNonnegative: self.sortOrder >= 0 "Dish task sort order cannot be negative"
 
@@ -630,7 +630,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
     constraint addDishMatch: dishId == self.dishId "This dish task is for a different dish. Pick the dish already on this dish task."
-    constraint addNamePresent: length(trim(name)) > 0 "Dish task name is required"
+    constraint addNamePresent: length(trim(name)) > 0 "This dish task has no name. Type a name for it."
     constraint addQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "Dish task quantity must be positive"
     constraint addSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
     mutate dishId = dishId
@@ -680,7 +680,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
-    constraint reviseNamePresent: length(trim(name)) > 0 "Dish task name is required"
+    constraint reviseNamePresent: length(trim(name)) > 0 "This dish task has no name. Type a name for it."
     constraint reviseQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "Dish task quantity must be positive"
     constraint reviseSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
     mutate name = name
