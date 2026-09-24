@@ -200,7 +200,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     guard user.id != null
     guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     constraint declarePersonMatch: personId == self.personId "This availability is for a different person. Pick the person already on this availability."
-    constraint declareDates: endsAt > startsAt "Availability end must be after its start"
+    constraint declareDates: endsAt > startsAt "This availability ends before it starts. Pick an end that's later than the start."
     mutate personId = personId
     mutate startsAt = startsAt
     mutate endsAt = endsAt

@@ -51,13 +51,13 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(visible).toContain(
       "This line's place in the recipe can't be negative. Use zero or more.",
     );
-    // A later leftover keeps its current wording until its own pass.
+    // Already-landed copy on the availability file stays.
     const availability = readFileSync(
       "src/workforce/availability.manifest",
       "utf8",
     );
     expect(availability).toContain(
-      "This time-off request ends before it starts. Pick an end that's later than the start.",
+      "This availability ends before it starts. Pick an end that's later than the start.",
     );
   });
 });

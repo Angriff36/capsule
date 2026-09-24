@@ -1195,7 +1195,7 @@ async function __runAvailabilityWindowDeclare(ctx: MutationCtx, { docId, personI
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
-    if (!((endsAt > startsAt))) throw new Error("Availability end must be after its start");
+    if (!((endsAt > startsAt))) throw new Error("This availability ends before it starts. Pick an end that's later than the start.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -1279,7 +1279,7 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("This availability is for a different person. Pick the person already on this availability.");
-    if (!((endsAt > startsAt))) throw new Error("Availability end must be after its start");
+    if (!((endsAt > startsAt))) throw new Error("This availability ends before it starts. Pick an end that's later than the start.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
