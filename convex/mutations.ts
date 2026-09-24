@@ -10523,7 +10523,7 @@ async function __runDishTaskSpecifyWork(ctx: MutationCtx, { docId, stage, resolu
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((leadTimeMinDays == null) || (leadTimeMinDays >= 0)) && ((leadTimeMaxDays == null) || (leadTimeMaxDays >= 0))))) throw new Error("This dish task's lead time can't be negative. Use zero or more days.");
-    if (!(((sequenceAfterDishTaskId == null) || (sequenceAfterDishTaskId !== doc._id)))) throw new Error("A step cannot follow itself");
+    if (!(((sequenceAfterDishTaskId == null) || (sequenceAfterDishTaskId !== doc._id)))) throw new Error("This dish task can't follow itself. Pick a different dish task to come after, or leave that blank.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

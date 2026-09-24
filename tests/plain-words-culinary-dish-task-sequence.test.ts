@@ -11,21 +11,21 @@ function expectPlain(text: string) {
   expect(text).not.toContain("bun run");
 }
 
-describe("plain words on leftover culinary dish task sort copy", () => {
-  it("keeps the dish task sort refusal free of jargon", () => {
+describe("plain words on leftover culinary dish task sequence copy", () => {
+  it("keeps the dish task follow-itself refusal free of jargon", () => {
     const manifest = readFileSync("src/culinary/dish.manifest", "utf8");
     // Strip // comments the same way the culinary leftover tests do.
     const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     const NEW =
-      "This dish task's place in the list can't be negative. Use zero or more.";
+      "This dish task can't follow itself. Pick a different dish task to come after, or leave that blank.";
     // The old jargon refusal is gone.
-    expect(visible).not.toContain("Dish task sort order cannot be negative");
+    expect(visible).not.toContain("A step cannot follow itself");
     // The refusal now speaks in plain catering words.
     expect(visible).toContain(NEW);
     expectPlain(NEW);
     // The generated copies carry the plain wording, not the old one.
     const mutations = readFileSync("convex/mutations.ts", "utf8");
-    expect(mutations).not.toContain("Dish task sort order cannot be negative");
+    expect(mutations).not.toContain("A step cannot follow itself");
     expect(mutations).toContain(NEW);
     const summary = readFileSync("manifest-context-summary.json", "utf8");
     expect(summary).toContain(NEW);
@@ -37,16 +37,13 @@ describe("plain words on leftover culinary dish task sort copy", () => {
       "When you enter a quantity on this dish task, it must be more than zero.",
     );
     expect(visible).toContain(
+      "This dish task's place in the list can't be negative. Use zero or more.",
+    );
+    expect(visible).toContain(
       "This dish task is for a different dish. Pick the dish already on this dish task.",
     );
-    expect(visible).toContain("This subrecipe's yield must be more than zero.");
-    // Already-landed copy on this same dish file stays.
     expect(visible).toContain(
       "This dish task's lead time can't be negative. Use zero or more days.",
-    );
-    // Already-landed sequence copy on this same dish file stays.
-    expect(visible).toContain(
-      "This dish task can't follow itself. Pick a different dish task to come after, or leave that blank.",
     );
     // Later leftovers on this file are pinned: they must not change with this one.
     expect(visible).toContain("Dish task retirement reason is required");

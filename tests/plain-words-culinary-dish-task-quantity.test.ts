@@ -45,7 +45,11 @@ describe("plain words on leftover culinary dish task quantity copy", () => {
     expect(visible).toContain(
       "This dish task's lead time can't be negative. Use zero or more days.",
     );
+    // Already-landed sequence copy on this same dish file stays.
+    expect(visible).toContain(
+      "This dish task can't follow itself. Pick a different dish task to come after, or leave that blank.",
+    );
     // Later leftovers on this file are pinned: they must not change with this one.
-    expect(visible).toContain("A step cannot follow itself");
+    expect(visible).toContain("Dish task retirement reason is required");
   });
 });

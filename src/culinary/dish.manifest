@@ -719,7 +719,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.deletedAt == null
     constraint specifyLeadTimeNonnegative: (leadTimeMinDays == null or leadTimeMinDays >= 0) and (leadTimeMaxDays == null or leadTimeMaxDays >= 0) "This dish task's lead time can't be negative. Use zero or more days."
-    constraint specifySequenceNotSelf: sequenceAfterDishTaskId == null or sequenceAfterDishTaskId != self.id "A step cannot follow itself"
+    constraint specifySequenceNotSelf: sequenceAfterDishTaskId == null or sequenceAfterDishTaskId != self.id "This dish task can't follow itself. Pick a different dish task to come after, or leave that blank."
     mutate stage = stage != null ? stage : self.stage
     mutate resolution = resolution != null ? resolution : self.resolution
     mutate choiceOptions = choiceOptions != null ? choiceOptions : self.choiceOptions
