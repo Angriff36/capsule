@@ -2247,6 +2247,7 @@ export const PackListItemSchema = z.object({
   containerServings: z.number().int().nullable().optional(),
   productionBatchId: z.string().uuid().nullable().optional(),
   note: z.string().nullable().optional(),
+  sentInstead: z.string().nullable().optional(),
   serviceStyleKitItemId: z.string().uuid().nullable().optional(),
   unitCorrectionSource: z.string().nullable().optional(),
   associationSource: z.string().nullable().optional(),
@@ -7716,6 +7717,13 @@ export const PackListItemRecordPackedCountParamsSchema = z.object({
 });
 
 export type PackListItemRecordPackedCountParams = z.infer<typeof PackListItemRecordPackedCountParamsSchema>;
+
+// Command: recordSentInstead on PackListItem
+export const PackListItemRecordSentInsteadParamsSchema = z.object({
+  sentInstead: z.string().optional(),
+});
+
+export type PackListItemRecordSentInsteadParams = z.infer<typeof PackListItemRecordSentInsteadParamsSchema>;
 
 // Command: remove on PackListItem
 export const PackListItemRemoveParamsSchema = z.object({});

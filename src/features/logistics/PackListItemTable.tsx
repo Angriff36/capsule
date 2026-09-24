@@ -10,6 +10,7 @@ interface PackListItemRow {
   _id: string;
   description: string;
   note?: string | null;
+  sentInstead?: string | null;
   dishId?: string | null;
   requiredQuantity: number;
   packedQuantity: number;
@@ -135,6 +136,11 @@ export function PackListItemTable({
                 {item.note ? (
                   <small className="block">Note: {item.note}</small>
                 ) : null}
+                {item.sentInstead ? (
+                  <small className="block">
+                    Sent instead: {item.sentInstead}
+                  </small>
+                ) : null}
                 {failedItem?.id === item._id ? (
                   <small className="block text-danger" role="alert">
                     {failedItem.message}
@@ -175,6 +181,15 @@ export function PackListItemTable({
                   ))}
                   {canEditLines ? (
                     <>
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() => onInvokeItem(item, "sentInstead")}
+                      >
+                        {item.sentInstead
+                          ? "Edit sent instead"
+                          : "Sent instead"}
+                      </button>
                       <button
                         className="btn btn-ghost btn-sm"
                         disabled={busy != null}

@@ -2023,6 +2023,7 @@ export default defineSchema({
     containerServings: v.optional(v.union(v.number(), v.null())),
     productionBatchId: v.optional(v.union(v.id("productionBatches"), v.null())),
     note: v.optional(v.union(v.string(), v.null())),
+    sentInstead: v.optional(v.union(v.string(), v.null())),
     serviceStyleKitItemId: v.optional(v.union(v.string(), v.null())),
     unitCorrectionSource: v.optional(v.union(v.string(), v.null())),
     associationSource: v.optional(v.union(v.string(), v.null())),

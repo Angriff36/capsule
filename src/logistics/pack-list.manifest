@@ -312,6 +312,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // Servingware type note for the packer (Mangia Ops Final Lock Training part
   // 3, PACKLIST): "wood board", "white marble bowl". Empty = no note.
   property note: string?
+  // What actually went out when it was not the listed item. The listed
+  // description, quantity, and status stay. Empty clears it.
+  property sentInstead: string?
   // Set on a line that came from the service style kit; the idempotency key of
   // the kit cascade.
   property indexed serviceStyleKitItemId: uuid?
@@ -639,6 +642,18 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Record a stand-in without rewriting the listed item. A blank entry clears it.
+  command recordSentInstead(optional sentInstead: string) {
+    guard self.deletedAt == null
+    mutate sentInstead = sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    emit PackListItemSentInsteadRecorded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      sentInstead: sentInstead != null and length(trim(sentInstead)) > 0 ? trim(sentInstead) : null
+    }
+  }
+
   store PackListItem in durable
 }
 
@@ -795,6 +810,13 @@ event PackListItemAnnotated: "pack_list_item.annotated" {
   packListItemId: string
   tenantId: string
   packListId: string
+}
+
+event PackListItemSentInsteadRecorded: "pack_list_item.sent_instead_recorded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  sentInstead: string?
 }
 
 event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {
