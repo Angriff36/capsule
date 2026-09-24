@@ -85,7 +85,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   transition status from "submitted" to ["confirmed", "cancelled"]
   transition status from "confirmed" to ["partially_received", "received", "cancelled"]
   transition status from "partially_received" to ["received", "cancelled"]
-  transition status from "received" to []
+  transition status from "received" to ["partially_received"]
   transition status from "cancelled" to []
 
   // manageAccess: Event.approve reaction chain ensures the weekly DRAFT.
@@ -406,6 +406,17 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A count correction on a finished order puts it back in receiving when the
+  // line is short again, so the buyer can record the rest. Already-open orders
+  // stay as they are.
+  command noteReceiptCorrection(lineStillShort: boolean) {
+    guard self.deletedAt == null
+    guard self.status == "confirmed" or self.status == "partially_received" or self.status == "received"
+    compute reopen = lineStillShort and self.status == "received"
+    mutate status = reopen ? "partially_received" : self.status
+    mutate receivedAt = reopen ? null : self.receivedAt
+  }
+
   store VendorOrder in durable
 }
 
@@ -469,7 +480,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   transition status from "pending" to ["added", "cancelled"]
   transition status from "added" to ["receiving", "complete", "cancelled"]
   transition status from "receiving" to ["complete", "cancelled"]
-  transition status from "complete" to []
+  transition status from "complete" to ["receiving"]
   transition status from "cancelled" to []
 
   default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may see vendor order lines"
@@ -710,6 +721,48 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The original delivery lot stays as first recorded. This writes the corrected
+  // received total and a reasoned difference; stock moves by that difference once.
+  command correctReceipt(
+    correctedQuantity: decimal(12, 4),
+    reason: string,
+    supplierLotNumber: string
+  ) {
+    guard self.addedAt != null
+    guard self.status == "receiving" or self.status == "complete"
+    guard self.deletedAt == null
+    guard self.receivedQuantity > 0
+    guard self.locationId != null
+    guard self.vendorOrder != null and (self.vendorOrder.status == "confirmed" or self.vendorOrder.status == "partially_received" or self.vendorOrder.status == "received")
+    constraint correctCountNonnegative: correctedQuantity >= 0 "The corrected count can't be negative. Use zero or more."
+    constraint correctCountWithinOrder: correctedQuantity <= self.orderedQuantity "The corrected count can't be higher than what was ordered."
+    constraint correctCountChanged: correctedQuantity != self.receivedQuantity "Enter a count that's different from the current received count."
+    constraint correctReasonRequired: length(trim(reason)) > 0 "Say why this count changed."
+    constraint correctLotRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
+    compute priorReceived = self.receivedQuantity
+    compute nextStatus = correctedQuantity == self.orderedQuantity ? "complete" : "receiving"
+    mutate receivedQuantity = correctedQuantity
+    mutate pendingSupplyQuantity = self.pendingSupplyQuantity != null ? max(0, self.orderedQuantity - correctedQuantity) : self.pendingSupplyQuantity
+    mutate status = nextStatus
+    mutate completedAt = correctedQuantity == self.orderedQuantity ? (self.completedAt != null ? self.completedAt : now()) : null
+    emit VendorOrderLineReceiptCorrected {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      vendorId: self.vendorOrder.vendorId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      supplierLotNumber: supplierLotNumber
+      priorReceivedQuantity: priorReceived
+      correctedReceivedQuantity: correctedQuantity
+      delta: correctedQuantity - priorReceived
+      orderedQuantity: self.orderedQuantity
+      lineStillShort: correctedQuantity < self.orderedQuantity
+      unit: self.unit
+      reason: reason
+    }
+  }
+
   command cancelLine(reason: string) {
     guard self.addedAt != null
     guard self.status == "added" or self.status == "receiving"
@@ -839,6 +892,82 @@ entity InventoryLot mixin TenantScoped, SoftDeletable {
   }
 
   store InventoryLot in durable
+}
+
+// One reasoned difference against a delivery. The original lot is never rewritten.
+// Replaying the same prior and corrected totals records no second stock move.
+entity ReceiptCorrection mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, vendorOrderLineId, priorReceivedQuantity, correctedReceivedQuantity]
+  timestamps
+  versionProperty version: number
+
+  property indexed required vendorOrderLineId: uuid
+  property required vendorOrderId: uuid
+  property required vendorId: uuid
+  property indexed required ingredientId: uuid
+  property indexed required locationId: uuid
+  property indexed required supplierLotNumber: string = ""
+  property required priorReceivedQuantity: decimal(12, 4) = 0
+  property required correctedReceivedQuantity: decimal(12, 4) = 0
+  property required delta: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required reason: string = ""
+  property recordedAt: datetime?
+
+  belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+
+  constraint receiptCorrectionReason: self.recordedAt == null or length(trim(self.reason)) > 0 "Say why this count changed."
+  constraint receiptCorrectionLot: self.recordedAt == null or length(trim(self.supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
+
+  default policy receiptCorrectionRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may see receipt corrections"
+  default policy receiptCorrectionWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may update receipt corrections"
+  default policy receiptCorrectionExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may change receipt corrections"
+
+  command record(
+    vendorOrderLineId: uuid,
+    vendorOrderId: uuid,
+    vendorId: uuid,
+    ingredientId: uuid,
+    locationId: uuid,
+    supplierLotNumber: string,
+    priorReceivedQuantity: decimal(12, 4),
+    correctedReceivedQuantity: decimal(12, 4),
+    delta: decimal(12, 4),
+    unit: UnitOfMeasure,
+    reason: string
+  ) {
+    guard self.recordedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.locationId == locationId and self.supplierLotNumber == supplierLotNumber and self.priorReceivedQuantity == priorReceivedQuantity and self.correctedReceivedQuantity == correctedReceivedQuantity and self.delta == delta and self.unit == unit and self.reason == reason)
+    guard self.deletedAt == null
+    constraint recordCorrectionReason: length(trim(reason)) > 0 "Say why this count changed."
+    constraint recordCorrectionLot: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required so this delivery can be traced."
+    compute stockDelta = self.recordedAt == null ? delta : 0
+    mutate vendorOrderLineId = vendorOrderLineId
+    mutate vendorOrderId = vendorOrderId
+    mutate vendorId = vendorId
+    mutate ingredientId = ingredientId
+    mutate locationId = locationId
+    mutate supplierLotNumber = supplierLotNumber
+    mutate priorReceivedQuantity = priorReceivedQuantity
+    mutate correctedReceivedQuantity = correctedReceivedQuantity
+    mutate delta = delta
+    mutate unit = unit
+    mutate reason = reason
+    mutate recordedAt = self.recordedAt == null ? now() : self.recordedAt
+    emit ReceiptCorrectionStock {
+      tenantId: self.tenantId
+      ingredientId: ingredientId
+      locationId: locationId
+      delta: stockDelta
+      unit: unit
+      reason: reason
+    }
+  }
+
+  store ReceiptCorrection in durable
 }
 
 event InventoryLotStockRecorded: "inventory_lot.stock_recorded" {
@@ -1194,6 +1323,23 @@ event VendorOrderLineReceived: "vendor_order_line.received" {
   discrepancyQuantity: decimal(12, 4)?
 }
 
+event VendorOrderLineReceiptCorrected: "vendor_order_line.receipt_corrected" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  vendorId: string
+  ingredientId: string
+  locationId: string
+  supplierLotNumber: string
+  priorReceivedQuantity: decimal(12, 4)
+  correctedReceivedQuantity: decimal(12, 4)
+  delta: decimal(12, 4)
+  orderedQuantity: decimal(12, 4)
+  lineStillShort: boolean
+  unit: UnitOfMeasure
+  reason: string
+}
+
 event VendorOrderLineQuantityRevised: "vendor_order_line.quantity_revised" {
   vendorOrderLineId: string
   tenantId: string
@@ -1312,4 +1458,46 @@ on VendorOrderLineReceived run InventoryLot.record
     cumulativeReceivedQuantity: payload.receivedQuantity
     unit: payload.unit
     unitCost: payload.unitCost
+  }
+
+on VendorOrderLineReceiptCorrected run ReceiptCorrection.record
+  match vendorOrderLineId = payload.vendorOrderLineId, priorReceivedQuantity = payload.priorReceivedQuantity, correctedReceivedQuantity = payload.correctedReceivedQuantity
+  else create
+  params {
+    vendorOrderLineId: payload.vendorOrderLineId
+    vendorOrderId: payload.vendorOrderId
+    vendorId: payload.vendorId
+    ingredientId: payload.ingredientId
+    locationId: payload.locationId
+    supplierLotNumber: payload.supplierLotNumber
+    priorReceivedQuantity: payload.priorReceivedQuantity
+    correctedReceivedQuantity: payload.correctedReceivedQuantity
+    delta: payload.delta
+    unit: payload.unit
+    reason: payload.reason
+  }
+
+on VendorOrderLineReceiptCorrected run VendorOrder.noteReceiptCorrection
+  resolve payload.vendorOrderId
+  params {
+    lineStillShort: payload.lineStillShort
+  }
+
+event ReceiptCorrectionStock: "receipt_correction.stock" {
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  delta: number
+  unit: string
+  reason: string
+}
+
+on ReceiptCorrectionStock run InventoryItem.applyReceiptCorrection
+  match ingredientId = payload.ingredientId, locationId = payload.locationId
+  params {
+    ingredientId: payload.ingredientId
+    locationId: payload.locationId
+    delta: payload.delta
+    unit: payload.unit
+    reason: payload.reason
   }

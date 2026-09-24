@@ -557,6 +557,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.QuoteSubmission_create, { "dedupKey": "demo-dedupKey-1", "clientName": "QuoteSubmission 1", "email": "user1@example.com", "phone": "demo-phone-1", "eventDate": 1767268800000, "eventEndTime": 1767268800000, "guestCount": 1, "serviceStyleId": "serviceStyleId-quote-submission-1", "occasionId": "occasionId-quote-submission-1", "serviceStyleText": "demo-serviceStyleText-1", "occasionText": "demo-occasionText-1", "venueName": "QuoteSubmission 1", "venueAddress": "demo-venueAddress-1", "menuPreferences": "demo-menuPreferences-1", "dietaryRestrictions": "demo-dietaryRestrictions-1", "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.QuoteSubmission_create, { "dedupKey": "demo-dedupKey-2", "clientName": "QuoteSubmission 2", "email": "user2@example.com", "phone": "demo-phone-2", "eventDate": 1767355200000, "eventEndTime": 1767355200000, "guestCount": 2, "serviceStyleId": "serviceStyleId-quote-submission-2", "occasionId": "occasionId-quote-submission-2", "serviceStyleText": "demo-serviceStyleText-2", "occasionText": "demo-occasionText-2", "venueName": "QuoteSubmission 2", "venueAddress": "demo-venueAddress-2", "menuPreferences": "demo-menuPreferences-2", "dietaryRestrictions": "demo-dietaryRestrictions-2", "notes": "demo-notes-2" } as any);
+  // ReceiptCorrection → api.mutations.ReceiptCorrection_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ReceiptCorrection_createViaRecord, { "vendorOrderLineId": "vendorOrderLineId-receipt-correction-1", "vendorOrderId": "vendorOrderId-receipt-correction-1", "vendorId": "vendorId-receipt-correction-1", "ingredientId": "ingredientId-receipt-correction-1", "locationId": "locationId-receipt-correction-1", "supplierLotNumber": "demo-supplierLotNumber-1", "priorReceivedQuantity": 1, "correctedReceivedQuantity": 1, "delta": 1, "unit": "demo-unit-1", "reason": "demo-reason-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ReceiptCorrection_createViaRecord, { "vendorOrderLineId": "vendorOrderLineId-receipt-correction-2", "vendorOrderId": "vendorOrderId-receipt-correction-2", "vendorId": "vendorId-receipt-correction-2", "ingredientId": "ingredientId-receipt-correction-2", "locationId": "locationId-receipt-correction-2", "supplierLotNumber": "demo-supplierLotNumber-2", "priorReceivedQuantity": 2, "correctedReceivedQuantity": 2, "delta": 2, "unit": "demo-unit-2", "reason": "demo-reason-2" } as any);
   // RecurringAvailability → api.mutations.RecurringAvailability_createViaDeclare
   rowsAttempted += 1;
   await client.mutation(api.mutations.RecurringAvailability_createViaDeclare, { "personId": "personId-recurring-availability-1", "dayOfWeek": 1, "startMinute": 1, "endMinute": 1, "notes": "demo-notes-1" } as any);
@@ -1373,6 +1378,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "QuoteSubmission",
       "createMutation": "QuoteSubmission_create",
+      "rowCount": 2
+    },
+    {
+      "entity": "ReceiptCorrection",
+      "createMutation": "ReceiptCorrection_createViaRecord",
       "rowCount": 2
     },
     {

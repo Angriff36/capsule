@@ -35,6 +35,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { VendorOrderReceiptCorrection } from "./VendorOrderReceiptCorrection";
 import {
   NEW_LOCATION_FIELD,
   ReceiptLocationField,
@@ -741,6 +742,13 @@ export function VendorOrderPage() {
                       </ul>
                     </div>
                   ) : null}
+                  <VendorOrderReceiptCorrection
+                    line={line}
+                    orderStatus={String(order.status)}
+                    latestLotNumber={lineLots[0]?.supplierLotNumber ?? ""}
+                    busy={busy}
+                    run={run}
+                  />
                   {receivingLineId === line._id ? (
                     <form
                       className="receipt-form"

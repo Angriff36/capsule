@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "01a82f34acdce4a754ca5b611a2df2e926bfefd4477adb8cadd40f5375755f72:025061cdbf73287d478ad40469b005670f1493d5f123bf967c67493e0a9ce987:065ccfd7acd70d03a016b60f01b8b98a7004a8470b152c018232841f610b6810:103b634474e98332e44102b628e646a9a55484ffc2f87cf0caf7f77c893d878b:1098ff71955a0e30ffa703abfb8f6f68ef42d9fcca1fbddee906faa46ac385ae:1351fc2514a762377691cfd1f268d22d822aa8b56f071cf5799d734219aa8225:163b29f0f4aa2136fb10ed050a5544b059fcee7067efe04f62e077b8ee2fb5e6:1af1fa24ba138563ee67bc22a8587dde8c15d208335234b3c66ad7b41b959811:1bb51dbcb670d7c50e4a1335d2b000a957e85019a030514d85530e20461171cb:1c96fc6ac39ff6daea06eda28853d972975a1371651970ff8e58a3435431f7f2:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:20a879e4454928c771ff0291df2086d06bf79bb07278d7f0c07a7a3c226249a3:2d4f6bdf6992d9131943f3b3838bc05c8db1d52fbf369ce4c8fbdbcd55831ed6:302693e21e3c0b4a6b6a7f0cf32281ff27570153fc0cce7a433902fd878579e8:309db2799e7c3d255d2b3cdf9840a20a3534a5bc56b25ba335245b3ffe5a45c8:31fcc697f13a224ca0e461543a010974a3ed39a9508c3d9b6125e4b7d8251fb9:32a47933fd5794ae26f9ddb1e1fed6b73a52b9e4aeda46be331860f6bd867d4a:33ecc76b215ddd5a9a412f869b68634f918ff5ee93b60037573ef959ded1d962:341ca0ed24e4e9287f1e235feb7bc043c25641c6257ad85d8a58738fcb8561e0:3819116602bcc67cdbbd2f47f45009ebbe64e29c9eba673123e6332cf4f4903c:3a134ec4f479f87c1087fa89e09f4f8b7732d99619f4d9f5a388ccdc5258a2fe:3ad5a0f88591557e057dc265f0fafa3c97f852ed954961e2bedec22a3542d8fe:3b2c38bc7f88f786ec2b92ed45663eab4d04f300ce6578a82738653ee820d32d:3fe58529dd9a9e986fec6c46cbe739fed2718908a3ac7c1120a93f3930c71374:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:4507e226149420b12ededb732b1a43f4cf1e1684a368e9301d0fbad2d4c669c6:45aab2b87b093b193d3d0841cf07073e50c076bfd56b142f121e35aa93f5331a:4bf2e9115e91e0d55243691638c01fb4c43bf450ab2a0e500406474364875834:4d8267a9d5ba0124f759050054658c9bdc5dfdde867b5b61870aaaecd292d53e:4dac7357924ad31265983e32b72832a7a80729a76ae62339f3951618b2fee5fe:50db8041205034de9003deec67ecbddd91faaee89d72383dc7601d5de7e1aec9:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:53bf27ae61ea046e8a540632d2ecbaf4c549ec3f312ad0c8660fdcc3fc9dab94:58d51449e9cd8fb021858845a386e76405610c988553bdc070a6446387564372:5917c6175d043b5e6b8bee098a33995c1f8299a171928631654df16098ddfd00:67b091a9b45c08f5beb41397076ff26b64f8ca0f17edeb4b520ea061f59603b5:7156e52f865de64360f5bee3e822a13d1525a277dce91c0fd77a6744dcbdbc12:715a0d80a1168805293261719cc10c3128f0ce3f43c017caa765d4560b2d9c60:717bb140186c2ebb9f86417b27be66f9eb48bceaa84f74319fa752f9dbf33d55:76ba4358b8b9b1a65d6c84a9a6b39cd20512e4b7ab42919fbb39186ac5490d1a:76e16eefe9e4d28380b5a246b9d7d60a63de7db8c0b54e7b50bc2c4d8f429bc9:78d18db50fe9e8553e7f2f6c9c1c648b19c3205bddee94af655d70cf7f9d2b41:79621c0407c626b3bd25b438a0d010178a635cb40bcefd54c0e7349ba6b0526d:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7c08cc1835effde546e3f72d5086e24cc2e80975c4f823b8c9fa664d479786e0:7d0fd3aafbe14cb5b19a592cd7bc3278690eb46553dc99c14db5cc9412fed0a8:7dce278c49da9280823ad5364f711c7a7e120733a6568e1169226da4594c48ea:80266310bc2fc266a7ecbec6d4a58a5587941820288067df59130ca43386113f:81005aa059c14171249fb303ca5445dba6a977dca26e59d9ca84e0c7459abbd1:81c644968057540224d298950ddbc6b35c90483655f656e84d1bc642c6ef5eff:820b12841da2b42ab1a206fd499cca9509ab9aa466cd49d5f99224d68e2ee13f:833405253590b4359113ba57271d8b59527c1a0b74a429df9c54a588217f4dc9:881ef0cba2072acaa17770c25540f138f395f2a583ec369fff55737618d3a77d:89fff9a65d3dfa1d0ff8b7e6a07929847a44cc9b5a3d98297a3ec9d83981b1d5:9268cf74f6798e90351a99b882d58735a171f0bad307d97292562851f951cf8d:93581c83a3cab29cf0551ef39a2e8c8b3306482b9ce25d947e085da2a08ef220:967d4ad325e1befdea12f4c857de6f82551a0354b6a5f0840921cf7044019328:9cddd23ecfcc3e535e53a4925807826471b8d46b70f9209bc58f07ba0827e0fe:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:9f417be1deb26b3fcbb816463225e47801e86e6579e16f04a887feb64a9b3e17:a398209ca99d4021868b9338ee019e652da35f5687495a6a0732e8fdd1540a0c:a737c0cd19939d30c1e415c72bf2e35486aa888d430cc45af7e5057306e4424f:a973cb18999b5e287e878c32ba9fc76c0df3f68018005180ca8e35e2c1c4ac10:ab4512525a0bd4dc52d48f6646efae3151eabf735e7817e87c4e77685270f344:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:afd850f6872461a95f6d32ed7ccabff48faee56bc1a00a8dd56c2c505c712c87:b0c6cf4554a78f07f207aea747d3f6cde14c7acf2631785325507e1f9d928b48:b7888a5374c72444d6177edc5ff03fbe5b67a4c37c61a0f9c3b4996fe7a85b4c:ba1b321af043def8fa128134c1904772dc1498a6f39de6628141b1aa92c76eee:ba23ad909a14dd5b351999456d9df8486935ffec121a4452344ca74dd6f9f6ef:bcb3a17214ae7069bbb5d0014eef2f5d7b14cb02175d9ea31b87415037daf844:be728cb34b977bb2e4bc282aadc1bef43807eaf8e828ba0a760df0c5e484c366:c0bc2dcfa2d04080130e1c9f22e06f77ac4ba7983b1a82d7346fefe226742466:c85014710aa52056cef74c2bca318eb7cbc9c96f5b24bab88501a84850bbc966:c957a68f8208c34d7941b7418bae05672026e7d1c731c60ce6920b5fc30a1f9a:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cf0712ffcc0aea3f80ffedcbb83da481ea0dd50463ca3a1d5fdc6158ce123809:cfbdcada92ff9c76befcb28d8701a80bd2a216e678846c83cc3c40f565878a8b:d6908f1a48b38aab1cd58322e8cc1c1f95c3c07cc97a05d200ecb5f82856466c:d8483f68e1ab1a090c03471e7d5714f72237690674dc115cb1c383177d86cece:d9034cdbacd9f51083c463ae4ae47fd3d5e421196d281c256fc9432e427bd7cf:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:db153fe2628ea68ed419ef44386d300a32dcc507cd008b6263ac6cbadd62bfb2:dc097c3160159a51fa09ebc6399588b0e505cef0f2d50736978588e29bf857ca:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:e4c555787cf04ddb022d79bb365f96ff15bddcd8a014bbee1a2a4b684c44a35e:e76aaabb32f07146632b47eac60c327a147f03cbfbecb7738b75b837389a93b1:e868ddb587fdd57f7a076e5e072fcc6d86f0e2918c0fdd5361c70b05a9a99c96:e97503a34126021d54aa4540c8ec44381ba0bf1a84195747762a6dfddf8295b5:eb0bbaf77b2297b377036a0b7d4a40dc6dc559da2f0e290a3b58c67d741ade91:ec5f68fcf0b31d498196210ced6e1d122d69a4ae122242357902b7ca8a5b6fb6:efb8205d537e2a8c161cd6377fe128c0fd5d5d49c72e382a5d714df2493d93ac:f022ebc37283be0ed50b22285d8c3e0e1bbc66c30f00e5868dcbdb00a160252f:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f587a98dc14f7610b632041c350db4e493e2111f1f7d783dfcba250dc5dd9798:f93aab61c541d5c2ce72f5eebd19c236bb2d30d93de38367b1777618aea04402:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fa705dca6d559ef8bcb1635d70ae0562f4613baa8da00c24f428a10560650525:fb1d24c40aaebc7ab84bfd03109b9ee102d79e21efebdafd1296ded9cae26311:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe029e043d28b4940122ee33527bfb545f78c1c392d59e886cf11c427bd059:ff2f834b45a911c3c6bc26c38a32e00e325112852a441477c5d0ff867571c68a";
+export const WIRING_CONTRACT_HASH = "01a82f34acdce4a754ca5b611a2df2e926bfefd4477adb8cadd40f5375755f72:01d5210652526326c241dcdd9d90ba4f2759cf31bdf7f1e90263405eee08a62c:025061cdbf73287d478ad40469b005670f1493d5f123bf967c67493e0a9ce987:065ccfd7acd70d03a016b60f01b8b98a7004a8470b152c018232841f610b6810:103b634474e98332e44102b628e646a9a55484ffc2f87cf0caf7f77c893d878b:1098ff71955a0e30ffa703abfb8f6f68ef42d9fcca1fbddee906faa46ac385ae:1351fc2514a762377691cfd1f268d22d822aa8b56f071cf5799d734219aa8225:163b29f0f4aa2136fb10ed050a5544b059fcee7067efe04f62e077b8ee2fb5e6:1af1fa24ba138563ee67bc22a8587dde8c15d208335234b3c66ad7b41b959811:1bb51dbcb670d7c50e4a1335d2b000a957e85019a030514d85530e20461171cb:1c96fc6ac39ff6daea06eda28853d972975a1371651970ff8e58a3435431f7f2:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:20a879e4454928c771ff0291df2086d06bf79bb07278d7f0c07a7a3c226249a3:2d4f6bdf6992d9131943f3b3838bc05c8db1d52fbf369ce4c8fbdbcd55831ed6:302693e21e3c0b4a6b6a7f0cf32281ff27570153fc0cce7a433902fd878579e8:309db2799e7c3d255d2b3cdf9840a20a3534a5bc56b25ba335245b3ffe5a45c8:31fcc697f13a224ca0e461543a010974a3ed39a9508c3d9b6125e4b7d8251fb9:33ecc76b215ddd5a9a412f869b68634f918ff5ee93b60037573ef959ded1d962:341ca0ed24e4e9287f1e235feb7bc043c25641c6257ad85d8a58738fcb8561e0:3819116602bcc67cdbbd2f47f45009ebbe64e29c9eba673123e6332cf4f4903c:3a134ec4f479f87c1087fa89e09f4f8b7732d99619f4d9f5a388ccdc5258a2fe:3ad5a0f88591557e057dc265f0fafa3c97f852ed954961e2bedec22a3542d8fe:3b2c38bc7f88f786ec2b92ed45663eab4d04f300ce6578a82738653ee820d32d:3fe58529dd9a9e986fec6c46cbe739fed2718908a3ac7c1120a93f3930c71374:4021a43427a72d2daffe25a117f282ffc343ff11dd02010652045485f3bf2816:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:4507e226149420b12ededb732b1a43f4cf1e1684a368e9301d0fbad2d4c669c6:45aab2b87b093b193d3d0841cf07073e50c076bfd56b142f121e35aa93f5331a:4bf2e9115e91e0d55243691638c01fb4c43bf450ab2a0e500406474364875834:4d8267a9d5ba0124f759050054658c9bdc5dfdde867b5b61870aaaecd292d53e:4dac7357924ad31265983e32b72832a7a80729a76ae62339f3951618b2fee5fe:50db8041205034de9003deec67ecbddd91faaee89d72383dc7601d5de7e1aec9:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:53bf27ae61ea046e8a540632d2ecbaf4c549ec3f312ad0c8660fdcc3fc9dab94:58d51449e9cd8fb021858845a386e76405610c988553bdc070a6446387564372:5917c6175d043b5e6b8bee098a33995c1f8299a171928631654df16098ddfd00:67b091a9b45c08f5beb41397076ff26b64f8ca0f17edeb4b520ea061f59603b5:7156e52f865de64360f5bee3e822a13d1525a277dce91c0fd77a6744dcbdbc12:715a0d80a1168805293261719cc10c3128f0ce3f43c017caa765d4560b2d9c60:717bb140186c2ebb9f86417b27be66f9eb48bceaa84f74319fa752f9dbf33d55:76ba4358b8b9b1a65d6c84a9a6b39cd20512e4b7ab42919fbb39186ac5490d1a:76e16eefe9e4d28380b5a246b9d7d60a63de7db8c0b54e7b50bc2c4d8f429bc9:79621c0407c626b3bd25b438a0d010178a635cb40bcefd54c0e7349ba6b0526d:79c322b92ca2e23a30125dbbcc3019cb8715ed93119224cca507f62a6f3b7621:7c08cc1835effde546e3f72d5086e24cc2e80975c4f823b8c9fa664d479786e0:7d0fd3aafbe14cb5b19a592cd7bc3278690eb46553dc99c14db5cc9412fed0a8:7dce278c49da9280823ad5364f711c7a7e120733a6568e1169226da4594c48ea:80266310bc2fc266a7ecbec6d4a58a5587941820288067df59130ca43386113f:81005aa059c14171249fb303ca5445dba6a977dca26e59d9ca84e0c7459abbd1:81c644968057540224d298950ddbc6b35c90483655f656e84d1bc642c6ef5eff:820b12841da2b42ab1a206fd499cca9509ab9aa466cd49d5f99224d68e2ee13f:833405253590b4359113ba57271d8b59527c1a0b74a429df9c54a588217f4dc9:881ef0cba2072acaa17770c25540f138f395f2a583ec369fff55737618d3a77d:89fff9a65d3dfa1d0ff8b7e6a07929847a44cc9b5a3d98297a3ec9d83981b1d5:9268cf74f6798e90351a99b882d58735a171f0bad307d97292562851f951cf8d:93581c83a3cab29cf0551ef39a2e8c8b3306482b9ce25d947e085da2a08ef220:967d4ad325e1befdea12f4c857de6f82551a0354b6a5f0840921cf7044019328:9cddd23ecfcc3e535e53a4925807826471b8d46b70f9209bc58f07ba0827e0fe:9e98bdeac2b20c1da7c8565bc0e68b67db011509c47c3c512b9e1c9f7be516c4:9f417be1deb26b3fcbb816463225e47801e86e6579e16f04a887feb64a9b3e17:a398209ca99d4021868b9338ee019e652da35f5687495a6a0732e8fdd1540a0c:a737c0cd19939d30c1e415c72bf2e35486aa888d430cc45af7e5057306e4424f:a973cb18999b5e287e878c32ba9fc76c0df3f68018005180ca8e35e2c1c4ac10:ab4512525a0bd4dc52d48f6646efae3151eabf735e7817e87c4e77685270f344:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afbd0cf1305dff953db623162ca2ab2170e7cc3d4f7a62739a8a2653d8ec8941:afd850f6872461a95f6d32ed7ccabff48faee56bc1a00a8dd56c2c505c712c87:b0c6cf4554a78f07f207aea747d3f6cde14c7acf2631785325507e1f9d928b48:b7888a5374c72444d6177edc5ff03fbe5b67a4c37c61a0f9c3b4996fe7a85b4c:ba1b321af043def8fa128134c1904772dc1498a6f39de6628141b1aa92c76eee:ba23ad909a14dd5b351999456d9df8486935ffec121a4452344ca74dd6f9f6ef:bcb3a17214ae7069bbb5d0014eef2f5d7b14cb02175d9ea31b87415037daf844:be728cb34b977bb2e4bc282aadc1bef43807eaf8e828ba0a760df0c5e484c366:c0bc2dcfa2d04080130e1c9f22e06f77ac4ba7983b1a82d7346fefe226742466:c3e6097c8e6b3b5fbda474fcc87650e99a67e5222afec9f969ca28553742b289:c85014710aa52056cef74c2bca318eb7cbc9c96f5b24bab88501a84850bbc966:c957a68f8208c34d7941b7418bae05672026e7d1c731c60ce6920b5fc30a1f9a:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cf0712ffcc0aea3f80ffedcbb83da481ea0dd50463ca3a1d5fdc6158ce123809:cfbdcada92ff9c76befcb28d8701a80bd2a216e678846c83cc3c40f565878a8b:d6908f1a48b38aab1cd58322e8cc1c1f95c3c07cc97a05d200ecb5f82856466c:d8483f68e1ab1a090c03471e7d5714f72237690674dc115cb1c383177d86cece:d9034cdbacd9f51083c463ae4ae47fd3d5e421196d281c256fc9432e427bd7cf:d9ef376b473936bad5512b64a8aea50c92505d6b1a159615719328cdd79c1c1d:db153fe2628ea68ed419ef44386d300a32dcc507cd008b6263ac6cbadd62bfb2:dc097c3160159a51fa09ebc6399588b0e505cef0f2d50736978588e29bf857ca:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:e4c555787cf04ddb022d79bb365f96ff15bddcd8a014bbee1a2a4b684c44a35e:e76aaabb32f07146632b47eac60c327a147f03cbfbecb7738b75b837389a93b1:e868ddb587fdd57f7a076e5e072fcc6d86f0e2918c0fdd5361c70b05a9a99c96:e97503a34126021d54aa4540c8ec44381ba0bf1a84195747762a6dfddf8295b5:eb0bbaf77b2297b377036a0b7d4a40dc6dc559da2f0e290a3b58c67d741ade91:ec5f68fcf0b31d498196210ced6e1d122d69a4ae122242357902b7ca8a5b6fb6:efb8205d537e2a8c161cd6377fe128c0fd5d5d49c72e382a5d714df2493d93ac:f022ebc37283be0ed50b22285d8c3e0e1bbc66c30f00e5868dcbdb00a160252f:f49c5ef7603c706a89514343223fe24d6e1496af83095a7796cb93e7336aaea4:f587a98dc14f7610b632041c350db4e493e2111f1f7d783dfcba250dc5dd9798:f93aab61c541d5c2ce72f5eebd19c236bb2d30d93de38367b1777618aea04402:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fa705dca6d559ef8bcb1635d70ae0562f4613baa8da00c24f428a10560650525:fb1d24c40aaebc7ab84bfd03109b9ee102d79e21efebdafd1296ded9cae26311:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe029e043d28b4940122ee33527bfb545f78c1c392d59e886cf11c427bd059:ff2f834b45a911c3c6bc26c38a32e00e325112852a441477c5d0ff867571c68a";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -70326,6 +70326,20 @@ export const IngredientClassifyAllergensInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -70671,6 +70685,20 @@ export const IngredientClearPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -70965,6 +70993,20 @@ export const IngredientConfigureSubstitutesInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -71269,6 +71311,20 @@ export const IngredientDiscontinueInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -71597,6 +71653,20 @@ export const IngredientIntroduceInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -72081,6 +72151,20 @@ export const IngredientLinkAsEditionInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -72387,6 +72471,20 @@ export const IngredientMergeIntoInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -72714,6 +72812,20 @@ export const IngredientPurgeInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -73022,6 +73134,20 @@ export const IngredientReinstateInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -73353,6 +73479,20 @@ export const IngredientSetNutritionInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -73701,6 +73841,20 @@ export const IngredientSetPreferredVendorInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -74002,6 +74156,20 @@ export const IngredientSetPreferredVendorsInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -74316,6 +74484,20 @@ export const IngredientSetPrimaryImageInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -74626,6 +74808,20 @@ export const IngredientUpdateCostingInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -74929,6 +75125,20 @@ export const IngredientUpdateDetailsInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -78471,6 +78681,287 @@ export const InventoryItemAdjustQuantityAction = {
       "name": "delta",
       "label": "Delta",
       "required": true
+    },
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- InventoryItem.applyReceiptCorrection ---
+export interface InventoryItemApplyReceiptCorrectionClientInput {
+  ingredientId: string;
+  locationId: string;
+  delta: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  reason: string;
+}
+
+export const InventoryItemApplyReceiptCorrectionCapability = {
+  capabilityId: "InventoryItem.applyReceiptCorrection",
+  entity: "InventoryItem",
+  command: "applyReceiptCorrection",
+  route: "/api/manifest/InventoryItem/commands/applyReceiptCorrection",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; locationId: string; quantityOnHand: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; parLevel: number; reorderThreshold: number; unitCost: number; stockedAt: number | null; removedAt: number | null; bestBeforeAt: number | null; useByAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["ingredientId","locationId","delta","unit","reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory staff and managers may see stock items"},{"kind":"policy_denial","message":"Inventory staff and managers may update stock items"},{"kind":"policy_denial","message":"Inventory staff and managers may change stock items"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Receipt ingredient must match stock"},{"kind":"constraint_block","message":"Receipt location must match stock"},{"kind":"constraint_block","message":"Say why this count changed."},{"kind":"constraint_block","message":"Receipt unit needs a measured conversion to the stock unit"},{"kind":"constraint_block","message":"Quantity on hand cannot be negative"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"InventoryItem not found"}],
+  emits: ["InventoryQuantityAdjusted"],
+} as const;
+
+export type InventoryItemApplyReceiptCorrectionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; locationId: string; quantityOnHand: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; parLevel: number; reorderThreshold: number; unitCost: number; stockedAt: number | null; removedAt: number | null; bestBeforeAt: number | null; useByAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for InventoryItem.applyReceiptCorrection.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindInventoryItemApplyReceiptCorrectionInput(client: InventoryItemApplyReceiptCorrectionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful InventoryItem.applyReceiptCorrection. */
+export const InventoryItemApplyReceiptCorrectionInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "InventoryItem",
+    "queryKeyHint": "queryKeys.inventoryItem.lists()",
+    "readId": "InventoryItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryItem",
+    "queryKeyHint": "queryKeys.inventoryItem.detail(id)",
+    "readId": "InventoryItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryReservation",
+    "queryKeyHint": "queryKeys.inventoryReservation.lists()",
+    "readId": "InventoryReservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryReservation",
+    "queryKeyHint": "queryKeys.inventoryReservation.detail(id)",
+    "readId": "InventoryReservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StockCountLine",
+    "queryKeyHint": "queryKeys.stockCountLine.lists()",
+    "readId": "StockCountLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StockCountLine",
+    "queryKeyHint": "queryKeys.stockCountLine.detail(id)",
+    "readId": "StockCountLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StockTransfer",
+    "queryKeyHint": "queryKeys.stockTransfer.lists()",
+    "readId": "StockTransfer.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StockTransfer",
+    "queryKeyHint": "queryKeys.stockTransfer.detail(id)",
+    "readId": "StockTransfer.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "WasteRecord",
+    "queryKeyHint": "queryKeys.wasteRecord.lists()",
+    "readId": "WasteRecord.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "WasteRecord",
+    "queryKeyHint": "queryKeys.wasteRecord.detail(id)",
+    "readId": "WasteRecord.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer InventoryItem.applyReceiptCorrection. Not a rendered control. */
+export const InventoryItemApplyReceiptCorrectionAction = {
+  "exposure": "human",
+  "label": "Apply receipt correction",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "ingredientId",
+      "label": "Ingredient id",
+      "required": true
+    },
+    {
+      "name": "locationId",
+      "label": "Location id",
+      "required": true
+    },
+    {
+      "name": "delta",
+      "label": "Delta",
+      "required": true
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "required": true,
+      "choices": [
+        {
+          "value": "each",
+          "label": "each"
+        },
+        {
+          "value": "gram",
+          "label": "gram"
+        },
+        {
+          "value": "kilogram",
+          "label": "kilogram"
+        },
+        {
+          "value": "ounce",
+          "label": "ounce"
+        },
+        {
+          "value": "pound",
+          "label": "pound"
+        },
+        {
+          "value": "milliliter",
+          "label": "milliliter"
+        },
+        {
+          "value": "liter",
+          "label": "liter"
+        },
+        {
+          "value": "teaspoon",
+          "label": "teaspoon"
+        },
+        {
+          "value": "tablespoon",
+          "label": "tablespoon"
+        },
+        {
+          "value": "cup",
+          "label": "cup"
+        },
+        {
+          "value": "pint",
+          "label": "pint"
+        },
+        {
+          "value": "quart",
+          "label": "quart"
+        },
+        {
+          "value": "gallon",
+          "label": "gallon"
+        },
+        {
+          "value": "portion",
+          "label": "portion"
+        },
+        {
+          "value": "serving",
+          "label": "serving"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "melon",
+          "label": "melon"
+        },
+        {
+          "value": "bottle",
+          "label": "bottle"
+        },
+        {
+          "value": "fluid_ounce",
+          "label": "fluid_ounce"
+        },
+        {
+          "value": "piece",
+          "label": "piece"
+        },
+        {
+          "value": "slice",
+          "label": "slice"
+        },
+        {
+          "value": "pizza",
+          "label": "pizza"
+        },
+        {
+          "value": "package",
+          "label": "package"
+        },
+        {
+          "value": "case",
+          "label": "case"
+        },
+        {
+          "value": "can",
+          "label": "can"
+        },
+        {
+          "value": "tub",
+          "label": "tub"
+        }
+      ]
     },
     {
       "name": "reason",
@@ -119237,6 +119728,309 @@ export const QuoteSubmissionStartProcessingAction = {
   "fields": []
 } as const;
 
+// --- ReceiptCorrection.record ---
+export interface ReceiptCorrectionRecordClientInput {
+  vendorOrderLineId: string;
+  vendorOrderId: string;
+  vendorId: string;
+  ingredientId: string;
+  locationId: string;
+  supplierLotNumber: string;
+  priorReceivedQuantity: number;
+  correctedReceivedQuantity: number;
+  delta: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub";
+  reason: string;
+}
+
+export const ReceiptCorrectionRecordCapability = {
+  capabilityId: "ReceiptCorrection.record",
+  entity: "ReceiptCorrection",
+  command: "record",
+  route: "/api/manifest/ReceiptCorrection/commands/record",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","locationId","supplierLotNumber","priorReceivedQuantity","correctedReceivedQuantity","delta","unit","reason"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Inventory, procurement, and managers may see receipt corrections"},{"kind":"policy_denial","message":"Procurement and managers may update receipt corrections"},{"kind":"policy_denial","message":"Procurement and managers may change receipt corrections"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Say why this count changed."},{"kind":"constraint_block","message":"Supplier lot number is required so this delivery can be traced."}],
+  emits: ["ReceiptCorrectionStock"],
+} as const;
+
+export type ReceiptCorrectionRecordResult = { docId: string };
+
+/**
+ * Build command input for ReceiptCorrection.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindReceiptCorrectionRecordInput(client: ReceiptCorrectionRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ReceiptCorrection.record. */
+export const ReceiptCorrectionRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryItem",
+    "queryKeyHint": "queryKeys.inventoryItem.lists()",
+    "readId": "InventoryItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryItem",
+    "queryKeyHint": "queryKeys.inventoryItem.detail(id)",
+    "readId": "InventoryItem.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer ReceiptCorrection.record. Not a rendered control. */
+export const ReceiptCorrectionRecordAction = {
+  "exposure": "human",
+  "label": "Record",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "vendorOrderLineId",
+      "label": "Vendor order line id",
+      "required": true
+    },
+    {
+      "name": "vendorOrderId",
+      "label": "Vendor order id",
+      "required": true
+    },
+    {
+      "name": "vendorId",
+      "label": "Vendor id",
+      "required": true
+    },
+    {
+      "name": "ingredientId",
+      "label": "Ingredient id",
+      "required": true
+    },
+    {
+      "name": "locationId",
+      "label": "Location id",
+      "required": true
+    },
+    {
+      "name": "supplierLotNumber",
+      "label": "Supplier lot number",
+      "required": true
+    },
+    {
+      "name": "priorReceivedQuantity",
+      "label": "Prior received quantity",
+      "required": true
+    },
+    {
+      "name": "correctedReceivedQuantity",
+      "label": "Corrected received quantity",
+      "required": true
+    },
+    {
+      "name": "delta",
+      "label": "Delta",
+      "required": true
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "required": true,
+      "choices": [
+        {
+          "value": "each",
+          "label": "each"
+        },
+        {
+          "value": "gram",
+          "label": "gram"
+        },
+        {
+          "value": "kilogram",
+          "label": "kilogram"
+        },
+        {
+          "value": "ounce",
+          "label": "ounce"
+        },
+        {
+          "value": "pound",
+          "label": "pound"
+        },
+        {
+          "value": "milliliter",
+          "label": "milliliter"
+        },
+        {
+          "value": "liter",
+          "label": "liter"
+        },
+        {
+          "value": "teaspoon",
+          "label": "teaspoon"
+        },
+        {
+          "value": "tablespoon",
+          "label": "tablespoon"
+        },
+        {
+          "value": "cup",
+          "label": "cup"
+        },
+        {
+          "value": "pint",
+          "label": "pint"
+        },
+        {
+          "value": "quart",
+          "label": "quart"
+        },
+        {
+          "value": "gallon",
+          "label": "gallon"
+        },
+        {
+          "value": "portion",
+          "label": "portion"
+        },
+        {
+          "value": "serving",
+          "label": "serving"
+        },
+        {
+          "value": "batch",
+          "label": "batch"
+        },
+        {
+          "value": "melon",
+          "label": "melon"
+        },
+        {
+          "value": "bottle",
+          "label": "bottle"
+        },
+        {
+          "value": "fluid_ounce",
+          "label": "fluid_ounce"
+        },
+        {
+          "value": "piece",
+          "label": "piece"
+        },
+        {
+          "value": "slice",
+          "label": "slice"
+        },
+        {
+          "value": "pizza",
+          "label": "pizza"
+        },
+        {
+          "value": "package",
+          "label": "package"
+        },
+        {
+          "value": "case",
+          "label": "case"
+        },
+        {
+          "value": "can",
+          "label": "can"
+        },
+        {
+          "value": "tub",
+          "label": "tub"
+        }
+      ]
+    },
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- RecurringAvailability.declare ---
 export interface RecurringAvailabilityDeclareClientInput {
   personId: string;
@@ -130026,6 +130820,20 @@ export const StorageLocationActivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StockCountLine",
     "queryKeyHint": "queryKeys.stockCountLine.lists()",
     "readId": "StockCountLine.list",
@@ -130182,6 +130990,20 @@ export const StorageLocationDeactivateInvalidation = [
     "entity": "InventoryLot",
     "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
     "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -130353,6 +131175,20 @@ export const StorageLocationRegisterInvalidation = [
     "entity": "InventoryLot",
     "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
     "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -130533,6 +131369,20 @@ export const StorageLocationReviseDetailsInvalidation = [
     "entity": "InventoryLot",
     "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
     "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -136637,6 +137487,20 @@ export const VendorOrderApproveInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -136828,6 +137692,20 @@ export const VendorOrderCancelInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -137052,6 +137930,20 @@ export const VendorOrderConfirmInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -137247,6 +138139,20 @@ export const VendorOrderEnsureWeeklyDraftInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -137573,6 +138479,20 @@ export const VendorOrderMarkPartiallyReceivedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -137638,7 +138558,8 @@ export const VendorOrderMarkPartiallyReceivedAction = {
   "availableFrom": {
     "property": "status",
     "values": [
-      "confirmed"
+      "confirmed",
+      "received"
     ]
   }
 } as const;
@@ -137648,6 +138569,12 @@ export const VendorOrderMarkPartiallyReceivedLifecycle = [
   {
     "property": "status",
     "from": "confirmed",
+    "to": "partially_received",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "received",
     "to": "partially_received",
     "proven": true
   }
@@ -137759,6 +138686,20 @@ export const VendorOrderMarkReceivedInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -137845,6 +138786,198 @@ export const VendorOrderMarkReceivedLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- VendorOrder.noteReceiptCorrection ---
+export interface VendorOrderNoteReceiptCorrectionClientInput {
+  lineStillShort: boolean;
+}
+
+export const VendorOrderNoteReceiptCorrectionCapability = {
+  capabilityId: "VendorOrder.noteReceiptCorrection",
+  entity: "VendorOrder",
+  command: "noteReceiptCorrection",
+  route: "/api/manifest/VendorOrder/commands/noteReceiptCorrection",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorId: string; eventId: string | null; sourceRangeStart: number | null; sourceRangeEnd: number | null; orderNumber: string | null; subtotal: number; taxAmount: number; shippingAmount: number; totalAmount: number; notes: string | null; status: \"draft\" | \"pending_approval\" | \"submitted\" | \"confirmed\" | \"partially_received\" | \"received\" | \"cancelled\"; openedAt: number | null; submittedAt: number | null; confirmedAt: number | null; receivedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; approvalRequestedAt: number | null; approvedAt: number | null; approvalNotes: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["lineStillShort"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor orders"},{"kind":"policy_denial","message":"Procurement and managers may update vendor orders"},{"kind":"policy_denial","message":"Procurement and managers may change vendor orders"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrder not found"}],
+  emits: [],
+} as const;
+
+export type VendorOrderNoteReceiptCorrectionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorId: string; eventId: string | null; sourceRangeStart: number | null; sourceRangeEnd: number | null; orderNumber: string | null; subtotal: number; taxAmount: number; shippingAmount: number; totalAmount: number; notes: string | null; status: "draft" | "pending_approval" | "submitted" | "confirmed" | "partially_received" | "received" | "cancelled"; openedAt: number | null; submittedAt: number | null; confirmedAt: number | null; receivedAt: number | null; cancelledAt: number | null; cancellationReason: string | null; approvalRequestedAt: number | null; approvedAt: number | null; approvalNotes: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VendorOrder.noteReceiptCorrection.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderNoteReceiptCorrectionInput(client: VendorOrderNoteReceiptCorrectionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrder.noteReceiptCorrection. */
+export const VendorOrderNoteReceiptCorrectionInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.lists()",
+    "readId": "Event.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Event",
+    "queryKeyHint": "queryKeys.event.detail(id)",
+    "readId": "Event.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
+    "readId": "IngredientPriceObservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.detail(id)",
+    "readId": "IngredientPriceObservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.lists()",
+    "readId": "InventoryLot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
+    "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "readId": "PurchaseNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.lists()",
+    "readId": "Vendor.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Vendor",
+    "queryKeyHint": "queryKeys.vendor.detail(id)",
+    "readId": "Vendor.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "readId": "VendorOrderLineDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "readId": "VendorOrderLineDemand.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "WeeklyPurchasingConfig",
+    "queryKeyHint": "queryKeys.weeklyPurchasingConfig.lists()",
+    "readId": "WeeklyPurchasingConfig.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "WeeklyPurchasingConfig",
+    "queryKeyHint": "queryKeys.weeklyPurchasingConfig.detail(id)",
+    "readId": "WeeklyPurchasingConfig.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VendorOrder.noteReceiptCorrection. Not a rendered control. */
+export const VendorOrderNoteReceiptCorrectionAction = {
+  "exposure": "human",
+  "label": "Note receipt correction",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "lineStillShort",
+      "label": "Line still short",
+      "required": true
+    }
+  ]
+} as const;
 
 // --- VendorOrder.open ---
 export interface VendorOrderOpenClientInput {
@@ -137955,6 +139088,20 @@ export const VendorOrderOpenInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -138162,6 +139309,20 @@ export const VendorOrderRequestChangesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -138350,6 +139511,20 @@ export const VendorOrderRetireEmptyDraftInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -138568,6 +139743,20 @@ export const VendorOrderSubmitInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -138761,6 +139950,20 @@ export const VendorOrderSubmitForApprovalInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -138950,6 +140153,20 @@ export const VendorOrderSyncLineTotalsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "Vendor",
     "queryKeyHint": "queryKeys.vendor.lists()",
     "readId": "Vendor.list",
@@ -139129,6 +140346,20 @@ export const VendorOrderUpdateTotalsInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -139340,6 +140571,20 @@ export const VendorOrderLineAddLineInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -139674,6 +140919,20 @@ export const VendorOrderLineCancelLineInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StorageLocation",
     "queryKeyHint": "queryKeys.storageLocation.lists()",
     "readId": "StorageLocation.list",
@@ -139882,6 +141141,20 @@ export const VendorOrderLineCommitSupplyInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StorageLocation",
     "queryKeyHint": "queryKeys.storageLocation.lists()",
     "readId": "StorageLocation.list",
@@ -139934,6 +141207,211 @@ export const VendorOrderLineCommitSupplyAction = {
       "name": "purchasingWeekStart",
       "label": "Purchasing week start",
       "required": false
+    }
+  ]
+} as const;
+
+// --- VendorOrderLine.correctReceipt ---
+export interface VendorOrderLineCorrectReceiptClientInput {
+  /** Bounds: 0..∞ */
+  correctedQuantity: number;
+  reason: string;
+  supplierLotNumber: string;
+}
+
+export const VendorOrderLineCorrectReceiptCapability = {
+  capabilityId: "VendorOrderLine.correctReceipt",
+  entity: "VendorOrderLine",
+  command: "correctReceipt",
+  route: "/api/manifest/VendorOrderLine/commands/correctReceipt",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: \"pending\" | \"added\" | \"receiving\" | \"complete\" | \"cancelled\"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["correctedQuantity","reason","supplierLotNumber"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Procurement and managers may see vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may update vendor order lines"},{"kind":"policy_denial","message":"Procurement and managers may change vendor order lines"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"guard_failure","message":"Guard 5 failed"},{"kind":"constraint_block","message":"The corrected count can't be negative. Use zero or more."},{"kind":"constraint_block","message":"The corrected count can't be higher than what was ordered."},{"kind":"constraint_block","message":"Enter a count that's different from the current received count."},{"kind":"constraint_block","message":"Say why this count changed."},{"kind":"constraint_block","message":"Supplier lot number is required so this delivery can be traced."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VendorOrderLine not found"}],
+  emits: ["VendorOrderLineReceiptCorrected"],
+} as const;
+
+export type VendorOrderLineCorrectReceiptResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderId: string; ingredientId: string; ingredientDemandId: string | null; locationId: string | null; orderedQuantity: number; plannedQuantity: number | null; quantityIsManual: boolean | null; quantityReviewReason: string | null; receivedQuantity: number; supplyWeekStart: number | null; pendingSupplyQuantity: number | null; stockAppliedQuantity: number | null; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; unitCost: number; lineTotalAmount: number | null; discrepancyQuantity: number | null; discrepancyNotes: string | null; status: "pending" | "added" | "receiving" | "complete" | "cancelled"; addedAt: number | null; completedAt: number | null; cancelledAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VendorOrderLine.correctReceipt.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineCorrectReceiptInput(client: VendorOrderLineCorrectReceiptClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLine.correctReceipt. */
+export const VendorOrderLineCorrectReceiptInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "readId": "VendorOrderLine.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "readId": "VendorOrderLine.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "readId": "Ingredient.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "readId": "Ingredient.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+    "readId": "IngredientDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+    "readId": "IngredientDemand.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.lists()",
+    "readId": "IngredientPriceObservation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientPriceObservation",
+    "queryKeyHint": "queryKeys.ingredientPriceObservation.detail(id)",
+    "readId": "IngredientPriceObservation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.lists()",
+    "readId": "InventoryLot.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "InventoryLot",
+    "queryKeyHint": "queryKeys.inventoryLot.detail(id)",
+    "readId": "InventoryLot.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "readId": "PurchaseNeed.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.lists()",
+    "readId": "StorageLocation.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StorageLocation",
+    "queryKeyHint": "queryKeys.storageLocation.detail(id)",
+    "readId": "StorageLocation.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "readId": "VendorOrder.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "readId": "VendorOrder.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "readId": "VendorOrderLineDemand.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "readId": "VendorOrderLineDemand.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VendorOrderLine.correctReceipt. Not a rendered control. */
+export const VendorOrderLineCorrectReceiptAction = {
+  "exposure": "human",
+  "label": "Correct receipt",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "correctedQuantity",
+      "label": "Corrected quantity",
+      "required": true
+    },
+    {
+      "name": "reason",
+      "label": "Reason",
+      "required": true
+    },
+    {
+      "name": "supplierLotNumber",
+      "label": "Supplier lot number",
+      "required": true
     }
   ]
 } as const;
@@ -140069,6 +141547,20 @@ export const VendorOrderLineEnsureWeeklyLineInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -140416,6 +141908,20 @@ export const VendorOrderLineReconcileDraftRequirementInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StorageLocation",
     "queryKeyHint": "queryKeys.storageLocation.lists()",
     "readId": "StorageLocation.list",
@@ -140613,6 +142119,20 @@ export const VendorOrderLineRecordReceiptInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -140818,6 +142338,20 @@ export const VendorOrderLineReleaseSupplyInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "StorageLocation",
     "queryKeyHint": "queryKeys.storageLocation.lists()",
     "readId": "StorageLocation.list",
@@ -140984,6 +142518,20 @@ export const VendorOrderLineRetireEmptyDraftInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -141189,6 +142737,20 @@ export const VendorOrderLineReviseQuantityInvalidation = [
     "entity": "PurchaseNeed",
     "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
     "readId": "PurchaseNeed.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.lists()",
+    "readId": "ReceiptCorrection.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ReceiptCorrection",
+    "queryKeyHint": "queryKeys.receiptCorrection.detail(id)",
+    "readId": "ReceiptCorrection.get",
     "label": "related entity detail"
   },
   {
@@ -146912,6 +148474,7 @@ export const ALL_CAPABILITY_IDS = [
   "Interview.recordOutcome",
   "Interview.schedule",
   "InventoryItem.adjustQuantity",
+  "InventoryItem.applyReceiptCorrection",
   "InventoryItem.open",
   "InventoryItem.receiveDelivery",
   "InventoryItem.receiveStock",
@@ -147135,6 +148698,7 @@ export const ALL_CAPABILITY_IDS = [
   "QuoteSubmission.fail",
   "QuoteSubmission.retry",
   "QuoteSubmission.startProcessing",
+  "ReceiptCorrection.record",
   "RecurringAvailability.declare",
   "RecurringAvailability.withdraw",
   "ReferralSource.activate",
@@ -147269,6 +148833,7 @@ export const ALL_CAPABILITY_IDS = [
   "VendorOrder.ensureWeeklyDraft",
   "VendorOrder.markPartiallyReceived",
   "VendorOrder.markReceived",
+  "VendorOrder.noteReceiptCorrection",
   "VendorOrder.open",
   "VendorOrder.requestChanges",
   "VendorOrder.retireEmptyDraft",
@@ -147279,6 +148844,7 @@ export const ALL_CAPABILITY_IDS = [
   "VendorOrderLine.addLine",
   "VendorOrderLine.cancelLine",
   "VendorOrderLine.commitSupply",
+  "VendorOrderLine.correctReceipt",
   "VendorOrderLine.ensureWeeklyLine",
   "VendorOrderLine.reconcileDraftRequirement",
   "VendorOrderLine.recordReceipt",
@@ -147919,6 +149485,14 @@ export const ALL_READ_IDS = [
   "QuoteSubmission.byTenantId",
   "QuoteSubmission.get",
   "QuoteSubmission.list",
+  "ReceiptCorrection.byIngredientId",
+  "ReceiptCorrection.byLocationId",
+  "ReceiptCorrection.bySupplierLotNumber",
+  "ReceiptCorrection.byTenantId",
+  "ReceiptCorrection.byVendorOrderId",
+  "ReceiptCorrection.byVendorOrderLineId",
+  "ReceiptCorrection.get",
+  "ReceiptCorrection.list",
   "RecurringAvailability.byPersonId",
   "RecurringAvailability.byTenantId",
   "RecurringAvailability.get",
@@ -149940,6 +151514,30 @@ export type getQuoteSubmissionResult = { _id: string; _creationTime: number; ten
 
 export const listQuoteSubmissionRead = {"entity":"QuoteSubmission","readId":"QuoteSubmission.list","exportName":"listQuoteSubmission","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: \"pending\" | \"processing\" | \"completed\" | \"failed\" | \"dismissed\"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; notes: string | null; consentGrantedAt: number; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listQuoteSubmissionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; dedupKey: string; status: "pending" | "processing" | "completed" | "failed" | "dismissed"; submittedAt: number; clientName: string; email: string; phone: string | null; eventDate: number; eventEndTime: number | null; guestCount: number; serviceStyleId: string | null; occasionId: string | null; serviceStyleText: string | null; occasionText: string | null; venueName: string | null; venueAddress: string | null; menuPreferences: string | null; dietaryRestrictions: string | null; notes: string | null; consentGrantedAt: number; clientId: string | null; leadId: string | null; eventId: string | null; proposalId: string | null; completedAt: number | null; errorMessage: string | null; processingErrors: string | null; createdAt: number; updatedAt: number }>;
+
+export const listReceiptCorrectionByIngredientIdRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.byIngredientId","exportName":"listReceiptCorrectionByIngredientId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ingredientId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listReceiptCorrectionByIngredientIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listReceiptCorrectionByLocationIdRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.byLocationId","exportName":"listReceiptCorrectionByLocationId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"locationId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listReceiptCorrectionByLocationIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listReceiptCorrectionBySupplierLotNumberRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.bySupplierLotNumber","exportName":"listReceiptCorrectionBySupplierLotNumber","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"supplierLotNumber","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listReceiptCorrectionBySupplierLotNumberResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listReceiptCorrectionByTenantIdRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.byTenantId","exportName":"listReceiptCorrectionByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listReceiptCorrectionByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listReceiptCorrectionByVendorOrderIdRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.byVendorOrderId","exportName":"listReceiptCorrectionByVendorOrderId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorOrderId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listReceiptCorrectionByVendorOrderIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listReceiptCorrectionByVendorOrderLineIdRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.byVendorOrderLineId","exportName":"listReceiptCorrectionByVendorOrderLineId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"vendorOrderLineId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listReceiptCorrectionByVendorOrderLineIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getReceiptCorrectionRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.get","exportName":"getReceiptCorrection","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getReceiptCorrectionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listReceiptCorrectionRead = {"entity":"ReceiptCorrection","readId":"ReceiptCorrection.list","exportName":"listReceiptCorrection","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listReceiptCorrectionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; vendorOrderLineId: string; vendorOrderId: string; vendorId: string; ingredientId: string; locationId: string; supplierLotNumber: string; priorReceivedQuantity: number; correctedReceivedQuantity: number; delta: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: string; recordedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listRecurringAvailabilityByPersonIdRead = {"entity":"RecurringAvailability","readId":"RecurringAvailability.byPersonId","exportName":"listRecurringAvailabilityByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; dayOfWeek: number; startMinute: number; endMinute: number; notes: string | null; status: \"active\" | \"withdrawn\"; declaredAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listRecurringAvailabilityByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; dayOfWeek: number; startMinute: number; endMinute: number; notes: string | null; status: "active" | "withdrawn"; declaredAt: number | null; withdrawnAt: number | null; createdAt: number; updatedAt: number }>;

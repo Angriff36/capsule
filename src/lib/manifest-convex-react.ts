@@ -330,6 +330,7 @@ import {
   InterviewRecordOutcomeParamsSchema,
   InterviewScheduleParamsSchema,
   InventoryItemAdjustQuantityParamsSchema,
+  InventoryItemApplyReceiptCorrectionParamsSchema,
   InventoryItemOpenParamsSchema,
   InventoryItemReceiveDeliveryParamsSchema,
   InventoryItemReceiveStockParamsSchema,
@@ -553,6 +554,7 @@ import {
   QuoteSubmissionFailParamsSchema,
   QuoteSubmissionRetryParamsSchema,
   QuoteSubmissionStartProcessingParamsSchema,
+  ReceiptCorrectionRecordParamsSchema,
   RecurringAvailabilityDeclareParamsSchema,
   RecurringAvailabilityWithdrawParamsSchema,
   ReferralSourceActivateParamsSchema,
@@ -684,6 +686,7 @@ import {
   VendorOrderLineAddLineParamsSchema,
   VendorOrderLineCancelLineParamsSchema,
   VendorOrderLineCommitSupplyParamsSchema,
+  VendorOrderLineCorrectReceiptParamsSchema,
   VendorOrderLineDemandLinkParamsSchema,
   VendorOrderLineDemandRetireParamsSchema,
   VendorOrderLineDemandReviseParamsSchema,
@@ -695,6 +698,7 @@ import {
   VendorOrderLineReviseQuantityParamsSchema,
   VendorOrderMarkPartiallyReceivedParamsSchema,
   VendorOrderMarkReceivedParamsSchema,
+  VendorOrderNoteReceiptCorrectionParamsSchema,
   VendorOrderOpenParamsSchema,
   VendorOrderRequestChangesParamsSchema,
   VendorOrderRetireEmptyDraftParamsSchema,
@@ -5354,6 +5358,16 @@ export function useInventoryItemAdjustQuantity() {
   };
 }
 
+/** Mutation hook for InventoryItem.applyReceiptCorrection. */
+export function useInventoryItemApplyReceiptCorrection() {
+  const mutate = useMutation(api.mutations.InventoryItem_applyReceiptCorrection);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InventoryItemApplyReceiptCorrectionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for InventoryItem.open. */
 export function useInventoryItemOpen() {
   const mutate = useMutation(api.mutations.InventoryItem_open);
@@ -8401,6 +8415,37 @@ export function useQuoteSubmissionStartProcessing() {
   };
 }
 
+/** Reactive list for ReceiptCorrection. */
+export function useListReceiptCorrection() {
+  return useQuery(api.queries.listReceiptCorrection);
+}
+
+/** Reactive get-by-id for ReceiptCorrection. Pass "skip" to suspend. */
+export function useGetReceiptCorrection(id: string | "skip") {
+  return useQuery(api.queries.getReceiptCorrection, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ReceiptCorrection.record. */
+export function useReceiptCorrectionRecord() {
+  const mutate = useMutation(api.mutations.ReceiptCorrection_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ReceiptCorrectionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ReceiptCorrection.record. */
+export function useCreateReceiptCorrection() {
+  const mutate = useMutation(api.mutations.ReceiptCorrection_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ReceiptCorrectionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for RecurringAvailability. */
 export function useListRecurringAvailability() {
   return useQuery(api.queries.listRecurringAvailability);
@@ -10474,6 +10519,16 @@ export function useVendorOrderMarkReceived() {
   };
 }
 
+/** Mutation hook for VendorOrder.noteReceiptCorrection. */
+export function useVendorOrderNoteReceiptCorrection() {
+  const mutate = useMutation(api.mutations.VendorOrder_noteReceiptCorrection);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderNoteReceiptCorrectionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for VendorOrder.open. */
 export function useVendorOrderOpen() {
   const mutate = useMutation(api.mutations.VendorOrder_open);
@@ -10591,6 +10646,16 @@ export function useVendorOrderLineCommitSupply() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = VendorOrderLineCommitSupplyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorOrderLine.correctReceipt. */
+export function useVendorOrderLineCorrectReceipt() {
+  const mutate = useMutation(api.mutations.VendorOrderLine_correctReceipt);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineCorrectReceiptParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11226,4 +11291,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1194 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1201 as const;
