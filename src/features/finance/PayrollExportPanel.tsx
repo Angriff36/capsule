@@ -96,7 +96,7 @@ export function PayrollExportPanel({
         </button>
       </div>
       <p className="text-base text-ink-2">
-        Completed time records supply clocked hours. A finalized payroll input
+        Completed time entries supply clocked hours. A finalized payroll input
         becomes the reviewed total for that person and period; its difference
         from clocked time is shown as the manual adjustment.
       </p>
@@ -181,7 +181,7 @@ function PayrollExportPreview({
           <p className="eyebrow">Export preview</p>
           <h2>{formatCountNoun(document.rows.length, "employee")}</h2>
         </div>
-        <span>{`${formatCountNoun(document.timeRecordCount, "time record")} · ${formatCountNoun(document.payrollInputCount, "finalized input")}`}</span>
+        <span>{`${formatCountNoun(document.timeRecordCount, "time entry", "time entries")} · ${formatCountNoun(document.payrollInputCount, "finalized input")}`}</span>
       </div>
       {missingNumberNames.length > 0 ? (
         <p className="mb-3 text-sm text-warn" role="status">
@@ -192,7 +192,7 @@ function PayrollExportPreview({
         <div className="document-empty">
           <p>No payroll-ready data in this period.</p>
           <span>
-            Close time records or finalize payroll inputs, then refresh this pay
+            Close time entries or finalize payroll inputs, then refresh this pay
             period.
           </span>
         </div>

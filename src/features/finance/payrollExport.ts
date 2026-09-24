@@ -327,7 +327,7 @@ export function buildPayrollExport({
       const overtimeMinutes = hasReviewedInput ? entry.inputOvertimeMinutes : 0;
       const manualAdjustmentMinutes =
         regularMinutes + overtimeMinutes - entry.recordedMinutes;
-      const sourceSummary = `${entry.timeRecordCount} completed time record${entry.timeRecordCount === 1 ? "" : "s"}; ${entry.payrollInputCount} finalized payroll input${entry.payrollInputCount === 1 ? "" : "s"}`;
+      const sourceSummary = `${entry.timeRecordCount} completed time ${entry.timeRecordCount === 1 ? "entry" : "entries"}; ${entry.payrollInputCount} finalized payroll input${entry.payrollInputCount === 1 ? "" : "s"}`;
       const memo = [sourceSummary, ...entry.notes].join(" | ");
       return {
         personId: entry.personId,

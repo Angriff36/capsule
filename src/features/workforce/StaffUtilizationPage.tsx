@@ -330,7 +330,7 @@ export function StaffUtilizationDashboard({
               <span>Total hours</span>
               <strong>{formatHours(report.totalHours)}</strong>
               <small>
-                {report.confirmedRecordCount} confirmed time records
+                {report.confirmedRecordCount} confirmed time entries
               </small>
             </div>
             <div
@@ -500,7 +500,7 @@ export function StaffUtilizationDashboard({
       <aside className="staff-utilization-method">
         <span className="eyebrow">Method</span>
         <p>
-          Confirmed hours use closed or corrected time records wholly inside the
+          Confirmed hours use closed or corrected time entries wholly inside the
           selected dates, less recorded breaks. Event-linked time is billable; a
           linked shift can supply the event. Scheduled demand uses scheduled,
           started, and completed shifts, clips them to the period, and excludes
