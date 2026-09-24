@@ -2878,6 +2878,29 @@ export const QuoteSubmissionSchema = z.object({
 
 export type QuoteSubmission = z.infer<typeof QuoteSubmissionSchema>;
 
+// Entity: ReceiptCorrection
+export const ReceiptCorrectionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  vendorOrderLineId: z.string().uuid(),
+  vendorOrderId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  locationId: z.string().uuid(),
+  supplierLotNumber: z.string().default(""),
+  priorReceivedQuantity: z.number().default(0),
+  correctedReceivedQuantity: z.number().default(0),
+  delta: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]).default("each"),
+  reason: z.string().default(""),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ReceiptCorrection = z.infer<typeof ReceiptCorrectionSchema>;
+
 // Entity: RecurringAvailability
 export const RecurringAvailabilitySchema = z.object({
   id: z.string().uuid(),
@@ -6899,6 +6922,17 @@ export const InventoryItemAdjustQuantityParamsSchema = z.object({
 
 export type InventoryItemAdjustQuantityParams = z.infer<typeof InventoryItemAdjustQuantityParamsSchema>;
 
+// Command: applyReceiptCorrection on InventoryItem
+export const InventoryItemApplyReceiptCorrectionParamsSchema = z.object({
+  ingredientId: z.string().min(1),
+  locationId: z.string().min(1),
+  delta: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  reason: z.string(),
+});
+
+export type InventoryItemApplyReceiptCorrectionParams = z.infer<typeof InventoryItemApplyReceiptCorrectionParamsSchema>;
+
 // Command: open on InventoryItem
 export const InventoryItemOpenParamsSchema = z.object({
   ingredientId: z.string().min(1),
@@ -8739,6 +8773,23 @@ export const QuoteSubmissionStartProcessingParamsSchema = z.object({});
 
 export type QuoteSubmissionStartProcessingParams = z.infer<typeof QuoteSubmissionStartProcessingParamsSchema>;
 
+// Command: record on ReceiptCorrection
+export const ReceiptCorrectionRecordParamsSchema = z.object({
+  vendorOrderLineId: z.string().min(1),
+  vendorOrderId: z.string().min(1),
+  vendorId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  locationId: z.string().min(1),
+  supplierLotNumber: z.string(),
+  priorReceivedQuantity: z.number(),
+  correctedReceivedQuantity: z.number(),
+  delta: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
+  reason: z.string(),
+});
+
+export type ReceiptCorrectionRecordParams = z.infer<typeof ReceiptCorrectionRecordParamsSchema>;
+
 // Command: declare on RecurringAvailability
 export const RecurringAvailabilityDeclareParamsSchema = z.object({
   personId: z.string().min(1),
@@ -9869,6 +9920,13 @@ export const VendorOrderMarkReceivedParamsSchema = z.object({});
 
 export type VendorOrderMarkReceivedParams = z.infer<typeof VendorOrderMarkReceivedParamsSchema>;
 
+// Command: noteReceiptCorrection on VendorOrder
+export const VendorOrderNoteReceiptCorrectionParamsSchema = z.object({
+  lineStillShort: z.boolean(),
+});
+
+export type VendorOrderNoteReceiptCorrectionParams = z.infer<typeof VendorOrderNoteReceiptCorrectionParamsSchema>;
+
 // Command: open on VendorOrder
 export const VendorOrderOpenParamsSchema = z.object({
   vendorId: z.string().min(1),
@@ -9945,6 +10003,15 @@ export const VendorOrderLineCommitSupplyParamsSchema = z.object({
 });
 
 export type VendorOrderLineCommitSupplyParams = z.infer<typeof VendorOrderLineCommitSupplyParamsSchema>;
+
+// Command: correctReceipt on VendorOrderLine
+export const VendorOrderLineCorrectReceiptParamsSchema = z.object({
+  correctedQuantity: z.number(),
+  reason: z.string(),
+  supplierLotNumber: z.string(),
+});
+
+export type VendorOrderLineCorrectReceiptParams = z.infer<typeof VendorOrderLineCorrectReceiptParamsSchema>;
 
 // Command: ensureWeeklyLine on VendorOrderLine
 export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({

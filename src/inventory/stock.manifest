@@ -175,6 +175,38 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Same unit conversion as a delivery. A zero delta is a replay and does not move stock.
+  command applyReceiptCorrection(ingredientId: uuid, locationId: uuid, delta: decimal(12, 4), unit: UnitOfMeasure, reason: string) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    constraint correctionIngredientMatch: ingredientId == self.ingredientId "Receipt ingredient must match stock"
+    constraint correctionLocationMatch: locationId == self.locationId "Receipt location must match stock"
+    constraint correctionReasonRequired: length(trim(reason)) > 0 "Say why this count changed."
+    compute stockUnit = self.unit
+    compute sourceMass = unit == "gram" ? 1 : unit == "kilogram" ? 1000 : unit == "ounce" ? 28.349523125 : unit == "pound" ? 453.59237 : 0
+    compute sourceVolume = unit == "milliliter" ? 1 : unit == "liter" ? 1000 : unit == "teaspoon" ? 4.92892159375 : unit == "tablespoon" ? 14.78676478125 : unit == "cup" ? 236.5882365 : unit == "pint" ? 473.176473 : unit == "quart" ? 946.352946 : unit == "gallon" ? 3785.411784 : 0
+    compute targetMass = stockUnit == "gram" ? 1 : stockUnit == "kilogram" ? 1000 : stockUnit == "ounce" ? 28.349523125 : stockUnit == "pound" ? 453.59237 : 0
+    compute targetVolume = stockUnit == "milliliter" ? 1 : stockUnit == "liter" ? 1000 : stockUnit == "teaspoon" ? 4.92892159375 : stockUnit == "tablespoon" ? 14.78676478125 : stockUnit == "cup" ? 236.5882365 : stockUnit == "pint" ? 473.176473 : stockUnit == "quart" ? 946.352946 : stockUnit == "gallon" ? 3785.411784 : 0
+    constraint correctionUnitCompatible: unit == self.unit or ((unit == "gram" or unit == "kilogram" or unit == "ounce" or unit == "pound") and (self.unit == "gram" or self.unit == "kilogram" or self.unit == "ounce" or self.unit == "pound")) or ((unit == "milliliter" or unit == "liter" or unit == "teaspoon" or unit == "tablespoon" or unit == "cup" or unit == "pint" or unit == "quart" or unit == "gallon") and (self.unit == "milliliter" or self.unit == "liter" or self.unit == "teaspoon" or self.unit == "tablespoon" or self.unit == "cup" or self.unit == "pint" or self.unit == "quart" or self.unit == "gallon")) "Receipt unit needs a measured conversion to the stock unit"
+    compute unitRatio = unit == stockUnit ? 1 : (targetMass > 0 ? sourceMass / targetMass : sourceVolume / targetVolume)
+    compute converted = delta * unitRatio
+    constraint correctionResultNonnegative: self.quantityOnHand + delta >= 0 "Quantity on hand cannot be negative"
+    compute previousQuantity = self.quantityOnHand
+    mutate quantityOnHand = self.quantityOnHand + converted
+    emit InventoryQuantityAdjusted {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      previousQuantity: previousQuantity
+      quantityOnHand: self.quantityOnHand
+      delta: converted
+      unit: self.unit
+      reason: reason
+    }
+  }
+
   command recount(actualQuantity: decimal(12, 4)) {
     guard self.stockedAt != null
     guard self.deletedAt == null
