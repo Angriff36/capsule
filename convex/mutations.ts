@@ -40393,7 +40393,7 @@ async function __runQualificationGrant(ctx: MutationCtx, { docId, personId, name
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 4 failed");
-    if (!((personId === doc.personId))) throw new Error("Grant personId must match the seeded person reference");
+    if (!((personId === doc.personId))) throw new Error("This qualification is for a different person. Pick the person already on this qualification.");
     if (!((((name).trim()).length > 0))) throw new Error("Qualification name is required");
     if (!((((certificationType).trim()).length > 0))) throw new Error("Certification type is required");
     if (!((((issuingBody).trim()).length > 0))) throw new Error("Issuing body is required");
@@ -40493,7 +40493,7 @@ export const Qualification_createViaGrant = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!(checkRole(user, "workforceManageAccess"))) throw new Error("Guard 4 failed");
-    if (!((personId === __draft.personId))) throw new Error("Grant personId must match the seeded person reference");
+    if (!((personId === __draft.personId))) throw new Error("This qualification is for a different person. Pick the person already on this qualification.");
     if (!((((name).trim()).length > 0))) throw new Error("Qualification name is required");
     if (!((((certificationType).trim()).length > 0))) throw new Error("Certification type is required");
     if (!((((issuingBody).trim()).length > 0))) throw new Error("Issuing body is required");

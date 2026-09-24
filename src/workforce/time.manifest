@@ -201,7 +201,7 @@ entity Qualification mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.person != null and self.person.status == "active"
     guard roleAllows(user.role, "workforceManageAccess")
-    constraint grantPersonMatch: personId == self.personId "Grant personId must match the seeded person reference"
+    constraint grantPersonMatch: personId == self.personId "This qualification is for a different person. Pick the person already on this qualification."
     constraint grantNamePresent: length(trim(name)) > 0 "Qualification name is required"
     constraint grantTypePresent: length(trim(certificationType)) > 0 "Certification type is required"
     constraint grantIssuingBodyPresent: length(trim(issuingBody)) > 0 "Issuing body is required"

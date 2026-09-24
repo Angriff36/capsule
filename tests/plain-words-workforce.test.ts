@@ -256,9 +256,54 @@ describe("plain words on workforce manifests", () => {
     );
 
     // later leftovers, unchanged
+    expect(visible).toContain("Break minutes must be non-negative");
     expect(visible).toContain(
+      "Corrected clock-out must be at or after clock-in",
+    );
+  });
+
+  it("keeps leftover workforce grant person match copy free of personId jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync("src/workforce/time.manifest", "utf8").replace(
+      /(^|[^:])\/\/[^\n]*/g,
+      "$1 ",
+    );
+
+    expect(visible).not.toContain(
       "Grant personId must match the seeded person reference",
     );
+
+    expect(visible).toContain(
+      "This qualification is for a different person. Pick the person already on this qualification.",
+    );
+    expectPlain(
+      "This qualification is for a different person. Pick the person already on this qualification.",
+    );
+
+    // already-landed leftovers must stay put
+    expect(visible).toContain(
+      "This clock-in is for a different person. Pick the person already on this time entry.",
+    );
+    expect(visible).toContain(
+      "This clock-in is for a different shift. Leave the shift blank or pick the one already on this time entry.",
+    );
+    expect(visible).toContain(
+      "This clock-in is for a different event. Leave the event blank or pick the one already on this time entry.",
+    );
+    expect(visible).toContain(
+      "Closed or corrected time entries require clock-out at or after clock-in",
+    );
+    expect(visible).toContain(
+      "Workforce staff or the linked person may see time entries",
+    );
+    expect(visible).toContain(
+      "Workforce staff or the linked person may update time entries",
+    );
+    expect(visible).toContain(
+      "Workforce staff or the linked person may change time entries",
+    );
+
+    // later leftovers, unchanged
     expect(visible).toContain("Break minutes must be non-negative");
     expect(visible).toContain(
       "Corrected clock-out must be at or after clock-in",
