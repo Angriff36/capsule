@@ -34,6 +34,6 @@ describe("plain words on leftover culinary dish task name copy", () => {
     );
     expect(visible).toContain("This subrecipe's yield must be more than zero.");
     // Later leftovers on this file are pinned: they must not change with this one.
-    expect(visible).toContain("Dish task quantity must be positive");
+    expect(visible).toContain("Dish task sort order cannot be negative");
   });
 });
