@@ -67,9 +67,9 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
     guard user.id != null
     guard personId == user.personId or (user.personId == null and personId == user.id) or roleAllows(user.role, "workforceManageAccess")
     guard self.person != null and self.person.status == "active"
-    constraint clockInPersonMatch: personId == self.personId "Clock-in personId must match the seeded person reference"
-    constraint clockInShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Clock-in shiftId must match the seeded shift reference when provided"
-    constraint clockInEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Clock-in eventId must match the seeded event reference when provided"
+    constraint clockInPersonMatch: personId == self.personId "This clock-in is for a different person. Pick the person already on this time entry."
+    constraint clockInShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "This clock-in is for a different shift. Leave the shift blank or pick the one already on this time entry."
+    constraint clockInEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This clock-in is for a different event. Leave the event blank or pick the one already on this time entry."
     mutate personId = personId
     mutate shiftId = shiftId != null ? shiftId : self.shiftId
     mutate eventId = eventId != null ? eventId : self.eventId

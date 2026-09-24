@@ -48344,9 +48344,9 @@ async function __runTimeRecordClockIn(ctx: MutationCtx, { docId, personId, shift
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 5 failed");
-    if (!((personId === doc.personId))) throw new Error("Clock-in personId must match the seeded person reference");
-    if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("Clock-in shiftId must match the seeded shift reference when provided");
-    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Clock-in eventId must match the seeded event reference when provided");
+    if (!((personId === doc.personId))) throw new Error("This clock-in is for a different person. Pick the person already on this time entry.");
+    if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("This clock-in is for a different shift. Leave the shift blank or pick the one already on this time entry.");
+    if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("This clock-in is for a different event. Leave the event blank or pick the one already on this time entry.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -48428,9 +48428,9 @@ export const TimeRecord_createViaClockIn = mutation({
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!((((personId === user.personId) || ((user.personId == null) && (personId === user.id))) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 4 failed");
     if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 5 failed");
-    if (!((personId === __draft.personId))) throw new Error("Clock-in personId must match the seeded person reference");
-    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Clock-in shiftId must match the seeded shift reference when provided");
-    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Clock-in eventId must match the seeded event reference when provided");
+    if (!((personId === __draft.personId))) throw new Error("This clock-in is for a different person. Pick the person already on this time entry.");
+    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("This clock-in is for a different shift. Leave the shift blank or pick the one already on this time entry.");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("This clock-in is for a different event. Leave the event blank or pick the one already on this time entry.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
