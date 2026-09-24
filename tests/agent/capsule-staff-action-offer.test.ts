@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { CapsuleCommandCatalog } from "../../src/agent/CapsuleCommandCatalog";
 import {
-  CapsuleStaffActionOffer,
+  announcementStaffActions,
   staffActionNeedsConfirm,
 } from "../../src/agent/CapsuleStaffActionOffer";
 
 describe("staff action offers from generated presentation", () => {
-  const offers = new CapsuleStaffActionOffer();
+  const offers = announcementStaffActions();
 
   it("offers the human post action with its generated label and fields", () => {
     const post = offers.forPerson("Announcement.post");
@@ -30,6 +31,9 @@ describe("staff action offers from generated presentation", () => {
     );
     expect(
       offers.stillCallableBySystem("IngredientDemand.syncFromContributions"),
+    ).toBe(true);
+    expect(
+      new CapsuleCommandCatalog().has("IngredientDemand.syncFromContributions"),
     ).toBe(true);
   });
 
