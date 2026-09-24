@@ -368,7 +368,11 @@ export async function handleManifestEvent(
     (event.type === "EventDishLineOverrideApplied" ||
       event.type === "EventDishLineOverrideRevoked")
   ) {
-    await lineOverridePurchasingFollowThrough.apply(ctx, event.payload.eventId);
+    await lineOverridePurchasingFollowThrough.apply(
+      ctx,
+      event.payload.eventId,
+      event.entityId,
+    );
     return;
   }
   if (

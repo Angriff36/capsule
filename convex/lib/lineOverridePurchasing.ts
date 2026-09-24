@@ -1,6 +1,7 @@
 import type { MutationCtx } from "../_generated/server";
 import { writeReconciledEventDemand } from "../culinaryDemand";
 import { getAuthContext, requireTenant } from "./authContext";
+import { standInPurchaseNeedOpener } from "./standInPurchaseNeed";
 import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
 /**
@@ -13,7 +14,11 @@ import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
  * role. The master recipe is not rewritten.
  */
 export class LineOverridePurchasingFollowThrough {
-  async apply(ctx: MutationCtx, eventIdRaw: unknown): Promise<void> {
+  async apply(
+    ctx: MutationCtx,
+    eventIdRaw: unknown,
+    overrideIdRaw: unknown,
+  ): Promise<void> {
     if (typeof eventIdRaw !== "string" || eventIdRaw.length === 0) return;
     const tenantId = requireTenant(await getAuthContext(ctx));
     const eventId = ctx.db.normalizeId("events", eventIdRaw);
@@ -24,6 +29,7 @@ export class LineOverridePurchasingFollowThrough {
     }
     const purchasing = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
     await writeReconciledEventDemand(purchasing, eventId);
+    await standInPurchaseNeedOpener.open(purchasing, eventId, overrideIdRaw);
   }
 }
 
