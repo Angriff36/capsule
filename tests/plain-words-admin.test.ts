@@ -151,4 +151,20 @@ describe("plain words on leftover admin manifests", () => {
 
     expectPlain("Recipes, dishes, menus, and prep work.");
   });
+
+  it("keeps leftover admin permissions copy free of domain and record jargon", () => {
+    const permissionsPage = readFileSync(
+      "src/features/admin/PermissionsPage.tsx",
+      "utf8",
+    );
+
+    expect(permissionsPage).not.toContain("that domain");
+    expect(permissionsPage).not.toContain("team record in app settings");
+    expect(permissionsPage).not.toContain("team record");
+    expect(permissionsPage).toContain("that area");
+    expect(permissionsPage).toContain("from this person's Team roles card");
+
+    expectPlain("that area");
+    expectPlain("from this person's Team roles card");
+  });
 });

@@ -99,7 +99,7 @@ export function PermissionsPage() {
       <TeamRolesPanel people={people} canEdit={canEdit} />
       <Section title="Organization access">
         <div className="border-b border-line px-4 py-3 text-sm leading-relaxed text-ink-3">
-          Off means nobody in this organization can use that domain (including
+          Off means nobody in this organization can use that area (including
           admins), until you turn it back on here. Administration stays in the
           nav so you can always reach this page.
         </div>
@@ -146,7 +146,7 @@ export function PermissionsPage() {
 
 function roleSourceHint(roleSource: string | undefined): string {
   if (roleSource === "person") {
-    return " (from team record in app settings).";
+    return " (from this person's Team roles card).";
   }
   if (roleSource === "idp") {
     return " (temporary sign-in fallback — hire and link this account under Team roles).";
