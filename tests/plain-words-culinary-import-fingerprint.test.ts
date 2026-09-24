@@ -39,7 +39,9 @@ describe("plain words on leftover culinary import constraint copy", () => {
       ).length - 1,
     ).toBe(2);
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Source line is required");
+    expect(visible).toContain(
+      "This line has no recipe text. Paste the original line from the recipe.",
+    );
     expect(visible).toContain("Source order cannot be negative");
     // Already-landed copy stays.
     expect(visible).toContain(

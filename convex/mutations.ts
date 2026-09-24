@@ -5500,7 +5500,7 @@ async function __runComponentImportLineStage(ctx: MutationCtx, { docId, importId
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_import != null))) throw new Error("Guard 2 failed");
     if (!((importId === doc.importId))) throw new Error("This line is for a different recipe import. Pick the recipe import already on this line.");
-    if (!((((sourceLine).trim()).length > 0))) throw new Error("Source line is required");
+    if (!((((sourceLine).trim()).length > 0))) throw new Error("This line has no recipe text. Paste the original line from the recipe.");
     if (!((sourceOrder >= 0))) throw new Error("Source order cannot be negative");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -5591,7 +5591,7 @@ export const ComponentImportLine_createViaStage = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_import != null))) throw new Error("Guard 2 failed");
     if (!((importId === __draft.importId))) throw new Error("This line is for a different recipe import. Pick the recipe import already on this line.");
-    if (!((((sourceLine).trim()).length > 0))) throw new Error("Source line is required");
+    if (!((((sourceLine).trim()).length > 0))) throw new Error("This line has no recipe text. Paste the original line from the recipe.");
     if (!((sourceOrder >= 0))) throw new Error("Source order cannot be negative");
     const doc: Record<string, any> = {
       ...__draft,
