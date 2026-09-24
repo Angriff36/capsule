@@ -2776,8 +2776,8 @@ const COMMAND_DISPATCH = {
   },
   "ReceiptCorrection.record": {
     ref: api.mutations.ReceiptCorrection_createViaRecord,
-    params: ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","locationId","supplierLotNumber","priorReceivedQuantity","correctedReceivedQuantity","delta","unit","reason","idempotencyKey"] as const,
-    paramMeta: [{"name":"vendorOrderLineId","type":"uuid","required":true},{"name":"vendorOrderId","type":"uuid","required":true},{"name":"vendorId","type":"uuid","required":true},{"name":"ingredientId","type":"uuid","required":true},{"name":"locationId","type":"uuid","required":true},{"name":"supplierLotNumber","type":"string","required":true},{"name":"priorReceivedQuantity","type":"decimal","required":true},{"name":"correctedReceivedQuantity","type":"decimal","required":true},{"name":"delta","type":"decimal","required":true},{"name":"unit","type":"UnitOfMeasure","required":true},{"name":"reason","type":"string","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["vendorOrderLineId","vendorOrderId","vendorId","ingredientId","locationId","supplierLotNumber","priorReceivedQuantity","correctedReceivedQuantity","delta","unit","reason","correctionSequence","idempotencyKey"] as const,
+    paramMeta: [{"name":"vendorOrderLineId","type":"uuid","required":true},{"name":"vendorOrderId","type":"uuid","required":true},{"name":"vendorId","type":"uuid","required":true},{"name":"ingredientId","type":"uuid","required":true},{"name":"locationId","type":"uuid","required":true},{"name":"supplierLotNumber","type":"string","required":true},{"name":"priorReceivedQuantity","type":"decimal","required":true},{"name":"correctedReceivedQuantity","type":"decimal","required":true},{"name":"delta","type":"decimal","required":true},{"name":"unit","type":"UnitOfMeasure","required":true},{"name":"reason","type":"string","required":true},{"name":"correctionSequence","type":"int","required":true},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "RecurringAvailability.declare": {
     ref: api.mutations.RecurringAvailability_createViaDeclare,
