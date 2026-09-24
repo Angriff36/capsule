@@ -319,4 +319,61 @@ describe("plain words on kitchen screens", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover dish subrecipe panel copy free of component jargon", () => {
+    const panel = readFileSync(
+      "src/features/kitchen/DishComponentsPanel.tsx",
+      "utf8",
+    );
+
+    for (const old of [
+      "Pick a component to attach.",
+      "Component attached.",
+      "Could not attach the component.",
+      "Detach component",
+      "Component detached.",
+      "Could not detach the component.",
+      "Component unavailable",
+      '"this component"',
+      '"Detach"',
+      ">Component</span>",
+      "Select a component…",
+      "the component&apos;s own",
+      "Attach component",
+      "Attaching…",
+    ]) {
+      expect(panel).not.toContain(old);
+    }
+
+    expect(panel).toContain("Pick a subrecipe to add.");
+    expect(panel).toContain("Subrecipe added.");
+    expect(panel).toContain("Could not add the subrecipe.");
+    expect(panel).toContain("Remove subrecipe");
+    expect(panel).toContain("Subrecipe removed.");
+    expect(panel).toContain("Could not remove the subrecipe.");
+    expect(panel).toContain("Recipe unavailable");
+    expect(panel).toContain('"this subrecipe"');
+    expect(panel).toContain('"Remove"');
+    expect(panel).toContain(">Subrecipe</span>");
+    expect(panel).toContain("Select a subrecipe…");
+    expect(panel).toContain("the subrecipe&apos;s own");
+    expect(panel).toContain("Add subrecipe");
+    expect(panel).toContain("Adding…");
+
+    // The fresh user-visible strings must themselves be plain catering English.
+    for (const fresh of [
+      "Pick a subrecipe to add.",
+      "Subrecipe added. Its ingredients now drive demand, purchasing, and food cost for every event using this dish.",
+      "Could not add the subrecipe.",
+      "Remove subrecipe",
+      "Subrecipe removed.",
+      "Could not remove the subrecipe.",
+      "Recipe unavailable",
+      "this subrecipe",
+      "Select a subrecipe…",
+      "Add subrecipe",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });
