@@ -86,4 +86,72 @@ describe("plain words on leftover procurement manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover procurement READ copy free of read jargon", () => {
+    const files = [
+      "src/procurement/purchase-need.manifest",
+      "src/procurement/order.manifest",
+      "src/procurement/event-purchasing.manifest",
+      "src/procurement/vendor.manifest",
+      "src/procurement/vendor-contract.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Inventory staff and managers may read purchase needs",
+      "Procurement and managers may read vendor orders",
+      "Procurement and managers may read vendor order lines",
+      "Inventory, procurement, and managers may read receipt lots",
+      "Kitchen, procurement, and managers may read confirmed ingredient prices",
+      "Procurement and managers may read order demand links",
+      "Procurement and managers may read weekly purchasing config",
+      "Inventory and managers may read event ingredient contributions",
+      "Procurement staff may read vendors",
+      "Procurement staff may read vendor contacts",
+      "Procurement staff may read vendor contracts",
+      "Procurement staff may read contract price tiers",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Inventory staff and managers may see purchase needs",
+      "Procurement and managers may see vendor orders",
+      "Procurement and managers may see vendor order lines",
+      "Inventory, procurement, and managers may see receipt lots",
+      "Kitchen, procurement, and managers may see confirmed ingredient prices",
+      "Procurement and managers may see order demand links",
+      "Procurement and managers may see weekly purchasing config",
+      "Inventory and managers may see event ingredient contributions",
+      "Procurement staff may see vendors",
+      "Procurement staff may see vendor contacts",
+      "Procurement staff may see vendor contracts",
+      "Procurement staff may see contract price tiers",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    for (const kept of [
+      "Inventory staff and managers may update purchase needs",
+      "Procurement and managers may update vendor orders",
+      "Procurement and managers may update vendor order lines",
+      "Procurement and managers may update receipt lots",
+      "Procurement and managers may update confirmed ingredient prices",
+      "Procurement and managers may update order demand links",
+      "Procurement and managers may update weekly purchasing config",
+      "Inventory and managers may update event ingredient contributions",
+      "Procurement staff may update vendors",
+      "Procurement staff may update vendor contacts",
+      "Procurement staff may update vendor contracts",
+      "Procurement staff may update contract price tiers",
+    ]) {
+      expect(visible).toContain(kept);
+    }
+  });
 });

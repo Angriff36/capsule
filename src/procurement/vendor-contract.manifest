@@ -47,7 +47,7 @@ entity VendorContract mixin TenantScoped, SoftDeletable {
   transition status from "expired" to []
   transition status from "terminated" to []
 
-  default policy vendorContractRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor contracts"
+  default policy vendorContractRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may see vendor contracts"
   default policy vendorContractWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may update vendor contracts"
   default policy vendorContractExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may change vendor contracts"
 
@@ -193,7 +193,7 @@ entity VendorContractPriceTier mixin TenantScoped, SoftDeletable {
   constraint tierMinQuantity: self.minQuantity >= 0 "Minimum quantity cannot be negative"
   constraint tierUnitPrice: self.unitPrice >= 0 "Unit price cannot be negative"
 
-  default policy vendorContractTierRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read contract price tiers"
+  default policy vendorContractTierRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may see contract price tiers"
   default policy vendorContractTierWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may update contract price tiers"
   default policy vendorContractTierExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may change contract price tiers"
 

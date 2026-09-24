@@ -53,7 +53,7 @@ entity Vendor mixin TenantScoped, SoftDeletable {
   transition status from "suspended" to ["active", "terminated"]
   transition status from "terminated" to []
 
-  default policy vendorRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendors"
+  default policy vendorRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may see vendors"
   default policy vendorWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may update vendors"
   default policy vendorExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may change vendors"
 
@@ -199,7 +199,7 @@ entity VendorContact mixin TenantScoped, SoftDeletable {
 
   belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
 
-  default policy vendorContactRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor contacts"
+  default policy vendorContactRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may see vendor contacts"
   default policy vendorContactWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may update vendor contacts"
   default policy vendorContactExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may change vendor contacts"
 

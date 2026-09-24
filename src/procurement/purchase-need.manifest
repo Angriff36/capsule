@@ -56,7 +56,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
 
   // manageAccess: Event.approve (event_manager) foreach-creates PurchaseNeed;
   // inventoryAccess: purchasing staff. Do not invent a specialty "approve-only" cap.
-  default policy purchaseNeedRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may read purchase needs"
+  default policy purchaseNeedRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may see purchase needs"
   default policy purchaseNeedWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may update purchase needs"
   default policy purchaseNeedExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may change purchase needs"
 
