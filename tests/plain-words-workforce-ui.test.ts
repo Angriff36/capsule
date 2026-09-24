@@ -65,4 +65,47 @@ describe("plain words on workforce UI", () => {
     expect(visible).toContain("<th>Recorded</th>");
     expect(visible).toContain("less recorded breaks");
   });
+
+  it("keeps leftover TimeSheet copy free of record jargon", () => {
+    const visible = readFileSync(
+      "src/features/workforce/TimeSheetPage.tsx",
+      "utf8",
+    );
+    // JSX reflows sentences across lines, so match on collapsed whitespace.
+    const flat = visible.replace(/\s+/g, " ");
+
+    for (const old of [
+      "Correct this time record",
+      "<h2>Time records</h2>",
+      'formatCountNoun( activeRecords.length, "record"',
+      'formatCountNoun(activeRecords.length, "record"',
+      "Enter both times to record a finished window",
+    ]) {
+      expect(flat).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Correct this time entry",
+      "<h2>Time entries</h2>",
+      'formatCountNoun( activeRecords.length, "time entry", "time entries", )',
+      "Enter both times to save a finished window",
+    ]) {
+      expect(flat).toContain(fresh);
+    }
+
+    for (const phrase of [
+      "Correct this time entry",
+      "Time entries",
+      "time entry",
+      "Enter both times to save a finished window",
+    ]) {
+      expectPlain(phrase);
+    }
+
+    // later leftovers, unchanged
+    expect(visible).toContain("No time has been recorded.");
+    expect(visible).toContain(
+      "Clock someone in to start their first time entry.",
+    );
+  });
 });

@@ -82,9 +82,9 @@ export function TimeSheetClockInForm({
         </button>
       </div>
       <p className="mt-2 max-w-160 text-ink-2">
-        Pick the event this time belongs to. Enter both times to record a
-        finished window (for example 5:00–10:00 PM). Leave clock-out empty to
-        stamp in now.
+        Pick the event this time belongs to. Enter both times to save a finished
+        window (for example 5:00–10:00 PM). Leave clock-out empty to stamp in
+        now.
       </p>
       <div className="supply-form-grid">
         <label className="field-label">
@@ -276,7 +276,7 @@ export function TimeSheetPage() {
       }
       if (key === "correct") {
         const values = await prompt.askFields({
-          title: "Correct this time record",
+          title: "Correct this time entry",
           description: "Set the right clock-in and clock-out times.",
           fields: [
             {
@@ -423,9 +423,15 @@ export function TimeSheetPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Attendance</p>
-            <h2>Time records</h2>
+            <h2>Time entries</h2>
           </div>
-          <span>{formatCountNoun(activeRecords.length, "record")}</span>
+          <span>
+            {formatCountNoun(
+              activeRecords.length,
+              "time entry",
+              "time entries",
+            )}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
