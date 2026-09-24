@@ -127,7 +127,7 @@ entity Client mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
 
-  default policy clientRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "financeAccess") "Sales and finance may read client accounts for CRM and billing"
+  default policy clientRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "financeAccess") "Sales and finance may see client accounts for CRM and billing"
   // Write policies gate command mutation (semantics.md § policy enforcement:
   // "enforced only at command execution"; no separate store-level write gate).
   // Staff tier here; manager-only commands carry explicit roleAllows guards.
@@ -384,7 +384,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
 
-  default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may read venues"
+  default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may see venues"
   default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may update venues"
   default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change venues"
 
@@ -819,7 +819,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   transition stage from "cancelled" to []
   transition stage from "closed_out" to []
 
-  default policy eventRead read: roleAllows(user.role, "staffAccess") "Staff may read shared event plans and operational context"
+  default policy eventRead read: roleAllows(user.role, "staffAccess") "Staff may see shared event plans and operational context"
   // Write policies gate command mutation (see Client note); staff tier here,
   // manager-only commands (approve/cancel/changePricing/...) carry guards.
   default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may update events"
@@ -1697,7 +1697,7 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   transition rsvpStatus from "confirmed" to ["confirmed", "declined"]
   transition rsvpStatus from "declined" to []
 
-  default policy eventGuestRead read: roleAllows(user.role, "eventAccess") "Event staff may read guest attendance"
+  default policy eventGuestRead read: roleAllows(user.role, "eventAccess") "Event staff may see guest attendance"
   default policy eventGuestWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the guest list"
   default policy eventGuestExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change the guest list"
 
@@ -1848,7 +1848,7 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
   constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
 
-  default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may read the shared event timeline"
+  default policy eventTimelineActivityRead read: roleAllows(user.role, "staffAccess") "Staff may see the shared event timeline"
   default policy eventTimelineActivityWrite write: roleAllows(user.role, "staffAccess") "Staff may add timeline work"
   default policy eventTimelineActivityExecute execute: roleAllows(user.role, "staffAccess") "Staff may change timeline work"
 
@@ -2035,7 +2035,7 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
 
   constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Timeline comment text is required"
 
-  default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may read timeline comments"
+  default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may see timeline comments"
   default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may add timeline comments"
   default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change timeline comments"
 
@@ -2101,7 +2101,7 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   constraint layoutSectionTypeComplete: self.addedAt == null or length(trim(self.type)) > 0 "Layout section type is required once added"
   constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Layout section sort order cannot be negative"
 
-  default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may read event layout sections"
+  default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may see event layout sections"
   default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the floor plan"
   default policy eventLayoutSectionExecute execute: roleAllows(user.role, "eventAccess") "Event staff may change the floor plan"
 

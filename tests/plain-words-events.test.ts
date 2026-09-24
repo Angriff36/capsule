@@ -419,4 +419,51 @@ describe("plain words on event screens", () => {
     expect(staffDenied.category).toBe("denied");
     expectPlain(`${staffDenied.title} ${staffDenied.detail}`);
   });
+
+  it("keeps leftover event.manifest READ copy free of read jargon", () => {
+    const manifest = readFileSync("src/operations/event.manifest", "utf8");
+    // strip // comments so developer notes are not treated as user copy
+    const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Sales and finance may read client accounts for CRM and billing",
+      "Event staff may read venues",
+      "Staff may read shared event plans and operational context",
+      "Event staff may read guest attendance",
+      "Staff may read the shared event timeline",
+      "Event staff may read timeline comments",
+      "Event staff may read event layout sections",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Sales and finance may see client accounts for CRM and billing",
+      "Event staff may see venues",
+      "Staff may see shared event plans and operational context",
+      "Event staff may see guest attendance",
+      "Staff may see the shared event timeline",
+      "Event staff may see timeline comments",
+      "Event staff may see event layout sections",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Sales staff may update client accounts");
+    expect(visible).toContain("Sales staff may change client accounts");
+    expect(visible).toContain("Event staff may update venues");
+    expect(visible).toContain("Event staff may change venues");
+    expect(visible).toContain("Event and sales staff may update events");
+    expect(visible).toContain("Event and sales staff may change events");
+    expect(visible).toContain("Event staff may update the guest list");
+    expect(visible).toContain("Event staff may change the guest list");
+    expect(visible).toContain("Staff may add timeline work");
+    expect(visible).toContain("Staff may change timeline work");
+    expect(visible).toContain("Event staff may add timeline comments");
+    expect(visible).toContain("Event staff may change timeline comments");
+    expect(visible).toContain("Event staff may update the floor plan");
+    expect(visible).toContain("Event staff may change the floor plan");
+  });
 });
