@@ -53,6 +53,47 @@ describe("plain words on leftover import manifests", () => {
     }
   });
 
+  it("keeps leftover import READ copy free of read jargon", () => {
+    const files = [
+      "src/import/import-run.manifest",
+      "src/import/import-artifact.manifest",
+      "src/import/external-record-link.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Staff may read import runs",
+      "Staff may read import artifacts",
+      "Staff may read external record links",
+      "Staff may read import conflicts",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Staff may see imports",
+      "Staff may see imported files",
+      "Staff may see import matches",
+      "Staff may see import conflicts",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    for (const landed of [
+      "Staff may update imports",
+      "Staff may update imported files",
+      "Staff may update import matches",
+      "Staff may update import conflicts",
+    ]) {
+      expect(visible).toContain(landed);
+    }
+  });
+
   it("keeps leftover import-screen copy free of import-run jargon", () => {
     const files = [
       "src/features/admin/import/ImportRunsListPage.tsx",

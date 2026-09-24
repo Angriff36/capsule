@@ -143,7 +143,7 @@ entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
   constraint linkResolvedRequiresUser: self.conflictStatus == "resolved" or self.resolvedByUserId == null "Resolved status requires a resolving user"
 
   // Policies
-  default policy externalRecordLinkRead read: roleAllows(user.role, "importAccess") "Staff may read external record links"
+  default policy externalRecordLinkRead read: roleAllows(user.role, "importAccess") "Staff may see import matches"
   default policy externalRecordLinkWrite write: roleAllows(user.role, "importAccess") "Staff may update import matches"
   default policy externalRecordLinkExecute execute: roleAllows(user.role, "importAccess") "Staff may change import matches"
 
@@ -540,7 +540,7 @@ entity ImportConflict mixin TenantScoped, SoftDeletable {
   transition status from "take_source" to ["pending"]
   transition status from "manual" to ["pending"]
 
-  default policy importConflictRead read: roleAllows(user.role, "importAccess") "Staff may read import conflicts"
+  default policy importConflictRead read: roleAllows(user.role, "importAccess") "Staff may see import conflicts"
   default policy importConflictWrite write: roleAllows(user.role, "importAccess") "Staff may update import conflicts"
   default policy importConflictExecute execute: roleAllows(user.role, "importAccess") "Staff may change import conflicts"
 

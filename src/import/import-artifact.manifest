@@ -62,7 +62,7 @@ entity ImportArtifact mixin TenantScoped, SoftDeletable {
   constraint artifactEntryCountNonNegative: self.entryCount >= 0 "Entry count must not be negative"
 
   // Policies
-  default policy importArtifactRead read: roleAllows(user.role, "importAccess") "Staff may read import artifacts"
+  default policy importArtifactRead read: roleAllows(user.role, "importAccess") "Staff may see imported files"
   default policy importArtifactWrite write: roleAllows(user.role, "importAccess") "Staff may update imported files"
   default policy importArtifactExecute execute: roleAllows(user.role, "importAccess") "Staff may change imported files"
 

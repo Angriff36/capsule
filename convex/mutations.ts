@@ -20250,7 +20250,7 @@ async function __runExternalRecordLinkDecide(ctx: MutationCtx, { docId, decision
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20301,7 +20301,7 @@ async function __runExternalRecordLinkDiscard(ctx: MutationCtx, { docId, reason,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20349,7 +20349,7 @@ async function __runExternalRecordLinkLink(ctx: MutationCtx, { docId, sourceSyst
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20489,7 +20489,7 @@ export const ExternalRecordLink_createViaLink = mutation({
       suggestedBy: args.suggestedBy,
       verifiedByUserId: args.verifiedByUserId
     };
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20544,7 +20544,7 @@ async function __runExternalRecordLinkObserve(ctx: MutationCtx, { docId, sourceV
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20591,7 +20591,7 @@ async function __runExternalRecordLinkRecordApplied(ctx: MutationCtx, { docId, a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20638,7 +20638,7 @@ async function __runExternalRecordLinkResolveConflict(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20691,7 +20691,7 @@ async function __runExternalRecordLinkRetire(ctx: MutationCtx, { docId, effectiv
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20741,7 +20741,7 @@ async function __runExternalRecordLinkUnlinkExternalRecord(ctx: MutationCtx, { d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20791,7 +20791,7 @@ async function __runExternalRecordLinkUpdateCapsuleId(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20842,7 +20842,7 @@ async function __runExternalRecordLinkVerifyLink(ctx: MutationCtx, { docId, veri
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ExternalRecordLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ExternalRecordLink not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read external record links");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import matches");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import matches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20897,7 +20897,7 @@ async function __runImportArtifactClassify(ctx: MutationCtx, { docId, dispositio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportArtifact not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportArtifact not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import artifacts");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imported files");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imported files");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imported files");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -20952,7 +20952,7 @@ async function __runImportArtifactRecordParse(ctx: MutationCtx, { docId, parseSt
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportArtifact not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportArtifact not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import artifacts");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imported files");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imported files");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imported files");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -21003,7 +21003,7 @@ async function __runImportArtifactRegister(ctx: MutationCtx, { docId, importRunI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportArtifact not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportArtifact not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import artifacts");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imported files");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imported files");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imported files");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -21071,7 +21071,7 @@ async function __runImportConflictRaise(ctx: MutationCtx, { docId, externalRecor
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportConflict not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportConflict not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import conflicts");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import conflicts");
     if (!((doc.raisedAt == null))) throw new Error("Guard 0 failed");
@@ -21167,7 +21167,7 @@ export const ImportConflict_createViaRaise = mutation({
       sourceValue: args.sourceValue,
       sourceVersion: args.sourceVersion
     };
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import conflicts");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import conflicts");
     if (!((__draft.raisedAt == null))) throw new Error("Guard 0 failed");
@@ -21204,7 +21204,7 @@ async function __runImportConflictSettle(ctx: MutationCtx, { docId, resolution, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportConflict not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportConflict not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import conflicts");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import conflicts");
     if (!((doc.raisedAt != null))) throw new Error("Guard 0 failed");
@@ -21270,7 +21270,7 @@ async function __runImportConflictUpdateSource(ctx: MutationCtx, { docId, source
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportConflict not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportConflict not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import conflicts");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update import conflicts");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change import conflicts");
     if (!((doc.raisedAt != null))) throw new Error("Guard 0 failed");
@@ -21585,7 +21585,7 @@ async function __runImportRunApproveReview(ctx: MutationCtx, { docId, finalRecor
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status === "reviewing"))) throw new Error("Guard 0 failed");
@@ -21651,7 +21651,7 @@ async function __runImportRunBeginReview(ctx: MutationCtx, { docId, actorId, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status === "validating"))) throw new Error("Guard 0 failed");
@@ -21714,7 +21714,7 @@ async function __runImportRunCommit(ctx: MutationCtx, { docId, actorId, version 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status === "committing"))) throw new Error("Guard 0 failed");
@@ -21782,7 +21782,7 @@ async function __runImportRunExplainArchiveDiscrepancy(ctx: MutationCtx, { docId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -21834,7 +21834,7 @@ async function __runImportRunMarkFailed(ctx: MutationCtx, { docId, failureDetail
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status !== "completed"))) throw new Error("Guard 0 failed");
@@ -21901,7 +21901,7 @@ async function __runImportRunRecordArchiveInventory(ctx: MutationCtx, { docId, a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -21962,7 +21962,7 @@ async function __runImportRunRecordCommitCheckpoint(ctx: MutationCtx, { docId, c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -22014,7 +22014,7 @@ async function __runImportRunRecordDispositionSummary(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -22069,7 +22069,7 @@ async function __runImportRunRecordParse(ctx: MutationCtx, { docId, recordCounts
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status === "started"))) throw new Error("Guard 0 failed");
@@ -22134,7 +22134,7 @@ async function __runImportRunRevert(ctx: MutationCtx, { docId, actorId, version 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status === "completed"))) throw new Error("Guard 0 failed");
@@ -22198,7 +22198,7 @@ async function __runImportRunStart(ctx: MutationCtx, { docId, sourceSystem, data
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -22266,7 +22266,7 @@ async function __runImportRunValidate(ctx: MutationCtx, { docId, actorId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ImportRun not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ImportRun not found");
-    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may read import runs");
+    if (!(checkRole(user, "importAccess"))) throw new Error("Staff may see imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may update imports");
     if (!(checkRole(user, "importAccess"))) throw new Error("Staff may change imports");
     if (!((doc.status === "parsing"))) throw new Error("Guard 0 failed");
