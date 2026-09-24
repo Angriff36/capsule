@@ -19,7 +19,7 @@ entity EventPacketArtifact mixin TenantScoped, SoftDeletable {
   property contextJson: string?
   constraint packetArtifactSize: self.byteSize >= 0 "Source byte size cannot be negative"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
-  default policy packetArtifactRead read: roleAllows(user.role, "eventPacketSeamOnly") "Source bytes and private evidence require the scoped packet seam"
+  default policy packetArtifactRead read: roleAllows(user.role, "eventPacketSeamOnly") "The original packet files stay behind the scenes"
   default policy packetArtifactWrite write: roleAllows(user.role, "eventPacketSeamOnly") "The event packet keeps the source files"
   default policy packetArtifactExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet files"
   store EventPacketArtifact in durable
@@ -34,7 +34,7 @@ entity EventPacketIssue mixin TenantScoped, SoftDeletable {
   property issueJson: string
   constraint packetIssueKey: length(trim(self.issueKey)) > 0 "An issue needs a stable key"
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
-  default policy packetIssueRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private issue evidence is projected through the packet seam"
+  default policy packetIssueRead read: roleAllows(user.role, "eventPacketSeamOnly") "Private packet issues stay behind the scenes"
   default policy packetIssueWrite write: roleAllows(user.role, "eventPacketSeamOnly") "Reconciliation owns issue lifecycle"
   default policy packetIssueExecute execute: roleAllows(user.role, "eventPacketSeamOnly") "Staff cannot change packet issues"
   store EventPacketIssue in durable

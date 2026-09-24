@@ -102,10 +102,53 @@ describe("plain words on leftover event-packet manifests", () => {
       "utf8",
     ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
     for (const later of [
-      "Source bytes and private evidence require the scoped packet seam",
-      "Private issue evidence is projected through the packet seam",
+      "Reconciliation owns issue lifecycle",
+      "Authenticated transactional decisions are immutable",
+      "Only exact-current immutable prints are recorded",
     ]) {
       expect(packet).toContain(later);
+    }
+  });
+
+  it("keeps leftover event-packet READ copy free of seam jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/operations/event-packet.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain(
+      "Source bytes and private evidence require the scoped packet seam",
+    );
+    expect(visible).not.toContain(
+      "Private issue evidence is projected through the packet seam",
+    );
+
+    expect(visible).toContain(
+      "The original packet files stay behind the scenes",
+    );
+    expectPlain("The original packet files stay behind the scenes");
+    expect(visible).toContain("Private packet issues stay behind the scenes");
+    expectPlain("Private packet issues stay behind the scenes");
+
+    for (const landed of [
+      "The event packet keeps the source files",
+      "Staff cannot change packet files",
+      "Staff cannot change packet issues",
+      "Staff cannot change packet decisions",
+      "Staff cannot change packet prints",
+      "Private approvals remain behind manager review",
+    ]) {
+      expect(visible).toContain(landed);
+    }
+
+    // lock the later event-packet leftovers; this test does not change them
+    for (const later of [
+      "Reconciliation owns issue lifecycle",
+      "Authenticated transactional decisions are immutable",
+      "Only exact-current immutable prints are recorded",
+    ]) {
+      expect(visible).toContain(later);
     }
   });
 });
