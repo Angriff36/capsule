@@ -67,15 +67,17 @@ export function SearchSelect({
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
   const hiddenRef = useRef<HTMLInputElement>(null);
-  // The draft saver only hears native input events. A React value update on
-  // the hidden field does not emit one, so a client or venue choice was lost
-  // once the search keystrokes had already been saved (#368 item 4).
+  // The draft saver listens on the form. These pickers sit outside that form
+  // and are tied to it only by the form attribute, so a bubbling event on the
+  // hidden field never reaches the saver (#368 item 4).
   const announceChoice = useRef(false);
 
   useEffect(() => {
     if (!announceChoice.current) return;
     announceChoice.current = false;
-    hiddenRef.current?.dispatchEvent(new Event("input", { bubbles: true }));
+    const field = hiddenRef.current;
+    const owner = field?.form ?? field;
+    owner?.dispatchEvent(new Event("input", { bubbles: true }));
   }, [value]);
 
   const selected = useMemo(

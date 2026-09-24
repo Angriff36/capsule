@@ -14,21 +14,31 @@ function EventDraftHarness() {
   const draft = useFormDraft("search-select-proof");
   const [clientId, setClientId] = useState("");
   return createElement(
-    "form",
-    { id: "event-create-form", ref: draft.formRef },
-    createElement(SearchSelect, {
-      name: "clientId",
-      value: clientId,
-      onChange: setClientId,
-      options: [
-        {
-          id: "client-kamini",
-          label: "Kamini Singh",
-          hint: "kamini@example.com",
-        },
-      ],
-      testId: "event-create-client",
-    }),
+    "div",
+    null,
+    createElement(
+      "form",
+      { id: "event-create-form", ref: draft.formRef },
+      createElement("input", { name: "title", defaultValue: "" }),
+    ),
+    createElement(
+      "aside",
+      null,
+      createElement(SearchSelect, {
+        name: "clientId",
+        form: "event-create-form",
+        value: clientId,
+        onChange: setClientId,
+        options: [
+          {
+            id: "client-kamini",
+            label: "Kamini Singh",
+            hint: "kamini@example.com",
+          },
+        ],
+        testId: "event-create-client",
+      }),
+    ),
   );
 }
 
@@ -65,15 +75,23 @@ describe("search select draft", () => {
       root?.render(createElement(EventDraftHarness));
     });
 
+    const title = container.querySelector(
+      "input[name=title]",
+    ) as HTMLInputElement;
+    await act(async () => {
+      title.value = "Ewing Wedding";
+      title.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await settleDraft();
+    expect(readDraft().values?.title).toBe("Ewing Wedding");
+    expect(readDraft().values?.clientId).toBeUndefined();
+
     const input = container.querySelector(
       "[data-testid=event-create-client]",
     ) as HTMLInputElement;
     await act(async () => {
       input.focus();
-      input.dispatchEvent(new Event("input", { bubbles: true }));
     });
-    await settleDraft();
-    expect(readDraft().values?.clientId).toBeUndefined();
 
     const option = container.querySelector("[role=option]");
     expect(option).not.toBeNull();
