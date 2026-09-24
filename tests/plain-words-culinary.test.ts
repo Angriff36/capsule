@@ -233,4 +233,28 @@ describe("plain words on culinary manifests", () => {
     // later leftover, unchanged
     expect(visible).toContain("Piece quantity must be positive");
   });
+
+  it("keeps leftover culinary recipe-name constraint copy free of component jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/culinary/component.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Component name is required");
+    expect(visible).toContain("Recipe name is required");
+    expectPlain("Recipe name is required");
+
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain("Component name is required");
+    expect(mutations).toContain("Recipe name is required");
+
+    // later leftovers, unchanged
+    expect(visible).toContain("Component yield quantity must be positive");
+    expect(visible).toContain("Piece quantity must be positive");
+
+    // already-landed leftovers must stay put
+    expect(visible).toContain("Portion size name is required");
+    expect(visible).toContain("Kitchen staff may see recipes");
+  });
 });

@@ -80,7 +80,7 @@ entity Component mixin TenantScoped, SoftDeletable {
   ) {
     guard self.draftedAt == null
     guard self.deletedAt == null
-    constraint draftComponentName: length(trim(name)) > 0 "Component name is required"
+    constraint draftComponentName: length(trim(name)) > 0 "Recipe name is required"
     constraint draftYieldPositive: yieldQuantity > 0 "Component yield quantity must be positive"
     constraint draftServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
     constraint draftBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Component batch multiplier must be positive"
@@ -122,7 +122,7 @@ entity Component mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "draft"
     guard self.deletedAt == null
-    constraint reviseComponentName: length(trim(name)) > 0 "Component name is required"
+    constraint reviseComponentName: length(trim(name)) > 0 "Recipe name is required"
     constraint reviseYieldPositive: yieldQuantity > 0 "Component yield quantity must be positive"
     constraint reviseServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
     constraint reviseBatchPositive: batchMultiplier > 0 "Component batch multiplier must be positive"

@@ -3422,7 +3422,7 @@ async function __runComponentDraft(ctx: MutationCtx, { docId, name, yieldQuantit
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Component name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
     if (!((yieldQuantity > 0))) throw new Error("Component yield quantity must be positive");
     if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
     if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Component batch multiplier must be positive");
@@ -3527,7 +3527,7 @@ export const Component_createViaDraft = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Component name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
     if (!((yieldQuantity > 0))) throw new Error("Component yield quantity must be positive");
     if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
     if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Component batch multiplier must be positive");
@@ -3819,7 +3819,7 @@ async function __runComponentReviseDraft(ctx: MutationCtx, { docId, name, yieldQ
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipes");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Component name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
     if (!((yieldQuantity > 0))) throw new Error("Component yield quantity must be positive");
     if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
     if (!((batchMultiplier > 0))) throw new Error("Component batch multiplier must be positive");
