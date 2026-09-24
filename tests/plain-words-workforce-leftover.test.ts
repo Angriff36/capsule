@@ -205,12 +205,12 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
     expect(visible).toContain(
       "This availability is missing a start or end, or it ends before it starts. Pick a start and an end that's later than the start.",
     );
-    // Later leftovers keep their current wording, pinned from their own files.
+    // Already-landed leftover on the allergen-check file stays.
     expect(visibleCopy("src/culinary/dish.manifest")).toContain(
       "This subrecipe is for a different dish. Pick the dish already on this subrecipe.",
     );
     expect(visibleCopy("src/quality/allergen-check.manifest")).toContain(
-      "Record dishId must match the seeded dish reference when provided",
+      "This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank.",
     );
   });
 });

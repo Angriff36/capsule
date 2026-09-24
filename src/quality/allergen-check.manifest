@@ -63,7 +63,7 @@ entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
     guard user.id != null
     constraint recordEventMatch: eventId == self.eventId "Record eventId must match the seeded event reference"
     constraint recordEventDishMatch: eventDishId == null or self.eventDishId == null or eventDishId == self.eventDishId "Record eventDishId must match the seeded event dish reference when provided"
-    constraint recordDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "Record dishId must match the seeded dish reference when provided"
+    constraint recordDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank."
     constraint recordFlagConsistency: (result == "pass" and (flaggedAllergens == null or length(flaggedAllergens) == 0)) or (result == "flagged" and flaggedAllergens != null and length(flaggedAllergens) > 0) "Pass requires no flagged allergens; flagged requires at least one"
     compute nextFlags = flaggedAllergens != null ? flaggedAllergens : []
     mutate eventId = eventId

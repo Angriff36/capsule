@@ -14442,7 +14442,7 @@ async function __runEventAllergenCheckRecord(ctx: MutationCtx, { docId, eventId,
     if (!((user.id != null))) throw new Error("Guard 4 failed");
     if (!((eventId === doc.eventId))) throw new Error("Record eventId must match the seeded event reference");
     if (!((((eventDishId == null) || (doc.eventDishId == null)) || (eventDishId === doc.eventDishId)))) throw new Error("Record eventDishId must match the seeded event dish reference when provided");
-    if (!((((dishId == null) || (doc.dishId == null)) || (dishId === doc.dishId)))) throw new Error("Record dishId must match the seeded dish reference when provided");
+    if (!((((dishId == null) || (doc.dishId == null)) || (dishId === doc.dishId)))) throw new Error("This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank.");
     if (!((((result === "pass") && ((flaggedAllergens == null) || ((flaggedAllergens).length === 0))) || (((result === "flagged") && (flaggedAllergens != null)) && ((flaggedAllergens).length > 0))))) throw new Error("Pass requires no flagged allergens; flagged requires at least one");
     const nextFlags = ((flaggedAllergens != null) ? flaggedAllergens : []);
     {
@@ -14547,7 +14547,7 @@ export const EventAllergenCheck_createViaRecord = mutation({
     if (!((user.id != null))) throw new Error("Guard 4 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Record eventId must match the seeded event reference");
     if (!((((eventDishId == null) || (__draft.eventDishId == null)) || (eventDishId === __draft.eventDishId)))) throw new Error("Record eventDishId must match the seeded event dish reference when provided");
-    if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("Record dishId must match the seeded dish reference when provided");
+    if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank.");
     if (!((((result === "pass") && ((flaggedAllergens == null) || ((flaggedAllergens).length === 0))) || (((result === "flagged") && (flaggedAllergens != null)) && ((flaggedAllergens).length > 0))))) throw new Error("Pass requires no flagged allergens; flagged requires at least one");
     const doc: Record<string, any> = {
       ...__draft,
