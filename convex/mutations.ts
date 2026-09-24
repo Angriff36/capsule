@@ -10189,7 +10189,7 @@ async function __runDishTaskAdd(ctx: MutationCtx, { docId, dishId, name, categor
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 2 failed");
-    if (!((dishId === doc.dishId))) throw new Error("Dish task dishId must match the seeded Dish reference");
+    if (!((dishId === doc.dishId))) throw new Error("This dish task is for a different dish. Pick the dish already on this dish task.");
     if (!((((name).trim()).length > 0))) throw new Error("Dish task name is required");
     if (!(((defaultQuantity == null) || (defaultQuantity > 0)))) throw new Error("Dish task quantity must be positive");
     if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Dish task sort order cannot be negative");
@@ -10301,7 +10301,7 @@ export const DishTask_createViaAdd = mutation({
     if (!((__draft.status === "active"))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_dish != null) && (__rel_dish.status === "active")))) throw new Error("Guard 2 failed");
-    if (!((dishId === __draft.dishId))) throw new Error("Dish task dishId must match the seeded Dish reference");
+    if (!((dishId === __draft.dishId))) throw new Error("This dish task is for a different dish. Pick the dish already on this dish task.");
     if (!((((name).trim()).length > 0))) throw new Error("Dish task name is required");
     if (!(((defaultQuantity == null) || (defaultQuantity > 0)))) throw new Error("Dish task quantity must be positive");
     if (!(((sortOrder == null) || (sortOrder >= 0)))) throw new Error("Dish task sort order cannot be negative");
