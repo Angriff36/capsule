@@ -7,6 +7,7 @@ import type {
 import { api } from "../lib/api";
 import type { CapsuleEventPrepStateLoader } from "./CapsuleEventPrepCoordinator";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
+import { CapsuleGeneratedReadCatalog } from "./CapsuleGeneratedReadCatalog";
 
 type QueryClient = {
   query(reference: unknown, args: Record<string, unknown>): Promise<unknown>;
@@ -25,25 +26,39 @@ export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoa
   private readonly injectedClient: QueryClient | null;
   private liveClient: ConvexHttpClient | null = null;
   private readonly auth: CapsuleAgentAuthManager;
+  private readonly reads: CapsuleGeneratedReadCatalog;
 
   constructor(
     client?: QueryClient,
     auth: CapsuleAgentAuthManager = new CapsuleAgentAuthManager(),
+    reads: CapsuleGeneratedReadCatalog = new CapsuleGeneratedReadCatalog(),
   ) {
     this.injectedClient = client ?? null;
     this.auth = auth;
+    this.reads = reads;
   }
 
   async load(input: { eventId: string; dishId: string }) {
     const client = await this.resolveClient();
     const [templateRows, taskRows, demandRows] = await Promise.all([
-      client.query(api.queries.listDishTaskByDishId, { dishId: input.dishId }),
-      client.query(api.queries.listPrepTaskByEventId, {
-        eventId: input.eventId,
-      }),
-      client.query(api.queries.listIngredientDemandByEventId, {
-        eventId: input.eventId,
-      }),
+      client.query(
+        api.queries.listDishTaskByDishId,
+        this.reads.argumentsFor("listDishTaskByDishId", {
+          dishId: input.dishId,
+        }),
+      ),
+      client.query(
+        api.queries.listPrepTaskByEventId,
+        this.reads.argumentsFor("listPrepTaskByEventId", {
+          eventId: input.eventId,
+        }),
+      ),
+      client.query(
+        api.queries.listIngredientDemandByEventId,
+        this.reads.argumentsFor("listIngredientDemandByEventId", {
+          eventId: input.eventId,
+        }),
+      ),
     ]);
     const templates = rows(templateRows)
       .filter((row) => row.dishId === input.dishId)
