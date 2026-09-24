@@ -45,7 +45,9 @@ describe("plain words on leftover culinary dish task sequence copy", () => {
     expect(visible).toContain(
       "This dish task's lead time can't be negative. Use zero or more days.",
     );
-    // Later leftovers on this file are pinned: they must not change with this one.
-    expect(visible).toContain("Dish task retirement reason is required");
+    // Already-landed retire copy on this same dish file stays.
+    expect(visible).toContain(
+      "This dish task needs a reason before you retire it. Write why you're taking it off.",
+    );
   });
 });

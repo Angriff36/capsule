@@ -10386,7 +10386,7 @@ async function __runDishTaskRetire(ctx: MutationCtx, { docId, reason, version }:
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change dish task templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((reason).trim()).length > 0))) throw new Error("Dish task retirement reason is required");
+    if (!((((reason).trim()).length > 0))) throw new Error("This dish task needs a reason before you retire it. Write why you're taking it off.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {

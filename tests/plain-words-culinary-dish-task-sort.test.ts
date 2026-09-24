@@ -48,7 +48,9 @@ describe("plain words on leftover culinary dish task sort copy", () => {
     expect(visible).toContain(
       "This dish task can't follow itself. Pick a different dish task to come after, or leave that blank.",
     );
-    // Later leftovers on this file are pinned: they must not change with this one.
-    expect(visible).toContain("Dish task retirement reason is required");
+    // Already-landed retire copy on this same dish file stays.
+    expect(visible).toContain(
+      "This dish task needs a reason before you retire it. Write why you're taking it off.",
+    );
   });
 });

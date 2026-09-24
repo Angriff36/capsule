@@ -739,7 +739,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   command retire(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint retireReasonPresent: length(trim(reason)) > 0 "Dish task retirement reason is required"
+    constraint retireReasonPresent: length(trim(reason)) > 0 "This dish task needs a reason before you retire it. Write why you're taking it off."
     mutate retiredAt = now()
     mutate retirementReason = reason
     mutate status = "retired"
