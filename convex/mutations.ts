@@ -5001,7 +5001,7 @@ async function __runComponentImportUpload(ctx: MutationCtx, { docId, sourceKind,
     if (!((doc.uploadedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((rawSourceText).trim()).length > 0))) throw new Error("Paste recipe text before parsing.");
-    if (!((sourceByteCount >= 0))) throw new Error("Source byte count cannot be negative");
+    if (!((sourceByteCount >= 0))) throw new Error("This recipe's size can't be negative. Use zero or more.");
     if (!((((sourceFingerprint).trim()).length > 0))) throw new Error("Source fingerprint is required");
     {
       const __cur = doc.status;
@@ -5106,7 +5106,7 @@ export const ComponentImport_createViaUpload = mutation({
     if (!((__draft.uploadedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((rawSourceText).trim()).length > 0))) throw new Error("Paste recipe text before parsing.");
-    if (!((sourceByteCount >= 0))) throw new Error("Source byte count cannot be negative");
+    if (!((sourceByteCount >= 0))) throw new Error("This recipe's size can't be negative. Use zero or more.");
     if (!((((sourceFingerprint).trim()).length > 0))) throw new Error("Source fingerprint is required");
     const doc: Record<string, any> = {
       ...__draft,
