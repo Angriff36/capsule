@@ -361,7 +361,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.packList != null and self.packList.openedAt != null and (self.packList.status == "draft" or self.packList.status == "packing")
     constraint addItemPackListMatch: packListId == self.packListId "This pack item is for a different pack list. Pick the pack list already on this pack item."
     constraint addItemDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "This pack item is for a different dish. Pick the dish already on this pack item."
-    constraint addItemBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "Add item productionBatchId must match the seeded batch reference when provided"
+    constraint addItemBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "This pack item is for a different batch. Pick the batch already on this pack item."
     constraint addItemDescriptionPresent: length(trim(description)) > 0 "Pack item description is required"
     constraint addItemQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
     mutate packListId = packListId
