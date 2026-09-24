@@ -5945,7 +5945,7 @@ async function __runComponentPortionSpecDefine(ctx: MutationCtx, { docId, compon
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Portion spec name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Portion size name is required");
     if (!((pieceQuantity > 0))) throw new Error("Piece quantity must be positive");
     if (!(((piecesPerBatch == null) || (piecesPerBatch > 0)))) throw new Error("Pieces per batch must be positive");
     if (version !== undefined && (doc as any).version !== version) {
@@ -6029,7 +6029,7 @@ export const ComponentPortionSpec_createViaDefine = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Portion spec name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Portion size name is required");
     if (!((pieceQuantity > 0))) throw new Error("Piece quantity must be positive");
     if (!(((piecesPerBatch == null) || (piecesPerBatch > 0)))) throw new Error("Pieces per batch must be positive");
     const doc: Record<string, any> = {
@@ -6115,7 +6115,7 @@ async function __runComponentPortionSpecRevise(ctx: MutationCtx, { docId, name, 
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change portion sizes");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((name).trim()).length > 0))) throw new Error("Portion spec name is required");
+    if (!((((name).trim()).length > 0))) throw new Error("Portion size name is required");
     if (!((pieceQuantity > 0))) throw new Error("Piece quantity must be positive");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);

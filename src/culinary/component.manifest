@@ -740,7 +740,7 @@ entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
 
   belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
 
-  constraint portionSpecNamed: self.definedAt == null or length(trim(self.name)) > 0 "Portion spec name is required"
+  constraint portionSpecNamed: self.definedAt == null or length(trim(self.name)) > 0 "Portion size name is required"
   constraint portionSpecPiecePositive: self.definedAt == null or self.pieceQuantity > 0 "Piece quantity must be positive"
 
   default policy componentPortionSpecRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see portion sizes"
@@ -757,7 +757,7 @@ entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
   ) {
     guard self.definedAt == null
     guard self.deletedAt == null
-    constraint defineSpecName: length(trim(name)) > 0 "Portion spec name is required"
+    constraint defineSpecName: length(trim(name)) > 0 "Portion size name is required"
     constraint defineSpecPiece: pieceQuantity > 0 "Piece quantity must be positive"
     constraint defineSpecPieces: piecesPerBatch == null or piecesPerBatch > 0 "Pieces per batch must be positive"
     mutate componentId = componentId
@@ -784,7 +784,7 @@ entity ComponentPortionSpec mixin TenantScoped, SoftDeletable {
   ) {
     guard self.definedAt != null
     guard self.deletedAt == null
-    constraint reviseSpecName: length(trim(name)) > 0 "Portion spec name is required"
+    constraint reviseSpecName: length(trim(name)) > 0 "Portion size name is required"
     constraint reviseSpecPiece: pieceQuantity > 0 "Piece quantity must be positive"
     mutate name = name
     mutate pieceQuantity = pieceQuantity
