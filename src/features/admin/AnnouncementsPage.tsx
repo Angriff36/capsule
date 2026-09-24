@@ -1,7 +1,7 @@
 import { useQuery } from "convex/react";
 import { useMemo, useState, type FormEvent } from "react";
 import {
-  CapsuleStaffActionOffer,
+  announcementStaffActions,
   staffActionNeedsConfirm,
 } from "../../agent/CapsuleStaffActionOffer";
 import { api } from "../../lib/api";
@@ -30,9 +30,9 @@ const FRIENDLY_CATEGORY: Record<string, string> = {
 };
 
 function categoryChoices(post: {
-  fields: Array<{
+  fields: ReadonlyArray<{
     name: string;
-    choices?: Array<{ value: string; label: string }>;
+    choices?: ReadonlyArray<{ value: string; label: string }>;
   }>;
 }) {
   const field = post.fields.find((item) => item.name === "category");
@@ -68,7 +68,7 @@ export function AnnouncementsPage() {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
-  const offers = useMemo(() => new CapsuleStaffActionOffer(), []);
+  const offers = useMemo(() => announcementStaffActions(), []);
   const post = offers.forPerson("Announcement.post");
   const removeOffer = offers.forPerson("Announcement.remove");
   const categories = post ? categoryChoices(post) : [];
