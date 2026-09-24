@@ -67,7 +67,7 @@ entity ProposalTemplate mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
 
-  default policy proposalTemplateRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal templates"
+  default policy proposalTemplateRead read: roleAllows(user.role, "salesAccess") "Sales staff may see proposal templates"
   default policy proposalTemplateWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update proposal templates"
   default policy proposalTemplateExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change proposal templates"
 

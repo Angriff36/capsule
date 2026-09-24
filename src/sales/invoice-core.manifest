@@ -96,7 +96,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   transition status from "voided" to []
   transition status from "written_off" to []
 
-  default policy invoiceRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may read invoices"
+  default policy invoiceRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may see invoices"
   default policy invoiceWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may update invoices"
   default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may change invoices"
 

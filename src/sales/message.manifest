@@ -51,7 +51,7 @@ entity Message mixin TenantScoped, SoftDeletable {
 
   constraint messageBodyPresent: length(trim(self.bodyText)) > 0 "Message text is required"
 
-  default policy messageRead read: roleAllows(user.role, "staffAccess") "Staff may read messages"
+  default policy messageRead read: roleAllows(user.role, "staffAccess") "Staff may see messages"
   default policy messageWrite write: roleAllows(user.role, "staffAccess") "Staff may update messages"
   default policy messageExecute execute: roleAllows(user.role, "staffAccess") "Staff may change messages"
 

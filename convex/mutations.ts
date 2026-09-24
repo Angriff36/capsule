@@ -2395,7 +2395,7 @@ async function __runClientCommunicationRecord(ctx: MutationCtx, { docId, clientC
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientContact = __rel_clientContact;
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read client communication history");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see client communication history");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add client notes");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change client notes");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -2483,7 +2483,7 @@ export const ClientCommunication_createViaRecord = mutation({
     };
     const __rel_clientContact = await __resolveRelation(ctx, "clientContacts", [__auth.tenantId, __draft.clientContactId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read client communication history");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see client communication history");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may add client notes");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change client notes");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -2526,7 +2526,7 @@ async function __runClientContactAdd(ctx: MutationCtx, { docId, clientId, givenN
     const doc = await __decryptDoc(ctx, "ClientContact", ["email","phone","mobile"], __storedDoc) as Record<string, any>;
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).client = __rel_client;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client contacts");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -2630,7 +2630,7 @@ export const ClientContact_createViaAdd = mutation({
       title: args.title
     };
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client contacts");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -2679,7 +2679,7 @@ async function __runClientContactReassignClient(ctx: MutationCtx, { docId, versi
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client contacts");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -2736,7 +2736,7 @@ async function __runClientContactRemove(ctx: MutationCtx, { docId, version }: an
     if (!__storedDoc) throw new Error("ClientContact not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("ClientContact not found");
     const doc = await __decryptDoc(ctx, "ClientContact", ["email","phone","mobile"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client contacts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -2798,7 +2798,7 @@ async function __runClientContactSetPrimary(ctx: MutationCtx, { docId, version }
     if (!__storedDoc) throw new Error("ClientContact not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("ClientContact not found");
     const doc = await __decryptDoc(ctx, "ClientContact", ["email","phone","mobile"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client contacts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -2847,7 +2847,7 @@ async function __runClientContactStageClientMerge(ctx: MutationCtx, { docId, cli
     if (!__storedDoc) throw new Error("ClientContact not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("ClientContact not found");
     const doc = await __decryptDoc(ctx, "ClientContact", ["email","phone","mobile"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client contacts");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -2902,7 +2902,7 @@ async function __runClientContactUpdateDetails(ctx: MutationCtx, { docId, givenN
     if (!__storedDoc) throw new Error("ClientContact not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("ClientContact not found");
     const doc = await __decryptDoc(ctx, "ClientContact", ["email","phone","mobile"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client contacts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client contacts");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -3184,7 +3184,7 @@ async function __runClientOutreachTaskComplete(ctx: MutationCtx, { docId, note, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ClientOutreachTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ClientOutreachTask not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client follow-up reminders");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client follow-up reminders");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
@@ -3244,7 +3244,7 @@ async function __runClientOutreachTaskDismiss(ctx: MutationCtx, { docId, note, v
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ClientOutreachTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ClientOutreachTask not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client follow-up reminders");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client follow-up reminders");
     if (!((doc.status === "open"))) throw new Error("Guard 0 failed");
@@ -3304,7 +3304,7 @@ async function __runClientOutreachTaskOpen(ctx: MutationCtx, { docId, clientId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ClientOutreachTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ClientOutreachTask not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client follow-up reminders");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client follow-up reminders");
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
@@ -3384,7 +3384,7 @@ export const ClientOutreachTask_createViaOpen = mutation({
       clientId: args.clientId,
       reason: args.reason
     };
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read client follow-up reminders");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update client follow-up reminders");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change client follow-up reminders");
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
@@ -6499,7 +6499,7 @@ async function __runContractDraft(ctx: MutationCtx, { docId, eventId, clientId, 
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     ((doc as any) as any).client = __rel_client;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -6593,7 +6593,7 @@ export const Contract_createViaDraft = mutation({
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -6635,7 +6635,7 @@ async function __runContractExpire(ctx: MutationCtx, { docId, version }: any, __
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Contract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Contract not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
@@ -6693,7 +6693,7 @@ async function __runContractMarkViewed(ctx: MutationCtx, { docId, version }: any
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Contract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Contract not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((doc.status === "sent"))) throw new Error("Guard 0 failed");
@@ -6752,7 +6752,7 @@ async function __runContractMarkVoided(ctx: MutationCtx, { docId, reason, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Contract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Contract not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
@@ -6818,7 +6818,7 @@ async function __runContractReassignClient(ctx: MutationCtx, { docId, version }:
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -6873,7 +6873,7 @@ async function __runContractSend(ctx: MutationCtx, { docId, version }: any, __cr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Contract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Contract not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -6934,7 +6934,7 @@ async function __runContractSign(ctx: MutationCtx, { docId, signedBy, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Contract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Contract not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((doc.status === "viewed"))) throw new Error("Guard 0 failed");
@@ -6997,7 +6997,7 @@ async function __runContractStageClientMerge(ctx: MutationCtx, { docId, clientMe
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Contract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Contract not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update contracts");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change contracts");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -26093,7 +26093,7 @@ async function __runInvoiceApplyCredit(ctx: MutationCtx, { docId, creditAmount, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "overdue")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
@@ -26162,7 +26162,7 @@ async function __runInvoiceApplyPayment(ctx: MutationCtx, { docId, paymentAmount
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "overdue")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
@@ -26229,7 +26229,7 @@ async function __runInvoiceAssignNumber(ctx: MutationCtx, { docId, invoiceNumber
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -26280,7 +26280,7 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).client = __rel_client;
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((doc.issuedAt == null) || (doc.eventId === eventId)))) throw new Error("Guard 0 failed");
@@ -26414,7 +26414,7 @@ export const Invoice_createViaIssue = mutation({
       total: args.total
     };
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((__draft.issuedAt == null) || (__draft.eventId === eventId)))) throw new Error("Guard 0 failed");
@@ -26474,7 +26474,7 @@ async function __runInvoiceMarkDepositPaid(ctx: MutationCtx, { docId, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "overdue")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
@@ -26541,7 +26541,7 @@ async function __runInvoiceMarkOverdue(ctx: MutationCtx, { docId, version }: any
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
@@ -26601,7 +26601,7 @@ async function __runInvoiceMarkViewed(ctx: MutationCtx, { docId, version }: any,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.status === "sent"))) throw new Error("Guard 0 failed");
@@ -26660,7 +26660,7 @@ async function __runInvoiceMarkVoided(ctx: MutationCtx, { docId, reason, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((((doc.status === "draft") || (doc.status === "sent")) || (doc.status === "viewed")) || (doc.status === "overdue")))) throw new Error("Guard 0 failed");
@@ -26727,7 +26727,7 @@ async function __runInvoiceReassignClient(ctx: MutationCtx, { docId, version }: 
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -26782,7 +26782,7 @@ async function __runInvoiceRecordCreditMemo(ctx: MutationCtx, { docId, creditAmo
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.status === "paid"))) throw new Error("Guard 0 failed");
@@ -26835,7 +26835,7 @@ async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((doc.status === "paid") || (doc.status === "partial")))) throw new Error("Guard 0 failed");
@@ -26903,7 +26903,7 @@ async function __runInvoiceSend(ctx: MutationCtx, { docId, version }: any, __cre
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -26964,7 +26964,7 @@ async function __runInvoiceSendBalanceReminder(ctx: MutationCtx, { docId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -27011,7 +27011,7 @@ async function __runInvoiceSetDeposit(ctx: MutationCtx, { docId, depositAmount, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -27063,7 +27063,7 @@ async function __runInvoiceStageClientMerge(ctx: MutationCtx, { docId, clientMer
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -27116,7 +27116,7 @@ async function __runInvoiceWriteOff(ctx: MutationCtx, { docId, reason, writeOffA
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may see invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may update invoices");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Finance staff and managers may change invoices");
     if (!(((doc.status === "overdue") || (doc.status === "partial")))) throw new Error("Guard 0 failed");
@@ -27368,7 +27368,7 @@ async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, ref
     if (!__storedDoc) throw new Error("Lead not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Lead not found");
     const doc = await __decryptDoc(ctx, "Lead", ["email","phone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt == null))) throw new Error("Guard 0 failed");
@@ -27475,7 +27475,7 @@ export const Lead_createViaCapture = mutation({
       referralSourceId: args.referralSourceId,
       source: args.source
     };
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((__draft.capturedAt == null))) throw new Error("Guard 0 failed");
@@ -27526,7 +27526,7 @@ async function __runLeadConfirmConversion(ctx: MutationCtx, { docId, version }: 
     const __rel_clientContact = await __resolveRelation(ctx, "clientContacts", [__auth.tenantId, doc.clientContactId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).client = __rel_client;
     ((doc as any) as any).clientContact = __rel_clientContact;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
@@ -27578,7 +27578,7 @@ async function __runLeadConfirmProposalSent(ctx: MutationCtx, { docId, version }
     const doc = await __decryptDoc(ctx, "Lead", ["email","phone"], __storedDoc) as Record<string, any>;
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
@@ -27631,7 +27631,7 @@ async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, sourc
     if (!__storedDoc) throw new Error("Lead not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Lead not found");
     const doc = await __decryptDoc(ctx, "Lead", ["email","phone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
@@ -27698,7 +27698,7 @@ async function __runLeadStageConversion(ctx: MutationCtx, { docId, clientId, cli
     if (!__storedDoc) throw new Error("Lead not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Lead not found");
     const doc = await __decryptDoc(ctx, "Lead", ["email","phone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
@@ -27744,7 +27744,7 @@ async function __runLeadStageProposal(ctx: MutationCtx, { docId, proposalId, ver
     if (!__storedDoc) throw new Error("Lead not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Lead not found");
     const doc = await __decryptDoc(ctx, "Lead", ["email","phone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
@@ -27789,7 +27789,7 @@ async function __runLeadUpdatePipeline(ctx: MutationCtx, { docId, stage, estimat
     if (!__storedDoc) throw new Error("Lead not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Lead not found");
     const doc = await __decryptDoc(ctx, "Lead", ["email","phone"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read leads");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update leads");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change leads");
     if (!((doc.capturedAt != null))) throw new Error("Guard 0 failed");
@@ -28626,7 +28626,7 @@ async function __runMessagePost(ctx: MutationCtx, { docId, threadId, direction, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Message not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Message not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change messages");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -28716,7 +28716,7 @@ export const Message_createViaPost = mutation({
       sentAt: args.sentAt,
       threadId: args.threadId
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change messages");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -28754,7 +28754,7 @@ async function __runMessageSetDelivery(ctx: MutationCtx, { docId, status, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Message not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Message not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read messages");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update messages");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change messages");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -28814,7 +28814,7 @@ async function __runMessageThreadCreate(ctx: MutationCtx, args: any) {
       openedByAuthSubjectId: user.id,
       version: 1
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read message threads");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see message threads");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update conversations");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change conversations");
     if (!((args.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -28862,7 +28862,7 @@ async function __runMessageThreadLinkContact(ctx: MutationCtx, { docId, contactI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("MessageThread not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MessageThread not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read message threads");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see message threads");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update conversations");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change conversations");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -28909,7 +28909,7 @@ async function __runMessageThreadLinkLead(ctx: MutationCtx, { docId, leadId, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("MessageThread not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MessageThread not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read message threads");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see message threads");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update conversations");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change conversations");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -28956,7 +28956,7 @@ async function __runMessageThreadSetStatus(ctx: MutationCtx, { docId, status, ve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("MessageThread not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MessageThread not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read message threads");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see message threads");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update conversations");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change conversations");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -37480,7 +37480,7 @@ async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, acceptedR
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
@@ -37570,7 +37570,7 @@ async function __runProposalDecline(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
@@ -37631,7 +37631,7 @@ async function __runProposalDraft(ctx: MutationCtx, { docId, clientId, title, su
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).client = __rel_client;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -37769,7 +37769,7 @@ export const Proposal_createViaDraft = mutation({
       visibleSections: args.visibleSections
     };
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
@@ -37823,7 +37823,7 @@ async function __runProposalExpire(ctx: MutationCtx, { docId, version }: any, __
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
@@ -37884,7 +37884,7 @@ async function __runProposalLinkEvent(ctx: MutationCtx, { docId, version }: any,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
     const __rel_pendingEvent = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.pendingEventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).pendingEvent = __rel_pendingEvent;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!(((doc.status === "draft") || (doc.status === "accepted")))) throw new Error("Guard 0 failed");
@@ -37964,7 +37964,7 @@ async function __runProposalMarkViewed(ctx: MutationCtx, { docId, version }: any
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!((doc.status === "sent"))) throw new Error("Guard 0 failed");
@@ -38027,7 +38027,7 @@ async function __runProposalReassignClient(ctx: MutationCtx, { docId, version }:
     const __rel_mergeTargetClient = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.mergeTargetClientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).clientMergeAuthorization = __rel_clientMergeAuthorization;
     ((doc as any) as any).mergeTargetClient = __rel_mergeTargetClient;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -38084,7 +38084,7 @@ async function __runProposalSend(ctx: MutationCtx, { docId, version }: any, __cr
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).client = __rel_client;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -38146,7 +38146,7 @@ async function __runProposalStageClientMerge(ctx: MutationCtx, { docId, clientMe
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -38199,7 +38199,7 @@ async function __runProposalStageEventLink(ctx: MutationCtx, { docId, eventId, v
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!(((doc.status === "draft") || (doc.status === "accepted")))) throw new Error("Guard 0 failed");
@@ -38247,7 +38247,7 @@ async function __runProposalSupersede(ctx: MutationCtx, { docId, revisedById, re
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposals");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposals");
     if (!(((doc.status === "sent") || (doc.status === "viewed")))) throw new Error("Guard 0 failed");
@@ -38313,7 +38313,7 @@ async function __runProposalDishSelectionAdjustServings(ctx: MutationCtx, { docI
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalDishSelection not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal dish selections");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal dish selections");
     if (!((doc.selectedAt != null))) throw new Error("Guard 0 failed");
@@ -38365,7 +38365,7 @@ async function __runProposalDishSelectionRemove(ctx: MutationCtx, { docId, versi
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalDishSelection not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal dish selections");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal dish selections");
     if (!((doc.selectedAt != null))) throw new Error("Guard 0 failed");
@@ -38419,7 +38419,7 @@ async function __runProposalDishSelectionSelect(ctx: MutationCtx, { docId, propo
     ((doc as any) as any).proposal = __rel_proposal;
     ((doc as any) as any).menu = __rel_menu;
     ((doc as any) as any).dish = __rel_dish;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal dish selections");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal dish selections");
     if (!((doc.selectedAt == null))) throw new Error("Guard 0 failed");
@@ -38512,7 +38512,7 @@ export const ProposalDishSelection_createViaSelect = mutation({
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, __draft.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_menu = await __resolveRelation(ctx, "menus", [__auth.tenantId, __draft.menuId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_dish = await __resolveRelation(ctx, "dishes", [__auth.tenantId, __draft.dishId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal dish selections");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal dish selections");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal dish selections");
     if (!((__draft.selectedAt == null))) throw new Error("Guard 0 failed");
@@ -38555,7 +38555,7 @@ async function __runProposalEnhancementOffer(ctx: MutationCtx, { docId, proposal
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalEnhancement not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal enhancements");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal enhancements");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -38637,7 +38637,7 @@ export const ProposalEnhancement_createViaOffer = mutation({
       proposalId: args.proposalId
     };
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, __draft.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal enhancements");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal enhancements");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -38677,7 +38677,7 @@ async function __runProposalEnhancementRevise(ctx: MutationCtx, { docId, name, p
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalEnhancement not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal enhancements");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal enhancements");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -38736,7 +38736,7 @@ async function __runProposalEnhancementWithdraw(ctx: MutationCtx, { docId, versi
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalEnhancement not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal enhancements");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal enhancements");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal enhancements");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -38787,7 +38787,7 @@ async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalI
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalLineItem not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal line items");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal line items");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -38894,7 +38894,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
       unitPrice: args.unitPrice
     };
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, __draft.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal line items");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal line items");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -38941,7 +38941,7 @@ async function __runProposalLineItemRemoveLine(ctx: MutationCtx, { docId, versio
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalLineItem not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal line items");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal line items");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -38991,7 +38991,7 @@ async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, descri
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalLineItem not found");
     const __rel_proposal = await __resolveRelation(ctx, "proposals", [__auth.tenantId, doc.proposalId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposal = __rel_proposal;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal line items");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal line items");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal line items");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -39060,7 +39060,7 @@ async function __runProposalRevisionCapture(ctx: MutationCtx, { docId, proposalI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProposalRevision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalRevision not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal revisions");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal revisions");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal revisions");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal revisions");
     if (!((doc.capturedAt == null))) throw new Error("Guard 0 failed");
@@ -39140,7 +39140,7 @@ export const ProposalRevision_createViaCapture = mutation({
       revisionNumber: args.revisionNumber,
       snapshot: args.snapshot
     };
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal revisions");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal revisions");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal revisions");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal revisions");
     if (!((__draft.capturedAt == null))) throw new Error("Guard 0 failed");
@@ -39177,7 +39177,7 @@ async function __runProposalTemplateArchive(ctx: MutationCtx, { docId, reason, v
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProposalTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalTemplate not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal templates");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -39242,7 +39242,7 @@ async function __runProposalTemplateDefine(ctx: MutationCtx, { docId, name, desc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProposalTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalTemplate not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal templates");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal templates");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
@@ -39338,7 +39338,7 @@ export const ProposalTemplate_createViaDefine = mutation({
       name: args.name,
       validityDays: args.validityDays
     };
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal templates");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal templates");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
@@ -39381,7 +39381,7 @@ async function __runProposalTemplateReactivate(ctx: MutationCtx, { docId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProposalTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalTemplate not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal templates");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal templates");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
@@ -39444,7 +39444,7 @@ async function __runProposalTemplateRevise(ctx: MutationCtx, { docId, name, desc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProposalTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProposalTemplate not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read proposal templates");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update proposal templates");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change proposal templates");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
@@ -41432,7 +41432,7 @@ async function __runReferralSourceActivate(ctx: MutationCtx, { docId, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReferralSource not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReferralSource not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read referral sources");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may update referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may change referral sources");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
@@ -41493,7 +41493,7 @@ async function __runReferralSourceDeactivate(ctx: MutationCtx, { docId, reason, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReferralSource not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReferralSource not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read referral sources");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may update referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may change referral sources");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -41556,7 +41556,7 @@ async function __runReferralSourceRegister(ctx: MutationCtx, { docId, name, code
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReferralSource not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReferralSource not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read referral sources");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may update referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may change referral sources");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -41646,7 +41646,7 @@ export const ReferralSource_createViaRegister = mutation({
       description: args.description,
       name: args.name
     };
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read referral sources");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may update referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may change referral sources");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -41683,7 +41683,7 @@ async function __runReferralSourceReviseDetails(ctx: MutationCtx, { docId, name,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ReferralSource not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ReferralSource not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read referral sources");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may update referral sources");
     if (!(checkRole(user, "salesManageAccess"))) throw new Error("Sales managers may change referral sources");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -43740,7 +43740,7 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
       createdByPersonId: user.id,
       version: 1
     };
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read share links");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see share links");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update share links");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change share links");
     if (!((args.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -43790,7 +43790,7 @@ async function __runShareLinkRevoke(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ShareLink not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ShareLink not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read share links");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see share links");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update share links");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may change share links");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -45503,7 +45503,7 @@ async function __runSignatureRequestComplete(ctx: MutationCtx, { docId, callback
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SignatureRequest not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SignatureRequest not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read signature requests");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see signature requests");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update signature requests");
     if (!((checkRole(user, "salesAccess") || checkRole(user, "clientAccess")))) throw new Error("Sales staff and clients may change signature requests");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -45575,7 +45575,7 @@ async function __runSignatureRequestExpire(ctx: MutationCtx, { docId, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SignatureRequest not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SignatureRequest not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read signature requests");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see signature requests");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update signature requests");
     if (!((checkRole(user, "salesAccess") || checkRole(user, "clientAccess")))) throw new Error("Sales staff and clients may change signature requests");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -45638,7 +45638,7 @@ async function __runSignatureRequestRequestSignature(ctx: MutationCtx, { docId, 
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SignatureRequest not found");
     const __rel_proposalRevision = await __resolveRelation(ctx, "proposalRevisions", [__auth.tenantId, doc.proposalRevisionId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).proposalRevision = __rel_proposalRevision;
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read signature requests");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see signature requests");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update signature requests");
     if (!((checkRole(user, "salesAccess") || checkRole(user, "clientAccess")))) throw new Error("Sales staff and clients may change signature requests");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -45746,7 +45746,7 @@ export const SignatureRequest_createViaRequestSignature = mutation({
       recipientPersonId: args.recipientPersonId
     };
     const __rel_proposalRevision = await __resolveRelation(ctx, "proposalRevisions", [__auth.tenantId, __draft.proposalRevisionId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read signature requests");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see signature requests");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update signature requests");
     if (!((checkRole(user, "salesAccess") || checkRole(user, "clientAccess")))) throw new Error("Sales staff and clients may change signature requests");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -45788,7 +45788,7 @@ async function __runSignatureRequestRevoke(ctx: MutationCtx, { docId, revokeReas
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SignatureRequest not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SignatureRequest not found");
-    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read signature requests");
+    if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may see signature requests");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may update signature requests");
     if (!((checkRole(user, "salesAccess") || checkRole(user, "clientAccess")))) throw new Error("Sales staff and clients may change signature requests");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -47625,7 +47625,7 @@ async function __runSyncErrorMarkResolved(ctx: MutationCtx, { docId, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SyncError not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SyncError not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read sync errors");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see sync errors");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update connection problems");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change connection problems");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -47671,7 +47671,7 @@ async function __runSyncErrorRecord(ctx: MutationCtx, { docId, sourceSystem, rec
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SyncError not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SyncError not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read sync errors");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see sync errors");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update connection problems");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change connection problems");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -47755,7 +47755,7 @@ export const SyncError_createViaRecord = mutation({
       recordType: args.recordType,
       sourceSystem: args.sourceSystem
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read sync errors");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see sync errors");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update connection problems");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change connection problems");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
@@ -47791,7 +47791,7 @@ async function __runSyncErrorReopen(ctx: MutationCtx, { docId, attempts, kind, e
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SyncError not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SyncError not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read sync errors");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see sync errors");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update connection problems");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change connection problems");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

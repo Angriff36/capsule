@@ -58,7 +58,7 @@ entity MessageThread mixin TenantScoped, SoftDeletable {
   belongsTo contact: ClientContact? fields [tenantId, contactId] references [tenantId, id]
   belongsTo lead: Lead? fields [tenantId, leadId] references [tenantId, id]
 
-  default policy messageThreadRead read: roleAllows(user.role, "staffAccess") "Staff may read message threads"
+  default policy messageThreadRead read: roleAllows(user.role, "staffAccess") "Staff may see message threads"
   default policy messageThreadWrite write: roleAllows(user.role, "staffAccess") "Staff may update conversations"
   default policy messageThreadExecute execute: roleAllows(user.role, "staffAccess") "Staff may change conversations"
 

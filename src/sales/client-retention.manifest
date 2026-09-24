@@ -30,7 +30,7 @@ entity ClientOutreachTask mixin TenantScoped {
   transition status from "completed" to []
   transition status from "dismissed" to []
 
-  default policy clientFollowUpReminderRead read: roleAllows(user.role, "salesAccess") "Sales staff may read client follow-up reminders"
+  default policy clientFollowUpReminderRead read: roleAllows(user.role, "salesAccess") "Sales staff may see client follow-up reminders"
   default policy clientFollowUpReminderWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update client follow-up reminders"
   default policy clientFollowUpReminderExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change client follow-up reminders"
 

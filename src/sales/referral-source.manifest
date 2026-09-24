@@ -47,7 +47,7 @@ entity ReferralSource mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
 
-  default policy referralSourceRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read referral sources"
+  default policy referralSourceRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may see referral sources"
   default policy referralSourceWrite write: roleAllows(user.role, "salesManageAccess") "Sales managers may update referral sources"
   default policy referralSourceExecute execute: roleAllows(user.role, "salesManageAccess") "Sales managers may change referral sources"
 

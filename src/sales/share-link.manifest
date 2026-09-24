@@ -74,7 +74,7 @@ entity ShareLink mixin TenantScoped, SoftDeletable {
   belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
   belongsTo proposalRevision: ProposalRevision fields [tenantId, proposalRevisionId] references [tenantId, id]
 
-  default policy shareLinkRead read: roleAllows(user.role, "salesAccess") "Sales staff may read share links"
+  default policy shareLinkRead read: roleAllows(user.role, "salesAccess") "Sales staff may see share links"
   default policy shareLinkWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update share links"
   default policy shareLinkExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may change share links"
 

@@ -195,4 +195,87 @@ describe("plain words on sales screens", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover sales READ copy free of read jargon", () => {
+    const files = [
+      "src/sales/client-communication.manifest",
+      "src/sales/client-retention.manifest",
+      "src/sales/contact.manifest",
+      "src/sales/contract.manifest",
+      "src/sales/lead.manifest",
+      "src/sales/referral-source.manifest",
+      "src/sales/message.manifest",
+      "src/sales/message-thread.manifest",
+      "src/sales/proposal-revision.manifest",
+      "src/sales/proposal-line-item.manifest",
+      "src/sales/share-link.manifest",
+      "src/sales/sync-error.manifest",
+      "src/sales/proposal-enhancement.manifest",
+      "src/sales/proposal-template.manifest",
+      "src/sales/signature-request.manifest",
+      "src/sales/proposal.manifest",
+      "src/sales/proposal-dish-selection.manifest",
+      "src/sales/invoice-core.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Staff may read client communication history",
+      "Sales staff may read client follow-up reminders",
+      "Sales staff may read client contacts",
+      "Sales staff may read contracts",
+      "Sales staff may read leads",
+      "Event and sales staff may read referral sources",
+      "Staff may read messages",
+      "Staff may read message threads",
+      "Sales staff may read proposal revisions",
+      "Sales staff may read proposal line items",
+      "Sales staff may read share links",
+      "Staff may read sync errors",
+      "Sales staff may read proposal enhancements",
+      "Sales staff may read proposal templates",
+      "Sales staff may read signature requests",
+      "Sales staff may read proposals",
+      "Sales staff may read proposal dish selections",
+      "Finance staff and managers may read invoices",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Staff may see client communication history",
+      "Sales staff may see client follow-up reminders",
+      "Sales staff may see client contacts",
+      "Sales staff may see contracts",
+      "Sales staff may see leads",
+      "Event and sales staff may see referral sources",
+      "Staff may see messages",
+      "Staff may see message threads",
+      "Sales staff may see proposal revisions",
+      "Sales staff may see proposal line items",
+      "Sales staff may see share links",
+      "Staff may see sync errors",
+      "Sales staff may see proposal enhancements",
+      "Sales staff may see proposal templates",
+      "Sales staff may see signature requests",
+      "Sales staff may see proposals",
+      "Sales staff may see proposal dish selections",
+      "Finance staff and managers may see invoices",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Sales staff may update proposals");
+    expect(visible).toContain("Sales staff may change proposals");
+    expect(visible).toContain("Finance staff and managers may update invoices");
+    expect(visible).toContain("Finance staff and managers may change invoices");
+    expect(visible).toContain("Staff may add client notes");
+    expect(visible).toContain("Staff may change client notes");
+  });
 });
