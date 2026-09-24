@@ -416,6 +416,7 @@ import {
   PackListItemEnsureKitItemParamsSchema,
   PackListItemMarkMissingParamsSchema,
   PackListItemMarkPackedParamsSchema,
+  PackListItemRecordPackedCountParamsSchema,
   PackListItemRemoveParamsSchema,
   PackListItemRestoreImportedAssociationParamsSchema,
   PackListItemSyncContainerServingsParamsSchema,
@@ -6643,6 +6644,16 @@ export function usePackListItemMarkPacked() {
   };
 }
 
+/** Mutation hook for PackListItem.recordPackedCount. */
+export function usePackListItemRecordPackedCount() {
+  const mutate = useMutation(api.mutations.PackListItem_recordPackedCount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemRecordPackedCountParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PackListItem.remove. */
 export function usePackListItemRemove() {
   const mutate = useMutation(api.mutations.PackListItem_remove);
@@ -11291,4 +11302,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1201 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1202 as const;

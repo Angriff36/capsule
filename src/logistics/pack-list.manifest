@@ -483,6 +483,31 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A short count stays listed. Mark packed is only the full amount, so the
+  // pack screen can keep offering that button from the proven listed → packed step.
+  command recordPackedCount(packedQuantity: decimal(12, 4)) {
+    guard self.status == "listed"
+    guard self.listedAt != null
+    guard self.deletedAt == null
+    guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
+    constraint recordPackedCountPositive: packedQuantity > 0 "Packed quantity must be positive"
+    constraint recordPackedCountShort: packedQuantity < self.requiredQuantity "This is the full amount. Mark the line packed."
+    compute previousPacked = self.packedQuantity
+    mutate packedQuantity = packedQuantity
+    emit PackListItemCountRecorded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.packList.eventId
+      description: self.description
+      previousPackedQuantity: previousPacked
+      packedQuantity: packedQuantity
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+      status: self.status
+    }
+  }
+
   command markPacked(packedQuantity: decimal(12, 4)) {
     guard self.status == "listed"
     guard self.listedAt != null
@@ -492,6 +517,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
     constraint markPackedQuantityPositive: packedQuantity > 0 "Packed quantity must be positive"
     constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+    constraint markPackedComplete: packedQuantity == self.requiredQuantity "Save a short count on this line until you have the full amount"
     compute previousStatus = self.status
     compute previousPacked = self.packedQuantity
     mutate packedQuantity = packedQuantity
@@ -685,6 +711,19 @@ event PackListItemAdded: "pack_list_item.added" {
   description: string
   dishId: string?
   productionBatchId: string?
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: PackListItemStatus
+}
+
+event PackListItemCountRecorded: "pack_list_item.count_recorded" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  description: string
+  previousPackedQuantity: decimal(12, 4)
+  packedQuantity: decimal(12, 4)
   requiredQuantity: decimal(12, 4)
   unit: UnitOfMeasure
   status: PackListItemStatus

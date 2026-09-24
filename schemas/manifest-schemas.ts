@@ -7708,6 +7708,13 @@ export const PackListItemMarkPackedParamsSchema = z.object({
 
 export type PackListItemMarkPackedParams = z.infer<typeof PackListItemMarkPackedParamsSchema>;
 
+// Command: recordPackedCount on PackListItem
+export const PackListItemRecordPackedCountParamsSchema = z.object({
+  packedQuantity: z.number(),
+});
+
+export type PackListItemRecordPackedCountParams = z.infer<typeof PackListItemRecordPackedCountParamsSchema>;
+
 // Command: remove on PackListItem
 export const PackListItemRemoveParamsSchema = z.object({});
 
