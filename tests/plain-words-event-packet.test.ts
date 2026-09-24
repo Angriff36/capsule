@@ -72,4 +72,40 @@ describe("plain words on leftover event-packet manifests", () => {
       expect(visible).toContain(landed);
     }
   });
+
+  it("keeps leftover event-number-sequence READ copy free of record jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/operations/event-number-sequence.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain(
+      "Event number sequences are private implementation records",
+    );
+    expect(visible).toContain("These counters stay behind the scenes");
+    expectPlain("These counters stay behind the scenes");
+
+    for (const landed of [
+      "Only Capsule can update event number counters",
+      "Event number counters stay behind the scenes",
+      "Staff may see event numbers",
+      "Only Capsule can assign event numbers",
+      "Assigned event numbers stay behind the scenes",
+    ]) {
+      expect(visible).toContain(landed);
+    }
+
+    // lock the later event-packet leftovers; this test does not change them
+    const packet = readFileSync(
+      "src/operations/event-packet.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    for (const later of [
+      "Source bytes and private evidence require the scoped packet seam",
+      "Private issue evidence is projected through the packet seam",
+    ]) {
+      expect(packet).toContain(later);
+    }
+  });
 });

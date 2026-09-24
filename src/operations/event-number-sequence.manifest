@@ -16,7 +16,7 @@ entity EventNumberSequence mixin TenantScoped {
 
   property required lastNumber: int
 
-  default policy eventNumberSequenceRead read: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number sequences are private implementation records"
+  default policy eventNumberSequenceRead read: roleAllows(user.role, "eventNumberSequenceSeamOnly") "These counters stay behind the scenes"
   default policy eventNumberSequenceWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Only Capsule can update event number counters"
   default policy eventNumberSequenceExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Event number counters stay behind the scenes"
 
