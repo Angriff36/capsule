@@ -54,14 +54,16 @@ export class ComponentCsvParser {
       errors.push({
         file: sheetFilename,
         row: 1,
-        message: "Unrecognized component sheet headers.",
+        message:
+          "These recipe sheet columns don't match. Use the usual recipe sheet columns.",
       });
     }
     if (!this.headersMatch(lineRows[0], COMPONENT_LINE_HEADERS)) {
       errors.push({
         file: linesFilename,
         row: 1,
-        message: "Unrecognized component line headers.",
+        message:
+          "These recipe line columns don't match. Use the usual recipe line columns.",
       });
     }
     if (errors.length) {
@@ -77,7 +79,8 @@ export class ComponentCsvParser {
       errors.push({
         file: sheetFilename,
         row: 2,
-        message: "Component sheet is missing a data row.",
+        message:
+          "This recipe sheet has no data row. Add one recipe row under the columns.",
       });
       return {
         draft: this.emptyDraft("Untitled import"),

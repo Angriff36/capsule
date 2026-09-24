@@ -48,4 +48,36 @@ describe("plain words on leftover kitchen Component labels", () => {
     expectPlain("Recipe");
     expectPlain("Recipe import not found");
   });
+
+  it("keeps leftover kitchen CSV header error copy free of component jargon", () => {
+    const parser = readFileSync(
+      "src/features/kitchen/import/ComponentCsvParser.ts",
+      "utf8",
+    );
+    // The old user-visible header errors are gone.
+    expect(parser).not.toContain("Unrecognized component sheet headers.");
+    expect(parser).not.toContain("Unrecognized component line headers.");
+    expect(parser).not.toContain("Component sheet is missing a data row.");
+    // New copy says what happened and what to do next.
+    expect(parser).toContain(
+      "These recipe sheet columns don't match. Use the usual recipe sheet columns.",
+    );
+    expect(parser).toContain(
+      "These recipe line columns don't match. Use the usual recipe line columns.",
+    );
+    expect(parser).toContain(
+      "This recipe sheet has no data row. Add one recipe row under the columns.",
+    );
+    expectPlain(
+      "These recipe sheet columns don't match. Use the usual recipe sheet columns.",
+    );
+    expectPlain(
+      "These recipe line columns don't match. Use the usual recipe line columns.",
+    );
+    expectPlain(
+      "This recipe sheet has no data row. Add one recipe row under the columns.",
+    );
+    // component_sheet.csv / component_lines.csv filenames and the
+    // component_name header key are identifiers and stay.
+  });
 });
