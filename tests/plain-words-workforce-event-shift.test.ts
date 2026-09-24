@@ -230,6 +230,8 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     expect(mutations).toContain(
       "This time-off request is for a different person. Pick the person already on this time-off request.",
     );
-    expect(mutations).toContain("Import source content is required");
+    expect(mutations).toContain(
+      "Stage importId must match the seeded import reference",
+    );
   });
 });

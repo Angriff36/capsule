@@ -289,4 +289,31 @@ describe("plain words on leftover culinary import constraint copy", () => {
       "Stage importId must match the seeded import reference",
     );
   });
+
+  it("keeps leftover culinary import source-present copy free of source-content jargon", () => {
+    const manifest = readFileSync(
+      "src/culinary/component-import.manifest",
+      "utf8",
+    );
+    // Strip // comments the same way the culinary leftover tests do.
+    const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    // The old source-content refusals are gone.
+    expect(visible).not.toContain("Import source content is required");
+    // The refusals now speak in plain catering words.
+    expect(visible).toContain("Paste recipe text before parsing.");
+    expectPlain("Paste recipe text before parsing.");
+    // The generated mutation file carries the same plain wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain("Import source content is required");
+    // Both the command-level and entity-level refusals use the plain wording.
+    expect(
+      mutations.split("Paste recipe text before parsing.").length - 1,
+    ).toBe(2);
+    // Later leftovers keep their current wording.
+    expect(visible).toContain(
+      "Stage importId must match the seeded import reference",
+    );
+    expect(visible).toContain("Source byte count cannot be negative");
+    expect(visible).toContain("Source fingerprint is required");
+  });
 });

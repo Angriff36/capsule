@@ -67,7 +67,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   hasMany lines: ComponentImportLine
   belongsTo resultingComponent: Component fields [tenantId, resultingComponentId] references [tenantId, id]
 
-  constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Import source content is required"
+  constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Paste recipe text before parsing."
   constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "When you enter a yield, it must be more than zero."
   constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "When you enter a batch size, it must be more than zero."
   constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "This recipe's line counts can't be negative. Use zero or more."
@@ -98,7 +98,7 @@ entity ComponentImport mixin TenantScoped, SoftDeletable {
   ) {
     guard self.uploadedAt == null
     guard self.deletedAt == null
-    constraint uploadSourcePresent: length(trim(rawSourceText)) > 0 "Import source content is required"
+    constraint uploadSourcePresent: length(trim(rawSourceText)) > 0 "Paste recipe text before parsing."
     constraint uploadByteCountNonnegative: sourceByteCount >= 0 "Source byte count cannot be negative"
     constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "Source fingerprint is required"
     mutate sourceKind = sourceKind

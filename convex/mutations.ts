@@ -5000,7 +5000,7 @@ async function __runComponentImportUpload(ctx: MutationCtx, { docId, sourceKind,
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((doc.uploadedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((rawSourceText).trim()).length > 0))) throw new Error("Import source content is required");
+    if (!((((rawSourceText).trim()).length > 0))) throw new Error("Paste recipe text before parsing.");
     if (!((sourceByteCount >= 0))) throw new Error("Source byte count cannot be negative");
     if (!((((sourceFingerprint).trim()).length > 0))) throw new Error("Source fingerprint is required");
     {
@@ -5105,7 +5105,7 @@ export const ComponentImport_createViaUpload = mutation({
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change recipe imports");
     if (!((__draft.uploadedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((((rawSourceText).trim()).length > 0))) throw new Error("Import source content is required");
+    if (!((((rawSourceText).trim()).length > 0))) throw new Error("Paste recipe text before parsing.");
     if (!((sourceByteCount >= 0))) throw new Error("Source byte count cannot be negative");
     if (!((((sourceFingerprint).trim()).length > 0))) throw new Error("Source fingerprint is required");
     const doc: Record<string, any> = {
