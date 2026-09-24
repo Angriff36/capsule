@@ -14,6 +14,7 @@
 import { createClerkClient } from "@clerk/backend";
 import { createHash } from "node:crypto";
 import { commandApiIdempotencyGate } from "./CommandApiIdempotencyGate";
+import { ConvexSiteOrigin } from "./ConvexSiteOrigin";
 
 export interface ApiKeyGatewayDeps {
   /**
@@ -157,10 +158,7 @@ export function createClerkApiKeyGatewayDeps(
   const clerk = createClerkClient({ secretKey });
   const sessions = new Map<string, string>();
   return {
-    convexSiteUrl: convexUrl
-      .replace(".convex.cloud", ".convex.site")
-      .replace(/:3210$/, ":3211")
-      .replace(/\/$/, ""),
+    convexSiteUrl: ConvexSiteOrigin.from(convexUrl),
     verifyApiKey: (secret) => clerk.apiKeys.verify(secret),
     mintSessionToken: async (userId) => {
       let sessionId = sessions.get(userId);

@@ -94,7 +94,7 @@ export class CapsuleAgentToolCallRouter {
     call: CapsuleAgentToolCall,
   ): Promise<CapsuleAgentToolResult | null> {
     if (call.name === CapsuleAgentBuiltinToolNames.listCommands) {
-      const commands = this.catalog.list();
+      const commands = this.catalog.offeredToPeople();
       const uiGaps = this.catalog.uiGaps();
       const uiGapWarning = this.uiBanner.forCapabilities(uiGaps);
       return {
@@ -115,10 +115,17 @@ export class CapsuleAgentToolCallRouter {
       }
       try {
         const descriptor = this.catalog.get(capabilityId);
+        const facts = this.catalog.generatedFacts();
+        const staleReadIds = facts.staleReadIds(capabilityId);
+        const firstReadId = staleReadIds[0];
         return this.withUiGap(
           {
             success: true,
-            data: descriptor,
+            data: {
+              ...descriptor,
+              staleReadIds,
+              read: firstReadId ? facts.read(firstReadId) : null,
+            },
             uiImplemented: descriptor.uiImplemented,
           },
           capabilityId,

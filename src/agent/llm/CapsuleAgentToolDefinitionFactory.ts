@@ -48,7 +48,7 @@ export class CapsuleAgentToolDefinitionFactory {
     const anthropic = [
       ...(includeBuiltins ? this.builtinAnthropicTools() : []),
       ...this.catalog
-        .list()
+        .offeredToPeople()
         .map((descriptor) => this.toAnthropicTool(descriptor)),
     ];
     if (format === "anthropic") {
