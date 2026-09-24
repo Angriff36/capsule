@@ -33,6 +33,7 @@ import {
   retireUnusedAutomaticDraft,
 } from "./purchasingEvents";
 import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
 import { ensureUniqueInvoiceNumber } from "./invoiceNumbering";
 import { ensureEventNumber } from "./eventNumbering";
 import { recordAcceptedProposalRevision } from "./proposalAcceptanceRevision";
@@ -360,6 +361,14 @@ export async function handleManifestEvent(
   }
   if (event.entity === "Event" && event.type === "EventCompleted") {
     await releaseEventInventoryHolds(ctx, event.entityId as Id<"events">);
+    return;
+  }
+  if (
+    event.entity === "EventDishLineOverride" &&
+    (event.type === "EventDishLineOverrideApplied" ||
+      event.type === "EventDishLineOverrideRevoked")
+  ) {
+    await lineOverridePurchasingFollowThrough.apply(ctx, event.payload.eventId);
     return;
   }
   if (
