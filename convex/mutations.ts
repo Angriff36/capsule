@@ -7756,7 +7756,7 @@ async function __runDeliveryCancel(ctx: MutationCtx, { docId, reason, version }:
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change deliveries");
     if (!(((doc.status === "scheduled") || (doc.status === "in_transit")))) throw new Error("Guard 0 failed");
@@ -7822,7 +7822,7 @@ async function __runDeliveryConfirmDelivery(ctx: MutationCtx, { docId, version }
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change deliveries");
     if (!((doc.status === "in_transit"))) throw new Error("Guard 0 failed");
@@ -7887,7 +7887,7 @@ async function __runDeliveryMarkFailed(ctx: MutationCtx, { docId, reason, versio
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change deliveries");
     if (!(((doc.status === "scheduled") || (doc.status === "in_transit")))) throw new Error("Guard 0 failed");
@@ -7958,7 +7958,7 @@ async function __runDeliverySchedule(ctx: MutationCtx, { docId, packListId, even
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).packList = __rel_packList;
     ((doc as any) as any).event = __rel_event;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change deliveries");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -8055,7 +8055,7 @@ export const Delivery_createViaSchedule = mutation({
     };
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, __draft.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change deliveries");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -8103,7 +8103,7 @@ async function __runDeliveryStandDownWithEvent(ctx: MutationCtx, { docId, versio
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change deliveries");
     if (!(((doc.status === "scheduled") || (doc.status === "in_transit")))) throw new Error("Guard 0 failed");
@@ -8168,7 +8168,7 @@ async function __runDeliveryStartTransit(ctx: MutationCtx, { docId, version }: a
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update deliveries");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change deliveries");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
@@ -19978,7 +19978,7 @@ async function __runEventVehicleAssignmentAssign(ctx: MutationCtx, { docId, even
     ((doc as any) as any).vehicle = __rel_vehicle;
     ((doc as any) as any).trailer = __rel_trailer;
     ((doc as any) as any).driver = __rel_driver;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read event vehicle assignments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may update event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may change event vehicle assignments");
     if (!((doc.assignedAt == null))) throw new Error("Guard 0 failed");
@@ -20068,7 +20068,7 @@ export const EventVehicleAssignment_createViaAssign = mutation({
     const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, __draft.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_trailer = await __resolveRelation(ctx, "trailers", [__auth.tenantId, __draft.trailerId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_driver = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.driverId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read event vehicle assignments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may update event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may change event vehicle assignments");
     if (!((__draft.assignedAt == null))) throw new Error("Guard 0 failed");
@@ -20109,7 +20109,7 @@ async function __runEventVehicleAssignmentClearPreloaded(ctx: MutationCtx, { doc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventVehicleAssignment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventVehicleAssignment not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read event vehicle assignments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may update event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may change event vehicle assignments");
     if (!((doc.preloadedAt != null))) throw new Error("Guard 0 failed");
@@ -20155,7 +20155,7 @@ async function __runEventVehicleAssignmentMarkPreloaded(ctx: MutationCtx, { docI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventVehicleAssignment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventVehicleAssignment not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read event vehicle assignments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may update event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may change event vehicle assignments");
     if (!((doc.assignedAt != null))) throw new Error("Guard 0 failed");
@@ -20202,7 +20202,7 @@ async function __runEventVehicleAssignmentRelease(ctx: MutationCtx, { docId, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventVehicleAssignment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventVehicleAssignment not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read event vehicle assignments");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may update event vehicle assignments");
     if (!((((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")) || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event, sales and logistics staff and managers may change event vehicle assignments");
     if (!((doc.assignedAt != null))) throw new Error("Guard 0 failed");
@@ -30235,7 +30235,7 @@ async function __runPackListAcknowledgePackingRequirement(ctx: MutationCtx, { do
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     {
@@ -30290,7 +30290,7 @@ async function __runPackListApplyServiceStyleKit(ctx: MutationCtx, { docId, serv
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((((doc.deletedAt == null) && (doc.status !== "dispatched")) && (doc.status !== "cancelled")))) throw new Error("Guard 0 failed");
@@ -30366,7 +30366,7 @@ async function __runPackListCancel(ctx: MutationCtx, { docId, reason, version }:
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!(((((doc.status === "draft") || (doc.status === "packing")) || (doc.status === "packed")) || (doc.status === "loaded")))) throw new Error("Guard 0 failed");
@@ -30433,7 +30433,7 @@ async function __runPackListDispatch(ctx: MutationCtx, { docId, version }: any, 
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((doc.status === "loaded"))) throw new Error("Guard 0 failed");
@@ -30497,7 +30497,7 @@ async function __runPackListMarkLoaded(ctx: MutationCtx, { docId, version }: any
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((doc.status === "packed"))) throw new Error("Guard 0 failed");
@@ -30561,7 +30561,7 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((doc.status === "packing"))) throw new Error("Guard 0 failed");
@@ -30648,7 +30648,7 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((((checkRole(user, "logisticsAccess") || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Guard 0 failed");
@@ -30769,7 +30769,7 @@ export const PackList_createViaOpen = mutation({
       purpose: args.purpose
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((((checkRole(user, "logisticsAccess") || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Guard 0 failed");
@@ -30848,7 +30848,7 @@ async function __runPackListRequestAssistance(ctx: MutationCtx, { docId, note, v
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((((doc.deletedAt == null) && (doc.status !== "dispatched")) && (doc.status !== "cancelled")))) throw new Error("Guard 0 failed");
@@ -30897,7 +30897,7 @@ async function __runPackListRequestDishContainers(ctx: MutationCtx, { docId, eve
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((((doc.deletedAt == null) && (doc.status !== "dispatched")) && (doc.status !== "cancelled")))) throw new Error("Guard 0 failed");
@@ -30980,7 +30980,7 @@ async function __runPackListResolveAssistance(ctx: MutationCtx, { docId, version
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((doc.assistanceRequestedAt != null))) throw new Error("Guard 0 failed");
@@ -31031,7 +31031,7 @@ async function __runPackListStandDownWithEvent(ctx: MutationCtx, { docId, versio
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!(((((doc.status === "draft") || (doc.status === "packing")) || (doc.status === "packed")) || (doc.status === "loaded")))) throw new Error("Guard 0 failed");
@@ -31097,7 +31097,7 @@ async function __runPackListStartPacking(ctx: MutationCtx, { docId, version }: a
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack lists");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack lists");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack lists");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
@@ -31161,7 +31161,7 @@ async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, d
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).packList = __rel_packList;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.listedAt == null))) throw new Error("Guard 0 failed");
@@ -31266,7 +31266,7 @@ export const PackListItem_createViaAddItem = mutation({
       unit: args.unit
     };
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, __draft.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((__draft.listedAt == null))) throw new Error("Guard 0 failed");
@@ -31311,7 +31311,7 @@ async function __runPackListItemAdjustQuantity(ctx: MutationCtx, { docId, requir
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).packList = __rel_packList;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
@@ -31381,7 +31381,7 @@ async function __runPackListItemAdoptContainerLink(ctx: MutationCtx, { docId, ev
       ((doc as any) as any).packList.items = ((doc as any) as any).packList.items.filter((row: any) => row.tenantId === __auth.tenantId);
     }
     ((doc as any) as any).dishContainer = __rel_dishContainer;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((((user.role === "owner") || (user.role === "admin")) || (user.role === "system")))) throw new Error("Guard 0 failed");
@@ -31442,7 +31442,7 @@ async function __runPackListItemAnnotate(ctx: MutationCtx, { docId, note, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -31497,7 +31497,7 @@ async function __runPackListItemCorrectImportedFluidOunces(ctx: MutationCtx, { d
       }
       if ((((doc as any) as any).packList as any).event && (((doc as any) as any).packList as any).event.tenantId !== __auth.tenantId) (((doc as any) as any).packList as any).event = null;
     }
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((((user.role === "owner") || (user.role === "admin")) || (user.role === "system")))) throw new Error("Guard 0 failed");
@@ -31556,7 +31556,7 @@ async function __runPackListItemEnsureContainer(ctx: MutationCtx, { docId, packL
     ((doc as any) as any).packList = __rel_packList;
     ((doc as any) as any).dishContainer = __rel_dishContainer;
     ((doc as any) as any).eventDish = __rel_eventDish;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -31636,7 +31636,7 @@ async function __runPackListItemEnsureKitItem(ctx: MutationCtx, { docId, packLis
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).packList = __rel_packList;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -31715,7 +31715,7 @@ async function __runPackListItemMarkMissing(ctx: MutationCtx, { docId, version }
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).packList = __rel_packList;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
@@ -31779,7 +31779,7 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).packList = __rel_packList;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
@@ -31848,7 +31848,7 @@ async function __runPackListItemRemove(ctx: MutationCtx, { docId, version }: any
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).packList = __rel_packList;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -31907,7 +31907,7 @@ async function __runPackListItemRestoreImportedAssociation(ctx: MutationCtx, { d
         (((doc as any) as any).packList as any).event.eventDishes = (((doc as any) as any).packList as any).event.eventDishes.filter((row: any) => row.tenantId === __auth.tenantId);
       }
     }
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     if (!((((user.role === "owner") || (user.role === "admin")) || (user.role === "system")))) throw new Error("Guard 0 failed");
@@ -31970,7 +31970,7 @@ async function __runPackListItemSyncContainerServings(ctx: MutationCtx, { docId,
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_dishContainer = await __resolveRelation(ctx, "dishContainers", [__auth.tenantId, doc.dishContainerId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_eventDish = await __resolveRelation(ctx, "eventDishes", [__auth.tenantId, doc.eventDishId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read pack list items");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may update pack list items");
     if (!(((((checkRole(user, "logisticsAccess") || checkRole(user, "kitchenAccess")) || checkRole(user, "eventAccess")) || checkRole(user, "salesAccess")) || checkRole(user, "manageAccess")))) throw new Error("Kitchen, logistics, event and sales staff and managers may change pack list items");
     const eligible = (((((((((doc.deletedAt == null) && (doc.followsDishServings === true)) && (__rel_dishContainer != null)) && (__rel_packList != null)) && (__rel_packList.status !== "dispatched")) && (__rel_packList.status !== "cancelled")) && (__rel_eventDish != null)) && (__rel_eventDish.deletedAt == null)) && (__rel_eventDish.removedAt == null));
@@ -32034,7 +32034,7 @@ async function __runPackListTemplateArchive(ctx: MutationCtx, { docId, reason, v
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListTemplate not found");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list templates");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change pack list templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -32096,7 +32096,7 @@ async function __runPackListTemplateDefine(ctx: MutationCtx, { docId, name, desc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListTemplate not found");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list templates");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change pack list templates");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
@@ -32188,7 +32188,7 @@ export const PackListTemplate_createViaDefine = mutation({
       serviceStyleId: args.serviceStyleId,
       venueRequirement: args.venueRequirement
     };
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list templates");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change pack list templates");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
@@ -32227,7 +32227,7 @@ async function __runPackListTemplateReactivate(ctx: MutationCtx, { docId, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListTemplate not found");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list templates");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change pack list templates");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
@@ -32287,7 +32287,7 @@ async function __runPackListTemplateRevise(ctx: MutationCtx, { docId, name, desc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListTemplate not found");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read pack list templates");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update pack list templates");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change pack list templates");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
@@ -48607,7 +48607,7 @@ async function __runTrailerRegister(ctx: MutationCtx, { docId, make, model, regi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Trailer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Trailer not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read trailers");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -48705,7 +48705,7 @@ export const Trailer_createViaRegister = mutation({
       registration: args.registration,
       statusNote: args.statusNote
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read trailers");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -48745,7 +48745,7 @@ async function __runTrailerReviseDetails(ctx: MutationCtx, { docId, make, model,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Trailer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Trailer not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read trailers");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -48802,7 +48802,7 @@ async function __runTrailerUpdateInsurance(ctx: MutationCtx, { docId, insuranceP
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Trailer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Trailer not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read trailers");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -48856,7 +48856,7 @@ async function __runTrailerUpdateOperationalStatus(ctx: MutationCtx, { docId, op
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Trailer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Trailer not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read trailers");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -48919,7 +48919,7 @@ async function __runTrailerUpdateRegistration(ctx: MutationCtx, { docId, registr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Trailer not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Trailer not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read trailers");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update trailers");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change trailers");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -49352,7 +49352,7 @@ async function __runVehicleRegister(ctx: MutationCtx, { docId, make, model, regi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Vehicle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Vehicle not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read vehicles");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -49454,7 +49454,7 @@ export const Vehicle_createViaRegister = mutation({
       registration: args.registration,
       statusNote: args.statusNote
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read vehicles");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -49495,7 +49495,7 @@ async function __runVehicleReviseDetails(ctx: MutationCtx, { docId, make, model,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Vehicle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Vehicle not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read vehicles");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -49554,7 +49554,7 @@ async function __runVehicleUpdateInsurance(ctx: MutationCtx, { docId, insuranceP
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Vehicle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Vehicle not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read vehicles");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -49608,7 +49608,7 @@ async function __runVehicleUpdateOperationalStatus(ctx: MutationCtx, { docId, op
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Vehicle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Vehicle not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read vehicles");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -49671,7 +49671,7 @@ async function __runVehicleUpdateRegistration(ctx: MutationCtx, { docId, registr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Vehicle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Vehicle not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read vehicles");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicles");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -49724,7 +49724,7 @@ async function __runVehicleFuelLogRecord(ctx: MutationCtx, { docId, vehicleId, o
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VehicleFuelLog not found");
     const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, doc.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vehicle = __rel_vehicle;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read fuel logs");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see fuel logs");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may add fuel logs");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change fuel logs");
     if (!((doc.loggedAt == null))) throw new Error("Guard 0 failed");
@@ -49806,7 +49806,7 @@ export const VehicleFuelLog_createViaRecord = mutation({
       vehicleId: args.vehicleId
     };
     const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, __draft.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read fuel logs");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see fuel logs");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may add fuel logs");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change fuel logs");
     if (!((__draft.loggedAt == null))) throw new Error("Guard 0 failed");
@@ -49844,7 +49844,7 @@ async function __runVehicleMaintenanceScheduleApplyService(ctx: MutationCtx, { d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VehicleMaintenanceSchedule not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VehicleMaintenanceSchedule not found");
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read vehicle maintenance");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see vehicle maintenance");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicle maintenance");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicle maintenance");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 0 failed");
@@ -49900,7 +49900,7 @@ async function __runVehicleMaintenanceScheduleSchedule(ctx: MutationCtx, { docId
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VehicleMaintenanceSchedule not found");
     const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, doc.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).vehicle = __rel_vehicle;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read vehicle maintenance");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see vehicle maintenance");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicle maintenance");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicle maintenance");
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
@@ -49993,7 +49993,7 @@ export const VehicleMaintenanceSchedule_createViaSchedule = mutation({
       vehicleId: args.vehicleId
     };
     const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, __draft.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read vehicle maintenance");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see vehicle maintenance");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may update vehicle maintenance");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicle maintenance");
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
@@ -50037,7 +50037,7 @@ async function __runVehicleServiceEntryRecord(ctx: MutationCtx, { docId, mainten
     const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, doc.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).maintenanceSchedule = __rel_maintenanceSchedule;
     ((doc as any) as any).vehicle = __rel_vehicle;
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read vehicle service history");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see vehicle service history");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may add vehicle service");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicle service");
     if (!((doc.loggedAt == null))) throw new Error("Guard 0 failed");
@@ -50141,7 +50141,7 @@ export const VehicleServiceEntry_createViaRecord = mutation({
     };
     const __rel_maintenanceSchedule = await __resolveRelation(ctx, "vehicleMaintenanceSchedules", [__auth.tenantId, __draft.maintenanceScheduleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_vehicle = await __resolveRelation(ctx, "vehicles", [__auth.tenantId, __draft.vehicleId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may read vehicle service history");
+    if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may see vehicle service history");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may add vehicle service");
     if (!((checkRole(user, "logisticsAccess") || checkRole(user, "manageAccess")))) throw new Error("Logistics staff and managers may change vehicle service");
     if (!((__draft.loggedAt == null))) throw new Error("Guard 0 failed");

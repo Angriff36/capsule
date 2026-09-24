@@ -57,7 +57,7 @@ entity Vehicle mixin TenantScoped, SoftDeletable {
   transition operationalStatus from "retired" to ["available", "in_use", "maintenance", "out_of_service"]
 
   // Read wide: the Event Tracker shows every role which truck goes to which event.
-  default policy vehicleRead read: roleAllows(user.role, "staffAccess") "Staff may read vehicles"
+  default policy vehicleRead read: roleAllows(user.role, "staffAccess") "Staff may see vehicles"
   default policy vehicleWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update vehicles"
   default policy vehicleExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change vehicles"
 
@@ -279,7 +279,7 @@ entity Trailer mixin TenantScoped, SoftDeletable {
   transition operationalStatus from "out_of_service" to ["available", "in_use", "maintenance", "retired"]
   transition operationalStatus from "retired" to ["available", "in_use", "maintenance", "out_of_service"]
 
-  default policy trailerRead read: roleAllows(user.role, "staffAccess") "Staff may read trailers"
+  default policy trailerRead read: roleAllows(user.role, "staffAccess") "Staff may see trailers"
   default policy trailerWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update trailers"
   default policy trailerExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change trailers"
 
@@ -474,7 +474,7 @@ entity VehicleFuelLog mixin TenantScoped, SoftDeletable {
 
   constraint vehicleFuelComplete: self.loggedAt == null or (self.odometer >= 0 and self.fuelCost >= 0 and self.filledAt != null) "Fuel logs require a nonnegative odometer, nonnegative cost, and fill date"
 
-  default policy vehicleFuelRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read fuel logs"
+  default policy vehicleFuelRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may see fuel logs"
   default policy vehicleFuelWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may add fuel logs"
   default policy vehicleFuelExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change fuel logs"
 
@@ -544,7 +544,7 @@ entity VehicleMaintenanceSchedule mixin TenantScoped, SoftDeletable {
 
   constraint vehicleMaintenanceComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and ((self.intervalType == "time" and self.intervalDays > 0 and self.nextDueAt != null) or (self.intervalType == "mileage" and self.intervalMiles > 0 and self.nextDueMileage != null))) "Scheduled maintenance requires a task and a time or mileage interval with a due target"
 
-  default policy vehicleMaintenanceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicle maintenance"
+  default policy vehicleMaintenanceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may see vehicle maintenance"
   default policy vehicleMaintenanceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update vehicle maintenance"
   default policy vehicleMaintenanceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change vehicle maintenance"
 
@@ -651,7 +651,7 @@ entity VehicleServiceEntry mixin TenantScoped, SoftDeletable {
 
   constraint vehicleServiceComplete: self.loggedAt == null or (length(trim(self.vendor)) > 0 and self.cost >= 0 and self.odometer >= 0 and self.completedAt != null) "Completed service requires a vendor, nonnegative cost, odometer reading, and completion time"
 
-  default policy vehicleServiceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicle service history"
+  default policy vehicleServiceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may see vehicle service history"
   default policy vehicleServiceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may add vehicle service"
   default policy vehicleServiceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change vehicle service"
 

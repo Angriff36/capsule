@@ -371,7 +371,9 @@ describe("runtime proof: Event lifecycle transition sequence (AC-225)", () => {
         docId: eventId,
         version,
       }),
-    ).rejects.toThrow(/Guard|denied|not authorized|Invalid|Staff may read/i);
+    ).rejects.toThrow(
+      /Guard|denied|not authorized|Invalid|Staff may read|Staff may see/i,
+    );
 
     const refused = await readEvent(events, eventId);
     expect(refused.stage).toBe("pending_approval");

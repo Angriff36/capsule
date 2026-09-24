@@ -64,7 +64,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
   // logisticsAccess: packing staff. Same cascade pattern as PurchaseNeed.
   // Read wide: the Event Tracker shows pack status to the whole crew. Event
   // and sales staff write because they open a pack list from the tracker row.
-  default policy packListRead read: roleAllows(user.role, "staffAccess") "Staff may read pack lists"
+  default policy packListRead read: roleAllows(user.role, "staffAccess") "Staff may see pack lists"
   default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may update pack lists"
   default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may change pack lists"
 
@@ -343,7 +343,7 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
 
   // Kitchen and logistics share physical packing; recipe corrections also
   // reconcile container requirements through these same commands.
-  default policy packListItemRead read: roleAllows(user.role, "staffAccess") "Staff may read pack list items"
+  default policy packListItemRead read: roleAllows(user.role, "staffAccess") "Staff may see pack list items"
   default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may update pack list items"
   default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "manageAccess") "Kitchen, logistics, event and sales staff and managers may change pack list items"
 

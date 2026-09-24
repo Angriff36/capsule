@@ -47,7 +47,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
 
   // manageAccess: reserved for manager-driven cascade; logisticsAccess: packing staff.
-  default policy deliveryRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read deliveries"
+  default policy deliveryRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may see deliveries"
   default policy deliveryWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update deliveries"
   default policy deliveryExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may change deliveries"
 
