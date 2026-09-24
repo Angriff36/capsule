@@ -252,6 +252,22 @@ export const ClientOutreachTaskSchema = z.object({
 
 export type ClientOutreachTask = z.infer<typeof ClientOutreachTaskSchema>;
 
+// Entity: ClientPortalLink
+export const ClientPortalLinkSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  status: z.enum(["active", "revoked"]).default("active"),
+  expiresAt: z.coerce.date(),
+  revokedAt: z.coerce.date().nullable().optional(),
+  issuedBySubject: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ClientPortalLink = z.infer<typeof ClientPortalLinkSchema>;
+
 // Entity: Component
 export const ComponentSchema = z.object({
   id: z.string().uuid(),
@@ -4325,6 +4341,19 @@ export const ClientOutreachTaskOpenParamsSchema = z.object({
 });
 
 export type ClientOutreachTaskOpenParams = z.infer<typeof ClientOutreachTaskOpenParamsSchema>;
+
+// Command: create on ClientPortalLink
+export const ClientPortalLinkCreateParamsSchema = z.object({
+  eventId: z.string().min(1),
+  expiresAt: z.coerce.date(),
+});
+
+export type ClientPortalLinkCreateParams = z.infer<typeof ClientPortalLinkCreateParamsSchema>;
+
+// Command: revoke on ClientPortalLink
+export const ClientPortalLinkRevokeParamsSchema = z.object({});
+
+export type ClientPortalLinkRevokeParams = z.infer<typeof ClientPortalLinkRevokeParamsSchema>;
 
 // Command: draft on Component
 export const ComponentDraftParamsSchema = z.object({

@@ -71,6 +71,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ClientOutreachTask_createViaOpen, { "clientId": "clientId-client-outreach-task-1", "reason": "demo-reason-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ClientOutreachTask_createViaOpen, { "clientId": "clientId-client-outreach-task-2", "reason": "demo-reason-2" } as any);
+  // ClientPortalLink → api.mutations.ClientPortalLink_create
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ClientPortalLink_create, { "eventId": "eventId-client-portal-link-1", "expiresAt": 1767268800000 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ClientPortalLink_create, { "eventId": "eventId-client-portal-link-2", "expiresAt": 1767355200000 } as any);
   // Component has multiple initialization commands (draft, purge, retire); using the selected initialization command: draft.
   // Component → api.mutations.Component_createViaDraft
   rowsAttempted += 1;
@@ -873,6 +878,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ClientOutreachTask",
       "createMutation": "ClientOutreachTask_createViaOpen",
+      "rowCount": 2
+    },
+    {
+      "entity": "ClientPortalLink",
+      "createMutation": "ClientPortalLink_create",
       "rowCount": 2
     },
     {

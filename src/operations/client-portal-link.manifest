@@ -1,0 +1,57 @@
+// One client-facing link for an event.
+//
+// The link's id is the public address (/portal/events/<id>). Staff copy a
+// link from the event; copying again turns the previous link off. The link
+// stops working after 90 days, and staff can turn it off sooner. The public
+// portal reads this row (convex/clientPortal.ts) and shows nothing when the
+// link is off, expired, or from another company.
+//
+// Older copied links that were signed without a saved row keep working until
+// staff copy a new link or turn the client link off. After either of those,
+// a saved row exists and the older signed link stops opening the event.
+
+enum ClientPortalLinkStatus {
+  active
+  revoked
+}
+
+entity ClientPortalLink mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required eventId: uuid
+  property required status: ClientPortalLinkStatus = "active"
+  property required expiresAt: datetime
+  property revokedAt: datetime?
+  property issuedBySubject: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  // Same people who can open the event can copy or turn off its client link.
+  // The copy button already lived on the event for every staff reader.
+  default policy clientPortalLinkRead read: roleAllows(user.role, "staffAccess") "Staff may see which client links are open"
+  default policy clientPortalLinkWrite write: roleAllows(user.role, "staffAccess") "Staff may update client links"
+  default policy clientPortalLinkExecute execute: roleAllows(user.role, "staffAccess") "Staff may change client links"
+
+  command create(
+    eventId: uuid,
+    expiresAt: datetime
+  ) {
+    guard user.id != null
+    constraint clientPortalExpiresFuture: expiresAt > now() "The client link must stay open until a later time"
+    mutate eventId = eventId
+    mutate status = "active"
+    mutate expiresAt = expiresAt
+    mutate issuedBySubject = user.id
+  }
+
+  command revoke() {
+    guard self.deletedAt == null
+    guard self.status == "active" "This client link is already off"
+    mutate status = "revoked"
+    mutate revokedAt = now()
+  }
+
+  store ClientPortalLink in durable
+}

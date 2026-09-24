@@ -32,6 +32,8 @@ import {
   ClientOutreachTaskCompleteParamsSchema,
   ClientOutreachTaskDismissParamsSchema,
   ClientOutreachTaskOpenParamsSchema,
+  ClientPortalLinkCreateParamsSchema,
+  ClientPortalLinkRevokeParamsSchema,
   ClientReactivateParamsSchema,
   ClientRegisterParamsSchema,
   ClientSetBirthdayParamsSchema,
@@ -1333,6 +1335,36 @@ export function useCreateClientOutreachTask() {
     const parsed = ClientOutreachTaskOpenParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for ClientPortalLink. */
+export function useListClientPortalLink() {
+  return useQuery(api.queries.listClientPortalLink);
+}
+
+/** Reactive get-by-id for ClientPortalLink. Pass "skip" to suspend. */
+export function useGetClientPortalLink(id: string | "skip") {
+  return useQuery(api.queries.getClientPortalLink, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ClientPortalLink.create. */
+export function useClientPortalLinkCreate() {
+  const mutate = useMutation(api.mutations.ClientPortalLink_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientPortalLinkCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ClientPortalLink.revoke. */
+export function useClientPortalLinkRevoke() {
+  const mutate = useMutation(api.mutations.ClientPortalLink_revoke);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientPortalLinkRevokeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
 
@@ -11183,4 +11215,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1189 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1193 as const;
