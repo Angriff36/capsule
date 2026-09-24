@@ -52,4 +52,24 @@ describe("plain words on leftover event-packet manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover event-number READ copy free of read jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/operations/event-number-sequence.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Staff may read event numbers");
+
+    expect(visible).toContain("Staff may see event numbers");
+    expectPlain("Staff may see event numbers");
+
+    for (const landed of [
+      "Only Capsule can assign event numbers",
+      "Assigned event numbers stay behind the scenes",
+    ]) {
+      expect(visible).toContain(landed);
+    }
+  });
 });

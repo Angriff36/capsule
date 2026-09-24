@@ -36,7 +36,7 @@ entity EventNumberAssignment mixin TenantScoped {
   property indexed required eventNumber: string
 
   // The whole crew reads event numbers; only the numbering seam writes them.
-  default policy eventNumberAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may read event numbers"
+  default policy eventNumberAssignmentRead read: roleAllows(user.role, "staffAccess") "Staff may see event numbers"
   default policy eventNumberAssignmentWrite write: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Only Capsule can assign event numbers"
   default policy eventNumberAssignmentExecute execute: roleAllows(user.role, "eventNumberSequenceSeamOnly") "Assigned event numbers stay behind the scenes"
 
