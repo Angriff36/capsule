@@ -66,6 +66,17 @@ export function SearchSelect({
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);
+  const hiddenRef = useRef<HTMLInputElement>(null);
+  // The draft saver only hears native input events. A React value update on
+  // the hidden field does not emit one, so a client or venue choice was lost
+  // once the search keystrokes had already been saved (#368 item 4).
+  const announceChoice = useRef(false);
+
+  useEffect(() => {
+    if (!announceChoice.current) return;
+    announceChoice.current = false;
+    hiddenRef.current?.dispatchEvent(new Event("input", { bubbles: true }));
+  }, [value]);
 
   const selected = useMemo(
     () => options.find((option) => option.id === value),
@@ -103,6 +114,7 @@ export function SearchSelect({
   }, [query, open]);
 
   const choose = (id: string) => {
+    announceChoice.current = true;
     onChange(id);
     setOpen(false);
     setQuery("");
@@ -128,6 +140,7 @@ export function SearchSelect({
         setQuery("");
       }
     } else if (event.key === "Backspace" && query === "" && value) {
+      announceChoice.current = true;
       onChange("");
     }
   };
@@ -138,6 +151,7 @@ export function SearchSelect({
     <div ref={rootRef} className="relative">
       {name ? (
         <input
+          ref={hiddenRef}
           type="hidden"
           name={name}
           value={value}
