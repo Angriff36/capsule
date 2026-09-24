@@ -95,4 +95,44 @@ describe("plain words on the kitchen recipe book", () => {
 
     expectPlain("Recipe");
   });
+
+  it("keeps leftover kitchen recipe detail copy free of component jargon", () => {
+    const detail = readFileSync(
+      "src/features/kitchen/ComponentDetailPage.tsx",
+      "utf8",
+    );
+
+    // The file name and identifiers stay — only the words a person reads.
+    expect(detail).not.toContain('useTrackRecent("Component"');
+    expect(detail).not.toContain('title="Component not found"');
+    expect(detail).not.toContain("This component is unavailable");
+    expect(detail).not.toContain("← Component index");
+    expect(detail).not.toContain("Component · Edition");
+    expect(detail).not.toContain("from this component.");
+    expect(detail).not.toContain("publish this component");
+    expect(detail).not.toContain("uses this component.");
+    expect(detail).not.toContain("when the component is ready");
+    expect(detail).not.toContain("Revise component");
+
+    expect(detail).toContain('useTrackRecent("Recipe"');
+    expect(detail).toContain('title="Recipe not found"');
+    expect(detail).toContain("This recipe is unavailable or no longer exists.");
+    expect(detail).toContain("← Recipes");
+    expect(detail).toContain("Recipe · Edition");
+    expect(detail).toContain("from this recipe.");
+    expect(detail).toContain("You can still publish this recipe");
+    expect(detail).toContain("No plated dish uses this recipe.");
+    expect(detail).toContain("when the recipe is ready");
+    expect(detail).toContain("Revise recipe");
+
+    for (const fresh of [
+      "Recipe not found",
+      "This recipe is unavailable or no longer exists.",
+      "← Recipes",
+      "No plated dish uses this recipe.",
+      "Revise recipe",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });
