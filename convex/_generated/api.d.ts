@@ -120,6 +120,7 @@ import type * as lib_prepTaskQuantity from "../lib/prepTaskQuantity.js";
 import type * as lib_prepWorkReconciliation from "../lib/prepWorkReconciliation.js";
 import type * as lib_proposalAcceptanceRevision from "../lib/proposalAcceptanceRevision.js";
 import type * as lib_proposalBookingVenue from "../lib/proposalBookingVenue.js";
+import type * as lib_proposalChangeDraft from "../lib/proposalChangeDraft.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
 import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
@@ -309,6 +310,7 @@ declare const fullApi: ApiFromModules<{
   "lib/prepWorkReconciliation": typeof lib_prepWorkReconciliation;
   "lib/proposalAcceptanceRevision": typeof lib_proposalAcceptanceRevision;
   "lib/proposalBookingVenue": typeof lib_proposalBookingVenue;
+  "lib/proposalChangeDraft": typeof lib_proposalChangeDraft;
   "lib/proposalDraft": typeof lib_proposalDraft;
   "lib/proposalEventCreation": typeof lib_proposalEventCreation;
   "lib/proposalPricing": typeof lib_proposalPricing;
