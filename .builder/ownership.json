@@ -18,7 +18,7 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "16f0ec58ae9e744fb11d3511edb83657bbddcc4ca202f44cc74d1929e47c545d"
+      "sha256": "fe5d077541efcbd6094eee3ea4a8afed3d3b899e9bda8053ecf947c359c6df25"
     },
     "convex/queries.ts": {
       "sha256": "abc03b4103b752762301d7c49b352c68b19201a75a83e2e21f733c038f0faf7f"
@@ -30,7 +30,7 @@
       "sha256": "c009ac4df823ff15b35e2af0388c73bcc2279e3cd7b043391ded24dd818b4864"
     },
     "manifest-context-summary.json": {
-      "sha256": "565eb3e111555a657519fc0bf921a56e122e68ff131d0a91939d2e31e50a1c87"
+      "sha256": "27eeb74ec4ed5a317e761621ddc17373f56b5db0f48a3009c4c93673362faa96"
     },
     "package.json": {
       "sha256": "6c7b659dc46be8b0ed001e609ad02ee20471a66f995572f19f339996854840f6"
@@ -45,10 +45,10 @@
       "sha256": "f3008707d27f5918a640b64d7541b3eed0d351bdce0c62d9ebc73dc6388af245"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "4fef7a7feab4aac7cdc9cd57713372a5fe789b6b3bdd62252bea5aadd7d8896e"
+      "sha256": "1409987f65210702b557670dbebf2045a092cef4bf251016b9159b48e839a13b"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "c39bf0fadf0475c945b0dff79f3d33bd77d554c5251bd3d9494dbf7f4e362b7d"
+      "sha256": "cc5cb83473a6953692cdd70f3f96016e442074f01c0b73188b88bdca4daf224c"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "29c3b61ffd7b482f4350aec81805dec9b52a518a4479775513ddfb9afe086879"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "09a4b54e916864e400f1a55ddf7fb9ab238676a3a04d106b19dd8a88b9d936ea"
+      "sha256": "b0639bc9183b94ba18fb4153fc74380ccfb513af57d0cd70a6eb46a23e9f4f1c"
     }
   },
   "package": {
