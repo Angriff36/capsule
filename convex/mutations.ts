@@ -4846,7 +4846,7 @@ async function __runComponentImportReviseReview(ctx: MutationCtx, { docId, expec
     if (!((doc.deletedAt == null))) throw new Error("Guard 3 failed");
     if (!((((parsedName).trim()).length > 0))) throw new Error("Reviewed recipe name is required");
     if (!(((parsedYieldQuantity == null) || (parsedYieldQuantity > 0)))) throw new Error("When you enter a yield on this review, it must be more than zero.");
-    if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("Reviewed batch multiplier must be positive when present");
+    if (!(((parsedBatchMultiplier == null) || (parsedBatchMultiplier > 0)))) throw new Error("When you enter a batch size on this review, it must be more than zero.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

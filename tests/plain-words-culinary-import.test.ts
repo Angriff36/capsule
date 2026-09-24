@@ -47,9 +47,8 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(summary).toContain("Completed imports require a resulting recipe");
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Reviewed batch multiplier must be positive when present",
+      "Resolved line count cannot exceed parsed line count",
     );
-    expect(visible).toContain("Import line counts cannot be negative");
     // Already-landed recipe leftovers stay.
     expect(visible).toContain("Kitchen staff may see recipe imports");
     expect(visible).toContain("Kitchen staff may update recipe imports");
@@ -97,9 +96,8 @@ describe("plain words on leftover culinary import constraint copy", () => {
     expect(visible).toContain("Completed imports require a resulting recipe");
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "Reviewed batch multiplier must be positive when present",
+      "Resolved line count cannot exceed parsed line count",
     );
-    expect(visible).toContain("Import line counts cannot be negative");
   });
 
   it("keeps leftover culinary import reviewed-yield and parsed-batch copy free of quantity jargon", () => {
@@ -153,8 +151,68 @@ describe("plain words on leftover culinary import constraint copy", () => {
     );
     // Later leftovers keep their current wording.
     expect(visible).toContain(
+      "Resolved line count cannot exceed parsed line count",
+    );
+  });
+
+  it("keeps leftover culinary import reviewed-batch and line-count copy free of multiplier jargon", () => {
+    const manifest = readFileSync(
+      "src/culinary/component-import.manifest",
+      "utf8",
+    );
+    // Strip // comments the same way the culinary leftover tests do.
+    const visible = manifest.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+    // The old reviewed-batch and line-count refusals are gone.
+    expect(visible).not.toContain(
       "Reviewed batch multiplier must be positive when present",
     );
-    expect(visible).toContain("Import line counts cannot be negative");
+    expect(visible).not.toContain("Import line counts cannot be negative");
+    // The refusals now speak in plain catering words.
+    expect(visible).toContain(
+      "When you enter a batch size on this review, it must be more than zero.",
+    );
+    expect(visible).toContain(
+      "This recipe's line counts can't be negative. Use zero or more.",
+    );
+    expectPlain(
+      "When you enter a batch size on this review, it must be more than zero.",
+    );
+    expectPlain(
+      "This recipe's line counts can't be negative. Use zero or more.",
+    );
+    // The generated mutation file carries the reviewed-batch wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain(
+      "Reviewed batch multiplier must be positive when present",
+    );
+    expect(mutations).toContain(
+      "When you enter a batch size on this review, it must be more than zero.",
+    );
+    // The line-count refusal projects into the summary, not the mutation file.
+    const summary = readFileSync("manifest-context-summary.json", "utf8");
+    expect(summary).not.toContain("Import line counts cannot be negative");
+    expect(summary).toContain(
+      "This recipe's line counts can't be negative. Use zero or more.",
+    );
+    // Already-landed copy stays.
+    expect(visible).toContain("Parsed recipe name is required");
+    expect(visible).toContain("Reviewed recipe name is required");
+    expect(visible).toContain("Completed imports require a resulting recipe");
+    expect(visible).toContain(
+      "This recipe can't have a negative number of lines. Use zero or more.",
+    );
+    expect(visible).toContain(
+      "When you enter a yield, it must be more than zero.",
+    );
+    expect(visible).toContain(
+      "When you enter a yield on this review, it must be more than zero.",
+    );
+    expect(visible).toContain(
+      "When you enter a batch size, it must be more than zero.",
+    );
+    // Later leftovers keep their current wording.
+    expect(visible).toContain(
+      "Resolved line count cannot exceed parsed line count",
+    );
   });
 });
