@@ -274,4 +274,49 @@ describe("plain words on kitchen screens", () => {
       "Not enough of this ingredient is on hold. Saved substitutes are ranked for the kitchen; the original ingredient is unchanged.",
     );
   });
+
+  it("keeps leftover kitchen portion-spec screen copy free of spec jargon", () => {
+    const panel = readFileSync(
+      "src/features/kitchen/DishComponentPortionSpecPanel.tsx",
+      "utf8",
+    );
+
+    for (const old of [
+      "Portion spec saved for",
+      "Could not save the portion spec.",
+      "<h2>Portion specs</h2>",
+      "Component unavailable",
+      "No portion specs on this subrecipe",
+      "<span>Portion spec</span>",
+      "Plain yield (no spec)",
+      "Save portion spec",
+    ]) {
+      expect(panel).not.toContain(old);
+    }
+
+    expect(panel).toContain("Portion size saved for");
+    expect(panel).toContain("Could not save the portion size.");
+    expect(panel).toContain("<h2>Portion sizes</h2>");
+    expect(panel).toContain("Recipe unavailable");
+    expect(panel).toContain(
+      "No portion sizes on this subrecipe — add one on its page first.",
+    );
+    expect(panel).toContain("<span>Portion size</span>");
+    expect(panel).toContain("Plain yield (no size)");
+    expect(panel).toContain("Save portion size");
+
+    // The fresh user-visible strings must themselves be plain catering English.
+    for (const fresh of [
+      "Portion size saved for the subrecipe.",
+      "Could not save the portion size.",
+      "Portion sizes",
+      "Recipe unavailable",
+      "No portion sizes on this subrecipe — add one on its page first.",
+      "Portion size",
+      "Plain yield (no size)",
+      "Save portion size",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });
