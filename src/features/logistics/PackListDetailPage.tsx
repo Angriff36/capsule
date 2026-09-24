@@ -6,6 +6,7 @@ import {
   useGetPackList,
   useListDish,
   useListEvent,
+  useListPerson,
   useListPackListItem,
   useListPackListTemplate,
   usePackListCancel,
@@ -72,6 +73,7 @@ export function PackListDetailPage() {
   const items = useListPackListItem();
   const events = useListEvent();
   const dishes = useListDish();
+  const people = useListPerson();
   const createItem = useCreatePackListItem();
   const applyPackTemplate = useApplyPackTemplate();
   const templates = useListPackListTemplate();
@@ -158,6 +160,15 @@ export function PackListDetailPage() {
       ? (dishes?.find((dish) => dish._id === dishId && dish.deletedAt == null)
           ?.name ?? null)
       : null;
+  const packedByName = (personId?: string | null) => {
+    if (!personId) return null;
+    const person = people?.find(
+      (row) => row._id === personId && row.deletedAt == null,
+    );
+    if (!person) return people ? "A teammate" : null;
+    const name = `${person.givenName} ${person.familyName}`.trim();
+    return name || "A teammate";
+  };
   const canAddItems =
     String(packList.status) === "draft" ||
     String(packList.status) === "packing";
@@ -773,6 +784,7 @@ export function PackListDetailPage() {
           canEditLines={listIsLive}
           busy={busy}
           dishName={dishName}
+          packedByName={packedByName}
           itemActions={(status) => policy.packItemActions(status)}
           failedItem={
             failureItemId && failure

@@ -2033,6 +2033,7 @@ export default defineSchema({
     status: v.union(v.literal("pending"), v.literal("listed"), v.literal("packed"), v.literal("missing")),
     listedAt: v.optional(v.union(v.number(), v.null())),
     packedAt: v.optional(v.union(v.number(), v.null())),
+    packedByPersonId: v.optional(v.union(v.string(), v.null())),
     missingAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
