@@ -40,9 +40,9 @@ describe("plain words on leftover quality allergen-check event copy", () => {
     expect(visible).toContain(
       "This allergen check is for a different dish. Pick the dish already on this allergen check, or leave that blank.",
     );
-    // Later leftovers on this file are pinned: they must not change with this one.
+    // Already-landed leftover on this file stays: it must not change with this one.
     expect(visible).toContain(
-      "Record eventDishId must match the seeded event dish reference when provided",
+      "This allergen check is for a different event dish. Pick the event dish already on this allergen check, or leave that blank.",
     );
   });
 });
