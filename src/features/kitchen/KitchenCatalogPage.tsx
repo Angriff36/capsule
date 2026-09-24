@@ -44,6 +44,7 @@ import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
 import { KitchenCatalogDisplayCache } from "./KitchenCatalogDisplayCache";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
+  KITCHEN_SECTIONS,
   KITCHEN_SECTION_SINGULAR,
   COMPONENT_IMPORT_PATH,
   dishPath,
@@ -471,7 +472,10 @@ function KitchenCatalogPageContent({
     });
   };
 
-  const title = section[0].toUpperCase() + section.slice(1);
+  const sectionLabel =
+    KITCHEN_SECTIONS.find((entry) => entry.key === section)?.label ?? section;
+  const title = sectionLabel;
+  const subtitle = `Browse and open ${sectionLabel.toLowerCase()} — then open the one that needs work.`;
   const lifecycleCommands = {
     purgeIngredient,
     reinstateIngredient,
@@ -490,9 +494,7 @@ function KitchenCatalogPageContent({
           <h1 className="text-xl font-semibold tracking-tight text-ink">
             {title}
           </h1>
-          <p className="mt-0.5 text-sm text-ink-2">
-            Browse and open {section} — then open the one that needs work.
-          </p>
+          <p className="mt-0.5 text-sm text-ink-2">{subtitle}</p>
         </div>
         <div className="component-book-masthead-actions">
           {section === "components" ? (
