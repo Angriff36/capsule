@@ -1,11 +1,11 @@
 /** Shared vocabulary for lifecycle reason prompts across workspaces. */
 export const ReasonCopy = {
   retireComponent: {
-    title: "Retire component",
-    description: "Record why this component is leaving the active book.",
+    title: "Retire recipe",
+    description: "Say why this recipe is leaving the active book.",
     label: "Retirement reason",
     placeholder: "e.g. Replaced by seasonal revision",
-    confirmLabel: "Retire component",
+    confirmLabel: "Retire recipe",
   },
   retireDish: {
     title: "Retire dish",
