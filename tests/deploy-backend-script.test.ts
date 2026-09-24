@@ -5,7 +5,7 @@
 // `curl` and `uname`. Nothing here contacts or changes production: the stubs
 // only write the command line they received to calls.log.
 import { describe, expect, it } from "vitest";
-import { spawnSync } from "node:child_process";
+import { YieldingCommand } from "./yielding-command";
 import {
   chmodSync,
   copyFileSync,
@@ -58,17 +58,19 @@ interface Checkout {
   run: (
     args: string[],
     env?: Record<string, string>,
-  ) => { status: number | null; output: string };
+  ) => Promise<{ status: number | null; output: string }>;
 }
 
-function git(cwd: string, ...args: string[]): string {
-  const result = spawnSync("git", args, { cwd, encoding: "utf8" });
+async function git(cwd: string, ...args: string[]): Promise<string> {
+  const result = await YieldingCommand.run("git", args, { cwd });
   if (result.status !== 0)
     throw new Error(`git ${args.join(" ")}: ${result.stderr}`);
   return result.stdout.trim();
 }
 
-function makeCheckout(originName = "Angriff36/capsule.git"): Checkout {
+async function makeCheckout(
+  originName = "Angriff36/capsule.git",
+): Promise<Checkout> {
   const root = mkdtempSync(join(tmpdir(), "capsule-deploy-backend-"));
   const origin = join(root, originName);
   const work = join(root, "work");
@@ -82,24 +84,24 @@ function makeCheckout(originName = "Angriff36/capsule.git"): Checkout {
     chmodSync(join(bin, name), 0o755);
   }
 
-  git(origin, "init", "--bare", "-b", "main");
-  git(work, "init", "-b", "main");
-  git(work, "config", "user.email", "test@example.invalid");
-  git(work, "config", "user.name", "Deploy Script Test");
-  git(work, "config", "core.autocrlf", "false");
+  await git(origin, "init", "--bare", "-b", "main");
+  await git(work, "init", "-b", "main");
+  await git(work, "config", "user.email", "test@example.invalid");
+  await git(work, "config", "user.name", "Deploy Script Test");
+  await git(work, "config", "core.autocrlf", "false");
   writeFileSync(join(work, ".bun-version"), "9.9.9\n");
   writeFileSync(join(work, ".gitignore"), ".env.local\nconvex/scratch/\n");
   copyFileSync(SCRIPT, join(work, "scripts", "deploy-backend.sh"));
-  git(work, "add", "-A");
-  git(work, "commit", "-m", "[release] fixture");
-  git(work, "remote", "add", "origin", origin.replace(/\\/g, "/"));
-  git(work, "push", "-q", "origin", "main");
+  await git(work, "add", "-A");
+  await git(work, "commit", "-m", "[release] fixture");
+  await git(work, "remote", "add", "origin", origin.replace(/\\/g, "/"));
+  await git(work, "push", "-q", "origin", "main");
 
   return {
     work,
-    sha: git(work, "rev-parse", "HEAD"),
+    sha: await git(work, "rev-parse", "HEAD"),
     log,
-    run: (args, env = {}) => {
+    run: async (args, env = {}) => {
       // Git Bash puts /usr/bin and /mingw64/bin ahead of the inherited PATH,
       // so the stubs go first from INSIDE bash. The .invalid addresses are the
       // second guard: a stub that lost the PATH race still reaches nothing.
@@ -107,12 +109,11 @@ function makeCheckout(originName = "Angriff36/capsule.git"): Checkout {
         'export PATH="$(cygpath -u "$STUB_BIN" 2>/dev/null || echo "$STUB_BIN"):$PATH"; exec bash scripts/deploy-backend.sh "$@"';
       // The backend address is CONVEX_SELF_HOSTED_URL below: also .invalid.
       const offline = ["--frontend-url", "http://frontend.invalid/"];
-      const result = spawnSync(
+      const result = await YieldingCommand.run(
         BASH,
         ["-c", launch, "bash", ...args, ...offline],
         {
           cwd: work,
-          encoding: "utf8",
           env: {
             ...process.env,
             STUB_BIN: bin,
@@ -138,9 +139,13 @@ function makeCheckout(originName = "Angriff36/capsule.git"): Checkout {
 describe("scripts/deploy-backend.sh", () => {
   it(
     "dry run passes at the expected sha and runs nothing",
-    () => {
-      const checkout = makeCheckout();
-      const result = checkout.run(["--expect", checkout.sha, "--dry-run"]);
+    async () => {
+      const checkout = await makeCheckout();
+      const result = await checkout.run([
+        "--expect",
+        checkout.sha,
+        "--dry-run",
+      ]);
       expect(result.output).toContain(
         `RESULT: DRY-RUN PASS - nothing was deployed (sha: ${checkout.sha})`,
       );
@@ -153,15 +158,15 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "refuses a sha that is not HEAD, a missing sha and a short sha",
-    () => {
-      const checkout = makeCheckout();
+    async () => {
+      const checkout = await makeCheckout();
       const other = "0123456789abcdef0123456789abcdef01234567";
       for (const args of [
         ["--expect", other, "--dry-run"],
         ["--dry-run"],
         ["--expect", checkout.sha.slice(0, 8), "--dry-run"],
       ]) {
-        const result = checkout.run(args);
+        const result = await checkout.run(args);
         expect(result.output).toContain("RESULT: FAIL");
         expect(result.status).toBe(1);
       }
@@ -171,24 +176,26 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "refuses tracked local changes, a foreign origin, the wrong bun and a missing credential",
-    () => {
-      const dirty = makeCheckout();
+    async () => {
+      const dirty = await makeCheckout();
       writeFileSync(join(dirty.work, ".bun-version"), "9.9.9\n\n");
-      expect(dirty.run(["--expect", dirty.sha, "--dry-run"]).output).toContain(
-        "tracked files have local changes",
-      );
-
-      const foreign = makeCheckout("someone-else/capsule.git");
       expect(
-        foreign.run(["--expect", foreign.sha, "--dry-run"]).output,
+        (await dirty.run(["--expect", dirty.sha, "--dry-run"])).output,
+      ).toContain("tracked files have local changes");
+
+      const foreign = await makeCheckout("someone-else/capsule.git");
+      expect(
+        (await foreign.run(["--expect", foreign.sha, "--dry-run"])).output,
       ).toContain("origin is not the Angriff36/capsule repository");
 
-      const checkout = makeCheckout();
+      const checkout = await makeCheckout();
       const dry = ["--expect", checkout.sha, "--dry-run"];
-      expect(checkout.run(dry, { STUB_BUN_VERSION: "1.0.0" }).output).toContain(
-        ".bun-version pins 9.9.9",
-      );
-      const missing = checkout.run(dry, { CONVEX_SELF_HOSTED_ADMIN_KEY: "" });
+      expect(
+        (await checkout.run(dry, { STUB_BUN_VERSION: "1.0.0" })).output,
+      ).toContain(".bun-version pins 9.9.9");
+      const missing = await checkout.run(dry, {
+        CONVEX_SELF_HOSTED_ADMIN_KEY: "",
+      });
       expect(missing.output).toContain(
         "CONVEX_SELF_HOSTED_ADMIN_KEY is not set",
       );
@@ -200,9 +207,9 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "a real run deploys with the documented commands, then probes the queries and the frontend",
-    () => {
-      const checkout = makeCheckout();
-      const result = checkout.run([
+    async () => {
+      const checkout = await makeCheckout();
+      const result = await checkout.run([
         "--expect",
         checkout.sha,
         "--verify",
@@ -228,13 +235,13 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "probes the backend that .env.local selects when the shell has no address",
-    () => {
-      const checkout = makeCheckout();
+    async () => {
+      const checkout = await makeCheckout();
       writeFileSync(
         join(checkout.work, ".env.local"),
         'CONVEX_SELF_HOSTED_URL="http://envfile.invalid/"\n',
       );
-      const result = checkout.run(["--expect", checkout.sha], {
+      const result = await checkout.run(["--expect", checkout.sha], {
         CONVEX_SELF_HOSTED_URL: "",
       });
       expect(result.output).toContain("RESULT: PASS");
@@ -247,10 +254,12 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "refuses a Convex Cloud deploy key in the shell, .env.local or .env",
-    () => {
-      const checkout = makeCheckout();
+    async () => {
+      const checkout = await makeCheckout();
       const real = ["--expect", checkout.sha];
-      const shell = checkout.run(real, { CONVEX_DEPLOY_KEY: "prod:stub-key" });
+      const shell = await checkout.run(real, {
+        CONVEX_DEPLOY_KEY: "prod:stub-key",
+      });
       expect(shell.output).toContain("CONVEX_DEPLOY_KEY is set");
       expect(shell.output).not.toContain("prod:stub-key");
       expect(shell.status).toBe(1);
@@ -259,7 +268,7 @@ describe("scripts/deploy-backend.sh", () => {
         join(checkout.work, ".env"),
         "CONVEX_DEPLOYMENT_TOKEN=stub-token\n",
       );
-      const envFile = checkout.run(real);
+      const envFile = await checkout.run(real);
       expect(envFile.output).toContain("CONVEX_DEPLOYMENT_TOKEN is set");
       expect(envFile.status).toBe(1);
 
@@ -268,7 +277,9 @@ describe("scripts/deploy-backend.sh", () => {
         join(checkout.work, ".env.local"),
         "CONVEX_DEPLOY_KEY=stub-key\n",
       );
-      expect(checkout.run(real).output).toContain("CONVEX_DEPLOY_KEY is set");
+      expect((await checkout.run(real)).output).toContain(
+        "CONVEX_DEPLOY_KEY is set",
+      );
 
       // Valid dotenv spellings the Convex CLI also reads.
       for (const line of [
@@ -277,7 +288,7 @@ describe("scripts/deploy-backend.sh", () => {
         "CONVEX_DEPLOY_KEY: stub-key",
       ]) {
         writeFileSync(join(checkout.work, ".env.local"), `${line}\n`);
-        const result = checkout.run(real);
+        const result = await checkout.run(real);
         expect(result.output).toContain(
           `${/CONVEX_\w+/.exec(line)?.[0]} is set`,
         );
@@ -290,7 +301,7 @@ describe("scripts/deploy-backend.sh", () => {
         join(checkout.work, ".env.local"),
         "# CONVEX_DEPLOY_KEY=stub-key\nCONVEX_DEPLOYMENT_TOKEN=\n",
       );
-      expect(checkout.run([...real, "--dry-run"]).output).toContain(
+      expect((await checkout.run([...real, "--dry-run"])).output).toContain(
         "RESULT: DRY-RUN PASS",
       );
       expect(existsSync(checkout.log)).toBe(false);
@@ -300,17 +311,19 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "refuses untracked files under convex/ and ignores untracked files elsewhere",
-    () => {
-      const checkout = makeCheckout();
+    async () => {
+      const checkout = await makeCheckout();
       const dry = ["--expect", checkout.sha, "--dry-run"];
       mkdirSync(join(checkout.work, "notes"));
       writeFileSync(join(checkout.work, "notes", "todo.md"), "x\n");
-      expect(checkout.run(dry).output).toContain("RESULT: DRY-RUN PASS");
+      expect((await checkout.run(dry)).output).toContain(
+        "RESULT: DRY-RUN PASS",
+      );
 
       mkdirSync(join(checkout.work, "convex", "lib"), { recursive: true });
       writeFileSync(join(checkout.work, "convex", "lib", "stray.ts"), "x\n");
       for (const args of [dry, ["--expect", checkout.sha]]) {
-        const result = checkout.run(args);
+        const result = await checkout.run(args);
         expect(result.output).toContain("convex/lib/stray.ts");
         expect(result.output).toContain("would be deployed");
         expect(result.status).toBe(1);
@@ -318,18 +331,18 @@ describe("scripts/deploy-backend.sh", () => {
       expect(existsSync(checkout.log)).toBe(false);
 
       // A git-ignored file under convex/ is on disk too: the CLI bundles it.
-      const ignored = makeCheckout();
+      const ignored = await makeCheckout();
       mkdirSync(join(ignored.work, "convex", "scratch"), { recursive: true });
       writeFileSync(join(ignored.work, "convex", "scratch", "old.ts"), "x\n");
-      const ignoredRun = ignored.run(["--expect", ignored.sha]);
+      const ignoredRun = await ignored.run(["--expect", ignored.sha]);
       expect(ignoredRun.output).toContain("convex/scratch");
       expect(ignoredRun.output).toContain("would be deployed");
       expect(ignoredRun.status).toBe(1);
 
       // An untracked root convex.json can point the deploy at other code.
-      const config = makeCheckout();
+      const config = await makeCheckout();
       writeFileSync(join(config.work, "convex.json"), '{"functions":"x/"}\n');
-      const configRun = config.run(["--expect", config.sha]);
+      const configRun = await config.run(["--expect", config.sha]);
       expect(configRun.output).toContain("convex.json");
       expect(configRun.output).toContain("would be deployed");
       expect(configRun.status).toBe(1);
@@ -341,10 +354,10 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "sends the argument payload of a --verify query and never passes an argument error",
-    () => {
-      const checkout = makeCheckout();
+    async () => {
+      const checkout = await makeCheckout();
       const real = ["--expect", checkout.sha];
-      const withArgs = checkout.run([
+      const withArgs = await checkout.run([
         ...real,
         "--verify",
         'custom:getOne={"id":"abc","deep":{"n":1}}',
@@ -358,16 +371,19 @@ describe("scripts/deploy-backend.sh", () => {
       );
       expect(calls[4]).toContain('"path":"queries:listFoo","args":{}');
 
-      const argumentError = checkout.run([...real, "--verify", "getOne"], {
-        STUB_QUERY_BODY:
-          '{"status":"error","errorMessage":"ArgumentValidationError: missing id"}',
-      });
+      const argumentError = await checkout.run(
+        [...real, "--verify", "getOne"],
+        {
+          STUB_QUERY_BODY:
+            '{"status":"error","errorMessage":"ArgumentValidationError: missing id"}',
+        },
+      );
       expect(argumentError.output).toContain("needs arguments");
       expect(argumentError.output).toContain("RESULT: FAIL");
       expect(argumentError.status).toBe(1);
 
-      const fresh = makeCheckout();
-      const notJson = fresh.run([
+      const fresh = await makeCheckout();
+      const notJson = await fresh.run([
         "--expect",
         fresh.sha,
         "--verify",
@@ -382,20 +398,22 @@ describe("scripts/deploy-backend.sh", () => {
 
   it(
     "a real run fails when a query answers Server Error, when the frontend is down, and off Linux",
-    () => {
-      const checkout = makeCheckout();
+    async () => {
+      const checkout = await makeCheckout();
       const real = ["--expect", checkout.sha];
-      const serverError = checkout.run(real, {
+      const serverError = await checkout.run(real, {
         STUB_QUERY_BODY: '{"status":"error","errorMessage":"Server Error"}',
       });
       expect(serverError.output).toContain("FAIL  queries:listEvent");
       expect(serverError.output).toContain("RESULT: FAIL");
       expect(serverError.status).toBe(1);
 
-      const down = checkout.run(real, { STUB_HTTP_CODE: "503" });
+      const down = await checkout.run(real, { STUB_HTTP_CODE: "503" });
       expect(down.output).toContain("frontend returned HTTP 503");
 
-      const windows = checkout.run(real, { STUB_UNAME: "MINGW64_NT-10.0" });
+      const windows = await checkout.run(real, {
+        STUB_UNAME: "MINGW64_NT-10.0",
+      });
       expect(windows.output).toContain("Linux production box only");
       expect(windows.status).toBe(1);
     },
