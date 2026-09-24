@@ -32,7 +32,7 @@ entity Announcement mixin TenantScoped, SoftDeletable {
 
   // All staff see announcements. Posting and removing are manager actions and
   // are gated explicitly on each command (manageAccess capability).
-  default policy announcementRead read: roleAllows(user.role, "staffAccess") "Staff may read announcements"
+  default policy announcementRead read: roleAllows(user.role, "staffAccess") "Staff may see announcements"
   default policy announcementWrite write: roleAllows(user.role, "staffAccess") "Staff may update announcements"
   default policy announcementExecute execute: roleAllows(user.role, "staffAccess") "Staff may change announcements"
 
@@ -81,7 +81,7 @@ entity AnnouncementDismissal mixin TenantScoped {
 
   constraint dismissalSubjectPresent: length(trim(self.authSubjectId)) > 0 "Dismissal requires a signed-in account"
 
-  default policy announcementDismissalRead read: roleAllows(user.role, "staffAccess") "Staff may read announcement dismissals"
+  default policy announcementDismissalRead read: roleAllows(user.role, "staffAccess") "Staff may see announcement dismissals"
   default policy announcementDismissalWrite write: roleAllows(user.role, "staffAccess") "Staff may update their own announcement dismissals"
   default policy announcementDismissalExecute execute: roleAllows(user.role, "staffAccess") "Staff may dismiss announcements for themselves"
 

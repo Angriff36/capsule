@@ -23,7 +23,7 @@ entity OrganizationCapabilitySetting mixin TenantScoped, SoftDeletable {
   // `self.capability == null` guard rejected every first-time registration
   // (#360). Same shape as Dish/Ingredient `introducedAt`.
   property registeredAt: datetime?
-  default policy capabilitySettingRead read: user.id != null "Authenticated staff may read capability settings"
+  default policy capabilitySettingRead read: user.id != null "Authenticated staff may see capability settings"
   default policy capabilitySettingWrite write: user.id != null "Authenticated staff may update capability settings"
   default policy capabilitySettingExecute execute: user.id != null "Authenticated staff may change capability settings"
   command register(capability: OrganizationCapability, enabled: boolean, optional updatedBy: string) {

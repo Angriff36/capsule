@@ -21,7 +21,7 @@ entity CutoverDecision mixin TenantScoped {
   property required rollbackPlan: string
   property businessApproved: boolean = false
   property tppReadOnlyAt: int?
-  default policy cutoverDecisionRead read: user.id != null "Authenticated staff may read cutover decisions"
+  default policy cutoverDecisionRead read: user.id != null "Authenticated staff may see cutover decisions"
   default policy cutoverDecisionWrite write: user.id != null "Authenticated staff may update cutover decisions"
   default policy cutoverDecisionExecute execute: user.id != null "Authenticated staff may change cutover decisions"
   // Creation command. CutoverDecision is tenant-scoped and historically created

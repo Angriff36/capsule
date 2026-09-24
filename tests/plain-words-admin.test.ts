@@ -78,4 +78,65 @@ describe("plain words on leftover admin manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover admin READ copy free of read jargon", () => {
+    const files = [
+      "src/admin/announcement.manifest",
+      "src/admin/assistant.manifest",
+      "src/admin/capability-setting.manifest",
+      "src/admin/cutover-decision.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Staff may read announcements",
+      "Staff may read announcement dismissals",
+      "Managers and admins may read assistant configuration",
+      "Authenticated staff may read capability settings",
+      "Authenticated staff may read cutover decisions",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Staff may see announcements",
+      "Staff may see announcement dismissals",
+      "Managers and admins may see assistant configuration",
+      "Authenticated staff may see capability settings",
+      "Authenticated staff may see cutover decisions",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain("Staff may update announcements");
+    expect(visible).toContain("Staff may change announcements");
+    expect(visible).toContain(
+      "Staff may update their own announcement dismissals",
+    );
+    expect(visible).toContain(
+      "Managers and admins may update assistant configuration",
+    );
+    expect(visible).toContain(
+      "Managers and admins may change assistant configuration",
+    );
+    expect(visible).toContain(
+      "Authenticated staff may update capability settings",
+    );
+    expect(visible).toContain(
+      "Authenticated staff may change capability settings",
+    );
+    expect(visible).toContain(
+      "Authenticated staff may update cutover decisions",
+    );
+    expect(visible).toContain(
+      "Authenticated staff may change cutover decisions",
+    );
+    expect(visible).toContain("Staff may see assistant upload registrations");
+  });
 });

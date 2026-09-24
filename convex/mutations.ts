@@ -623,7 +623,7 @@ async function __runAnnouncementPost(ctx: MutationCtx, { docId, title, body, cat
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Announcement not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Announcement not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcements");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see announcements");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update announcements");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -698,7 +698,7 @@ export const Announcement_createViaPost = mutation({
       expiresAt: args.expiresAt,
       title: args.title
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcements");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see announcements");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update announcements");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -733,7 +733,7 @@ async function __runAnnouncementRemove(ctx: MutationCtx, { docId, version }: any
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Announcement not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Announcement not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcements");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see announcements");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update announcements");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may change announcements");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -779,7 +779,7 @@ async function __runAnnouncementDismissalDismiss(ctx: MutationCtx, { docId, anno
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("AnnouncementDismissal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("AnnouncementDismissal not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcement dismissals");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see announcement dismissals");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update their own announcement dismissals");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may dismiss announcements for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
@@ -840,7 +840,7 @@ export const AnnouncementDismissal_createViaDismiss = mutation({
       updatedAt: Date.now(),
       announcementId: args.announcementId
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read announcement dismissals");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see announcement dismissals");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may update their own announcement dismissals");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may dismiss announcements for themselves");
     if (!((user.id != null))) throw new Error("Guard 0 failed");
@@ -870,7 +870,7 @@ async function __runAssistantLlmConfigConfigure(ctx: MutationCtx, { docId, baseU
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("AssistantLlmConfig not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("AssistantLlmConfig not found");
-    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may read assistant configuration");
+    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may see assistant configuration");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may update assistant configuration");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may change assistant configuration");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -938,7 +938,7 @@ export const AssistantLlmConfig_createViaConfigure = mutation({
       baseUrl: args.baseUrl,
       model: args.model
     };
-    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may read assistant configuration");
+    if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may see assistant configuration");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may update assistant configuration");
     if (!((checkRole(user, "manageAccess") || checkRole(user, "adminAccess")))) throw new Error("Managers and admins may change assistant configuration");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -7561,7 +7561,7 @@ async function __runCutoverDecisionCreate(ctx: MutationCtx, args: any) {
       rollbackPlan: args.rollbackPlan,
       businessApproved: ((args.businessApproved != null) ? args.businessApproved : false)
     };
-    if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
@@ -7598,7 +7598,7 @@ async function __runCutoverDecisionExecute(ctx: MutationCtx, { docId, decision, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
@@ -7638,7 +7638,7 @@ async function __runCutoverDecisionRecordApprovals(ctx: MutationCtx, { docId, bu
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!(checkRole(user, "adminAccess"))) throw new Error("Guard 0 failed");
@@ -7678,7 +7678,7 @@ async function __runCutoverDecisionRollback(ctx: MutationCtx, { docId, reason }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!((doc.status === "go"))) throw new Error("Guard 0 failed");
@@ -7718,7 +7718,7 @@ async function __runCutoverDecisionSetTppReadOnly(ctx: MutationCtx, { docId, rea
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("CutoverDecision not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("CutoverDecision not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may read cutover decisions");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may update cutover decisions");
     if (!((user.id != null))) throw new Error("Authenticated staff may change cutover decisions");
     if (!((doc.status === "go"))) throw new Error("Guard 0 failed");
@@ -30096,7 +30096,7 @@ async function __runOrganizationCapabilitySettingRegister(ctx: MutationCtx, { do
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("OrganizationCapabilitySetting not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OrganizationCapabilitySetting not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may read capability settings");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -30161,7 +30161,7 @@ export const OrganizationCapabilitySetting_createViaRegister = mutation({
       enabled: args.enabled,
       updatedBy: args.updatedBy
     };
-    if (!((user.id != null))) throw new Error("Authenticated staff may read capability settings");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -30190,7 +30190,7 @@ async function __runOrganizationCapabilitySettingSetEnabled(ctx: MutationCtx, { 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("OrganizationCapabilitySetting not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("OrganizationCapabilitySetting not found");
-    if (!((user.id != null))) throw new Error("Authenticated staff may read capability settings");
+    if (!((user.id != null))) throw new Error("Authenticated staff may see capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may update capability settings");
     if (!((user.id != null))) throw new Error("Authenticated staff may change capability settings");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

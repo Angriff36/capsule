@@ -13,7 +13,7 @@ entity AssistantLlmConfig mixin TenantScoped, SoftDeletable {
   property required model: string
   property configuredAt: datetime?
 
-  default policy assistantLlmConfigRead read: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may read assistant configuration"
+  default policy assistantLlmConfigRead read: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may see assistant configuration"
   default policy assistantLlmConfigWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may update assistant configuration"
   default policy assistantLlmConfigExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "adminAccess") "Managers and admins may change assistant configuration"
 
