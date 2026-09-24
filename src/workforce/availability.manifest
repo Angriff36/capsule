@@ -178,7 +178,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  constraint availabilityDeclaredComplete: self.declaredAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt) "Declared availability requires a valid start/end range"
+  constraint availabilityDeclaredComplete: self.declaredAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt) "This availability is missing a start or end, or it ends before it starts. Pick a start and an end that's later than the start."
 
   transition status from "active" to ["withdrawn"]
   transition status from "withdrawn" to []

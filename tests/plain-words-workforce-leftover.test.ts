@@ -139,7 +139,41 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
     );
     // Later leftovers keep their current wording.
     expect(visible).toContain(
+      "Submitted time off requires a valid date range and reason",
+    );
+  });
+
+  it("keeps leftover availability declared start/end copy free of declared-range jargon", () => {
+    const visible = visibleCopy("src/workforce/availability.manifest");
+    // Old declared-range wording is gone from the manifest and the generated mutation file.
+    expect(visible).not.toContain(
       "Declared availability requires a valid start/end range",
+    );
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain(
+      "Declared availability requires a valid start/end range",
+    );
+    // The refusal now says what happened and what to do next.
+    const declaredRange =
+      "This availability is missing a start or end, or it ends before it starts. Pick a start and an end that's later than the start.";
+    expect(visible).toContain(declaredRange);
+    expectPlain(declaredRange);
+    // The generated context summary carries the same wording.
+    const summary = readFileSync("manifest-context-summary.json", "utf8");
+    expect(summary).toContain(declaredRange);
+    // Already-landed leftovers on the same file stay.
+    expect(visible).toContain(
+      "This availability is for a different person. Pick the person already on this availability.",
+    );
+    expect(visible).toContain(
+      "This availability ends before it starts. Pick an end that's later than the start.",
+    );
+    expect(visible).toContain(
+      "This time-off request ends before it starts. Pick an end that's later than the start.",
+    );
+    // Later leftovers keep their current wording.
+    expect(visible).toContain(
+      "Submitted time off requires a valid date range and reason",
     );
   });
 });
