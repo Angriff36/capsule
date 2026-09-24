@@ -337,7 +337,7 @@ export const getEvent = query({
               role: assignment.role,
               startsAt: assignment.startsAt ?? null,
               endsAt: assignment.endsAt ?? null,
-              notes: assignment.notes ?? null,
+              // Crew notes stay on the staff schedule. They are not for the client.
               status: assignment.status,
             },
             person:
