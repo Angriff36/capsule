@@ -21,6 +21,7 @@ import {
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
   usePackListItemRecordPackedCount,
+  usePackListItemRecordSentInstead,
   usePackListMarkLoaded,
   usePackListMarkPacked,
   usePackListStartPacking,
@@ -84,6 +85,7 @@ export function PackListDetailPage() {
   const kitItems = useListServiceStyleKitItem();
   const markItemPacked = usePackListItemMarkPacked();
   const recordPackedCount = usePackListItemRecordPackedCount();
+  const recordSentInstead = usePackListItemRecordSentInstead();
   const markItemMissing = usePackListItemMarkMissing();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();
@@ -379,9 +381,42 @@ export function PackListDetailPage() {
       packedQuantity: number;
       status: unknown;
       note?: string | null;
+      sentInstead?: string | null;
     },
     key: string,
   ) => {
+    if (key === "sentInstead") {
+      const values = await prompt.askFields({
+        title: "Sent instead",
+        description:
+          "If a different item went out, say what it was. The listed item stays. Leave this empty to clear it.",
+        confirmLabel: "Save",
+        fields: [
+          {
+            name: "sentInstead",
+            label: "What went out",
+            inputType: "text",
+            required: false,
+            defaultValue: item.sentInstead ?? "",
+          },
+        ],
+      });
+      if (!values) return;
+      const sentInstead = values.sentInstead?.trim() || undefined;
+      void run(`${item._id}:sentInstead`, async () => {
+        await recordSentInstead({
+          docId: item._id,
+          version: item.version,
+          sentInstead,
+        });
+        setNotice(
+          sentInstead
+            ? "Saved what went out instead."
+            : "Cleared what went out instead.",
+        );
+      });
+      return;
+    }
     if (key === "note") {
       const values = await prompt.askFields({
         title: "Packer note",
