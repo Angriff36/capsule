@@ -6,6 +6,8 @@ import {
 } from "@angriff36/manifest/projections/wiring";
 import wiringContract from "../generated/manifest-wiring-contract.json";
 import type { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
+import { CapsuleConvexQueryRefetch } from "./CapsuleConvexQueryRefetch";
+import { CapsuleStaleReadRefresher } from "./CapsuleStaleReadRefresher";
 
 const contract = wiringContract as unknown as WiringContract;
 
@@ -28,7 +30,16 @@ export class CapsuleGeneratedCommandFailure extends Error {
  * Server-owned names such as tenantId are never copied into the body.
  */
 export class CapsuleGeneratedCommandGateway {
-  constructor(private readonly auth: CapsuleAgentAuthManager) {}
+  private readonly refreshReads: CapsuleStaleReadRefresher;
+
+  constructor(
+    private readonly auth: CapsuleAgentAuthManager,
+    refreshReads?: CapsuleStaleReadRefresher,
+  ) {
+    this.refreshReads =
+      refreshReads ??
+      new CapsuleStaleReadRefresher(new CapsuleConvexQueryRefetch(auth));
+  }
 
   async execute(
     capabilityId: string,
@@ -39,14 +50,23 @@ export class CapsuleGeneratedCommandGateway {
       capabilityId,
       this.call(consumer, capabilityId, args),
     );
-    if (outcome.ok) {
-      return outcome.data;
+    return this.finish(capabilityId, outcome);
+  }
+
+  async finish(
+    capabilityId: string,
+    outcome:
+      | { ok: true; data: unknown }
+      | { ok: false; kind: string; message: string; status: number },
+  ): Promise<unknown> {
+    if (!outcome.ok) {
+      throw new CapsuleGeneratedCommandFailure(
+        outcome.kind,
+        outcome.message,
+        outcome.status,
+      );
     }
-    throw new CapsuleGeneratedCommandFailure(
-      outcome.kind,
-      outcome.message,
-      outcome.status,
-    );
+    return this.refreshReads.afterSuccess(capabilityId, outcome.data);
   }
 
   private consumer(bearerToken: string): GeneratedWiringConsumer {
