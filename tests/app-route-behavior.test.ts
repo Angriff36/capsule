@@ -37,7 +37,7 @@ it.each([
   ["/kitchen/dishes", "Dishes"],
   ["/kitchen/menus", "Menus"],
   ["/admin/catalogs", "Catalogs"],
-  ["/kitchen/components/import", "Component import"],
+  ["/kitchen/components/import", "Import recipe"],
 ])(
   "opens %s through the real authentication gate and shell",
   async (path, heading) => {

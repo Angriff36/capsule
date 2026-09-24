@@ -502,7 +502,7 @@ export function ComponentImportPage() {
       <header className="component-import-header">
         <div>
           <p className="eyebrow">Culinary book · Import</p>
-          <h1 className="display-title mt-2">Component import</h1>
+          <h1 className="display-title mt-2">Import recipe</h1>
           <p className="mt-3 max-w-150 text-ink-2">
             Paste text or upload `.txt` / CSV exports, review ingredient
             matches, then save through generated commands.
