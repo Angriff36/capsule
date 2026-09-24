@@ -68,4 +68,65 @@ describe("plain words on leftover production manifests", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover production READ copy free of read jargon", () => {
+    const files = [
+      "src/production/task.manifest",
+      "src/production/station.manifest",
+      "src/production/batch.manifest",
+      "src/production/task-comment.manifest",
+      "src/production/prep.manifest",
+    ];
+    // strip // comments so developer notes are not treated as user copy
+    const visible = files
+      .map((path) => readFileSync(path, "utf8"))
+      .join("\n")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    for (const old of [
+      "Kitchen staff may read quality checks",
+      "Kitchen staff and event managers may read prep task comments",
+      "Kitchen staff and managers may read production batches",
+      "Kitchen staff and managers may read batch allocations",
+      "Employed staff may read stations",
+      "Kitchen and event managers may read prep tasks",
+      "Kitchen and event managers may read prep task dependencies",
+      "Kitchen and event managers may read prep task materials",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      "Kitchen staff may see quality checks",
+      "Kitchen staff and event managers may see prep task comments",
+      "Kitchen staff and managers may see production batches",
+      "Kitchen staff and managers may see batch allocations",
+      "Employed staff may see stations",
+      "Kitchen and event managers may see prep tasks",
+      "Kitchen and event managers may see prep task dependencies",
+      "Kitchen and event managers may see prep task materials",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+
+    // already-landed write leftovers must stay put
+    expect(visible).toContain(
+      "Kitchen and event managers may update prep tasks",
+    );
+    expect(visible).toContain("Kitchen staff and managers may update stations");
+    expect(visible).toContain(
+      "Kitchen staff and managers may update production batches",
+    );
+    expect(visible).toContain(
+      "Kitchen staff and managers may update batch allocations",
+    );
+    expect(visible).toContain(
+      "Kitchen staff and event managers may update prep task comments",
+    );
+    expect(visible).toContain("Kitchen staff may update quality checks");
+    expect(visible).toContain(
+      "Kitchen and event managers may declare prep task dependencies",
+    );
+  });
 });

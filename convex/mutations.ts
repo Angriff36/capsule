@@ -34892,7 +34892,7 @@ async function __runPrepTaskAssign(ctx: MutationCtx, { docId, personId, version 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((doc.resolution == null) || (doc.resolution !== "choice_pending")))) throw new Error("Guard 0 failed");
@@ -34959,7 +34959,7 @@ async function __runPrepTaskCancel(ctx: MutationCtx, { docId, reason, version }:
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")) || (doc.status === "blocked")))) throw new Error("Guard 0 failed");
@@ -35023,7 +35023,7 @@ async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -35087,7 +35087,7 @@ async function __runPrepTaskComplete(ctx: MutationCtx, { docId, completedQuantit
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.status === "in_progress"))) throw new Error("Guard 0 failed");
@@ -35160,7 +35160,7 @@ async function __runPrepTaskLinkRecipe(ctx: MutationCtx, { docId, dishTaskId, di
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
     const __rel_eventDish = await __resolveRelation(ctx, "eventDishes", [__auth.tenantId, doc.eventDishId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).eventDish = __rel_eventDish;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -35209,7 +35209,7 @@ async function __runPrepTaskMarkBlocked(ctx: MutationCtx, { docId, reason, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")))) throw new Error("Guard 0 failed");
@@ -35273,7 +35273,7 @@ async function __runPrepTaskMarkOverride(ctx: MutationCtx, { docId, overrideOfDi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -35332,7 +35332,7 @@ async function __runPrepTaskOpen(ctx: MutationCtx, { docId, eventDishId, eventId
     const __rel_eventDish = await __resolveRelation(ctx, "eventDishes", [__auth.tenantId, doc.eventDishId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_dishTask = await __resolveRelation(ctx, "dishTasks", [__auth.tenantId, doc.dishTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).eventDish = __rel_eventDish;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.claimedAt == null))) throw new Error("Guard 0 failed");
@@ -35479,7 +35479,7 @@ export const PrepTask_createViaOpen = mutation({
     };
     const __rel_eventDish = await __resolveRelation(ctx, "eventDishes", [__auth.tenantId, __draft.eventDishId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_dishTask = await __resolveRelation(ctx, "dishTasks", [__auth.tenantId, __draft.dishTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((__draft.claimedAt == null))) throw new Error("Guard 0 failed");
@@ -35555,7 +35555,7 @@ async function __runPrepTaskReconcileRemainingWork(ctx: MutationCtx, { docId, ex
       }
     }
     ((doc as any) as any).dishTask = __rel_dishTask;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((doc.deletedAt == null) && (doc.isGenerated === true)))) throw new Error("Guard 0 failed");
@@ -35619,7 +35619,7 @@ async function __runPrepTaskRefreshGenerated(ctx: MutationCtx, { docId, quantity
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -35678,7 +35678,7 @@ async function __runPrepTaskRefreshRecipeTemplate(ctx: MutationCtx, { docId, exp
     ((doc as any) as any).event = __rel_event;
     ((doc as any) as any).eventDish = __rel_eventDish;
     ((doc as any) as any).dishTask = __rel_dishTask;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((doc.deletedAt == null) && (doc.isGenerated === true)))) throw new Error("Guard 0 failed");
@@ -35734,7 +35734,7 @@ async function __runPrepTaskRelease(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.status === "claimed"))) throw new Error("Guard 0 failed");
@@ -35798,7 +35798,7 @@ async function __runPrepTaskReplaceRecipeComponent(ctx: MutationCtx, { docId, pr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -35842,7 +35842,7 @@ async function __runPrepTaskResolveChoice(ctx: MutationCtx, { docId, choice, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -35896,7 +35896,7 @@ async function __runPrepTaskRetireWithTemplate(ctx: MutationCtx, { docId, expect
     const __rel_dishTask = await __resolveRelation(ctx, "dishTasks", [__auth.tenantId, doc.dishTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).event = __rel_event;
     ((doc as any) as any).dishTask = __rel_dishTask;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((doc.deletedAt == null) && (doc.isGenerated === true)))) throw new Error("Guard 0 failed");
@@ -35956,7 +35956,7 @@ async function __runPrepTaskRevise(ctx: MutationCtx, { docId, name, quantity, un
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((((doc.status === "pending") || (doc.status === "claimed")) || (doc.status === "in_progress")) || (doc.status === "blocked")))) throw new Error("Guard 0 failed");
@@ -36020,7 +36020,7 @@ async function __runPrepTaskSetChoice(ctx: MutationCtx, { docId, choiceOptions, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36064,7 +36064,7 @@ async function __runPrepTaskStandDown(ctx: MutationCtx, { docId, reason, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36130,7 +36130,7 @@ async function __runPrepTaskStart(ctx: MutationCtx, { docId, version }: any, __c
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
     (doc as any).incomingDependencies = await ctx.db.query("prepTaskDependencies").withIndex("by_dependentTaskId", (q: any) => q.eq("dependentTaskId", docId)).collect();
     (doc as any).incomingDependencies = (doc as any).incomingDependencies.filter((row: any) => row.tenantId === __auth.tenantId);
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!(((doc.resolution == null) || (doc.resolution !== "choice_pending")))) throw new Error("Guard 0 failed");
@@ -36194,7 +36194,7 @@ async function __runPrepTaskUnblock(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTask not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTask not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep tasks");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep tasks");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep tasks");
     if (!((doc.status === "blocked"))) throw new Error("Guard 0 failed");
@@ -36259,7 +36259,7 @@ async function __runPrepTaskCommentEdit(ctx: MutationCtx, { docId, body, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTaskComment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTaskComment not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may read prep task comments");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may see prep task comments");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may update prep task comments");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may change prep task comments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36308,7 +36308,7 @@ async function __runPrepTaskCommentPost(ctx: MutationCtx, { docId, prepTaskId, e
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTaskComment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTaskComment not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may read prep task comments");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may see prep task comments");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may update prep task comments");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may change prep task comments");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36406,7 +36406,7 @@ export const PrepTaskComment_createViaPost = mutation({
       taskOwnerAssignedToId: args.taskOwnerAssignedToId,
       taskOwnerAuthSubjectId: args.taskOwnerAuthSubjectId
     };
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may read prep task comments");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may see prep task comments");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may update prep task comments");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and event managers may change prep task comments");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -36453,7 +36453,7 @@ async function __runPrepTaskDependencyDeclare(ctx: MutationCtx, { docId, depende
     const __rel_predecessorTask = await __resolveRelation(ctx, "prepTasks", [__auth.tenantId, doc.predecessorTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).dependentTask = __rel_dependentTask;
     ((doc as any) as any).predecessorTask = __rel_predecessorTask;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep task dependencies");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may declare prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task dependencies");
     if (!((__rel_dependentTask != null))) throw new Error("Guard 0 failed");
@@ -36519,7 +36519,7 @@ export const PrepTaskDependency_createViaDeclare = mutation({
     };
     const __rel_dependentTask = await __resolveRelation(ctx, "prepTasks", [__auth.tenantId, __draft.dependentTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_predecessorTask = await __resolveRelation(ctx, "prepTasks", [__auth.tenantId, __draft.predecessorTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep task dependencies");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may declare prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task dependencies");
     if (!((__rel_dependentTask != null))) throw new Error("Guard 0 failed");
@@ -36554,7 +36554,7 @@ async function __runPrepTaskDependencyReleaseRetiredRequirement(ctx: MutationCtx
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTaskDependency not found");
     const __rel_predecessorTask = await __resolveRelation(ctx, "prepTasks", [__auth.tenantId, doc.predecessorTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).predecessorTask = __rel_predecessorTask;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep task dependencies");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may declare prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task dependencies");
     if (!((doc.isSatisfied === false))) throw new Error("Guard 0 failed");
@@ -36594,7 +36594,7 @@ async function __runPrepTaskDependencySatisfy(ctx: MutationCtx, { docId }: any, 
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTaskDependency not found");
     const __rel_predecessorTask = await __resolveRelation(ctx, "prepTasks", [__auth.tenantId, doc.predecessorTaskId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).predecessorTask = __rel_predecessorTask;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep task dependencies");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may declare prep task dependencies");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task dependencies");
     if (!((doc.isSatisfied === false))) throw new Error("Guard 0 failed");
@@ -36636,7 +36636,7 @@ async function __runPrepTaskMaterialLink(ctx: MutationCtx, { docId, prepTaskId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTaskMaterial not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTaskMaterial not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep task materials");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task materials");
     if (!((doc.linkedAt == null))) throw new Error("Guard 0 failed");
@@ -36722,7 +36722,7 @@ export const PrepTaskMaterial_createViaLink = mutation({
       workQuantity: args.workQuantity,
       workUnit: args.workUnit
     };
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep task materials");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task materials");
     if (!((__draft.linkedAt == null))) throw new Error("Guard 0 failed");
@@ -36759,7 +36759,7 @@ async function __runPrepTaskMaterialUnlink(ctx: MutationCtx, { docId, reason, ve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PrepTaskMaterial not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PrepTaskMaterial not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may read prep task materials");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may see prep task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may update prep task materials");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen and event managers may change prep task materials");
     if (!((doc.linkedAt != null))) throw new Error("Guard 0 failed");
@@ -36807,7 +36807,7 @@ async function __runProductionBatchCancel(ctx: MutationCtx, { docId, reason, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatch not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatch not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read production batches");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change production batches");
     if (!(((doc.status === "planned") || (doc.status === "in_progress")))) throw new Error("Guard 0 failed");
@@ -36871,7 +36871,7 @@ async function __runProductionBatchComplete(ctx: MutationCtx, { docId, actualYie
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatch not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatch not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read production batches");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change production batches");
     if (!((doc.status === "in_progress"))) throw new Error("Guard 0 failed");
@@ -36943,7 +36943,7 @@ async function __runProductionBatchPlan(ctx: MutationCtx, { docId, componentId, 
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatch not found");
     const __rel_component = await __resolveRelation(ctx, "components", [__auth.tenantId, doc.componentId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).component = __rel_component;
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read production batches");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change production batches");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -37027,7 +37027,7 @@ export const ProductionBatch_createViaPlan = mutation({
       yieldUnit: args.yieldUnit
     };
     const __rel_component = await __resolveRelation(ctx, "components", [__auth.tenantId, __draft.componentId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read production batches");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change production batches");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -37066,7 +37066,7 @@ async function __runProductionBatchReconcilePlan(ctx: MutationCtx, { docId, plan
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatch not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatch not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read production batches");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change production batches");
     if (!((doc.status === "planned"))) throw new Error("Guard 0 failed");
@@ -37126,7 +37126,7 @@ async function __runProductionBatchStart(ctx: MutationCtx, { docId, version }: a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatch not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatch not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read production batches");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update production batches");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change production batches");
     if (!((doc.status === "planned"))) throw new Error("Guard 0 failed");
@@ -37187,7 +37187,7 @@ async function __runProductionBatchAllocationAllocate(ctx: MutationCtx, { docId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatchAllocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatchAllocation not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read batch allocations");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!((doc.allocatedAt == null))) throw new Error("Guard 0 failed");
@@ -37276,7 +37276,7 @@ export const ProductionBatchAllocation_createViaAllocate = mutation({
       productionBatchId: args.productionBatchId,
       unit: args.unit
     };
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read batch allocations");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!((__draft.allocatedAt == null))) throw new Error("Guard 0 failed");
@@ -37315,7 +37315,7 @@ async function __runProductionBatchAllocationMarkPortioned(ctx: MutationCtx, { d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatchAllocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatchAllocation not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read batch allocations");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!((doc.status === "produced"))) throw new Error("Guard 0 failed");
@@ -37369,7 +37369,7 @@ async function __runProductionBatchAllocationMarkProduced(ctx: MutationCtx, { do
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatchAllocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatchAllocation not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read batch allocations");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!((doc.status === "planned"))) throw new Error("Guard 0 failed");
@@ -37423,7 +37423,7 @@ async function __runProductionBatchAllocationRelease(ctx: MutationCtx, { docId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatchAllocation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatchAllocation not found");
-    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may read batch allocations");
+    if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may see batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update batch allocations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change batch allocations");
     if (!(((doc.status === "planned") || (doc.status === "produced")))) throw new Error("Guard 0 failed");
@@ -40597,7 +40597,7 @@ async function __runQualityCheckFail(ctx: MutationCtx, { docId, notes, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("QualityCheck not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("QualityCheck not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read quality checks");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change quality checks");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -40666,7 +40666,7 @@ async function __runQualityCheckOpen(ctx: MutationCtx, { docId, prepTaskId, prod
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("QualityCheck not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("QualityCheck not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read quality checks");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change quality checks");
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
@@ -40740,7 +40740,7 @@ export const QualityCheck_createViaOpen = mutation({
       prepTaskId: args.prepTaskId,
       productionBatchId: args.productionBatchId
     };
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read quality checks");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change quality checks");
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
@@ -40776,7 +40776,7 @@ async function __runQualityCheckPass(ctx: MutationCtx, { docId, notes, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("QualityCheck not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("QualityCheck not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read quality checks");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change quality checks");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
@@ -40842,7 +40842,7 @@ async function __runQualityCheckReinspect(ctx: MutationCtx, { docId, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("QualityCheck not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("QualityCheck not found");
-    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may read quality checks");
+    if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may see quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may update quality checks");
     if (!(checkRole(user, "kitchenAccess"))) throw new Error("Kitchen staff may change quality checks");
     if (!(((doc.status === "passed") || (doc.status === "failed")))) throw new Error("Guard 0 failed");
@@ -46286,7 +46286,7 @@ async function __runStationDefine(ctx: MutationCtx, { docId, name, sortOrder, al
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Station not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Station not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read stations");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
@@ -46357,7 +46357,7 @@ export const Station_createViaDefine = mutation({
       aliases: args.aliases,
       name: args.name
     };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read stations");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
@@ -46390,7 +46390,7 @@ async function __runStationReinstate(ctx: MutationCtx, { docId, version }: any, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Station not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Station not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read stations");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
@@ -46444,7 +46444,7 @@ async function __runStationRename(ctx: MutationCtx, { docId, name, sortOrder, al
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Station not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Station not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read stations");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
@@ -46496,7 +46496,7 @@ async function __runStationRetire(ctx: MutationCtx, { docId, reason, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Station not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Station not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may read stations");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Employed staff may see stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may update stations");
     if (!((checkRole(user, "kitchenAccess") || checkRole(user, "manageAccess")))) throw new Error("Kitchen staff and managers may change stations");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");

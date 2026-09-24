@@ -49,7 +49,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   transition status from "cancelled" to []
 
   // manageAccess: Event.approve cascade (event_manager) must plan batches.
-  default policy productionBatchRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read production batches"
+  default policy productionBatchRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may see production batches"
   default policy productionBatchWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update production batches"
   default policy productionBatchExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change production batches"
 
@@ -305,7 +305,7 @@ entity ProductionBatchAllocation mixin TenantScoped, SoftDeletable {
   transition status from "portioned" to []
   transition status from "released" to []
 
-  default policy productionBatchAllocationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read batch allocations"
+  default policy productionBatchAllocationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may see batch allocations"
   default policy productionBatchAllocationWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update batch allocations"
   default policy productionBatchAllocationExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change batch allocations"
 

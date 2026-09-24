@@ -90,7 +90,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   transition status from "completed" to []
   transition status from "cancelled" to []
 
-  default policy prepTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may read prep tasks"
+  default policy prepTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may see prep tasks"
   default policy prepTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may update prep tasks"
   default policy prepTaskExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may change prep tasks"
 
@@ -633,7 +633,7 @@ entity PrepTaskDependency mixin TenantScoped {
   belongsTo dependentTask: PrepTask fields [tenantId, dependentTaskId] references [tenantId, id]
   belongsTo predecessorTask: PrepTask fields [tenantId, predecessorTaskId] references [tenantId, id]
 
-  default policy prepTaskDependencyRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may read prep task dependencies"
+  default policy prepTaskDependencyRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may see prep task dependencies"
   default policy prepTaskDependencyWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may declare prep task dependencies"
   default policy prepTaskDependencyExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may change prep task dependencies"
 
@@ -935,7 +935,7 @@ entity PrepTaskMaterial mixin TenantScoped, SoftDeletable {
 
   belongsTo prepTask: PrepTask fields [tenantId, prepTaskId] references [tenantId, id]
 
-  default policy prepTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may read prep task materials"
+  default policy prepTaskMaterialRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may see prep task materials"
   default policy prepTaskMaterialWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may update prep task materials"
   default policy prepTaskMaterialExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may change prep task materials"
 

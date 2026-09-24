@@ -29,7 +29,7 @@ entity Station mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy stationRead read: roleAllows(user.role, "staffAccess") "Employed staff may read stations"
+  default policy stationRead read: roleAllows(user.role, "staffAccess") "Employed staff may see stations"
   default policy stationWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may update stations"
   default policy stationExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may change stations"
 
