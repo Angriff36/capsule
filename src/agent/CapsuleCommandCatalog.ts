@@ -96,42 +96,46 @@ export class CapsuleCommandCatalog {
     this.uiCoverage.assertAcSurfacesRecorded();
     this.byId = new Map();
     for (const id of capabilityIds) {
-      const raw = contract.capabilities.find((c) => c.capabilityId === id);
-      if (!raw) {
-        throw new Error(
-          `Wiring contract missing capability '${id}' — regenerate Manifest wiring.`,
-        );
-      }
-      const mutationName = mutationNameForCapability(raw.capabilityId);
-      const uiSurface = this.uiCoverage.surface(raw.capabilityId);
-      const generated = this.wiringFacts.command(raw.capabilityId);
+      const generated = this.generatedCommand(id);
+      const mutationName = mutationNameForCapability(generated.capabilityId);
+      const uiSurface = this.uiCoverage.surface(generated.capabilityId);
       this.byId.set(id, {
-        capabilityId: raw.capabilityId,
-        entity: raw.entity,
-        command: raw.command,
-        route: raw.route,
+        capabilityId: generated.capabilityId,
+        entity: generated.entity,
+        command: generated.command,
+        route: generated.route,
         mutationName,
         requiresDocumentId:
           CapsuleMutationTargetKind.requiresDocumentId(mutationName),
         uiImplemented: uiSurface != null,
         uiSurface,
-        clientParameterNames: raw.clientParameterNames,
-        parameters: raw.parameters.map((p) => ({
-          name: p.name,
-          tsType: p.tsType,
-          required: p.required,
-          ownership: p.ownership,
-          irTypeName: p.irTypeName,
-          nullable: p.nullable,
-          constraints: p.constraints,
+        clientParameterNames: generated.clientParameterNames,
+        parameters: generated.parameters.map((parameter) => ({
+          name: parameter.name,
+          tsType: parameter.tsType,
+          required: parameter.required,
+          ownership: parameter.ownership,
+          irTypeName: parameter.irTypeName,
+          nullable: parameter.nullable,
+          constraints: parameter.constraints,
         })),
-        emits: raw.emits,
+        emits: generated.emits,
         resultKind: generated.resultKind,
         failures: generated.failures,
         invalidation: generated.invalidation,
         serverParameterNames: generated.serverParameterNames,
         presentation: generated.presentation,
       });
+    }
+  }
+
+  private generatedCommand(capabilityId: string) {
+    try {
+      return this.wiringFacts.command(capabilityId);
+    } catch {
+      throw new Error(
+        `Wiring contract missing capability '${capabilityId}' — regenerate Manifest wiring.`,
+      );
     }
   }
 
