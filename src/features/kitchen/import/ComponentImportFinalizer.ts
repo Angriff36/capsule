@@ -73,14 +73,14 @@ export class ComponentImportFinalizer {
     operationKey?: string,
   ): Promise<ComponentImportFinalizeResult> {
     const name = review.name.trim();
-    if (!name) throw new Error("Component name is required");
+    if (!name) throw new Error("Recipe name is required");
     const yieldQuantity = requireMeasuredQuantity(
       review.yieldQuantity,
-      "Component yield quantity must be positive",
+      "Recipe yield quantity must be positive",
     );
     const yieldUnit = requireMeasuredUnit(
       review.yieldUnit,
-      "Component yield unit is required",
+      "Recipe yield unit is required",
     );
     if (review.lines.length === 0) {
       throw new Error("Add at least one ingredient line before saving");

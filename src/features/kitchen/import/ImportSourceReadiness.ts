@@ -39,7 +39,7 @@ export class ImportSourceReadinessChecker {
         return {
           ready: false,
           kind: "none",
-          message: "Paste component text before parsing.",
+          message: "Paste recipe text before parsing.",
         };
       }
       return { ready: true, kind: "paste_text" };
@@ -56,14 +56,14 @@ export class ImportSourceReadinessChecker {
         ready: false,
         kind: "none",
         message:
-          "Load both component sheet and component lines CSV files, or choose a .txt component file.",
+          "Load both the recipe sheet and recipe lines CSV files, or choose a .txt recipe file.",
       };
     }
     return {
       ready: false,
       kind: "none",
       message:
-        "Choose a .txt component file or load the paired CSV bundle before parsing.",
+        "Choose a .txt recipe file or load the paired CSV files before parsing.",
     };
   }
 
@@ -81,10 +81,10 @@ export class ImportSourceReadinessChecker {
       return `CSV bundle ready · sheet ${formatCountNoun(this.countRows(snapshot.sheetCsv), "row")} · lines ${formatCountNoun(this.countRows(snapshot.linesCsv), "row")}`;
     }
     if (hasSheet) {
-      return `Component sheet loaded · ${formatCountNoun(this.countRows(snapshot.sheetCsv), "row")} · add component_lines.csv to continue`;
+      return `Recipe sheet loaded · ${formatCountNoun(this.countRows(snapshot.sheetCsv), "row")} · add component_lines.csv to continue`;
     }
     if (hasLines) {
-      return `Component lines loaded · ${formatCountNoun(this.countRows(snapshot.linesCsv), "row")} · add component_sheet.csv to continue`;
+      return `Recipe lines loaded · ${formatCountNoun(this.countRows(snapshot.linesCsv), "row")} · add component_sheet.csv to continue`;
     }
     return null;
   }

@@ -42,11 +42,11 @@ export class ComponentTextParser {
     const warnings: string[] = [];
     if (!text) {
       return {
-        name: "Untitled component",
+        name: "Untitled recipe",
         yieldQuantity: null,
         yieldUnit: null,
         lines: [],
-        warnings: ["Paste a component to begin."],
+        warnings: ["Paste a recipe to begin."],
       };
     }
 
@@ -81,7 +81,7 @@ export class ComponentTextParser {
     const first = lines.find(
       (line) => line.length > 0 && !this.isSectionHeader(line),
     );
-    return first?.replace(/^#+\s*/, "").trim() || "Untitled component";
+    return first?.replace(/^#+\s*/, "").trim() || "Untitled recipe";
   }
 
   private extractDescription(

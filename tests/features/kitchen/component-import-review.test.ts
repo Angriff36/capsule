@@ -369,7 +369,7 @@ describe("ComponentImportPage resumable review", () => {
     await renderPage(`/kitchen/components/import?importId=${IMPORT_ID}`);
     expect(container.textContent).toContain("This import is complete.");
     const open = Array.from(container.querySelectorAll("a")).find((anchor) =>
-      anchor.textContent?.includes("Open component"),
+      anchor.textContent?.includes("Open recipe"),
     );
     expect(open?.getAttribute("href")).toBe(
       `/kitchen/components/${COMPONENT_ID}`,

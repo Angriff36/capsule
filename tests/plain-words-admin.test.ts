@@ -139,4 +139,16 @@ describe("plain words on leftover admin manifests", () => {
     );
     expect(visible).toContain("Staff may see assistant upload registrations");
   });
+
+  it("keeps leftover admin kitchen capability copy free of component jargon", () => {
+    const permissionsPage = readFileSync(
+      "src/features/admin/PermissionsPage.tsx",
+      "utf8",
+    );
+
+    expect(permissionsPage).not.toContain("Components, dishes");
+    expect(permissionsPage).toContain("Recipes, dishes, menus, and prep work.");
+
+    expectPlain("Recipes, dishes, menus, and prep work.");
+  });
 });

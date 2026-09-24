@@ -23,7 +23,7 @@ export function componentImportOutcome(result: {
     ? {
         navigateToId: null,
         recoveredId: result.componentId,
-        notice: `Recovered a previously saved component import with ${count} ingredient ${count === 1 ? "line" : "lines"}. The current review is still here; open the saved component or choose Save component again to import this review.`,
+        notice: `Recovered a previously saved recipe import with ${count} ingredient ${count === 1 ? "line" : "lines"}. The current review is still here; open the saved recipe or choose Save and edit recipe again to import this review.`,
       }
     : { navigateToId: result.componentId, recoveredId: null, notice: null };
 }

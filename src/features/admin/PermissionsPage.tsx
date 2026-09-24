@@ -14,7 +14,7 @@ import { TeamRolesPanel } from "./TeamRolesPanel";
 import { useActionFailure } from "../../ui/action-result";
 
 const CAPABILITIES = [
-  ["kitchen", "Kitchen", "Components, dishes, menus, and prep work."],
+  ["kitchen", "Kitchen", "Recipes, dishes, menus, and prep work."],
   ["inventory", "Inventory", "Stock, locations, demand, and waste."],
   ["procurement", "Procurement", "Vendors, purchase needs, and orders."],
   ["events", "Events", "Bookings, execution, staffing, and closeout."],

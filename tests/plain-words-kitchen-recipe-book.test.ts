@@ -59,4 +59,283 @@ describe("plain words on the kitchen recipe book", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen recipe-book crumbs and page guide free of component jargon", () => {
+    const guides = readFileSync("src/app/guide/pageGuides.ts", "utf8");
+    const crumbs = readFileSync("src/app/shell/breadcrumbs.ts", "utf8");
+    const all = [guides, crumbs].join("\n");
+
+    expect(all).not.toContain("Recipes & components");
+    expect(all).not.toContain("Create a component");
+    expect(guides).toContain('title: "Recipes"');
+    expect(crumbs).toContain('Recipes: "Recipe"');
+    expect(guides).toContain("Create a recipe with its ingredients and yield.");
+
+    for (const fresh of [
+      "Recipes",
+      "Recipe",
+      "Create a recipe with its ingredients and yield.",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
+
+  it("keeps leftover kitchen catalog card kind label free of component jargon", () => {
+    const tone = readFileSync(
+      "src/features/kitchen/culinary-studio/CulinaryCatalogCardTone.ts",
+      "utf8",
+    );
+
+    expect(tone).not.toContain('return "Component"');
+    expect(tone).toContain('return "Recipe"');
+    expect(tone).toContain('return "Ingredient"');
+    expect(tone).toContain('return "Dish"');
+    expect(tone).toContain('return "Menu"');
+    expect(tone).toContain('return "Kitchen item"');
+
+    expectPlain("Recipe");
+  });
+
+  it("keeps leftover kitchen recipe detail copy free of component jargon", () => {
+    const detail = readFileSync(
+      "src/features/kitchen/ComponentDetailPage.tsx",
+      "utf8",
+    );
+
+    // The file name and identifiers stay — only the words a person reads.
+    expect(detail).not.toContain('useTrackRecent("Component"');
+    expect(detail).not.toContain('title="Component not found"');
+    expect(detail).not.toContain("This component is unavailable");
+    expect(detail).not.toContain("← Component index");
+    expect(detail).not.toContain("Component · Edition");
+    expect(detail).not.toContain("from this component.");
+    expect(detail).not.toContain("publish this component");
+    expect(detail).not.toContain("uses this component.");
+    expect(detail).not.toContain("when the component is ready");
+    expect(detail).not.toContain("Revise component");
+
+    expect(detail).toContain('useTrackRecent("Recipe"');
+    expect(detail).toContain('title="Recipe not found"');
+    expect(detail).toContain("This recipe is unavailable or no longer exists.");
+    expect(detail).toContain("← Recipes");
+    expect(detail).toContain("Recipe · Edition");
+    expect(detail).toContain("from this recipe.");
+    expect(detail).toContain("You can still publish this recipe");
+    expect(detail).toContain("No plated dish uses this recipe.");
+    expect(detail).toContain("when the recipe is ready");
+    expect(detail).toContain("Revise recipe");
+
+    for (const fresh of [
+      "Recipe not found",
+      "This recipe is unavailable or no longer exists.",
+      "← Recipes",
+      "No plated dish uses this recipe.",
+      "Revise recipe",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
+
+  it("keeps leftover kitchen import workbench copy free of component jargon", () => {
+    const page = readFileSync(
+      "src/features/kitchen/import/ComponentImportPage.tsx",
+      "utf8",
+    );
+    const panes = readFileSync(
+      "src/features/kitchen/import/ComponentImportPanes.tsx",
+      "utf8",
+    );
+    const readiness = readFileSync(
+      "src/features/kitchen/import/ImportSourceReadiness.ts",
+      "utf8",
+    );
+    const recovery = readFileSync(
+      "src/features/kitchen/culinaryRecovery.ts",
+      "utf8",
+    );
+    const all = [page, panes, readiness, recovery].join("\n");
+
+    // The old leftover words a kitchen person could read are gone. File
+    // names, identifiers, CSS classes, and the component_lines.csv /
+    // component_sheet.csv file names are not user text — they stay.
+    expect(all).not.toContain("Open saved component");
+    expect(all).not.toContain("Open component");
+    expect(all).not.toContain("generated commands");
+    expect(all).not.toContain("Component text");
+    expect(all).not.toContain("Component sheet CSV");
+    expect(all).not.toContain("Component lines CSV");
+    expect(all).not.toContain("Plain text component");
+    expect(all).not.toContain("Paste component text");
+    expect(all).not.toContain("Component name");
+    expect(all).not.toContain("<h3>Components</h3>");
+    expect(all).not.toContain("Save and edit component");
+    expect(all).not.toContain("Paste component text before parsing");
+    expect(all).not.toContain("Component sheet loaded");
+    expect(all).not.toContain("Component lines loaded");
+    expect(all).not.toContain("saved component import");
+    expect(all).not.toContain("Save component again");
+
+    expect(page).toContain("then save the review and open the recipe.");
+    expect(page).toContain("Open saved recipe");
+    expect(page).toContain("The corrected formula lives on its recipe.");
+    expect(panes).toContain("Recipe text");
+    expect(panes).toContain("Recipe sheet CSV");
+    expect(panes).toContain("Recipe lines CSV");
+    expect(panes).toContain("Plain text recipe (.txt)");
+    expect(panes).toContain("Paste recipe text or choose");
+    expect(panes).toContain("Recipe name");
+    expect(panes).toContain("<h3>Ingredients</h3>");
+    expect(panes).toContain("Save and edit recipe");
+    expect(readiness).toContain("Paste recipe text before parsing.");
+    expect(readiness).toContain("Recipe sheet loaded");
+    expect(readiness).toContain("Recipe lines loaded");
+    expect(readiness).toContain("component_lines.csv");
+    expect(readiness).toContain("component_sheet.csv");
+    expect(recovery).toContain("Recovered a previously saved recipe import");
+
+    for (const fresh of [
+      "Recipe text",
+      "Recipe name",
+      "Ingredients",
+      "Save and edit recipe",
+      "Open recipe",
+      "Paste recipe text before parsing.",
+      "The corrected formula lives on its recipe.",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
+
+  it("keeps leftover kitchen import parser and save-error copy free of component jargon", () => {
+    const textParser = readFileSync(
+      "src/features/kitchen/import/ComponentTextParser.ts",
+      "utf8",
+    );
+    const csvParser = readFileSync(
+      "src/features/kitchen/import/ComponentCsvParser.ts",
+      "utf8",
+    );
+    const finalizer = readFileSync(
+      "src/features/kitchen/import/ComponentImportFinalizer.ts",
+      "utf8",
+    );
+    const repository = readFileSync(
+      "src/features/kitchen/import/ComponentImportRepository.ts",
+      "utf8",
+    );
+    const all = [textParser, csvParser, finalizer, repository].join("\n");
+
+    // The old leftover strings a kitchen person could read are gone.
+    // Identifiers, the component_sheet.csv / component_lines.csv file
+    // names, and the CSV header error messages are not this concern.
+    expect(all).not.toContain("Untitled component");
+    expect(all).not.toContain("Paste a component to begin.");
+    expect(all).not.toContain("Component name is required");
+    expect(all).not.toContain("Component yield quantity must be positive");
+    expect(all).not.toContain("Component yield unit is required");
+    expect(all).not.toContain("Component import not found");
+
+    expect(textParser).toContain('"Untitled recipe"');
+    expect(textParser).toContain("Paste a recipe to begin.");
+    expect(csvParser).toContain('"Untitled recipe"');
+    expect(csvParser).toContain('"Untitled import"');
+    expect(finalizer).toContain('"Recipe name is required"');
+    expect(finalizer).toContain('"Recipe yield quantity must be positive"');
+    expect(finalizer).toContain('"Recipe yield unit is required"');
+    expect(repository).toContain('"Recipe import not found"');
+
+    for (const fresh of [
+      "Untitled recipe",
+      "Paste a recipe to begin.",
+      "Recipe name is required",
+      "Recipe yield quantity must be positive",
+      "Recipe yield unit is required",
+      "Recipe import not found",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
+
+  it("keeps leftover kitchen uses and cost copy free of component jargon", () => {
+    const ingredientDetail = readFileSync(
+      "src/features/kitchen/IngredientDetailPage.tsx",
+      "utf8",
+    );
+    const costPanel = readFileSync(
+      "src/features/kitchen/ComponentCostPanel.tsx",
+      "utf8",
+    );
+    const profitability = readFileSync(
+      "src/features/kitchen/MenuProfitabilityPanel.tsx",
+      "utf8",
+    );
+    const all = [ingredientDetail, costPanel, profitability].join("\n");
+
+    // The old leftover words a kitchen person could read are gone.
+    // Identifiers (componentUses, componentCount, row.componentCost), the
+    // kind="component" link kind, the id="component-cost-heading", CSS
+    // classes, and data-testid values are not user text — they stay.
+    expect(all).not.toContain("<h2>Component uses</h2>");
+    expect(all).not.toContain(
+      'formatCountNoun(componentUses.length, "component")',
+    );
+    expect(all).not.toContain("No components use this ingredient yet.");
+    expect(all).not.toContain(
+      "An ingredient on this component is no longer available.",
+    );
+    expect(all).not.toContain(">Component cost</h2>");
+    expect(all).not.toContain("review its component ingredients.");
+    expect(all).not.toContain("complete its component costing.");
+    expect(all).not.toContain("Complete component pricing");
+    expect(all).not.toContain("Live component cost");
+    expect(all).not.toContain("missing price or component cost");
+    expect(all).not.toContain("<span>Component cost</span>");
+    expect(all).not.toContain('? "component" : "components"');
+
+    expect(ingredientDetail).toContain("<h2>Recipe uses</h2>");
+    expect(ingredientDetail).toContain(
+      'formatCountNoun(componentUses.length, "recipe")',
+    );
+    expect(ingredientDetail).toContain("No recipes use this ingredient yet.");
+    expect(costPanel).toContain(
+      "An ingredient on this recipe is no longer available.",
+    );
+    expect(costPanel).toContain(
+      '<h2 id="component-cost-heading">Recipe cost</h2>',
+    );
+    expect(profitability).toContain("review its recipe ingredients.");
+    expect(profitability).toContain(
+      "Set a selling price and complete its recipe costing.",
+    );
+    expect(profitability).toContain(
+      "Complete recipe pricing before trusting this margin.",
+    );
+    expect(profitability).toContain(
+      "Live recipe cost against each dish's menu price",
+    );
+    expect(profitability).toContain("missing price or recipe cost");
+    expect(profitability).toContain("<span>Recipe cost</span>");
+    expect(profitability).toContain(
+      '{row.componentCount === 1 ? "recipe" : "recipes"}',
+    );
+    expect(profitability).not.toContain("Review components");
+    expect(profitability).toContain("Review recipes");
+
+    for (const fresh of [
+      "Recipe uses",
+      "No recipes use this ingredient yet.",
+      "An ingredient on this recipe is no longer available.",
+      "Recipe cost",
+      "Review recipes",
+      "review its recipe ingredients.",
+      "Set a selling price and complete its recipe costing.",
+      "Complete recipe pricing before trusting this margin.",
+      "Live recipe cost against each dish's menu price",
+      "missing price or recipe cost",
+      "1 recipe",
+      "2 recipes",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });
