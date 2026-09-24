@@ -55,7 +55,7 @@ entity TimeOffRequest mixin TenantScoped, SoftDeletable {
     guard self.person != null and self.person.status == "active" and self.person.deletedAt == null
     guard (self.person.authSubjectId != null and self.person.authSubjectId == user.id) or roleAllows(user.role, "workforceManageAccess")
     constraint submitTimeOffPersonMatch: personId == self.personId "This time-off request is for a different person. Pick the person already on this time-off request."
-    constraint submitTimeOffDates: endsAt > startsAt "Time-off end must be after its start"
+    constraint submitTimeOffDates: endsAt > startsAt "This time-off request ends before it starts. Pick an end that's later than the start."
     constraint submitTimeOffReason: length(trim(reason)) > 0 "Tell your manager why you need the time off"
     mutate personId = personId
     mutate requesterAuthSubjectId = self.person.authSubjectId

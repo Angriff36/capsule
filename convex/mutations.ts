@@ -48632,7 +48632,7 @@ async function __runTimeOffRequestSubmit(ctx: MutationCtx, { docId, personId, st
     if (!((((__rel_person != null) && (__rel_person.status === "active")) && (__rel_person.deletedAt == null)))) throw new Error("Guard 4 failed");
     if (!((((__rel_person.authSubjectId != null) && (__rel_person.authSubjectId === user.id)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
     if (!((personId === doc.personId))) throw new Error("This time-off request is for a different person. Pick the person already on this time-off request.");
-    if (!((endsAt > startsAt))) throw new Error("Time-off end must be after its start");
+    if (!((endsAt > startsAt))) throw new Error("This time-off request ends before it starts. Pick an end that's later than the start.");
     if (!((((reason).trim()).length > 0))) throw new Error("Tell your manager why you need the time off");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -48716,7 +48716,7 @@ export const TimeOffRequest_createViaSubmit = mutation({
     if (!((((__rel_person != null) && (__rel_person.status === "active")) && (__rel_person.deletedAt == null)))) throw new Error("Guard 4 failed");
     if (!((((__rel_person.authSubjectId != null) && (__rel_person.authSubjectId === user.id)) || checkRole(user, "workforceManageAccess")))) throw new Error("Guard 5 failed");
     if (!((personId === __draft.personId))) throw new Error("This time-off request is for a different person. Pick the person already on this time-off request.");
-    if (!((endsAt > startsAt))) throw new Error("Time-off end must be after its start");
+    if (!((endsAt > startsAt))) throw new Error("This time-off request ends before it starts. Pick an end that's later than the start.");
     if (!((((reason).trim()).length > 0))) throw new Error("Tell your manager why you need the time off");
     const doc: Record<string, any> = {
       ...__draft,

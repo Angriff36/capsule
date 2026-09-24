@@ -56,6 +56,8 @@ describe("plain words on leftover culinary import constraint copy", () => {
       "src/workforce/availability.manifest",
       "utf8",
     );
-    expect(availability).toContain("Time-off end must be after its start");
+    expect(availability).toContain(
+      "This time-off request ends before it starts. Pick an end that's later than the start.",
+    );
   });
 });

@@ -89,6 +89,27 @@ describe("plain words on leftover workforce schedule-notice and swap recipient c
       "This availability is for a different person. Pick the person already on this availability.",
     );
     // Later leftovers keep their current wording.
-    expect(visible).toContain("Time-off end must be after its start");
+    expect(visible).toContain("Availability end must be after its start");
+  });
+
+  it("keeps leftover time-off end-after-start copy free of constraint-style jargon", () => {
+    const visible = visibleCopy("src/workforce/availability.manifest");
+    // Old constraint-style wording is gone from the manifest.
+    expect(visible).not.toContain("Time-off end must be after its start");
+    // The refusal now says what happened and what to do next.
+    const endAfterStart =
+      "This time-off request ends before it starts. Pick an end that's later than the start.";
+    expect(visible).toContain(endAfterStart);
+    expectPlain(endAfterStart);
+    // The generated mutation file carries the same wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain("Time-off end must be after its start");
+    expect(mutations).toContain(endAfterStart);
+    // Already-landed leftover on the same file stays.
+    expect(visible).toContain(
+      "This time-off request is for a different person. Pick the person already on this time-off request.",
+    );
+    // Later leftovers keep their current wording.
+    expect(visible).toContain("Availability end must be after its start");
   });
 });
