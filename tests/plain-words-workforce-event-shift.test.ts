@@ -66,12 +66,6 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     }
     // Later leftovers keep their current wording.
     expect(visible).toContain(
-      "The recipient needs a matching active certification",
-    );
-    expect(visible).toContain(
-      "Recipient certification must match the shift requirement",
-    );
-    expect(visible).toContain(
       "Payroll period end must be at or after period start",
     );
     // The time-off person leftover keeps its wording, pinned from the generated file.
@@ -90,6 +84,63 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
     );
     expect(visible).toContain(
       "This payroll input is for a different person. Pick the person already on this payroll input.",
+    );
+  });
+
+  it("keeps leftover shift-swap certification copy free of recipient jargon", () => {
+    const visible = visibleCopy("src/workforce/shift-swap.manifest");
+    // Old recipient wording is gone from the three certification refusals.
+    for (const old of [
+      "The recipient needs a matching active certification",
+      "Recipient certification must match the shift requirement",
+      "Recipient certification must remain valid through the shift",
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+    // The refusals now say what is wrong and what to pick next.
+    for (const fresh of [
+      "This person needs a current matching certification for the shift. Pick someone who already has it.",
+      "This person's certification doesn't match what the shift needs. Pick someone with the same certification.",
+      "This person's certification expires before the shift ends. Pick someone whose certification lasts through the shift.",
+    ]) {
+      expect(visible).toContain(fresh);
+      expectPlain(fresh);
+    }
+    // The generated mutation file carries the same wording.
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    for (const old of [
+      "The recipient needs a matching active certification",
+      "Recipient certification must match the shift requirement",
+      "Recipient certification must remain valid through the shift",
+    ]) {
+      expect(mutations).not.toContain(old);
+    }
+    for (const fresh of [
+      "This person needs a current matching certification for the shift. Pick someone who already has it.",
+      "This person's certification doesn't match what the shift needs. Pick someone with the same certification.",
+      "This person's certification expires before the shift ends. Pick someone whose certification lasts through the shift.",
+    ]) {
+      expect(mutations).toContain(fresh);
+    }
+    // Already-landed copy stays.
+    expect(visible).toContain(
+      "This swap is for a different person. Pick the person already on this swap.",
+    );
+    expect(visible).toContain(
+      "This swap is for a different shift. Pick the shift already on this swap.",
+    );
+    expect(visible).toContain(
+      "The shift certification requirement changed after this request was proposed",
+    );
+    // Later leftovers keep their current wording.
+    expect(visible).toContain(
+      "Replacement certification must belong to the recipient",
+    );
+    expect(visible).toContain(
+      "The recipient needs the training required by this shift type",
+    );
+    expect(visible).toContain(
+      "Recipient training must match the shift type requirement",
     );
   });
 });
