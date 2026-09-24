@@ -56,4 +56,22 @@ describe("plain words on leftover insights manifests", () => {
     expect(visible).toContain("Staff may update saved reports");
     expect(visible).toContain("Staff may change saved reports");
   });
+
+  it("keeps leftover tpp-report-favorite READ copy free of read jargon", () => {
+    const source = readFileSync(
+      "src/insights/tpp-report-favorite.manifest",
+      "utf8",
+    );
+    // strip // comments so developer notes are not treated as user copy
+    const visible = source.replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Staff may read their own report favorites");
+    expect(visible).toContain("Staff may see their own report favorites");
+    expectPlain("Staff may see their own report favorites");
+
+    // write/execute leftovers stay for a later slice
+    expect(visible).toContain(
+      "Report favorites are managed only through the app",
+    );
+  });
 });
