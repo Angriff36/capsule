@@ -3423,9 +3423,9 @@ async function __runComponentDraft(ctx: MutationCtx, { docId, name, yieldQuantit
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
-    if (!((yieldQuantity > 0))) throw new Error("Component yield quantity must be positive");
+    if (!((yieldQuantity > 0))) throw new Error("Recipe yield quantity must be positive");
     if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
-    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Component batch multiplier must be positive");
+    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Recipe batch multiplier must be positive");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -3528,9 +3528,9 @@ export const Component_createViaDraft = mutation({
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
-    if (!((yieldQuantity > 0))) throw new Error("Component yield quantity must be positive");
+    if (!((yieldQuantity > 0))) throw new Error("Recipe yield quantity must be positive");
     if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
-    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Component batch multiplier must be positive");
+    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Recipe batch multiplier must be positive");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,
@@ -3820,9 +3820,9 @@ async function __runComponentReviseDraft(ctx: MutationCtx, { docId, name, yieldQ
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
-    if (!((yieldQuantity > 0))) throw new Error("Component yield quantity must be positive");
+    if (!((yieldQuantity > 0))) throw new Error("Recipe yield quantity must be positive");
     if (!(((servesPerYield == null) || (servesPerYield > 0)))) throw new Error("Serves per yield must be a positive integer");
-    if (!((batchMultiplier > 0))) throw new Error("Component batch multiplier must be positive");
+    if (!((batchMultiplier > 0))) throw new Error("Recipe batch multiplier must be positive");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

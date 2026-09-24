@@ -250,10 +250,47 @@ describe("plain words on culinary manifests", () => {
     expect(mutations).toContain("Recipe name is required");
 
     // later leftovers, unchanged
-    expect(visible).toContain("Component yield quantity must be positive");
+    expect(visible).toContain("Component ingredient quantity must be positive");
     expect(visible).toContain("Piece quantity must be positive");
 
     // already-landed leftovers must stay put
+    expect(visible).toContain("Portion size name is required");
+    expect(visible).toContain("Kitchen staff may see recipes");
+  });
+
+  it("keeps leftover culinary yield-and-batch constraint copy free of component jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/culinary/component.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain("Component yield quantity must be positive");
+    expect(visible).not.toContain(
+      "Component batch multiplier must be positive",
+    );
+    expect(visible).toContain("Recipe yield quantity must be positive");
+    expect(visible).toContain("Recipe batch multiplier must be positive");
+    expectPlain("Recipe yield quantity must be positive");
+    expectPlain("Recipe batch multiplier must be positive");
+
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    expect(mutations).not.toContain(
+      "Component yield quantity must be positive",
+    );
+    expect(mutations).not.toContain(
+      "Component batch multiplier must be positive",
+    );
+    expect(mutations).toContain("Recipe yield quantity must be positive");
+    expect(mutations).toContain("Recipe batch multiplier must be positive");
+
+    // later leftovers, unchanged
+    expect(visible).toContain("Component ingredient quantity must be positive");
+    expect(visible).toContain("Component steps require an instruction");
+    expect(visible).toContain("Piece quantity must be positive");
+
+    // already-landed leftovers must stay put
+    expect(visible).toContain("Recipe name is required");
     expect(visible).toContain("Portion size name is required");
     expect(visible).toContain("Kitchen staff may see recipes");
   });
