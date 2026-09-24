@@ -19005,7 +19005,7 @@ async function __runEventTemplateArchive(ctx: MutationCtx, { docId, reason, vers
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTemplate not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read event templates");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change event templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -19068,7 +19068,7 @@ async function __runEventTemplateDefine(ctx: MutationCtx, { docId, name, clientT
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTemplate not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read event templates");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change event templates");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
@@ -19165,7 +19165,7 @@ export const EventTemplate_createViaDefine = mutation({
       notes: args.notes,
       sourceEventId: args.sourceEventId
     };
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read event templates");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change event templates");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
@@ -19206,7 +19206,7 @@ async function __runEventTemplateReactivate(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTemplate not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read event templates");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change event templates");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
@@ -19266,7 +19266,7 @@ async function __runEventTemplateRevise(ctx: MutationCtx, { docId, name, clientT
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventTemplate not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read event templates");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update event templates");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change event templates");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
@@ -29003,7 +29003,7 @@ async function __runOccasionActivate(ctx: MutationCtx, { docId, version }: any, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Occasion not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Occasion not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read occasions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change occasions");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
@@ -29064,7 +29064,7 @@ async function __runOccasionDeactivate(ctx: MutationCtx, { docId, reason, versio
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Occasion not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Occasion not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read occasions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change occasions");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -29127,7 +29127,7 @@ async function __runOccasionRegister(ctx: MutationCtx, { docId, name, code, sort
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Occasion not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Occasion not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read occasions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change occasions");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -29217,7 +29217,7 @@ export const Occasion_createViaRegister = mutation({
       description: args.description,
       name: args.name
     };
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read occasions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change occasions");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -29254,7 +29254,7 @@ async function __runOccasionReviseDetails(ctx: MutationCtx, { docId, name, descr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Occasion not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Occasion not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read occasions");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update occasions");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change occasions");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -43107,7 +43107,7 @@ async function __runServiceStyleActivate(ctx: MutationCtx, { docId, version }: a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read service styles");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.status === "inactive"))) throw new Error("Guard 0 failed");
@@ -43168,7 +43168,7 @@ async function __runServiceStyleDeactivate(ctx: MutationCtx, { docId, reason, ve
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read service styles");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -43231,7 +43231,7 @@ async function __runServiceStyleRegister(ctx: MutationCtx, { docId, name, code, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read service styles");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -43321,7 +43321,7 @@ export const ServiceStyle_createViaRegister = mutation({
       description: args.description,
       name: args.name
     };
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read service styles");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
@@ -43358,7 +43358,7 @@ async function __runServiceStyleReviseDetails(ctx: MutationCtx, { docId, name, d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyle not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyle not found");
-    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may read service styles");
+    if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may see service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may update service styles");
     if (!(checkRole(user, "eventManageAccess"))) throw new Error("Event managers may change service styles");
     if (!((doc.registeredAt != null))) throw new Error("Guard 0 failed");
@@ -43414,7 +43414,7 @@ async function __runServiceStyleKitItemAdd(ctx: MutationCtx, { docId, serviceSty
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyleKitItem not found");
     const __rel_serviceStyle = await __resolveRelation(ctx, "serviceStyles", [__auth.tenantId, doc.serviceStyleId], ["tenantId","id"], "tenantId", __auth.tenantId);
     ((doc as any) as any).serviceStyle = __rel_serviceStyle;
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read service style kits");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may update service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may change service style kits");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -43505,7 +43505,7 @@ export const ServiceStyleKitItem_createViaAdd = mutation({
       serviceStyleId: args.serviceStyleId
     };
     const __rel_serviceStyle = await __resolveRelation(ctx, "serviceStyles", [__auth.tenantId, __draft.serviceStyleId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read service style kits");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may update service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may change service style kits");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -43545,7 +43545,7 @@ async function __runServiceStyleKitItemReinstate(ctx: MutationCtx, { docId, vers
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyleKitItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyleKitItem not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read service style kits");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may update service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may change service style kits");
     if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
@@ -43606,7 +43606,7 @@ async function __runServiceStyleKitItemRetire(ctx: MutationCtx, { docId, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyleKitItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyleKitItem not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read service style kits");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may update service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may change service style kits");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -43667,7 +43667,7 @@ async function __runServiceStyleKitItemRevise(ctx: MutationCtx, { docId, descrip
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ServiceStyleKitItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ServiceStyleKitItem not found");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read service style kits");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may update service style kits");
     if (!(((checkRole(user, "eventManageAccess") || checkRole(user, "logisticsAccess")) || checkRole(user, "manageAccess")))) throw new Error("Event managers, logistics staff and managers may change service style kits");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -54195,7 +54195,7 @@ async function __runVenueLayoutTemplateArchive(ctx: MutationCtx, { docId, reason
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueLayoutTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueLayoutTemplate not found");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue layout templates");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue layout templates");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
@@ -54257,7 +54257,7 @@ async function __runVenueLayoutTemplateDefine(ctx: MutationCtx, { docId, venueId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueLayoutTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueLayoutTemplate not found");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue layout templates");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue layout templates");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
@@ -54332,7 +54332,7 @@ export const VenueLayoutTemplate_createViaDefine = mutation({
       name: args.name,
       venueId: args.venueId
     };
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue layout templates");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue layout templates");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
@@ -54366,7 +54366,7 @@ async function __runVenueLayoutTemplateReactivate(ctx: MutationCtx, { docId, ver
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueLayoutTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueLayoutTemplate not found");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue layout templates");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue layout templates");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
@@ -54426,7 +54426,7 @@ async function __runVenueLayoutTemplateRevise(ctx: MutationCtx, { docId, name, d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueLayoutTemplate not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueLayoutTemplate not found");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue layout templates");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue layout templates");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue layout templates");
     if (!((doc.definedAt != null))) throw new Error("Guard 0 failed");
@@ -54479,7 +54479,7 @@ async function __runVenueNotePin(ctx: MutationCtx, { docId, version }: any, __cr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may see venue notes; management-only notes require managers");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue notes");
     if (!((doc.postedAt != null))) throw new Error("Guard 0 failed");
@@ -54526,7 +54526,7 @@ async function __runVenueNotePost(ctx: MutationCtx, { docId, venueId, eventId, a
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may see venue notes; management-only notes require managers");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue notes");
     if (!((doc.postedAt == null))) throw new Error("Guard 0 failed");
@@ -54619,7 +54619,7 @@ export const VenueNote_createViaPost = mutation({
       eventId: args.eventId,
       venueId: args.venueId
     };
-    if (!((checkRole(user, "eventAccess") && ((__draft.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!((checkRole(user, "eventAccess") && ((__draft.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may see venue notes; management-only notes require managers");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue notes");
     if (!((__draft.postedAt == null))) throw new Error("Guard 0 failed");
@@ -54660,7 +54660,7 @@ async function __runVenueNoteRemove(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may see venue notes; management-only notes require managers");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue notes");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -54706,7 +54706,7 @@ async function __runVenueNoteRevise(ctx: MutationCtx, { docId, content, category
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may see venue notes; management-only notes require managers");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue notes");
     if (!((doc.postedAt != null))) throw new Error("Guard 0 failed");
@@ -54759,7 +54759,7 @@ async function __runVenueNoteUnpin(ctx: MutationCtx, { docId, version }: any, __
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueNote not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueNote not found");
-    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may read venue notes; management-only notes require managers");
+    if (!((checkRole(user, "eventAccess") && ((doc.visibility !== "management_only") || checkRole(user, "manageAccess"))))) throw new Error("Event staff may see venue notes; management-only notes require managers");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue notes");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue notes");
     if (!((doc.postedAt != null))) throw new Error("Guard 0 failed");
@@ -54806,7 +54806,7 @@ async function __runVenueRoomAdd(ctx: MutationCtx, { docId, venueId, name, roomT
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueRoom not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueRoom not found");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue rooms");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue rooms");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
@@ -54890,7 +54890,7 @@ export const VenueRoom_createViaAdd = mutation({
       squareFootage: args.squareFootage,
       venueId: args.venueId
     };
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue rooms");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue rooms");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
@@ -54928,7 +54928,7 @@ async function __runVenueRoomRemove(ctx: MutationCtx, { docId, version }: any, _
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueRoom not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueRoom not found");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue rooms");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue rooms");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -54974,7 +54974,7 @@ async function __runVenueRoomRevise(ctx: MutationCtx, { docId, name, roomType, c
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueRoom not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueRoom not found");
-    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may read venue rooms");
+    if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may see venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venue rooms");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venue rooms");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
@@ -55032,7 +55032,7 @@ async function __runVenueVendorRelationshipEstablish(ctx: MutationCtx, { docId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may read venue vendor relationships");
+    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -55161,7 +55161,7 @@ export const VenueVendorRelationship_createViaEstablish = mutation({
       vendorId: args.vendorId,
       venueId: args.venueId
     };
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may read venue vendor relationships");
+    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -55205,7 +55205,7 @@ async function __runVenueVendorRelationshipRetire(ctx: MutationCtx, { docId, rea
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may read venue vendor relationships");
+    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -55252,7 +55252,7 @@ async function __runVenueVendorRelationshipReviseDetails(ctx: MutationCtx, { doc
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may read venue vendor relationships");
+    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
@@ -55323,7 +55323,7 @@ async function __runVenueVendorRelationshipReviseStatus(ctx: MutationCtx, { docI
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VenueVendorRelationship not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VenueVendorRelationship not found");
-    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may read venue vendor relationships");
+    if (!(checkRole(user, "facilityAccess"))) throw new Error("Facility staff may see venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may update venue vendor relationships");
     if (!(checkRole(user, "facilityManageAccess"))) throw new Error("Facility managers may change venue vendor relationships");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");

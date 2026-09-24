@@ -60,7 +60,7 @@ entity ServiceStyleKitItem mixin TenantScoped, SoftDeletable {
 
   // The whole crew reads the kit (it explains the pack list). The people who
   // run events and logistics keep it up to date.
-  default policy serviceStyleKitItemRead read: roleAllows(user.role, "staffAccess") "Staff may read service style kits"
+  default policy serviceStyleKitItemRead read: roleAllows(user.role, "staffAccess") "Staff may see service style kits"
   default policy serviceStyleKitItemWrite write: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may update service style kits"
   default policy serviceStyleKitItemExecute execute: roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event managers, logistics staff and managers may change service style kits"
 

@@ -46,7 +46,7 @@ entity Occasion mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["inactive"]
   transition status from "inactive" to ["active"]
 
-  default policy occasionRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read occasions"
+  default policy occasionRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may see occasions"
   default policy occasionWrite write: roleAllows(user.role, "eventManageAccess") "Event managers may update occasions"
   default policy occasionExecute execute: roleAllows(user.role, "eventManageAccess") "Event managers may change occasions"
 
