@@ -108,4 +108,52 @@ describe("plain words on workforce UI", () => {
       "Clock someone in to start their first time entry.",
     );
   });
+
+  it("keeps leftover Training reviews candidates scorecards meetings and stock count labels free of record jargon", () => {
+    const files = [
+      "src/features/workforce/TrainingPage.tsx",
+      "src/features/workforce/PerformanceReviewsPage.tsx",
+      "src/features/workforce/CandidatesPage.tsx",
+      "src/features/workforce/RoleScorecardsPage.tsx",
+      "src/features/workforce/OneOnOnesPage.tsx",
+      "src/features/workforce/MyReviewsPage.tsx",
+      "src/features/inventory/StockBookPage.tsx",
+    ];
+    const visible = files.map((path) => readFileSync(path, "utf8")).join("\n");
+
+    for (const old of [
+      'formatCountNoun(activeCompletions.length, "record")',
+      'formatCountNoun(recordedReviews.length, "record")',
+      'formatCountNoun(liveCandidates.length, "record")',
+      'formatCountNoun(rows.length, "record")',
+      'formatCountNoun(heldMeetings.length, "record")',
+      'formatCountNoun(reviews?.length ?? 0, "record")',
+      'formatCountNoun(activeReservations.length, "record")',
+    ]) {
+      expect(visible).not.toContain(old);
+    }
+
+    for (const fresh of [
+      'formatCountNoun(activeCompletions.length, "completion")',
+      'formatCountNoun(recordedReviews.length, "review")',
+      'formatCountNoun(liveCandidates.length, "candidate")',
+      'formatCountNoun(rows.length, "scorecard")',
+      'formatCountNoun(heldMeetings.length, "meeting")',
+      'formatCountNoun(reviews?.length ?? 0, "review")',
+      'formatCountNoun(activeReservations.length, "reservation")',
+    ]) {
+      expect(visible).toContain(fresh);
+    }
+
+    for (const phrase of [
+      "completion",
+      "review",
+      "candidate",
+      "scorecard",
+      "meeting",
+      "reservation",
+    ]) {
+      expectPlain(phrase);
+    }
+  });
 });

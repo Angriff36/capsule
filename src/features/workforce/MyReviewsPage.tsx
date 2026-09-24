@@ -33,7 +33,7 @@ export function MyReviewsPage() {
             <p className="eyebrow">Your reviews</p>
             <h2>Recorded feedback</h2>
           </div>
-          <span>{formatCountNoun(reviews?.length ?? 0, "record")}</span>
+          <span>{formatCountNoun(reviews?.length ?? 0, "review")}</span>
         </div>
         {reviews === undefined ? (
           <TableSkeleton rows={4} />

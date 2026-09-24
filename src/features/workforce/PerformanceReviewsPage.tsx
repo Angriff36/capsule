@@ -192,7 +192,7 @@ export function PerformanceReviewsPage() {
             <p className="eyebrow">Review ledger</p>
             <h2>Recorded reviews</h2>
           </div>
-          <span>{formatCountNoun(recordedReviews.length, "record")}</span>
+          <span>{formatCountNoun(recordedReviews.length, "review")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={4} />

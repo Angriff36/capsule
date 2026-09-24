@@ -831,7 +831,9 @@ export function StockBookPage() {
               <p className="eyebrow">Event claims</p>
               <h2>Reservations</h2>
             </div>
-            <span>{formatCountNoun(activeReservations.length, "record")}</span>
+            <span>
+              {formatCountNoun(activeReservations.length, "reservation")}
+            </span>
           </div>
           {reservations === undefined || events === undefined ? (
             <TableSkeleton rows={5} />
