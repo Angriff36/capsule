@@ -376,4 +376,33 @@ describe("plain words on kitchen screens", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen nav label copy free of component jargon", () => {
+    const files = [
+      "src/features/kitchen/kitchenRoutes.ts",
+      "src/features/kitchen/KitchenDashboardPage.tsx",
+      "src/features/kitchen/KitchenCatalogPage.tsx",
+    ];
+    const all = files.map((path) => readFileSync(path, "utf8")).join("\n");
+
+    // Strip comments and hyphenated identifiers so the checks only see
+    // user-visible text.
+    const visible = all
+      .replace(/\/\*[\s\S]*?\*\//g, " ")
+      .replace(/(^|[^:])\/\/[^\n]*/g, "$1 ")
+      .replace(/\b[A-Za-z]+(?:-[A-Za-z]+)+\b/g, " ");
+
+    expect(all).not.toContain('label: "Components"');
+    expect(all).not.toContain('<Link to="/kitchen">Components</Link>');
+    expect(all).not.toContain("Browse and open {section}");
+    expect(all).not.toContain("section[0].toUpperCase() + section.slice(1)");
+    expect(visible).not.toMatch(/>\s*Components\s*</);
+
+    expect(all).toContain('label: "Recipes"');
+    expect(all).toContain('<Link to="/kitchen">Recipes</Link>');
+    expect(all).toContain("Browse and open");
+
+    expectPlain("Recipes");
+    expectPlain("Browse and open recipes — then open the one that needs work.");
+  });
 });

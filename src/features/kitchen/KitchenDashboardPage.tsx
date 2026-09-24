@@ -1145,7 +1145,7 @@ export function KitchenDashboardPage() {
           </select>
           <ActionMenu>
             <Link to="/kitchen/yield">Yield variance</Link>
-            <Link to="/kitchen">Components</Link>
+            <Link to="/kitchen">Recipes</Link>
             <Link to="/kitchen/ingredients">Ingredients</Link>
             <Link to="/kitchen/dishes">Dishes</Link>
             <Link to="/kitchen/menus">Menus</Link>

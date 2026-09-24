@@ -32,7 +32,7 @@ it.each([
   ["/inventory/demand", "What each event needs"],
   ["/inventory/stock", "What the house holds"],
   ["/inventory/purchasing", "Weekly purchasing drafts"],
-  ["/kitchen/components", "Components"],
+  ["/kitchen/components", "Recipes"],
   ["/kitchen/ingredients", "Ingredients"],
   ["/kitchen/dishes", "Dishes"],
   ["/kitchen/menus", "Menus"],
