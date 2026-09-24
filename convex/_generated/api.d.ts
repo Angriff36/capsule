@@ -58,6 +58,7 @@ import type * as lib_cateringPackageOperations from "../lib/cateringPackageOpera
 import type * as lib_clerkSignInTicket from "../lib/clerkSignInTicket.js";
 import type * as lib_clerkStaffAccount from "../lib/clerkStaffAccount.js";
 import type * as lib_clientOutreach from "../lib/clientOutreach.js";
+import type * as lib_clientPortalLinks from "../lib/clientPortalLinks.js";
 import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
 import type * as lib_culinaryModel_catalogReclassification from "../lib/culinaryModel/catalogReclassification.js";
 import type * as lib_culinaryModel_costing from "../lib/culinaryModel/costing.js";
@@ -246,6 +247,7 @@ declare const fullApi: ApiFromModules<{
   "lib/clerkSignInTicket": typeof lib_clerkSignInTicket;
   "lib/clerkStaffAccount": typeof lib_clerkStaffAccount;
   "lib/clientOutreach": typeof lib_clientOutreach;
+  "lib/clientPortalLinks": typeof lib_clientPortalLinks;
   "lib/clientPortalToken": typeof lib_clientPortalToken;
   "lib/culinaryModel/catalogReclassification": typeof lib_culinaryModel_catalogReclassification;
   "lib/culinaryModel/costing": typeof lib_culinaryModel_costing;
