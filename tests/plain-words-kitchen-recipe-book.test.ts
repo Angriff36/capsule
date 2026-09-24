@@ -255,4 +255,87 @@ describe("plain words on the kitchen recipe book", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen uses and cost copy free of component jargon", () => {
+    const ingredientDetail = readFileSync(
+      "src/features/kitchen/IngredientDetailPage.tsx",
+      "utf8",
+    );
+    const costPanel = readFileSync(
+      "src/features/kitchen/ComponentCostPanel.tsx",
+      "utf8",
+    );
+    const profitability = readFileSync(
+      "src/features/kitchen/MenuProfitabilityPanel.tsx",
+      "utf8",
+    );
+    const all = [ingredientDetail, costPanel, profitability].join("\n");
+
+    // The old leftover words a kitchen person could read are gone.
+    // Identifiers (componentUses, componentCount, row.componentCost), the
+    // kind="component" link kind, the id="component-cost-heading", CSS
+    // classes, and data-testid values are not user text — they stay.
+    expect(all).not.toContain("<h2>Component uses</h2>");
+    expect(all).not.toContain(
+      'formatCountNoun(componentUses.length, "component")',
+    );
+    expect(all).not.toContain("No components use this ingredient yet.");
+    expect(all).not.toContain(
+      "An ingredient on this component is no longer available.",
+    );
+    expect(all).not.toContain(">Component cost</h2>");
+    expect(all).not.toContain("review its component ingredients.");
+    expect(all).not.toContain("complete its component costing.");
+    expect(all).not.toContain("Complete component pricing");
+    expect(all).not.toContain("Live component cost");
+    expect(all).not.toContain("missing price or component cost");
+    expect(all).not.toContain("<span>Component cost</span>");
+    expect(all).not.toContain('? "component" : "components"');
+
+    expect(ingredientDetail).toContain("<h2>Recipe uses</h2>");
+    expect(ingredientDetail).toContain(
+      'formatCountNoun(componentUses.length, "recipe")',
+    );
+    expect(ingredientDetail).toContain("No recipes use this ingredient yet.");
+    expect(costPanel).toContain(
+      "An ingredient on this recipe is no longer available.",
+    );
+    expect(costPanel).toContain(
+      '<h2 id="component-cost-heading">Recipe cost</h2>',
+    );
+    expect(profitability).toContain("review its recipe ingredients.");
+    expect(profitability).toContain(
+      "Set a selling price and complete its recipe costing.",
+    );
+    expect(profitability).toContain(
+      "Complete recipe pricing before trusting this margin.",
+    );
+    expect(profitability).toContain(
+      "Live recipe cost against each dish's menu price",
+    );
+    expect(profitability).toContain("missing price or recipe cost");
+    expect(profitability).toContain("<span>Recipe cost</span>");
+    expect(profitability).toContain(
+      '{row.componentCount === 1 ? "recipe" : "recipes"}',
+    );
+    expect(profitability).not.toContain("Review components");
+    expect(profitability).toContain("Review recipes");
+
+    for (const fresh of [
+      "Recipe uses",
+      "No recipes use this ingredient yet.",
+      "An ingredient on this recipe is no longer available.",
+      "Recipe cost",
+      "Review recipes",
+      "review its recipe ingredients.",
+      "Set a selling price and complete its recipe costing.",
+      "Complete recipe pricing before trusting this margin.",
+      "Live recipe cost against each dish's menu price",
+      "missing price or recipe cost",
+      "1 recipe",
+      "2 recipes",
+    ]) {
+      expectPlain(fresh);
+    }
+  });
 });

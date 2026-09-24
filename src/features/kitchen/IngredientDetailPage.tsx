@@ -634,8 +634,8 @@ export function IngredientDetailPage() {
 
       <section className="culinary-section">
         <div className="culinary-section-heading">
-          <h2>Component uses</h2>
-          <span>{formatCountNoun(componentUses.length, "component")}</span>
+          <h2>Recipe uses</h2>
+          <span>{formatCountNoun(componentUses.length, "recipe")}</span>
         </div>
         {componentUses.length ? (
           <ul className="ingredient-list">
@@ -653,7 +653,7 @@ export function IngredientDetailPage() {
           </ul>
         ) : (
           <div className="document-empty">
-            <p>No components use this ingredient yet.</p>
+            <p>No recipes use this ingredient yet.</p>
           </div>
         )}
       </section>
