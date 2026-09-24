@@ -363,7 +363,7 @@ entity ComponentImportLine mixin TenantScoped, SoftDeletable {
   belongsTo import: ComponentImport fields [tenantId, importId] references [tenantId, id]
   belongsTo matchedIngredient: Ingredient fields [tenantId, matchedIngredientId] references [tenantId, id]
 
-  constraint lineMatchedIngredientAllowed: self.matchedIngredientId == null or self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchStatus == "confirmed_new" "Only exact, confirmed existing, or attached confirmed-new lines may carry a matched ingredient id"
+  constraint lineMatchedIngredientAllowed: self.matchedIngredientId == null or self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchStatus == "confirmed_new" "This line isn't ready to keep that ingredient. Confirm the match first, or attach the ingredient you created."
   constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null or self.resolvedAt != null "This new line isn't finished yet. Finish it before you attach the ingredient you created."
 
   default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may see recipe import lines"
