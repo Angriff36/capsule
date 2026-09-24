@@ -79,4 +79,20 @@ describe("plain words on the kitchen recipe book", () => {
       expectPlain(fresh);
     }
   });
+
+  it("keeps leftover kitchen catalog card kind label free of component jargon", () => {
+    const tone = readFileSync(
+      "src/features/kitchen/culinary-studio/CulinaryCatalogCardTone.ts",
+      "utf8",
+    );
+
+    expect(tone).not.toContain('return "Component"');
+    expect(tone).toContain('return "Recipe"');
+    expect(tone).toContain('return "Ingredient"');
+    expect(tone).toContain('return "Dish"');
+    expect(tone).toContain('return "Menu"');
+    expect(tone).toContain('return "Kitchen item"');
+
+    expectPlain("Recipe");
+  });
 });
