@@ -231,7 +231,7 @@ describe("plain words on leftover workforce and payroll event/shift match copy",
       "This time-off request is for a different person. Pick the person already on this time-off request.",
     );
     expect(mutations).toContain(
-      "Add item dishId must match the seeded dish reference when provided",
+      "Add item productionBatchId must match the seeded batch reference when provided",
     );
   });
 });

@@ -31304,7 +31304,7 @@ async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, d
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_packList != null) && (__rel_packList.openedAt != null)) && ((__rel_packList.status === "draft") || (__rel_packList.status === "packing"))))) throw new Error("Guard 3 failed");
     if (!((packListId === doc.packListId))) throw new Error("This pack item is for a different pack list. Pick the pack list already on this pack item.");
-    if (!((((dishId == null) || (doc.dishId == null)) || (dishId === doc.dishId)))) throw new Error("Add item dishId must match the seeded dish reference when provided");
+    if (!((((dishId == null) || (doc.dishId == null)) || (dishId === doc.dishId)))) throw new Error("This pack item is for a different dish. Pick the dish already on this pack item.");
     if (!((((productionBatchId == null) || (doc.productionBatchId == null)) || (productionBatchId === doc.productionBatchId)))) throw new Error("Add item productionBatchId must match the seeded batch reference when provided");
     if (!((((description).trim()).length > 0))) throw new Error("Pack item description is required");
     if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
@@ -31409,7 +31409,7 @@ export const PackListItem_createViaAddItem = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((((__rel_packList != null) && (__rel_packList.openedAt != null)) && ((__rel_packList.status === "draft") || (__rel_packList.status === "packing"))))) throw new Error("Guard 3 failed");
     if (!((packListId === __draft.packListId))) throw new Error("This pack item is for a different pack list. Pick the pack list already on this pack item.");
-    if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("Add item dishId must match the seeded dish reference when provided");
+    if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("This pack item is for a different dish. Pick the dish already on this pack item.");
     if (!((((productionBatchId == null) || (__draft.productionBatchId == null)) || (productionBatchId === __draft.productionBatchId)))) throw new Error("Add item productionBatchId must match the seeded batch reference when provided");
     if (!((((description).trim()).length > 0))) throw new Error("Pack item description is required");
     if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
