@@ -51,4 +51,36 @@ describe("plain words on leftover facilities equipment manifests", () => {
       expect(visible).toContain(landed);
     }
   });
+
+  it("keeps leftover facilities equipment-reservation constraint copy free of reservation jargon", () => {
+    // strip // comments so developer notes are not treated as user copy
+    const visible = readFileSync(
+      "src/facilities/equipment.manifest",
+      "utf8",
+    ).replace(/(^|[^:])\/\/[^\n]*/g, "$1 ");
+
+    expect(visible).not.toContain(
+      "Equipment reservations require a valid date range and positive quantity",
+    );
+    expect(visible).toContain(
+      "Equipment handoffs require a valid date range and positive quantity",
+    );
+    expectPlain(
+      "Equipment handoffs require a valid date range and positive quantity",
+    );
+
+    // already-landed write/read leftovers must stay put
+    expect(visible).toContain(
+      "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event",
+    );
+    expect(visible).toContain(
+      "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event",
+    );
+    expect(visible).toContain(
+      "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event",
+    );
+
+    // later leftover, unchanged
+    expect(visible).toContain("Equipment quantity cannot be negative");
+  });
 });
